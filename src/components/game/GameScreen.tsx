@@ -3,6 +3,7 @@ import type { GameEngine } from '@/hooks/useGameEngine';
 import { PHASES, GRADE_NAMES, XP_PER_LEVEL } from '@/data/phases';
 import { weedMap, weeds } from '@/data/weeds';
 import type { GradeLevel } from '@/types/game';
+import CardFlipMatch from './CardFlipMatch';
 
 export default function GameScreen(game: GameEngine) {
   const { grade, xp, level, current, feedback, round, questionNum, streak,
@@ -11,7 +12,12 @@ export default function GameScreen(game: GameEngine) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [fillInValue, setFillInValue] = useState('');
+  const [matchingResult, setMatchingResult] = useState<{ correct: number; attempts: number; xpEarned: number } | null>(null);
 
+  const pickRandomWeeds = (n: number) => {
+    const shuffled = [...weeds].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, n).map(w => ({ weed: w }));
+  };
   if (!current || !grade) return null;
   const weed = weedMap[current.weedId];
   const xpInLevel = xp % XP_PER_LEVEL;
@@ -111,109 +117,155 @@ export default function GameScreen(game: GameEngine) {
         </header>
 
         <div className="flex-1 p-4 sm:p-6 max-w-3xl mx-auto w-full space-y-4">
-          {/* Weed Card */}
-          <div className="bg-card border border-border rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-4 animate-scale-in">
-            {/* Image / Emoji */}
-            <div className="w-full sm:w-40 h-40 bg-muted rounded-lg flex items-center justify-center text-6xl shrink-0">
-              <WeedImage weedId={weed.id} stage={current.imageStage} emoji={weed.emoji} />
+          {/* Matching Game Mode */}
+          {current.type === 'matching' && !feedback ? (
+            <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
+              <p className="font-display font-semibold text-foreground">{current.text}</p>
+              <CardFlipMatch
+                pairs={pickRandomWeeds(4)}
+                xpReward={current.xpReward}
+                onComplete={(correct, attempts) => {
+                  const xpEarned = correct * current.xpReward;
+                  for (let i = 0; i < correct; i++) {
+                    submitAnswer('__matching_correct__');
+                  }
+                  setMatchingResult({ correct, attempts, xpEarned });
+                }}
+              />
             </div>
-            {/* Traits */}
-            <div className="flex-1 space-y-2">
-              {current.showName && <h2 className="font-display font-bold text-lg text-foreground">{weed.commonName}</h2>}
-              {current.showFamily && <p className="text-sm text-primary">Family: {weed.family}</p>}
-              <div className="text-xs text-muted-foreground uppercase tracking-wider">Identifying Traits</div>
-              <ul className="space-y-1">
-                {weed.traits.slice(0, 3).map((t, i) => (
-                  <li key={i} className="text-sm text-foreground flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>{t}
-                  </li>
-                ))}
-              </ul>
-              <div className="text-xs text-muted-foreground">Stage: <span className="capitalize text-foreground">{current.imageStage}</span></div>
-            </div>
-          </div>
-
-          {/* Safety Banner */}
-          {weed.safetyNote && (
-            <div className="bg-destructive/15 border border-destructive/50 rounded-lg p-3 text-sm text-destructive-foreground animate-fade-in">
-              {weed.safetyNote}
-            </div>
-          )}
-
-          {/* Question */}
-          <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
-            <p className="font-display font-semibold text-foreground">{current.text}</p>
-
-            {/* Answer Area */}
-            {!feedback && current.type === 'mcq' && (
-              <div className={`grid gap-3 ${current.options.some(o => o.length > 50) ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-                {current.options.map((opt, i) => (
-                  <button key={i} onClick={() => handleSubmit(opt)}
-                    className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all text-left text-sm">
-                    <span className="shrink-0 w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
-                      {String.fromCharCode(65 + i)}
-                    </span>
-                    <span className="text-foreground">{opt}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {!feedback && current.type === 'binary' && (
-              <div className="grid grid-cols-2 gap-4">
-                {current.options.map((opt, i) => (
-                  <button key={i} onClick={() => handleSubmit(opt)}
-                    className="px-6 py-4 rounded-lg border-2 border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all text-center font-semibold text-foreground">
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {!feedback && current.type === 'fillin' && (
-              <form onSubmit={handleFillIn} className="flex gap-3">
-                <input
-                  type="text" value={fillInValue} onChange={e => setFillInValue(e.target.value)}
-                  placeholder="Type your answer..."
-                  autoFocus
-                  className="flex-1 px-4 py-3 rounded-lg border border-border bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <button type="submit" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
-                  Submit
-                </button>
-              </form>
-            )}
-
-            {/* Feedback */}
-            {feedback && (
-              <div className={`rounded-lg p-4 space-y-3 animate-scale-in ${feedback.correct ? 'bg-accent/15 border border-accent/50' : 'bg-destructive/15 border border-destructive/50'}`}>
+          ) : current.type === 'matching' && matchingResult ? (
+            <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
+              <div className="rounded-lg p-4 space-y-3 bg-accent/15 border border-accent/50">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{feedback.correct ? '✅' : '❌'}</span>
-                  <span className={`font-display font-bold ${feedback.correct ? 'text-accent' : 'text-destructive'}`}>
-                    {feedback.correct ? 'Correct!' : 'Incorrect'}
-                  </span>
-                  {feedback.xpEarned > 0 && <span className="text-sm text-primary font-semibold ml-auto">+{feedback.xpEarned} XP</span>}
+                  <span className="text-xl">✅</span>
+                  <span className="font-display font-bold text-accent">All Matched!</span>
+                  <span className="text-sm text-primary font-semibold ml-auto">+{matchingResult.xpEarned} XP</span>
                 </div>
-
-                {!feedback.correct && (
-                  <p className="text-sm text-foreground">
-                    <span className="text-muted-foreground">Correct answer:</span>{' '}
-                    <span className="font-semibold text-accent">{feedback.correctAnswer}</span>
-                  </p>
-                )}
-
-                <div className="text-sm text-foreground space-y-1">
-                  <p><span className="text-primary">💡 Memory Hook:</span> {feedback.weed.memoryHook}</p>
-                  <p><span className="text-muted-foreground">Look-alike:</span> Often confused with {feedback.weed.lookAlike.species} — {feedback.weed.lookAlike.difference}</p>
-                </div>
-
-                <button onClick={handleNext}
+                <p className="text-sm text-muted-foreground">
+                  Completed {matchingResult.correct} pairs in {matchingResult.attempts} attempts.
+                </p>
+                <button onClick={() => { setMatchingResult(null); nextQuestion(); }}
                   className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity mt-2">
                   NEXT QUESTION →
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <>
+              {/* Weed Card */}
+              <div className="bg-card border border-border rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-4 animate-scale-in">
+                {/* Image / Emoji */}
+                <div className="w-full sm:w-40 h-40 bg-muted rounded-lg flex items-center justify-center text-6xl shrink-0">
+                  <WeedImage weedId={weed.id} stage={current.imageStage} emoji={weed.emoji} />
+                </div>
+                {/* Traits */}
+                <div className="flex-1 space-y-2">
+                  {current.showName && <h2 className="font-display font-bold text-lg text-foreground">{weed.commonName}</h2>}
+                  {current.showFamily && <p className="text-sm text-primary">Family: {weed.family}</p>}
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider">Identifying Traits</div>
+                  <ul className="space-y-1">
+                    {weed.traits.slice(0, 3).map((t, i) => (
+                      <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                        <span className="text-accent mt-0.5">•</span>{t}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="text-xs text-muted-foreground">Stage: <span className="capitalize text-foreground">{current.imageStage}</span></div>
+                </div>
+              </div>
+
+              {/* Safety Banner */}
+              {weed.safetyNote && (
+                <div className="bg-destructive/15 border border-destructive/50 rounded-lg p-3 text-sm text-destructive-foreground animate-fade-in">
+                  {weed.safetyNote}
+                </div>
+              )}
+
+              {/* Question */}
+              <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
+                <p className="font-display font-semibold text-foreground">{current.text}</p>
+
+                {/* Answer Area */}
+                {!feedback && current.type === 'mcq' && (
+                  <div className={`grid gap-3 ${current.options.some(o => o.length > 50) ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                    {current.options.map((opt, i) => (
+                      <button key={i} onClick={() => handleSubmit(opt)}
+                        className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all text-left text-sm">
+                        <span className="shrink-0 w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
+                          {String.fromCharCode(65 + i)}
+                        </span>
+                        <span className="text-foreground">{opt}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {!feedback && current.type === 'binary' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {current.options.map((opt, i) => (
+                      <button key={i} onClick={() => handleSubmit(opt)}
+                        className="px-6 py-4 rounded-lg border-2 border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all text-center font-semibold text-foreground">
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {!feedback && current.type === 'fillin' && (
+                  <form onSubmit={handleFillIn} className="flex gap-3">
+                    <input
+                      type="text" value={fillInValue} onChange={e => setFillInValue(e.target.value)}
+                      placeholder="Type your answer..."
+                      autoFocus
+                      className="flex-1 px-4 py-3 rounded-lg border border-border bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <button type="submit" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
+                      Submit
+                    </button>
+                  </form>
+                )}
+
+                {/* Feedback */}
+                {feedback && (
+                  <div className={`rounded-lg p-4 space-y-3 animate-scale-in ${feedback.correct ? 'bg-accent/15 border border-accent/50' : 'bg-destructive/15 border border-destructive/50'}`}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{feedback.correct ? '✅' : '❌'}</span>
+                      <span className={`font-display font-bold ${feedback.correct ? 'text-accent' : 'text-destructive'}`}>
+                        {feedback.correct ? 'Correct!' : 'Incorrect'}
+                      </span>
+                      {feedback.xpEarned > 0 && <span className="text-sm text-primary font-semibold ml-auto">+{feedback.xpEarned} XP</span>}
+                    </div>
+
+                    {!feedback.correct && (
+                      <p className="text-sm text-foreground">
+                        <span className="text-muted-foreground">Correct answer:</span>{' '}
+                        <span className="font-semibold text-accent">{feedback.correctAnswer}</span>
+                      </p>
+                    )}
+
+                    {/* Monocot/Dicot definition for e2 phase */}
+                    {current.phaseId === 'e2' && (
+                      <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3 space-y-1">
+                        <p><span className="font-semibold text-primary">🌾 Monocot:</span> Plants with one seed leaf, parallel leaf veins, fibrous roots, and flower parts in multiples of 3. Examples: grasses, sedges.</p>
+                        <p><span className="font-semibold text-primary">🍀 Dicot:</span> Plants with two seed leaves, branching (net) leaf veins, taproot systems, and flower parts in multiples of 4 or 5. Examples: broadleaf weeds.</p>
+                        <p className="text-muted-foreground mt-1"><strong>{feedback.weed.commonName}</strong> is a <strong>{feedback.weed.plantType}</strong> ({feedback.weed.family}).</p>
+                      </div>
+                    )}
+
+                    <div className="text-sm text-foreground space-y-1">
+                      <p><span className="text-primary">💡 Memory Hook:</span> {feedback.weed.memoryHook}</p>
+                      <p><span className="text-muted-foreground">Look-alike:</span> Often confused with {feedback.weed.lookAlike.species} — {feedback.weed.lookAlike.difference}</p>
+                    </div>
+
+                    <button onClick={handleNext}
+                      className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity mt-2">
+                      NEXT QUESTION →
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>
