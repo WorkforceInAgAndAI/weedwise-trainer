@@ -16,6 +16,7 @@ export interface Weed {
   management: string;
   controlTiming: string;
   actImmediately: boolean;
+  actReason: string;
   lookAlike: { id: string; species: string; difference: string };
   memoryHook: string;
   safetyNote?: string;

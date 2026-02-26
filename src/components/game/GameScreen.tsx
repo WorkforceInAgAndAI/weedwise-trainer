@@ -252,6 +252,13 @@ export default function GameScreen(game: GameEngine) {
                       </div>
                     )}
 
+                    {/* Act Now or Wait reasoning for e5 phase */}
+                    {current.phaseId === 'e5' && (
+                      <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3">
+                        <p><span className="font-semibold text-primary">{feedback.weed.actImmediately ? '🚨 Why Act Now:' : '👀 Why Monitor & Wait:'}</span> {feedback.weed.actReason}</p>
+                      </div>
+                    )}
+
                     <div className="text-sm text-foreground space-y-1">
                       <p><span className="text-primary">💡 Memory Hook:</span> {feedback.weed.memoryHook}</p>
                       <p><span className="text-muted-foreground">Look-alike:</span> Often confused with {feedback.weed.lookAlike.species} — {feedback.weed.lookAlike.difference}</p>
