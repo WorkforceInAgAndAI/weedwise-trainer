@@ -34,8 +34,8 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
       return { ...base, type: 'binary', text: 'Look at this plant. Is it a Monocot or a Dicot?', options: ['🌾 Monocot', '🍀 Dicot'], correct: weed.plantType === 'Monocot' ? '🌾 Monocot' : '🍀 Dicot' };
     }
     case 'e3': {
-      const opts = shuffle([weed.commonName, ...pickRandom(others, 3).map(w => w.commonName)]);
-      return { ...base, type: 'mcq', text: `Which weed does this emoji represent? ${weed.emoji}`, options: opts, correct: weed.commonName, showName: false };
+      // Matching game — generate a placeholder question; the UI handles the actual mini-game
+      return { ...base, type: 'matching', text: 'Match each emoji to its weed species!', options: [], correct: '', showName: false };
     }
     case 'e4': {
       const habitats: string[] = ['Crop fields', 'Roadsides & disturbed areas', 'Wet areas & waterways', 'Pastures & meadows'];
@@ -88,9 +88,18 @@ function getUnlockedPhases(grade: GradeLevel, xp: number): PhaseConfig[] {
 function buildPool(grade: GradeLevel, xp: number): Question[] {
   const unlocked = getUnlockedPhases(grade, xp);
   const questions: Question[] = [];
+  const matchingPhaseSeen = new Set<string>();
   for (const phase of unlocked) {
-    for (const weed of weeds) {
-      questions.push(generateQuestion(phase, weed, weeds));
+    if (phase.id === 'e3') {
+      // Only add one matching question per pool (the UI picks random weeds)
+      if (!matchingPhaseSeen.has(phase.id)) {
+        matchingPhaseSeen.add(phase.id);
+        questions.push(generateQuestion(phase, weeds[0], weeds));
+      }
+    } else {
+      for (const weed of weeds) {
+        questions.push(generateQuestion(phase, weed, weeds));
+      }
     }
   }
   return shuffle(questions);
@@ -159,7 +168,9 @@ export function useGameEngine() {
     const weed = weedMap[current.weedId];
 
     let isCorrect = false;
-    if (current.type === 'fillin') {
+    if (answer === '__matching_correct__') {
+      isCorrect = true;
+    } else if (current.type === 'fillin') {
       const a = answer.trim().toLowerCase();
       const c = current.correct.toLowerCase();
       const genus = c.split(' ')[0];
@@ -221,7 +232,10 @@ export function useGameEngine() {
       ...prev,
     ].slice(0, 50));
 
-    setFeedback({ correct: isCorrect, xpEarned, correctAnswer: current.correct, weed });
+    // Don't show feedback for matching games — the CardFlipMatch component handles its own UI
+    if (answer !== '__matching_correct__') {
+      setFeedback({ correct: isCorrect, xpEarned, correctAnswer: current.correct, weed });
+    }
   }, [current, grade, streak]);
 
   const endSession = useCallback(() => setScreen('results'), []);
