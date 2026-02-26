@@ -38,8 +38,8 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
       return { ...base, type: 'matching', text: 'Match each emoji to its weed species!', options: [], correct: '', showName: false };
     }
     case 'e4': {
-      const habitats: string[] = ['Crop fields', 'Roadsides & disturbed areas', 'Wet areas & waterways', 'Pastures & meadows'];
-      return { ...base, type: 'mcq', text: `Where does ${weed.commonName} primarily grow?`, options: habitats, correct: weed.primaryHabitat };
+      const habitats: string[] = ['Warm, fertile & moist soils', 'Hot, dry & drought-tolerant soils', 'Wet, poorly drained soils', 'Cool, moist & well-drained soils'];
+      return { ...base, type: 'mcq', text: `What soil & climate conditions does ${weed.commonName} thrive in?`, options: habitats, correct: weed.primaryHabitat };
     }
     case 'e5': {
       return { ...base, type: 'binary', text: `${weed.commonName} has been spotted at early growth stage. What should you do?`, options: ['🚨 Act Now!', '👀 Monitor & Wait'], correct: weed.actImmediately ? '🚨 Act Now!' : '👀 Monitor & Wait' };
