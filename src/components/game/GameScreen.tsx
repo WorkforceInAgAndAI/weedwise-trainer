@@ -156,7 +156,7 @@ export default function GameScreen(game: GameEngine) {
               <div className="bg-card border border-border rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-4 animate-scale-in">
                 {/* Image / Emoji */}
                 <div className="w-full sm:w-40 h-40 bg-muted rounded-lg flex items-center justify-center text-6xl shrink-0">
-                  <WeedImage weedId={weed.id} stage={current.imageStage} emoji={weed.emoji} />
+                  <WeedImage weedId={weed.id} stage={current.imageStage} />
                 </div>
                 {/* Traits */}
                 <div className="flex-1 space-y-2">
@@ -279,16 +279,41 @@ export default function GameScreen(game: GameEngine) {
   );
 }
 
-function WeedImage({ weedId, stage, emoji }: { weedId: string; stage: string; emoji: string }) {
-  const [failed, setFailed] = useState(true);
-  const src = `/images/${weedId}/${stage}.jpg`;
+const STAGE_PREFIX_MAP: Record<string, string> = {
+  seedling: 'seedling',
+  vegetative: 'veg',
+  flower: 'repro',
+  whole: 'plant',
+};
+
+function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1) {
+  const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+  return `/images/${weedId}/${prefix}_${variant}.jpg`;
+}
+
+function WeedImage({ weedId, stage }: { weedId: string; stage: string }) {
+  const [variant] = useState<1 | 2>(() => (Math.random() < 0.5 ? 1 : 2));
+  const [fallbackVariant, setFallbackVariant] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const src = getImageSrc(weedId, stage, fallbackVariant ? (variant === 1 ? 2 : 1) : variant);
 
   if (failed) {
-    return <span>{emoji}</span>;
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-muted rounded-lg text-muted-foreground text-xs text-center p-2">
+        Image not found
+      </div>
+    );
   }
 
   return (
     <img src={src} alt="" className="w-full h-full object-cover rounded-lg"
-      onError={() => setFailed(true)} />
+      onError={() => {
+        if (!fallbackVariant) {
+          setFallbackVariant(true);
+        } else {
+          setFailed(true);
+        }
+      }} />
   );
 }

@@ -1,10 +1,17 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { Weed } from '@/types/game';
 
+const STAGE_PREFIX_MAP: Record<string, string> = {
+  seedling: 'seedling',
+  vegetative: 'veg',
+  flower: 'repro',
+  whole: 'plant',
+};
+
 interface MatchCard {
   id: string;
   content: string;
-  type: 'emoji' | 'name';
+  type: 'image' | 'name';
   weedId: string;
   flipped: boolean;
   matched: boolean;
@@ -26,7 +33,9 @@ export default function CardFlipMatch({ pairs, xpReward, onComplete }: CardFlipM
   useEffect(() => {
     const cardList: MatchCard[] = [];
     pairs.forEach(({ weed }) => {
-      cardList.push({ id: `emoji-${weed.id}`, content: weed.emoji, type: 'emoji', weedId: weed.id, flipped: false, matched: false });
+      const prefix = STAGE_PREFIX_MAP['vegetative'] || 'veg';
+      const variant = Math.random() < 0.5 ? 1 : 2;
+      cardList.push({ id: `image-${weed.id}`, content: `/images/${weed.id}/${prefix}_${variant}.jpg`, type: 'image', weedId: weed.id, flipped: false, matched: false });
       cardList.push({ id: `name-${weed.id}`, content: weed.commonName, type: 'name', weedId: weed.id, flipped: false, matched: false });
     });
     // Shuffle
@@ -105,9 +114,11 @@ export default function CardFlipMatch({ pairs, xpReward, onComplete }: CardFlipM
               }`}
           >
             {card.flipped || card.matched ? (
-              <span className={card.type === 'emoji' ? 'text-3xl' : 'text-xs sm:text-sm font-semibold text-foreground'}>
-                {card.content}
-              </span>
+              card.type === 'image' ? (
+                <img src={card.content} alt="" className="w-full h-full object-cover rounded-md" />
+              ) : (
+                <span className="text-xs sm:text-sm font-semibold text-foreground">{card.content}</span>
+              )
             ) : (
               <span className="text-2xl text-muted-foreground">❓</span>
             )}
