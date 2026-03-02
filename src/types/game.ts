@@ -77,3 +77,17 @@ export interface FeedbackData {
   correctAnswer: string;
   weed: Weed;
 }
+
+export interface BadgeDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: 'species' | 'topic' | 'streak' | 'phase';
+  requirement: {
+    type: string;
+    count?: number;
+    topic?: string;
+    grade?: string;
+  };
+}
