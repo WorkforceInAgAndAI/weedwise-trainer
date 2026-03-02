@@ -12,7 +12,7 @@ export interface Weed {
   emoji: string;
   traits: string[];
   habitat: string;
-  primaryHabitat: 'Warm, fertile & moist soils' | 'Hot, dry & drought-tolerant soils' | 'Wet, poorly drained soils' | 'Cool, moist & well-drained soils';
+  primaryHabitat: 'Row Crop Fields' | 'Wet Areas & Ditches' | 'Roadsides & Disturbed' | 'Pastures & Meadows';
   management: string;
   controlTiming: string;
   actImmediately: boolean;

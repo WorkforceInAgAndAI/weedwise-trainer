@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
@@ -14,99 +14,153 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
     }));
   }, []);
 
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [results, setResults] = useState<Array<{ weedId: string; correct: boolean }>>([]);
-  const [flash, setFlash] = useState<'correct' | 'wrong' | null>(null);
-  const [done, setDone] = useState(false);
+  const [placements, setPlacements] = useState<Record<string, 'Native' | 'Introduced'>>({});
+  const [selected, setSelected] = useState<string | null>(null);
+  const [checked, setChecked] = useState(false);
 
-  const current = queue[currentIdx];
+  const unplaced = queue.filter(q => !placements[q.weedId]);
+  const allPlaced = unplaced.length === 0;
 
-  const handleStamp = useCallback((stamp: 'Native' | 'Introduced') => {
-    if (flash || done) return;
-    const isCorrect = stamp === current.correct;
-    const newResults = [...results, { weedId: current.weedId, correct: isCorrect }];
-    setResults(newResults);
-    setFlash(isCorrect ? 'correct' : 'wrong');
+  const handleZoneDrop = (zone: 'Native' | 'Introduced') => {
+    if (checked || !selected) return;
+    setPlacements(prev => ({ ...prev, [selected]: zone }));
+    setSelected(null);
+  };
 
-    setTimeout(() => {
-      setFlash(null);
-      if (currentIdx + 1 >= queue.length) {
-        setDone(true);
-        onComplete(newResults);
-      } else {
-        setCurrentIdx(i => i + 1);
-      }
-    }, 800);
-  }, [current, currentIdx, done, flash, onComplete, queue.length, results]);
+  const handleRemove = (weedId: string) => {
+    if (checked) return;
+    setPlacements(prev => {
+      const n = { ...prev };
+      delete n[weedId];
+      return n;
+    });
+  };
 
-  const correctCount = results.filter(r => r.correct).length;
+  const handleCheck = () => {
+    setChecked(true);
+    onComplete(queue.map(q => ({
+      weedId: q.weedId,
+      correct: placements[q.weedId] === q.correct,
+    })));
+  };
 
-  if (done) {
-    return (
-      <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
-        <h2 className="font-display font-bold text-lg text-foreground">🛂 Classification Complete!</h2>
-        <div className="text-3xl font-bold text-center text-foreground py-4">{correctCount}/{queue.length}</div>
-        <div className="space-y-1">
-          {queue.map((q, i) => (
-            <div key={q.weedId} className="flex items-center gap-2 text-sm">
-              <span>{results[i]?.correct ? '✅' : '❌'}</span>
-              <span className="text-foreground font-semibold">{q.name}</span>
-              <span className="text-muted-foreground">— {q.correct}</span>
-            </div>
-          ))}
-        </div>
-        <button onClick={onNext} className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">NEXT →</button>
-      </div>
-    );
-  }
+  const correctCount = checked ? queue.filter(q => placements[q.weedId] === q.correct).length : 0;
+  const nativeWeeds = queue.filter(q => placements[q.weedId] === 'Native');
+  const introducedWeeds = queue.filter(q => placements[q.weedId] === 'Introduced');
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className="font-display font-bold text-lg text-foreground">🛂 Native or Introduced?</h2>
-        <span className="text-sm text-muted-foreground">{currentIdx + 1}/{queue.length}</span>
+        <p className="text-sm text-muted-foreground">Tap a weed, then drop it into the correct origin zone.</p>
       </div>
 
-      {/* Progress bar */}
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(currentIdx / queue.length) * 100}%` }} />
-      </div>
-
-      {/* Weed card with flash effect */}
-      <div className={`rounded-xl border-2 p-4 transition-all duration-300 ${
-        flash === 'correct' ? 'border-accent bg-accent/10' : flash === 'wrong' ? 'border-destructive bg-destructive/10' : 'border-border'
-      }`}>
-        <div className="flex items-center gap-4">
-          <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0">
-            <WeedImage weedId={current.weedId} stage="whole" className="w-full h-full" />
+      {/* Two drop zones side by side */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Native zone */}
+        <button
+          onClick={() => handleZoneDrop('Native')}
+          disabled={checked || !selected}
+          className={`p-3 rounded-xl border-2 text-left transition-all min-h-[140px] bg-green-900/15 border-green-600/50 ${
+            selected ? 'cursor-pointer ring-1 ring-green-500/40 hover:bg-green-900/25' : 'cursor-default'
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl">🌿</span>
+            <div>
+              <span className="text-sm font-bold text-foreground block">Native</span>
+              <span className="text-[10px] text-muted-foreground">Originally from N. America</span>
+            </div>
           </div>
-          <div>
-            <h3 className="font-display font-bold text-xl text-foreground">{current.name}</h3>
-            <p className="text-sm text-muted-foreground mt-1">Where does this species originate?</p>
-            {flash && (
-              <div className={`mt-2 text-sm font-bold animate-scale-in ${flash === 'correct' ? 'text-accent' : 'text-destructive'}`}>
-                {flash === 'correct' ? '✅ Correct!' : `❌ It's ${current.correct}`}
+          <div className="flex flex-wrap gap-1 mt-2">
+            {nativeWeeds.map(w => (
+              <span
+                key={w.weedId}
+                onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
+                className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 ${
+                  checked
+                    ? w.correct === 'Native' ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
+                    : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
+                }`}
+              >
+                {w.name} {!checked && '✕'}
+              </span>
+            ))}
+          </div>
+        </button>
+
+        {/* Introduced zone */}
+        <button
+          onClick={() => handleZoneDrop('Introduced')}
+          disabled={checked || !selected}
+          className={`p-3 rounded-xl border-2 text-left transition-all min-h-[140px] bg-amber-900/15 border-amber-600/50 ${
+            selected ? 'cursor-pointer ring-1 ring-amber-500/40 hover:bg-amber-900/25' : 'cursor-default'
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl">🚢</span>
+            <div>
+              <span className="text-sm font-bold text-foreground block">Introduced</span>
+              <span className="text-[10px] text-muted-foreground">Brought from elsewhere</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {introducedWeeds.map(w => (
+              <span
+                key={w.weedId}
+                onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
+                className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 ${
+                  checked
+                    ? w.correct === 'Introduced' ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
+                    : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
+                }`}
+              >
+                {w.name} {!checked && '✕'}
+              </span>
+            ))}
+          </div>
+        </button>
+      </div>
+
+      {/* Weed cards to drag */}
+      {unplaced.length > 0 && (
+        <div className="grid grid-cols-4 gap-2">
+          {unplaced.map(item => (
+            <button
+              key={item.weedId}
+              onClick={() => setSelected(selected === item.weedId ? null : item.weedId)}
+              className={`p-2 rounded-lg border-2 transition-all text-center ${
+                selected === item.weedId
+                  ? 'border-primary bg-primary/10 scale-105'
+                  : 'border-border bg-secondary/50 hover:border-primary/50'
+              }`}
+            >
+              <div className="w-full h-14 mb-1 overflow-hidden rounded">
+                <WeedImage weedId={item.weedId} stage="whole" className="w-full h-full" />
               </div>
-            )}
-          </div>
+              <span className="text-[10px] font-semibold text-foreground leading-tight block">{item.name}</span>
+            </button>
+          ))}
         </div>
-      </div>
+      )}
 
-      {/* Stamp buttons */}
-      <div className="grid grid-cols-2 gap-4">
-        <button onClick={() => handleStamp('Native')} disabled={!!flash}
-          className="p-4 rounded-xl border-2 border-green-600/40 bg-green-900/10 hover:bg-green-900/20 transition-all text-center disabled:opacity-50">
-          <span className="text-3xl block mb-1">🌿</span>
-          <span className="font-bold text-foreground">NATIVE</span>
-          <span className="text-[10px] text-muted-foreground block">Originally from N. America</span>
+      {!checked && allPlaced && (
+        <button onClick={handleCheck} className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
+          ✅ Check Answers
         </button>
-        <button onClick={() => handleStamp('Introduced')} disabled={!!flash}
-          className="p-4 rounded-xl border-2 border-amber-600/40 bg-amber-900/10 hover:bg-amber-900/20 transition-all text-center disabled:opacity-50">
-          <span className="text-3xl block mb-1">🚢</span>
-          <span className="font-bold text-foreground">INTRODUCED</span>
-          <span className="text-[10px] text-muted-foreground block">Brought from elsewhere</span>
-        </button>
-      </div>
+      )}
+
+      {checked && (
+        <div className="rounded-lg p-4 space-y-3 animate-scale-in border border-border bg-muted/30">
+          <div className="text-lg font-bold text-foreground">{correctCount}/{queue.length} Correct!</div>
+          {queue.filter(q => placements[q.weedId] !== q.correct).map(q => (
+            <p key={q.weedId} className="text-sm text-muted-foreground">
+              <span className="text-foreground font-semibold">{q.name}</span> → actually <span className="font-bold">{q.correct}</span>
+            </p>
+          ))}
+          <button onClick={onNext} className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">NEXT →</button>
+        </div>
+      )}
     </div>
   );
 }
