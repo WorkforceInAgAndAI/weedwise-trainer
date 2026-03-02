@@ -1,5 +1,6 @@
 import type { GameEngine } from '@/hooks/useGameEngine';
 import { weeds } from '@/data/weeds';
+import WeedImage from './WeedImage';
 
 export default function Glossary({ setShowGlossary }: GameEngine) {
   return (
@@ -14,7 +15,9 @@ export default function Glossary({ setShowGlossary }: GameEngine) {
           {weeds.map(w => (
             <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-2 animate-fade-in">
               <div className="flex items-center gap-3">
-                <span className="text-3xl">{w.emoji}</span>
+                <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
+                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                </div>
                 <div>
                   <div className="font-display font-bold text-foreground">{w.commonName}</div>
                   <div className="text-xs text-primary italic">{w.scientificName}</div>

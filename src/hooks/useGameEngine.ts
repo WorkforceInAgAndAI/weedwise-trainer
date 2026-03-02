@@ -17,6 +17,9 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return shuffle(arr).slice(0, Math.min(n, arr.length));
 }
 
+// Phases that are batch mini-games (one question per pool, component picks weeds)
+const BATCH_PHASES = new Set(['e3', 'e4', 'm2', 'm3', 'm5', 'h2', 'h3']);
+
 function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Question {
   const others = allWeeds.filter(w => w.id !== weed.id);
   const base = {
@@ -33,48 +36,9 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
     case 'e2': {
       return { ...base, type: 'binary', text: 'Look at this plant. Is it a Monocot or a Dicot?', options: ['🌾 Monocot', '🍀 Dicot'], correct: weed.plantType === 'Monocot' ? '🌾 Monocot' : '🍀 Dicot' };
     }
-    case 'e3': {
-      // Matching game — generate a placeholder question; the UI handles the actual mini-game
-      return { ...base, type: 'matching', text: 'Match each emoji to its weed species!', options: [], correct: '', showName: false };
-    }
-    case 'e4': {
-      const habitats: string[] = ['Warm, fertile & moist soils', 'Hot, dry & drought-tolerant soils', 'Wet, poorly drained soils', 'Cool, moist & well-drained soils'];
-      return { ...base, type: 'mcq', text: `What soil & climate conditions does ${weed.commonName} thrive in?`, options: habitats, correct: weed.primaryHabitat };
-    }
-    case 'e5': {
-      return { ...base, type: 'binary', text: `${weed.commonName} has been spotted at early growth stage. What should you do?`, options: ['🚨 Act Now!', '👀 Monitor & Wait'], correct: weed.actImmediately ? '🚨 Act Now!' : '👀 Monitor & Wait' };
-    }
-    case 'm2': {
-      const allFamilies = [...new Set(allWeeds.map(w => w.family))];
-      let opts = pickRandom(allFamilies.filter(f => f !== weed.family), 3);
-      opts.push(weed.family);
-      return { ...base, type: 'mcq', text: `Which plant family does ${weed.commonName} belong to?`, options: shuffle(opts), correct: weed.family };
-    }
-    case 'm3': {
-      const cycles = ['Annual', 'Perennial', 'Biennial', 'Annual/Winter Annual'];
-      return { ...base, type: 'mcq', text: `What is the life cycle of ${weed.commonName}?`, options: cycles, correct: weed.lifeCycle };
-    }
-    case 'm4': {
-      const lookAlikeWeed = allWeeds.find(w => w.id === weed.lookAlike.id) || pickRandom(others, 1)[0];
-      return { ...base, type: 'binary', text: 'Based on the traits and image shown, which weed is this?', options: shuffle([weed.commonName, lookAlikeWeed.commonName]), correct: weed.commonName, showName: false };
-    }
-    case 'm5': {
-      return { ...base, type: 'binary', text: `Is ${weed.commonName} native to North America or introduced?`, options: ['🌿 Native', '🚢 Introduced'], correct: weed.origin === 'Native' ? '🌿 Native' : '🚢 Introduced' };
-    }
-    case 'h2': {
-      return { ...base, type: 'fillin', text: `What is the scientific name of ${weed.commonName}?`, options: [], correct: weed.scientificName };
-    }
-    case 'h3': {
-      const opts = shuffle([weed.eppoCode, ...pickRandom(others, 3).map(w => w.eppoCode)]);
-      return { ...base, type: 'mcq', text: 'Which EPPO code belongs to the weed shown?', options: opts, correct: weed.eppoCode };
-    }
-    case 'h4': {
-      const opts = shuffle([weed.controlTiming, ...pickRandom(others, 3).map(w => w.controlTiming)]);
-      return { ...base, type: 'mcq', text: `When is the optimal time to control ${weed.commonName}?`, options: opts, correct: weed.controlTiming };
-    }
-    case 'h5': {
-      const opts = shuffle([weed.management, ...pickRandom(others, 3).map(w => w.management)]);
-      return { ...base, type: 'mcq', text: `What is the best IPM approach for ${weed.commonName}?`, options: opts, correct: weed.management };
+    // Per-weed interactive phases
+    case 'e5': case 'm4': case 'h4': case 'h5': {
+      return { ...base, type: 'minigame', text: phase.name, options: [], correct: '' };
     }
     default:
       throw new Error(`Unknown phase: ${phase.id}`);
@@ -88,14 +52,16 @@ function getUnlockedPhases(grade: GradeLevel, xp: number): PhaseConfig[] {
 function buildPool(grade: GradeLevel, xp: number): Question[] {
   const unlocked = getUnlockedPhases(grade, xp);
   const questions: Question[] = [];
-  const matchingPhaseSeen = new Set<string>();
+
   for (const phase of unlocked) {
-    if (phase.id === 'e3') {
-      // Only add one matching question per pool (the UI picks random weeds)
-      if (!matchingPhaseSeen.has(phase.id)) {
-        matchingPhaseSeen.add(phase.id);
-        questions.push(generateQuestion(phase, weeds[0], weeds));
-      }
+    if (BATCH_PHASES.has(phase.id)) {
+      // One mini-game question per pool
+      questions.push({
+        weedId: weeds[0].id, phaseId: phase.id, phaseName: phase.name,
+        xpReward: phase.xpReward, imageStage: phase.imageStage,
+        showName: phase.showName, showFamily: phase.showFamily,
+        type: 'minigame', text: phase.name, options: [], correct: '',
+      });
     } else {
       for (const weed of weeds) {
         questions.push(generateQuestion(phase, weed, weeds));
@@ -161,6 +127,62 @@ export function useGameEngine() {
     timerRef.current = Date.now();
   }, [grade]);
 
+  const completeMinigame = useCallback((phaseId: string, results: Array<{ weedId: string; correct: boolean }>) => {
+    if (!grade) return;
+    const phase = PHASES[grade].find(p => p.id === phaseId);
+    if (!phase) return;
+
+    const correctCount = results.filter(r => r.correct).length;
+    const xpEarned = correctCount * phase.xpReward;
+    const newXp = xpRef.current + xpEarned;
+
+    const oldUnlocked = getUnlockedPhases(grade, xpRef.current).length;
+    xpRef.current = newXp;
+    setXp(newXp);
+    const newUnlocked = getUnlockedPhases(grade, newXp).length;
+
+    if (newUnlocked > oldUnlocked) {
+      const newPhase = PHASES[grade][newUnlocked - 1];
+      toast('🔓 New Phase Unlocked!', { description: newPhase.name });
+      poolRef.current = buildPool(grade, newXp);
+    }
+
+    setPhaseStats(prev => ({
+      ...prev,
+      [phaseId]: {
+        correct: (prev[phaseId]?.correct || 0) + correctCount,
+        wrong: (prev[phaseId]?.wrong || 0) + (results.length - correctCount),
+      },
+    }));
+
+    results.forEach(r => {
+      setWeedStats(prev => {
+        const stat = prev[r.weedId] || { timesShown: 0, timesCorrect: 0, timesWrong: 0, consecutiveCorrect: 0, mastered: false, totalTimeMs: 0 };
+        const updated: WeedStat = {
+          ...stat,
+          timesShown: stat.timesShown + 1,
+          timesCorrect: stat.timesCorrect + (r.correct ? 1 : 0),
+          timesWrong: stat.timesWrong + (r.correct ? 0 : 1),
+          consecutiveCorrect: r.correct ? stat.consecutiveCorrect + 1 : 0,
+          mastered: (stat.timesCorrect + (r.correct ? 1 : 0)) >= 3,
+        };
+        if (updated.mastered && !stat.mastered) {
+          toast('⭐ Species Mastered!', { description: weedMap[r.weedId]?.commonName });
+        }
+        return { ...prev, [r.weedId]: updated };
+      });
+    });
+
+    const allCorrect = results.every(r => r.correct);
+    setStreak(s => allCorrect ? s + correctCount : 0);
+
+    const oldLevel = Math.floor((newXp - xpEarned) / XP_PER_LEVEL) + 1;
+    const newLevel = Math.floor(newXp / XP_PER_LEVEL) + 1;
+    if (newLevel > oldLevel) {
+      toast('🎉 Level Up!', { description: `You reached Level ${newLevel}!` });
+    }
+  }, [grade]);
+
   const submitAnswer = useCallback((answer: string) => {
     if (!current || !grade) return;
 
@@ -168,9 +190,7 @@ export function useGameEngine() {
     const weed = weedMap[current.weedId];
 
     let isCorrect = false;
-    if (answer === '__matching_correct__') {
-      isCorrect = true;
-    } else if (current.type === 'fillin') {
+    if (current.type === 'fillin') {
       const a = answer.trim().toLowerCase();
       const c = current.correct.toLowerCase();
       const genus = c.split(' ')[0];
@@ -190,7 +210,6 @@ export function useGameEngine() {
     if (newUnlocked > oldUnlocked) {
       const newPhase = PHASES[grade][newUnlocked - 1];
       toast('🔓 New Phase Unlocked!', { description: newPhase.name });
-      // Rebuild pool with new phase
       poolRef.current = buildPool(grade, newXp);
     }
 
@@ -232,10 +251,7 @@ export function useGameEngine() {
       ...prev,
     ].slice(0, 50));
 
-    // Don't show feedback for matching games — the CardFlipMatch component handles its own UI
-    if (answer !== '__matching_correct__') {
-      setFeedback({ correct: isCorrect, xpEarned, correctAnswer: current.correct, weed });
-    }
+    setFeedback({ correct: isCorrect, xpEarned, correctAnswer: current.correct, weed });
   }, [current, grade, streak]);
 
   const endSession = useCallback(() => setScreen('results'), []);
@@ -259,6 +275,7 @@ export function useGameEngine() {
     totalCorrect, totalWrong,
     startGame, submitAnswer, nextQuestion, endSession, resetToLanding,
     setShowInstructor, setShowGlossary,
+    completeMinigame,
   };
 }
 
