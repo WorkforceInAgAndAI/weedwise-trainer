@@ -77,7 +77,7 @@ export default function LifecycleImageSort({ onComplete, onNext }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
       <div>
-        <h2 className="font-display font-bold text-lg text-foreground">🖼️ Visual ID Challenge</h2>
+        <h2 className="font-display font-bold text-lg text-foreground">🖼️ Life Stage Image Sort</h2>
         <p className="text-sm text-muted-foreground">Sort these growth stage images into the correct species. Tap an image, then tap the species it belongs to.</p>
       </div>
 
