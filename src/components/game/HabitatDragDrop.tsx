@@ -3,24 +3,24 @@ import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
 const HABITATS = [
-  { id: 'warm', label: 'Warm, fertile & moist soils', icon: '🌿', region: 'Midwest Corn Belt', desc: 'Rich bottomlands, river valleys' },
-  { id: 'hot', label: 'Hot, dry & drought-tolerant soils', icon: '☀️', region: 'Southern Plains', desc: 'Arid fields, roadsides, dry areas' },
-  { id: 'wet', label: 'Wet, poorly drained soils', icon: '💧', region: 'River Valleys & Lowlands', desc: 'Ditches, floodplains, paddies' },
-  { id: 'cool', label: 'Cool, moist & well-drained soils', icon: '❄️', region: 'Northern Tier', desc: 'Temperate meadows, pastures' },
+  { id: 'rowcrop', label: 'Row Crop Fields', icon: '🌽', desc: 'Corn, soybean & small grain fields' },
+  { id: 'wet', label: 'Wet Areas & Ditches', icon: '💧', desc: 'Floodplains, ditches, stream banks' },
+  { id: 'roadsides', label: 'Roadsides & Disturbed', icon: '🛤️', desc: 'Roadsides, fallow fields, waste areas' },
+  { id: 'pastures', label: 'Pastures & Meadows', icon: '🌾', desc: 'Pastures, prairies, meadows' },
 ];
 
 const HABITAT_KEY: Record<string, string> = {
-  'Warm, fertile & moist soils': 'warm',
-  'Hot, dry & drought-tolerant soils': 'hot',
-  'Wet, poorly drained soils': 'wet',
-  'Cool, moist & well-drained soils': 'cool',
+  'Row Crop Fields': 'rowcrop',
+  'Wet Areas & Ditches': 'wet',
+  'Roadsides & Disturbed': 'roadsides',
+  'Pastures & Meadows': 'pastures',
 };
 
 const ZONE_STYLES: Record<string, string> = {
-  warm: 'bg-green-900/20 border-green-600/60 hover:bg-green-900/30',
-  hot: 'bg-amber-900/20 border-amber-600/60 hover:bg-amber-900/30',
+  rowcrop: 'bg-green-900/20 border-green-600/60 hover:bg-green-900/30',
   wet: 'bg-blue-900/20 border-blue-600/60 hover:bg-blue-900/30',
-  cool: 'bg-cyan-900/20 border-cyan-600/60 hover:bg-cyan-900/30',
+  roadsides: 'bg-amber-900/20 border-amber-600/60 hover:bg-amber-900/30',
+  pastures: 'bg-emerald-900/20 border-emerald-600/60 hover:bg-emerald-900/30',
 };
 
 interface Props {
@@ -66,10 +66,10 @@ export default function HabitatDragDrop({ onComplete, onNext }: Props) {
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
       <div>
         <h2 className="font-display font-bold text-lg text-foreground">🗺️ Habitat Sort</h2>
-        <p className="text-sm text-muted-foreground">Tap a weed below, then tap the habitat zone where it thrives.</p>
+        <p className="text-sm text-muted-foreground">Tap a weed below, then tap the Midwest habitat where it's most commonly found.</p>
       </div>
 
-      {/* Map-style zones */}
+      {/* Habitat zones */}
       <div className="grid grid-cols-2 gap-3">
         {HABITATS.map(h => {
           const zoneWeeds = items.filter(i => placements[i.weedId] === h.id);
@@ -79,7 +79,7 @@ export default function HabitatDragDrop({ onComplete, onNext }: Props) {
               className={`p-3 rounded-xl border-2 text-left transition-all min-h-[110px] ${ZONE_STYLES[h.id]} ${selected ? 'cursor-pointer ring-1 ring-primary/30' : 'cursor-default'}`}>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">{h.icon}</span>
-                <span className="text-xs font-bold text-foreground">{h.region}</span>
+                <span className="text-xs font-bold text-foreground">{h.label}</span>
               </div>
               <div className="text-[10px] text-muted-foreground mb-2">{h.desc}</div>
               <div className="flex flex-wrap gap-1">
@@ -123,7 +123,7 @@ export default function HabitatDragDrop({ onComplete, onNext }: Props) {
           <div className="text-lg font-bold text-foreground">{correctCount}/{items.length} Correct!</div>
           {items.filter(i => placements[i.weedId] !== i.correctZone).map(i => {
             const correct = HABITATS.find(h => h.id === i.correctZone);
-            return <p key={i.weedId} className="text-sm text-muted-foreground"><span className="text-foreground font-semibold">{i.name}</span> → {correct?.region}</p>;
+            return <p key={i.weedId} className="text-sm text-muted-foreground"><span className="text-foreground font-semibold">{i.name}</span> → {correct?.label}</p>;
           })}
           <button onClick={onNext} className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">NEXT →</button>
         </div>
