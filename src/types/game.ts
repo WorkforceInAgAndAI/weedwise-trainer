@@ -38,7 +38,7 @@ export interface Question {
   phaseId: string;
   phaseName: string;
   xpReward: number;
-  type: 'mcq' | 'binary' | 'fillin' | 'matching';
+  type: 'mcq' | 'binary' | 'fillin' | 'matching' | 'minigame';
   text: string;
   options: string[];
   correct: string;
