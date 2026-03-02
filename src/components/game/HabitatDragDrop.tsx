@@ -3,24 +3,24 @@ import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
 const HABITATS = [
-  { id: 'rowcrop', label: 'Row Crop Fields', icon: '🌽', desc: 'Corn, soybean & small grain fields' },
-  { id: 'wet', label: 'Wet Areas & Ditches', icon: '💧', desc: 'Floodplains, ditches, stream banks' },
-  { id: 'roadsides', label: 'Roadsides & Disturbed', icon: '🛤️', desc: 'Roadsides, fallow fields, waste areas' },
-  { id: 'pastures', label: 'Pastures & Meadows', icon: '🌾', desc: 'Pastures, prairies, meadows' },
+  { id: 'warm', label: 'Warm-Season / Full Sun', icon: '☀️', desc: 'Summer annuals thriving in hot, sunny conditions' },
+  { id: 'cool', label: 'Cool-Season / Early Spring', icon: '❄️', desc: 'Winter annuals & biennials active early or late in the season' },
+  { id: 'wet', label: 'Wet / Poorly Drained', icon: '💧', desc: 'Floodplains, ditches, stream banks & saturated soils' },
+  { id: 'dry', label: 'Dry / Disturbed', icon: '🏜️', desc: 'Compacted, drought-tolerant, roadsides & waste areas' },
 ];
 
 const HABITAT_KEY: Record<string, string> = {
-  'Row Crop Fields': 'rowcrop',
-  'Wet Areas & Ditches': 'wet',
-  'Roadsides & Disturbed': 'roadsides',
-  'Pastures & Meadows': 'pastures',
+  'Warm-Season / Full Sun': 'warm',
+  'Cool-Season / Early Spring': 'cool',
+  'Wet / Poorly Drained': 'wet',
+  'Dry / Disturbed': 'dry',
 };
 
 const ZONE_STYLES: Record<string, string> = {
-  rowcrop: 'bg-green-900/20 border-green-600/60 hover:bg-green-900/30',
+  warm: 'bg-orange-900/20 border-orange-600/60 hover:bg-orange-900/30',
+  cool: 'bg-sky-900/20 border-sky-600/60 hover:bg-sky-900/30',
   wet: 'bg-blue-900/20 border-blue-600/60 hover:bg-blue-900/30',
-  roadsides: 'bg-amber-900/20 border-amber-600/60 hover:bg-amber-900/30',
-  pastures: 'bg-emerald-900/20 border-emerald-600/60 hover:bg-emerald-900/30',
+  dry: 'bg-amber-900/20 border-amber-600/60 hover:bg-amber-900/30',
 };
 
 interface Props {
@@ -66,7 +66,7 @@ export default function HabitatDragDrop({ onComplete, onNext }: Props) {
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
       <div>
         <h2 className="font-display font-bold text-lg text-foreground">🗺️ Habitat Sort</h2>
-        <p className="text-sm text-muted-foreground">Tap a weed below, then tap the Midwest habitat where it's most commonly found.</p>
+        <p className="text-sm text-muted-foreground">Tap a weed below, then tap the climate/ecosystem zone where it thrives.</p>
       </div>
 
       {/* Habitat zones */}

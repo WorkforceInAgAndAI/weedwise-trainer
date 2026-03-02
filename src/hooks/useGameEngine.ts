@@ -20,6 +20,13 @@ function pickRandom<T>(arr: T[], n: number): T[] {
 // Phases that are batch mini-games (one question per pool, component picks weeds)
 const BATCH_PHASES = new Set(['e3', 'e4', 'm2', 'm3', 'm5', 'h2', 'h3']);
 
+// How many correct answers at a tier before a species advances to next tier
+const TIER_ADVANCE_THRESHOLD = 2;
+
+function getPhaseIndex(grade: GradeLevel, phaseId: string): number {
+  return PHASES[grade].findIndex(p => p.id === phaseId);
+}
+
 function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Question {
   const others = allWeeds.filter(w => w.id !== weed.id);
   const base = {
@@ -49,13 +56,19 @@ function getUnlockedPhases(grade: GradeLevel, xp: number): PhaseConfig[] {
   return PHASES[grade].filter(p => xp >= p.xpRequired);
 }
 
-function buildPool(grade: GradeLevel, xp: number): Question[] {
+/** Get species eligible for a given phase based on their mastery tier */
+function getEligibleWeeds(grade: GradeLevel, phaseId: string, speciesTiers: Record<string, number>): Weed[] {
+  const phaseIdx = getPhaseIndex(grade, phaseId);
+  return weeds.filter(w => (speciesTiers[w.id] ?? 0) >= phaseIdx);
+}
+
+function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, number>): Question[] {
   const unlocked = getUnlockedPhases(grade, xp);
   const questions: Question[] = [];
 
   for (const phase of unlocked) {
     if (BATCH_PHASES.has(phase.id)) {
-      // One mini-game question per pool
+      // Batch mini-games always available once unlocked
       questions.push({
         weedId: weeds[0].id, phaseId: phase.id, phaseName: phase.name,
         xpReward: phase.xpReward, imageStage: phase.imageStage,
@@ -63,11 +76,21 @@ function buildPool(grade: GradeLevel, xp: number): Question[] {
         type: 'minigame', text: phase.name, options: [], correct: '',
       });
     } else {
-      for (const weed of weeds) {
+      const eligible = getEligibleWeeds(grade, phase.id, speciesTiers);
+      for (const weed of eligible) {
         questions.push(generateQuestion(phase, weed, weeds));
       }
     }
   }
+
+  // If no questions generated (edge case), fall back to phase 1 with all weeds
+  if (questions.length === 0) {
+    const firstPhase = PHASES[grade][0];
+    for (const weed of weeds) {
+      questions.push(generateQuestion(firstPhase, weed, weeds));
+    }
+  }
+
   return shuffle(questions);
 }
 
@@ -85,11 +108,41 @@ export function useGameEngine() {
   const [questionLog, setQuestionLog] = useState<LogEntry[]>([]);
   const [showInstructor, setShowInstructor] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
+  // Per-species mastery tier: 0 = phase 1 only, 1 = phases 1-2, etc.
+  const [speciesTiers, setSpeciesTiers] = useState<Record<string, number>>({});
+  // Track correct count at current tier for advancement
+  const [tierProgress, setTierProgress] = useState<Record<string, number>>({});
 
   const poolRef = useRef<Question[]>([]);
   const roundRef = useRef(1);
   const xpRef = useRef(0);
   const timerRef = useRef(0);
+  const speciesTiersRef = useRef<Record<string, number>>({});
+  const tierProgressRef = useRef<Record<string, number>>({});
+
+  const advanceSpeciesTier = useCallback((weedId: string, grade: GradeLevel) => {
+    const currentTier = speciesTiersRef.current[weedId] ?? 0;
+    const currentProgress = (tierProgressRef.current[weedId] ?? 0) + 1;
+    const maxTier = PHASES[grade].length - 1;
+
+    if (currentProgress >= TIER_ADVANCE_THRESHOLD && currentTier < maxTier) {
+      const newTier = currentTier + 1;
+      speciesTiersRef.current = { ...speciesTiersRef.current, [weedId]: newTier };
+      setSpeciesTiers(prev => ({ ...prev, [weedId]: newTier }));
+      tierProgressRef.current = { ...tierProgressRef.current, [weedId]: 0 };
+      setTierProgress(prev => ({ ...prev, [weedId]: 0 }));
+      const phaseName = PHASES[grade][newTier]?.name;
+      const weedName = weedMap[weedId]?.commonName;
+      if (phaseName && weedName) {
+        toast('🌱 Species Advanced!', { description: `${weedName} unlocked "${phaseName}"` });
+      }
+      // Rebuild pool to include newly eligible questions
+      poolRef.current = buildPool(grade, xpRef.current, speciesTiersRef.current);
+    } else {
+      tierProgressRef.current = { ...tierProgressRef.current, [weedId]: currentProgress };
+      setTierProgress(prev => ({ ...prev, [weedId]: currentProgress }));
+    }
+  }, []);
 
   const startGame = useCallback((g: GradeLevel) => {
     setGrade(g);
@@ -101,8 +154,10 @@ export function useGameEngine() {
     setPhaseStats({});
     setQuestionLog([]);
     setFeedback(null);
+    setSpeciesTiers({}); speciesTiersRef.current = {};
+    setTierProgress({}); tierProgressRef.current = {};
 
-    const p = buildPool(g, 0);
+    const p = buildPool(g, 0, {});
     const [first, ...rest] = p;
     poolRef.current = rest;
     setCurrent(first);
@@ -115,7 +170,7 @@ export function useGameEngine() {
     setFeedback(null);
 
     if (poolRef.current.length === 0) {
-      poolRef.current = buildPool(grade, xpRef.current);
+      poolRef.current = buildPool(grade, xpRef.current, speciesTiersRef.current);
       roundRef.current += 1;
       setRound(roundRef.current);
     }
@@ -144,7 +199,7 @@ export function useGameEngine() {
     if (newUnlocked > oldUnlocked) {
       const newPhase = PHASES[grade][newUnlocked - 1];
       toast('🔓 New Phase Unlocked!', { description: newPhase.name });
-      poolRef.current = buildPool(grade, newXp);
+      poolRef.current = buildPool(grade, newXp, speciesTiersRef.current);
     }
 
     setPhaseStats(prev => ({
@@ -171,6 +226,11 @@ export function useGameEngine() {
         }
         return { ...prev, [r.weedId]: updated };
       });
+
+      // Advance species tier on correct answers
+      if (r.correct) {
+        advanceSpeciesTier(r.weedId, grade);
+      }
     });
 
     const allCorrect = results.every(r => r.correct);
@@ -181,7 +241,7 @@ export function useGameEngine() {
     if (newLevel > oldLevel) {
       toast('🎉 Level Up!', { description: `You reached Level ${newLevel}!` });
     }
-  }, [grade]);
+  }, [grade, advanceSpeciesTier]);
 
   const submitAnswer = useCallback((answer: string) => {
     if (!current || !grade) return;
@@ -210,7 +270,7 @@ export function useGameEngine() {
     if (newUnlocked > oldUnlocked) {
       const newPhase = PHASES[grade][newUnlocked - 1];
       toast('🔓 New Phase Unlocked!', { description: newPhase.name });
-      poolRef.current = buildPool(grade, newXp);
+      poolRef.current = buildPool(grade, newXp, speciesTiersRef.current);
     }
 
     setWeedStats(prev => {
@@ -228,6 +288,11 @@ export function useGameEngine() {
       }
       return { ...prev, [current.weedId]: updated };
     });
+
+    // Advance species tier on correct
+    if (isCorrect) {
+      advanceSpeciesTier(current.weedId, grade);
+    }
 
     setPhaseStats(prev => {
       const stat = prev[current.phaseId] || { correct: 0, wrong: 0 };
@@ -252,7 +317,7 @@ export function useGameEngine() {
     ].slice(0, 50));
 
     setFeedback({ correct: isCorrect, xpEarned, correctAnswer: current.correct, weed });
-  }, [current, grade, streak]);
+  }, [current, grade, streak, advanceSpeciesTier]);
 
   const endSession = useCallback(() => setScreen('results'), []);
   const resetToLanding = useCallback(() => {
@@ -267,7 +332,7 @@ export function useGameEngine() {
 
   return {
     screen, grade, xp, current, feedback, round, questionNum, streak,
-    weedStats, phaseStats, questionLog,
+    weedStats, phaseStats, questionLog, speciesTiers, tierProgress,
     showInstructor, showGlossary,
     level: Math.floor(xp / XP_PER_LEVEL) + 1,
     unlockedPhases: grade ? getUnlockedPhases(grade, xp) : [],
