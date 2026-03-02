@@ -28,11 +28,13 @@ interface Props {
 }
 
 export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
+  const STAGES = ['seedling', 'vegetative', 'flower', 'whole'] as const;
   const pair = useMemo(() => {
     const pairs = getFamilyPairs();
     const p = pairs[Math.floor(Math.random() * pairs.length)];
     const flipped = Math.random() < 0.5;
-    return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0] };
+    const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
+    return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage };
   }, []);
 
   const [choice, setChoice] = useState<string | null>(null);
@@ -72,7 +74,7 @@ export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
                 : choice === w.id ? 'border-primary ring-2 ring-primary/30 scale-[1.02]' : 'border-border hover:border-primary/50'
             }`}>
             <div className="h-40 sm:h-52 overflow-hidden">
-              <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
+              <WeedImage weedId={w.id} stage={pair.stage} className="w-full h-full" />
             </div>
             <div className="p-3 bg-secondary/50">
               {submitted ? (

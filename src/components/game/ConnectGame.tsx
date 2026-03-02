@@ -47,9 +47,12 @@ export default function ConnectGame({ mode, onComplete, onNext }: Props) {
 
   const handleRightClick = (id: string) => {
     if (checked || !selectedLeft) return;
-    // Remove any existing connection to this right item
     const newConn = { ...connections };
-    Object.keys(newConn).forEach(k => { if (newConn[k] === id) delete newConn[k]; });
+    // In family mode, allow many-to-one (multiple weeds → same family)
+    // In scientific mode, one-to-one only
+    if (mode === 'scientific') {
+      Object.keys(newConn).forEach(k => { if (newConn[k] === id) delete newConn[k]; });
+    }
     newConn[selectedLeft] = id;
     setConnections(newConn);
     setSelectedLeft(null);
