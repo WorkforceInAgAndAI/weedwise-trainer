@@ -6,14 +6,14 @@ export interface Weed {
   scientificName: string;
   eppoCode: string;
   family: string;
-  plantType: 'Dicot' | 'Monocot';
+  plantType: 'Dicot' | 'Monocot' | 'Non-flowering';
   lifeCycle: string;
   origin: 'Native' | 'Introduced';
   emoji: string;
   image?: string;
   traits: string[];
   habitat: string;
-  primaryHabitat: 'Warm-Season / Full Sun' | 'Cool-Season / Early Spring' | 'Wet / Poorly Drained' | 'Dry / Disturbed';
+  primaryHabitat: string;
   management: string;
   controlTiming: string;
   actImmediately: boolean;
