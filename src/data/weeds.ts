@@ -1679,7 +1679,7 @@ export const weeds: Weed[] = [
       "2–3 feet tall",
     ],
     habitat: "Wet disturbed areas, ditches, field margins, moist soils",
-    primaryHabitat: "Cool-Season / Wet Soils / Non-flowering",
+    primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Perennial rhizomatous; extremely difficult to control; no effective herbicide",
     management: "Drainage improvement, repeated mechanical removal, long-term commitment",
