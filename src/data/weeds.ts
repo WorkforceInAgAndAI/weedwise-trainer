@@ -27,7 +27,7 @@ export const weeds: Weed[] = [
     management: "PRE herbicides (Group 15) + POST multiple MOA, cover crops",
     controlTiming: "Before 4-inch height; rapid growth limits late control",
     lookAlike: {
-      id: "palmer_amaranth",
+      id: "palmer-amaranth",
       species: "Palmer Amaranth",
       difference: "Palmer has petioles longer than leaf blades; Waterhemp petioles shorter",
     },
