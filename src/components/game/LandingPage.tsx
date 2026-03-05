@@ -21,7 +21,14 @@ interface Props extends GameEngine {
 
 export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, studentSession }: Props) {
   const [showGradePicker, setShowGradePicker] = useState(false);
-  const [isLightMode, setIsLightMode] = useState(() => document.documentElement.classList.contains('light'));
+  const [isLightMode, setIsLightMode] = useState(() => {
+    // Default to light mode if no preference has been set
+    if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
+      document.documentElement.classList.add('light');
+      return true;
+    }
+    return document.documentElement.classList.contains('light');
+  });
 
   const toggleTheme = (checked: boolean) => {
     setIsLightMode(checked);
