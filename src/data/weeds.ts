@@ -1369,7 +1369,7 @@ export const weeds: Weed[] = [
       "Winter to spring germination",
     ],
     habitat: "Winter grain fields, pastures, lawns, disturbed areas",
-    primaryHabitat: "Cool-Season / Winter Annual/Perennial",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Biennial/perennial; hairy foliage resists some herbicides; weak competitor",
     management: "POST herbicides (may require surfactant), repeated cutting, improved competition",
