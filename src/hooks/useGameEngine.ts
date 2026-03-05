@@ -56,10 +56,9 @@ function getUnlockedPhases(grade: GradeLevel, xp: number): PhaseConfig[] {
   return PHASES[grade].filter(p => xp >= p.xpRequired);
 }
 
-/** Get species eligible for a given phase based on their mastery tier */
-function getEligibleWeeds(grade: GradeLevel, phaseId: string, speciesTiers: Record<string, number>): Weed[] {
-  const phaseIdx = getPhaseIndex(grade, phaseId);
-  return weeds.filter(w => (speciesTiers[w.id] ?? 0) >= phaseIdx);
+/** Get species eligible for a given phase — all weeds are eligible for any unlocked phase */
+function getEligibleWeeds(_grade: GradeLevel, _phaseId: string, _speciesTiers: Record<string, number>): Weed[] {
+  return weeds;
 }
 
 function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, number>): Question[] {
