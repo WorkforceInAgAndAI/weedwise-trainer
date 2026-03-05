@@ -1741,7 +1741,7 @@ export const weeds: Weed[] = [
       "2–3 feet tall second year",
     ],
     habitat: "Pastures, roadsides, disturbed areas",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Biennial; responsive to herbicides in first year",
     management: "POST broadleaf herbicides fall or spring, hand pulling",
