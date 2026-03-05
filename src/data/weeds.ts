@@ -1916,7 +1916,7 @@ export const weeds: Weed[] = [
       "Grows 4–8 inches spreading as mat",
     ],
     habitat: "Lawns, gardens, disturbed areas, moist shade",
-    primaryHabitat: "Cool-Season / Partial Shade",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Perennial ground cover but with early control prevents establishment; low crop impact",
     management: "POST herbicides (triclopyr, dicamba), repeated cultivation, dense plantings",
