@@ -336,7 +336,7 @@ export const weeds: Weed[] = [
       "Milky sap in stems",
     ],
     habitat: "Disturbed areas, field margins, roadsides",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Moderate competitor; spiny nature deters livestock",
     management: "POST broadleaf herbicides, mowing, cultivation",
