@@ -1090,7 +1090,7 @@ export const weeds: Weed[] = [
       "Flowers open in morning, close by afternoon",
     ],
     habitat: "Warm-season row crops, disturbed areas, moist soils",
-    primaryHabitat: "Warm-Season / Moist Soils",
+    primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Emerging problem weed; prolific seed producer; competitive; no herbicide solutions yet",
     management: "Hand removal, mechanical cultivation, mulching, preventive sanitation",
