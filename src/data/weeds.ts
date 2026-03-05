@@ -1493,7 +1493,7 @@ export const weeds: Weed[] = [
       "1–2 feet tall at flowering",
     ],
     habitat: "Lawns, pastures, bulb gardens, disturbed areas",
-    primaryHabitat: "Cool-Season / Bulb Perennial",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Bulb perennial; ineffective herbicide response; mechanical removal difficult",
     management: "Hand digging bulbs, repeated cutting, improved competition, cultivation",
