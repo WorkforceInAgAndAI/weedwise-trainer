@@ -1390,7 +1390,7 @@ export const weeds: Weed[] = [
     family: "Malvaceae",
     plantType: "Dicot",
     lifeCycle: "Annual",
-    origin: "Native/Introduced",
+    origin: "Introduced",
     emoji: "🌵",
     traits: [
       "Prickle-like stipules at leaf base (key ID)",
