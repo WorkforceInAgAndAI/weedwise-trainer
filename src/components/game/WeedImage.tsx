@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { resolveImageUrl } from '@/lib/imageMap';
 
 const STAGE_PREFIX_MAP: Record<string, string> = {
   seedling: 'seedling',
@@ -7,11 +8,10 @@ const STAGE_PREFIX_MAP: Record<string, string> = {
   whole: 'plant',
 };
 
-const EXTENSIONS = ['jpg', 'jpeg'];
-
 export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, ext = 'jpg') {
   const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
-  return `/images/${weedId}/${prefix}_${variant}.${ext}`;
+  const filename = `${prefix}_${variant}.${ext}`;
+  return resolveImageUrl(weedId, filename) || `/images/${weedId}/${filename}`;
 }
 
 export default function WeedImage({ weedId, stage, className }: { weedId: string; stage: string; className?: string }) {
@@ -19,13 +19,15 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
   const [attemptIndex, setAttemptIndex] = useState(0);
   const [failed, setFailed] = useState(false);
 
-  // Try: variant + jpg, variant + jpeg, otherVariant + jpg, otherVariant + jpeg
   const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
+  const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+
+  // Build attempts using the resolved image map
   const attempts = [
-    { v: variant, ext: 'jpg' },
-    { v: variant, ext: 'jpeg' },
-    { v: otherVariant, ext: 'jpg' },
-    { v: otherVariant, ext: 'jpeg' },
+    `${prefix}_${variant}.jpg`,
+    `${prefix}_${variant}.jpeg`,
+    `${prefix}_${otherVariant}.jpg`,
+    `${prefix}_${otherVariant}.jpeg`,
   ];
 
   if (failed) {
@@ -36,8 +38,33 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
     );
   }
 
-  const current = attempts[attemptIndex];
-  const src = getImageSrc(weedId, stage, current.v as 1 | 2, current.ext);
+  const filename = attempts[attemptIndex];
+  const src = resolveImageUrl(weedId, filename);
+
+  // If this attempt has no resolved URL, skip to next
+  if (!src) {
+    if (attemptIndex < attempts.length - 1) {
+      // Use a micro-task to avoid setting state during render
+      const nextIndex = attemptIndex + 1;
+      // Find next valid attempt
+      let found = false;
+      for (let i = nextIndex; i < attempts.length; i++) {
+        if (resolveImageUrl(weedId, attempts[i])) {
+          if (i !== attemptIndex) {
+            setTimeout(() => setAttemptIndex(i), 0);
+          }
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        setTimeout(() => setFailed(true), 0);
+      }
+      return null; // render nothing while resolving
+    }
+    setTimeout(() => setFailed(true), 0);
+    return null;
+  }
 
   return (
     <img
