@@ -13,6 +13,7 @@ import LifecycleImageSort from './LifecycleImageSort';
 import ControlTimingGame from './ControlTimingGame';
 import IPMPlanBuilder from './IPMPlanBuilder';
 import WeedImage from './WeedImage';
+import { filterTraitsForQuestion } from '@/lib/traitFilter';
 
 export default function GameScreen(game: GameEngine) {
   const { grade, xp, level, current, feedback, round, questionNum, streak,
@@ -85,7 +86,7 @@ export default function GameScreen(game: GameEngine) {
             {current.showFamily && <p className="text-sm text-primary">Family: {weed.family}</p>}
             <div className="text-xs text-muted-foreground uppercase tracking-wider">Identifying Traits</div>
             <ul className="space-y-1">
-              {weed.traits.slice(0, 3).map((t, i) => (
+              {(current.showName ? weed.traits.slice(0, 3) : filterTraitsForQuestion(weed.traits, weed.commonName).slice(0, 3)).map((t, i) => (
                 <li key={i} className="text-sm text-foreground flex items-start gap-2">
                   <span className="text-accent mt-0.5">•</span>{t}
                 </li>
