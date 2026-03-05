@@ -588,7 +588,7 @@ export const weeds: Weed[] = [
       "Bracts (modified leaves) at flower base",
     ],
     habitat: "Field margins, hedgerows, disturbed areas, shade tolerant",
-    primaryHabitat: "Cool-Season / Partial Shade Tolerant",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
     actReason: "Perennial rhizomatous; extremely persistent; difficult to control",
     management: "Repeated POST glyphosate, digging rhizomes, biological control",
