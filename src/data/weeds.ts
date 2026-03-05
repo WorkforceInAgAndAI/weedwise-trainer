@@ -1307,7 +1307,7 @@ export const weeds: Weed[] = [
       "6–9 feet tall vining",
     ],
     habitat: "Field margins, pastures, disturbed areas, scrambling on nearby plants",
-    primaryHabitat: "Warm-Season / Partial Shade Tolerant",
+    primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
     actReason: "Perennial tuberously rooted; vines through crop; spreading concern; difficult to control",
     management: "Repeated POST applications, biological control, mechanical removal",
