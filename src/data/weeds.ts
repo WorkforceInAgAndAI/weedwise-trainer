@@ -1803,7 +1803,7 @@ export const weeds: Weed[] = [
       "Hairy stems and leaves",
     ],
     habitat: "Disturbed areas, gardens, field margins",
-    primaryHabitat: "Cool-Season / Winter Annual",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual/annual; responds well to herbicides; moderate competitor",
     management: "POST broadleaf herbicides, cultivation, mulching",
