@@ -89,7 +89,7 @@ export const weeds: Weed[] = [
     management: "PRE herbicides, early POST before 4 inches, cultivation",
     controlTiming: "Seedling to 4-inch stage",
     lookAlike: {
-      id: "palmer_amaranth",
+      id: "palmer-amaranth",
       species: "Palmer Amaranth",
       difference: "Palmer has longer petioles and is less hairy; Redroot has red taproot",
     },
