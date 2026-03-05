@@ -13,7 +13,7 @@ export interface Weed {
   image?: string;
   traits: string[];
   habitat: string;
-  primaryHabitat: 'Warm-Season / Full Sun' | 'Cool-Season / Early Spring' | 'Wet / Poorly Drained' | 'Dry / Disturbed';
+  primaryHabitat: string;
   management: string;
   controlTiming: string;
   actImmediately: boolean;
