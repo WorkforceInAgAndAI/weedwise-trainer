@@ -871,7 +871,7 @@ export const weeds: Weed[] = [
       "Allelopathic rhizomes inhibit crop growth",
     ],
     habitat: "Pastures, disturbed areas, field margins",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
     actReason: "Perennial rhizomatous; extremely competitive; allelopathic; difficult to eradicate",
     management: "Repeated POST glyphosate, mechanical removal of rhizomes, rotation",
