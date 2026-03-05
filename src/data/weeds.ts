@@ -34,7 +34,7 @@ export const weeds: Weed[] = [
     memoryHook: "Waterhemp loves water — find it near rivers and wet fields",
   },
   {
-    id: "palmer_amaranth",
+    id: "palmer-amaranth",
     commonName: "Palmer Amaranth",
     scientificName: "Amaranthus palmeri",
     eppoCode: "AMAPL",
