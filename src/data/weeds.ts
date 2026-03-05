@@ -210,7 +210,7 @@ export const weeds: Weed[] = [
       "1–2 feet tall",
     ],
     habitat: "Small grain fields, disturbed areas",
-    primaryHabitat: "Cool-Season / Winter Annual",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
     actReason: "Develops herbicide resistance; produces 10,000+ seeds per plant",
     management: "POST broadleaf herbicides, fall or spring control, rotation",
