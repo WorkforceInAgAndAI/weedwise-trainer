@@ -1524,7 +1524,7 @@ export const weeds: Weed[] = [
       "1–3 feet tall, rounded bush shape",
     ],
     habitat: "Row crops, rangelands, disturbed areas, arid regions",
-    primaryHabitat: "Warm-Season / Drought Tolerant / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Prolific seed producer; tumbles hundreds of yards; drought tolerant; expanding range",
     management: "PRE herbicides, early POST before spines develop, mechanical removal early",
