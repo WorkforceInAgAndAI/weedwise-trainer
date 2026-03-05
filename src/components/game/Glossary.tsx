@@ -44,10 +44,10 @@ function filterWeeds(activeFilter: FilterKey) {
   if (activeFilter === 'dicot') return weeds.filter(w => w.plantType === 'Dicot');
   if (activeFilter === 'native') return weeds.filter(w => w.origin === 'Native');
   if (activeFilter === 'introduced') return weeds.filter(w => w.origin === 'Introduced');
-  if (activeFilter === 'warm') return weeds.filter(w => w.primaryHabitat === 'Warm-Season / Full Sun');
-  if (activeFilter === 'cool') return weeds.filter(w => w.primaryHabitat === 'Cool-Season / Early Spring');
-  if (activeFilter === 'wet') return weeds.filter(w => w.primaryHabitat === 'Wet / Poorly Drained');
-  if (activeFilter === 'dry') return weeds.filter(w => w.primaryHabitat === 'Dry / Disturbed');
+  if (activeFilter === 'warm') return weeds.filter(w => w.primaryHabitat.toLowerCase().includes('warm'));
+  if (activeFilter === 'cool') return weeds.filter(w => w.primaryHabitat.toLowerCase().includes('cool'));
+  if (activeFilter === 'wet') return weeds.filter(w => w.primaryHabitat.toLowerCase().includes('wet') || w.primaryHabitat.toLowerCase().includes('moist') || w.primaryHabitat.toLowerCase().includes('aquatic'));
+  if (activeFilter === 'dry') return weeds.filter(w => w.primaryHabitat.toLowerCase().includes('dry') || w.primaryHabitat.toLowerCase().includes('disturbed') || w.primaryHabitat.toLowerCase().includes('arid'));
   if (activeFilter === 'annual') return weeds.filter(w => w.lifeCycle.includes('Annual'));
   if (activeFilter === 'perennial') return weeds.filter(w => w.lifeCycle === 'Perennial');
   if (activeFilter === 'biennial') return weeds.filter(w => w.lifeCycle === 'Biennial');

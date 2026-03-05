@@ -26,8 +26,12 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
   const attempts = [
     `${prefix}_${variant}.jpg`,
     `${prefix}_${variant}.jpeg`,
+    `${prefix}_${variant}.png`,
+    `${prefix}_${variant}.webp`,
     `${prefix}_${otherVariant}.jpg`,
     `${prefix}_${otherVariant}.jpeg`,
+    `${prefix}_${otherVariant}.png`,
+    `${prefix}_${otherVariant}.webp`,
   ];
 
   if (failed) {

@@ -1,6 +1,6 @@
 // Eagerly import all weed images from src/assets/images via Vite glob
 const modules = import.meta.glob<string>(
-  '/src/assets/images/**/*.{jpg,jpeg}',
+  '/src/assets/images/**/*.{jpg,jpeg,png,webp}',
   { eager: true, query: '?url', import: 'default' }
 );
 
