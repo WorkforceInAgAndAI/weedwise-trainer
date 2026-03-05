@@ -2176,7 +2176,7 @@ export const weeds: Weed[] = [
     scientificName: "Equisetum hyemale",
     eppoCode: "EQUHY",
     family: "Equisetaceae",
-    plantType: "Non-flowering",
+    plantType: "Monocot",
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "🪶",
