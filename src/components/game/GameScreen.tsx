@@ -44,21 +44,7 @@ export default function GameScreen(game: GameEngine) {
 
     // Batch mini-games
     switch (current.phaseId) {
-      case 'e3':
-        return (
-          <div key={key} className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
-            <p className="font-display font-semibold text-foreground">{current.text}</p>
-            <CardFlipMatch
-              pairs={[...weeds].sort(() => Math.random() - 0.5).slice(0, 4).map(w => ({ weed: w }))}
-              xpReward={current.xpReward}
-              onComplete={(correct, attempts) => {
-                const picked = [...weeds].sort(() => Math.random() - 0.5).slice(0, correct);
-                completeMinigame(current.phaseId, picked.map(w => ({ weedId: w.id, correct: true })));
-                nextQuestion();
-              }}
-            />
-          </div>
-        );
+      case 'e3': return <CardFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e4': return <HabitatDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm2': return <ConnectGame key={key} mode="family" onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;

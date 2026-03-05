@@ -10,6 +10,7 @@ export interface Weed {
   lifeCycle: string;
   origin: 'Native' | 'Introduced';
   emoji: string;
+  image?: string;
   traits: string[];
   habitat: string;
   primaryHabitat: 'Warm-Season / Full Sun' | 'Cool-Season / Early Spring' | 'Wet / Poorly Drained' | 'Dry / Disturbed';
