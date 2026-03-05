@@ -1635,7 +1635,7 @@ export const weeds: Weed[] = [
     scientificName: "Equisetum arvense",
     eppoCode: "EQUAR",
     family: "Equisetaceae",
-    plantType: "Non-flowering",
+    plantType: "Monocot",
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "🌾",
