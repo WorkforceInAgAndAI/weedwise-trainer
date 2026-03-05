@@ -1276,7 +1276,7 @@ export const weeds: Weed[] = [
       "3–5 feet tall, erect unbranched",
     ],
     habitat: "Pastures, roadsides, field margins, disturbed areas",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Perennial but slower rhizomatous spreading; important monarch butterfly host",
     management: "POST herbicides if needed, repeated cutting, biological control preferred",
