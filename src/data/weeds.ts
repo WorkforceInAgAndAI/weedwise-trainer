@@ -1026,7 +1026,7 @@ export const weeds: Weed[] = [
       "Sandy soil preference",
     ],
     habitat: "Row crops in sandy soils, disturbed areas",
-    primaryHabitat: "Warm-Season / Sandy Soils / Full Sun",
+    primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
     actReason: "Spiny burs painful to livestock and workers; difficult to control once established",
     management: "PRE herbicides, early POST before bur development, sanitation",
