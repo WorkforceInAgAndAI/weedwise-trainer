@@ -557,7 +557,7 @@ export const weeds: Weed[] = [
       "Viny growth habit without support",
     ],
     habitat: "Pastures, roadsides, field margins, disturbed areas",
-    primaryHabitat: "Cool to Warm-Season / Full Sun",
+    primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
     actReason: "Perennial spreads via rhizomes; extremely difficult to control; long-lived seeds",
     management: "Repeated POST applications (glyphosate), biological control, cultivation",
