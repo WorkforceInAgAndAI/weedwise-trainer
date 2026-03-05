@@ -6,7 +6,7 @@ export interface Weed {
   scientificName: string;
   eppoCode: string;
   family: string;
-  plantType: 'Dicot' | 'Monocot';
+  plantType: 'Dicot' | 'Monocot' | 'Non-flowering';
   lifeCycle: string;
   origin: 'Native' | 'Introduced';
   emoji: string;
