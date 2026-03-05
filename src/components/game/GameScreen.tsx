@@ -13,6 +13,7 @@ import LifecycleImageSort from './LifecycleImageSort';
 import ControlTimingGame from './ControlTimingGame';
 import IPMPlanBuilder from './IPMPlanBuilder';
 import WeedImage from './WeedImage';
+import { filterTraitsForQuestion } from '@/lib/traitFilter';
 
 export default function GameScreen(game: GameEngine) {
   const { grade, xp, level, current, feedback, round, questionNum, streak,
@@ -43,21 +44,7 @@ export default function GameScreen(game: GameEngine) {
 
     // Batch mini-games
     switch (current.phaseId) {
-      case 'e3':
-        return (
-          <div key={key} className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
-            <p className="font-display font-semibold text-foreground">{current.text}</p>
-            <CardFlipMatch
-              pairs={[...weeds].sort(() => Math.random() - 0.5).slice(0, 4).map(w => ({ weed: w }))}
-              xpReward={current.xpReward}
-              onComplete={(correct, attempts) => {
-                const picked = [...weeds].sort(() => Math.random() - 0.5).slice(0, correct);
-                completeMinigame(current.phaseId, picked.map(w => ({ weedId: w.id, correct: true })));
-                nextQuestion();
-              }}
-            />
-          </div>
-        );
+      case 'e3': return <CardFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e4': return <HabitatDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm2': return <ConnectGame key={key} mode="family" onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
@@ -85,7 +72,7 @@ export default function GameScreen(game: GameEngine) {
             {current.showFamily && <p className="text-sm text-primary">Family: {weed.family}</p>}
             <div className="text-xs text-muted-foreground uppercase tracking-wider">Identifying Traits</div>
             <ul className="space-y-1">
-              {weed.traits.slice(0, 3).map((t, i) => (
+              {(current.showName ? weed.traits.slice(0, 3) : filterTraitsForQuestion(weed.traits, weed.commonName).slice(0, 3)).map((t, i) => (
                 <li key={i} className="text-sm text-foreground flex items-start gap-2">
                   <span className="text-accent mt-0.5">•</span>{t}
                 </li>
