@@ -72,6 +72,62 @@ function renderTopicContent(topicId: TopicId, grade: GradeLevel, topicWeeds: Wee
         </div>
       );
 
+    case 'life-stages':
+      const LIFE_STAGE_INFO = [
+        { stage: 'seedling', label: '🌱 Seedling', desc: 'The earliest growth stage after germination. Cotyledons (seed leaves) are visible, and the first true leaves are emerging. This is the easiest time to control most weeds.' },
+        { stage: 'vegetative', label: '🌿 Vegetative', desc: 'Active growth phase with expanding leaves and branching. The plant is developing its root system and above-ground biomass. Key ID features like leaf shape and arrangement are most visible.' },
+        { stage: 'flower', label: '🌸 Reproductive', desc: 'The plant is flowering and/or setting seed. Flower structure is a critical ID feature. Control at this stage is often too late — seeds may already be dispersing.' },
+      ];
+      return (
+        <div className="space-y-6">
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+            <p className="font-semibold text-primary">📸 Why Life Stages Matter</p>
+            <p>Weeds look very different at each growth stage. Learning to recognize them <strong>early (seedling)</strong> is critical because that's when they're easiest to control. By the time they flower, they've already competed with crops and may be spreading seeds.</p>
+            {grade !== 'elementary' && (
+              <p>In IPM, <strong>scouting timing</strong> is everything. Knowing what a weed looks like at each stage lets you catch it early and choose the right control method.</p>
+            )}
+          </div>
+
+          {/* Stage overview cards */}
+          <div className="grid grid-cols-3 gap-3">
+            {LIFE_STAGE_INFO.map(s => (
+              <div key={s.stage} className="bg-card border border-border rounded-lg p-3 text-center">
+                <div className="text-2xl mb-1">{s.label.split(' ')[0]}</div>
+                <div className="text-xs font-bold text-foreground">{s.label.split(' ').slice(1).join(' ')}</div>
+                <p className="text-[10px] text-muted-foreground mt-1">{s.desc.split('.')[0]}.</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Species comparison gallery */}
+          {topicWeeds.slice(0, grade === 'elementary' ? 12 : 20).map(w => (
+            <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <h3 className="font-display font-bold text-foreground">{w.commonName}</h3>
+                {grade !== 'elementary' && <span className="text-xs text-primary italic">{w.scientificName}</span>}
+                <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">{w.family}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {LIFE_STAGE_INFO.map(s => (
+                  <div key={s.stage} className="space-y-1">
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
+                    <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                      <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {grade !== 'elementary' && (
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Best control timing:</span> {w.controlTiming}
+                </div>
+              )}
+              <p className="text-xs text-primary">💡 {w.memoryHook}</p>
+            </div>
+          ))}
+        </div>
+      );
+
     case 'monocot-dicot':
       const monocots = topicWeeds.filter(w => w.plantType === 'Monocot');
       const dicots = topicWeeds.filter(w => w.plantType === 'Dicot');

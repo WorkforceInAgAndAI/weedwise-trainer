@@ -104,6 +104,7 @@ const Index = () => {
       {showClassJoin && <ClassJoinFlow onClose={() => setShowClassJoin(false)} />}
       {showDashboard && <InstructorDashboard onClose={() => setShowDashboard(false)} />}
       {showLeaderboard && <StudentLeaderboard onClose={() => setShowLeaderboard(false)} />}
+      {showCompetition && <CompetitionMode onClose={() => setShowCompetition(false)} />}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} onAuthenticated={handleAuthComplete} />
       )}
