@@ -46,6 +46,8 @@ export default function InstructorDashboard({ onClose }: Props) {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       setShowAuth(true);
+    } else if (!authLoading && isAuthenticated) {
+      setShowAuth(false);
     }
   }, [authLoading, isAuthenticated]);
 
