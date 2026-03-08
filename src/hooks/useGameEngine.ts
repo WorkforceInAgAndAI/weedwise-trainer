@@ -114,6 +114,8 @@ export function useGameEngine() {
   const [questionLog, setQuestionLog] = useState<LogEntry[]>([]);
   const [showInstructor, setShowInstructor] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
+  const [consecutiveWrong, setConsecutiveWrong] = useState(0);
+  const [penaltyUntil, setPenaltyUntil] = useState(0);
   // Per-species mastery tier: 0 = phase 1 only, 1 = phases 1-2, etc.
   const [speciesTiers, setSpeciesTiers] = useState<Record<string, number>>({});
   // Track correct count at current tier for advancement
