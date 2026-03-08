@@ -23,7 +23,7 @@ interface Props extends GameEngine {
   auth: ReturnType<typeof useAuth>;
 }
 
-export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, studentSession, auth }: Props) {
+export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, onOpenCompetition, studentSession, auth }: Props) {
   const [showGradePicker, setShowGradePicker] = useState(false);
   const [isLightMode, setIsLightMode] = useState(() => {
     if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
