@@ -19,11 +19,12 @@ interface Props extends GameEngine {
   onOpenLeaderboard: () => void;
   onOpenAuth: () => void;
   onOpenCompetition: () => void;
+  onOpenFarmMode: () => void;
   studentSession: { nickname: string; className: string } | null;
   auth: ReturnType<typeof useAuth>;
 }
 
-export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, onOpenCompetition, studentSession, auth }: Props) {
+export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, onOpenCompetition, onOpenFarmMode, studentSession, auth }: Props) {
   const [showGradePicker, setShowGradePicker] = useState(false);
   const [isLightMode, setIsLightMode] = useState(() => {
     if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
@@ -74,7 +75,7 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
         <div className="text-6xl mb-4">🌿</div>
         <h1 className="text-5xl sm:text-6xl font-display font-extrabold text-primary mb-3 tracking-tight">WeedID</h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-md mx-auto">Midwest Weed Identification Trainer</p>
-        <p className="text-sm text-muted-foreground mt-2">Learn to identify 25 key weed species through gamified quizzes</p>
+        <p className="text-sm text-muted-foreground mt-2">Learn to identify 88 weed species through gamified quizzes & farm simulation</p>
       </div>
 
       {/* Student session indicator */}
@@ -87,23 +88,32 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
         </div>
       )}
 
-      {/* Two prominent mode buttons */}
-      <div className="flex gap-4 mb-10 max-w-md w-full">
+      {/* Three main mode cards */}
+      <div className="grid grid-cols-3 gap-4 mb-10 max-w-xl w-full">
         <button
           onClick={onOpenLearning}
-          className="flex-1 bg-card border-2 border-primary/30 rounded-lg p-6 text-center hover:border-primary hover:scale-[1.02] transition-all"
+          className="bg-card border-2 border-primary/30 rounded-xl p-5 text-center hover:border-primary hover:scale-[1.02] transition-all"
         >
-          <div className="text-4xl mb-3">📚</div>
-          <div className="font-display font-bold text-lg text-foreground">Learn</div>
-          <div className="text-xs text-muted-foreground mt-1">Study weeds by topic</div>
+          <div className="text-3xl sm:text-4xl mb-2">📚</div>
+          <div className="font-display font-bold text-sm sm:text-base text-foreground">Learn</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Study weeds by topic</div>
         </button>
         <button
           onClick={() => setShowGradePicker(true)}
-          className="flex-1 bg-card border-2 border-accent/30 rounded-lg p-6 text-center hover:border-accent hover:scale-[1.02] transition-all"
+          className="bg-card border-2 border-accent/30 rounded-xl p-5 text-center hover:border-accent hover:scale-[1.02] transition-all"
         >
-          <div className="text-4xl mb-3">🎮</div>
-          <div className="font-display font-bold text-lg text-foreground">Play</div>
-          <div className="text-xs text-muted-foreground mt-1">Test your knowledge</div>
+          <div className="text-3xl sm:text-4xl mb-2">🎯</div>
+          <div className="font-display font-bold text-sm sm:text-base text-foreground">Practice</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Quiz & mini-games</div>
+        </button>
+        <button
+          onClick={onOpenFarmMode}
+          className="bg-card border-2 border-grade-high/30 rounded-xl p-5 text-center hover:border-grade-high hover:scale-[1.02] transition-all relative overflow-hidden"
+        >
+          <div className="text-3xl sm:text-4xl mb-2">🌾</div>
+          <div className="font-display font-bold text-sm sm:text-base text-foreground">Play</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Manage your farm</div>
+          <div className="absolute top-1 right-1 px-1.5 py-0.5 bg-primary text-primary-foreground text-[9px] font-bold rounded-full">NEW</div>
         </button>
       </div>
 
@@ -126,7 +136,7 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
                   <div className="flex-1">
                     <h3 className={`text-lg font-display font-bold ${colorClass}`}>{GRADE_NAMES[grade]}</h3>
                     <p className="text-sm text-muted-foreground">Grades {GRADE_RANGES[grade]}</p>
-                    <p className="text-xs text-muted-foreground mt-1">5 phases • 25 species • XP rewards</p>
+                    <p className="text-xs text-muted-foreground mt-1">5 phases • 88 species • XP rewards</p>
                   </div>
                   <span className="text-muted-foreground text-lg">→</span>
                 </button>
@@ -136,43 +146,38 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3 justify-center">
-        <button
-          onClick={onOpenClassJoin}
-          className="px-5 py-2.5 rounded-lg border border-primary/50 bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
-        >
-          🏫 Join / Create Class
-        </button>
-        <button
-          onClick={onOpenCompetition}
-          className="px-5 py-2.5 rounded-lg border border-destructive/50 bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-colors"
-        >
-          ⚔️ Competition
-        </button>
-        <button
-          onClick={onOpenLeaderboard}
-          className="px-5 py-2.5 rounded-lg border border-accent/50 bg-accent/10 text-foreground text-sm font-medium hover:bg-accent/20 transition-colors"
-        >
-          🏆 Leaderboard
-        </button>
-        <button
-          onClick={onOpenDashboard}
-          className="px-5 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors"
-        >
-          📊 Instructor Dashboard
-        </button>
-        <button
-          onClick={() => setShowInstructor(true)}
-          className="px-5 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors"
-        >
-          📈 Session Stats
-        </button>
-        <button
-          onClick={onOpenGlossary}
-          className="px-5 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors"
-        >
-          📖 Glossary
-        </button>
+      {/* Organized secondary actions */}
+      <div className="max-w-xl w-full space-y-3">
+        {/* Community row */}
+        <div className="flex gap-2 justify-center">
+          <button onClick={onOpenClassJoin}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
+            <span>🏫</span> <span>Class</span>
+          </button>
+          <button onClick={onOpenCompetition}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
+            <span>⚔️</span> <span>Compete</span>
+          </button>
+          <button onClick={onOpenLeaderboard}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
+            <span>🏆</span> <span>Leaderboard</span>
+          </button>
+        </div>
+        {/* Tools row */}
+        <div className="flex gap-2 justify-center">
+          <button onClick={onOpenGlossary}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
+            <span>📖</span> <span>Glossary</span>
+          </button>
+          <button onClick={() => setShowInstructor(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
+            <span>📈</span> <span>Stats</span>
+          </button>
+          <button onClick={onOpenDashboard}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
+            <span>📊</span> <span>Dashboard</span>
+          </button>
+        </div>
       </div>
     </div>
   );
