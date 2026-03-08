@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { weeds } from '@/data/weeds';
 import { BADGES, BADGE_MAP } from '@/data/badges';
-import { useInstructorAuth } from '@/hooks/useInstructorAuth';
-import InstructorAuth from './InstructorAuth';
+import { useAuth } from '@/hooks/useAuth';
+import AuthModal from './AuthModal';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Json } from '@/integrations/supabase/types';
 
