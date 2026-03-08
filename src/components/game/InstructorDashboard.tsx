@@ -29,7 +29,7 @@ type TopicFilter = 'all' | 'monocot' | 'dicot' | 'native' | 'introduced' | 'warm
 interface Props { onClose: () => void; }
 
 export default function InstructorDashboard({ onClose }: Props) {
-  const { user, instructor, loading: authLoading, logout, isAuthenticated } = useInstructorAuth();
+  const { user, instructor, role, loading: authLoading, logout, isAuthenticated } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
 
   const [classes, setClasses] = useState<ClassInfo[]>([]);
