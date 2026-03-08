@@ -49,6 +49,120 @@ export type Database = {
           },
         ]
       }
+      competition_scores: {
+        Row: {
+          competition_id: string
+          completed: boolean
+          correct_count: number
+          created_at: string
+          id: string
+          score: number
+          student_id: string
+          team_name: string | null
+          time_taken_ms: number
+          total_count: number
+        }
+        Insert: {
+          competition_id: string
+          completed?: boolean
+          correct_count?: number
+          created_at?: string
+          id?: string
+          score?: number
+          student_id: string
+          team_name?: string | null
+          time_taken_ms?: number
+          total_count?: number
+        }
+        Update: {
+          competition_id?: string
+          completed?: boolean
+          correct_count?: number
+          created_at?: string
+          id?: string
+          score?: number
+          student_id?: string
+          team_name?: string | null
+          time_taken_ms?: number
+          total_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_scores_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competition_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_scores_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competition_sessions: {
+        Row: {
+          class_id: string
+          created_at: string
+          created_by: string
+          ended_at: string | null
+          grade_level: string
+          id: string
+          mode: string
+          question_count: number
+          question_seed: string
+          started_at: string | null
+          status: string
+          time_limit_seconds: number
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          created_by: string
+          ended_at?: string | null
+          grade_level: string
+          id?: string
+          mode?: string
+          question_count?: number
+          question_seed?: string
+          started_at?: string | null
+          status?: string
+          time_limit_seconds?: number
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          created_by?: string
+          ended_at?: string | null
+          grade_level?: string
+          id?: string
+          mode?: string
+          question_count?: number
+          question_seed?: string
+          started_at?: string | null
+          status?: string
+          time_limit_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_sessions_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_sessions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_sessions: {
         Row: {
           created_at: string
