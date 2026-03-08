@@ -52,16 +52,26 @@ export default function AuthModal({ onClose, onAuthenticated, defaultMode = 'log
 
     if (signUpErr) { setLoading(false); setError(signUpErr.message); return; }
 
-    if (signUpData.user) {
-      await supabase.from('instructors').insert({
+    if (signUpData.user && signUpData.session) {
+      // User is auto-confirmed and authenticated — create instructor profile now
+      const { error: profileErr } = await supabase.from('instructors').insert({
         user_id: signUpData.user.id,
         display_name: displayName.trim(),
       });
+      if (profileErr) {
+        setLoading(false);
+        setError('Account created but profile failed: ' + profileErr.message);
+        return;
+      }
+      setLoading(false);
+      toast.success('Instructor account created!');
+      onAuthenticated('instructor');
+    } else {
+      // Fallback: email confirmation required
+      setLoading(false);
+      toast.success('Account created! Check your email to verify, then log in.');
+      setMode('login');
     }
-
-    setLoading(false);
-    toast.success('Account created! Check your email to verify, then log in.');
-    setMode('login');
   };
 
   const handleSignupStudent = async (e: FormEvent) => {
@@ -69,16 +79,22 @@ export default function AuthModal({ onClose, onAuthenticated, defaultMode = 'log
     setLoading(true);
     setError('');
 
-    const { error: signUpErr } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
       email, password,
       options: { emailRedirectTo: window.location.origin },
     });
 
     if (signUpErr) { setLoading(false); setError(signUpErr.message); return; }
 
-    setLoading(false);
-    toast.success('Account created! Check your email to verify, then log in.');
-    setMode('login');
+    if (signUpData.session) {
+      setLoading(false);
+      toast.success('Student account created!');
+      onAuthenticated('student');
+    } else {
+      setLoading(false);
+      toast.success('Account created! Check your email to verify, then log in.');
+      setMode('login');
+    }
   };
 
   const handleForgot = async (e: FormEvent) => {
