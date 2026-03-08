@@ -79,16 +79,22 @@ export default function AuthModal({ onClose, onAuthenticated, defaultMode = 'log
     setLoading(true);
     setError('');
 
-    const { error: signUpErr } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
       email, password,
       options: { emailRedirectTo: window.location.origin },
     });
 
     if (signUpErr) { setLoading(false); setError(signUpErr.message); return; }
 
-    setLoading(false);
-    toast.success('Account created! Check your email to verify, then log in.');
-    setMode('login');
+    if (signUpData.session) {
+      setLoading(false);
+      toast.success('Student account created!');
+      onAuthenticated('student');
+    } else {
+      setLoading(false);
+      toast.success('Account created! Check your email to verify, then log in.');
+      setMode('login');
+    }
   };
 
   const handleForgot = async (e: FormEvent) => {
