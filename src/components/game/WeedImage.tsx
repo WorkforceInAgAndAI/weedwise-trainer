@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { resolveImageUrl } from '@/lib/imageMap';
 
 const STAGE_PREFIX_MAP: Record<string, string> = {
@@ -15,26 +15,39 @@ export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, e
 }
 
 export default function WeedImage({ weedId, stage, className }: { weedId: string; stage: string; className?: string }) {
-  const [variant] = useState<1 | 2>(() => (Math.random() < 0.5 ? 1 : 2));
-  const [attemptIndex, setAttemptIndex] = useState(0);
-  const [failed, setFailed] = useState(false);
+  const [errorCount, setErrorCount] = useState(0);
 
-  const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
-  const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+  // Build ordered list of resolved image URLs synchronously
+  const resolvedAttempts = useMemo(() => {
+    const variant = Math.random() < 0.5 ? 1 : 2;
+    const otherVariant = variant === 1 ? 2 : 1;
+    const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+    const exts = ['jpg', 'jpeg', 'png', 'webp'];
+    
+    const urls: string[] = [];
+    // Primary variant first, all extensions
+    for (const ext of exts) {
+      const url = resolveImageUrl(weedId, `${prefix}_${variant}.${ext}`);
+      if (url) urls.push(url);
+    }
+    // Then other variant
+    for (const ext of exts) {
+      const url = resolveImageUrl(weedId, `${prefix}_${otherVariant}.${ext}`);
+      if (url) urls.push(url);
+    }
+    // Fallback: try 'plant' stage if original stage had no images
+    if (urls.length === 0 && prefix !== 'plant') {
+      for (const v of [variant, otherVariant]) {
+        for (const ext of exts) {
+          const url = resolveImageUrl(weedId, `plant_${v}.${ext}`);
+          if (url) urls.push(url);
+        }
+      }
+    }
+    return urls;
+  }, [weedId, stage]);
 
-  // Build attempts using the resolved image map
-  const attempts = [
-    `${prefix}_${variant}.jpg`,
-    `${prefix}_${variant}.jpeg`,
-    `${prefix}_${variant}.png`,
-    `${prefix}_${variant}.webp`,
-    `${prefix}_${otherVariant}.jpg`,
-    `${prefix}_${otherVariant}.jpeg`,
-    `${prefix}_${otherVariant}.png`,
-    `${prefix}_${otherVariant}.webp`,
-  ];
-
-  if (failed) {
+  if (resolvedAttempts.length === 0 || errorCount >= resolvedAttempts.length) {
     return (
       <div className={`flex items-center justify-center bg-muted rounded-lg text-muted-foreground text-xs p-2 ${className || ''}`}>
         No image
@@ -42,46 +55,14 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
     );
   }
 
-  const filename = attempts[attemptIndex];
-  const src = resolveImageUrl(weedId, filename);
-
-  // If this attempt has no resolved URL, skip to next
-  if (!src) {
-    if (attemptIndex < attempts.length - 1) {
-      // Use a micro-task to avoid setting state during render
-      const nextIndex = attemptIndex + 1;
-      // Find next valid attempt
-      let found = false;
-      for (let i = nextIndex; i < attempts.length; i++) {
-        if (resolveImageUrl(weedId, attempts[i])) {
-          if (i !== attemptIndex) {
-            setTimeout(() => setAttemptIndex(i), 0);
-          }
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        setTimeout(() => setFailed(true), 0);
-      }
-      return null; // render nothing while resolving
-    }
-    setTimeout(() => setFailed(true), 0);
-    return null;
-  }
+  const src = resolvedAttempts[errorCount];
 
   return (
     <img
       src={src}
       alt=""
       className={`object-cover rounded-lg ${className || ''}`}
-      onError={() => {
-        if (attemptIndex < attempts.length - 1) {
-          setAttemptIndex(attemptIndex + 1);
-        } else {
-          setFailed(true);
-        }
-      }}
+      onError={() => setErrorCount(prev => prev + 1)}
     />
   );
 }

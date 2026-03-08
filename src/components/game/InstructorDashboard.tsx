@@ -139,7 +139,40 @@ export default function InstructorDashboard({ onClose }: Props) {
   }
 
   if (!isAuthenticated || showAuth) {
-    return <InstructorAuth onAuthenticated={() => setShowAuth(false)} onClose={onClose} />;
+    return (
+      <AuthModal
+        onAuthenticated={(authRole) => {
+          setShowAuth(false);
+          // If they logged in as a student, close the dashboard
+          if (authRole === 'student') onClose();
+        }}
+        onClose={onClose}
+        defaultMode="login"
+      />
+    );
+  }
+
+  // If logged in but not an instructor, show message
+  if (role !== 'instructor' || !instructor) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center p-4">
+        <div className="bg-card border border-border rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 text-center animate-scale-in">
+          <div className="text-4xl">📊</div>
+          <h2 className="text-xl font-display font-bold text-foreground">Instructor Access Required</h2>
+          <p className="text-sm text-muted-foreground">
+            You're logged in as a student. To access the dashboard, sign out and create an instructor account.
+          </p>
+          <div className="flex gap-2 justify-center">
+            <button onClick={logout} className="px-4 py-2 rounded-lg border border-destructive/50 text-destructive hover:bg-destructive/10 text-sm">
+              Sign Out
+            </button>
+            <button onClick={onClose} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary text-sm">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const joinUrl = selectedClassInfo ? `${window.location.origin}?join=${selectedClassInfo.join_code}` : '';
