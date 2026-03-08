@@ -13,6 +13,7 @@ import Glossary from '@/components/game/Glossary';
 import LearningModule from '@/components/game/LearningModule';
 import ClassJoinFlow from '@/components/game/ClassJoinFlow';
 import StudentLeaderboard from '@/components/game/StudentLeaderboard';
+import CompetitionMode from '@/components/game/CompetitionMode';
 import AuthModal from '@/components/game/AuthModal';
 import type { GradeLevel } from '@/types/game';
 import { useEffect, useRef } from 'react';
@@ -27,6 +28,7 @@ const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCompetition, setShowCompetition] = useState(false);
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
   const { createSession, updateSession } = useSessionPersistence(session?.studentId ?? null);
