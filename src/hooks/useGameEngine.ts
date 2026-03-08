@@ -65,31 +65,33 @@ function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, n
   const unlocked = getUnlockedPhases(grade, xp);
   const questions: Question[] = [];
 
-  // For each unlocked phase, generate a limited set of questions
-  // to ensure variety across phases
+  // Ensure EVEN distribution across all unlocked phases
+  // Each phase gets exactly 2 entries per pool cycle
+  const QUESTIONS_PER_PHASE = 2;
+
   for (const phase of unlocked) {
-    if (BATCH_PHASES.has(phase.id)) {
-      // Each batch mini-game gets 1 entry per pool cycle
-      questions.push({
-        weedId: weeds[0].id, phaseId: phase.id, phaseName: phase.name,
-        xpReward: phase.xpReward, imageStage: phase.imageStage,
-        showName: phase.showName, showFamily: phase.showFamily,
-        type: 'minigame', text: phase.name, options: [], correct: '',
-      });
-    } else {
-      // Per-weed phases: pick 2-3 random weeds per phase (not all 88!)
-      const eligible = getEligibleWeeds(grade, phase.id, speciesTiers);
-      const picked = pickRandom(eligible, 3);
-      for (const weed of picked) {
-        questions.push(generateQuestion(phase, weed, weeds));
+    for (let i = 0; i < QUESTIONS_PER_PHASE; i++) {
+      if (BATCH_PHASES.has(phase.id)) {
+        questions.push({
+          weedId: weeds[0].id, phaseId: phase.id, phaseName: phase.name,
+          xpReward: phase.xpReward, imageStage: phase.imageStage,
+          showName: phase.showName, showFamily: phase.showFamily,
+          type: 'minigame', text: phase.name, options: [], correct: '',
+        });
+      } else {
+        const eligible = getEligibleWeeds(grade, phase.id, speciesTiers);
+        const picked = pickRandom(eligible, 1);
+        for (const weed of picked) {
+          questions.push(generateQuestion(phase, weed, weeds));
+        }
       }
     }
   }
 
-  // If only 1 phase unlocked, add a few more questions for variety
-  if (unlocked.length === 1 && questions.length < 5) {
+  // If only 1 phase unlocked, add extras for variety
+  if (unlocked.length === 1 && questions.length < 6) {
     const firstPhase = unlocked[0];
-    const extra = pickRandom(weeds, 3);
+    const extra = pickRandom(weeds, 4);
     for (const weed of extra) {
       questions.push(generateQuestion(firstPhase, weed, weeds));
     }
@@ -112,6 +114,8 @@ export function useGameEngine() {
   const [questionLog, setQuestionLog] = useState<LogEntry[]>([]);
   const [showInstructor, setShowInstructor] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
+  const [consecutiveWrong, setConsecutiveWrong] = useState(0);
+  const [penaltyUntil, setPenaltyUntil] = useState(0);
   // Per-species mastery tier: 0 = phase 1 only, 1 = phases 1-2, etc.
   const [speciesTiers, setSpeciesTiers] = useState<Record<string, number>>({});
   // Track correct count at current tier for advancement
@@ -310,6 +314,22 @@ export function useGameEngine() {
     });
 
     setStreak(newStreak);
+
+    // Track consecutive wrong for time penalty
+    if (!isCorrect) {
+      setConsecutiveWrong(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 3) {
+          // 5-second penalty
+          setPenaltyUntil(Date.now() + 5000);
+          toast('⏳ Slow Down!', { description: 'Take a moment to review — 5 second pause' });
+        }
+        return newCount;
+      });
+    } else {
+      setConsecutiveWrong(0);
+    }
+
     if (isCorrect && newStreak > 0 && newStreak % 5 === 0) {
       toast('🔥 Streak Bonus!', { description: `${newStreak} in a row! +${streakBonus} bonus XP` });
     } else if (isCorrect && newStreak > 0 && newStreak % 3 === 0) {
@@ -344,7 +364,7 @@ export function useGameEngine() {
   return {
     screen, grade, xp, current, feedback, round, questionNum, streak,
     weedStats, phaseStats, questionLog, speciesTiers, tierProgress,
-    showInstructor, showGlossary,
+    showInstructor, showGlossary, consecutiveWrong, penaltyUntil,
     level: Math.floor(xp / XP_PER_LEVEL) + 1,
     unlockedPhases: grade ? getUnlockedPhases(grade, xp) : [],
     masteredCount: Object.values(weedStats).filter(s => s.mastered).length,

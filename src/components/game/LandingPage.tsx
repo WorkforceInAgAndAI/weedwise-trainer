@@ -18,11 +18,12 @@ interface Props extends GameEngine {
   onOpenDashboard: () => void;
   onOpenLeaderboard: () => void;
   onOpenAuth: () => void;
+  onOpenCompetition: () => void;
   studentSession: { nickname: string; className: string } | null;
   auth: ReturnType<typeof useAuth>;
 }
 
-export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, studentSession, auth }: Props) {
+export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, onOpenCompetition, studentSession, auth }: Props) {
   const [showGradePicker, setShowGradePicker] = useState(false);
   const [isLightMode, setIsLightMode] = useState(() => {
     if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
@@ -141,6 +142,12 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
           className="px-5 py-2.5 rounded-lg border border-primary/50 bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
         >
           🏫 Join / Create Class
+        </button>
+        <button
+          onClick={onOpenCompetition}
+          className="px-5 py-2.5 rounded-lg border border-destructive/50 bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-colors"
+        >
+          ⚔️ Competition
         </button>
         <button
           onClick={onOpenLeaderboard}
