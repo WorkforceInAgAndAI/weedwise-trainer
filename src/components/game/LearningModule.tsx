@@ -30,6 +30,7 @@ function getTopicWeeds(topicId: TopicId): Weed[] {
   switch (topicId) {
     case 'names': return weeds;
     case 'monocot-dicot': return weeds;
+    case 'life-stages': return weeds;
     case 'native-introduced': return weeds;
     case 'families': return weeds;
     case 'habitats': return weeds;

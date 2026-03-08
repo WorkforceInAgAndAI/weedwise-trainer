@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import { PHASES, GRADE_NAMES, XP_PER_LEVEL } from '@/data/phases';
 import { weedMap, weeds } from '@/data/weeds';
@@ -17,33 +17,58 @@ import { filterTraitsForQuestion } from '@/lib/traitFilter';
 
 export default function GameScreen(game: GameEngine) {
   const { grade, xp, level, current, feedback, round, questionNum, streak,
-    totalCorrect, totalWrong, masteredCount,
+    totalCorrect, totalWrong, masteredCount, consecutiveWrong, penaltyUntil,
     submitAnswer, nextQuestion, endSession, setShowInstructor, setShowGlossary,
     completeMinigame } = game;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [fillInValue, setFillInValue] = useState('');
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [penaltyRemaining, setPenaltyRemaining] = useState(0);
+  const [xpPopup, setXpPopup] = useState<{ amount: number; id: number } | null>(null);
+
+  // Penalty timer
+  useEffect(() => {
+    if (!penaltyUntil) return;
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((penaltyUntil - Date.now()) / 1000));
+      setPenaltyRemaining(remaining);
+      if (remaining <= 0) clearInterval(interval);
+    }, 100);
+    return () => clearInterval(interval);
+  }, [penaltyUntil]);
+
+  // XP popup animation
+  useEffect(() => {
+    if (feedback?.xpEarned && feedback.xpEarned > 0) {
+      const id = Date.now();
+      setXpPopup({ amount: feedback.xpEarned, id });
+      const timeout = setTimeout(() => setXpPopup(null), 1500);
+      return () => clearTimeout(timeout);
+    }
+  }, [feedback]);
 
   if (!current || !grade) return null;
   const weed = weedMap[current.weedId];
   const xpInLevel = xp % XP_PER_LEVEL;
   const phases = PHASES[grade];
   const gradeColor = grade === 'elementary' ? 'bg-grade-elementary' : grade === 'middle' ? 'bg-grade-middle' : 'bg-grade-high';
+  const isPenalized = penaltyRemaining > 0;
 
-  const handleSubmit = (answer: string) => { if (!feedback) submitAnswer(answer); setSelectedAnswer(null); };
-  const handleFillIn = (e: FormEvent) => { e.preventDefault(); if (fillInValue.trim()) handleSubmit(fillInValue.trim()); };
+  const handleSubmit = (answer: string) => { if (!feedback && !isPenalized) submitAnswer(answer); setSelectedAnswer(null); };
+  const handleFillIn = (e: FormEvent) => { e.preventDefault(); if (fillInValue.trim() && !isPenalized) handleSubmit(fillInValue.trim()); };
   const handleNext = () => { setFillInValue(''); setSelectedAnswer(null); nextQuestion(); };
 
-  // Mini-game completion handler
   const onMinigameComplete = (results: Array<{ weedId: string; correct: boolean }>) => {
     completeMinigame(current.phaseId, results);
   };
 
+  // Streak multiplier display
+  const streakMultiplier = streak >= 10 ? '3x' : streak >= 5 ? '2x' : streak >= 3 ? '1.5x' : null;
+
   const renderActivity = () => {
     const key = `${current.phaseId}-${questionNum}`;
 
-    // Batch mini-games
     switch (current.phaseId) {
       case 'e3': return <CardFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e4': return <HabitatDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
@@ -52,19 +77,25 @@ export default function GameScreen(game: GameEngine) {
       case 'm5': return <NativeOrIntroduced key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h2': return <ConnectGame key={key} mode="scientific" onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h3': return <LifecycleImageSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-
-      // Per-weed interactive phases
       case 'e5': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm4': return <LookAlikeChallenge key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h4': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h5': return <IPMPlanBuilder key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
     }
 
-    // Standard MCQ / Binary / Fill-in
     return (
       <>
+        {/* Penalty overlay */}
+        {isPenalized && (
+          <div className="bg-destructive/10 border-2 border-destructive/30 rounded-xl p-6 text-center animate-scale-in">
+            <div className="text-4xl mb-2">⏳</div>
+            <p className="font-display font-bold text-xl text-destructive">{penaltyRemaining}s</p>
+            <p className="text-sm text-muted-foreground mt-1">Take a moment to review before continuing</p>
+          </div>
+        )}
+
         {/* Weed Card */}
-        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-4 animate-scale-in">
+        <div className={`bg-card border border-border rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-4 animate-scale-in ${isPenalized ? 'opacity-50 pointer-events-none' : ''}`}>
           <div className="w-full sm:w-40 h-40 bg-muted rounded-lg overflow-hidden shrink-0">
             <WeedImage weedId={weed.id} stage={current.imageStage} className="w-full h-full" />
           </div>
@@ -89,7 +120,7 @@ export default function GameScreen(game: GameEngine) {
           </div>
         )}
 
-        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
+        <div className={`bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up ${isPenalized ? 'opacity-50 pointer-events-none' : ''}`}>
           <p className="font-display font-semibold text-foreground">{current.text}</p>
 
           {/* MCQ with confirm */}
@@ -156,23 +187,52 @@ export default function GameScreen(game: GameEngine) {
               <div className="flex items-center gap-2">
                 <span className="text-xl">{feedback.correct ? '✅' : '❌'}</span>
                 <span className={`font-display font-bold ${feedback.correct ? 'text-accent' : 'text-destructive'}`}>{feedback.correct ? 'Correct!' : 'Incorrect'}</span>
-                {feedback.xpEarned > 0 && <span className="text-sm text-primary font-semibold ml-auto">+{feedback.xpEarned} XP</span>}
+                {feedback.xpEarned > 0 && (
+                  <span className="text-sm text-primary font-semibold ml-auto relative">
+                    +{feedback.xpEarned} XP
+                    {/* XP popup animation */}
+                    {xpPopup && (
+                      <span key={xpPopup.id} className="absolute -top-6 left-1/2 -translate-x-1/2 text-primary font-bold text-lg animate-bounce opacity-0"
+                        style={{ animation: 'floatUp 1.5s ease-out forwards' }}>
+                        +{xpPopup.amount}
+                      </span>
+                    )}
+                  </span>
+                )}
               </div>
-              {/* Streak celebration */}
+
+              {/* Streak celebration with fire animation */}
               {feedback.correct && streak >= 3 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/30">
-                  <span className="text-lg">🔥</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/30 relative overflow-hidden">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(streak, 10) }).map((_, i) => (
+                      <span key={i} className="text-sm" style={{ animationDelay: `${i * 50}ms`, animation: 'pulse 0.5s ease-in-out' }}>🔥</span>
+                    ))}
+                  </div>
                   <span className="text-sm font-bold text-primary">{streak} in a row!</span>
-                  {streak % 3 === 0 && <span className="text-xs text-accent ml-auto">+bonus XP!</span>}
+                  {streakMultiplier && (
+                    <span className="ml-auto px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-bold animate-pulse">
+                      {streakMultiplier} XP
+                    </span>
+                  )}
                 </div>
               )}
-              {/* Wrong answer encouragement */}
+
+              {/* Wrong answer with consecutive wrong counter */}
               {!feedback.correct && (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border">
-                  <span className="text-lg">💪</span>
-                  <span className="text-xs text-muted-foreground">Keep going! Review the info below to improve.</span>
+                  <span className="text-lg">{consecutiveWrong >= 3 ? '⏳' : '💪'}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {consecutiveWrong >= 3 ? 'Take a breath — review the info below' : 'Keep going! Review the info below to improve.'}
+                  </span>
+                  {consecutiveWrong >= 2 && (
+                    <span className="ml-auto text-xs text-destructive font-bold">
+                      {consecutiveWrong} wrong
+                    </span>
+                  )}
                 </div>
               )}
+
               {!feedback.correct && <p className="text-sm text-foreground"><span className="text-muted-foreground">Correct answer:</span> <span className="font-semibold text-accent">{feedback.correctAnswer}</span></p>}
               {current.phaseId === 'e2' && (
                 <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3 space-y-1">
@@ -208,6 +268,20 @@ export default function GameScreen(game: GameEngine) {
             <div className="h-3 bg-muted rounded-full overflow-hidden"><div className={`h-full ${gradeColor} rounded-full transition-all duration-500`} style={{ width: `${(xpInLevel / XP_PER_LEVEL) * 100}%` }} /></div>
             <div className="text-xs text-primary font-semibold mt-1">{xp} Total XP</div>
           </div>
+
+          {/* Streak display in sidebar */}
+          {streak >= 3 && (
+            <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+              <div className="flex justify-center gap-0.5 mb-1">
+                {Array.from({ length: Math.min(streak, 10) }).map((_, i) => (
+                  <span key={i} className="text-sm">🔥</span>
+                ))}
+              </div>
+              <div className="text-sm font-bold text-primary">{streak} Streak!</div>
+              {streakMultiplier && <div className="text-xs text-accent font-bold">{streakMultiplier} XP Multiplier</div>}
+            </div>
+          )}
+
           <div>
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Phases</h3>
             <div className="space-y-1">
@@ -244,7 +318,17 @@ export default function GameScreen(game: GameEngine) {
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${gradeColor} text-accent-foreground`}>{current.phaseName}</span>
           <span className="text-sm text-muted-foreground">Round {round}</span>
           <span className="text-sm text-muted-foreground">Q#{questionNum}</span>
-          {streak >= 3 && <span className="text-sm font-bold text-destructive animate-pulse">🔥 {streak} streak!</span>}
+          {streak >= 3 && (
+            <span className="text-sm font-bold text-destructive flex items-center gap-1">
+              {Array.from({ length: Math.min(Math.floor(streak / 3), 3) }).map((_, i) => (
+                <span key={i} className="animate-pulse" style={{ animationDelay: `${i * 100}ms` }}>🔥</span>
+              ))}
+              {streak}
+            </span>
+          )}
+          {isPenalized && (
+            <span className="text-sm font-bold text-destructive animate-pulse">⏳ {penaltyRemaining}s</span>
+          )}
           <div className="flex-1" />
           <span className="text-sm font-semibold text-primary">{GRADE_NAMES[grade]}</span>
         </header>
@@ -253,6 +337,14 @@ export default function GameScreen(game: GameEngine) {
           {renderActivity()}
         </div>
       </main>
+
+      {/* Global XP float animation styles */}
+      <style>{`
+        @keyframes floatUp {
+          0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          100% { opacity: 0; transform: translateX(-50%) translateY(-40px); }
+        }
+      `}</style>
     </div>
   );
 }

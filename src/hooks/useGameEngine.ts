@@ -364,7 +364,7 @@ export function useGameEngine() {
   return {
     screen, grade, xp, current, feedback, round, questionNum, streak,
     weedStats, phaseStats, questionLog, speciesTiers, tierProgress,
-    showInstructor, showGlossary,
+    showInstructor, showGlossary, consecutiveWrong, penaltyUntil,
     level: Math.floor(xp / XP_PER_LEVEL) + 1,
     unlockedPhases: grade ? getUnlockedPhases(grade, xp) : [],
     masteredCount: Object.values(weedStats).filter(s => s.mastered).length,
