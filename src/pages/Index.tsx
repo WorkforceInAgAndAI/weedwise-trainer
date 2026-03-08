@@ -3,6 +3,7 @@ import { useGameEngine } from '@/hooks/useGameEngine';
 import { useStudent } from '@/contexts/StudentContext';
 import { useBadgeChecker } from '@/hooks/useBadgeChecker';
 import { useSessionPersistence } from '@/hooks/useSessionPersistence';
+import { useAuth } from '@/hooks/useAuth';
 import LandingPage from '@/components/game/LandingPage';
 import GameScreen from '@/components/game/GameScreen';
 import ResultsScreen from '@/components/game/ResultsScreen';
@@ -12,17 +13,20 @@ import Glossary from '@/components/game/Glossary';
 import LearningModule from '@/components/game/LearningModule';
 import ClassJoinFlow from '@/components/game/ClassJoinFlow';
 import StudentLeaderboard from '@/components/game/StudentLeaderboard';
+import AuthModal from '@/components/game/AuthModal';
 import type { GradeLevel } from '@/types/game';
 import { useEffect, useRef } from 'react';
 
 const Index = () => {
   const game = useGameEngine();
   const { session } = useStudent();
+  const auth = useAuth();
   const [showLearning, setShowLearning] = useState(false);
   const [showGlossaryDirect, setShowGlossaryDirect] = useState(false);
   const [showClassJoin, setShowClassJoin] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
   const { createSession, updateSession } = useSessionPersistence(session?.studentId ?? null);
@@ -37,7 +41,6 @@ const Index = () => {
     if (total === 0 || total === prevCorrectRef.current) return;
     prevCorrectRef.current = total;
 
-    // Check badges
     checkBadges({
       weedStats: game.weedStats,
       streak: game.streak,
@@ -47,7 +50,6 @@ const Index = () => {
       xp: game.xp,
     });
 
-    // Persist session
     updateSession({
       xp: game.xp,
       totalCorrect: game.totalCorrect,
@@ -65,6 +67,14 @@ const Index = () => {
     if (session) createSession(g);
   };
 
+  const handleAuthComplete = (role: 'instructor' | 'student') => {
+    setShowAuthModal(false);
+    if (role === 'instructor') {
+      setShowDashboard(true);
+    }
+    // Students just stay on landing page
+  };
+
   return (
     <>
       {game.screen === 'landing' && (
@@ -76,7 +86,9 @@ const Index = () => {
           onOpenClassJoin={() => setShowClassJoin(true)}
           onOpenDashboard={() => setShowDashboard(true)}
           onOpenLeaderboard={() => setShowLeaderboard(true)}
+          onOpenAuth={() => setShowAuthModal(true)}
           studentSession={session}
+          auth={auth}
         />
       )}
       {game.screen === 'playing' && <GameScreen {...game} />}
@@ -89,6 +101,9 @@ const Index = () => {
       {showClassJoin && <ClassJoinFlow onClose={() => setShowClassJoin(false)} />}
       {showDashboard && <InstructorDashboard onClose={() => setShowDashboard(false)} />}
       {showLeaderboard && <StudentLeaderboard onClose={() => setShowLeaderboard(false)} />}
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} onAuthenticated={handleAuthComplete} />
+      )}
     </>
   );
 };
