@@ -89,6 +89,7 @@ const Index = () => {
           onOpenDashboard={() => setShowDashboard(true)}
           onOpenLeaderboard={() => setShowLeaderboard(true)}
           onOpenAuth={() => setShowAuthModal(true)}
+          onOpenCompetition={() => setShowCompetition(true)}
           studentSession={session}
           auth={auth}
         />
