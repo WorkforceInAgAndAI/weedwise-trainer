@@ -65,9 +65,11 @@ function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, n
   const unlocked = getUnlockedPhases(grade, xp);
   const questions: Question[] = [];
 
+  // For each unlocked phase, generate a limited set of questions
+  // to ensure variety across phases
   for (const phase of unlocked) {
     if (BATCH_PHASES.has(phase.id)) {
-      // Batch mini-games always available once unlocked
+      // Each batch mini-game gets 1 entry per pool cycle
       questions.push({
         weedId: weeds[0].id, phaseId: phase.id, phaseName: phase.name,
         xpReward: phase.xpReward, imageStage: phase.imageStage,
@@ -75,17 +77,20 @@ function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, n
         type: 'minigame', text: phase.name, options: [], correct: '',
       });
     } else {
+      // Per-weed phases: pick 2-3 random weeds per phase (not all 88!)
       const eligible = getEligibleWeeds(grade, phase.id, speciesTiers);
-      for (const weed of eligible) {
+      const picked = pickRandom(eligible, 3);
+      for (const weed of picked) {
         questions.push(generateQuestion(phase, weed, weeds));
       }
     }
   }
 
-  // If no questions generated (edge case), fall back to phase 1 with all weeds
-  if (questions.length === 0) {
-    const firstPhase = PHASES[grade][0];
-    for (const weed of weeds) {
+  // If only 1 phase unlocked, add a few more questions for variety
+  if (unlocked.length === 1 && questions.length < 5) {
+    const firstPhase = unlocked[0];
+    const extra = pickRandom(weeds, 3);
+    for (const weed of extra) {
       questions.push(generateQuestion(firstPhase, weed, weeds));
     }
   }
