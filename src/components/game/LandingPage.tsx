@@ -3,6 +3,7 @@ import type { GameEngine } from '@/hooks/useGameEngine';
 import { GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
 import type { GradeLevel } from '@/types/game';
 import { Switch } from '@/components/ui/switch';
+import type { useAuth } from '@/hooks/useAuth';
 
 const gradeCards: { grade: GradeLevel; icon: string; colorClass: string; borderClass: string }[] = [
   { grade: 'elementary', icon: '🌱', colorClass: 'text-grade-elementary', borderClass: 'border-grade-elementary hover:shadow-[0_0_20px_hsl(95_57%_46%/0.3)]' },
@@ -16,13 +17,14 @@ interface Props extends GameEngine {
   onOpenClassJoin: () => void;
   onOpenDashboard: () => void;
   onOpenLeaderboard: () => void;
+  onOpenAuth: () => void;
   studentSession: { nickname: string; className: string } | null;
+  auth: ReturnType<typeof useAuth>;
 }
 
-export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, studentSession }: Props) {
+export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, studentSession, auth }: Props) {
   const [showGradePicker, setShowGradePicker] = useState(false);
   const [isLightMode, setIsLightMode] = useState(() => {
-    // Default to light mode if no preference has been set
     if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
       document.documentElement.classList.add('light');
       return true;
@@ -41,11 +43,30 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 relative">
-      {/* Theme toggle */}
-      <div className="absolute top-4 right-4 flex items-center gap-2">
+      {/* Top bar: theme toggle + auth */}
+      <div className="absolute top-4 right-4 flex items-center gap-3">
         <span className="text-sm text-muted-foreground">🌙</span>
         <Switch checked={isLightMode} onCheckedChange={toggleTheme} />
         <span className="text-sm text-muted-foreground">☀️</span>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        {auth.isAuthenticated ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-foreground font-medium">
+              {auth.role === 'instructor' ? `📊 ${auth.instructor?.display_name}` : `👤 ${auth.user?.email?.split('@')[0]}`}
+            </span>
+            <button onClick={auth.logout}
+              className="px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive text-xs font-medium hover:bg-destructive/10 transition-colors">
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <button onClick={onOpenAuth}
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
+            Log In
+          </button>
+        )}
       </div>
 
       <div className="text-center mb-8 animate-fade-in">
