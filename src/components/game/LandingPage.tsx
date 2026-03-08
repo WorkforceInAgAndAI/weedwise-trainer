@@ -18,6 +18,7 @@ interface Props extends GameEngine {
   onOpenDashboard: () => void;
   onOpenLeaderboard: () => void;
   onOpenAuth: () => void;
+  onOpenCompetition: () => void;
   studentSession: { nickname: string; className: string } | null;
   auth: ReturnType<typeof useAuth>;
 }
