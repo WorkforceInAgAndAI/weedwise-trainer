@@ -229,7 +229,7 @@ export default function GameScreen(game: GameEngine) {
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${gradeColor} text-accent-foreground`}>{current.phaseName}</span>
           <span className="text-sm text-muted-foreground">Round {round}</span>
           <span className="text-sm text-muted-foreground">Q#{questionNum}</span>
-          {streak >= 3 && <span className="text-sm font-bold text-orange-500 animate-pulse">🔥 {streak} streak!</span>}
+          {streak >= 3 && <span className="text-sm font-bold text-destructive animate-pulse">🔥 {streak} streak!</span>}
           <div className="flex-1" />
           <span className="text-sm font-semibold text-primary">{GRADE_NAMES[grade]}</span>
         </header>
