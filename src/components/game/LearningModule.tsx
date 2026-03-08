@@ -4,7 +4,7 @@ import type { GradeLevel, Weed } from '@/types/game';
 import { GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
 import WeedImage from './WeedImage';
 
-type TopicId = 'names' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'look-alikes' | 'safety';
+type TopicId = 'names' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety';
 
 interface Topic {
   id: TopicId;
@@ -17,6 +17,7 @@ interface Topic {
 const TOPICS: Topic[] = [
   { id: 'names', name: 'Weed Names & ID', icon: '🏷️', description: 'Learn common names, scientific names, and key traits', grades: ['elementary', 'middle', 'high'] },
   { id: 'monocot-dicot', name: 'Monocot vs Dicot', icon: '🌾', description: 'Understand the difference between monocots and dicots', grades: ['elementary', 'middle', 'high'] },
+  { id: 'life-stages', name: 'Life Stages', icon: '📸', description: 'Learn to identify weeds at seedling, vegetative, and reproductive stages', grades: ['elementary', 'middle', 'high'] },
   { id: 'native-introduced', name: 'Native vs Introduced', icon: '🌍', description: 'Which species are native and which were introduced', grades: ['elementary', 'middle', 'high'] },
   { id: 'families', name: 'Plant Families', icon: '🧬', description: 'Group weeds by their botanical families', grades: ['middle', 'high'] },
   { id: 'habitats', name: 'Habitats & Climate', icon: '🗺️', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['elementary', 'middle', 'high'] },
