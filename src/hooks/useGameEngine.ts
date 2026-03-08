@@ -314,6 +314,22 @@ export function useGameEngine() {
     });
 
     setStreak(newStreak);
+
+    // Track consecutive wrong for time penalty
+    if (!isCorrect) {
+      setConsecutiveWrong(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 3) {
+          // 5-second penalty
+          setPenaltyUntil(Date.now() + 5000);
+          toast('⏳ Slow Down!', { description: 'Take a moment to review — 5 second pause' });
+        }
+        return newCount;
+      });
+    } else {
+      setConsecutiveWrong(0);
+    }
+
     if (isCorrect && newStreak > 0 && newStreak % 5 === 0) {
       toast('🔥 Streak Bonus!', { description: `${newStreak} in a row! +${streakBonus} bonus XP` });
     } else if (isCorrect && newStreak > 0 && newStreak % 3 === 0) {
