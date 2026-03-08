@@ -309,10 +309,11 @@ export function useGameEngine() {
       return { ...prev, [current.phaseId]: { correct: stat.correct + (isCorrect ? 1 : 0), wrong: stat.wrong + (isCorrect ? 0 : 1) } };
     });
 
-    const newStreak = isCorrect ? streak + 1 : 0;
     setStreak(newStreak);
     if (isCorrect && newStreak > 0 && newStreak % 5 === 0) {
-      toast('🔥 Streak!', { description: `${newStreak} correct in a row!` });
+      toast('🔥 Streak Bonus!', { description: `${newStreak} in a row! +${streakBonus} bonus XP` });
+    } else if (isCorrect && newStreak > 0 && newStreak % 3 === 0) {
+      toast('🔥 Streak!', { description: `${newStreak} correct in a row! +${streakBonus} bonus XP` });
     }
 
     const oldLevel = Math.floor((xpRef.current - xpEarned) / XP_PER_LEVEL) + 1;
