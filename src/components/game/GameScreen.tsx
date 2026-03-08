@@ -158,6 +158,21 @@ export default function GameScreen(game: GameEngine) {
                 <span className={`font-display font-bold ${feedback.correct ? 'text-accent' : 'text-destructive'}`}>{feedback.correct ? 'Correct!' : 'Incorrect'}</span>
                 {feedback.xpEarned > 0 && <span className="text-sm text-primary font-semibold ml-auto">+{feedback.xpEarned} XP</span>}
               </div>
+              {/* Streak celebration */}
+              {feedback.correct && streak >= 3 && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/30">
+                  <span className="text-lg">🔥</span>
+                  <span className="text-sm font-bold text-primary">{streak} in a row!</span>
+                  {streak % 3 === 0 && <span className="text-xs text-accent ml-auto">+bonus XP!</span>}
+                </div>
+              )}
+              {/* Wrong answer encouragement */}
+              {!feedback.correct && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border">
+                  <span className="text-lg">💪</span>
+                  <span className="text-xs text-muted-foreground">Keep going! Review the info below to improve.</span>
+                </div>
+              )}
               {!feedback.correct && <p className="text-sm text-foreground"><span className="text-muted-foreground">Correct answer:</span> <span className="font-semibold text-accent">{feedback.correctAnswer}</span></p>}
               {current.phaseId === 'e2' && (
                 <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3 space-y-1">

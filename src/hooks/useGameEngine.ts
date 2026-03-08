@@ -65,9 +65,11 @@ function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, n
   const unlocked = getUnlockedPhases(grade, xp);
   const questions: Question[] = [];
 
+  // For each unlocked phase, generate a limited set of questions
+  // to ensure variety across phases
   for (const phase of unlocked) {
     if (BATCH_PHASES.has(phase.id)) {
-      // Batch mini-games always available once unlocked
+      // Each batch mini-game gets 1 entry per pool cycle
       questions.push({
         weedId: weeds[0].id, phaseId: phase.id, phaseName: phase.name,
         xpReward: phase.xpReward, imageStage: phase.imageStage,
@@ -75,17 +77,20 @@ function buildPool(grade: GradeLevel, xp: number, speciesTiers: Record<string, n
         type: 'minigame', text: phase.name, options: [], correct: '',
       });
     } else {
+      // Per-weed phases: pick 2-3 random weeds per phase (not all 88!)
       const eligible = getEligibleWeeds(grade, phase.id, speciesTiers);
-      for (const weed of eligible) {
+      const picked = pickRandom(eligible, 3);
+      for (const weed of picked) {
         questions.push(generateQuestion(phase, weed, weeds));
       }
     }
   }
 
-  // If no questions generated (edge case), fall back to phase 1 with all weeds
-  if (questions.length === 0) {
-    const firstPhase = PHASES[grade][0];
-    for (const weed of weeds) {
+  // If only 1 phase unlocked, add a few more questions for variety
+  if (unlocked.length === 1 && questions.length < 5) {
+    const firstPhase = unlocked[0];
+    const extra = pickRandom(weeds, 3);
+    for (const weed of extra) {
       questions.push(generateQuestion(firstPhase, weed, weeds));
     }
   }
@@ -258,7 +263,13 @@ export function useGameEngine() {
       isCorrect = answer === current.correct;
     }
 
-    const xpEarned = isCorrect ? current.xpReward : 0;
+    // Streak bonus: +2 XP for every 3 in a row, +5 for every 5
+    const newStreak = isCorrect ? streak + 1 : 0;
+    let streakBonus = 0;
+    if (isCorrect && newStreak >= 5 && newStreak % 5 === 0) streakBonus = 5;
+    else if (isCorrect && newStreak >= 3 && newStreak % 3 === 0) streakBonus = 2;
+
+    const xpEarned = isCorrect ? current.xpReward + streakBonus : 0;
     const newXp = xpRef.current + xpEarned;
     const oldUnlocked = getUnlockedPhases(grade, xpRef.current).length;
     const newUnlocked = getUnlockedPhases(grade, newXp).length;
@@ -298,10 +309,11 @@ export function useGameEngine() {
       return { ...prev, [current.phaseId]: { correct: stat.correct + (isCorrect ? 1 : 0), wrong: stat.wrong + (isCorrect ? 0 : 1) } };
     });
 
-    const newStreak = isCorrect ? streak + 1 : 0;
     setStreak(newStreak);
     if (isCorrect && newStreak > 0 && newStreak % 5 === 0) {
-      toast('🔥 Streak!', { description: `${newStreak} correct in a row!` });
+      toast('🔥 Streak Bonus!', { description: `${newStreak} in a row! +${streakBonus} bonus XP` });
+    } else if (isCorrect && newStreak > 0 && newStreak % 3 === 0) {
+      toast('🔥 Streak!', { description: `${newStreak} correct in a row! +${streakBonus} bonus XP` });
     }
 
     const oldLevel = Math.floor((xpRef.current - xpEarned) / XP_PER_LEVEL) + 1;

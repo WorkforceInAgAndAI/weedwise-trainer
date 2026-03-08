@@ -3,9 +3,9 @@ import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 
 const STAGES = [
-  { id: 'seedling', label: 'Seedling', desc: '1-3 leaves, just emerged', imageStage: 'seedling' },
-  { id: 'vegetative', label: 'Vegetative', desc: 'Active growth, branching', imageStage: 'vegetative' },
-  { id: 'reproductive', label: 'Reproductive', desc: 'Flowering / seed set', imageStage: 'flower' },
+  { id: 'seedling', label: '🌱 Seedling', desc: '1-3 leaves, just emerged', imageStage: 'seedling' },
+  { id: 'vegetative', label: '🌿 Vegetative', desc: 'Active growth, branching', imageStage: 'vegetative' },
+  { id: 'reproductive', label: '🌸 Reproductive', desc: 'Flowering / seed set', imageStage: 'flower' },
 ];
 
 const METHODS = [
@@ -47,6 +47,7 @@ interface Props {
 }
 
 export default function ControlTimingGame({ weed, onComplete, onNext }: Props) {
+  const [step, setStep] = useState<1 | 2>(1);
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -65,70 +66,102 @@ export default function ControlTimingGame({ weed, onComplete, onNext }: Props) {
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
+      {/* Header */}
       <div>
         <h2 className="font-display font-bold text-lg text-foreground">⏱️ Control Strategy</h2>
         <p className="text-sm text-muted-foreground">
-          Choose the best <span className="font-bold text-foreground">growth stage</span> AND{' '}
-          <span className="font-bold text-foreground">control method</span> for{' '}
-          <span className="text-foreground font-bold">{weed.commonName}</span>.
+          Choose the best strategy for <span className="text-foreground font-bold">{weed.commonName}</span>
         </p>
       </div>
 
-      {/* Step 1: Growth stage */}
-      <div>
-        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">① Select Growth Stage</h3>
-        <div className="flex gap-2">
-          {STAGES.map(stage => (
-            <button key={stage.id} onClick={() => !submitted && setSelectedStage(stage.id)}
-              disabled={submitted}
-              className={`flex-1 flex flex-col items-center transition-all ${submitted ? '' : ''}`}>
-              <div className={`w-full h-24 rounded-lg overflow-hidden border-2 mb-1.5 transition-all ${
-                submitted
-                  ? stage.id === optStage ? 'border-accent ring-2 ring-accent/30' : selectedStage === stage.id && !isStageCorrect ? 'border-destructive' : 'border-border opacity-50'
-                  : selectedStage === stage.id ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'
-              }`}>
-                <WeedImage weedId={weed.id} stage={stage.imageStage} className="w-full h-full" />
-              </div>
-              <span className="text-[10px] font-bold text-foreground">{stage.label}</span>
-              <span className="text-[8px] text-muted-foreground text-center">{stage.desc}</span>
-            </button>
-          ))}
+      {/* Step indicator */}
+      <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+          step === 1 && !submitted ? 'bg-primary text-primary-foreground' : selectedStage ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'
+        }`}>
+          {selectedStage ? '✓' : '①'} Growth Stage
+        </div>
+        <div className="w-6 h-0.5 bg-border" />
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+          step === 2 && !submitted ? 'bg-primary text-primary-foreground' : selectedMethod ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'
+        }`}>
+          {selectedMethod ? '✓' : '②'} Control Method
         </div>
       </div>
+
+      {/* Step 1: Growth stage */}
+      {(step === 1 || submitted) && (
+        <div>
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+            {step === 1 && !submitted ? 'When should you act? Tap a growth stage:' : 'Growth Stage'}
+          </h3>
+          <div className="flex gap-2">
+            {STAGES.map(stage => (
+              <button key={stage.id} onClick={() => {
+                if (submitted) return;
+                setSelectedStage(stage.id);
+                setStep(2);
+              }}
+                disabled={submitted}
+                className="flex-1 flex flex-col items-center transition-all">
+                <div className={`w-full h-24 rounded-lg overflow-hidden border-2 mb-1.5 transition-all ${
+                  submitted
+                    ? stage.id === optStage ? 'border-accent ring-2 ring-accent/30' : selectedStage === stage.id && !isStageCorrect ? 'border-destructive' : 'border-border opacity-50'
+                    : selectedStage === stage.id ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-border hover:border-primary/50'
+                }`}>
+                  <WeedImage weedId={weed.id} stage={stage.imageStage} className="w-full h-full" />
+                </div>
+                <span className="text-xs font-bold text-foreground">{stage.label}</span>
+                <span className="text-[8px] text-muted-foreground text-center">{stage.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Step 2: Control method */}
-      <div>
-        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">② Select Control Method</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {METHODS.map(method => (
-            <button key={method.id} onClick={() => !submitted && setSelectedMethod(method.id)}
-              disabled={submitted}
-              className={`p-2.5 rounded-lg border-2 text-left transition-all ${
-                submitted
-                  ? method.id === optMethod ? 'border-accent bg-accent/10' : selectedMethod === method.id && !isMethodCorrect ? 'border-destructive bg-destructive/10' : 'border-border opacity-50'
-                  : selectedMethod === method.id ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
-              }`}>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{method.icon}</span>
-                <div>
-                  <span className="text-xs font-bold text-foreground block">{method.label}</span>
-                  <span className="text-[9px] text-muted-foreground">{method.desc}</span>
+      {(step === 2 || submitted) && (
+        <div className={step === 2 && !submitted ? 'animate-fade-in' : ''}>
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+            {step === 2 && !submitted ? 'How should you control it? Tap a method:' : 'Control Method'}
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            {METHODS.map(method => (
+              <button key={method.id} onClick={() => {
+                if (submitted) return;
+                setSelectedMethod(method.id);
+              }}
+                disabled={submitted}
+                className={`p-3 rounded-lg border-2 text-left transition-all ${
+                  submitted
+                    ? method.id === optMethod ? 'border-accent bg-accent/10' : selectedMethod === method.id && !isMethodCorrect ? 'border-destructive bg-destructive/10' : 'border-border opacity-50'
+                    : selectedMethod === method.id ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-border hover:border-primary/50'
+                }`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{method.icon}</span>
+                  <div>
+                    <span className="text-xs font-bold text-foreground block">{method.label}</span>
+                    <span className="text-[9px] text-muted-foreground">{method.desc}</span>
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
+          {!submitted && selectedMethod && (
+            <div className="mt-3 space-y-2">
+              <button onClick={() => setStep(1)} className="w-full px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:bg-secondary transition-colors">
+                ← Change Growth Stage
+              </button>
+              <button onClick={handleSubmit} className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
+                Apply {METHODS.find(m => m.id === selectedMethod)?.label} at {STAGES.find(s => s.id === selectedStage)?.label} Stage ✓
+              </button>
+            </div>
+          )}
         </div>
-      </div>
-
-      {!submitted && selectedStage && selectedMethod && (
-        <button onClick={handleSubmit} className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
-          Apply {METHODS.find(m => m.id === selectedMethod)?.label} at {STAGES.find(s => s.id === selectedStage)?.label} Stage
-        </button>
       )}
 
       {submitted && (
         <div className="space-y-4 animate-scale-in">
-          {/* Result feedback */}
           <div className={`rounded-lg p-4 ${isBothCorrect ? 'bg-accent/15 border border-accent/50' : 'bg-destructive/15 border border-destructive/50'}`}>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl">{isBothCorrect ? '✅' : isStageCorrect || isMethodCorrect ? '⚠️' : '❌'}</span>
@@ -140,50 +173,31 @@ export default function ControlTimingGame({ weed, onComplete, onNext }: Props) {
             <p className="text-xs text-muted-foreground">Best approach: <span className="text-foreground font-semibold">{weed.management}</span></p>
           </div>
 
-          {/* Effectiveness matrix */}
+          {/* Effectiveness comparison */}
           <div className="bg-muted/30 rounded-lg p-4 border border-border">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Effectiveness by Stage × Method</h3>
-            <div className="space-y-2">
-              {STAGES.map(stage => {
-                const eff = getEffectiveness(stage.id, selectedMethod!, optStage, optMethod);
-                const optEff = getEffectiveness(stage.id, optMethod, optStage, optMethod);
-                const isOpt = stage.id === optStage;
-                return (
-                  <div key={stage.id} className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] w-20 ${isOpt ? 'font-bold text-accent' : 'text-muted-foreground'}`}>
-                        {stage.label} {isOpt && '⭐'}
-                      </span>
-                      <div className="flex-1 space-y-0.5">
-                        {/* Your choice */}
-                        <div className="flex items-center gap-1">
-                          <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-700 ${isOpt && isMethodCorrect ? 'bg-accent' : 'bg-primary/60'}`}
-                              style={{ width: `${eff}%` }}
-                            />
-                          </div>
-                          <span className="text-[9px] font-bold w-8 text-right text-muted-foreground">{eff}%</span>
-                        </div>
-                        {/* Optimal for this stage */}
-                        {selectedMethod !== optMethod && (
-                          <div className="flex items-center gap-1">
-                            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full rounded-full bg-accent/40 transition-all duration-700" style={{ width: `${optEff}%` }} />
-                            </div>
-                            <span className="text-[8px] w-8 text-right text-accent/60">{optEff}%</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Effectiveness Comparison</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Your Choice</span>
+                  <span className="font-bold text-foreground">{getEffectiveness(selectedStage!, selectedMethod!, optStage, optMethod)}%</span>
+                </div>
+                <div className="h-4 bg-muted rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all duration-700 ${isBothCorrect ? 'bg-accent' : 'bg-primary/60'}`}
+                    style={{ width: `${getEffectiveness(selectedStage!, selectedMethod!, optStage, optMethod)}%` }} />
+                </div>
+              </div>
+              {!isBothCorrect && (
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-accent">Optimal Strategy</span>
+                    <span className="font-bold text-accent">{getEffectiveness(optStage, optMethod, optStage, optMethod)}%</span>
                   </div>
-                );
-              })}
-            </div>
-            <div className="flex gap-4 mt-2">
-              <span className="text-[9px] text-muted-foreground flex items-center gap-1"><span className="w-3 h-2 rounded bg-primary/60 inline-block" /> Your choice</span>
-              {selectedMethod !== optMethod && (
-                <span className="text-[9px] text-muted-foreground flex items-center gap-1"><span className="w-3 h-2 rounded bg-accent/40 inline-block" /> Optimal method</span>
+                  <div className="h-4 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-accent transition-all duration-700"
+                      style={{ width: `${getEffectiveness(optStage, optMethod, optStage, optMethod)}%` }} />
+                  </div>
+                </div>
               )}
             </div>
           </div>
