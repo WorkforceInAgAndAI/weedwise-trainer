@@ -263,7 +263,13 @@ export function useGameEngine() {
       isCorrect = answer === current.correct;
     }
 
-    const xpEarned = isCorrect ? current.xpReward : 0;
+    // Streak bonus: +2 XP for every 3 in a row, +5 for every 5
+    const newStreak = isCorrect ? streak + 1 : 0;
+    let streakBonus = 0;
+    if (isCorrect && newStreak >= 5 && newStreak % 5 === 0) streakBonus = 5;
+    else if (isCorrect && newStreak >= 3 && newStreak % 3 === 0) streakBonus = 2;
+
+    const xpEarned = isCorrect ? current.xpReward + streakBonus : 0;
     const newXp = xpRef.current + xpEarned;
     const oldUnlocked = getUnlockedPhases(grade, xpRef.current).length;
     const newUnlocked = getUnlockedPhases(grade, newXp).length;
