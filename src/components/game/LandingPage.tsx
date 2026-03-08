@@ -144,6 +144,12 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
           🏫 Join / Create Class
         </button>
         <button
+          onClick={onOpenCompetition}
+          className="px-5 py-2.5 rounded-lg border border-destructive/50 bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-colors"
+        >
+          ⚔️ Competition
+        </button>
+        <button
           onClick={onOpenLeaderboard}
           className="px-5 py-2.5 rounded-lg border border-accent/50 bg-accent/10 text-foreground text-sm font-medium hover:bg-accent/20 transition-colors"
         >
