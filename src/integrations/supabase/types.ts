@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          instructor_id: string | null
           instructor_name: string
           join_code: string
           name: string
@@ -25,6 +26,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          instructor_id?: string | null
           instructor_name: string
           join_code: string
           name: string
@@ -32,11 +34,20 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          instructor_id?: string | null
           instructor_name?: string
           join_code?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "classes_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       game_sessions: {
         Row: {
@@ -91,6 +102,27 @@ export type Database = {
           },
         ]
       }
+      instructors: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_badges: {
         Row: {
           badge_id: string
@@ -126,18 +158,21 @@ export type Database = {
           created_at: string
           id: string
           nickname: string
+          user_id: string | null
         }
         Insert: {
           class_id: string
           created_at?: string
           id?: string
           nickname: string
+          user_id?: string | null
         }
         Update: {
           class_id?: string
           created_at?: string
           id?: string
           nickname?: string
+          user_id?: string | null
         }
         Relationships: [
           {
