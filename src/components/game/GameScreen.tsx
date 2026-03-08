@@ -23,6 +23,7 @@ export default function GameScreen(game: GameEngine) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [fillInValue, setFillInValue] = useState('');
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
   if (!current || !grade) return null;
   const weed = weedMap[current.weedId];
@@ -30,9 +31,9 @@ export default function GameScreen(game: GameEngine) {
   const phases = PHASES[grade];
   const gradeColor = grade === 'elementary' ? 'bg-grade-elementary' : grade === 'middle' ? 'bg-grade-middle' : 'bg-grade-high';
 
-  const handleSubmit = (answer: string) => { if (!feedback) submitAnswer(answer); };
+  const handleSubmit = (answer: string) => { if (!feedback) submitAnswer(answer); setSelectedAnswer(null); };
   const handleFillIn = (e: FormEvent) => { e.preventDefault(); if (fillInValue.trim()) handleSubmit(fillInValue.trim()); };
-  const handleNext = () => { setFillInValue(''); nextQuestion(); };
+  const handleNext = () => { setFillInValue(''); setSelectedAnswer(null); nextQuestion(); };
 
   // Mini-game completion handler
   const onMinigameComplete = (results: Array<{ weedId: string; correct: boolean }>) => {
@@ -78,7 +79,7 @@ export default function GameScreen(game: GameEngine) {
                 </li>
               ))}
             </ul>
-            <div className="text-xs text-muted-foreground">Stage: <span className="capitalize text-foreground">{current.imageStage}</span></div>
+            <div className="text-xs text-muted-foreground">Stage: <span className="capitalize text-foreground">{current.imageStage === 'whole' ? 'Whole Plant' : current.imageStage}</span></div>
           </div>
         </div>
 
@@ -91,26 +92,54 @@ export default function GameScreen(game: GameEngine) {
         <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-slide-up">
           <p className="font-display font-semibold text-foreground">{current.text}</p>
 
+          {/* MCQ with confirm */}
           {!feedback && current.type === 'mcq' && (
-            <div className={`grid gap-3 ${current.options.some(o => o.length > 50) ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-              {current.options.map((opt, i) => (
-                <button key={i} onClick={() => handleSubmit(opt)}
-                  className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all text-left text-sm">
-                  <span className="shrink-0 w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">{String.fromCharCode(65 + i)}</span>
-                  <span className="text-foreground">{opt}</span>
+            <div className="space-y-3">
+              <div className={`grid gap-3 ${current.options.some(o => o.length > 50) ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                {current.options.map((opt, i) => (
+                  <button key={i} onClick={() => setSelectedAnswer(opt)}
+                    className={`flex items-start gap-3 px-4 py-3 rounded-lg border transition-all text-left text-sm ${
+                      selectedAnswer === opt
+                        ? 'border-primary bg-primary/15 ring-2 ring-primary/30'
+                        : 'border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50'
+                    }`}>
+                    <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                      selectedAnswer === opt ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    }`}>{String.fromCharCode(65 + i)}</span>
+                    <span className="text-foreground">{opt}</span>
+                  </button>
+                ))}
+              </div>
+              {selectedAnswer && (
+                <button onClick={() => handleSubmit(selectedAnswer)}
+                  className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity animate-fade-in">
+                  Confirm Selection ✓
                 </button>
-              ))}
+              )}
             </div>
           )}
 
+          {/* Binary with confirm */}
           {!feedback && current.type === 'binary' && (
-            <div className="grid grid-cols-2 gap-4">
-              {current.options.map((opt, i) => (
-                <button key={i} onClick={() => handleSubmit(opt)}
-                  className="px-6 py-4 rounded-lg border-2 border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all text-center font-semibold text-foreground">
-                  {opt}
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-4">
+                {current.options.map((opt, i) => (
+                  <button key={i} onClick={() => setSelectedAnswer(opt)}
+                    className={`px-6 py-4 rounded-lg border-2 transition-all text-center font-semibold ${
+                      selectedAnswer === opt
+                        ? 'border-primary bg-primary/15 ring-2 ring-primary/30 text-foreground'
+                        : 'border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 text-foreground'
+                    }`}>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              {selectedAnswer && (
+                <button onClick={() => handleSubmit(selectedAnswer)}
+                  className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity animate-fade-in">
+                  Confirm Selection ✓
                 </button>
-              ))}
+              )}
             </div>
           )}
 
@@ -183,7 +212,7 @@ export default function GameScreen(game: GameEngine) {
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Session</h3>
             <div className="flex justify-between"><span className="text-muted-foreground">Correct</span><span className="text-accent font-semibold">{totalCorrect}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Wrong</span><span className="text-destructive font-semibold">{totalWrong}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Mastered</span><span className="text-primary font-semibold">{masteredCount}/25</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Mastered</span><span className="text-primary font-semibold">{masteredCount}/{weeds.length}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Streak</span><span className="font-semibold">{streak} 🔥</span></div>
           </div>
           <div className="space-y-2 pt-2">
@@ -200,6 +229,7 @@ export default function GameScreen(game: GameEngine) {
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${gradeColor} text-accent-foreground`}>{current.phaseName}</span>
           <span className="text-sm text-muted-foreground">Round {round}</span>
           <span className="text-sm text-muted-foreground">Q#{questionNum}</span>
+          {streak >= 3 && <span className="text-sm font-bold text-destructive animate-pulse">🔥 {streak} streak!</span>}
           <div className="flex-1" />
           <span className="text-sm font-semibold text-primary">{GRADE_NAMES[grade]}</span>
         </header>
