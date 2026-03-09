@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
+import WeedDetailPopup from './WeedDetailPopup';
 import type { Weed } from '@/types/game';
 
 interface FilterOption {
@@ -11,24 +12,19 @@ interface FilterOption {
 }
 
 const FILTERS: FilterOption[] = [
-  // Plant type
   { key: 'monocot', label: 'Monocots', icon: '🌾', group: 'Plant Type' },
   { key: 'dicot', label: 'Dicots', icon: '🍀', group: 'Plant Type' },
   { key: 'non-flowering', label: 'Non-flowering', icon: '🌱', group: 'Plant Type' },
-  // Origin
   { key: 'native', label: 'Native', icon: '🏡', group: 'Origin' },
   { key: 'introduced', label: 'Introduced', icon: '🚢', group: 'Origin' },
-  // Habitat
   { key: 'warm', label: 'Warm-Season', icon: '☀️', group: 'Habitat' },
   { key: 'cool', label: 'Cool-Season', icon: '❄️', group: 'Habitat' },
   { key: 'wet', label: 'Wet / Moist', icon: '💧', group: 'Habitat' },
   { key: 'dry', label: 'Dry / Disturbed', icon: '🏜️', group: 'Habitat' },
-  // Life Cycle
   { key: 'annual', label: 'Annual', icon: '🔄', group: 'Life Cycle' },
   { key: 'perennial', label: 'Perennial', icon: '♾️', group: 'Life Cycle' },
   { key: 'biennial', label: 'Biennial', icon: '2️⃣', group: 'Life Cycle' },
   { key: 'winter-annual', label: 'Winter Annual', icon: '❄️🔄', group: 'Life Cycle' },
-  // Life Stage (image stage)
   { key: 'stage:seedling', label: 'Seedling', icon: '🌱', group: 'Life Stage' },
   { key: 'stage:vegetative', label: 'Vegetative', icon: '🌿', group: 'Life Stage' },
   { key: 'stage:flower', label: 'Reproductive', icon: '🌸', group: 'Life Stage' },
@@ -63,7 +59,6 @@ function matchesFilter(w: Weed, key: string): boolean {
     if (!target) return false;
     return w.id === weedId || w.id === target.lookAlike.id;
   }
-  // Life stage filters don't filter weeds — they change the displayed image
   if (key.startsWith('stage:')) return true;
   return true;
 }
@@ -84,7 +79,6 @@ export default function Glossary({ onClose }: Props) {
       if (next.has(key)) {
         next.delete(key);
       } else {
-        // If toggling a lookalike, clear other lookalikes
         if (key.startsWith('lookalike:')) {
           for (const k of next) { if (k.startsWith('lookalike:')) next.delete(k); }
         }
@@ -96,7 +90,6 @@ export default function Glossary({ onClose }: Props) {
 
   const clearFilters = useCallback(() => setActiveFilters(new Set()), []);
 
-  // Determine which life stage to show images for
   const displayStage = useMemo(() => {
     for (const f of activeFilters) {
       if (f.startsWith('stage:')) return f.replace('stage:', '');
@@ -106,13 +99,10 @@ export default function Glossary({ onClose }: Props) {
 
   const filtered = useMemo(() => {
     let result = weeds;
-
-    // Apply all active filters (AND logic)
     const nonStageFilters = [...activeFilters].filter(f => !f.startsWith('stage:'));
     if (nonStageFilters.length > 0) {
       result = result.filter(w => nonStageFilters.every(f => matchesFilter(w, f)));
     }
-
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(w =>
@@ -155,7 +145,6 @@ export default function Glossary({ onClose }: Props) {
           />
         </div>
 
-        {/* Active filters bar */}
         {activeFilters.size > 0 && (
           <div className="mb-3 flex flex-wrap items-center gap-1.5">
             <span className="text-xs text-muted-foreground">Active:</span>
@@ -174,7 +163,6 @@ export default function Glossary({ onClose }: Props) {
           </div>
         )}
 
-        {/* Filter groups */}
         <div className="mb-4 space-y-2">
           {Array.from(groups.entries()).map(([groupName, options]) => (
             <div key={groupName}>
@@ -205,7 +193,6 @@ export default function Glossary({ onClose }: Props) {
             </div>
           ))}
 
-          {/* Look-alike clusters */}
           <div>
             <button
               onClick={() => setExpandedGroup(expandedGroup === 'Look-Alikes' ? null : 'Look-Alikes')}
@@ -265,89 +252,7 @@ export default function Glossary({ onClose }: Props) {
         </div>
       </div>
 
-      {/* Species Detail Popup */}
-      {selectedWeed && (
-        <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur flex items-center justify-center p-4" onClick={() => setSelectedWeed(null)}>
-          <div className="bg-card border border-border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 animate-scale-in" onClick={e => e.stopPropagation()}>
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-xl font-display font-bold text-foreground">{selectedWeed.commonName}</h2>
-                <p className="text-sm text-primary italic">{selectedWeed.scientificName}</p>
-                <p className="text-xs text-muted-foreground">EPPO: {selectedWeed.eppoCode} • {selectedWeed.family}</p>
-              </div>
-              <button onClick={() => setSelectedWeed(null)} className="px-3 py-1 rounded-lg border border-border hover:bg-secondary text-sm">✕</button>
-            </div>
-
-            {/* Image gallery - all stages */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {(['whole', 'seedling', 'vegetative', 'flower'] as const).map(stage => (
-                <div key={stage} className="space-y-1">
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase text-center">
-                    {stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
-                  </div>
-                  <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                    <WeedImage weedId={selectedWeed.id} stage={stage} className="w-full h-full" />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-1.5">
-              <span className="text-xs px-2 py-1 rounded-full bg-primary/15 text-primary font-medium">{selectedWeed.plantType}</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-primary/15 text-primary font-medium">{selectedWeed.lifeCycle}</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-primary/15 text-primary font-medium">{selectedWeed.origin}</span>
-              <span className="text-xs px-2 py-1 rounded-full bg-secondary text-foreground font-medium">{selectedWeed.primaryHabitat}</span>
-            </div>
-
-            {selectedWeed.safetyNote && (
-              <div className="bg-destructive/15 border border-destructive/50 rounded-lg p-3 text-sm text-destructive-foreground">
-                {selectedWeed.safetyNote}
-              </div>
-            )}
-
-            {/* Traits */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-1">Identifying Traits</h3>
-              <ul className="space-y-1">
-                {selectedWeed.traits.map((t, i) => (
-                  <li key={i} className="text-sm text-foreground flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>{t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Habitat */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-1">Habitat</h3>
-              <p className="text-sm text-muted-foreground">{selectedWeed.habitat}</p>
-            </div>
-
-            {/* Management */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-1">Management</h3>
-              <p className="text-sm text-muted-foreground">{selectedWeed.management}</p>
-              <p className="text-sm text-muted-foreground mt-1"><span className="font-medium text-foreground">Timing:</span> {selectedWeed.controlTiming}</p>
-              {selectedWeed.actImmediately && (
-                <p className="text-sm text-destructive mt-1">⚠️ Act Immediately: {selectedWeed.actReason}</p>
-              )}
-            </div>
-
-            {/* Look-alike */}
-            <div className="bg-secondary/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold text-foreground mb-1">🔀 Look-Alike: {selectedWeed.lookAlike.species}</h3>
-              <p className="text-sm text-muted-foreground">{selectedWeed.lookAlike.difference}</p>
-            </div>
-
-            {/* Memory Hook */}
-            <div className="bg-primary/10 rounded-lg p-3">
-              <h3 className="text-sm font-semibold text-primary mb-1">💡 Memory Hook</h3>
-              <p className="text-sm text-foreground">{selectedWeed.memoryHook}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {selectedWeed && <WeedDetailPopup weed={selectedWeed} onClose={() => setSelectedWeed(null)} />}
     </div>
   );
 }
