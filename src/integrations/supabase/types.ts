@@ -17,27 +17,33 @@ export type Database = {
       classes: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           instructor_id: string | null
           instructor_name: string
           join_code: string
           name: string
+          year: string | null
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           instructor_id?: string | null
           instructor_name: string
           join_code: string
           name: string
+          year?: string | null
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           instructor_id?: string | null
           instructor_name?: string
           join_code?: string
           name?: string
+          year?: string | null
         }
         Relationships: [
           {
