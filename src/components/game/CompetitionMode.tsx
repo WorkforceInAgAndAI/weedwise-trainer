@@ -5,6 +5,7 @@ import { weeds, weedMap } from '@/data/weeds';
 import { PHASES, GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
 import type { GradeLevel, Weed } from '@/types/game';
 import WeedImage from './WeedImage';
+import { Input } from '@/components/ui/input';
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   const a = [...arr];
@@ -44,6 +45,19 @@ interface ScoreData {
   completed: boolean;
 }
 
+interface ClassData {
+  id: string;
+  name: string;
+  instructor_name: string;
+  year: string | null;
+}
+
+interface StudentData {
+  id: string;
+  nickname: string;
+  class_id: string;
+}
+
 interface Props {
   onClose: () => void;
 }
@@ -61,7 +75,7 @@ function generateQuestions(seed: string, grade: GradeLevel, count: number) {
 
 export default function CompetitionMode({ onClose }: Props) {
   const { session } = useStudent();
-  const [screen, setScreen] = useState<'lobby' | 'waiting' | 'playing' | 'results'>('lobby');
+  const [screen, setScreen] = useState<'lobby' | 'search' | 'leaderboard' | 'waiting' | 'playing' | 'results'>('lobby');
   const [grade, setGrade] = useState<GradeLevel>('middle');
   const [mode, setMode] = useState<'ffa' | 'teams'>('ffa');
   const [teamName, setTeamName] = useState('');
@@ -75,6 +89,21 @@ export default function CompetitionMode({ onClose }: Props) {
   const startTimeRef = useRef(0);
   const [joinCode, setJoinCode] = useState('');
   const [activeComps, setActiveComps] = useState<CompetitionData[]>([]);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allClasses, setAllClasses] = useState<ClassData[]>([]);
+  const [allStudents, setAllStudents] = useState<(StudentData & { className?: string })[]>([]);
+  const [selectedCompetitor, setSelectedCompetitor] = useState<{ type: 'class' | 'student'; id: string; name: string } | null>(null);
+  
+  // Leaderboard state
+  const [leaderboardData, setLeaderboardData] = useState<{
+    nickname: string;
+    className: string;
+    totalEarnings: number;
+    gamesPlayed: number;
+    avgAccuracy: number;
+  }[]>([]);
 
   const questions = useMemo(() => {
     if (!competition) return [];
@@ -96,6 +125,100 @@ export default function CompetitionMode({ onClose }: Props) {
     };
     load();
   }, [session]);
+
+  // Load all classes and students for search
+  useEffect(() => {
+    const loadSearchData = async () => {
+      const { data: classes } = await supabase
+        .from('classes')
+        .select('id, name, instructor_name, year')
+        .order('name');
+      if (classes) setAllClasses(classes as ClassData[]);
+
+      const { data: students } = await supabase
+        .from('students')
+        .select('id, nickname, class_id')
+        .order('nickname');
+      
+      if (students && classes) {
+        const classMap: Record<string, string> = {};
+        (classes as ClassData[]).forEach(c => { classMap[c.id] = c.name; });
+        setAllStudents((students as StudentData[]).map(s => ({
+          ...s,
+          className: classMap[s.class_id] || 'Unknown Class'
+        })));
+      }
+    };
+    loadSearchData();
+  }, []);
+
+  // Load leaderboard data
+  const loadLeaderboard = async () => {
+    const { data: sessions } = await supabase
+      .from('game_sessions')
+      .select('student_id, total_xp, total_correct, total_wrong')
+      .order('total_xp', { ascending: false })
+      .limit(100);
+
+    if (!sessions) return;
+
+    const studentIds = [...new Set(sessions.map((s: any) => s.student_id))];
+    const { data: students } = await supabase
+      .from('students')
+      .select('id, nickname, class_id')
+      .in('id', studentIds);
+
+    if (!students) return;
+
+    const classIds = [...new Set(students.map((s: any) => s.class_id))];
+    const { data: classes } = await supabase
+      .from('classes')
+      .select('id, name')
+      .in('id', classIds);
+
+    const classMap: Record<string, string> = {};
+    classes?.forEach((c: any) => { classMap[c.id] = c.name; });
+
+    const studentMap: Record<string, { nickname: string; className: string }> = {};
+    students?.forEach((s: any) => {
+      studentMap[s.id] = { nickname: s.nickname, className: classMap[s.class_id] || 'Unknown' };
+    });
+
+    // Aggregate by student
+    const aggregated: Record<string, { xp: number; correct: number; wrong: number; games: number }> = {};
+    sessions.forEach((s: any) => {
+      if (!aggregated[s.student_id]) {
+        aggregated[s.student_id] = { xp: 0, correct: 0, wrong: 0, games: 0 };
+      }
+      aggregated[s.student_id].xp += s.total_xp;
+      aggregated[s.student_id].correct += s.total_correct;
+      aggregated[s.student_id].wrong += s.total_wrong;
+      aggregated[s.student_id].games += 1;
+    });
+
+    const leaderboard = Object.entries(aggregated)
+      .map(([studentId, data]) => {
+        const info = studentMap[studentId] || { nickname: 'Unknown', className: 'Unknown' };
+        const total = data.correct + data.wrong;
+        return {
+          nickname: info.nickname,
+          className: info.className,
+          totalEarnings: data.xp * 10, // Convert XP to simulated "earnings"
+          gamesPlayed: data.games,
+          avgAccuracy: total > 0 ? Math.round((data.correct / total) * 100) : 0,
+        };
+      })
+      .sort((a, b) => b.totalEarnings - a.totalEarnings)
+      .slice(0, 50);
+
+    setLeaderboardData(leaderboard);
+  };
+
+  useEffect(() => {
+    if (screen === 'leaderboard') {
+      loadLeaderboard();
+    }
+  }, [screen]);
 
   // Realtime subscription for scores
   useEffect(() => {
@@ -138,7 +261,6 @@ export default function CompetitionMode({ onClose }: Props) {
       .eq('competition_id', competition.id)
       .order('score', { ascending: false });
     if (data) {
-      // Load nicknames
       const studentIds = data.map((s: any) => s.student_id);
       const { data: students } = await supabase.from('students').select('id, nickname').in('id', studentIds);
       const nickMap: Record<string, string> = {};
@@ -240,6 +362,19 @@ export default function CompetitionMode({ onClose }: Props) {
     setScreen('results');
   };
 
+  // Filter search results
+  const filteredClasses = allClasses.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.instructor_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredStudents = allStudents.filter(s =>
+    s.id !== session?.studentId && (
+      s.nickname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.className || '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
   if (!session) {
     return (
       <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center p-4">
@@ -260,6 +395,204 @@ export default function CompetitionMode({ onClose }: Props) {
           <h1 className="text-2xl font-display font-bold text-primary">⚔️ Competition Mode</h1>
           <button onClick={onClose} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-sm">✕ Close</button>
         </div>
+
+        {/* Navigation tabs */}
+        {(screen === 'lobby' || screen === 'search' || screen === 'leaderboard') && (
+          <div className="flex gap-2 mb-6">
+            <button
+              onClick={() => setScreen('lobby')}
+              className={`flex-1 py-2.5 rounded-lg border-2 text-sm font-semibold transition-all ${
+                screen === 'lobby' ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:border-primary/30'
+              }`}
+            >
+              🎮 Quick Match
+            </button>
+            <button
+              onClick={() => setScreen('search')}
+              className={`flex-1 py-2.5 rounded-lg border-2 text-sm font-semibold transition-all ${
+                screen === 'search' ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:border-primary/30'
+              }`}
+            >
+              🔍 Find Competitor
+            </button>
+            <button
+              onClick={() => setScreen('leaderboard')}
+              className={`flex-1 py-2.5 rounded-lg border-2 text-sm font-semibold transition-all ${
+                screen === 'leaderboard' ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:border-primary/30'
+              }`}
+            >
+              🏆 Leaderboard
+            </button>
+          </div>
+        )}
+
+        {/* Search for competitors */}
+        {screen === 'search' && (
+          <div className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+              <h2 className="font-display font-bold text-lg text-foreground">Find a Competitor</h2>
+              
+              <Input
+                type="text"
+                placeholder="Search classes or students by name..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+
+              {/* Classes */}
+              {filteredClasses.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Classes</h3>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {filteredClasses.slice(0, 10).map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelectedCompetitor({ type: 'class', id: c.id, name: c.name })}
+                        className={`w-full p-3 rounded-lg border text-left transition-all ${
+                          selectedCompetitor?.type === 'class' && selectedCompetitor.id === c.id
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50 bg-secondary/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">🏫</span>
+                          <div>
+                            <div className="font-semibold text-foreground text-sm">{c.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {c.instructor_name} {c.year ? `• ${c.year}` : ''}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Students */}
+              {filteredStudents.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Students</h3>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {filteredStudents.slice(0, 10).map(s => (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedCompetitor({ type: 'student', id: s.id, name: s.nickname })}
+                        className={`w-full p-3 rounded-lg border text-left transition-all ${
+                          selectedCompetitor?.type === 'student' && selectedCompetitor.id === s.id
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50 bg-secondary/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">👤</span>
+                          <div>
+                            <div className="font-semibold text-foreground text-sm">{s.nickname}</div>
+                            <div className="text-xs text-muted-foreground">{s.className}</div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchQuery && filteredClasses.length === 0 && filteredStudents.length === 0 && (
+                <p className="text-center text-muted-foreground text-sm py-4">No results found for "{searchQuery}"</p>
+              )}
+            </div>
+
+            {/* Selected competitor + grade selection */}
+            {selectedCompetitor && (
+              <div className="bg-card border border-primary/30 rounded-xl p-6 space-y-4 animate-scale-in">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{selectedCompetitor.type === 'class' ? '🏫' : '👤'}</span>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Competing against:</div>
+                    <div className="font-display font-bold text-lg text-foreground">{selectedCompetitor.name}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-2">Select Grade Level</label>
+                  <div className="flex gap-2">
+                    {(['elementary', 'middle', 'high'] as GradeLevel[]).map(g => (
+                      <button key={g} onClick={() => setGrade(g)}
+                        className={`flex-1 py-2.5 rounded-lg border-2 text-center text-sm font-semibold transition-all ${
+                          grade === g ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:border-primary/30'
+                        }`}>
+                        {GRADE_NAMES[g]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={createCompetition}
+                  className="w-full px-4 py-3 rounded-lg bg-accent text-accent-foreground font-semibold hover:opacity-90 transition-opacity text-lg"
+                >
+                  ⚔️ Start Competition
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Global Leaderboard */}
+        {screen === 'leaderboard' && (
+          <div className="space-y-4">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-display font-bold text-lg text-foreground">🏆 Farm Management Leaderboard</h2>
+                <button onClick={loadLeaderboard} className="text-xs text-primary hover:underline">Refresh</button>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">Top performers ranked by total earnings from management strategies</p>
+
+              {leaderboardData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-4xl mb-2">📊</div>
+                  <p>No data yet. Play some games to appear on the leaderboard!</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {leaderboardData.map((entry, i) => {
+                    const isMe = entry.nickname === session.nickname;
+                    return (
+                      <div
+                        key={i}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                          isMe ? 'bg-primary/10 border border-primary/30' : 'bg-secondary/30 hover:bg-secondary/50'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-lg ${
+                          i === 0 ? 'bg-yellow-500 text-white' :
+                          i === 1 ? 'bg-gray-400 text-white' :
+                          i === 2 ? 'bg-orange-500 text-white' :
+                          'bg-muted text-muted-foreground'
+                        }`}>
+                          {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-foreground truncate">
+                            {entry.nickname} {isMe && <span className="text-primary text-xs">(You)</span>}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">{entry.className}</div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="font-bold text-primary">${entry.totalEarnings.toLocaleString()}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {entry.gamesPlayed} games • {entry.avgAccuracy}% acc
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Lobby */}
         {screen === 'lobby' && (
