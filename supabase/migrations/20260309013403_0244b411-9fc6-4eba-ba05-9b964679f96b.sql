@@ -1,0 +1,1 @@
+ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS year text, ADD COLUMN IF NOT EXISTS description text;
