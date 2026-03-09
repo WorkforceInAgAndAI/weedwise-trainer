@@ -6,7 +6,7 @@ const STAGE_PREFIX_MAP: Record<string, string> = {
   vegetative: 'veg',
   flower: 'repro',
   whole: 'plant',
-  ligule: 'ligule',
+  ligule: 'ligu',
 };
 
 export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, ext = 'jpg') {

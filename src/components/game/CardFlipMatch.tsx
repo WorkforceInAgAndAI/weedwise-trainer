@@ -123,8 +123,6 @@ export default function CardFlipMatch({ onComplete, onNext }: CardFlipMatchProps
     );
   }
 
-  const visibleCards = cards.filter(c => !c.matched);
-
   return (
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
       <div>
@@ -135,17 +133,20 @@ export default function CardFlipMatch({ onComplete, onNext }: CardFlipMatchProps
         <span>Matched: {matchedCount}/3</span>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {visibleCards.map(card => (
+        {cards.map(card => (
           <button
             key={card.id}
             onClick={() => handleClick(card.id)}
+            disabled={card.matched}
             className={`relative h-28 sm:h-32 rounded-lg border-2 transition-all duration-300 flex items-center justify-center text-center p-2
-              ${card.flipped
-                ? 'border-primary bg-primary/10'
-                : 'border-border bg-secondary/50 hover:border-primary/50 hover:bg-secondary cursor-pointer'
+              ${card.matched
+                ? 'border-accent bg-accent/10 opacity-80'
+                : card.flipped
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border bg-secondary/50 hover:border-primary/50 hover:bg-secondary cursor-pointer'
               }`}
           >
-            {card.flipped ? (
+            {card.flipped || card.matched ? (
               card.type === 'image' ? (
                 <div className="w-full h-full overflow-hidden rounded-md">
                   <WeedImage weedId={card.content} stage="vegetative" className="w-full h-full" />
