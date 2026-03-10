@@ -1050,8 +1050,8 @@ export default function FarmMode({ onClose }: Props) {
         {selectedDot && currentWeed && idOptions && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50" onClick={(e) => { if (e.target === e.currentTarget && !showFeedback) closeDotPopup(); }}>
             <div className="bg-card border border-border rounded-xl shadow-xl max-w-sm w-full mx-4 overflow-hidden">
-              <div className="aspect-square max-h-64 bg-muted overflow-hidden">
-                <WeedImage weedId={currentWeed.id} stage={selectedDot.imageStage} className="w-full h-full" />
+              <div className="aspect-square max-h-64 bg-muted overflow-hidden flex items-center justify-center">
+                <WeedImage weedId={currentWeed.id} stage={selectedDot.imageStage} className="w-full h-full object-contain" />
               </div>
               <div className="p-4">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">🔍 Identify this weed</div>
