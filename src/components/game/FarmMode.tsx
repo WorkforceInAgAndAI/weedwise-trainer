@@ -723,20 +723,20 @@ export default function FarmMode({ onClose }: Props) {
     toast('🗓️ New Year!', { description: `Year ${year + 1} — new weeds are emerging` });
   }, [grade, year, yieldResults, fields, closeDotPopup, scoutPhases]);
 
-  // ── Earnings display component (always visible) ──
+  // ── Earnings display component (bottom-right popup) ──
   const EarningsBar = () => {
     const yearlyTotal = totalEarnings + money;
     const profit = yearlyTotal - (TOTAL_EXPENSES * year);
     return (
-      <div className="fixed top-3 right-3 z-[60] bg-card/95 backdrop-blur border border-border rounded-lg px-3 py-2 shadow-lg flex items-center gap-3">
+      <div className="fixed bottom-4 right-4 z-[60] bg-card/95 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-xl flex items-center gap-4 animate-in slide-in-from-bottom-2">
         <div className="text-center">
-          <div className="text-[10px] text-muted-foreground">Earnings</div>
-          <div className="font-display font-bold text-sm text-accent">${(totalEarnings + money).toLocaleString()}</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">💰 Earnings</div>
+          <div className="font-display font-bold text-base text-accent">${yearlyTotal.toLocaleString()}</div>
         </div>
-        <div className="w-px h-8 bg-border" />
+        <div className="w-px h-10 bg-border" />
         <div className="text-center">
-          <div className="text-[10px] text-muted-foreground">Profit/Loss</div>
-          <div className={`font-display font-bold text-sm ${profit >= 0 ? 'text-accent' : 'text-destructive'}`}>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">📊 Profit/Loss</div>
+          <div className={`font-display font-bold text-base ${profit >= 0 ? 'text-accent' : 'text-destructive'}`}>
             {profit >= 0 ? '+' : '-'}${Math.abs(profit).toLocaleString()}
           </div>
         </div>
