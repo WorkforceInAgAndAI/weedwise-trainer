@@ -370,7 +370,7 @@ export default function FarmMode({ onClose }: Props) {
       setFieldTimeRemaining(remaining);
       if (remaining <= 0) {
         clearInterval(interval);
-        toast('⏰ Time's up!', { description: 'Moving to next field.' });
+        toast('⏰ Time is up!', { description: 'Moving to next field.' });
         handleFinishFieldAuto();
       }
     }, 200);
