@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { weeds, weedMap } from '@/data/weeds';
 import { crops, cropMap } from '@/data/crops';
 import { fieldEnvironments, getFieldCount, getScoutingPhases, fieldMap } from '@/data/fields';
@@ -17,9 +17,7 @@ interface WeedDot {
   y: number;
   found: boolean;
   category?: 'monocot' | 'dicot';
-  /** Which image variant this dot uses */
   imageVariant: 1 | 2;
-  /** Which image stage to show based on when found */
   imageStage: string;
 }
 
@@ -34,6 +32,7 @@ interface ManagementAction {
   method: string;
   timing: string;
   effective: boolean;
+  bestChoice: boolean;
 }
 
 interface InvasiveReport {
@@ -45,15 +44,21 @@ interface InvasiveReport {
   submitted: boolean;
 }
 
-/** A weed the student found but hasn't sorted yet */
 interface UnsortedWeed {
   weedId: string;
   dotId: string;
 }
 
+interface SortResult {
+  weedId: string;
+  selectedCats: SortCategory[];
+  correctCats: SortCategory[];
+  status: 'correct' | 'partial' | 'incorrect';
+}
+
 type SortCategory = 'monocot' | 'dicot' | 'annual' | 'perennial' | 'invasive';
 
-type FarmPhase = 'avatar' | 'overview' | 'scouting' | 'sorting' | 'categorize-review' | 'invasive-report' | 'management' | 'results';
+type FarmPhase = 'avatar' | 'overview' | 'scouting' | 'sorting' | 'sort-results' | 'categorize-review' | 'invasive-report' | 'management' | 'mgmt-feedback' | 'results';
 
 interface Avatar {
   id: string;
@@ -74,6 +79,7 @@ const FARM_EXPENSES = 8000;
 const FAMILY_EXPENSES = 5000;
 const TOTAL_EXPENSES = FARM_EXPENSES + FAMILY_EXPENSES;
 const WEEDS_PER_GAME = 20;
+const FIELD_TIME_LIMIT_MS = 120_000; // 2 minutes per field for upper levels
 
 // ── Helpers ────────────────────────────────────────────────
 function shuffle<T>(arr: T[]): T[] {
@@ -89,11 +95,17 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return shuffle(arr).slice(0, Math.min(n, arr.length));
 }
 
-function getStageForPhase(phaseImageStage: string, grade: GradeLevel): string {
-  return phaseImageStage || 'whole';
+/** Get image stage based on season index for upper levels */
+function getSeasonStage(seasonIdx: number, totalSeasons: number): string {
+  if (totalSeasons <= 1) return 'whole';
+  const ratio = seasonIdx / (totalSeasons - 1);
+  if (ratio <= 0.25) return 'seedling';
+  if (ratio <= 0.5) return 'vegetative';
+  if (ratio <= 0.75) return 'flower';
+  return 'whole';
 }
 
-function generateDots(weedPool: Weed[], fieldId: string, scoutPhases: { imageStage: string }[]): WeedDot[] {
+function generateDots(weedPool: Weed[], fieldId: string, imageStage: string): WeedDot[] {
   const dots: WeedDot[] = [];
   let dotId = 0;
   weedPool.forEach(weed => {
@@ -111,22 +123,16 @@ function generateDots(weedPool: Weed[], fieldId: string, scoutPhases: { imageSta
         x = 5 + Math.random() * 90;
         y = 5 + Math.random() * 90;
       }
-      // Each dot gets a random image variant and a random stage from available phases
       const imageVariant: 1 | 2 = Math.random() < 0.5 ? 1 : 2;
-      const phaseIdx = Math.floor(Math.random() * scoutPhases.length);
-      const imageStage = scoutPhases[phaseIdx]?.imageStage || 'whole';
       dots.push({ id: `${fieldId}-${dotId++}`, weedId: weed.id, x, y, found: false, imageVariant, imageStage });
     }
   });
   return dots;
 }
 
-function getWeedLabel(weed: Weed, grade: GradeLevel): string {
-  switch (grade) {
-    case 'elementary': return weed.plantType === 'Monocot' ? '🌾 Monocot' : '🍀 Dicot';
-    case 'middle': return weed.commonName;
-    case 'high': return weed.scientificName;
-  }
+function getWeedLabel(weed: Weed, _grade: GradeLevel): string {
+  // Always show the weed name, not Monocot/Dicot
+  return weed.commonName;
 }
 
 function getCategoryLabel(type: 'monocot' | 'dicot', grade: GradeLevel): string {
@@ -154,6 +160,77 @@ function isMethodEffective(method: string, groupLabel: string, weedIds: string[]
   if (method.includes('Hand Removal') && weedIds.length <= 3) return true;
   if (method.includes('Pre-emergent') && groupLabel.includes('Annual')) return true;
   return false;
+}
+
+/** Determine the BEST method+timing for a group */
+function getBestManagement(groupLabel: string, weedIds: string[]): { method: string; timing: string; explanation: string } {
+  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
+  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
+  const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
+  const isInvasiveGroup = groupLabel.includes('Invasive') || groupLabel.includes('Priority');
+
+  if (isInvasiveGroup) {
+    return {
+      method: 'Integrated Multi-MOA Program',
+      timing: 'Year-round monitoring',
+      explanation: 'Invasive species require a comprehensive, multi-mode-of-action approach with year-round vigilance to prevent establishment and spread.'
+    };
+  }
+  if (isGrassGroup && isAnnualGroup) {
+    return {
+      method: 'Pre-emergent Herbicide (Group 15)',
+      timing: 'At planting (Pre-emerge)',
+      explanation: 'Annual grasses are best controlled with pre-emergent herbicides applied at planting, preventing seedling establishment before they compete with crops.'
+    };
+  }
+  if (isGrassGroup && isPerennialGroup) {
+    return {
+      method: 'Post-emergent Grass Herbicide (Clethodim)',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'Perennial grasses need post-emergent grass-specific herbicides applied early when plants are small and actively growing for maximum uptake.'
+    };
+  }
+  if (isGrassGroup) {
+    return {
+      method: 'Post-emergent Grass Herbicide (Clethodim)',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'Grass weeds respond best to grass-specific herbicides like Clethodim applied early when weeds are small and actively growing.'
+    };
+  }
+  if (isBroadleafGroup && isAnnualGroup) {
+    return {
+      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'Annual broadleaf weeds are effectively controlled with post-emergent broadleaf herbicides applied when plants are young and actively growing.'
+    };
+  }
+  if (isBroadleafGroup && isPerennialGroup) {
+    return {
+      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
+      timing: 'Mid-season',
+      explanation: 'Perennial broadleaf weeds need systemic herbicides applied mid-season when plants are translocating nutrients to roots, maximizing herbicide movement.'
+    };
+  }
+  if (isBroadleafGroup) {
+    return {
+      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'Broadleaf weeds are best managed with broadleaf-specific herbicides applied early in the growth stage.'
+    };
+  }
+  if (isPerennialGroup) {
+    return {
+      method: 'Mowing & Cutting',
+      timing: 'Mid-season',
+      explanation: 'Perennial weeds can be managed through repeated mowing during mid-season to deplete root reserves over time.'
+    };
+  }
+  return {
+    method: 'Integrated Multi-MOA Program',
+    timing: 'Year-round monitoring',
+    explanation: 'A diverse weed group benefits from an integrated approach combining multiple control methods throughout the season.'
+  };
 }
 
 const MANAGEMENT_METHODS = [
@@ -193,14 +270,13 @@ function getCorrectCategories(weed: Weed): SortCategory[] {
   return cats;
 }
 
-/** Pre-generate stable quiz options for a dot */
 function buildQuizOptions(weed: Weed, grade: GradeLevel): { options: string[]; correct: string; prompt: string } {
   switch (grade) {
     case 'elementary':
       return {
         prompt: 'Is this a Monocot or Dicot?',
-        options: ['🌾 Monocot', '🍀 Dicot'],
-        correct: weed.plantType === 'Monocot' ? '🌾 Monocot' : '🍀 Dicot',
+        options: ['Monocot', 'Dicot'],
+        correct: weed.plantType === 'Monocot' ? 'Monocot' : 'Dicot',
       };
     case 'middle': {
       const others = weeds.filter(w => w.id !== weed.id);
@@ -229,22 +305,30 @@ export default function FarmMode({ onClose }: Props) {
   const [avatar, setAvatar] = useState<Avatar | null>(null);
   const [phase, setPhase] = useState<FarmPhase>('avatar');
   const [year, setYear] = useState(1);
-  const [money, setMoney] = useState(20000);
+  const [totalEarnings, setTotalEarnings] = useState(0); // cumulative money earned through gameplay
+  const [money, setMoney] = useState(0); // running earnings this year
 
   const [fields, setFields] = useState<FieldState[]>([]);
   const [activeFieldIdx, setActiveFieldIdx] = useState(0);
   const [scoutPhaseIdx, setScoutPhaseIdx] = useState(0);
+  // Track missed weed IDs from scouting to carry forward
+  const [missedWeedIds, setMissedWeedIds] = useState<string[]>([]);
 
   const [selectedDot, setSelectedDot] = useState<WeedDot | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const quizOptionsRef = useRef<{ options: string[]; correct: string; prompt: string } | null>(null);
 
+  // Field timer for upper levels
+  const [fieldStartTime, setFieldStartTime] = useState(0);
+  const [fieldTimeRemaining, setFieldTimeRemaining] = useState(FIELD_TIME_LIMIT_MS);
+
   // Sorting phase state
   const [unsortedWeeds, setUnsortedWeeds] = useState<UnsortedWeed[]>([]);
   const [sortedWeeds, setSortedWeeds] = useState<Record<SortCategory, string[]>>({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
   const [currentSortWeed, setCurrentSortWeed] = useState(0);
   const [selectedSortCats, setSelectedSortCats] = useState<SortCategory[]>([]);
+  const [sortResults, setSortResults] = useState<SortResult[]>([]);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
@@ -252,10 +336,14 @@ export default function FarmMode({ onClose }: Props) {
   const [currentMgmtGroup, setCurrentMgmtGroup] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState('');
   const [selectedTiming, setSelectedTiming] = useState('');
+  const [mgmtFeedback, setMgmtFeedback] = useState<ManagementAction | null>(null);
+  const [mgmtBest, setMgmtBest] = useState<{ method: string; timing: string; explanation: string } | null>(null);
   const [yieldResults, setYieldResults] = useState<{ fieldId: string; crop: string; baseYield: number; adjustedYield: number; weedPenalty: number }[]>([]);
 
   const scoutPhases = useMemo(() => grade ? getScoutingPhases(grade) : [], [grade]);
   const currentScoutPhase = scoutPhases[scoutPhaseIdx];
+  const hasMultipleSeasons = scoutPhases.length > 1;
+  const hasTimer = grade === 'middle' || grade === 'high';
 
   const activeField = fields[activeFieldIdx];
   const totalDotsFound = fields.reduce((s, f) => s + f.dots.filter(d => d.found).length, 0);
@@ -273,6 +361,38 @@ export default function FarmMode({ onClose }: Props) {
     return [...ids];
   }, [fields]);
 
+  // Timer effect for upper levels
+  useEffect(() => {
+    if (phase !== 'scouting' || !hasTimer || fieldStartTime === 0) return;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - fieldStartTime;
+      const remaining = Math.max(0, FIELD_TIME_LIMIT_MS - elapsed);
+      setFieldTimeRemaining(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+        toast('⏰ Time's up!', { description: 'Moving to next field.' });
+        handleFinishFieldAuto();
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [phase, hasTimer, fieldStartTime]);
+
+  const handleFinishFieldAuto = useCallback(() => {
+    // Auto-advance when timer runs out
+    if (activeFieldIdx < fields.length - 1) {
+      setActiveFieldIdx(i => i + 1);
+      closeDotPopup();
+      setFieldStartTime(Date.now());
+    } else {
+      // For upper levels with seasonal flow: finish this season's scouting of all fields
+      if (hasMultipleSeasons) {
+        finishSeasonScouting();
+      } else {
+        finishScouting();
+      }
+    }
+  }, [activeFieldIdx, fields.length, hasMultipleSeasons]);
+
   // ── Grade + avatar ──────────────────────────────────────
   const handleGradeSelect = useCallback((g: GradeLevel) => {
     setGrade(g);
@@ -281,11 +401,14 @@ export default function FarmMode({ onClose }: Props) {
     const selectedFields = pickRandom(fieldEnvironments, count);
     const weedSample = pickRandom(weeds, WEEDS_PER_GAME);
     const perField = Math.ceil(weedSample.length / count);
+    const hasSeasons = phases.length > 1;
+    // For upper levels, use the first season's stage
+    const stage = hasSeasons ? getSeasonStage(0, phases.length) : 'whole';
     const fieldStates: FieldState[] = selectedFields.map((env, i) => {
       const start = i * perField;
       const fieldWeeds = weedSample.slice(start, Math.min(start + perField, weedSample.length));
       const cropId = env.suggestedCrops.length ? env.suggestedCrops[0] : undefined;
-      return { fieldId: env.id, dots: generateDots(fieldWeeds, env.id, phases), cropId };
+      return { fieldId: env.id, dots: generateDots(fieldWeeds, env.id, stage), cropId };
     });
     setFields(fieldStates);
   }, []);
@@ -316,6 +439,7 @@ export default function FarmMode({ onClose }: Props) {
     })));
     if (correct) {
       setMoney(m => m + 100);
+      setTotalEarnings(e => e + 100);
       toast.success(`+$100 — Identified ${getWeedLabel(weed, grade)}!`);
     } else {
       toast.error(`Incorrect — that was ${getWeedLabel(weed, grade)}`);
@@ -329,23 +453,16 @@ export default function FarmMode({ onClose }: Props) {
     quizOptionsRef.current = null;
   }, []);
 
-  // ── Move to next field or next scout phase ──
-  const handleFinishField = useCallback(() => {
-    if (activeFieldIdx < fields.length - 1) {
-      setActiveFieldIdx(i => i + 1);
-      closeDotPopup();
-    } else if (scoutPhaseIdx < scoutPhases.length - 1) {
-      setScoutPhaseIdx(i => i + 1);
-      setActiveFieldIdx(0);
-      closeDotPopup();
-      toast('🌱 Season advancing...', { description: scoutPhases[scoutPhaseIdx + 1]?.name });
-    } else {
-      finishScouting();
-    }
-  }, [activeFieldIdx, fields.length, scoutPhaseIdx, scoutPhases, closeDotPopup]);
-
-  const finishScouting = useCallback(() => {
-    // Collect unique found weeds for manual sorting
+  /** For upper levels: finish scouting all fields for this season, then sort & manage */
+  const finishSeasonScouting = useCallback(() => {
+    // Track missed weeds (unfound dots)
+    const missed: string[] = [];
+    fields.forEach(f => f.dots.filter(d => !d.found).forEach(d => {
+      if (!missed.includes(d.weedId)) missed.push(d.weedId);
+    }));
+    setMissedWeedIds(prev => [...prev, ...missed.filter(id => !prev.includes(id))]);
+    
+    // Collect unique found weeds for sorting
     const foundMap = new Map<string, string>();
     fields.forEach(f => f.dots.filter(d => d.found && d.category).forEach(d => {
       if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
@@ -355,6 +472,84 @@ export default function FarmMode({ onClose }: Props) {
     setCurrentSortWeed(0);
     setSelectedSortCats([]);
     setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+    setSortResults([]);
+    setPhase('sorting');
+    toast.success('Scouting complete for this season! Sort your findings.');
+  }, [fields]);
+
+  /** For upper levels: after sort+manage of one season, advance to next season */
+  const advanceToNextSeason = useCallback(() => {
+    if (!grade) return;
+    const nextSeasonIdx = scoutPhaseIdx + 1;
+    if (nextSeasonIdx >= scoutPhases.length) {
+      // All seasons done, calculate year results
+      calculateResults();
+      return;
+    }
+    setScoutPhaseIdx(nextSeasonIdx);
+    setActiveFieldIdx(0);
+    closeDotPopup();
+    
+    // Regenerate dots for next season with appropriate stage and carry-over missed weeds
+    const stage = getSeasonStage(nextSeasonIdx, scoutPhases.length);
+    const baseSample = pickRandom(weeds, WEEDS_PER_GAME);
+    // Add extra weeds similar to missed ones
+    const extraMissed = missedWeedIds.length > 0
+      ? pickRandom(missedWeedIds.map(id => weedMap[id]).filter(Boolean) as Weed[], Math.min(missedWeedIds.length, 5))
+      : [];
+    const weedSample = shuffle([...baseSample, ...extraMissed]).slice(0, WEEDS_PER_GAME + extraMissed.length);
+    const perField = Math.ceil(weedSample.length / fields.length);
+    
+    setFields(prev => prev.map((f, i) => {
+      const start = i * perField;
+      const fieldWeeds = weedSample.slice(start, Math.min(start + perField, weedSample.length));
+      return { ...f, dots: generateDots(fieldWeeds, f.fieldId, stage) };
+    }));
+    
+    setGroups([]);
+    setManagementActions([]);
+    setInvasiveReports([]);
+    setUnsortedWeeds([]);
+    setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+    setSortResults([]);
+    setFieldStartTime(Date.now());
+    setPhase('scouting');
+    toast('🌱 Season advancing...', { description: scoutPhases[nextSeasonIdx]?.name });
+  }, [grade, scoutPhaseIdx, scoutPhases, fields, missedWeedIds, closeDotPopup]);
+
+  // ── Move to next field (elementary: linear; upper: all fields then sort) ──
+  const handleFinishField = useCallback(() => {
+    if (activeFieldIdx < fields.length - 1) {
+      setActiveFieldIdx(i => i + 1);
+      closeDotPopup();
+      if (hasTimer) setFieldStartTime(Date.now());
+    } else if (!hasMultipleSeasons) {
+      // Elementary: single season, proceed as before
+      if (scoutPhaseIdx < scoutPhases.length - 1) {
+        setScoutPhaseIdx(i => i + 1);
+        setActiveFieldIdx(0);
+        closeDotPopup();
+        toast('🌱 Season advancing...', { description: scoutPhases[scoutPhaseIdx + 1]?.name });
+      } else {
+        finishScouting();
+      }
+    } else {
+      // Upper levels: all fields scouted for this season → sort & manage
+      finishSeasonScouting();
+    }
+  }, [activeFieldIdx, fields.length, scoutPhaseIdx, scoutPhases, closeDotPopup, hasMultipleSeasons, hasTimer]);
+
+  const finishScouting = useCallback(() => {
+    const foundMap = new Map<string, string>();
+    fields.forEach(f => f.dots.filter(d => d.found && d.category).forEach(d => {
+      if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
+    }));
+    const unsorted: UnsortedWeed[] = [...foundMap.entries()].map(([weedId, dotId]) => ({ weedId, dotId }));
+    setUnsortedWeeds(shuffle(unsorted));
+    setCurrentSortWeed(0);
+    setSelectedSortCats([]);
+    setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+    setSortResults([]);
     setPhase('sorting');
     toast.success('Scouting complete! Now sort your findings into categories.');
   }, [fields]);
@@ -367,10 +562,13 @@ export default function FarmMode({ onClose }: Props) {
     const weed = weedMap[current.weedId];
     if (!weed) return;
     const correctCats = getCorrectCategories(weed);
-    const correct = selectedSortCats.every(c => correctCats.includes(c)) && correctCats.every(c => selectedSortCats.includes(c));
+    const allCorrect = selectedSortCats.every(c => correctCats.includes(c)) && correctCats.every(c => selectedSortCats.includes(c));
     const partial = selectedSortCats.some(c => correctCats.includes(c));
 
-    // Add to sorted buckets regardless
+    const status: SortResult['status'] = allCorrect ? 'correct' : partial ? 'partial' : 'incorrect';
+    setSortResults(prev => [...prev, { weedId: current.weedId, selectedCats: [...selectedSortCats], correctCats, status }]);
+
+    // Add to sorted buckets
     setSortedWeeds(prev => {
       const next = { ...prev };
       selectedSortCats.forEach(cat => {
@@ -381,32 +579,29 @@ export default function FarmMode({ onClose }: Props) {
       return next;
     });
 
-    if (correct) {
+    if (allCorrect) {
       setMoney(m => m + 150);
-      toast.success(`+$150 — Perfect categorization!`);
+      setTotalEarnings(e => e + 150);
     } else if (partial) {
       setMoney(m => m + 50);
-      toast(`Partially correct! +$50`, { description: `Correct: ${correctCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}` });
-    } else {
-      toast.error(`Incorrect. Correct: ${correctCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}`);
+      setTotalEarnings(e => e + 50);
     }
 
     setSelectedSortCats([]);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
-      finishSorting();
+      // Show sort results screen instead of immediately proceeding
+      setPhase('sort-results');
     }
   }, [selectedSortCats, currentSortWeed, unsortedWeeds]);
 
   const finishSorting = useCallback(() => {
-    // Build groups from student's sorting for management phase
     const groupList = SORT_CATEGORIES
       .map(cat => ({ label: cat.label, weedIds: sortedWeeds[cat.id] || [] }))
       .filter(g => g.weedIds.length > 0);
     setGroups(groupList);
 
-    // Check for invasives
     const invasiveIds = sortedWeeds.invasive || [];
     const reports: InvasiveReport[] = invasiveIds.map(wId => {
       const dotCount = fields.reduce((s, f) => s + f.dots.filter(d => d.weedId === wId && d.found).length, 0);
@@ -422,6 +617,8 @@ export default function FarmMode({ onClose }: Props) {
     setCurrentMgmtGroup(0);
     setSelectedMethod('');
     setSelectedTiming('');
+    setMgmtFeedback(null);
+    setMgmtBest(null);
     setPhase('management');
   }, []);
 
@@ -430,60 +627,80 @@ export default function FarmMode({ onClose }: Props) {
     const group = groups[currentMgmtGroup];
     if (!group) return;
     const effective = isMethodEffective(selectedMethod, group.label, group.weedIds);
-    setManagementActions(prev => [...prev, { groupLabel: group.label, method: selectedMethod, timing: selectedTiming, effective }]);
-    if (effective) {
-      setMoney(m => m + 500);
-      toast.success('+$500 — Effective management strategy!');
+    const best = getBestManagement(group.label, group.weedIds);
+    const isBestChoice = selectedMethod === best.method && selectedTiming === best.timing;
+
+    const action: ManagementAction = { groupLabel: group.label, method: selectedMethod, timing: selectedTiming, effective, bestChoice: isBestChoice };
+    setManagementActions(prev => [...prev, action]);
+
+    if (isBestChoice) {
+      setMoney(m => m + 750);
+      setTotalEarnings(e => e + 750);
+    } else if (effective) {
+      setMoney(m => m + 400);
+      setTotalEarnings(e => e + 400);
     } else {
       setMoney(m => m - 150);
-      toast.error('-$150 — That method is not effective for this group!');
     }
+
+    // Show feedback screen
+    setMgmtFeedback(action);
+    setMgmtBest(best);
+    setPhase('mgmt-feedback');
+  }, [selectedMethod, selectedTiming, groups, currentMgmtGroup]);
+
+  const handleMgmtFeedbackNext = useCallback(() => {
+    setMgmtFeedback(null);
+    setMgmtBest(null);
     setSelectedMethod('');
     setSelectedTiming('');
     if (currentMgmtGroup < groups.length - 1) {
       setCurrentMgmtGroup(i => i + 1);
+      setPhase('management');
     } else {
-      calculateResults();
+      // For upper levels with seasonal flow, advance to next season
+      if (hasMultipleSeasons && scoutPhaseIdx < scoutPhases.length - 1) {
+        advanceToNextSeason();
+      } else {
+        calculateResults();
+      }
     }
-  }, [selectedMethod, selectedTiming, groups, currentMgmtGroup]);
+  }, [currentMgmtGroup, groups.length, hasMultipleSeasons, scoutPhaseIdx, scoutPhases.length, advanceToNextSeason]);
 
   const calculateResults = useCallback(() => {
     const allMgmt = [...managementActions];
-    if (selectedMethod) {
-      const group = groups[groups.length - 1];
-      if (group) allMgmt.push({ groupLabel: group.label, method: selectedMethod, timing: selectedTiming, effective: isMethodEffective(selectedMethod, group.label, group.weedIds) });
-    }
     const effectiveCount = allMgmt.filter(a => a.effective).length;
     const totalGroups = Math.max(groups.length, 1);
     const mgmtRate = effectiveCount / totalGroups;
     const results = fields.map(f => {
       const crop = f.cropId ? cropMap[f.cropId] : null;
-      const baseYield = crop?.baseYieldValue || 200; // even no-crop fields earn some from conservation
+      const baseYield = crop?.baseYieldValue || 200;
       const foundRate = f.dots.length > 0 ? f.dots.filter(d => d.found && d.category).length / f.dots.length : 0;
-      // More generous formula: base * (0.3 + 0.35*scouting + 0.35*mgmt) so even mediocre play gets ~65%
       const yieldMultiplier = 0.3 + 0.35 * foundRate + 0.35 * mgmtRate;
       const adjusted = Math.round(baseYield * yieldMultiplier);
       const penalty = baseYield - adjusted;
       return { fieldId: f.fieldId, crop: crop?.name || 'Conservation (CRP)', baseYield, adjustedYield: adjusted, weedPenalty: penalty };
     });
     setYieldResults(results);
-    setManagementActions(allMgmt);
     setPhase('results');
-  }, [fields, managementActions, groups, selectedMethod, selectedTiming]);
+  }, [fields, managementActions, groups]);
 
   // ── Year progression ────────────────────────────────────
   const handleNextYear = useCallback(() => {
     if (!grade) return;
     const totalYield = yieldResults.reduce((s, r) => s + r.adjustedYield, 0);
-    setMoney(m => m + totalYield - TOTAL_EXPENSES);
+    setTotalEarnings(e => e + totalYield);
+    setMoney(0);
     setYear(y => y + 1);
-    const phases = getScoutingPhases(grade);
+    setMissedWeedIds([]);
+    const hasSeasons = scoutPhases.length > 1;
+    const stage = hasSeasons ? getSeasonStage(0, scoutPhases.length) : 'whole';
     const weedSample = pickRandom(weeds, WEEDS_PER_GAME);
     const perField = Math.ceil(weedSample.length / fields.length);
     setFields(prev => prev.map((f, i) => {
       const start = i * perField;
       const fieldWeeds = weedSample.slice(start, Math.min(start + perField, weedSample.length));
-      return { ...f, dots: generateDots(fieldWeeds, f.fieldId, phases) };
+      return { ...f, dots: generateDots(fieldWeeds, f.fieldId, stage) };
     }));
     setPhase('overview');
     setGroups([]);
@@ -495,8 +712,30 @@ export default function FarmMode({ onClose }: Props) {
     setYieldResults([]);
     setUnsortedWeeds([]);
     setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+    setSortResults([]);
     toast('🗓️ New Year!', { description: `Year ${year + 1} — new weeds are emerging` });
-  }, [grade, year, yieldResults, fields, closeDotPopup]);
+  }, [grade, year, yieldResults, fields, closeDotPopup, scoutPhases]);
+
+  // ── Earnings display component (always visible) ──
+  const EarningsBar = () => {
+    const yearlyTotal = totalEarnings + money;
+    const profit = yearlyTotal - (TOTAL_EXPENSES * year);
+    return (
+      <div className="fixed top-3 right-3 z-[60] bg-card/95 backdrop-blur border border-border rounded-lg px-3 py-2 shadow-lg flex items-center gap-3">
+        <div className="text-center">
+          <div className="text-[10px] text-muted-foreground">Earnings</div>
+          <div className="font-display font-bold text-sm text-accent">${(totalEarnings + money).toLocaleString()}</div>
+        </div>
+        <div className="w-px h-8 bg-border" />
+        <div className="text-center">
+          <div className="text-[10px] text-muted-foreground">Profit/Loss</div>
+          <div className={`font-display font-bold text-sm ${profit >= 0 ? 'text-accent' : 'text-destructive'}`}>
+            {profit >= 0 ? '+' : '-'}${Math.abs(profit).toLocaleString()}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // ═══════════════════════════════════════════════════════════
   // AVATAR SELECT
@@ -556,6 +795,7 @@ export default function FarmMode({ onClose }: Props) {
   if (phase === 'overview') {
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
         <div className="p-4 max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -568,10 +808,6 @@ export default function FarmMode({ onClose }: Props) {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="bg-accent/15 border border-accent/30 rounded-lg px-4 py-2 text-center">
-                <div className="text-xs text-muted-foreground">Balance</div>
-                <div className={`font-display font-bold ${money >= TOTAL_EXPENSES ? 'text-accent' : 'text-destructive'}`}>${money.toLocaleString()}</div>
-              </div>
               <div className="bg-muted rounded-lg px-4 py-2 text-center">
                 <div className="text-xs text-muted-foreground">Expenses</div>
                 <div className="font-display font-bold text-destructive">${TOTAL_EXPENSES.toLocaleString()}/yr</div>
@@ -582,6 +818,8 @@ export default function FarmMode({ onClose }: Props) {
           <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6 text-center">
             <p className="text-sm text-foreground">
               <span className="font-bold text-primary">🎯 Goal:</span> Scout fields, identify & sort weeds, apply management, and earn enough to cover ${TOTAL_EXPENSES.toLocaleString()} in annual expenses.
+              {hasMultipleSeasons && <span className="block mt-1 text-xs text-muted-foreground">You'll scout all fields each season, then sort and manage weeds before the next season begins.</span>}
+              {hasTimer && <span className="block mt-1 text-xs text-destructive font-semibold">⏱️ 2-minute time limit per field!</span>}
             </p>
           </div>
 
@@ -592,7 +830,6 @@ export default function FarmMode({ onClose }: Props) {
               const crop = f.cropId ? cropMap[f.cropId] : null;
               return (
                 <div key={f.fieldId} className="border-2 border-border rounded-xl overflow-hidden">
-                  {/* Immersive field preview */}
                   <FieldPreview fieldId={f.fieldId} className="h-32" />
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -608,7 +845,6 @@ export default function FarmMode({ onClose }: Props) {
             })}
           </div>
 
-          {/* Crop-Weed Info */}
           <div className="bg-card border border-border rounded-lg p-4 mb-6">
             <h3 className="font-display font-bold text-sm text-foreground mb-3">📋 Crop–Weed Relationships</h3>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -633,7 +869,6 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
 
-          {/* Economic threshold info */}
           <div className="bg-card border border-border rounded-lg p-4 mb-6">
             <h3 className="font-display font-bold text-sm text-foreground mb-2">💰 Economic Thresholds</h3>
             <p className="text-xs text-muted-foreground mb-3">
@@ -656,7 +891,7 @@ export default function FarmMode({ onClose }: Props) {
           </div>
 
           <button
-            onClick={() => { setActiveFieldIdx(0); setScoutPhaseIdx(0); setPhase('scouting'); }}
+            onClick={() => { setActiveFieldIdx(0); setScoutPhaseIdx(0); setPhase('scouting'); if (hasTimer) setFieldStartTime(Date.now()); }}
             className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-display font-bold text-lg hover:opacity-90 transition-opacity">
             🔍 Begin Scouting — {scoutPhases[0]?.name}
           </button>
@@ -673,9 +908,11 @@ export default function FarmMode({ onClose }: Props) {
     const foundInField = activeField.dots.filter(d => d.found).length;
     const currentWeed = selectedDot ? weedMap[selectedDot.weedId] : null;
     const idOptions = quizOptionsRef.current;
+    const timerSec = Math.ceil(fieldTimeRemaining / 1000);
 
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <EarningsBar />
         {/* Top bar */}
         <div className="flex items-center justify-between p-3 border-b border-border bg-card shrink-0">
           <div className="flex items-center gap-3">
@@ -688,17 +925,19 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-accent">${money.toLocaleString()}</span>
+            {hasTimer && (
+              <span className={`text-sm font-bold px-2 py-1 rounded ${timerSec <= 30 ? 'text-destructive bg-destructive/10 animate-pulse' : 'text-foreground bg-muted'}`}>
+                ⏱️ {Math.floor(timerSec / 60)}:{(timerSec % 60).toString().padStart(2, '0')}
+              </span>
+            )}
             <span className="text-xs bg-muted px-2 py-1 rounded">{foundInField} found</span>
           </div>
         </div>
 
         <div className="flex-1 flex overflow-hidden">
-          {/* Field Map — fully immersive */}
           <div className="flex-1 relative overflow-hidden">
             <FieldBackground fieldId={activeField.fieldId} />
 
-            {/* Weed dots */}
             {activeField.dots.map(dot => {
               const weed = weedMap[dot.weedId];
               const isMonocot = weed?.plantType === 'Monocot';
@@ -720,24 +959,22 @@ export default function FarmMode({ onClose }: Props) {
               );
             })}
 
-            {/* Bottom controls */}
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
               <div className="bg-card/90 backdrop-blur border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground">
                 Click colored dots to scout weeds
               </div>
               <button onClick={handleFinishField}
                 className="bg-primary/90 backdrop-blur text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
-                {activeFieldIdx < fields.length - 1 ? 'Next Field →' : scoutPhaseIdx < scoutPhases.length - 1 ? 'Next Season →' : 'Finish Scouting →'}
+                {activeFieldIdx < fields.length - 1 ? 'Next Field →' : hasMultipleSeasons ? 'Finish Season Scouting →' : 'Finish Scouting →'}
               </button>
             </div>
 
-            {/* Field selector tabs */}
             <div className="absolute top-3 left-3 flex gap-1">
               {fields.map((f, i) => {
                 const fEnv = fieldMap[f.fieldId];
                 return (
                   <button key={f.fieldId}
-                    onClick={() => { setActiveFieldIdx(i); closeDotPopup(); }}
+                    onClick={() => { setActiveFieldIdx(i); closeDotPopup(); if (hasTimer) setFieldStartTime(Date.now()); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       i === activeFieldIdx ? 'bg-primary text-primary-foreground' : 'bg-card/80 backdrop-blur text-foreground hover:bg-card'
                     }`}>
@@ -747,12 +984,11 @@ export default function FarmMode({ onClose }: Props) {
               })}
             </div>
 
-            {/* Scout phase indicator */}
             {scoutPhases.length > 1 && (
               <div className="absolute top-3 right-3 flex gap-1 bg-card/80 backdrop-blur rounded-lg px-2 py-1">
                 {scoutPhases.map((sp, i) => (
-                  <span key={sp.id} className={`text-[10px] px-2 py-0.5 rounded ${i === scoutPhaseIdx ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
-                    {sp.name}
+                  <span key={sp.id} className={`text-[10px] px-2 py-0.5 rounded ${i === scoutPhaseIdx ? 'bg-primary text-primary-foreground' : i < scoutPhaseIdx ? 'text-accent' : 'text-muted-foreground'}`}>
+                    {i < scoutPhaseIdx ? '✓ ' : ''}{sp.name}
                   </span>
                 ))}
               </div>
@@ -767,13 +1003,11 @@ export default function FarmMode({ onClose }: Props) {
             </div>
             <ScrollArea className="flex-1">
               <div className="p-3 space-y-4">
-                {/* Monocot basket */}
                 <div className="border border-primary/30 rounded-lg p-2 bg-primary/5">
                   <div className="text-xs font-bold text-primary mb-2">{getCategoryLabel('monocot', grade)}</div>
                   <div className="flex flex-wrap gap-1">
                     {monocotBasket.length === 0 && <span className="text-[10px] text-muted-foreground italic">Empty</span>}
                     {monocotBasket.map(wId => {
-                      // Find the dot to get its specific variant
                       const dot = fields.flatMap(f => f.dots).find(d => d.weedId === wId && d.found);
                       return (
                         <div key={wId} className="w-10 h-10 rounded-md overflow-hidden bg-muted border border-primary/20" title={weedMap[wId]?.commonName}>
@@ -785,7 +1019,6 @@ export default function FarmMode({ onClose }: Props) {
                   <div className="text-[10px] text-muted-foreground mt-1">{monocotBasket.length} species</div>
                 </div>
 
-                {/* Dicot basket */}
                 <div className="border border-amber-600/30 rounded-lg p-2 bg-amber-600/5">
                   <div className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-2">{getCategoryLabel('dicot', grade)}</div>
                   <div className="flex flex-wrap gap-1">
@@ -806,12 +1039,11 @@ export default function FarmMode({ onClose }: Props) {
           </div>
         </div>
 
-        {/* Identification popup — single image per dot */}
+        {/* Identification popup */}
         {selectedDot && currentWeed && idOptions && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50" onClick={(e) => { if (e.target === e.currentTarget && !showFeedback) closeDotPopup(); }}>
             <div className="bg-card border border-border rounded-xl shadow-xl max-w-sm w-full mx-4 overflow-hidden">
-              {/* Single image for this specific dot */}
-              <div className="h-48 bg-muted overflow-hidden">
+              <div className="aspect-square max-h-64 bg-muted overflow-hidden">
                 <WeedImage weedId={currentWeed.id} stage={selectedDot.imageStage} className="w-full h-full" />
               </div>
               <div className="p-4">
@@ -855,7 +1087,7 @@ export default function FarmMode({ onClose }: Props) {
                   }`}>
                     <div className="flex items-center gap-2 mb-1">
                       <span>{selectedAnswer === idOptions.correct ? '✅' : '❌'}</span>
-                      <span className="font-display font-bold text-sm">{selectedAnswer === idOptions.correct ? 'Correct!' : 'Incorrect'}</span>
+                      <span className="font-display font-bold text-sm">{selectedAnswer === idOptions.correct ? 'Correct! +$100' : 'Incorrect'}</span>
                     </div>
                     <p className="text-xs text-foreground mb-1">
                       <span className="font-bold text-primary">{currentWeed.commonName}</span>{' '}
@@ -882,7 +1114,7 @@ export default function FarmMode({ onClose }: Props) {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // SORTING PHASE — students manually categorize each weed
+  // SORTING PHASE
   // ═══════════════════════════════════════════════════════════
   if (phase === 'sorting') {
     const current = unsortedWeeds[currentSortWeed];
@@ -890,15 +1122,13 @@ export default function FarmMode({ onClose }: Props) {
     const progress = unsortedWeeds.length > 0 ? ((currentSortWeed) / unsortedWeeds.length) * 100 : 100;
 
     if (!current || !currentW) {
-      // All sorted, move on
       finishSorting();
       return null;
     }
 
-    const sortedCount = Object.values(sortedWeeds).reduce((s, arr) => s + arr.length, 0);
-
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
         <div className="p-4 max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -906,25 +1136,26 @@ export default function FarmMode({ onClose }: Props) {
               <p className="text-xs text-muted-foreground">Categorize each weed you found. Select ALL categories that apply.</p>
             </div>
             <div className="text-right">
-              <div className="text-sm font-bold text-accent">${money.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground">{currentSortWeed + 1} / {unsortedWeeds.length}</div>
             </div>
           </div>
 
-          {/* Progress bar */}
           <div className="h-2 bg-muted rounded-full mb-6 overflow-hidden">
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Current weed to sort */}
+          {/* Current weed — square photo */}
           <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
-            <div className="h-48 bg-muted overflow-hidden">
+            <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto">
               <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full" />
             </div>
             <div className="p-4">
-              <div className="font-display font-bold text-lg text-foreground">{getWeedLabel(currentW, grade)}</div>
-              {grade !== 'elementary' && (
-                <div className="text-xs text-muted-foreground italic">{grade === 'high' ? currentW.commonName : currentW.scientificName}</div>
+              <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
+              {grade === 'high' && (
+                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
+              )}
+              {grade === 'middle' && (
+                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
               )}
               <div className="flex flex-wrap gap-1 mt-2">
                 {currentW.traits.slice(0, 4).map((t, i) => (
@@ -935,7 +1166,6 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
 
-          {/* Category buttons */}
           <div className="space-y-2 mb-6">
             <p className="text-sm font-semibold text-foreground">Select all categories that apply:</p>
             {SORT_CATEGORIES.map(cat => (
@@ -965,15 +1195,102 @@ export default function FarmMode({ onClose }: Props) {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // CATEGORIZE REVIEW (after manual sorting)
+  // SORT RESULTS SCREEN
+  // ═══════════════════════════════════════════════════════════
+  if (phase === 'sort-results') {
+    const correctCount = sortResults.filter(r => r.status === 'correct').length;
+    const partialCount = sortResults.filter(r => r.status === 'partial').length;
+    const incorrectCount = sortResults.filter(r => r.status === 'incorrect').length;
+    const totalMoney = correctCount * 150 + partialCount * 50;
+
+    return (
+      <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
+        <div className="p-4 max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-2">{correctCount > incorrectCount ? '🎉' : '📋'}</div>
+            <h1 className="font-display font-bold text-2xl text-foreground mb-1">Sorting Results</h1>
+            <p className="text-sm text-muted-foreground">Here's how you categorized the weeds</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
+              <div className="text-2xl font-display font-extrabold text-accent">{correctCount}</div>
+              <div className="text-xs text-muted-foreground">Correct</div>
+              <div className="text-[10px] text-accent">+${correctCount * 150}</div>
+            </div>
+            <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+              <div className="text-2xl font-display font-extrabold text-primary">{partialCount}</div>
+              <div className="text-xs text-muted-foreground">Partial</div>
+              <div className="text-[10px] text-primary">+${partialCount * 50}</div>
+            </div>
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-center">
+              <div className="text-2xl font-display font-extrabold text-destructive">{incorrectCount}</div>
+              <div className="text-xs text-muted-foreground">Incorrect</div>
+              <div className="text-[10px] text-destructive">+$0</div>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-4 mb-4">
+            <div className="text-center mb-2">
+              <span className="font-display font-bold text-lg text-accent">+${totalMoney.toLocaleString()}</span>
+              <span className="text-sm text-muted-foreground ml-2">earned from sorting</span>
+            </div>
+          </div>
+
+          <ScrollArea className="h-72 mb-6">
+            <div className="space-y-2">
+              {sortResults.map((r, idx) => {
+                const w = weedMap[r.weedId];
+                return (
+                  <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
+                    r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
+                    r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
+                    'bg-destructive/5 border-destructive/30'
+                  }`}>
+                    <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
+                    <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
+                      <WeedImage weedId={r.weedId} stage="whole" className="w-full h-full" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Your picks: {r.selectedCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}
+                      </div>
+                      {r.status !== 'correct' && (
+                        <div className="text-[10px] text-accent">
+                          Correct: {r.correctCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs font-bold shrink-0">
+                      {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+
+          <button onClick={finishSorting}
+            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-display font-bold text-lg hover:opacity-90">
+            Continue →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // CATEGORIZE REVIEW
   // ═══════════════════════════════════════════════════════════
   if (phase === 'categorize-review') {
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
         <div className="p-4 max-w-3xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="font-display font-bold text-2xl text-foreground">📊 Sorting Summary</h1>
-            <span className="text-sm font-bold text-accent">${money.toLocaleString()}</span>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-6">
@@ -1042,6 +1359,7 @@ export default function FarmMode({ onClose }: Props) {
     const allSubmitted = invasiveReports.every(r => r.submitted);
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
         <div className="p-4 max-w-2xl mx-auto">
           <h1 className="font-display font-bold text-2xl text-foreground mb-2">🚨 Invasive Species Report</h1>
           <p className="text-sm text-muted-foreground mb-6">Complete a field report for each invasive species found.</p>
@@ -1098,6 +1416,7 @@ export default function FarmMode({ onClose }: Props) {
                           if (!report.density) { toast.error('Select a distribution pattern'); return; }
                           setInvasiveReports(prev => prev.map((r, i) => i === idx ? { ...r, submitted: true } : r));
                           setMoney(m => m + 300);
+                          setTotalEarnings(e => e + 300);
                           toast.success(`+$300 — Report filed for ${w?.commonName}!`);
                         }}
                         className="w-full py-2.5 rounded-lg bg-destructive text-destructive-foreground font-semibold text-sm hover:opacity-90">
@@ -1132,11 +1451,12 @@ export default function FarmMode({ onClose }: Props) {
     const isBroadleafGroup = group?.label.includes('Dicot') || group?.label.includes('Broadlea');
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
         <div className="p-4 max-w-3xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="font-display font-bold text-xl text-foreground">🛠️ Management Plan</h1>
-              <p className="text-xs text-muted-foreground">Choose the right method for each weed group</p>
+              <p className="text-xs text-muted-foreground">Choose the right method and timing for each weed group</p>
             </div>
             <div className="text-sm text-muted-foreground">Group {currentMgmtGroup + 1}/{groups.length}</div>
           </div>
@@ -1183,17 +1503,6 @@ export default function FarmMode({ onClose }: Props) {
                   ))}
                 </div>
               </div>
-              {selectedMethod && (
-                <div className={`rounded-lg p-3 text-sm ${
-                  isMethodEffective(selectedMethod, group.label, group.weedIds)
-                    ? 'bg-accent/10 border border-accent/30 text-accent'
-                    : 'bg-destructive/10 border border-destructive/30 text-destructive'
-                }`}>
-                  {isMethodEffective(selectedMethod, group.label, group.weedIds)
-                    ? '✅ This method should be effective for this weed group.'
-                    : '⚠️ This method may not be effective for this weed group. Consider your choice carefully.'}
-                </div>
-              )}
               <button onClick={submitManagement} disabled={!selectedMethod || !selectedTiming}
                 className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
                 Apply Management ✓
@@ -1206,11 +1515,77 @@ export default function FarmMode({ onClose }: Props) {
   }
 
   // ═══════════════════════════════════════════════════════════
+  // MANAGEMENT FEEDBACK SCREEN
+  // ═══════════════════════════════════════════════════════════
+  if (phase === 'mgmt-feedback' && mgmtFeedback && mgmtBest) {
+    const isBest = mgmtFeedback.bestChoice;
+    const isEffective = mgmtFeedback.effective;
+    return (
+      <div className="fixed inset-0 bg-background z-50 overflow-auto">
+        <EarningsBar />
+        <div className="p-4 max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <div className="text-5xl mb-3">{isBest ? '🌟' : isEffective ? '✅' : '❌'}</div>
+            <h1 className="font-display font-bold text-2xl text-foreground mb-1">
+              {isBest ? 'Best Solution!' : isEffective ? 'Effective Strategy' : 'Ineffective Strategy'}
+            </h1>
+            <p className={`font-display font-bold text-xl ${isBest ? 'text-accent' : isEffective ? 'text-primary' : 'text-destructive'}`}>
+              {isBest ? '+$750' : isEffective ? '+$400' : '-$150'}
+            </p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-4 mb-4">
+            <h3 className="font-display font-bold text-sm text-foreground mb-2">Your Choice</h3>
+            <div className="text-sm text-foreground mb-1">
+              <span className="font-semibold">Method:</span> {mgmtFeedback.method}
+            </div>
+            <div className="text-sm text-foreground mb-2">
+              <span className="font-semibold">Timing:</span> {mgmtFeedback.timing}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <span className="font-semibold">For:</span> {mgmtFeedback.groupLabel}
+            </div>
+          </div>
+
+          {!isBest && (
+            <div className="bg-accent/10 border border-accent/30 rounded-xl p-4 mb-4">
+              <h3 className="font-display font-bold text-sm text-accent mb-2">⭐ Best Solution</h3>
+              <div className="text-sm text-foreground mb-1">
+                <span className="font-semibold">Method:</span> {mgmtBest.method}
+              </div>
+              <div className="text-sm text-foreground mb-2">
+                <span className="font-semibold">Timing:</span> {mgmtBest.timing}
+              </div>
+            </div>
+          )}
+
+          <div className={`rounded-xl p-4 mb-6 ${isBest ? 'bg-accent/10 border border-accent/30' : isEffective ? 'bg-primary/10 border border-primary/30' : 'bg-destructive/10 border border-destructive/30'}`}>
+            <h3 className="font-display font-bold text-sm text-foreground mb-2">💡 Why?</h3>
+            <p className="text-sm text-muted-foreground">{mgmtBest.explanation}</p>
+            {!isEffective && (
+              <p className="text-sm text-destructive mt-2">
+                Your chosen method ({mgmtFeedback.method}) is not effective against this group because the herbicide class or control method doesn't match the weed type and life cycle.
+              </p>
+            )}
+          </div>
+
+          <button onClick={handleMgmtFeedbackNext}
+            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-display font-bold text-lg hover:opacity-90">
+            {currentMgmtGroup < groups.length - 1 ? 'Next Group →' : hasMultipleSeasons && scoutPhaseIdx < scoutPhases.length - 1 ? 'Next Season →' : 'See Results →'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // RESULTS
   // ═══════════════════════════════════════════════════════════
   if (phase === 'results') {
     const totalYield = yieldResults.reduce((s, r) => s + r.adjustedYield, 0);
-    const netIncome = totalYield - TOTAL_EXPENSES;
+    const yearEarnings = totalEarnings + money + totalYield;
+    const yearExpenses = TOTAL_EXPENSES * year;
+    const netIncome = yearEarnings - yearExpenses;
     const profitable = netIncome >= 0;
 
     const chartData = yieldResults.map(r => {
@@ -1223,8 +1598,8 @@ export default function FarmMode({ onClose }: Props) {
       const scoutRate = totalDotsFound / Math.max(totalDots, 1);
       const correctRate = correctDots / Math.max(totalDotsFound, 1);
       const mgmtEffective = managementActions.filter(a => a.effective).length;
+      const mgmtBestCount = managementActions.filter(a => a.bestChoice).length;
       const mgmtTotal = managementActions.length;
-      const sortScore = unsortedWeeds.length > 0 ? Math.min(1, Object.values(sortedWeeds).reduce((s, a) => s + a.length, 0) / unsortedWeeds.length) : 0;
 
       if (grade === 'elementary') {
         const scoutPct = Math.round(scoutRate * 100);
@@ -1234,9 +1609,7 @@ export default function FarmMode({ onClose }: Props) {
             <p>{emoji} You found <span className="font-bold text-primary">{scoutPct}%</span> of the weeds in your fields!</p>
             <p>You correctly identified <span className="font-bold text-accent">{correctDots}</span> weeds.</p>
             <p>You sorted <span className="font-bold text-primary">{unsortedWeeds.length}</span> species into groups.</p>
-            {mgmtEffective < mgmtTotal && (
-              <p>Some treatments didn't work — <span className="font-bold">grass medicines</span> only work on grasses!</p>
-            )}
+            <p><span className="font-bold">{mgmtBestCount}</span> best solutions and <span className="font-bold">{mgmtEffective - mgmtBestCount}</span> effective solutions chosen.</p>
             {!profitable && <p>Find more weeds and pick the right treatments to earn more next year! 💰</p>}
           </div>
         );
@@ -1246,11 +1619,8 @@ export default function FarmMode({ onClose }: Props) {
         return (
           <div className="space-y-2 text-sm">
             <p><span className="font-bold">Scouting:</span> {Math.round(scoutRate * 100)}% coverage • {Math.round(correctRate * 100)}% accuracy</p>
-            <p><span className="font-bold">Sorting:</span> {unsortedWeeds.length} species categorized into management groups</p>
-            <p><span className="font-bold">Management:</span> {mgmtEffective}/{mgmtTotal} strategies effective</p>
-            {mgmtEffective < mgmtTotal && (
-              <p className="text-destructive text-xs">❌ Ineffective: wrong herbicide class (grass vs. broadleaf) or wrong timing for life cycle.</p>
-            )}
+            <p><span className="font-bold">Sorting:</span> {unsortedWeeds.length} species categorized</p>
+            <p><span className="font-bold">Management:</span> {mgmtBestCount} best, {mgmtEffective - mgmtBestCount} effective, {mgmtTotal - mgmtEffective} ineffective</p>
             <p className="text-xs text-muted-foreground">Revenue = Sum of (Base Yield × [30% base + 35% scouting + 35% management])</p>
           </div>
         );
@@ -1268,8 +1638,8 @@ export default function FarmMode({ onClose }: Props) {
               <div className="font-bold">{Math.round(correctRate * 100)}%</div>
             </div>
             <div className="bg-muted rounded-lg p-2">
-              <div className="text-[10px] text-muted-foreground">Management Score</div>
-              <div className="font-bold">{mgmtEffective}/{mgmtTotal} effective</div>
+              <div className="text-[10px] text-muted-foreground">Best Solutions</div>
+              <div className="font-bold text-accent">{mgmtBestCount}/{mgmtTotal}</div>
             </div>
             <div className="bg-muted rounded-lg p-2">
               <div className="text-[10px] text-muted-foreground">Invasives Reported</div>
@@ -1278,7 +1648,7 @@ export default function FarmMode({ onClose }: Props) {
           </div>
           <p className="text-muted-foreground">Adj. Yield = Base × [0.30 + 0.35 × (Found/Total) + 0.35 × (Effective/Groups)]</p>
           {managementActions.filter(a => !a.effective).map((a, i) => (
-            <p key={i} className="text-destructive">✗ {a.method} failed on {a.groupLabel}: herbicide class mismatch or wrong timing.</p>
+            <p key={i} className="text-destructive">✗ {a.method} failed on {a.groupLabel}</p>
           ))}
         </div>
       );
@@ -1299,12 +1669,12 @@ export default function FarmMode({ onClose }: Props) {
 
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-center">
-              <div className="text-xs text-muted-foreground">Revenue</div>
-              <div className="font-display font-bold text-xl text-accent">${totalYield.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Total Earnings</div>
+              <div className="font-display font-bold text-xl text-accent">${yearEarnings.toLocaleString()}</div>
             </div>
             <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-center">
-              <div className="text-xs text-muted-foreground">Expenses</div>
-              <div className="font-display font-bold text-xl text-destructive">-${TOTAL_EXPENSES.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Expenses ({year}yr)</div>
+              <div className="font-display font-bold text-xl text-destructive">-${yearExpenses.toLocaleString()}</div>
             </div>
             <div className={`border rounded-lg p-4 text-center ${profitable ? 'bg-accent/15 border-accent/40' : 'bg-destructive/15 border-destructive/40'}`}>
               <div className="text-xs text-muted-foreground">{profitable ? 'Profit' : 'Loss'}</div>
@@ -1314,7 +1684,20 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
 
-          {/* Yield Chart */}
+          {/* Revenue from field yields this year */}
+          <div className="bg-card border border-border rounded-lg p-4 mb-4">
+            <div className="grid grid-cols-2 gap-3 text-center">
+              <div>
+                <div className="text-xs text-muted-foreground">Field Revenue</div>
+                <div className="font-display font-bold text-foreground">${totalYield.toLocaleString()}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Activity Earnings</div>
+                <div className="font-display font-bold text-foreground">${(totalEarnings + money).toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-card border border-border rounded-lg p-4 mb-6">
             <h3 className="font-display font-bold text-sm text-foreground mb-3">📊 Field Yield Breakdown</h3>
             <div className="h-56">
@@ -1338,7 +1721,6 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
 
-          {/* Explanation */}
           <div className="bg-card border border-border rounded-lg p-4 mb-6">
             <h3 className="font-display font-bold text-sm text-foreground mb-3">
               {grade === 'elementary' ? '📝 What Happened' : grade === 'middle' ? '📋 Performance Analysis' : '📈 Detailed Analysis'}
@@ -1346,7 +1728,6 @@ export default function FarmMode({ onClose }: Props) {
             {getResultExplanation()}
           </div>
 
-          {/* Field details */}
           <div className="space-y-3 mb-6">
             {yieldResults.map(r => {
               const env = fieldMap[r.fieldId];
@@ -1412,9 +1793,7 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
     case 'row-crop':
       return (
         <div className="absolute inset-0 bg-gradient-to-b from-sky-300/30 via-amber-700/20 to-amber-900/40">
-          {/* Sky */}
           <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-400/20 to-transparent" />
-          {/* Crop rows */}
           <div className="absolute inset-x-0 top-[20%] bottom-0">
             {Array.from({ length: 16 }).map((_, i) => (
               <div key={i} className="flex items-end justify-around" style={{ height: '6.25%' }}>
@@ -1427,9 +1806,7 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
               </div>
             ))}
           </div>
-          {/* Soil texture */}
           <div className="absolute bottom-0 left-0 right-0 h-[15%] bg-gradient-to-t from-amber-900/30 to-transparent" />
-          {/* Tractor tracks */}
           <div className="absolute inset-y-[25%] left-[20%] w-px bg-amber-800/15" />
           <div className="absolute inset-y-[25%] left-[22%] w-px bg-amber-800/15" />
           <div className="absolute inset-y-[25%] right-[20%] w-px bg-amber-800/15" />
@@ -1440,12 +1817,9 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
     case 'pasture':
       return (
         <div className="absolute inset-0 bg-gradient-to-b from-sky-300/25 via-green-600/25 to-green-800/35">
-          {/* Sky */}
           <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-sky-400/20 to-transparent" />
-          {/* Clouds */}
           <div className="absolute top-[5%] left-[15%] text-xl opacity-20 select-none pointer-events-none">☁️</div>
           <div className="absolute top-[8%] right-[25%] text-lg opacity-15 select-none pointer-events-none">☁️</div>
-          {/* Rolling grass */}
           <div className="absolute top-[30%] inset-x-0 bottom-0 opacity-30">
             {Array.from({ length: 20 }).map((_, i) => (
               <div key={i} className="flex items-end justify-around" style={{ height: '5%' }}>
@@ -1457,18 +1831,15 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
               </div>
             ))}
           </div>
-          {/* Cows */}
           <div className="absolute top-[40%] left-[10%] text-2xl opacity-40 select-none pointer-events-none">🐄</div>
           <div className="absolute top-[55%] right-[15%] text-xl opacity-35 select-none pointer-events-none">🐄</div>
           <div className="absolute top-[65%] left-[45%] text-lg opacity-30 select-none pointer-events-none">🐄</div>
           <div className="absolute top-[50%] right-[40%] text-sm opacity-25 select-none pointer-events-none">🐂</div>
-          {/* Fence */}
           <div className="absolute bottom-[10%] left-0 right-0 h-px bg-amber-800/20" />
           <div className="absolute bottom-[12%] left-0 right-0 h-px bg-amber-800/15" />
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="absolute bottom-[8%] w-0.5 h-[6%] bg-amber-800/20" style={{ left: `${12 + i * 11}%` }} />
           ))}
-          {/* Barn in distance */}
           <div className="absolute top-[25%] right-[10%] text-lg opacity-25 select-none pointer-events-none">🏚️</div>
         </div>
       );
@@ -1476,9 +1847,7 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
     case 'small-grain':
       return (
         <div className="absolute inset-0 bg-gradient-to-b from-sky-200/20 via-yellow-600/25 to-amber-700/30">
-          {/* Sky */}
           <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-300/20 to-transparent" />
-          {/* Dense grain canopy */}
           <div className="absolute top-[22%] inset-x-0 bottom-0 opacity-35">
             {Array.from({ length: 18 }).map((_, i) => (
               <div key={i} className="flex items-end justify-around" style={{ height: '5.5%' }}>
@@ -1491,9 +1860,7 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
               </div>
             ))}
           </div>
-          {/* Grain elevator in distance */}
           <div className="absolute top-[18%] left-[8%] text-sm opacity-20 select-none pointer-events-none">🏗️</div>
-          {/* Golden shimmer */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/5 to-transparent" />
         </div>
       );
@@ -1501,9 +1868,7 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
     case 'wetland-edge':
       return (
         <div className="absolute inset-0 bg-gradient-to-b from-sky-400/20 via-teal-700/25 to-blue-800/40">
-          {/* Sky */}
           <div className="absolute top-0 left-0 right-0 h-[20%] bg-gradient-to-b from-sky-400/25 to-transparent" />
-          {/* Cattails / reeds */}
           <div className="absolute top-[15%] inset-x-0 bottom-[30%] opacity-30">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="absolute" style={{ left: `${5 + i * 12}%`, top: `${10 + Math.sin(i) * 15}%`, bottom: '0' }}>
@@ -1511,9 +1876,7 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
               </div>
             ))}
           </div>
-          {/* Water surface */}
           <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-gradient-to-t from-blue-900/40 via-blue-700/25 to-transparent">
-            {/* Water ripples */}
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="absolute text-xs opacity-20 select-none pointer-events-none"
                 style={{ left: `${10 + i * 18}%`, top: `${20 + i * 12}%` }}>
@@ -1521,53 +1884,41 @@ function FieldBackground({ fieldId }: { fieldId: string }) {
               </div>
             ))}
           </div>
-          {/* Ducks */}
           <div className="absolute bottom-[25%] left-[30%] text-lg opacity-30 select-none pointer-events-none">🦆</div>
           <div className="absolute bottom-[20%] right-[20%] text-sm opacity-25 select-none pointer-events-none">🦆</div>
-          {/* Heron */}
-          <div className="absolute top-[35%] right-[10%] text-xl opacity-25 select-none pointer-events-none">🦢</div>
-          {/* Lily pads */}
-          <div className="absolute bottom-[15%] left-[50%] text-sm opacity-25 select-none pointer-events-none">🍃</div>
-          <div className="absolute bottom-[12%] left-[60%] text-xs opacity-20 select-none pointer-events-none">🍃</div>
-          {/* Ditch line */}
-          <div className="absolute bottom-[30%] left-0 right-0 h-0.5 bg-teal-600/15" />
+          <div className="absolute bottom-[35%] right-[35%] text-lg opacity-20 select-none pointer-events-none">🦢</div>
         </div>
       );
 
     case 'field-edge':
       return (
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-300/20 via-stone-600/20 to-green-900/30">
-          {/* Sky */}
-          <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-300/20 to-transparent" />
-          {/* Fencerow on left */}
-          <div className="absolute left-0 top-[20%] bottom-0 w-[8%] bg-gradient-to-r from-stone-700/20 to-transparent" />
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="absolute left-[3%] w-1 bg-amber-800/25 rounded" style={{ top: `${25 + i * 12}%`, height: '8%' }} />
-          ))}
-          <div className="absolute left-[1%] top-[25%] bottom-[15%] w-px bg-amber-700/20" />
-          <div className="absolute left-[5%] top-[25%] bottom-[15%] w-px bg-amber-700/15" />
-          {/* Trees along edge */}
-          <div className="absolute top-[15%] left-[1%] text-2xl opacity-30 select-none pointer-events-none">🌳</div>
-          <div className="absolute top-[25%] left-[0%] text-xl opacity-25 select-none pointer-events-none">🌲</div>
-          <div className="absolute top-[40%] left-[2%] text-lg opacity-25 select-none pointer-events-none">🌳</div>
-          {/* Road / gravel */}
-          <div className="absolute right-0 top-[20%] bottom-0 w-[12%] bg-gradient-to-l from-stone-500/15 to-transparent" />
-          <div className="absolute right-[4%] top-[20%] bottom-0 border-l border-dashed border-stone-400/15" />
-          {/* Scattered vegetation */}
-          <div className="absolute inset-x-[10%] top-[30%] bottom-[10%] opacity-25">
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-300/25 via-green-700/20 to-amber-800/30">
+          <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-400/20 to-transparent" />
+          <div className="absolute top-[20%] left-0 w-[40%] bottom-0 opacity-25">
             {Array.from({ length: 12 }).map((_, i) => (
-              <span key={i} className="absolute text-sm select-none pointer-events-none"
-                style={{ left: `${Math.random() * 80}%`, top: `${Math.random() * 80}%` }}>
-                {i % 3 === 0 ? '🌿' : i % 3 === 1 ? '🌱' : '🍂'}
-              </span>
+              <div key={i} className="flex items-end justify-around" style={{ height: '8%' }}>
+                {Array.from({ length: 4 }).map((_, j) => (
+                  <span key={j} className="text-lg select-none pointer-events-none">🌳</span>
+                ))}
+              </div>
             ))}
           </div>
-          {/* Mailbox / sign */}
-          <div className="absolute top-[22%] right-[6%] text-sm opacity-20 select-none pointer-events-none">📫</div>
+          <div className="absolute top-[25%] right-0 w-[55%] bottom-0">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <div key={i} className="flex items-end justify-around opacity-30" style={{ height: '7%' }}>
+                {Array.from({ length: 8 }).map((_, j) => (
+                  <span key={j} className="text-xs select-none pointer-events-none">
+                    {(i + j) % 3 === 0 ? '🌾' : '🌿'}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="absolute top-[20%] left-[38%] w-1 bottom-0 bg-amber-700/15" />
         </div>
       );
 
     default:
-      return <div className="absolute inset-0 bg-gradient-to-b from-sky-300/20 to-green-800/30" />;
+      return <div className="absolute inset-0 bg-gradient-to-b from-sky-300/20 via-green-600/20 to-green-800/30" />;
   }
 }
