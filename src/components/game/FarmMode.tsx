@@ -329,6 +329,7 @@ export default function FarmMode({ onClose }: Props) {
   const [currentSortWeed, setCurrentSortWeed] = useState(0);
   const [selectedSortCats, setSelectedSortCats] = useState<SortCategory[]>([]);
   const [sortResults, setSortResults] = useState<SortResult[]>([]);
+  const [sortFeedbackResult, setSortFeedbackResult] = useState<SortResult | null>(null);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
