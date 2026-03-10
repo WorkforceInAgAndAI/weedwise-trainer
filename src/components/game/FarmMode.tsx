@@ -933,7 +933,13 @@ export default function FarmMode({ onClose }: Props) {
           </div>
           <div className="flex items-center gap-3">
             {hasTimer && (
-              <span className={`text-sm font-bold px-2 py-1 rounded ${timerSec <= 30 ? 'text-destructive bg-destructive/10 animate-pulse' : 'text-foreground bg-muted'}`}>
+              <span className={`text-base font-bold px-3 py-1.5 rounded-lg border-2 ${
+                timerSec <= 30
+                  ? 'text-destructive bg-destructive/15 border-destructive/50 animate-pulse'
+                  : timerSec <= 60
+                    ? 'text-amber-600 bg-amber-600/10 border-amber-600/30'
+                    : 'text-foreground bg-muted border-border'
+              }`}>
                 ⏱️ {Math.floor(timerSec / 60)}:{(timerSec % 60).toString().padStart(2, '0')}
               </span>
             )}
