@@ -567,7 +567,8 @@ export default function FarmMode({ onClose }: Props) {
     const partial = selectedSortCats.some(c => correctCats.includes(c));
 
     const status: SortResult['status'] = allCorrect ? 'correct' : partial ? 'partial' : 'incorrect';
-    setSortResults(prev => [...prev, { weedId: current.weedId, selectedCats: [...selectedSortCats], correctCats, status }]);
+    const result: SortResult = { weedId: current.weedId, selectedCats: [...selectedSortCats], correctCats, status };
+    setSortResults(prev => [...prev, result]);
 
     // Add to sorted buckets
     setSortedWeeds(prev => {
@@ -589,13 +590,18 @@ export default function FarmMode({ onClose }: Props) {
     }
 
     setSelectedSortCats([]);
+    // Show per-weed feedback before advancing
+    setSortFeedbackResult(result);
+  }, [selectedSortCats, currentSortWeed, unsortedWeeds]);
+
+  const handleSortFeedbackNext = useCallback(() => {
+    setSortFeedbackResult(null);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
-      // Show sort results screen instead of immediately proceeding
       setPhase('sort-results');
     }
-  }, [selectedSortCats, currentSortWeed, unsortedWeeds]);
+  }, [currentSortWeed, unsortedWeeds.length]);
 
   const finishSorting = useCallback(() => {
     const groupList = SORT_CATEGORIES
