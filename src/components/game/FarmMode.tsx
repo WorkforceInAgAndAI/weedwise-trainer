@@ -1195,11 +1195,69 @@ export default function FarmMode({ onClose }: Props) {
             ))}
           </div>
 
-          <button onClick={handleSortSubmit} disabled={selectedSortCats.length === 0}
+          <button onClick={handleSortSubmit} disabled={selectedSortCats.length === 0 || !!sortFeedbackResult}
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-display font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
             Confirm Sorting ✓
           </button>
         </div>
+
+        {/* Per-weed sort feedback overlay */}
+        {sortFeedbackResult && (() => {
+          const fbWeed = weedMap[sortFeedbackResult.weedId];
+          const isCorrect = sortFeedbackResult.status === 'correct';
+          const isPartial = sortFeedbackResult.status === 'partial';
+          const catLabel = (id: SortCategory) => SORT_CATEGORIES.find(c => c.id === id)?.label || id;
+          return (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
+              <div className={`bg-card border-2 rounded-xl shadow-xl max-w-md w-full overflow-hidden ${
+                isCorrect ? 'border-accent/50' : isPartial ? 'border-amber-500/50' : 'border-destructive/50'
+              }`}>
+                <div className={`p-4 text-center ${
+                  isCorrect ? 'bg-accent/10' : isPartial ? 'bg-amber-500/10' : 'bg-destructive/10'
+                }`}>
+                  <div className="text-3xl mb-1">{isCorrect ? '✅' : isPartial ? '⚠️' : '❌'}</div>
+                  <div className="font-display font-bold text-lg text-foreground">
+                    {isCorrect ? 'Correct! +$150' : isPartial ? 'Partially Correct +$50' : 'Incorrect'}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">{fbWeed?.commonName}</div>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div>
+                    <div className="text-xs font-semibold text-muted-foreground mb-1">Your Answer</div>
+                    <div className="flex flex-wrap gap-1">
+                      {sortFeedbackResult.selectedCats.map(c => {
+                        const correct = sortFeedbackResult.correctCats.includes(c);
+                        return (
+                          <span key={c} className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            correct ? 'bg-accent/15 text-accent' : 'bg-destructive/15 text-destructive'
+                          }`}>
+                            {correct ? '✓' : '✗'} {catLabel(c)}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {!isCorrect && (
+                    <div>
+                      <div className="text-xs font-semibold text-muted-foreground mb-1">Correct Answer</div>
+                      <div className="flex flex-wrap gap-1">
+                        {sortFeedbackResult.correctCats.map(c => (
+                          <span key={c} className="text-xs px-2 py-1 rounded-full bg-accent/15 text-accent font-medium">
+                            ✓ {catLabel(c)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <button onClick={handleSortFeedbackNext}
+                    className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
+                    {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     );
   }
