@@ -1157,17 +1157,14 @@ export default function FarmMode({ onClose }: Props) {
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Current weed — square photo */}
+          {/* Current weed — square photo centered */}
           <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
-            <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto">
-              <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full" />
+            <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto flex items-center justify-center">
+              <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full object-contain" />
             </div>
             <div className="p-4">
               <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
-              {grade === 'high' && (
-                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
-              )}
-              {grade === 'middle' && (
+              {(grade === 'high' || grade === 'middle') && (
                 <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
               )}
               <div className="flex flex-wrap gap-1 mt-2">
