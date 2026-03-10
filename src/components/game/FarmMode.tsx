@@ -75,9 +75,9 @@ const AVATARS: Avatar[] = [
 ];
 
 // ── Constants ──────────────────────────────────────────────
-const FARM_EXPENSES = 8000;
-const FAMILY_EXPENSES = 5000;
-const TOTAL_EXPENSES = FARM_EXPENSES + FAMILY_EXPENSES;
+const FARM_EXPENSES = 6000;
+const FAMILY_EXPENSES = 4000;
+const TOTAL_EXPENSES = FARM_EXPENSES + FAMILY_EXPENSES; // $10,000
 const WEEDS_PER_GAME = 20;
 const FIELD_TIME_LIMIT_MS = 120_000; // 2 minutes per field for upper levels
 
@@ -329,6 +329,7 @@ export default function FarmMode({ onClose }: Props) {
   const [currentSortWeed, setCurrentSortWeed] = useState(0);
   const [selectedSortCats, setSelectedSortCats] = useState<SortCategory[]>([]);
   const [sortResults, setSortResults] = useState<SortResult[]>([]);
+  const [sortFeedbackResult, setSortFeedbackResult] = useState<SortResult | null>(null);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
@@ -566,7 +567,8 @@ export default function FarmMode({ onClose }: Props) {
     const partial = selectedSortCats.some(c => correctCats.includes(c));
 
     const status: SortResult['status'] = allCorrect ? 'correct' : partial ? 'partial' : 'incorrect';
-    setSortResults(prev => [...prev, { weedId: current.weedId, selectedCats: [...selectedSortCats], correctCats, status }]);
+    const result: SortResult = { weedId: current.weedId, selectedCats: [...selectedSortCats], correctCats, status };
+    setSortResults(prev => [...prev, result]);
 
     // Add to sorted buckets
     setSortedWeeds(prev => {
@@ -588,13 +590,18 @@ export default function FarmMode({ onClose }: Props) {
     }
 
     setSelectedSortCats([]);
+    // Show per-weed feedback before advancing
+    setSortFeedbackResult(result);
+  }, [selectedSortCats, currentSortWeed, unsortedWeeds]);
+
+  const handleSortFeedbackNext = useCallback(() => {
+    setSortFeedbackResult(null);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
-      // Show sort results screen instead of immediately proceeding
       setPhase('sort-results');
     }
-  }, [selectedSortCats, currentSortWeed, unsortedWeeds]);
+  }, [currentSortWeed, unsortedWeeds.length]);
 
   const finishSorting = useCallback(() => {
     const groupList = SORT_CATEGORIES
@@ -716,20 +723,20 @@ export default function FarmMode({ onClose }: Props) {
     toast('🗓️ New Year!', { description: `Year ${year + 1} — new weeds are emerging` });
   }, [grade, year, yieldResults, fields, closeDotPopup, scoutPhases]);
 
-  // ── Earnings display component (always visible) ──
+  // ── Earnings display component (bottom-right popup) ──
   const EarningsBar = () => {
     const yearlyTotal = totalEarnings + money;
     const profit = yearlyTotal - (TOTAL_EXPENSES * year);
     return (
-      <div className="fixed top-3 right-3 z-[60] bg-card/95 backdrop-blur border border-border rounded-lg px-3 py-2 shadow-lg flex items-center gap-3">
+      <div className="fixed bottom-4 right-4 z-[60] bg-card/95 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-xl flex items-center gap-4 animate-in slide-in-from-bottom-2">
         <div className="text-center">
-          <div className="text-[10px] text-muted-foreground">Earnings</div>
-          <div className="font-display font-bold text-sm text-accent">${(totalEarnings + money).toLocaleString()}</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">💰 Earnings</div>
+          <div className="font-display font-bold text-base text-accent">${yearlyTotal.toLocaleString()}</div>
         </div>
-        <div className="w-px h-8 bg-border" />
+        <div className="w-px h-10 bg-border" />
         <div className="text-center">
-          <div className="text-[10px] text-muted-foreground">Profit/Loss</div>
-          <div className={`font-display font-bold text-sm ${profit >= 0 ? 'text-accent' : 'text-destructive'}`}>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">📊 Profit/Loss</div>
+          <div className={`font-display font-bold text-base ${profit >= 0 ? 'text-accent' : 'text-destructive'}`}>
             {profit >= 0 ? '+' : '-'}${Math.abs(profit).toLocaleString()}
           </div>
         </div>
@@ -926,7 +933,13 @@ export default function FarmMode({ onClose }: Props) {
           </div>
           <div className="flex items-center gap-3">
             {hasTimer && (
-              <span className={`text-sm font-bold px-2 py-1 rounded ${timerSec <= 30 ? 'text-destructive bg-destructive/10 animate-pulse' : 'text-foreground bg-muted'}`}>
+              <span className={`text-base font-bold px-3 py-1.5 rounded-lg border-2 ${
+                timerSec <= 30
+                  ? 'text-destructive bg-destructive/15 border-destructive/50 animate-pulse'
+                  : timerSec <= 60
+                    ? 'text-amber-600 bg-amber-600/10 border-amber-600/30'
+                    : 'text-foreground bg-muted border-border'
+              }`}>
                 ⏱️ {Math.floor(timerSec / 60)}:{(timerSec % 60).toString().padStart(2, '0')}
               </span>
             )}
@@ -1043,8 +1056,8 @@ export default function FarmMode({ onClose }: Props) {
         {selectedDot && currentWeed && idOptions && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50" onClick={(e) => { if (e.target === e.currentTarget && !showFeedback) closeDotPopup(); }}>
             <div className="bg-card border border-border rounded-xl shadow-xl max-w-sm w-full mx-4 overflow-hidden">
-              <div className="aspect-square max-h-64 bg-muted overflow-hidden">
-                <WeedImage weedId={currentWeed.id} stage={selectedDot.imageStage} className="w-full h-full" />
+              <div className="aspect-square max-h-64 bg-muted overflow-hidden flex items-center justify-center">
+                <WeedImage weedId={currentWeed.id} stage={selectedDot.imageStage} className="w-full h-full object-contain" />
               </div>
               <div className="p-4">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">🔍 Identify this weed</div>
@@ -1144,17 +1157,14 @@ export default function FarmMode({ onClose }: Props) {
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Current weed — square photo */}
+          {/* Current weed — square photo centered */}
           <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
-            <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto">
-              <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full" />
+            <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto flex items-center justify-center">
+              <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full object-contain" />
             </div>
             <div className="p-4">
               <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
-              {grade === 'high' && (
-                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
-              )}
-              {grade === 'middle' && (
+              {(grade === 'high' || grade === 'middle') && (
                 <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
               )}
               <div className="flex flex-wrap gap-1 mt-2">
@@ -1185,11 +1195,69 @@ export default function FarmMode({ onClose }: Props) {
             ))}
           </div>
 
-          <button onClick={handleSortSubmit} disabled={selectedSortCats.length === 0}
+          <button onClick={handleSortSubmit} disabled={selectedSortCats.length === 0 || !!sortFeedbackResult}
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-display font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
             Confirm Sorting ✓
           </button>
         </div>
+
+        {/* Per-weed sort feedback overlay */}
+        {sortFeedbackResult && (() => {
+          const fbWeed = weedMap[sortFeedbackResult.weedId];
+          const isCorrect = sortFeedbackResult.status === 'correct';
+          const isPartial = sortFeedbackResult.status === 'partial';
+          const catLabel = (id: SortCategory) => SORT_CATEGORIES.find(c => c.id === id)?.label || id;
+          return (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
+              <div className={`bg-card border-2 rounded-xl shadow-xl max-w-md w-full overflow-hidden ${
+                isCorrect ? 'border-accent/50' : isPartial ? 'border-amber-500/50' : 'border-destructive/50'
+              }`}>
+                <div className={`p-4 text-center ${
+                  isCorrect ? 'bg-accent/10' : isPartial ? 'bg-amber-500/10' : 'bg-destructive/10'
+                }`}>
+                  <div className="text-3xl mb-1">{isCorrect ? '✅' : isPartial ? '⚠️' : '❌'}</div>
+                  <div className="font-display font-bold text-lg text-foreground">
+                    {isCorrect ? 'Correct! +$150' : isPartial ? 'Partially Correct +$50' : 'Incorrect'}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">{fbWeed?.commonName}</div>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div>
+                    <div className="text-xs font-semibold text-muted-foreground mb-1">Your Answer</div>
+                    <div className="flex flex-wrap gap-1">
+                      {sortFeedbackResult.selectedCats.map(c => {
+                        const correct = sortFeedbackResult.correctCats.includes(c);
+                        return (
+                          <span key={c} className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            correct ? 'bg-accent/15 text-accent' : 'bg-destructive/15 text-destructive'
+                          }`}>
+                            {correct ? '✓' : '✗'} {catLabel(c)}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {!isCorrect && (
+                    <div>
+                      <div className="text-xs font-semibold text-muted-foreground mb-1">Correct Answer</div>
+                      <div className="flex flex-wrap gap-1">
+                        {sortFeedbackResult.correctCats.map(c => (
+                          <span key={c} className="text-xs px-2 py-1 rounded-full bg-accent/15 text-accent font-medium">
+                            ✓ {catLabel(c)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <button onClick={handleSortFeedbackNext}
+                    className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
+                    {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     );
   }
