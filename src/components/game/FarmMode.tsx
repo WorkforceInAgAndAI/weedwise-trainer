@@ -75,9 +75,9 @@ const AVATARS: Avatar[] = [
 ];
 
 // ── Constants ──────────────────────────────────────────────
-const FARM_EXPENSES = 8000;
-const FAMILY_EXPENSES = 5000;
-const TOTAL_EXPENSES = FARM_EXPENSES + FAMILY_EXPENSES;
+const FARM_EXPENSES = 6000;
+const FAMILY_EXPENSES = 4000;
+const TOTAL_EXPENSES = FARM_EXPENSES + FAMILY_EXPENSES; // $10,000
 const WEEDS_PER_GAME = 20;
 const FIELD_TIME_LIMIT_MS = 120_000; // 2 minutes per field for upper levels
 
