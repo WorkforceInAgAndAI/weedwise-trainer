@@ -1943,7 +1943,7 @@ export const weeds: Weed[] = [
       "Tiny flowers in leaf axils",
     ],
     habitat: "Disturbed areas, field margins, sandy soils",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Annual; weak to moderate competitor; good herbicide response",
     management: "POST herbicides, cultivation, early control important",
