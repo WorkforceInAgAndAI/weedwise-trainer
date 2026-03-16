@@ -748,6 +748,46 @@ export default function FarmMode({ onClose }: Props) {
       return;
     }
 
+    // High school: 4-row radio sorting
+    if (grade === 'high') {
+      if (!highPlantType || !highOrigin || !highLifeCycle || !highFamily) { toast.error('Select one option in each row'); return; }
+      const current = unsortedWeeds[currentSortWeed];
+      if (!current) return;
+      const weed = weedMap[current.weedId];
+      if (!weed) return;
+      const correctPlantType = weed.plantType === 'Monocot' ? 'monocot' : 'dicot';
+      const correctOrigin = weed.origin === 'Native' ? 'native' : 'introduced';
+      const correctLC = getCorrectLifeCycle(weed);
+      const correctFam = weed.family;
+
+      const ptCorrect = highPlantType === correctPlantType;
+      const orCorrect = highOrigin === correctOrigin;
+      const lcCorrect = highLifeCycle === correctLC;
+      const famCorrect = highFamily === correctFam;
+      const correctCount = [ptCorrect, orCorrect, lcCorrect, famCorrect].filter(Boolean).length;
+      const status: HighSortResult['status'] = correctCount === 4 ? 'correct' : correctCount > 0 ? 'partial' : 'incorrect';
+
+      const result: HighSortResult = {
+        weedId: current.weedId,
+        plantType: { selected: highPlantType, correct: correctPlantType, isCorrect: ptCorrect },
+        origin: { selected: highOrigin, correct: correctOrigin, isCorrect: orCorrect },
+        lifeCycle: { selected: highLifeCycle, correct: correctLC, isCorrect: lcCorrect },
+        family: { selected: highFamily, correct: correctFam, isCorrect: famCorrect },
+        status,
+      };
+      setHighSortResults(prev => [...prev, result]);
+
+      if (status === 'correct') { setMoney(m => m + 150); setTotalEarnings(e => e + 150); }
+      else if (status === 'partial') { setMoney(m => m + 50); setTotalEarnings(e => e + 50); }
+
+      setHighPlantType(null);
+      setHighOrigin(null);
+      setHighLifeCycle(null);
+      setHighFamily(null);
+      setHighSortFeedback(result);
+      return;
+    }
+
     if (selectedSortCats.length === 0) { toast.error('Select at least one category'); return; }
     const current = unsortedWeeds[currentSortWeed];
     if (!current) return;
@@ -781,7 +821,7 @@ export default function FarmMode({ onClose }: Props) {
 
     setSelectedSortCats([]);
     setSortFeedbackResult(result);
-  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields, midPlantType, midOrigin, midLifeCycle, midHabitat]);
+  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields, midPlantType, midOrigin, midLifeCycle, midHabitat, highPlantType, highOrigin, highLifeCycle, highFamily]);
 
   const handleSortFeedbackNext = useCallback(() => {
     setSortFeedbackResult(null);
