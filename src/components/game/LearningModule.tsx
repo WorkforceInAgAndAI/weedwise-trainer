@@ -6,7 +6,7 @@ import WeedImage from './WeedImage';
 import WeedDetailPopup from './WeedDetailPopup';
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from '@/data/familyDescriptions';
 
-type TopicId = 'names' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety';
+type TopicId = 'names' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods';
 
 interface Topic {
   id: TopicId;
