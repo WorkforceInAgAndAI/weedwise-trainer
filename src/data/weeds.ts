@@ -1106,7 +1106,7 @@ export const weeds: Weed[] = [
       "Yellow flowers in clusters",
     ],
     habitat: "Row crops, disturbed areas, scrambling on nearby plants",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Highly competitive; tendrils vine through crop; prolific seed production",
     management: "PRE residual herbicides, early POST, hand removal, burning debris",
