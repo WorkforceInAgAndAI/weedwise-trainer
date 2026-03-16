@@ -1850,7 +1850,7 @@ export const weeds: Weed[] = [
       "Spiny seed pod (schizocarp)",
     ],
     habitat: "Row crops, disturbed areas, warm-season fields",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Increasingly problematic; herbicide-resistant biotypes developing; highly competitive",
     management: "PRE residual herbicides, multiple POST MOA, early control critical",
