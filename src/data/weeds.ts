@@ -238,7 +238,7 @@ export const weeds: Weed[] = [
       "Long slender seed pods",
     ],
     habitat: "Woodlands, disturbed areas, shade tolerant",
-    primaryHabitat: "Cool-Season / Shade Tolerant",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
     actReason: "Allelopathic; displaces native understory flora; spreading invasive in forests",
     management: "Hand pulling biennial rosettes, POST herbicides, early spring control",
