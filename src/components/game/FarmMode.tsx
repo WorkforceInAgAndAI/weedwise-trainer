@@ -1819,7 +1819,12 @@ export default function FarmMode({ onClose }: Props) {
       );
     }
 
-    // High: existing multi-category sorting
+    // High: 4-row radio sorting
+    const allFamilies = [...new Set(weeds.map(w => w.family))];
+    const correctFamily = currentW.family;
+    const distractorFamilies = shuffle(allFamilies.filter(f => f !== correctFamily)).slice(0, 2);
+    const familyOptions = shuffle([correctFamily, ...distractorFamilies]);
+
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <EarningsBar />
@@ -1827,7 +1832,7 @@ export default function FarmMode({ onClose }: Props) {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="font-display font-bold text-xl text-foreground">🗂️ Sort Your Findings</h1>
-              <p className="text-xs text-muted-foreground">Categorize each weed you found. Select ALL categories that apply.</p>
+              <p className="text-xs text-muted-foreground">Classify each weed by selecting one option per row.</p>
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">{currentSortWeed + 1} / {unsortedWeeds.length}</div>
@@ -1838,18 +1843,16 @@ export default function FarmMode({ onClose }: Props) {
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Current weed — square photo centered */}
+          {/* Current weed card */}
           <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
             <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto flex items-center justify-center">
               <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full object-contain" />
             </div>
             <div className="p-4">
               <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
-              {(grade === 'high' || grade === 'middle') && (
-                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
-              )}
+              <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
               <div className="flex flex-wrap gap-1 mt-2">
-                {currentW.traits.slice(0, 4).map((t, i) => (
+                {currentW.traits.slice(0, 3).map((t, i) => (
                   <span key={i} className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full">{t}</span>
                 ))}
               </div>
@@ -1857,37 +1860,75 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
 
-          <div className="space-y-2 mb-6">
-            <p className="text-sm font-semibold text-foreground">Select all categories that apply:</p>
-            {SORT_CATEGORIES.map(cat => (
-              <button key={cat.id}
-                onClick={() => setSelectedSortCats(prev =>
-                  prev.includes(cat.id) ? prev.filter(c => c !== cat.id) : [...prev, cat.id]
-                )}
-                className={`w-full px-4 py-3 rounded-lg border-2 text-left transition-all flex items-center justify-between ${
-                  selectedSortCats.includes(cat.id) ? cat.color + ' ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
-                }`}>
-                <div>
-                  <div className="font-semibold text-sm text-foreground">{cat.label}</div>
-                  <div className="text-[10px] text-muted-foreground">{cat.description}</div>
-                </div>
-                {selectedSortCats.includes(cat.id) && <span className="text-primary text-lg">✓</span>}
-              </button>
-            ))}
+          {/* Row 1: Monocot vs Dicot */}
+          <div className="space-y-4 mb-6">
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Plant Type</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ id: 'monocot', label: '🌾 Monocot' }, { id: 'dicot', label: '🍀 Dicot' }].map(opt => (
+                  <button key={opt.id} onClick={() => setHighPlantType(opt.id)}
+                    className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                      highPlantType === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{opt.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2: Native vs Introduced */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Origin</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ id: 'native', label: '🏡 Native' }, { id: 'introduced', label: '🌍 Introduced' }].map(opt => (
+                  <button key={opt.id} onClick={() => setHighOrigin(opt.id)}
+                    className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                      highOrigin === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{opt.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 3: Life Cycle */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Life Cycle</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'annual', label: '📅 Annual' },
+                  { id: 'perennial', label: '🔄 Perennial' },
+                  { id: 'biennial', label: '2️⃣ Biennial' },
+                ].map(opt => (
+                  <button key={opt.id} onClick={() => setHighLifeCycle(opt.id)}
+                    className={`px-3 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                      highLifeCycle === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{opt.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 4: Family */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Plant Family</p>
+              <div className="grid grid-cols-3 gap-2">
+                {familyOptions.map(fam => (
+                  <button key={fam} onClick={() => setHighFamily(fam)}
+                    className={`px-3 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                      highFamily === fam ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{fam}</button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <button onClick={handleSortSubmit} disabled={selectedSortCats.length === 0 || !!sortFeedbackResult}
+          <button onClick={handleSortSubmit} disabled={!highPlantType || !highOrigin || !highLifeCycle || !highFamily || !!highSortFeedback}
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-display font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
             Confirm Sorting ✓
           </button>
         </div>
 
-        {/* Per-weed sort feedback overlay */}
-        {sortFeedbackResult && (() => {
-          const fbWeed = weedMap[sortFeedbackResult.weedId];
-          const isCorrect = sortFeedbackResult.status === 'correct';
-          const isPartial = sortFeedbackResult.status === 'partial';
-          const catLabel = (id: SortCategory) => SORT_CATEGORIES.find(c => c.id === id)?.label || id;
+        {/* High school sort feedback overlay */}
+        {highSortFeedback && (() => {
+          const fbWeed = weedMap[highSortFeedback.weedId];
+          const isCorrect = highSortFeedback.status === 'correct';
+          const isPartial = highSortFeedback.status === 'partial';
           return (
             <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
               <div className={`bg-card border-2 rounded-xl max-w-sm w-full p-5 animate-scale-in ${
@@ -1896,19 +1937,51 @@ export default function FarmMode({ onClose }: Props) {
                 <div className="text-center mb-4">
                   <div className="text-4xl mb-2">{isCorrect ? '✅' : isPartial ? '🟡' : '❌'}</div>
                   <div className="font-display font-bold text-lg text-foreground">
-                    {isCorrect ? 'Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
+                    {isCorrect ? 'All Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
                   </div>
                   <div className={`text-sm font-semibold ${isCorrect ? 'text-accent' : isPartial ? 'text-primary' : 'text-destructive'}`}>
                     {isCorrect ? '+$150' : isPartial ? '+$50' : '$0'}
                   </div>
                   <div className="text-sm text-foreground mt-1">{fbWeed?.commonName}</div>
                 </div>
-                {!isCorrect && (
-                  <div className="bg-muted/50 rounded-lg p-3 mb-4 text-xs space-y-1">
-                    <div><span className="font-semibold text-foreground">Your picks:</span> {sortFeedbackResult.selectedCats.map(catLabel).join(', ')}</div>
-                    <div><span className="font-semibold text-accent">Correct:</span> {sortFeedbackResult.correctCats.map(catLabel).join(', ')}</div>
+                <div className="space-y-2 mb-4">
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.plantType.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.plantType.isCorrect ? '✅' : '❌'}</span>
+                    <span>Plant Type: {highSortFeedback.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                    {!highSortFeedback.plantType.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.plantType.correct === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                    )}
                   </div>
-                )}
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.origin.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.origin.isCorrect ? '✅' : '❌'}</span>
+                    <span>Origin: {highSortFeedback.origin.selected === 'native' ? 'Native' : 'Introduced'}</span>
+                    {!highSortFeedback.origin.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.origin.correct === 'native' ? 'Native' : 'Introduced'}</span>
+                    )}
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.lifeCycle.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.lifeCycle.isCorrect ? '✅' : '❌'}</span>
+                    <span>Life Cycle: {highSortFeedback.lifeCycle.selected.charAt(0).toUpperCase() + highSortFeedback.lifeCycle.selected.slice(1)}</span>
+                    {!highSortFeedback.lifeCycle.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.lifeCycle.correct.charAt(0).toUpperCase() + highSortFeedback.lifeCycle.correct.slice(1)}</span>
+                    )}
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.family.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.family.isCorrect ? '✅' : '❌'}</span>
+                    <span>Family: {highSortFeedback.family.selected}</span>
+                    {!highSortFeedback.family.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.family.correct}</span>
+                    )}
+                  </div>
+                </div>
                 <button onClick={handleSortFeedbackNext}
                   className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
                   {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
