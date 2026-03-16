@@ -2429,7 +2429,7 @@ export const weeds: Weed[] = [
     emoji: "⚪",
     traits: ["White flowers", "Sticky hairy stems", "Opposite leaves", "Inflated calyx"],
     habitat: "Crop fields, roadsides, meadows, disturbed areas",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     management: "Broadleaf herbicides in rosette stage; cultivation",
     controlTiming: "Rosette stage before bolting",
     actImmediately: false,
