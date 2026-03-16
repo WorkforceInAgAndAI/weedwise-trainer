@@ -16,11 +16,12 @@ export const PHASES: Record<GradeLevel, PhaseConfig[]> = {
     { id: 'm5', name: 'Scientific Name Match', description: 'Match common names to scientific names with card flip', xpRequired: 120, xpReward: 6, imageStage: 'whole', showName: true, showFamily: false },
   ],
   high: [
-    { id: 'h1', name: 'Weed Identification', description: 'Multiple choice — vegetative characteristics', xpRequired: 0, xpReward: 5, imageStage: 'seedling', showName: false, showFamily: false },
-    { id: 'h2', name: 'Scientific Name Match', description: 'Connect common names to scientific names', xpRequired: 20, xpReward: 6, imageStage: 'vegetative', showName: true, showFamily: true },
+    { id: 'h1', name: 'Name the Weed', description: 'Multiple choice — identify by scientific name', xpRequired: 0, xpReward: 5, imageStage: 'seedling', showName: false, showFamily: false },
+    { id: 'h2', name: 'Life Cycle Sort', description: 'Sort weeds into Annual, Perennial, or Biennial', xpRequired: 20, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
     { id: 'h3', name: 'Life Stage Image Sort', description: 'Sort life stage images into correct species', xpRequired: 50, xpReward: 5, imageStage: 'flower', showName: false, showFamily: true },
-    { id: 'h4', name: 'Control Timing', description: 'Choose optimal timing and see population impact', xpRequired: 80, xpReward: 6, imageStage: 'flower', showName: true, showFamily: false },
-    { id: 'h5', name: 'IPM Plan Builder', description: 'Build an integrated pest management strategy', xpRequired: 120, xpReward: 8, imageStage: 'vegetative', showName: true, showFamily: false },
+    { id: 'h4', name: 'Habitat/Climate Connect', description: 'Match species to their preferred habitat', xpRequired: 80, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
+    { id: 'h5', name: 'Family Match', description: 'Match scientific names to plant families', xpRequired: 100, xpReward: 6, imageStage: 'whole', showName: true, showFamily: false },
+    { id: 'h6', name: 'Control Timing', description: 'Choose optimal timing and see population impact', xpRequired: 130, xpReward: 6, imageStage: 'flower', showName: true, showFamily: false },
   ],
 };
 
