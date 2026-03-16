@@ -437,6 +437,14 @@ export default function FarmMode({ onClose }: Props) {
   const [midSortResults, setMidSortResults] = useState<MiddleSortResult[]>([]);
   const [midSortFeedback, setMidSortFeedback] = useState<MiddleSortResult | null>(null);
 
+  // High school sorting state
+  const [highPlantType, setHighPlantType] = useState<string | null>(null);
+  const [highOrigin, setHighOrigin] = useState<string | null>(null);
+  const [highLifeCycle, setHighLifeCycle] = useState<string | null>(null);
+  const [highFamily, setHighFamily] = useState<string | null>(null);
+  const [highSortResults, setHighSortResults] = useState<HighSortResult[]>([]);
+  const [highSortFeedback, setHighSortFeedback] = useState<HighSortResult | null>(null);
+
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
   const [managementActions, setManagementActions] = useState<ManagementAction[]>([]);
