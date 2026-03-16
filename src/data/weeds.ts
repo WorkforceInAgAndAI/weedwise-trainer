@@ -1987,7 +1987,7 @@ export const weeds: Weed[] = [
     emoji: "🌾",
     traits: ["No ligule", "Flat compressed sheaths", "Purplish stems", "Panicle seedhead"],
     habitat: "Crop fields, gardens, wet areas, ditches",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Wet / Poorly Drained",
     management: "Pre-emergent herbicides; cultivation before canopy closure",
     controlTiming: "Before 4-leaf stage",
     actImmediately: false,
