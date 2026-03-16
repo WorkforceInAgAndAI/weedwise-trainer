@@ -486,7 +486,7 @@ export const weeds: Weed[] = [
       "Globular berry inside papery husk",
     ],
     habitat: "Disturbed areas, gardens, field margins",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Moderate competitor; seeds persist in soil; responsive to herbicides",
     management: "PRE/POST herbicides, cultivation, mulching",
