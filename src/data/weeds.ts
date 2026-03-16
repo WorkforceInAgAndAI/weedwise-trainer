@@ -2167,7 +2167,7 @@ export const weeds: Weed[] = [
     emoji: "🌿",
     traits: ["Pyramidal shape", "Alternate narrow leaves", "Hairy stems", "Tumbleweed at maturity"],
     habitat: "Crop fields, roadsides, waste areas, saline soils",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     management: "Pre-emergent herbicides; post-emergent before 6-inch height",
     controlTiming: "Before 3-inch height; rapid growth and herbicide resistance common",
     actImmediately: true,
