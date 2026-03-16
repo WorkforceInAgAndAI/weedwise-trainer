@@ -416,7 +416,7 @@ export default function FarmMode({ onClose }: Props) {
     const perField = Math.ceil(weedSample.length / count);
     const hasSeasons = phases.length > 1;
     // For upper levels, use the first season's stage
-    const stage = hasSeasons ? getSeasonStage(0, phases.length) : 'whole';
+    const stage = hasSeasons ? getSeasonStage(0, phases.length) : (g === 'elementary' ? 'random' : 'whole');
     const fieldStates: FieldState[] = selectedFields.map((env, i) => {
       const start = i * perField;
       const fieldWeeds = weedSample.slice(start, Math.min(start + perField, weedSample.length));
