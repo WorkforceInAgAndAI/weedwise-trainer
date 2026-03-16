@@ -796,7 +796,7 @@ export const weeds: Weed[] = [
       "Late-season germination",
     ],
     habitat: "Lawns, thin crop stands, disturbed areas",
-    primaryHabitat: "Warm-Season / Shade Tolerant",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Weak competitor; late-germinating; troublesome in lawns more than crops",
     management: "POST grass herbicides late season, improved crop vigor",
