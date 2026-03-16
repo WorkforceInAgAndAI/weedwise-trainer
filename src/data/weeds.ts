@@ -1967,7 +1967,7 @@ export const weeds: Weed[] = [
     emoji: "🌾",
     traits: ["Glossy leaves", "Rolled vernation", "Clasping auricles", "Bunch-type growth"],
     habitat: "Roadsides, fields, lawns, disturbed areas",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     management: "Pre-emergent herbicides in fall; post-emergent in early spring",
     controlTiming: "Before tillering; 2-4 leaf stage",
     actImmediately: false,
