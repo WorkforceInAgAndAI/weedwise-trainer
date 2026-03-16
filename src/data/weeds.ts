@@ -2409,7 +2409,7 @@ export const weeds: Weed[] = [
     emoji: "🌿",
     traits: ["Triangular stem", "3-ranked leaves", "Yellow-brown spikelets", "Tubers (nutlets)"],
     habitat: "Crop fields, lawns, gardens, wet areas",
-    primaryHabitat: "Warm-Season / Moist Soils",
+    primaryHabitat: "Wet / Poorly Drained",
     management: "Nutsedge-specific herbicides (halosulfuron); tuber exhaustion through repeated cultivation",
     controlTiming: "5-6 leaf stage; before tuber production begins",
     actImmediately: true,
