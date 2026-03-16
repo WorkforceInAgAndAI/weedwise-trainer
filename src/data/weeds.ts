@@ -734,7 +734,7 @@ export const weeds: Weed[] = [
       "Produces 10,000+ seeds",
     ],
     habitat: "Row crops, disturbed areas, dry soils",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Prolific seed producer; matures to tumble weed dispersing seeds widely",
     management: "PRE herbicides, early POST before 4 leaves, mechanical removal",
