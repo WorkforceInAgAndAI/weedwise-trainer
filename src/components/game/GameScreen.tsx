@@ -6,6 +6,8 @@ import CardFlipMatch from './CardFlipMatch';
 import LifeStageSortGame from './LifeStageSortGame';
 import ActNowScenario from './ActNowScenario';
 import ConnectGame from './ConnectGame';
+import HabitatConnect from './HabitatConnect';
+import ScientificNameFlipMatch from './ScientificNameFlipMatch';
 import LifeCycleDragDrop from './LifeCycleDragDrop';
 import LookAlikeChallenge from './LookAlikeChallenge';
 import NativeOrIntroduced from './NativeOrIntroduced';
