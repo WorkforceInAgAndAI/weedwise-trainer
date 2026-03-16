@@ -2047,7 +2047,7 @@ export const weeds: Weed[] = [
     emoji: "🤧",
     traits: ["Deeply lobed leaves", "Green inconspicuous flowers", "Major allergen", "Branching habit"],
     habitat: "Crop fields, roadsides, gardens, disturbed areas",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     management: "Pre-emergent herbicides; post-emergent before flowering",
     controlTiming: "Before 6-inch height; prior to pollen production",
     actImmediately: false,
