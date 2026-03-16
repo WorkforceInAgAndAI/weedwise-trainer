@@ -286,7 +286,7 @@ function buildQuizOptions(weed: Weed, grade: GradeLevel): { options: string[]; c
   switch (grade) {
     case 'elementary':
       return {
-        prompt: 'Is this a Monocot or Dicot?',
+        prompt: `Is ${weed.commonName} a Monocot or Dicot?`,
         options: ['Monocot', 'Dicot'],
         correct: weed.plantType === 'Monocot' ? 'Monocot' : 'Dicot',
       };
