@@ -2107,7 +2107,7 @@ export const weeds: Weed[] = [
     emoji: "💛",
     traits: ["Compound leaves", "Yellow umbel flowers", "Smooth stems", "Prairie native"],
     habitat: "Prairies, meadows, open woods, roadsides",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     management: "Generally not controlled; native prairie species; distinguish from toxic look-alikes",
     controlTiming: "N/A — desirable native species",
     actImmediately: false,
