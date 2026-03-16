@@ -424,7 +424,7 @@ export const weeds: Weed[] = [
       "2–4 feet tall",
     ],
     habitat: "Pastures, disturbed areas, field margins",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Perennial spreads via rhizomes; toxic to livestock; extremely difficult to control",
     management: "Repeated cutting/mowing, POST (glyphosate), burning, biological control",
