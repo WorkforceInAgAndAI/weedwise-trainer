@@ -1772,6 +1772,59 @@ export default function FarmMode({ onClose }: Props) {
     const group = groups[currentMgmtGroup];
     const isGrassGroup = group?.label.includes('Monocot') || group?.label.includes('Grass');
     const isBroadleafGroup = group?.label.includes('Dicot') || group?.label.includes('Broadlea');
+
+    if (grade === 'elementary') {
+      return (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <EarningsBar />
+          <div className="p-4 max-w-3xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="font-display font-bold text-xl text-foreground">🛠️ Management Plan</h1>
+                <p className="text-xs text-muted-foreground">Choose the best way to manage each weed group</p>
+              </div>
+              <div className="text-sm text-muted-foreground">Group {currentMgmtGroup + 1}/{groups.length}</div>
+            </div>
+            <div className="flex gap-1 mb-6">
+              {groups.map((_, i) => (
+                <div key={i} className={`h-2 flex-1 rounded-full ${i <= currentMgmtGroup ? 'bg-accent' : 'bg-muted'}`} />
+              ))}
+            </div>
+            {group && (
+              <div className="space-y-4">
+                <div className="bg-card border border-border rounded-xl p-4">
+                  <h2 className="font-display font-bold text-lg text-foreground mb-2">{group.label}</h2>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {group.weedIds.map(wId => (
+                      <span key={wId} className="px-2 py-1 text-xs bg-muted text-foreground rounded-full">{weedMap[wId]?.commonName}</span>
+                    ))}
+                  </div>
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-muted-foreground">
+                    💡 <span className="font-semibold text-foreground">Tip:</span> Choose the best way to get rid of these weeds!
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-sm text-foreground mb-2">What should you do?</h3>
+                  <div className="grid gap-2 grid-cols-1">
+                    {ELEM_MANAGEMENT_METHODS.map(m => (
+                      <button key={m} onClick={() => setSelectedMethod(m)}
+                        className={`px-4 py-3 rounded-lg border text-left text-sm transition-all ${
+                          selectedMethod === m ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                        }`}>{m}</button>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={submitManagement} disabled={!selectedMethod}
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Apply Management ✓
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <EarningsBar />
