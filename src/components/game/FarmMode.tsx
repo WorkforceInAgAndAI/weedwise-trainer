@@ -813,13 +813,33 @@ export default function FarmMode({ onClose }: Props) {
 
   const finishSorting = useCallback(() => {
     if (grade === 'elementary') {
-      // For elementary, group weeds by plant type for management
       const allWeedIds = unsortedWeeds.map(u => u.weedId);
       const monocotIds = allWeedIds.filter(id => weedMap[id]?.plantType === 'Monocot');
       const dicotIds = allWeedIds.filter(id => weedMap[id]?.plantType !== 'Monocot');
       const groupList: { label: string; weedIds: string[] }[] = [];
       if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
       if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
+      setGroups(groupList);
+      setCurrentMgmtGroup(0);
+      setSelectedMethod('');
+      setSelectedTiming('');
+      setMgmtFeedback(null);
+      setMgmtBest(null);
+      setPhase('management');
+      return;
+    }
+
+    if (grade === 'middle') {
+      const allWeedIds = unsortedWeeds.map(u => u.weedId);
+      const monocotIds = allWeedIds.filter(id => weedMap[id]?.plantType === 'Monocot');
+      const dicotIds = allWeedIds.filter(id => weedMap[id]?.plantType !== 'Monocot');
+      const annualIds = allWeedIds.filter(id => !weedMap[id]?.lifeCycle.toLowerCase().includes('perennial'));
+      const perennialIds = allWeedIds.filter(id => weedMap[id]?.lifeCycle.toLowerCase().includes('perennial'));
+      const groupList: { label: string; weedIds: string[] }[] = [];
+      if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
+      if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
+      if (annualIds.length > 0) groupList.push({ label: '📅 Annuals / Biennials', weedIds: annualIds });
+      if (perennialIds.length > 0) groupList.push({ label: '🔄 Perennials', weedIds: perennialIds });
       setGroups(groupList);
       setCurrentMgmtGroup(0);
       setSelectedMethod('');
