@@ -1695,7 +1695,7 @@ export const weeds: Weed[] = [
       "4–9 feet tall, large stature",
     ],
     habitat: "Disturbed areas, field margins, pastures, waste ground",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Toxic berries to livestock and humans; deep taproot; prolific seeder",
     management: "Hand removal with gloves, POST herbicides, repeated cutting before seed set",
