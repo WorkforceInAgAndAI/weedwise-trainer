@@ -3,7 +3,7 @@ import type { GameEngine } from '@/hooks/useGameEngine';
 import { PHASES, GRADE_NAMES, XP_PER_LEVEL } from '@/data/phases';
 import { weedMap, weeds } from '@/data/weeds';
 import CardFlipMatch from './CardFlipMatch';
-import HabitatDragDrop from './HabitatDragDrop';
+import LifeStageSortGame from './LifeStageSortGame';
 import ActNowScenario from './ActNowScenario';
 import ConnectGame from './ConnectGame';
 import LifeCycleDragDrop from './LifeCycleDragDrop';
