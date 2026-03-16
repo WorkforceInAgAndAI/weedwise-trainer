@@ -2178,6 +2178,7 @@ export const weeds: Weed[] = [
     actReason: "Develops herbicide resistance rapidly; becomes tumbleweed spreading seeds widely",
     lookAlike: { id: "lambsquarters", species: "Lambsquarters", difference: "Lambsquarters has mealy white coating on leaves and diamond-shaped leaves; Kochia has narrow lance-shaped leaves and pyramidal form" },
     memoryHook: "Kochia = Christmas tree shape + becomes tumbleweed + tolerates salt + resistance prone",
+    safetyNote: "⚠️ Can accumulate nitrates and other toxins that cause poisoning, photosensitization, and liver damage in grazing animals when eaten in large amounts.",
   },
   {
     id: "lambsquarters",
