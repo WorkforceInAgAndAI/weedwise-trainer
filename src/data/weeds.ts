@@ -393,7 +393,7 @@ export const weeds: Weed[] = [
       "Weak angular stems",
     ],
     habitat: "Disturbed areas, gardens, field margins",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Moderate competitor; toxicity level lower than Jimsonweed but still present",
     management: "POST herbicides, hand removal, cultivation",
