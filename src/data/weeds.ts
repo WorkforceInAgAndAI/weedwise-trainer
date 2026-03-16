@@ -1184,6 +1184,7 @@ export const weeds: Weed[] = [
       difference: "Ground Ivy is perennial with rounded scalloped leaves; Henbit has purple-veined clasping leaves",
     },
     memoryHook: "Henbit = square stems + purple tubular flowers + winter annual",
+    safetyNote: "⚠️ Generally only mildly toxic, but large quantities may upset digestion in livestock; can contribute to nitrates in forage.",
   },
   {
     id: "Ground_ivy",
