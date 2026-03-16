@@ -1246,6 +1246,7 @@ export const weeds: Weed[] = [
       difference: "Milkweed has opposite broader leaves; Dogbane has narrow lanceolate leaves",
     },
     memoryHook: "Hemp dogbane = rhizomatous + fibrous stems + narrow leaves + perennial",
+    safetyNote: "⚠️ Contains cardiac glycosides similar to oleander; highly toxic to livestock and pets if ingested, leading to heart and digestive problems.",
   },
   {
     id: "common_Milkweed",
