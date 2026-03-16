@@ -1483,9 +1483,18 @@ export default function FarmMode({ onClose }: Props) {
   // SORT RESULTS SCREEN
   // ═══════════════════════════════════════════════════════════
   if (phase === 'sort-results') {
-    const correctCount = sortResults.filter(r => r.status === 'correct').length;
-    const partialCount = sortResults.filter(r => r.status === 'partial').length;
-    const incorrectCount = sortResults.filter(r => r.status === 'incorrect').length;
+    // Use elementary results or standard results
+    const isElem = grade === 'elementary';
+    const resultsToShow = isElem ? elemSortResults : sortResults;
+    const correctCount = isElem
+      ? elemSortResults.filter(r => r.status === 'correct').length
+      : sortResults.filter(r => r.status === 'correct').length;
+    const partialCount = isElem
+      ? elemSortResults.filter(r => r.status === 'partial').length
+      : sortResults.filter(r => r.status === 'partial').length;
+    const incorrectCount = isElem
+      ? elemSortResults.filter(r => r.status === 'incorrect').length
+      : sortResults.filter(r => r.status === 'incorrect').length;
     const totalMoney = correctCount * 150 + partialCount * 50;
 
     return (
@@ -1525,35 +1534,64 @@ export default function FarmMode({ onClose }: Props) {
 
           <ScrollArea className="h-72 mb-6">
             <div className="space-y-2">
-              {sortResults.map((r, idx) => {
-                const w = weedMap[r.weedId];
-                return (
-                  <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
-                    r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
-                    r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
-                    'bg-destructive/5 border-destructive/30'
-                  }`}>
-                    <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
-                    <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
-                      <WeedImage weedId={r.weedId} stage="whole" className="w-full h-full" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
-                      <div className="text-[10px] text-muted-foreground">
-                        Your picks: {r.selectedCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}
+              {isElem ? (
+                elemSortResults.map((r, idx) => {
+                  const w = weedMap[r.weedId];
+                  return (
+                    <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
+                      r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
+                      r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
+                      'bg-destructive/5 border-destructive/30'
+                    }`}>
+                      <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
+                      <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
+                        <WeedImage weedId={r.weedId} stage={r.dotImageStage} className="w-full h-full" />
                       </div>
-                      {r.status !== 'correct' && (
-                        <div className="text-[10px] text-accent">
-                          Correct: {r.correctCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {r.plantType.isCorrect ? '✅' : '❌'} {r.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}
+                          {' • '}{r.origin.isCorrect ? '✅' : '❌'} {r.origin.selected === 'native' ? 'Native' : 'Introduced'}
+                          {' • '}{r.lifeStage.isCorrect ? '✅' : '❌'} {lifeStageLabel(r.lifeStage.selected)}
                         </div>
-                      )}
+                      </div>
+                      <span className="text-xs font-bold shrink-0">
+                        {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
+                      </span>
                     </div>
-                    <span className="text-xs font-bold shrink-0">
-                      {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
-                    </span>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                sortResults.map((r, idx) => {
+                  const w = weedMap[r.weedId];
+                  return (
+                    <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
+                      r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
+                      r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
+                      'bg-destructive/5 border-destructive/30'
+                    }`}>
+                      <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
+                      <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
+                        <WeedImage weedId={r.weedId} stage="whole" className="w-full h-full" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          Your picks: {r.selectedCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}
+                        </div>
+                        {r.status !== 'correct' && (
+                          <div className="text-[10px] text-accent">
+                            Correct: {r.correctCats.map(c => SORT_CATEGORIES.find(s => s.id === c)?.label).join(', ')}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold shrink-0">
+                        {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </ScrollArea>
 
