@@ -2449,7 +2449,7 @@ export const weeds: Weed[] = [
     emoji: "🌿",
     traits: ["Palmate compound leaves", "5-7 serrated leaflets", "Distinctive odor", "Dioecious"],
     habitat: "Disturbed areas, fencerows, ditches, old farmsteads",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     management: "Report to authorities in many jurisdictions; mechanical removal; herbicides",
     controlTiming: "Seedling to vegetative stage; before flowering",
     actImmediately: false,
