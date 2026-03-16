@@ -1199,7 +1199,7 @@ export const weeds: Weed[] = [
       "Persistent through seasons",
     ],
     habitat: "Pastures, lawns, moist shaded areas, field margins",
-    primaryHabitat: "Cool-Season / Partial Shade",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Perennial but slower spreading; somewhat palatable to livestock",
     management: "POST herbicides, burning, repeated cutting, improved pasture species",
