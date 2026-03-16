@@ -362,7 +362,7 @@ export const weeds: Weed[] = [
       "Distinctive unpleasant musty odor",
     ],
     habitat: "Disturbed areas, pastures, waste ground",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Highly toxic to livestock and humans; alkaloid compounds cause neurological damage",
     management: "Hand removal with gloves, POST herbicides, preventive sanitation",
