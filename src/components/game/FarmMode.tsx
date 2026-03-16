@@ -282,6 +282,68 @@ const ELEM_MANAGEMENT_METHODS = [
   'Water the weed',
 ];
 
+const MID_MANAGEMENT_METHODS = [
+  'Hand weeding',
+  'Pre-Emergent Herbicide',
+  'Post-Emergent Herbicide',
+  'Cover Crop/Mulch',
+  'Wait to act',
+  'Fertilize',
+];
+
+function isMidMethodEffective(method: string, groupLabel: string, weedIds: string[]): boolean {
+  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
+  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
+  const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
+  // Fertilize is never effective as weed management
+  if (method === 'Fertilize') return false;
+  if (method === 'Pre-Emergent Herbicide' && isAnnualGroup) return true;
+  if (method === 'Pre-Emergent Herbicide' && isPerennialGroup) return false;
+  if (method === 'Post-Emergent Herbicide') return true;
+  if (method === 'Hand weeding' && weedIds.length <= 3) return true;
+  if (method === 'Hand weeding') return true;
+  if (method === 'Cover Crop/Mulch') return true;
+  if (method === 'Wait to act' && weedIds.length <= 2) return true;
+  if (method === 'Wait to act') return false;
+  return false;
+}
+
+function getMidBestMethod(groupLabel: string, weedIds: string[]): { method: string; explanation: string } {
+  const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
+  if (isAnnualGroup) return { method: 'Pre-Emergent Herbicide', explanation: 'Annual weeds are best stopped before they emerge. A pre-emergent herbicide prevents seeds from germinating.' };
+  if (isPerennialGroup) return { method: 'Post-Emergent Herbicide', explanation: 'Perennial weeds regrow from roots, so post-emergent herbicides applied to actively growing plants are most effective.' };
+  if (weedIds.length <= 2) return { method: 'Hand weeding', explanation: 'With only a few weeds, hand weeding is the most targeted and cost-effective approach.' };
+  return { method: 'Post-Emergent Herbicide', explanation: 'Post-emergent herbicides target actively growing weeds and are effective across many weed types.' };
+}
+
+function getCorrectHabitat(weed: Weed): string {
+  const h = weed.habitat.toLowerCase();
+  if (h.startsWith('warm-season') || h.startsWith('warm')) return 'warm';
+  if (h.startsWith('cool-season') || h.startsWith('cool')) return 'cool';
+  if (h.startsWith('wet') || h.includes('poorly drained')) return 'wet';
+  if (h.startsWith('dry') || h.includes('disturbed')) return 'dry';
+  return 'warm';
+}
+
+function getCorrectLifeCycle(weed: Weed): string {
+  const lc = weed.lifeCycle.toLowerCase();
+  if (lc.includes('perennial')) return 'perennial';
+  if (lc.includes('biennial')) return 'biennial';
+  return 'annual';
+}
+
+function habitatLabel(h: string): string {
+  switch (h) {
+    case 'warm': return 'Warm-Season / Full Sun';
+    case 'cool': return 'Cool-Season / Early Spring';
+    case 'wet': return 'Wet / Poorly Drained';
+    case 'dry': return 'Dry / Disturbed';
+    default: return h;
+  }
+}
+
 function isElemMethodEffective(method: string): boolean {
   return ['Hand weeding', 'Apply general herbicides', 'Mulch over the weed'].includes(method);
 }
