@@ -827,7 +827,7 @@ export const weeds: Weed[] = [
       "Matures and shatters quickly",
     ],
     habitat: "Saline soils, pastures, disturbed areas",
-    primaryHabitat: "Cool to Warm-Season / Saline Tolerant",
+    primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Spiny awns harmful to livestock; seed head contaminates forage quality",
     management: "PRE herbicides, early POST before boot, improved species reseeding",
