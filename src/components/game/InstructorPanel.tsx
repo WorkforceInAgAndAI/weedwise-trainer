@@ -53,7 +53,7 @@ export default function InstructorPanel(game: GameEngine) {
     <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
       <div className="max-w-6xl mx-auto p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-display font-bold text-primary">📊 Instructor Panel</h1>
+          <h1 className="text-2xl font-display font-bold text-primary"><h1 className="text-2xl font-display font-bold text-primary">📊 Session Overview</h1></h1>
           <button onClick={() => setShowInstructor(false)} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-sm">✕ Close</button>
         </div>
 

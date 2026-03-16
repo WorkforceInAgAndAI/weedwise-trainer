@@ -19,7 +19,7 @@ const FILTERS: FilterOption[] = [
   { key: 'introduced', label: 'Introduced', icon: '🚢', group: 'Origin' },
   { key: 'warm', label: 'Warm-Season', icon: '☀️', group: 'Habitat' },
   { key: 'cool', label: 'Cool-Season', icon: '❄️', group: 'Habitat' },
-  { key: 'wet', label: 'Wet / Moist', icon: '💧', group: 'Habitat' },
+  { key: 'wet', label: 'Wet / Poorly Drained', icon: '💧', group: 'Habitat' },
   { key: 'dry', label: 'Dry / Disturbed', icon: '🏜️', group: 'Habitat' },
   { key: 'annual', label: 'Annual', icon: '🔄', group: 'Life Cycle' },
   { key: 'perennial', label: 'Perennial', icon: '♾️', group: 'Life Cycle' },
@@ -44,10 +44,10 @@ function matchesFilter(w: Weed, key: string): boolean {
   if (key === 'non-flowering') return w.plantType === 'Non-flowering';
   if (key === 'native') return w.origin === 'Native';
   if (key === 'introduced') return w.origin === 'Introduced';
-  if (key === 'warm') return w.primaryHabitat.toLowerCase().includes('warm');
-  if (key === 'cool') return w.primaryHabitat.toLowerCase().includes('cool');
-  if (key === 'wet') return w.primaryHabitat.toLowerCase().includes('wet') || w.primaryHabitat.toLowerCase().includes('moist') || w.primaryHabitat.toLowerCase().includes('aquatic');
-  if (key === 'dry') return w.primaryHabitat.toLowerCase().includes('dry') || w.primaryHabitat.toLowerCase().includes('disturbed') || w.primaryHabitat.toLowerCase().includes('arid');
+  if (key === 'warm') return w.primaryHabitat.startsWith('Warm-Season');
+  if (key === 'cool') return w.primaryHabitat.startsWith('Cool-Season');
+  if (key === 'wet') return w.primaryHabitat.startsWith('Wet');
+  if (key === 'dry') return w.primaryHabitat.startsWith('Dry');
   if (key === 'annual') return w.lifeCycle.includes('Annual') && !w.lifeCycle.toLowerCase().includes('winter');
   if (key === 'perennial') return w.lifeCycle === 'Perennial';
   if (key === 'biennial') return w.lifeCycle === 'Biennial';
