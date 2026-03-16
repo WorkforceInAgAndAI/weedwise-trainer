@@ -466,6 +466,7 @@ export const weeds: Weed[] = [
       difference: "Horsenettle is perennial with rhizomes; Buffalobur is annual",
     },
     memoryHook: "Buffalobur = annual + yellow prickles + spiny fruit = livestock hazard",
+    safetyNote: "⚠️ Spiny plant whose berries and foliage contain solanine-type alkaloids that are poisonous to livestock and humans if eaten.",
   },
   {
     id: "Smooth_Groundcherry",
