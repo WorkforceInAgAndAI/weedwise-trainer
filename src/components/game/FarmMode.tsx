@@ -56,6 +56,15 @@ interface SortResult {
   status: 'correct' | 'partial' | 'incorrect';
 }
 
+interface ElemSortResult {
+  weedId: string;
+  dotImageStage: string;
+  plantType: { selected: string; correct: string; isCorrect: boolean };
+  origin: { selected: string; correct: string; isCorrect: boolean };
+  lifeStage: { selected: string; correct: string; isCorrect: boolean };
+  status: 'correct' | 'partial' | 'incorrect';
+}
+
 type SortCategory = 'monocot' | 'dicot' | 'annual' | 'perennial' | 'invasive';
 
 type FarmPhase = 'avatar' | 'overview' | 'scouting' | 'sorting' | 'sort-results' | 'categorize-review' | 'invasive-report' | 'management' | 'mgmt-feedback' | 'results';
