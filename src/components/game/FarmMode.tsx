@@ -445,6 +445,20 @@ export default function FarmMode({ onClose }: Props) {
   const [highSortResults, setHighSortResults] = useState<HighSortResult[]>([]);
   const [highSortFeedback, setHighSortFeedback] = useState<HighSortResult | null>(null);
   const highFamilyOptionsRef = useRef<string[]>([]);
+  const highFamilyWeedRef = useRef<string>('');
+
+  // Stabilize family options per weed so they don't re-shuffle on every click
+  useEffect(() => {
+    if (grade !== 'high' || phase !== 'sorting') return;
+    const current = unsortedWeeds[currentSortWeed];
+    if (!current) return;
+    const w = weedMap[current.weedId];
+    if (!w || highFamilyWeedRef.current === current.weedId) return;
+    highFamilyWeedRef.current = current.weedId;
+    const allFamilies = [...new Set(weeds.map(x => x.family))];
+    const distractors = shuffle(allFamilies.filter(f => f !== w.family)).slice(0, 2);
+    highFamilyOptionsRef.current = shuffle([w.family, ...distractors]);
+  }, [grade, phase, currentSortWeed, unsortedWeeds]);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
