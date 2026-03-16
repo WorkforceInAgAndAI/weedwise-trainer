@@ -373,6 +373,7 @@ export const weeds: Weed[] = [
       difference: "Nightshade is smaller (1–2 ft) with smaller flowers; Jimsonweed is 2–5 ft with large trumpets",
     },
     memoryHook: "Jimsonweed = spiny pod + large trumpet flowers + musty smell = toxic",
+    safetyNote: "⚠️ HIGHLY POISONOUS — tropane alkaloids (atropine, scopolamine) can cause hallucinations, rapid heartbeat, seizures, and death in humans and animals if ingested.",
   },
   {
     id: "Eastern_black_nightshade",
