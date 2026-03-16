@@ -18,7 +18,7 @@ export const PHASES: Record<GradeLevel, PhaseConfig[]> = {
   high: [
     { id: 'h1', name: 'Name the Weed', description: 'Multiple choice — identify by scientific name', xpRequired: 0, xpReward: 5, imageStage: 'seedling', showName: false, showFamily: false },
     { id: 'h2', name: 'Life Cycle Sort', description: 'Sort weeds into Annual, Perennial, or Biennial', xpRequired: 20, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
-    { id: 'h3', name: 'Life Stage Image Sort', description: 'Sort life stage images into correct species', xpRequired: 50, xpReward: 5, imageStage: 'flower', showName: false, showFamily: true },
+    { id: 'h3', name: 'Monocot or Dicot?', description: 'Classify plants by leaf type using scientific names', xpRequired: 50, xpReward: 5, imageStage: 'whole', showName: false, showFamily: false },
     { id: 'h4', name: 'Habitat/Climate Connect', description: 'Match species to their preferred habitat', xpRequired: 80, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
     { id: 'h5', name: 'Family Match', description: 'Match scientific names to plant families', xpRequired: 100, xpReward: 6, imageStage: 'whole', showName: true, showFamily: false },
     { id: 'h6', name: 'Control Timing', description: 'Choose optimal timing and see population impact', xpRequired: 130, xpReward: 6, imageStage: 'flower', showName: true, showFamily: false },
