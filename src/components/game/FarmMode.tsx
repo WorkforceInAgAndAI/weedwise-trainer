@@ -569,6 +569,44 @@ export default function FarmMode({ onClose }: Props) {
 
   // ── Sorting phase ──────────────────────────────────────
   const handleSortSubmit = useCallback(() => {
+    if (grade === 'elementary') {
+      if (!elemPlantType || !elemOrigin || !elemLifeStage) { toast.error('Select one option in each row'); return; }
+      const current = unsortedWeeds[currentSortWeed];
+      if (!current) return;
+      const weed = weedMap[current.weedId];
+      if (!weed) return;
+      const dot = fields.flatMap(f => f.dots).find(d => d.id === current.dotId);
+      const dotStage = dot?.imageStage || 'whole';
+      const correctPlantType = weed.plantType === 'Monocot' ? 'monocot' : 'dicot';
+      const correctOrigin = weed.origin === 'Native' ? 'native' : 'introduced';
+      const correctLifeStage = imageStageToLifeStage(dotStage);
+
+      const ptCorrect = elemPlantType === correctPlantType;
+      const orCorrect = elemOrigin === correctOrigin;
+      const lsCorrect = elemLifeStage === correctLifeStage;
+      const correctCount = [ptCorrect, orCorrect, lsCorrect].filter(Boolean).length;
+      const status: ElemSortResult['status'] = correctCount === 3 ? 'correct' : correctCount > 0 ? 'partial' : 'incorrect';
+
+      const result: ElemSortResult = {
+        weedId: current.weedId,
+        dotImageStage: dotStage,
+        plantType: { selected: elemPlantType, correct: correctPlantType, isCorrect: ptCorrect },
+        origin: { selected: elemOrigin, correct: correctOrigin, isCorrect: orCorrect },
+        lifeStage: { selected: elemLifeStage, correct: correctLifeStage, isCorrect: lsCorrect },
+        status,
+      };
+      setElemSortResults(prev => [...prev, result]);
+
+      if (status === 'correct') { setMoney(m => m + 150); setTotalEarnings(e => e + 150); }
+      else if (status === 'partial') { setMoney(m => m + 50); setTotalEarnings(e => e + 50); }
+
+      setElemPlantType(null);
+      setElemOrigin(null);
+      setElemLifeStage(null);
+      setElemSortFeedback(result);
+      return;
+    }
+
     if (selectedSortCats.length === 0) { toast.error('Select at least one category'); return; }
     const current = unsortedWeeds[currentSortWeed];
     if (!current) return;
@@ -582,7 +620,6 @@ export default function FarmMode({ onClose }: Props) {
     const result: SortResult = { weedId: current.weedId, selectedCats: [...selectedSortCats], correctCats, status };
     setSortResults(prev => [...prev, result]);
 
-    // Add to sorted buckets
     setSortedWeeds(prev => {
       const next = { ...prev };
       selectedSortCats.forEach(cat => {
@@ -602,12 +639,12 @@ export default function FarmMode({ onClose }: Props) {
     }
 
     setSelectedSortCats([]);
-    // Show per-weed feedback before advancing
     setSortFeedbackResult(result);
-  }, [selectedSortCats, currentSortWeed, unsortedWeeds]);
+  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields]);
 
   const handleSortFeedbackNext = useCallback(() => {
     setSortFeedbackResult(null);
+    setElemSortFeedback(null);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
