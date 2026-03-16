@@ -6,6 +6,8 @@ import CardFlipMatch from './CardFlipMatch';
 import LifeStageSortGame from './LifeStageSortGame';
 import ActNowScenario from './ActNowScenario';
 import ConnectGame from './ConnectGame';
+import HabitatConnect from './HabitatConnect';
+import ScientificNameFlipMatch from './ScientificNameFlipMatch';
 import LifeCycleDragDrop from './LifeCycleDragDrop';
 import LookAlikeChallenge from './LookAlikeChallenge';
 import NativeOrIntroduced from './NativeOrIntroduced';
@@ -72,9 +74,9 @@ export default function GameScreen(game: GameEngine) {
     switch (current.phaseId) {
       case 'e3': return <CardFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e4': return <LifeStageSortGame key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'm2': return <ConnectGame key={key} mode="family" onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'm2': return <HabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'm5': return <NativeOrIntroduced key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'm5': return <ScientificNameFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h2': return <ConnectGame key={key} mode="scientific" onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h3': return <LifecycleImageSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e5': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
