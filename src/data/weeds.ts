@@ -1502,6 +1502,7 @@ export const weeds: Weed[] = [
       difference: "Carrot has flat-topped white flowers; Star has drooping star-shaped flowers",
     },
     memoryHook: "Star of Bethlehem = white star flowers with green stripe + bulbous + grass-like leaves",
+    safetyNote: "⚠️ Ornamental bulb that is poisonous; cardiac glycosides in bulbs and leaves can cause vomiting, arrhythmias, and potentially death if ingested.",
   },
   {
     id: "Russian_thistle",
