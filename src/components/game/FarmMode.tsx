@@ -855,7 +855,7 @@ export default function FarmMode({ onClose }: Props) {
     const yearlyTotal = totalEarnings + money;
     const profit = yearlyTotal - (TOTAL_EXPENSES * year);
     return (
-      <div className="fixed bottom-4 right-4 z-[60] bg-card/95 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-xl flex items-center gap-4 animate-in slide-in-from-bottom-2">
+      <div className="fixed bottom-4 right-4 z-[60] bg-card/95 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-xl flex items-center gap-4">
         <div className="text-center">
           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">💰 Earnings</div>
           <div className="font-display font-bold text-base text-accent">${yearlyTotal.toLocaleString()}</div>
