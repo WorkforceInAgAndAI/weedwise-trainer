@@ -702,7 +702,12 @@ export default function FarmMode({ onClose }: Props) {
       if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
       if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
       setGroups(groupList);
-      startManagement();
+      setCurrentMgmtGroup(0);
+      setSelectedMethod('');
+      setSelectedTiming('');
+      setMgmtFeedback(null);
+      setMgmtBest(null);
+      setPhase('management');
       return;
     }
 
@@ -719,7 +724,7 @@ export default function FarmMode({ onClose }: Props) {
     });
     setInvasiveReports(reports);
     setPhase('categorize-review');
-  }, [grade, sortedWeeds, fields, unsortedWeeds, startManagement]);
+  }, [grade, sortedWeeds, fields, unsortedWeeds]);
 
   // ── Management ──────────────────────────────────────────
   const startManagement = useCallback(() => {
