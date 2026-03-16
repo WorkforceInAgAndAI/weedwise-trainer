@@ -1912,7 +1912,7 @@ export const weeds: Weed[] = [
       "Very fine delicate appearance",
     ],
     habitat: "Disturbed areas, compacted soils, sidewalk cracks",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Annual; weak competitor; responsive to early herbicides",
     management: "PRE herbicides, early POST, mulching, soil loosening",
