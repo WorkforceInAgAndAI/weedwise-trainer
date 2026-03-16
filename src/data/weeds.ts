@@ -437,6 +437,7 @@ export const weeds: Weed[] = [
       difference: "Buffalobur is annual; Horsenettle is perennial with rhizomes",
     },
     memoryHook: "Horsenettle = yellow spines + orange berries + rhizomes = persistent perennial",
+    safetyNote: "⚠️ A spiny nightshade with toxic glycoalkaloids in fruit and foliage; ingestion can cause digestive upset and neurological signs in livestock and people.",
   },
   {
     id: "Buffalobur",
