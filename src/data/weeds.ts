@@ -841,6 +841,7 @@ export const weeds: Weed[] = [
       difference: "Foxtail has distinctive awned seed head; Nimblewill has fine panicle",
     },
     memoryHook: "Foxtail barley = fox-like awned seed head + toxic to livestock",
+    safetyNote: "⚠️ Seed heads form sharp awns that can lodge in the mouths, eyes, and skin of pets and livestock, causing painful injuries, infections, and abscesses.",
   },
   {
     id: "Quackgrass",
