@@ -3,7 +3,7 @@ import type { GameEngine } from '@/hooks/useGameEngine';
 import { PHASES, GRADE_NAMES, XP_PER_LEVEL } from '@/data/phases';
 import { weedMap, weeds } from '@/data/weeds';
 import CardFlipMatch from './CardFlipMatch';
-import HabitatDragDrop from './HabitatDragDrop';
+import LifeStageSortGame from './LifeStageSortGame';
 import ActNowScenario from './ActNowScenario';
 import ConnectGame from './ConnectGame';
 import LifeCycleDragDrop from './LifeCycleDragDrop';
@@ -71,7 +71,7 @@ export default function GameScreen(game: GameEngine) {
 
     switch (current.phaseId) {
       case 'e3': return <CardFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'e4': return <HabitatDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'e4': return <LifeStageSortGame key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm2': return <ConnectGame key={key} mode="family" onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm5': return <NativeOrIntroduced key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;

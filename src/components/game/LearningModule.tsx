@@ -22,7 +22,7 @@ const TOPICS: Topic[] = [
   { id: 'life-stages', name: 'Life Stages', icon: '📸', description: 'Learn to identify weeds at seedling, vegetative, and reproductive stages', grades: ['elementary', 'middle', 'high'] },
   { id: 'native-introduced', name: 'Native vs Introduced', icon: '🌍', description: 'Which species are native and which were introduced', grades: ['elementary', 'middle', 'high'] },
   { id: 'families', name: 'Plant Families', icon: '🧬', description: 'Group weeds by their botanical families', grades: ['middle', 'high'] },
-  { id: 'habitats', name: 'Habitats & Climate', icon: '🗺️', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['elementary', 'middle', 'high'] },
+  { id: 'habitats', name: 'Habitats & Climate', icon: '🗺️', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['middle', 'high'] },
   { id: 'life-cycles', name: 'Life Cycles', icon: '🔄', description: 'Annual, biennial, and perennial growth patterns', grades: ['middle', 'high'] },
   { id: 'look-alikes', name: 'Look-Alike Species', icon: '🔀', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
   { id: 'safety', name: 'Safety & Toxicity', icon: '⚠️', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
