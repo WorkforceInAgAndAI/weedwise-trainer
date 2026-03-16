@@ -1915,9 +1915,11 @@ export default function FarmMode({ onClose }: Props) {
             <div className="text-sm text-foreground mb-1">
               <span className="font-semibold">Method:</span> {mgmtFeedback.method}
             </div>
-            <div className="text-sm text-foreground mb-2">
-              <span className="font-semibold">Timing:</span> {mgmtFeedback.timing}
-            </div>
+            {mgmtFeedback.timing !== 'N/A' && (
+              <div className="text-sm text-foreground mb-2">
+                <span className="font-semibold">Timing:</span> {mgmtFeedback.timing}
+              </div>
+            )}
             <div className="text-sm text-muted-foreground">
               <span className="font-semibold">For:</span> {mgmtFeedback.groupLabel}
             </div>
@@ -1929,9 +1931,11 @@ export default function FarmMode({ onClose }: Props) {
               <div className="text-sm text-foreground mb-1">
                 <span className="font-semibold">Method:</span> {mgmtBest.method}
               </div>
-              <div className="text-sm text-foreground mb-2">
-                <span className="font-semibold">Timing:</span> {mgmtBest.timing}
-              </div>
+              {mgmtBest.timing !== 'N/A' && (
+                <div className="text-sm text-foreground mb-2">
+                  <span className="font-semibold">Timing:</span> {mgmtBest.timing}
+                </div>
+              )}
             </div>
           )}
 
