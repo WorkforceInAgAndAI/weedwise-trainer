@@ -376,6 +376,12 @@ export default function FarmMode({ onClose }: Props) {
   const [selectedSortCats, setSelectedSortCats] = useState<SortCategory[]>([]);
   const [sortResults, setSortResults] = useState<SortResult[]>([]);
   const [sortFeedbackResult, setSortFeedbackResult] = useState<SortResult | null>(null);
+  // Elementary sorting state
+  const [elemSortResults, setElemSortResults] = useState<ElemSortResult[]>([]);
+  const [elemSortFeedback, setElemSortFeedback] = useState<ElemSortResult | null>(null);
+  const [elemPlantType, setElemPlantType] = useState<string | null>(null);
+  const [elemOrigin, setElemOrigin] = useState<string | null>(null);
+  const [elemLifeStage, setElemLifeStage] = useState<string | null>(null);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
