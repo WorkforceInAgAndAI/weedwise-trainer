@@ -641,7 +641,7 @@ export const weeds: Weed[] = [
       "1–2 feet tall, branching",
     ],
     habitat: "Wet areas, disturbed ground, field margins",
-    primaryHabitat: "Warm-Season / Moist Soils",
+    primaryHabitat: "Wet / Poorly Drained",
     actImmediately: false,
     actReason: "Moderate competitor; indicator of wet soils; responds well to herbicides",
     management: "POST broadleaf herbicides, drainage improvement, cultivation",
