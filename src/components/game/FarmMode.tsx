@@ -897,6 +897,27 @@ export default function FarmMode({ onClose }: Props) {
       return;
     }
 
+    if (grade === 'middle') {
+      if (!selectedMethod) return;
+      const group = groups[currentMgmtGroup];
+      if (!group) return;
+      const effective = isMidMethodEffective(selectedMethod, group.label, group.weedIds);
+      const best = getMidBestMethod(group.label, group.weedIds);
+      const isBestChoice = selectedMethod === best.method;
+
+      const action: ManagementAction = { groupLabel: group.label, method: selectedMethod, timing: 'N/A', effective, bestChoice: isBestChoice };
+      setManagementActions(prev => [...prev, action]);
+
+      if (isBestChoice) { setMoney(m => m + 750); setTotalEarnings(e => e + 750); }
+      else if (effective) { setMoney(m => m + 400); setTotalEarnings(e => e + 400); }
+      else { setMoney(m => m - 200); }
+
+      setMgmtFeedback(action);
+      setMgmtBest({ ...best, timing: 'N/A' });
+      setPhase('mgmt-feedback');
+      return;
+    }
+
     if (!selectedMethod || !selectedTiming) return;
     const group = groups[currentMgmtGroup];
     if (!group) return;
