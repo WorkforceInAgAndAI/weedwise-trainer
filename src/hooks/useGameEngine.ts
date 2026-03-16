@@ -36,15 +36,20 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
   };
 
   switch (phase.id) {
-    case 'e1': case 'm1': case 'h1': {
+    case 'e1': case 'm1': {
       const opts = shuffle([weed.commonName, ...pickRandom(others, 3).map(w => w.commonName)]);
       return { ...base, type: 'mcq', text: 'Which weed is shown based on the traits and image?', options: opts, correct: weed.commonName };
+    }
+    case 'h1': {
+      // High school: answer is scientific name
+      const opts = shuffle([weed.scientificName, ...pickRandom(others, 3).map(w => w.scientificName)]);
+      return { ...base, type: 'mcq', text: 'Identify this weed by its scientific name based on the traits and image.', options: opts, correct: weed.scientificName };
     }
     case 'e2': {
       return { ...base, type: 'binary', text: 'Look at this plant. Is it a Monocot or a Dicot?', options: ['Monocot', 'Dicot'], correct: weed.plantType === 'Monocot' ? 'Monocot' : 'Dicot' };
     }
     // Per-weed interactive phases
-    case 'e5': case 'm4': case 'h4': case 'h5': {
+    case 'e5': case 'm4': case 'h6': {
       return { ...base, type: 'minigame', text: phase.name, options: [], correct: '' };
     }
     default:
