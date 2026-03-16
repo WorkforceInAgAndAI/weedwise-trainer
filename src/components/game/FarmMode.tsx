@@ -1224,6 +1224,160 @@ export default function FarmMode({ onClose }: Props) {
       return null;
     }
 
+    // Get the dot's image stage for this weed
+    const currentDot = fields.flatMap(f => f.dots).find(d => d.id === current.dotId);
+    const currentImgStage = currentDot?.imageStage || 'whole';
+
+    // Elementary: 3-row radio sorting
+    if (grade === 'elementary') {
+      return (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <EarningsBar />
+          <div className="p-4 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="font-display font-bold text-xl text-foreground">🗂️ Sort Your Findings</h1>
+                <p className="text-xs text-muted-foreground">Classify each weed by selecting one option per row.</p>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-muted-foreground">{currentSortWeed + 1} / {unsortedWeeds.length}</div>
+              </div>
+            </div>
+
+            <div className="h-2 bg-muted rounded-full mb-6 overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
+            </div>
+
+            {/* Current weed card */}
+            <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
+              <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto flex items-center justify-center">
+                <WeedImage weedId={currentW.id} stage={currentImgStage} className="w-full h-full object-contain" />
+              </div>
+              <div className="p-4">
+                <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {currentW.traits.slice(0, 3).map((t, i) => (
+                    <span key={i} className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full">{t}</span>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{currentW.habitat}</p>
+              </div>
+            </div>
+
+            {/* Row 1: Monocot vs Dicot */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Plant Type</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ id: 'monocot', label: '🌾 Monocot' }, { id: 'dicot', label: '🍀 Dicot' }].map(opt => (
+                    <button key={opt.id} onClick={() => setElemPlantType(opt.id)}
+                      className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                        elemPlantType === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 2: Native vs Introduced */}
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Origin</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ id: 'native', label: '🏡 Native' }, { id: 'introduced', label: '🌍 Introduced' }].map(opt => (
+                    <button key={opt.id} onClick={() => setElemOrigin(opt.id)}
+                      className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                        elemOrigin === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 3: Life Stage */}
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Life Stage</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { id: 'seedling', label: '🌱 Seedling' },
+                    { id: 'vegetative', label: '🌿 Vegetative' },
+                    { id: 'reproductive', label: '🌸 Reproductive' },
+                    { id: 'plant', label: '🌳 Mature Plant' },
+                  ].map(opt => (
+                    <button key={opt.id} onClick={() => setElemLifeStage(opt.id)}
+                      className={`px-2 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                        elemLifeStage === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button onClick={handleSortSubmit} disabled={!elemPlantType || !elemOrigin || !elemLifeStage || !!elemSortFeedback}
+              className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-display font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
+              Confirm Sorting ✓
+            </button>
+          </div>
+
+          {/* Elementary sort feedback overlay */}
+          {elemSortFeedback && (() => {
+            const fbWeed = weedMap[elemSortFeedback.weedId];
+            const isCorrect = elemSortFeedback.status === 'correct';
+            const isPartial = elemSortFeedback.status === 'partial';
+            return (
+              <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
+                <div className={`bg-card border-2 rounded-xl max-w-sm w-full p-5 animate-scale-in ${
+                  isCorrect ? 'border-accent' : isPartial ? 'border-primary' : 'border-destructive'
+                }`}>
+                  <div className="text-center mb-4">
+                    <div className="text-4xl mb-2">{isCorrect ? '✅' : isPartial ? '🟡' : '❌'}</div>
+                    <div className="font-display font-bold text-lg text-foreground">
+                      {isCorrect ? 'All Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
+                    </div>
+                    <div className={`text-sm font-semibold ${isCorrect ? 'text-accent' : isPartial ? 'text-primary' : 'text-destructive'}`}>
+                      {isCorrect ? '+$150' : isPartial ? '+$50' : '$0'}
+                    </div>
+                    <div className="text-sm text-foreground mt-1">{fbWeed?.commonName}</div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      elemSortFeedback.plantType.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{elemSortFeedback.plantType.isCorrect ? '✅' : '❌'}</span>
+                      <span>Plant Type: {elemSortFeedback.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                      {!elemSortFeedback.plantType.isCorrect && (
+                        <span className="ml-auto text-xs">→ {elemSortFeedback.plantType.correct === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                      )}
+                    </div>
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      elemSortFeedback.origin.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{elemSortFeedback.origin.isCorrect ? '✅' : '❌'}</span>
+                      <span>Origin: {elemSortFeedback.origin.selected === 'native' ? 'Native' : 'Introduced'}</span>
+                      {!elemSortFeedback.origin.isCorrect && (
+                        <span className="ml-auto text-xs">→ {elemSortFeedback.origin.correct === 'native' ? 'Native' : 'Introduced'}</span>
+                      )}
+                    </div>
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      elemSortFeedback.lifeStage.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{elemSortFeedback.lifeStage.isCorrect ? '✅' : '❌'}</span>
+                      <span>Life Stage: {lifeStageLabel(elemSortFeedback.lifeStage.selected)}</span>
+                      {!elemSortFeedback.lifeStage.isCorrect && (
+                        <span className="ml-auto text-xs">→ {lifeStageLabel(elemSortFeedback.lifeStage.correct)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <button onClick={handleSortFeedbackNext}
+                    className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
+                    {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      );
+    }
+
+    // Middle/High: existing multi-category sorting
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <EarningsBar />
@@ -1294,51 +1448,29 @@ export default function FarmMode({ onClose }: Props) {
           const catLabel = (id: SortCategory) => SORT_CATEGORIES.find(c => c.id === id)?.label || id;
           return (
             <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
-              <div className={`bg-card border-2 rounded-xl shadow-xl max-w-md w-full overflow-hidden ${
-                isCorrect ? 'border-accent/50' : isPartial ? 'border-amber-500/50' : 'border-destructive/50'
+              <div className={`bg-card border-2 rounded-xl max-w-sm w-full p-5 animate-scale-in ${
+                isCorrect ? 'border-accent' : isPartial ? 'border-primary' : 'border-destructive'
               }`}>
-                <div className={`p-4 text-center ${
-                  isCorrect ? 'bg-accent/10' : isPartial ? 'bg-amber-500/10' : 'bg-destructive/10'
-                }`}>
-                  <div className="text-3xl mb-1">{isCorrect ? '✅' : isPartial ? '⚠️' : '❌'}</div>
+                <div className="text-center mb-4">
+                  <div className="text-4xl mb-2">{isCorrect ? '✅' : isPartial ? '🟡' : '❌'}</div>
                   <div className="font-display font-bold text-lg text-foreground">
-                    {isCorrect ? 'Correct! +$150' : isPartial ? 'Partially Correct +$50' : 'Incorrect'}
+                    {isCorrect ? 'Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">{fbWeed?.commonName}</div>
-                </div>
-                <div className="p-4 space-y-3">
-                  <div>
-                    <div className="text-xs font-semibold text-muted-foreground mb-1">Your Answer</div>
-                    <div className="flex flex-wrap gap-1">
-                      {sortFeedbackResult.selectedCats.map(c => {
-                        const correct = sortFeedbackResult.correctCats.includes(c);
-                        return (
-                          <span key={c} className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            correct ? 'bg-accent/15 text-accent' : 'bg-destructive/15 text-destructive'
-                          }`}>
-                            {correct ? '✓' : '✗'} {catLabel(c)}
-                          </span>
-                        );
-                      })}
-                    </div>
+                  <div className={`text-sm font-semibold ${isCorrect ? 'text-accent' : isPartial ? 'text-primary' : 'text-destructive'}`}>
+                    {isCorrect ? '+$150' : isPartial ? '+$50' : '$0'}
                   </div>
-                  {!isCorrect && (
-                    <div>
-                      <div className="text-xs font-semibold text-muted-foreground mb-1">Correct Answer</div>
-                      <div className="flex flex-wrap gap-1">
-                        {sortFeedbackResult.correctCats.map(c => (
-                          <span key={c} className="text-xs px-2 py-1 rounded-full bg-accent/15 text-accent font-medium">
-                            ✓ {catLabel(c)}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <button onClick={handleSortFeedbackNext}
-                    className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
-                    {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
-                  </button>
+                  <div className="text-sm text-foreground mt-1">{fbWeed?.commonName}</div>
                 </div>
+                {!isCorrect && (
+                  <div className="bg-muted/50 rounded-lg p-3 mb-4 text-xs space-y-1">
+                    <div><span className="font-semibold text-foreground">Your picks:</span> {sortFeedbackResult.selectedCats.map(catLabel).join(', ')}</div>
+                    <div><span className="font-semibold text-accent">Correct:</span> {sortFeedbackResult.correctCats.map(catLabel).join(', ')}</div>
+                  </div>
+                )}
+                <button onClick={handleSortFeedbackNext}
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
+                  {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
+                </button>
               </div>
             </div>
           );
