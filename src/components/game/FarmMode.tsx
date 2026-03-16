@@ -874,6 +874,43 @@ export default function FarmMode({ onClose }: Props) {
       return;
     }
 
+    if (grade === 'high') {
+      const allWeedIds = unsortedWeeds.map(u => u.weedId);
+      const monocotIds = allWeedIds.filter(id => weedMap[id]?.plantType === 'Monocot');
+      const dicotIds = allWeedIds.filter(id => weedMap[id]?.plantType !== 'Monocot');
+      const annualIds = allWeedIds.filter(id => !weedMap[id]?.lifeCycle.toLowerCase().includes('perennial') && !weedMap[id]?.lifeCycle.toLowerCase().includes('biennial'));
+      const perennialIds = allWeedIds.filter(id => weedMap[id]?.lifeCycle.toLowerCase().includes('perennial'));
+      const biennialIds = allWeedIds.filter(id => weedMap[id]?.lifeCycle.toLowerCase().includes('biennial'));
+      const invasiveIds = allWeedIds.filter(id => weedMap[id]?.origin === 'Introduced' && weedMap[id]?.actImmediately);
+      const groupList: { label: string; weedIds: string[] }[] = [];
+      if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
+      if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
+      if (annualIds.length > 0) groupList.push({ label: '📅 Annuals', weedIds: annualIds });
+      if (perennialIds.length > 0) groupList.push({ label: '🔄 Perennials', weedIds: perennialIds });
+      if (biennialIds.length > 0) groupList.push({ label: '2️⃣ Biennials', weedIds: biennialIds });
+      if (invasiveIds.length > 0) groupList.push({ label: '⚠️ Invasive / Priority', weedIds: invasiveIds });
+      setGroups(groupList);
+
+      const reports: InvasiveReport[] = invasiveIds.map(wId => {
+        const dotCount = fields.reduce((s, f) => s + f.dots.filter(d => d.weedId === wId && d.found).length, 0);
+        const fieldId = fields.find(f => f.dots.some(d => d.weedId === wId && d.found))?.fieldId || '';
+        return { weedId: wId, fieldId, count: dotCount, density: '', notes: '', submitted: false };
+      });
+      setInvasiveReports(reports);
+
+      if (invasiveIds.length > 0) {
+        setPhase('categorize-review');
+      } else {
+        setCurrentMgmtGroup(0);
+        setSelectedMethod('');
+        setSelectedTiming('');
+        setMgmtFeedback(null);
+        setMgmtBest(null);
+        setPhase('management');
+      }
+      return;
+    }
+
     const groupList = SORT_CATEGORIES
       .map(cat => ({ label: cat.label, weedIds: sortedWeeds[cat.id] || [] }))
       .filter(g => g.weedIds.length > 0);
