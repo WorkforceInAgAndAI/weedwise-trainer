@@ -1044,7 +1044,7 @@ export const weeds: Weed[] = [
       "Hairy throughout",
     ],
     habitat: "Warm-season row crops, disturbed areas",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Emerging problematic weed; competitive; potential herbicide resistance",
     management: "PRE herbicides, early POST, cultivation, hand removal",
