@@ -305,7 +305,7 @@ export default function GameScreen(game: GameEngine) {
             <div className="flex justify-between"><span className="text-muted-foreground">Streak</span><span className="font-semibold">{streak} 🔥</span></div>
           </div>
           <div className="space-y-2 pt-2">
-            <button onClick={() => setShowInstructor(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors"><button onClick={() => setShowInstructor(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors">📊 Session Overview</button></button>
+            <button onClick={() => setShowInstructor(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors">📊 Session Overview</button>
             <button onClick={() => setShowGlossary(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors">📖 Glossary</button>
             <button onClick={endSession} className="w-full px-3 py-2 text-sm rounded-lg border border-destructive text-destructive hover:bg-destructive/10 transition-colors">🏁 End Session</button>
           </div>
