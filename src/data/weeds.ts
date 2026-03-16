@@ -1571,7 +1571,7 @@ export const weeds: Weed[] = [
       "Hairy throughout",
     ],
     habitat: "Rangelands, disturbed areas, arid regions",
-    primaryHabitat: "Cool-Season / Arid",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Annual/winter annual; weak competitor in humid regions; problematic in arid zones",
     management: "POST broadleaf herbicides, mechanical control, cultivation",
