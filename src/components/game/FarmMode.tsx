@@ -264,14 +264,13 @@ function getBestManagement(groupLabel: string, weedIds: string[]): { method: str
 }
 
 const MANAGEMENT_METHODS = [
-  'Pre-emergent Herbicide (Group 15)',
-  'Post-emergent Broadleaf Herbicide (2,4-D)',
-  'Post-emergent Grass Herbicide (Clethodim)',
-  'Mechanical Cultivation',
-  'Cover Crops',
-  'Mowing & Cutting',
-  'Hand Removal',
-  'Integrated Multi-MOA Program',
+  'Hand weeding',
+  "Don't touch",
+  'Pre-Emergent Herbicides',
+  'Post-Emergent Herbicides',
+  'Cover crop',
+  'Tillage',
+  'Multi-MOA herbicides',
 ];
 
 const MANAGEMENT_TIMING = [
