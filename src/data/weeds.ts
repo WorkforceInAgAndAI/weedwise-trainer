@@ -2187,7 +2187,7 @@ export const weeds: Weed[] = [
     emoji: "🌿",
     traits: ["White mealy coating", "Diamond-shaped leaves", "Alternate leaves", "Green flower clusters"],
     habitat: "Crop fields, gardens, disturbed areas, rich soils",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     management: "Pre-emergent and post-emergent broadleaf herbicides",
     controlTiming: "Before 4-inch height; seedling stage most susceptible",
     actImmediately: false,
