@@ -5,15 +5,15 @@ import { weedMap, weeds } from '@/data/weeds';
 import CardFlipMatch from './CardFlipMatch';
 import LifeStageSortGame from './LifeStageSortGame';
 import ActNowScenario from './ActNowScenario';
-import ConnectGame from './ConnectGame';
 import HabitatConnect from './HabitatConnect';
 import ScientificNameFlipMatch from './ScientificNameFlipMatch';
 import LifeCycleDragDrop from './LifeCycleDragDrop';
 import LookAlikeChallenge from './LookAlikeChallenge';
-import NativeOrIntroduced from './NativeOrIntroduced';
 import LifecycleImageSort from './LifecycleImageSort';
 import ControlTimingGame from './ControlTimingGame';
-import IPMPlanBuilder from './IPMPlanBuilder';
+import HighSchoolLifeCycleSort from './HighSchoolLifeCycleSort';
+import HighSchoolHabitatConnect from './HighSchoolHabitatConnect';
+import FamilyFlipMatch from './FamilyFlipMatch';
 import WeedImage from './WeedImage';
 import { filterTraitsForQuestion } from '@/lib/traitFilter';
 
@@ -65,7 +65,6 @@ export default function GameScreen(game: GameEngine) {
     completeMinigame(current.phaseId, results);
   };
 
-  // Streak multiplier display
   const streakMultiplier = streak >= 10 ? '3x' : streak >= 5 ? '2x' : streak >= 3 ? '1.5x' : null;
 
   const renderActivity = () => {
@@ -77,12 +76,13 @@ export default function GameScreen(game: GameEngine) {
       case 'm2': return <HabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm5': return <ScientificNameFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'h2': return <ConnectGame key={key} mode="scientific" onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'h2': return <HighSchoolLifeCycleSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h3': return <LifecycleImageSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'h4': return <HighSchoolHabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'h5': return <FamilyFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e5': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm4': return <LookAlikeChallenge key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'h4': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'h5': return <IPMPlanBuilder key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'h6': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
     }
 
     return (
@@ -271,7 +271,6 @@ export default function GameScreen(game: GameEngine) {
             <div className="text-xs text-primary font-semibold mt-1">{xp} Total XP</div>
           </div>
 
-          {/* Streak display in sidebar */}
           {streak >= 3 && (
             <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
               <div className="flex justify-center gap-0.5 mb-1">

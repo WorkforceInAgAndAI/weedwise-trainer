@@ -657,61 +657,100 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
     }
 
     case 'control-methods': {
-      const CONTROL_METHODS = [
+      const isHighSchool = grade === 'high';
+
+      const MIDDLE_METHODS = [
         {
-          key: 'pre-emergent',
-          icon: '🧪',
-          label: 'General Pre-Emergent Herbicide',
+          key: 'pre-emergent', icon: '🧪', label: 'General Pre-Emergent Herbicide',
           desc: 'A chemical applied to the soil BEFORE weed seeds sprout. Think of it like putting down a barrier — the herbicide stops seeds from growing into plants. Farmers apply these early in the season before weeds appear.',
           example: 'Applied before planting or right after planting crops, before any weeds pop up.',
         },
         {
-          key: 'post-emergent',
-          icon: '💊',
-          label: 'General Post-Emergent Herbicide',
+          key: 'post-emergent', icon: '💊', label: 'General Post-Emergent Herbicide',
           desc: 'A chemical sprayed on weeds AFTER they have already started growing. This targets weeds you can see. It works best when weeds are small — the bigger they get, the harder they are to kill.',
           example: 'Sprayed when weeds are small (2-4 inches tall) for best results.',
         },
         {
-          key: 'wait',
-          icon: '⏳',
-          label: 'Wait to Act',
+          key: 'wait', icon: '⏳', label: 'Wait to Act',
           desc: 'Sometimes the best strategy is to wait and watch. Not every weed needs immediate action. Some weeds are not very competitive or may die on their own. Good scouts monitor the situation before spending money on control.',
           example: 'A few small weeds in a healthy, thick crop may not need treatment.',
         },
         {
-          key: 'hand-weeding',
-          icon: '🧤',
-          label: 'Hand Weeding',
+          key: 'hand-weeding', icon: '🧤', label: 'Hand Weeding',
           desc: 'Physically pulling weeds out by hand or with a hoe. This works great for small areas, gardens, or when only a few weeds are present. Always pull weeds before they produce seeds!',
           example: 'Walking through a field and pulling out individual Palmer Amaranth plants before they set seed.',
         },
         {
-          key: 'mulch-cover',
-          icon: '🌿',
-          label: 'Mulch / Cover Crops',
+          key: 'mulch-cover', icon: '🌿', label: 'Mulch / Cover Crops',
           desc: 'Covering the soil with mulch (straw, wood chips) or planting cover crops (like clover or rye) to block sunlight and prevent weed seeds from germinating. This is a natural, chemical-free approach.',
           example: 'Planting crimson clover after harvesting corn — the clover covers the soil and stops winter weeds from growing.',
         },
         {
-          key: 'tillage',
-          icon: '🚜',
-          label: 'Mechanical Cultivation (Tillage)',
+          key: 'tillage', icon: '🚜', label: 'Mechanical Cultivation (Tillage)',
           desc: 'Using farm equipment like plows, cultivators, or discs to turn over or disturb the soil. This buries weed seeds deep where they can\'t sprout, or cuts off small weeds at the roots.',
           example: 'Running a cultivator between crop rows to uproot small weeds without damaging the crop.',
         },
       ];
 
+      const HIGH_SCHOOL_METHODS = [
+        {
+          key: 'pre-emergent', icon: '🧪', label: 'General Pre-Emergent Herbicide',
+          desc: 'Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical — applying too early or too late reduces efficacy significantly.',
+          example: 'Applying pendimethalin or S-metolachlor to corn fields before planting to prevent annual grass and small-seeded broadleaf emergence.',
+        },
+        {
+          key: 'post-emergent', icon: '💊', label: 'General Post-Emergent Herbicide',
+          desc: 'Post-emergent herbicides target actively growing weeds. They can be selective (targeting specific weed types while leaving the crop unharmed) or non-selective (killing all vegetation). Efficacy depends on weed growth stage, environmental conditions, and application rate. Most effective when weeds are young and actively growing.',
+          example: 'Applying a selective broadleaf herbicide to a soybean field to control waterhemp at the 2-4 inch stage.',
+        },
+        {
+          key: 'multi-moa', icon: '🔬', label: 'Multi-MOA Herbicides',
+          desc: 'Multi-Mode of Action (MOA) herbicide programs use two or more herbicides with different mechanisms of killing weeds in a single application or across a season. This is the most critical strategy for preventing herbicide resistance. When weeds survive one MOA, the second MOA provides backup control. Different MOA groups are identified by numbers (e.g., Group 2, Group 9, Group 15).',
+          example: 'Tank-mixing a Group 15 pre-emergent with a Group 27 post-emergent to control resistant Palmer amaranth — if the weed survives one herbicide mechanism, the other provides backup.',
+        },
+        {
+          key: 'wait', icon: '⏳', label: 'Wait to Act',
+          desc: 'Economic threshold-based decision making: not every weed population justifies the cost of control. Scouting data should inform whether weed density and species composition warrant intervention. Low-density populations of non-competitive species may not reduce yield enough to justify herbicide costs. However, waiting too long on aggressive species like Palmer amaranth or waterhemp can be catastrophic.',
+          example: 'A scout finds 1-2 common chickweed plants per square meter in a vigorous winter wheat stand — the crop canopy will likely suppress them without intervention.',
+        },
+        {
+          key: 'hand-weeding', icon: '🧤', label: 'Hand Weeding',
+          desc: 'Manual removal of weeds, particularly important for removing herbicide-resistant escapes before they set seed. In resistance management, "zero seed tolerance" programs rely on hand weeding to prevent resistant biotypes from adding to the soil seed bank. Also critical for removing weeds in areas where herbicides cannot be applied.',
+          example: 'Walking bean fields in late summer to hand-pull waterhemp escapes that survived herbicide applications — preventing thousands of resistant seeds from entering the seed bank.',
+        },
+        {
+          key: 'mulch-cover', icon: '🌿', label: 'Mulch / Cover Crops',
+          desc: 'Cover crops suppress weeds through physical biomass that blocks light, allelopathic compounds that inhibit germination, and competition for resources. Species like cereal rye can produce 4,000-8,000 lbs/acre of biomass. The residue also moderates soil temperature and moisture, disrupting weed germination patterns. Cover crop selection should match the target weed spectrum.',
+          example: 'Planting cereal rye at 60-90 lbs/acre after corn harvest, then roller-crimping in spring before soybean planting to create a dense mulch mat that suppresses waterhemp emergence by 60-90%.',
+        },
+        {
+          key: 'tillage', icon: '🚜', label: 'Mechanical Cultivation (Tillage)',
+          desc: 'Tillage can be strategic or conventional. Strategic tillage (1-2 passes) targets specific weed flushes while minimizing soil disturbance. Row cultivation controls between-row weeds mechanically. Deep inversion tillage can bury weed seeds below their emergence depth. However, tillage also brings buried seeds to the surface and can increase erosion — it must be balanced with soil health goals.',
+          example: 'Using a precision inter-row cultivator with guidance systems to mechanically remove weeds between soybean rows at the V2-V3 stage, reducing reliance on post-emergent herbicides.',
+        },
+      ];
+
+      const methods = isHighSchool ? HIGH_SCHOOL_METHODS : MIDDLE_METHODS;
+
       return (
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
             <p className="font-semibold text-primary">🛠️ Weed Control Methods</p>
-            <p>There are many ways to manage weeds. Good farmers use a <strong>combination</strong> of methods — this is called <strong>Integrated Pest Management (IPM)</strong>. No single method works perfectly alone!</p>
-            <p className="text-muted-foreground">Learn each method below. You'll use these strategies in the game to protect your crops.</p>
+            {isHighSchool ? (
+              <>
+                <p>Effective weed management requires an <strong>Integrated Pest Management (IPM)</strong> approach — combining multiple control tactics to reduce weed pressure, prevent resistance, and protect crop yield. No single method is sustainable long-term.</p>
+                <p className="text-muted-foreground">Understanding each tool's <strong>mode of action</strong>, <strong>timing window</strong>, and <strong>limitations</strong> is essential for building effective management programs.</p>
+              </>
+            ) : (
+              <>
+                <p>There are many ways to manage weeds. Good farmers use a <strong>combination</strong> of methods — this is called <strong>Integrated Pest Management (IPM)</strong>. No single method works perfectly alone!</p>
+                <p className="text-muted-foreground">Learn each method below. You'll use these strategies in the game to protect your crops.</p>
+              </>
+            )}
           </div>
 
           <div className="space-y-3">
-            {CONTROL_METHODS.map(method => (
+            {methods.map(method => (
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{method.icon}</span>
@@ -727,7 +766,11 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-2">
             <p className="font-semibold text-accent text-sm">🎯 Key Takeaway</p>
-            <p className="text-sm text-foreground">The best weed management uses <strong>multiple methods together</strong>. For example: start with a <strong>pre-emergent herbicide</strong>, plant <strong>cover crops</strong>, and use <strong>hand weeding</strong> for any weeds that break through. This reduces the chance that weeds develop resistance to any single method.</p>
+            {isHighSchool ? (
+              <p className="text-sm text-foreground">Sustainable weed management requires <strong>diversifying tactics across multiple MOA groups</strong>, integrating cultural practices like <strong>cover crops and tillage</strong>, and making data-driven decisions based on <strong>scouting and economic thresholds</strong>. Over-reliance on any single herbicide group accelerates resistance evolution.</p>
+            ) : (
+              <p className="text-sm text-foreground">The best weed management uses <strong>multiple methods together</strong>. For example: start with a <strong>pre-emergent herbicide</strong>, plant <strong>cover crops</strong>, and use <strong>hand weeding</strong> for any weeds that break through. This reduces the chance that weeds develop resistance to any single method.</p>
+            )}
           </div>
         </div>
       );
