@@ -133,7 +133,10 @@ function generateDots(weedPool: Weed[], fieldId: string, imageStage: string): We
         y = 5 + Math.random() * 90;
       }
       const imageVariant: 1 | 2 = Math.random() < 0.5 ? 1 : 2;
-      dots.push({ id: `${fieldId}-${dotId++}`, weedId: weed.id, x, y, found: false, imageVariant, imageStage });
+      const actualStage = imageStage === 'random'
+        ? (['seedling', 'vegetative', 'flower', 'whole'])[Math.floor(Math.random() * 4)]
+        : imageStage;
+      dots.push({ id: `${fieldId}-${dotId++}`, weedId: weed.id, x, y, found: false, imageVariant, imageStage: actualStage });
     }
   });
   return dots;
