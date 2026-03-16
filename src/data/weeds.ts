@@ -1719,6 +1719,7 @@ export const weeds: Weed[] = [
       difference: "Burdock has coarser basal leaves; Pokeweed has large stem leaves throughout",
     },
     memoryHook: "Pokeweed = purple berries + large oval leaves + tall + toxic",
+    safetyNote: "⚠️ All parts, especially roots and berries, contain pokeweed toxins; ingestion can cause severe gastrointestinal irritation and systemic illness in humans and animals.",
   },
   {
     id: "Wild_Carrot",
