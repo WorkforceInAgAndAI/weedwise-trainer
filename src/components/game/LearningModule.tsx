@@ -137,7 +137,7 @@ export default function LearningModule({ onClose }: Props) {
     { grade: 'high', icon: '🧪', color: 'border-grade-high' },
   ];
 
-  const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles';
+  const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles' || selectedTopic === 'control-methods';
 
   return (
     <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
