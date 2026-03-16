@@ -2275,6 +2275,7 @@ export const weeds: Weed[] = [
     actReason: "Vining habit interferes with harvest; hard seed coat enables long soil persistence",
     lookAlike: { id: "Field_bindweed", species: "Field Bindweed", difference: "Bindweed is perennial with smaller flowers and arrow-shaped leaves; Morningglory is annual with larger trumpet flowers" },
     memoryHook: "Morningglory = trumpet flowers + heart leaves + twining annual vine",
+    safetyNote: "⚠️ Seeds and foliage can cause digestive disturbances and possible neurologic effects when consumed in quantity by animals.",
   },
   {
     id: "pennsylvania-smartweed",
