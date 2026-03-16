@@ -1143,14 +1143,17 @@ export default function FarmMode({ onClose }: Props) {
               </div>
               <div className="p-4">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">🔍 Identify this weed</div>
-                <ul className="space-y-1 mb-3">
-                  {currentWeed.traits.slice(0, 3).map((t, i) => (
-                    <li key={i} className="text-xs text-foreground flex items-start gap-1.5">
-                      <span className="text-accent">•</span>{t}
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-display font-semibold text-foreground text-sm mb-3">{idOptions.prompt}</p>
+                {grade === 'elementary' ? (
+                  <div className="font-display font-bold text-lg text-foreground mb-3">{currentWeed.commonName}</div>
+                ) : (
+                  <ul className="space-y-1 mb-3">
+                    {currentWeed.traits.slice(0, 3).map((t, i) => (
+                      <li key={i} className="text-xs text-foreground flex items-start gap-1.5">
+                        <span className="text-accent">•</span>{t}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {!showFeedback ? (
                   <div className="space-y-2">
                     <div className="grid gap-2 grid-cols-1">
