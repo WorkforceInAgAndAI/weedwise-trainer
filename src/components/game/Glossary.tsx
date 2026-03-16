@@ -19,7 +19,7 @@ const FILTERS: FilterOption[] = [
   { key: 'introduced', label: 'Introduced', icon: '🚢', group: 'Origin' },
   { key: 'warm', label: 'Warm-Season', icon: '☀️', group: 'Habitat' },
   { key: 'cool', label: 'Cool-Season', icon: '❄️', group: 'Habitat' },
-  { key: 'wet', label: 'Wet / Moist', icon: '💧', group: 'Habitat' },
+  { key: 'wet', label: 'Wet / Poorly Drained', icon: '💧', group: 'Habitat' },
   { key: 'dry', label: 'Dry / Disturbed', icon: '🏜️', group: 'Habitat' },
   { key: 'annual', label: 'Annual', icon: '🔄', group: 'Life Cycle' },
   { key: 'perennial', label: 'Perennial', icon: '♾️', group: 'Life Cycle' },
