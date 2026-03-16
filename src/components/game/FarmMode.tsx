@@ -2491,9 +2491,7 @@ export default function FarmMode({ onClose }: Props) {
                 </div>
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-muted-foreground">
                   💡 <span className="font-semibold text-foreground">Tip:</span>{' '}
-                  {isGrassGroup && 'Grass weeds require grass-specific herbicides. Broadleaf herbicides will NOT work.'}
-                  {isBroadleafGroup && 'Broadleaf weeds need broadleaf herbicides. Grass herbicides will NOT be effective.'}
-                  {!isGrassGroup && !isBroadleafGroup && 'Consider the life cycle and growth habit when choosing your approach.'}
+                  Consider the life cycle, growth habit, and density when choosing your control method and timing.
                 </div>
               </div>
               <div>
