@@ -982,7 +982,7 @@ export const weeds: Weed[] = [
       "Compressed inflorescence",
     ],
     habitat: "Row crops, disturbed areas, compacted soils",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Highly competitive; develops herbicide resistance; prefers compacted soils",
     management: "PRE residual herbicides, early POST, soil loosening",
