@@ -1137,7 +1137,7 @@ export const weeds: Weed[] = [
       "1–3 feet tall, weak and clambering",
     ],
     habitat: "Winter grain fields, disturbed areas, field margins",
-    primaryHabitat: "Cool-Season / Winter Annual",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual; weak competitive threat; hooked hairs cling to clothing/animals",
     management: "POST broadleaf herbicides fall or spring, mechanical control",
