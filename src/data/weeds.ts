@@ -2368,7 +2368,7 @@ export const weeds: Weed[] = [
     emoji: "⚠️",
     traits: ["Grooved stems", "Yellow umbel flowers", "Compound pinnate leaves", "Parsnip-like taproot"],
     habitat: "Roadsides, pastures, ditches, old fields",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     management: "Mowing at peak bloom; herbicide to rosettes; AVOID SKIN CONTACT",
     controlTiming: "Rosette stage in first year; before flowering in second year",
     actImmediately: true,
