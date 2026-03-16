@@ -692,6 +692,27 @@ export default function FarmMode({ onClose }: Props) {
   }, []);
 
   const submitManagement = useCallback(() => {
+    if (grade === 'elementary') {
+      if (!selectedMethod) return;
+      const group = groups[currentMgmtGroup];
+      if (!group) return;
+      const effective = isElemMethodEffective(selectedMethod);
+      const best = getElemBestMethod(group.weedIds);
+      const isBestChoice = selectedMethod === best.method;
+
+      const action: ManagementAction = { groupLabel: group.label, method: selectedMethod, timing: 'N/A', effective, bestChoice: isBestChoice };
+      setManagementActions(prev => [...prev, action]);
+
+      if (isBestChoice) { setMoney(m => m + 750); setTotalEarnings(e => e + 750); }
+      else if (effective) { setMoney(m => m + 400); setTotalEarnings(e => e + 400); }
+      else { setMoney(m => m - 150); }
+
+      setMgmtFeedback(action);
+      setMgmtBest({ ...best, timing: 'N/A' });
+      setPhase('mgmt-feedback');
+      return;
+    }
+
     if (!selectedMethod || !selectedTiming) return;
     const group = groups[currentMgmtGroup];
     if (!group) return;
@@ -712,11 +733,10 @@ export default function FarmMode({ onClose }: Props) {
       setMoney(m => m - 150);
     }
 
-    // Show feedback screen
     setMgmtFeedback(action);
     setMgmtBest(best);
     setPhase('mgmt-feedback');
-  }, [selectedMethod, selectedTiming, groups, currentMgmtGroup]);
+  }, [grade, selectedMethod, selectedTiming, groups, currentMgmtGroup]);
 
   const handleMgmtFeedbackNext = useCallback(() => {
     setMgmtFeedback(null);
