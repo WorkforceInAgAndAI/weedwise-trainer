@@ -235,11 +235,11 @@ export default function GameScreen(game: GameEngine) {
               )}
 
               {!feedback.correct && <p className="text-sm text-foreground"><span className="text-muted-foreground">Correct answer:</span> <span className="font-semibold text-accent">{feedback.correctAnswer}</span></p>}
-              {current.phaseId === 'e2' && (
+              {(current.phaseId === 'e2' || current.phaseId === 'h3') && (
                 <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3 space-y-1">
                   <p><span className="font-semibold text-primary">🌾 Monocot:</span> One seed leaf, parallel veins, fibrous roots.</p>
                   <p><span className="font-semibold text-primary">🍀 Dicot:</span> Two seed leaves, branching veins, taproot.</p>
-                  <p className="text-muted-foreground mt-1"><strong>{feedback.weed.commonName}</strong> is a <strong>{feedback.weed.plantType}</strong> ({feedback.weed.family}).</p>
+                  <p className="text-muted-foreground mt-1"><strong>{feedback.weed.scientificName}</strong> ({feedback.weed.commonName}) is a <strong>{feedback.weed.plantType}</strong> ({feedback.weed.family}).</p>
                 </div>
               )}
               <div className="text-sm text-foreground space-y-1">
