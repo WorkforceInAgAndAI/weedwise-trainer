@@ -1416,7 +1416,7 @@ export const weeds: Weed[] = [
       "Spreads via wind-dispersed seeds",
     ],
     habitat: "Pastures, roadsides, disturbed areas, rangelands",
-    primaryHabitat: "Cool-Season / Biennial",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
     actReason: "Biennial; prolific seed producer; displaces forage; spiny nature hazardous to livestock",
     management: "POST herbicides fall or spring rosette, hand pulling, biological control (weevil)",
