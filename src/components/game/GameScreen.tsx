@@ -71,7 +71,7 @@ export default function GameScreen(game: GameEngine) {
 
     switch (current.phaseId) {
       case 'e3': return <CardFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'e4': return <HabitatDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'e4': return <LifeStageSortGame key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm2': return <ConnectGame key={key} mode="family" onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm5': return <NativeOrIntroduced key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
