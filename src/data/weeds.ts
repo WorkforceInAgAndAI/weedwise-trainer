@@ -1273,6 +1273,7 @@ export const weeds: Weed[] = [
       difference: "Dogbane has narrow lanceolate leaves; Milkweed has broader oval leaves",
     },
     memoryHook: "Common milkweed = broad oval leaves + pink fragrant flower umbels + silky seeds",
+    safetyNote: "⚠️ Contains cardiac glycosides that can poison livestock and pets if ingested, causing digestive upset, weakness, and potentially heart problems.",
   },
   {
     id: "Honey-vine_climbing_milkweed",
