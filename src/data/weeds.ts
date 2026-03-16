@@ -1148,6 +1148,7 @@ export const weeds: Weed[] = [
       difference: "Ground Ivy is perennial with round scalloped leaves; Bedstraw is annual with narrow leaves",
     },
     memoryHook: "Catchweed = hooked hairs that stick to clothes + whorled narrow leaves",
+    safetyNote: "⚠️ Can cause low-level poisoning if eaten in quantity by livestock and may inflame the digestive tract; bristly stems can irritate sensitive skin.",
   },
   {
     id: "Henbit_deadnettle",
