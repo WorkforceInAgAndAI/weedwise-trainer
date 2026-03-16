@@ -300,7 +300,7 @@ export const weeds: Weed[] = [
       "Fine seedhead with bristles",
     ],
     habitat: "Disturbed areas, field margins, roadsides",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Herbicide-resistant biotypes; extremely competitive in late-planted fields",
     management: "PRE residual herbicides, early POST before 4 inches, tillage",
