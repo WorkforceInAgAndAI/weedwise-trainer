@@ -656,6 +656,91 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
       );
     }
 
+    case 'control-methods': {
+      const CONTROL_METHODS = [
+        {
+          key: 'pre-emergent',
+          icon: '🧪',
+          label: 'General Pre-Emergent Herbicide',
+          desc: 'A chemical applied to the soil BEFORE weed seeds sprout. Think of it like putting down a barrier — the herbicide stops seeds from growing into plants. Farmers apply these early in the season before weeds appear.',
+          example: 'Applied before planting or right after planting crops, before any weeds pop up.',
+        },
+        {
+          key: 'post-emergent',
+          icon: '💊',
+          label: 'General Post-Emergent Herbicide',
+          desc: 'A chemical sprayed on weeds AFTER they have already started growing. This targets weeds you can see. It works best when weeds are small — the bigger they get, the harder they are to kill.',
+          example: 'Sprayed when weeds are small (2-4 inches tall) for best results.',
+        },
+        {
+          key: 'wait',
+          icon: '⏳',
+          label: 'Wait to Act',
+          desc: 'Sometimes the best strategy is to wait and watch. Not every weed needs immediate action. Some weeds are not very competitive or may die on their own. Good scouts monitor the situation before spending money on control.',
+          example: 'A few small weeds in a healthy, thick crop may not need treatment.',
+        },
+        {
+          key: 'fertilize',
+          icon: '🌱',
+          label: 'Fertilize',
+          desc: 'Making the crop stronger by adding nutrients to the soil. A healthy, fast-growing crop shades out weeds and outcompetes them for water and nutrients. This is an indirect way to fight weeds.',
+          example: 'Adding nitrogen fertilizer helps corn grow a thick canopy that blocks sunlight from reaching weed seedlings.',
+        },
+        {
+          key: 'hand-weeding',
+          icon: '🧤',
+          label: 'Hand Weeding',
+          desc: 'Physically pulling weeds out by hand or with a hoe. This works great for small areas, gardens, or when only a few weeds are present. Always pull weeds before they produce seeds!',
+          example: 'Walking through a field and pulling out individual Palmer Amaranth plants before they set seed.',
+        },
+        {
+          key: 'mulch-cover',
+          icon: '🌿',
+          label: 'Mulch / Cover Crops',
+          desc: 'Covering the soil with mulch (straw, wood chips) or planting cover crops (like clover or rye) to block sunlight and prevent weed seeds from germinating. This is a natural, chemical-free approach.',
+          example: 'Planting crimson clover after harvesting corn — the clover covers the soil and stops winter weeds from growing.',
+        },
+        {
+          key: 'tillage',
+          icon: '🚜',
+          label: 'Mechanical Cultivation (Tillage)',
+          desc: 'Using farm equipment like plows, cultivators, or discs to turn over or disturb the soil. This buries weed seeds deep where they can\'t sprout, or cuts off small weeds at the roots.',
+          example: 'Running a cultivator between crop rows to uproot small weeds without damaging the crop.',
+        },
+      ];
+
+      return (
+        <div className="space-y-4">
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+            <p className="font-semibold text-primary">🛠️ Weed Control Methods</p>
+            <p>There are many ways to manage weeds. Good farmers use a <strong>combination</strong> of methods — this is called <strong>Integrated Pest Management (IPM)</strong>. No single method works perfectly alone!</p>
+            <p className="text-muted-foreground">Learn each method below. You'll use these strategies in the game to protect your crops.</p>
+          </div>
+
+          <div className="space-y-3">
+            {CONTROL_METHODS.map(method => (
+              <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{method.icon}</span>
+                  <h3 className="font-display font-bold text-foreground">{method.label}</h3>
+                </div>
+                <p className="text-sm text-foreground">{method.desc}</p>
+                <div className="bg-primary/10 rounded-lg p-3">
+                  <p className="text-xs text-primary"><span className="font-semibold">Example:</span> {method.example}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-2">
+            <p className="font-semibold text-accent text-sm">🎯 Key Takeaway</p>
+            <p className="text-sm text-foreground">The best weed management uses <strong>multiple methods together</strong>. For example: start with a <strong>pre-emergent herbicide</strong>, plant <strong>cover crops</strong>, and use <strong>hand weeding</strong> for any weeds that break through. This reduces the chance that weeds develop resistance to any single method.</p>
+          </div>
+        </div>
+      );
+    }
+
+
     case 'safety':
       return (
         <div className="space-y-4">

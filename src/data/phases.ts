@@ -10,10 +10,10 @@ export const PHASES: Record<GradeLevel, PhaseConfig[]> = {
   ],
   middle: [
     { id: 'm1', name: 'Identify the Weed', description: 'Multiple choice from characteristics', xpRequired: 0, xpReward: 5, imageStage: 'vegetative', showName: false, showFamily: false },
-    { id: 'm2', name: 'Plant Family Connect', description: 'Connect each weed to its plant family', xpRequired: 20, xpReward: 5, imageStage: 'vegetative', showName: true, showFamily: false },
+    { id: 'm2', name: 'Habitat Connect', description: 'Match weeds to their habitats', xpRequired: 20, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
     { id: 'm3', name: 'Life Cycle Sort', description: 'Sort weeds by their life cycle type', xpRequired: 50, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
     { id: 'm4', name: 'Look-Alike Challenge', description: 'Tell apart similar species from the same family', xpRequired: 80, xpReward: 6, imageStage: 'seedling', showName: false, showFamily: false },
-    { id: 'm5', name: 'Native or Introduced?', description: 'Rapid-fire species origin classification', xpRequired: 120, xpReward: 5, imageStage: 'flower', showName: true, showFamily: false },
+    { id: 'm5', name: 'Scientific Name Match', description: 'Match common names to scientific names with card flip', xpRequired: 120, xpReward: 6, imageStage: 'whole', showName: true, showFamily: false },
   ],
   high: [
     { id: 'h1', name: 'Weed Identification', description: 'Multiple choice — vegetative characteristics', xpRequired: 0, xpReward: 5, imageStage: 'seedling', showName: false, showFamily: false },
