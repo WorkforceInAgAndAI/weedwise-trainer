@@ -1689,6 +1689,7 @@ export const weeds: Weed[] = [
       difference: "Horsetail has whorled branches; Scouring-rush lacks them",
     },
     memoryHook: "Scouring-rush = abrasive silica-rich + dark stem bands + no whorled branches",
+    safetyNote: "⚠️ Like other horsetails, contains thiaminase that can cause vitamin B1 deficiency and neurologic signs in grazing animals when eaten chronically.",
   },
   {
     id: "commonPokeweed",
