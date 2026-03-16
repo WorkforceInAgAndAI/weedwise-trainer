@@ -444,6 +444,21 @@ export default function FarmMode({ onClose }: Props) {
   const [highFamily, setHighFamily] = useState<string | null>(null);
   const [highSortResults, setHighSortResults] = useState<HighSortResult[]>([]);
   const [highSortFeedback, setHighSortFeedback] = useState<HighSortResult | null>(null);
+  const highFamilyOptionsRef = useRef<string[]>([]);
+  const highFamilyWeedRef = useRef<string>('');
+
+  // Stabilize family options per weed so they don't re-shuffle on every click
+  useEffect(() => {
+    if (grade !== 'high' || phase !== 'sorting') return;
+    const current = unsortedWeeds[currentSortWeed];
+    if (!current) return;
+    const w = weedMap[current.weedId];
+    if (!w || highFamilyWeedRef.current === current.weedId) return;
+    highFamilyWeedRef.current = current.weedId;
+    const allFamilies = [...new Set(weeds.map(x => x.family))];
+    const distractors = shuffle(allFamilies.filter(f => f !== w.family)).slice(0, 2);
+    highFamilyOptionsRef.current = shuffle([w.family, ...distractors]);
+  }, [grade, phase, currentSortWeed, unsortedWeeds]);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
@@ -1820,10 +1835,8 @@ export default function FarmMode({ onClose }: Props) {
     }
 
     // High: 4-row radio sorting
-    const allFamilies = [...new Set(weeds.map(w => w.family))];
-    const correctFamily = currentW.family;
-    const distractorFamilies = shuffle(allFamilies.filter(f => f !== correctFamily)).slice(0, 2);
-    const familyOptions = shuffle([correctFamily, ...distractorFamilies]);
+    // familyOptions are memoized per-weed via highFamilyOptionsRef to prevent re-shuffle on every render
+    const familyOptions = highFamilyOptionsRef.current;
 
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">

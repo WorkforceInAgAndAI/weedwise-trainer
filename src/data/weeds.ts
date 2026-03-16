@@ -63,6 +63,7 @@ export const weeds: Weed[] = [
       difference: "Waterhemp has shorter petioles and elongated seed head without spines",
     },
     memoryHook: "Palmer grows like a palm tree — fast and tall",
+    safetyNote: "⚠️ Can accumulate high nitrates and sometimes oxalates; heavy consumption by ruminants can lead to nitrate poisoning and kidney damage.",
   },
   {
     id: "Redroot_pigweed",
@@ -311,6 +312,7 @@ export const weeds: Weed[] = [
       difference: "Lettuce has different flower structure; Horseweed has wiry stems",
     },
     memoryHook: "Horseweed = wiry stem horses can browse, resistant populations common",
+    safetyNote: "⚠️ Can cause skin and respiratory irritation in sensitive people and may be mildly toxic to livestock if grazed heavily.",
   },
   {
     id: "Prickly_lettuce",
@@ -373,6 +375,7 @@ export const weeds: Weed[] = [
       difference: "Nightshade is smaller (1–2 ft) with smaller flowers; Jimsonweed is 2–5 ft with large trumpets",
     },
     memoryHook: "Jimsonweed = spiny pod + large trumpet flowers + musty smell = toxic",
+    safetyNote: "⚠️ HIGHLY POISONOUS — tropane alkaloids (atropine, scopolamine) can cause hallucinations, rapid heartbeat, seizures, and death in humans and animals if ingested.",
   },
   {
     id: "Eastern_black_nightshade",
@@ -404,6 +407,7 @@ export const weeds: Weed[] = [
       difference: "Jimsonweed has large trumpet flowers and spiny pods; Nightshade has small flowers and berries",
     },
     memoryHook: "Black nightshade = black berries + small white flowers + bushy compact form",
+    safetyNote: "⚠️ Contains toxic alkaloids in leaves and unripe berries; ingestion can cause gastrointestinal and neurological signs in people and livestock.",
   },
   {
     id: "horsenettle",
@@ -435,6 +439,7 @@ export const weeds: Weed[] = [
       difference: "Buffalobur is annual; Horsenettle is perennial with rhizomes",
     },
     memoryHook: "Horsenettle = yellow spines + orange berries + rhizomes = persistent perennial",
+    safetyNote: "⚠️ A spiny nightshade with toxic glycoalkaloids in fruit and foliage; ingestion can cause digestive upset and neurological signs in livestock and people.",
   },
   {
     id: "Buffalobur",
@@ -466,6 +471,7 @@ export const weeds: Weed[] = [
       difference: "Horsenettle is perennial with rhizomes; Buffalobur is annual",
     },
     memoryHook: "Buffalobur = annual + yellow prickles + spiny fruit = livestock hazard",
+    safetyNote: "⚠️ Spiny plant whose berries and foliage contain solanine-type alkaloids that are poisonous to livestock and humans if eaten.",
   },
   {
     id: "Smooth_Groundcherry",
@@ -528,6 +534,7 @@ export const weeds: Weed[] = [
       difference: "Bindweed is perennial with smaller flowers; Morningglory is annual with large flowers",
     },
     memoryHook: "Morningglory = annual twining vine with large purple funnel flowers",
+    safetyNote: "⚠️ Seeds contain compounds that can cause digestive upset and, in large doses, neurological signs in livestock.",
   },
   {
     id: "Field_bindweed",
@@ -838,6 +845,7 @@ export const weeds: Weed[] = [
       difference: "Foxtail has distinctive awned seed head; Nimblewill has fine panicle",
     },
     memoryHook: "Foxtail barley = fox-like awned seed head + toxic to livestock",
+    safetyNote: "⚠️ Seed heads form sharp awns that can lodge in the mouths, eyes, and skin of pets and livestock, causing painful injuries, infections, and abscesses.",
   },
   {
     id: "Quackgrass",
@@ -1148,6 +1156,7 @@ export const weeds: Weed[] = [
       difference: "Ground Ivy is perennial with round scalloped leaves; Bedstraw is annual with narrow leaves",
     },
     memoryHook: "Catchweed = hooked hairs that stick to clothes + whorled narrow leaves",
+    safetyNote: "⚠️ Can cause low-level poisoning if eaten in quantity by livestock and may inflame the digestive tract; bristly stems can irritate sensitive skin.",
   },
   {
     id: "Henbit_deadnettle",
@@ -1179,6 +1188,7 @@ export const weeds: Weed[] = [
       difference: "Ground Ivy is perennial with rounded scalloped leaves; Henbit has purple-veined clasping leaves",
     },
     memoryHook: "Henbit = square stems + purple tubular flowers + winter annual",
+    safetyNote: "⚠️ Generally only mildly toxic, but large quantities may upset digestion in livestock; can contribute to nitrates in forage.",
   },
   {
     id: "Ground_ivy",
@@ -1241,6 +1251,7 @@ export const weeds: Weed[] = [
       difference: "Milkweed has opposite broader leaves; Dogbane has narrow lanceolate leaves",
     },
     memoryHook: "Hemp dogbane = rhizomatous + fibrous stems + narrow leaves + perennial",
+    safetyNote: "⚠️ Contains cardiac glycosides similar to oleander; highly toxic to livestock and pets if ingested, leading to heart and digestive problems.",
   },
   {
     id: "common_Milkweed",
@@ -1272,6 +1283,7 @@ export const weeds: Weed[] = [
       difference: "Dogbane has narrow lanceolate leaves; Milkweed has broader oval leaves",
     },
     memoryHook: "Common milkweed = broad oval leaves + pink fragrant flower umbels + silky seeds",
+    safetyNote: "⚠️ Contains cardiac glycosides that can poison livestock and pets if ingested, causing digestive upset, weakness, and potentially heart problems.",
   },
   {
     id: "Honey-vine_climbing_milkweed",
@@ -1303,6 +1315,7 @@ export const weeds: Weed[] = [
       difference: "Morningglory is annual with funnel flowers; Milkweed is perennial with small fragrant flowers",
     },
     memoryHook: "Honey-vine = twining perennial + fragrant flowers + tuber rooted + vines through crops",
+    safetyNote: "⚠️ Milkweed relative with cardiac glycosides; ingestion can cause vomiting, diarrhea, and heart rhythm disturbances in animals.",
   },
   {
     id: "CommonChickweed",
@@ -1489,6 +1502,7 @@ export const weeds: Weed[] = [
       difference: "Carrot has flat-topped white flowers; Star has drooping star-shaped flowers",
     },
     memoryHook: "Star of Bethlehem = white star flowers with green stripe + bulbous + grass-like leaves",
+    safetyNote: "⚠️ Ornamental bulb that is poisonous; cardiac glycosides in bulbs and leaves can cause vomiting, arrhythmias, and potentially death if ingested.",
   },
   {
     id: "Russian_thistle",
@@ -1644,6 +1658,7 @@ export const weeds: Weed[] = [
       difference: "Scouring-rush lacks whorled branches; Horsetail has prominent whorled branches",
     },
     memoryHook: "Field horsetail = jointed hollow stems + whorled branches + wet soils",
+    safetyNote: "⚠️ Contains thiaminase that destroys vitamin B1; chronic ingestion by horses and livestock can cause weakness, weight loss, and neurologic signs.",
   },
   {
     id: "Scouringrush",
@@ -1675,6 +1690,7 @@ export const weeds: Weed[] = [
       difference: "Horsetail has whorled branches; Scouring-rush lacks them",
     },
     memoryHook: "Scouring-rush = abrasive silica-rich + dark stem bands + no whorled branches",
+    safetyNote: "⚠️ Like other horsetails, contains thiaminase that can cause vitamin B1 deficiency and neurologic signs in grazing animals when eaten chronically.",
   },
   {
     id: "commonPokeweed",
@@ -1706,6 +1722,7 @@ export const weeds: Weed[] = [
       difference: "Burdock has coarser basal leaves; Pokeweed has large stem leaves throughout",
     },
     memoryHook: "Pokeweed = purple berries + large oval leaves + tall + toxic",
+    safetyNote: "⚠️ All parts, especially roots and berries, contain pokeweed toxins; ingestion can cause severe gastrointestinal irritation and systemic illness in humans and animals.",
   },
   {
     id: "Wild_Carrot",
@@ -1737,6 +1754,7 @@ export const weeds: Weed[] = [
       difference: "Hemlock has purple-spotted stems; Wild Carrot has hairy stems without spots",
     },
     memoryHook: "Wild carrot = feathery leaves + flat-topped flowers + edible taproot",
+    safetyNote: "⚠️ Foliage can cause skin irritation in sensitive people; often confused with deadly look-alikes such as poison hemlock and water hemlock.",
   },
   {
     id: "Corn_speedwell",
@@ -1923,6 +1941,7 @@ export const weeds: Weed[] = [
       difference: "Toothed lacks red spot; both are spurges with latex",
     },
     memoryHook: "Spotted spurge = red spot + mat-like growth + milky latex",
+    safetyNote: "⚠️ Milky sap is irritating to skin and mucous membranes; ingestion by pets or livestock can cause vomiting and diarrhea.",
   },
   {
     id: "Toothed_spurge",
@@ -1954,6 +1973,7 @@ export const weeds: Weed[] = [
       difference: "Spotted has red leaf spot; Toothed lacks spot but has toothed margins",
     },
     memoryHook: "Toothed spurge = toothed leaves (no spot) + milky latex + warm-season annual",
+    safetyNote: "⚠️ Closely related to spotted spurge; acrid latex sap can irritate skin and eyes and cause gastrointestinal upset if consumed.",
   },
   {
     id: "annual-ryegrass",
@@ -2174,6 +2194,7 @@ export const weeds: Weed[] = [
     actReason: "Develops herbicide resistance rapidly; becomes tumbleweed spreading seeds widely",
     lookAlike: { id: "lambsquarters", species: "Lambsquarters", difference: "Lambsquarters has mealy white coating on leaves and diamond-shaped leaves; Kochia has narrow lance-shaped leaves and pyramidal form" },
     memoryHook: "Kochia = Christmas tree shape + becomes tumbleweed + tolerates salt + resistance prone",
+    safetyNote: "⚠️ Can accumulate nitrates and other toxins that cause poisoning, photosensitization, and liver damage in grazing animals when eaten in large amounts.",
   },
   {
     id: "lambsquarters",
@@ -2254,6 +2275,7 @@ export const weeds: Weed[] = [
     actReason: "Vining habit interferes with harvest; hard seed coat enables long soil persistence",
     lookAlike: { id: "Field_bindweed", species: "Field Bindweed", difference: "Bindweed is perennial with smaller flowers and arrow-shaped leaves; Morningglory is annual with larger trumpet flowers" },
     memoryHook: "Morningglory = trumpet flowers + heart leaves + twining annual vine",
+    safetyNote: "⚠️ Seeds and foliage can cause digestive disturbances and possible neurologic effects when consumed in quantity by animals.",
   },
   {
     id: "pennsylvania-smartweed",
