@@ -680,13 +680,6 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
           example: 'A few small weeds in a healthy, thick crop may not need treatment.',
         },
         {
-          key: 'fertilize',
-          icon: '🌱',
-          label: 'Fertilize',
-          desc: 'Making the crop stronger by adding nutrients to the soil. A healthy, fast-growing crop shades out weeds and outcompetes them for water and nutrients. This is an indirect way to fight weeds.',
-          example: 'Adding nitrogen fertilizer helps corn grow a thick canopy that blocks sunlight from reaching weed seedlings.',
-        },
-        {
           key: 'hand-weeding',
           icon: '🧤',
           label: 'Hand Weeding',
