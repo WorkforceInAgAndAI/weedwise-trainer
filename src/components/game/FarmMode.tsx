@@ -174,92 +174,59 @@ function getCategoryLabel(type: 'monocot' | 'dicot', grade: GradeLevel): string 
 }
 
 function isMethodEffective(method: string, groupLabel: string, weedIds: string[]): boolean {
-  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
-  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
   const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
   const isInvasiveGroup = groupLabel.includes('Invasive') || groupLabel.includes('Priority');
-  if (method.includes('Grass Herbicide') && isBroadleafGroup) return false;
-  if (method.includes('Broadleaf Herbicide') && isGrassGroup) return false;
-  if (method.includes('Pre-emergent') && isPerennialGroup) return false;
-  if (method === 'Mowing & Cutting' && !isPerennialGroup) return false;
-  if (method.includes('Integrated')) return true;
-  if (method.includes('Grass Herbicide') && isGrassGroup) return true;
-  if (method.includes('Broadleaf Herbicide') && isBroadleafGroup) return true;
-  if (method.includes('Mechanical') && !isInvasiveGroup) return true;
-  if (method.includes('Cover Crops')) return true;
-  if (method.includes('Hand Removal') && weedIds.length <= 3) return true;
-  if (method.includes('Pre-emergent') && groupLabel.includes('Annual')) return true;
+  if (method === "Don't touch") return false;
+  if (method === 'Pre-Emergent Herbicides' && isPerennialGroup) return false;
+  if (method === 'Pre-Emergent Herbicides' && isAnnualGroup) return true;
+  if (method === 'Post-Emergent Herbicides') return true;
+  if (method === 'Multi-MOA herbicides') return true;
+  if (method === 'Hand weeding' && weedIds.length <= 3) return true;
+  if (method === 'Hand weeding') return true;
+  if (method === 'Cover crop') return true;
+  if (method === 'Tillage' && !isInvasiveGroup) return true;
   return false;
 }
 
 /** Determine the BEST method+timing for a group */
 function getBestManagement(groupLabel: string, weedIds: string[]): { method: string; timing: string; explanation: string } {
-  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
-  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
   const isPerennialGroup = groupLabel.includes('Perennial');
   const isAnnualGroup = groupLabel.includes('Annual');
   const isInvasiveGroup = groupLabel.includes('Invasive') || groupLabel.includes('Priority');
 
   if (isInvasiveGroup) {
     return {
-      method: 'Integrated Multi-MOA Program',
+      method: 'Multi-MOA herbicides',
       timing: 'Year-round monitoring',
       explanation: 'Invasive species require a comprehensive, multi-mode-of-action approach with year-round vigilance to prevent establishment and spread.'
     };
   }
-  if (isGrassGroup && isAnnualGroup) {
+  if (isAnnualGroup) {
     return {
-      method: 'Pre-emergent Herbicide (Group 15)',
+      method: 'Pre-Emergent Herbicides',
       timing: 'At planting (Pre-emerge)',
-      explanation: 'Annual grasses are best controlled with pre-emergent herbicides applied at planting, preventing seedling establishment before they compete with crops.'
-    };
-  }
-  if (isGrassGroup && isPerennialGroup) {
-    return {
-      method: 'Post-emergent Grass Herbicide (Clethodim)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Perennial grasses need post-emergent grass-specific herbicides applied early when plants are small and actively growing for maximum uptake.'
-    };
-  }
-  if (isGrassGroup) {
-    return {
-      method: 'Post-emergent Grass Herbicide (Clethodim)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Grass weeds respond best to grass-specific herbicides like Clethodim applied early when weeds are small and actively growing.'
-    };
-  }
-  if (isBroadleafGroup && isAnnualGroup) {
-    return {
-      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Annual broadleaf weeds are effectively controlled with post-emergent broadleaf herbicides applied when plants are young and actively growing.'
-    };
-  }
-  if (isBroadleafGroup && isPerennialGroup) {
-    return {
-      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
-      timing: 'Mid-season',
-      explanation: 'Perennial broadleaf weeds need systemic herbicides applied mid-season when plants are translocating nutrients to roots, maximizing herbicide movement.'
-    };
-  }
-  if (isBroadleafGroup) {
-    return {
-      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Broadleaf weeds are best managed with broadleaf-specific herbicides applied early in the growth stage.'
+      explanation: 'Annual weeds are best controlled with pre-emergent herbicides applied at planting, preventing seedling establishment before they compete with crops.'
     };
   }
   if (isPerennialGroup) {
     return {
-      method: 'Mowing & Cutting',
-      timing: 'Mid-season',
-      explanation: 'Perennial weeds can be managed through repeated mowing during mid-season to deplete root reserves over time.'
+      method: 'Post-Emergent Herbicides',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'Perennial weeds regrow from roots, so post-emergent herbicides applied to actively growing plants are most effective.'
+    };
+  }
+  if (weedIds.length <= 2) {
+    return {
+      method: 'Hand weeding',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'With only a few weeds, hand weeding is the most targeted and cost-effective approach.'
     };
   }
   return {
-    method: 'Integrated Multi-MOA Program',
+    method: 'Multi-MOA herbicides',
     timing: 'Year-round monitoring',
-    explanation: 'A diverse weed group benefits from an integrated approach combining multiple control methods throughout the season.'
+    explanation: 'A diverse weed group benefits from an integrated approach combining multiple modes of action throughout the season.'
   };
 }
 
