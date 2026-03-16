@@ -703,7 +703,7 @@ export const weeds: Weed[] = [
       "2–4 feet tall at maturity",
     ],
     habitat: "Pastures, disturbed areas, roadsides, wet soils",
-    primaryHabitat: "Cool-Season / Full Sun to Partial Shade",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Perennial but responsive to herbicides; deep taproot limits mechanical removal",
     management: "POST herbicides (glyphosate, 2,4-D), repeated cutting, hand pulling",
