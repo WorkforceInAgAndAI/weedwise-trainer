@@ -1864,18 +1864,23 @@ export default function FarmMode({ onClose }: Props) {
   // SORT RESULTS SCREEN
   // ═══════════════════════════════════════════════════════════
   if (phase === 'sort-results') {
-    // Use elementary results or standard results
     const isElem = grade === 'elementary';
-    const resultsToShow = isElem ? elemSortResults : sortResults;
+    const isMid = grade === 'middle';
     const correctCount = isElem
       ? elemSortResults.filter(r => r.status === 'correct').length
-      : sortResults.filter(r => r.status === 'correct').length;
+      : isMid
+        ? midSortResults.filter(r => r.status === 'correct').length
+        : sortResults.filter(r => r.status === 'correct').length;
     const partialCount = isElem
       ? elemSortResults.filter(r => r.status === 'partial').length
-      : sortResults.filter(r => r.status === 'partial').length;
+      : isMid
+        ? midSortResults.filter(r => r.status === 'partial').length
+        : sortResults.filter(r => r.status === 'partial').length;
     const incorrectCount = isElem
       ? elemSortResults.filter(r => r.status === 'incorrect').length
-      : sortResults.filter(r => r.status === 'incorrect').length;
+      : isMid
+        ? midSortResults.filter(r => r.status === 'incorrect').length
+        : sortResults.filter(r => r.status === 'incorrect').length;
     const totalMoney = correctCount * 150 + partialCount * 50;
 
     return (
