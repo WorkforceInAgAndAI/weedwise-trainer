@@ -1947,6 +1947,34 @@ export default function FarmMode({ onClose }: Props) {
                     </div>
                   );
                 })
+              ) : isMid ? (
+                midSortResults.map((r, idx) => {
+                  const w = weedMap[r.weedId];
+                  return (
+                    <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
+                      r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
+                      r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
+                      'bg-destructive/5 border-destructive/30'
+                    }`}>
+                      <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
+                      <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
+                        <WeedImage weedId={r.weedId} stage="whole" className="w-full h-full" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {r.plantType.isCorrect ? '✅' : '❌'} {r.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}
+                          {' • '}{r.origin.isCorrect ? '✅' : '❌'} {r.origin.selected === 'native' ? 'Native' : 'Introduced'}
+                          {' • '}{r.lifeCycle.isCorrect ? '✅' : '❌'} {r.lifeCycle.selected.charAt(0).toUpperCase() + r.lifeCycle.selected.slice(1)}
+                          {' • '}{r.habitat.isCorrect ? '✅' : '❌'} {habitatLabel(r.habitat.selected)}
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold shrink-0">
+                        {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
+                      </span>
+                    </div>
+                  );
+                })
               ) : (
                 sortResults.map((r, idx) => {
                   const w = weedMap[r.weedId];
