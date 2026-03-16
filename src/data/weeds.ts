@@ -1939,6 +1939,7 @@ export const weeds: Weed[] = [
       difference: "Toothed lacks red spot; both are spurges with latex",
     },
     memoryHook: "Spotted spurge = red spot + mat-like growth + milky latex",
+    safetyNote: "⚠️ Milky sap is irritating to skin and mucous membranes; ingestion by pets or livestock can cause vomiting and diarrhea.",
   },
   {
     id: "Toothed_spurge",
