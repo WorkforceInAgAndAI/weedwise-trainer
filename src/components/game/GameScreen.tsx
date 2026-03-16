@@ -77,7 +77,6 @@ export default function GameScreen(game: GameEngine) {
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm5': return <ScientificNameFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h2': return <HighSchoolLifeCycleSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'h3': return <LifecycleImageSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h4': return <HighSchoolHabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h5': return <FamilyFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'e5': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
@@ -236,11 +235,11 @@ export default function GameScreen(game: GameEngine) {
               )}
 
               {!feedback.correct && <p className="text-sm text-foreground"><span className="text-muted-foreground">Correct answer:</span> <span className="font-semibold text-accent">{feedback.correctAnswer}</span></p>}
-              {current.phaseId === 'e2' && (
+              {(current.phaseId === 'e2' || current.phaseId === 'h3') && (
                 <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3 space-y-1">
                   <p><span className="font-semibold text-primary">🌾 Monocot:</span> One seed leaf, parallel veins, fibrous roots.</p>
                   <p><span className="font-semibold text-primary">🍀 Dicot:</span> Two seed leaves, branching veins, taproot.</p>
-                  <p className="text-muted-foreground mt-1"><strong>{feedback.weed.commonName}</strong> is a <strong>{feedback.weed.plantType}</strong> ({feedback.weed.family}).</p>
+                  <p className="text-muted-foreground mt-1"><strong>{feedback.weed.scientificName}</strong> ({feedback.weed.commonName}) is a <strong>{feedback.weed.plantType}</strong> ({feedback.weed.family}).</p>
                 </div>
               )}
               <div className="text-sm text-foreground space-y-1">
@@ -306,7 +305,7 @@ export default function GameScreen(game: GameEngine) {
             <div className="flex justify-between"><span className="text-muted-foreground">Streak</span><span className="font-semibold">{streak} 🔥</span></div>
           </div>
           <div className="space-y-2 pt-2">
-            <button onClick={() => setShowInstructor(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors"><button onClick={() => setShowInstructor(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors">📊 Session Overview</button></button>
+            <button onClick={() => setShowInstructor(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors">📊 Session Overview</button>
             <button onClick={() => setShowGlossary(true)} className="w-full px-3 py-2 text-sm rounded-lg border border-border hover:bg-secondary transition-colors">📖 Glossary</button>
             <button onClick={endSession} className="w-full px-3 py-2 text-sm rounded-lg border border-destructive text-destructive hover:bg-destructive/10 transition-colors">🏁 End Session</button>
           </div>

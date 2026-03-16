@@ -74,6 +74,15 @@ interface MiddleSortResult {
   status: 'correct' | 'partial' | 'incorrect';
 }
 
+interface HighSortResult {
+  weedId: string;
+  plantType: { selected: string; correct: string; isCorrect: boolean };
+  origin: { selected: string; correct: string; isCorrect: boolean };
+  lifeCycle: { selected: string; correct: string; isCorrect: boolean };
+  family: { selected: string; correct: string; isCorrect: boolean };
+  status: 'correct' | 'partial' | 'incorrect';
+}
+
 type SortCategory = 'monocot' | 'dicot' | 'annual' | 'perennial' | 'invasive';
 
 type FarmPhase = 'avatar' | 'overview' | 'scouting' | 'sorting' | 'sort-results' | 'categorize-review' | 'invasive-report' | 'management' | 'mgmt-feedback' | 'results';
@@ -165,104 +174,70 @@ function getCategoryLabel(type: 'monocot' | 'dicot', grade: GradeLevel): string 
 }
 
 function isMethodEffective(method: string, groupLabel: string, weedIds: string[]): boolean {
-  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
-  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
   const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
   const isInvasiveGroup = groupLabel.includes('Invasive') || groupLabel.includes('Priority');
-  if (method.includes('Grass Herbicide') && isBroadleafGroup) return false;
-  if (method.includes('Broadleaf Herbicide') && isGrassGroup) return false;
-  if (method.includes('Pre-emergent') && isPerennialGroup) return false;
-  if (method === 'Mowing & Cutting' && !isPerennialGroup) return false;
-  if (method.includes('Integrated')) return true;
-  if (method.includes('Grass Herbicide') && isGrassGroup) return true;
-  if (method.includes('Broadleaf Herbicide') && isBroadleafGroup) return true;
-  if (method.includes('Mechanical') && !isInvasiveGroup) return true;
-  if (method.includes('Cover Crops')) return true;
-  if (method.includes('Hand Removal') && weedIds.length <= 3) return true;
-  if (method.includes('Pre-emergent') && groupLabel.includes('Annual')) return true;
+  if (method === "Don't touch") return false;
+  if (method === 'Pre-Emergent Herbicides' && isPerennialGroup) return false;
+  if (method === 'Pre-Emergent Herbicides' && isAnnualGroup) return true;
+  if (method === 'Post-Emergent Herbicides') return true;
+  if (method === 'Multi-MOA herbicides') return true;
+  if (method === 'Hand weeding' && weedIds.length <= 3) return true;
+  if (method === 'Hand weeding') return true;
+  if (method === 'Cover crop') return true;
+  if (method === 'Tillage' && !isInvasiveGroup) return true;
   return false;
 }
 
 /** Determine the BEST method+timing for a group */
 function getBestManagement(groupLabel: string, weedIds: string[]): { method: string; timing: string; explanation: string } {
-  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
-  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
   const isPerennialGroup = groupLabel.includes('Perennial');
   const isAnnualGroup = groupLabel.includes('Annual');
   const isInvasiveGroup = groupLabel.includes('Invasive') || groupLabel.includes('Priority');
 
   if (isInvasiveGroup) {
     return {
-      method: 'Integrated Multi-MOA Program',
+      method: 'Multi-MOA herbicides',
       timing: 'Year-round monitoring',
       explanation: 'Invasive species require a comprehensive, multi-mode-of-action approach with year-round vigilance to prevent establishment and spread.'
     };
   }
-  if (isGrassGroup && isAnnualGroup) {
+  if (isAnnualGroup) {
     return {
-      method: 'Pre-emergent Herbicide (Group 15)',
+      method: 'Pre-Emergent Herbicides',
       timing: 'At planting (Pre-emerge)',
-      explanation: 'Annual grasses are best controlled with pre-emergent herbicides applied at planting, preventing seedling establishment before they compete with crops.'
-    };
-  }
-  if (isGrassGroup && isPerennialGroup) {
-    return {
-      method: 'Post-emergent Grass Herbicide (Clethodim)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Perennial grasses need post-emergent grass-specific herbicides applied early when plants are small and actively growing for maximum uptake.'
-    };
-  }
-  if (isGrassGroup) {
-    return {
-      method: 'Post-emergent Grass Herbicide (Clethodim)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Grass weeds respond best to grass-specific herbicides like Clethodim applied early when weeds are small and actively growing.'
-    };
-  }
-  if (isBroadleafGroup && isAnnualGroup) {
-    return {
-      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Annual broadleaf weeds are effectively controlled with post-emergent broadleaf herbicides applied when plants are young and actively growing.'
-    };
-  }
-  if (isBroadleafGroup && isPerennialGroup) {
-    return {
-      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
-      timing: 'Mid-season',
-      explanation: 'Perennial broadleaf weeds need systemic herbicides applied mid-season when plants are translocating nutrients to roots, maximizing herbicide movement.'
-    };
-  }
-  if (isBroadleafGroup) {
-    return {
-      method: 'Post-emergent Broadleaf Herbicide (2,4-D)',
-      timing: 'Early post-emerge (< 4 inches)',
-      explanation: 'Broadleaf weeds are best managed with broadleaf-specific herbicides applied early in the growth stage.'
+      explanation: 'Annual weeds are best controlled with pre-emergent herbicides applied at planting, preventing seedling establishment before they compete with crops.'
     };
   }
   if (isPerennialGroup) {
     return {
-      method: 'Mowing & Cutting',
-      timing: 'Mid-season',
-      explanation: 'Perennial weeds can be managed through repeated mowing during mid-season to deplete root reserves over time.'
+      method: 'Post-Emergent Herbicides',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'Perennial weeds regrow from roots, so post-emergent herbicides applied to actively growing plants are most effective.'
+    };
+  }
+  if (weedIds.length <= 2) {
+    return {
+      method: 'Hand weeding',
+      timing: 'Early post-emerge (< 4 inches)',
+      explanation: 'With only a few weeds, hand weeding is the most targeted and cost-effective approach.'
     };
   }
   return {
-    method: 'Integrated Multi-MOA Program',
+    method: 'Multi-MOA herbicides',
     timing: 'Year-round monitoring',
-    explanation: 'A diverse weed group benefits from an integrated approach combining multiple control methods throughout the season.'
+    explanation: 'A diverse weed group benefits from an integrated approach combining multiple modes of action throughout the season.'
   };
 }
 
 const MANAGEMENT_METHODS = [
-  'Pre-emergent Herbicide (Group 15)',
-  'Post-emergent Broadleaf Herbicide (2,4-D)',
-  'Post-emergent Grass Herbicide (Clethodim)',
-  'Mechanical Cultivation',
-  'Cover Crops',
-  'Mowing & Cutting',
-  'Hand Removal',
-  'Integrated Multi-MOA Program',
+  'Hand weeding',
+  "Don't touch",
+  'Pre-Emergent Herbicides',
+  'Post-Emergent Herbicides',
+  'Cover crop',
+  'Tillage',
+  'Multi-MOA herbicides',
 ];
 
 const MANAGEMENT_TIMING = [
@@ -461,6 +436,14 @@ export default function FarmMode({ onClose }: Props) {
   const [midHabitat, setMidHabitat] = useState<string | null>(null);
   const [midSortResults, setMidSortResults] = useState<MiddleSortResult[]>([]);
   const [midSortFeedback, setMidSortFeedback] = useState<MiddleSortResult | null>(null);
+
+  // High school sorting state
+  const [highPlantType, setHighPlantType] = useState<string | null>(null);
+  const [highOrigin, setHighOrigin] = useState<string | null>(null);
+  const [highLifeCycle, setHighLifeCycle] = useState<string | null>(null);
+  const [highFamily, setHighFamily] = useState<string | null>(null);
+  const [highSortResults, setHighSortResults] = useState<HighSortResult[]>([]);
+  const [highSortFeedback, setHighSortFeedback] = useState<HighSortResult | null>(null);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
@@ -765,6 +748,46 @@ export default function FarmMode({ onClose }: Props) {
       return;
     }
 
+    // High school: 4-row radio sorting
+    if (grade === 'high') {
+      if (!highPlantType || !highOrigin || !highLifeCycle || !highFamily) { toast.error('Select one option in each row'); return; }
+      const current = unsortedWeeds[currentSortWeed];
+      if (!current) return;
+      const weed = weedMap[current.weedId];
+      if (!weed) return;
+      const correctPlantType = weed.plantType === 'Monocot' ? 'monocot' : 'dicot';
+      const correctOrigin = weed.origin === 'Native' ? 'native' : 'introduced';
+      const correctLC = getCorrectLifeCycle(weed);
+      const correctFam = weed.family;
+
+      const ptCorrect = highPlantType === correctPlantType;
+      const orCorrect = highOrigin === correctOrigin;
+      const lcCorrect = highLifeCycle === correctLC;
+      const famCorrect = highFamily === correctFam;
+      const correctCount = [ptCorrect, orCorrect, lcCorrect, famCorrect].filter(Boolean).length;
+      const status: HighSortResult['status'] = correctCount === 4 ? 'correct' : correctCount > 0 ? 'partial' : 'incorrect';
+
+      const result: HighSortResult = {
+        weedId: current.weedId,
+        plantType: { selected: highPlantType, correct: correctPlantType, isCorrect: ptCorrect },
+        origin: { selected: highOrigin, correct: correctOrigin, isCorrect: orCorrect },
+        lifeCycle: { selected: highLifeCycle, correct: correctLC, isCorrect: lcCorrect },
+        family: { selected: highFamily, correct: correctFam, isCorrect: famCorrect },
+        status,
+      };
+      setHighSortResults(prev => [...prev, result]);
+
+      if (status === 'correct') { setMoney(m => m + 150); setTotalEarnings(e => e + 150); }
+      else if (status === 'partial') { setMoney(m => m + 50); setTotalEarnings(e => e + 50); }
+
+      setHighPlantType(null);
+      setHighOrigin(null);
+      setHighLifeCycle(null);
+      setHighFamily(null);
+      setHighSortFeedback(result);
+      return;
+    }
+
     if (selectedSortCats.length === 0) { toast.error('Select at least one category'); return; }
     const current = unsortedWeeds[currentSortWeed];
     if (!current) return;
@@ -798,12 +821,13 @@ export default function FarmMode({ onClose }: Props) {
 
     setSelectedSortCats([]);
     setSortFeedbackResult(result);
-  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields, midPlantType, midOrigin, midLifeCycle, midHabitat]);
+  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields, midPlantType, midOrigin, midLifeCycle, midHabitat, highPlantType, highOrigin, highLifeCycle, highFamily]);
 
   const handleSortFeedbackNext = useCallback(() => {
     setSortFeedbackResult(null);
     setElemSortFeedback(null);
     setMidSortFeedback(null);
+    setHighSortFeedback(null);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
@@ -847,6 +871,43 @@ export default function FarmMode({ onClose }: Props) {
       setMgmtFeedback(null);
       setMgmtBest(null);
       setPhase('management');
+      return;
+    }
+
+    if (grade === 'high') {
+      const allWeedIds = unsortedWeeds.map(u => u.weedId);
+      const monocotIds = allWeedIds.filter(id => weedMap[id]?.plantType === 'Monocot');
+      const dicotIds = allWeedIds.filter(id => weedMap[id]?.plantType !== 'Monocot');
+      const annualIds = allWeedIds.filter(id => !weedMap[id]?.lifeCycle.toLowerCase().includes('perennial') && !weedMap[id]?.lifeCycle.toLowerCase().includes('biennial'));
+      const perennialIds = allWeedIds.filter(id => weedMap[id]?.lifeCycle.toLowerCase().includes('perennial'));
+      const biennialIds = allWeedIds.filter(id => weedMap[id]?.lifeCycle.toLowerCase().includes('biennial'));
+      const invasiveIds = allWeedIds.filter(id => weedMap[id]?.origin === 'Introduced' && weedMap[id]?.actImmediately);
+      const groupList: { label: string; weedIds: string[] }[] = [];
+      if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
+      if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
+      if (annualIds.length > 0) groupList.push({ label: '📅 Annuals', weedIds: annualIds });
+      if (perennialIds.length > 0) groupList.push({ label: '🔄 Perennials', weedIds: perennialIds });
+      if (biennialIds.length > 0) groupList.push({ label: '2️⃣ Biennials', weedIds: biennialIds });
+      if (invasiveIds.length > 0) groupList.push({ label: '⚠️ Invasive / Priority', weedIds: invasiveIds });
+      setGroups(groupList);
+
+      const reports: InvasiveReport[] = invasiveIds.map(wId => {
+        const dotCount = fields.reduce((s, f) => s + f.dots.filter(d => d.weedId === wId && d.found).length, 0);
+        const fieldId = fields.find(f => f.dots.some(d => d.weedId === wId && d.found))?.fieldId || '';
+        return { weedId: wId, fieldId, count: dotCount, density: '', notes: '', submitted: false };
+      });
+      setInvasiveReports(reports);
+
+      if (invasiveIds.length > 0) {
+        setPhase('categorize-review');
+      } else {
+        setCurrentMgmtGroup(0);
+        setSelectedMethod('');
+        setSelectedTiming('');
+        setMgmtFeedback(null);
+        setMgmtBest(null);
+        setPhase('management');
+      }
       return;
     }
 
@@ -1758,7 +1819,12 @@ export default function FarmMode({ onClose }: Props) {
       );
     }
 
-    // High: existing multi-category sorting
+    // High: 4-row radio sorting
+    const allFamilies = [...new Set(weeds.map(w => w.family))];
+    const correctFamily = currentW.family;
+    const distractorFamilies = shuffle(allFamilies.filter(f => f !== correctFamily)).slice(0, 2);
+    const familyOptions = shuffle([correctFamily, ...distractorFamilies]);
+
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <EarningsBar />
@@ -1766,7 +1832,7 @@ export default function FarmMode({ onClose }: Props) {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="font-display font-bold text-xl text-foreground">🗂️ Sort Your Findings</h1>
-              <p className="text-xs text-muted-foreground">Categorize each weed you found. Select ALL categories that apply.</p>
+              <p className="text-xs text-muted-foreground">Classify each weed by selecting one option per row.</p>
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">{currentSortWeed + 1} / {unsortedWeeds.length}</div>
@@ -1777,18 +1843,16 @@ export default function FarmMode({ onClose }: Props) {
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Current weed — square photo centered */}
+          {/* Current weed card */}
           <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
             <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto flex items-center justify-center">
               <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full object-contain" />
             </div>
             <div className="p-4">
               <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
-              {(grade === 'high' || grade === 'middle') && (
-                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
-              )}
+              <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
               <div className="flex flex-wrap gap-1 mt-2">
-                {currentW.traits.slice(0, 4).map((t, i) => (
+                {currentW.traits.slice(0, 3).map((t, i) => (
                   <span key={i} className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full">{t}</span>
                 ))}
               </div>
@@ -1796,37 +1860,75 @@ export default function FarmMode({ onClose }: Props) {
             </div>
           </div>
 
-          <div className="space-y-2 mb-6">
-            <p className="text-sm font-semibold text-foreground">Select all categories that apply:</p>
-            {SORT_CATEGORIES.map(cat => (
-              <button key={cat.id}
-                onClick={() => setSelectedSortCats(prev =>
-                  prev.includes(cat.id) ? prev.filter(c => c !== cat.id) : [...prev, cat.id]
-                )}
-                className={`w-full px-4 py-3 rounded-lg border-2 text-left transition-all flex items-center justify-between ${
-                  selectedSortCats.includes(cat.id) ? cat.color + ' ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
-                }`}>
-                <div>
-                  <div className="font-semibold text-sm text-foreground">{cat.label}</div>
-                  <div className="text-[10px] text-muted-foreground">{cat.description}</div>
-                </div>
-                {selectedSortCats.includes(cat.id) && <span className="text-primary text-lg">✓</span>}
-              </button>
-            ))}
+          {/* Row 1: Monocot vs Dicot */}
+          <div className="space-y-4 mb-6">
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Plant Type</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ id: 'monocot', label: '🌾 Monocot' }, { id: 'dicot', label: '🍀 Dicot' }].map(opt => (
+                  <button key={opt.id} onClick={() => setHighPlantType(opt.id)}
+                    className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                      highPlantType === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{opt.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2: Native vs Introduced */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Origin</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ id: 'native', label: '🏡 Native' }, { id: 'introduced', label: '🌍 Introduced' }].map(opt => (
+                  <button key={opt.id} onClick={() => setHighOrigin(opt.id)}
+                    className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                      highOrigin === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{opt.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 3: Life Cycle */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Life Cycle</p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'annual', label: '📅 Annual' },
+                  { id: 'perennial', label: '🔄 Perennial' },
+                  { id: 'biennial', label: '2️⃣ Biennial' },
+                ].map(opt => (
+                  <button key={opt.id} onClick={() => setHighLifeCycle(opt.id)}
+                    className={`px-3 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                      highLifeCycle === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{opt.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 4: Family */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">Plant Family</p>
+              <div className="grid grid-cols-3 gap-2">
+                {familyOptions.map(fam => (
+                  <button key={fam} onClick={() => setHighFamily(fam)}
+                    className={`px-3 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                      highFamily === fam ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                    }`}>{fam}</button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <button onClick={handleSortSubmit} disabled={selectedSortCats.length === 0 || !!sortFeedbackResult}
+          <button onClick={handleSortSubmit} disabled={!highPlantType || !highOrigin || !highLifeCycle || !highFamily || !!highSortFeedback}
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-display font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
             Confirm Sorting ✓
           </button>
         </div>
 
-        {/* Per-weed sort feedback overlay */}
-        {sortFeedbackResult && (() => {
-          const fbWeed = weedMap[sortFeedbackResult.weedId];
-          const isCorrect = sortFeedbackResult.status === 'correct';
-          const isPartial = sortFeedbackResult.status === 'partial';
-          const catLabel = (id: SortCategory) => SORT_CATEGORIES.find(c => c.id === id)?.label || id;
+        {/* High school sort feedback overlay */}
+        {highSortFeedback && (() => {
+          const fbWeed = weedMap[highSortFeedback.weedId];
+          const isCorrect = highSortFeedback.status === 'correct';
+          const isPartial = highSortFeedback.status === 'partial';
           return (
             <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
               <div className={`bg-card border-2 rounded-xl max-w-sm w-full p-5 animate-scale-in ${
@@ -1835,19 +1937,51 @@ export default function FarmMode({ onClose }: Props) {
                 <div className="text-center mb-4">
                   <div className="text-4xl mb-2">{isCorrect ? '✅' : isPartial ? '🟡' : '❌'}</div>
                   <div className="font-display font-bold text-lg text-foreground">
-                    {isCorrect ? 'Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
+                    {isCorrect ? 'All Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
                   </div>
                   <div className={`text-sm font-semibold ${isCorrect ? 'text-accent' : isPartial ? 'text-primary' : 'text-destructive'}`}>
                     {isCorrect ? '+$150' : isPartial ? '+$50' : '$0'}
                   </div>
                   <div className="text-sm text-foreground mt-1">{fbWeed?.commonName}</div>
                 </div>
-                {!isCorrect && (
-                  <div className="bg-muted/50 rounded-lg p-3 mb-4 text-xs space-y-1">
-                    <div><span className="font-semibold text-foreground">Your picks:</span> {sortFeedbackResult.selectedCats.map(catLabel).join(', ')}</div>
-                    <div><span className="font-semibold text-accent">Correct:</span> {sortFeedbackResult.correctCats.map(catLabel).join(', ')}</div>
+                <div className="space-y-2 mb-4">
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.plantType.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.plantType.isCorrect ? '✅' : '❌'}</span>
+                    <span>Plant Type: {highSortFeedback.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                    {!highSortFeedback.plantType.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.plantType.correct === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                    )}
                   </div>
-                )}
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.origin.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.origin.isCorrect ? '✅' : '❌'}</span>
+                    <span>Origin: {highSortFeedback.origin.selected === 'native' ? 'Native' : 'Introduced'}</span>
+                    {!highSortFeedback.origin.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.origin.correct === 'native' ? 'Native' : 'Introduced'}</span>
+                    )}
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.lifeCycle.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.lifeCycle.isCorrect ? '✅' : '❌'}</span>
+                    <span>Life Cycle: {highSortFeedback.lifeCycle.selected.charAt(0).toUpperCase() + highSortFeedback.lifeCycle.selected.slice(1)}</span>
+                    {!highSortFeedback.lifeCycle.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.lifeCycle.correct.charAt(0).toUpperCase() + highSortFeedback.lifeCycle.correct.slice(1)}</span>
+                    )}
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                    highSortFeedback.family.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                  }`}>
+                    <span>{highSortFeedback.family.isCorrect ? '✅' : '❌'}</span>
+                    <span>Family: {highSortFeedback.family.selected}</span>
+                    {!highSortFeedback.family.isCorrect && (
+                      <span className="ml-auto text-xs">→ {highSortFeedback.family.correct}</span>
+                    )}
+                  </div>
+                </div>
                 <button onClick={handleSortFeedbackNext}
                   className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
                   {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
@@ -1866,21 +2000,28 @@ export default function FarmMode({ onClose }: Props) {
   if (phase === 'sort-results') {
     const isElem = grade === 'elementary';
     const isMid = grade === 'middle';
+    const isHigh = grade === 'high';
     const correctCount = isElem
       ? elemSortResults.filter(r => r.status === 'correct').length
       : isMid
         ? midSortResults.filter(r => r.status === 'correct').length
-        : sortResults.filter(r => r.status === 'correct').length;
+        : isHigh
+          ? highSortResults.filter(r => r.status === 'correct').length
+          : sortResults.filter(r => r.status === 'correct').length;
     const partialCount = isElem
       ? elemSortResults.filter(r => r.status === 'partial').length
       : isMid
         ? midSortResults.filter(r => r.status === 'partial').length
-        : sortResults.filter(r => r.status === 'partial').length;
+        : isHigh
+          ? highSortResults.filter(r => r.status === 'partial').length
+          : sortResults.filter(r => r.status === 'partial').length;
     const incorrectCount = isElem
       ? elemSortResults.filter(r => r.status === 'incorrect').length
       : isMid
         ? midSortResults.filter(r => r.status === 'incorrect').length
-        : sortResults.filter(r => r.status === 'incorrect').length;
+        : isHigh
+          ? highSortResults.filter(r => r.status === 'incorrect').length
+          : sortResults.filter(r => r.status === 'incorrect').length;
     const totalMoney = correctCount * 150 + partialCount * 50;
 
     return (
@@ -1967,6 +2108,34 @@ export default function FarmMode({ onClose }: Props) {
                           {' • '}{r.origin.isCorrect ? '✅' : '❌'} {r.origin.selected === 'native' ? 'Native' : 'Introduced'}
                           {' • '}{r.lifeCycle.isCorrect ? '✅' : '❌'} {r.lifeCycle.selected.charAt(0).toUpperCase() + r.lifeCycle.selected.slice(1)}
                           {' • '}{r.habitat.isCorrect ? '✅' : '❌'} {habitatLabel(r.habitat.selected)}
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold shrink-0">
+                        {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
+                      </span>
+                    </div>
+                  );
+                })
+              ) : isHigh ? (
+                highSortResults.map((r, idx) => {
+                  const w = weedMap[r.weedId];
+                  return (
+                    <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
+                      r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
+                      r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
+                      'bg-destructive/5 border-destructive/30'
+                    }`}>
+                      <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
+                      <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
+                        <WeedImage weedId={r.weedId} stage="whole" className="w-full h-full" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {r.plantType.isCorrect ? '✅' : '❌'} {r.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}
+                          {' • '}{r.origin.isCorrect ? '✅' : '❌'} {r.origin.selected === 'native' ? 'Native' : 'Introduced'}
+                          {' • '}{r.lifeCycle.isCorrect ? '✅' : '❌'} {r.lifeCycle.selected.charAt(0).toUpperCase() + r.lifeCycle.selected.slice(1)}
+                          {' • '}{r.family.isCorrect ? '✅' : '❌'} {r.family.selected}
                         </div>
                       </div>
                       <span className="text-xs font-bold shrink-0">
@@ -2322,9 +2491,7 @@ export default function FarmMode({ onClose }: Props) {
                 </div>
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-muted-foreground">
                   💡 <span className="font-semibold text-foreground">Tip:</span>{' '}
-                  {isGrassGroup && 'Grass weeds require grass-specific herbicides. Broadleaf herbicides will NOT work.'}
-                  {isBroadleafGroup && 'Broadleaf weeds need broadleaf herbicides. Grass herbicides will NOT be effective.'}
-                  {!isGrassGroup && !isBroadleafGroup && 'Consider the life cycle and growth habit when choosing your approach.'}
+                  Consider the life cycle, growth habit, and density when choosing your control method and timing.
                 </div>
               </div>
               <div>

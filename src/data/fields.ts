@@ -65,7 +65,7 @@ export function getFieldCount(grade: GradeLevel): number {
   switch (grade) {
     case 'elementary': return 2;
     case 'middle': return 3;
-    case 'high': return 5;
+    case 'high': return 3;
   }
 }
 
