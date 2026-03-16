@@ -827,6 +827,7 @@ export default function FarmMode({ onClose }: Props) {
     setSortFeedbackResult(null);
     setElemSortFeedback(null);
     setMidSortFeedback(null);
+    setHighSortFeedback(null);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
