@@ -1971,6 +1971,7 @@ export const weeds: Weed[] = [
       difference: "Spotted has red leaf spot; Toothed lacks spot but has toothed margins",
     },
     memoryHook: "Toothed spurge = toothed leaves (no spot) + milky latex + warm-season annual",
+    safetyNote: "⚠️ Closely related to spotted spurge; acrid latex sap can irritate skin and eyes and cause gastrointestinal upset if consumed.",
   },
   {
     id: "annual-ryegrass",
