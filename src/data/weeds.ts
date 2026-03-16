@@ -1311,6 +1311,7 @@ export const weeds: Weed[] = [
       difference: "Morningglory is annual with funnel flowers; Milkweed is perennial with small fragrant flowers",
     },
     memoryHook: "Honey-vine = twining perennial + fragrant flowers + tuber rooted + vines through crops",
+    safetyNote: "⚠️ Milkweed relative with cardiac glycosides; ingestion can cause vomiting, diarrhea, and heart rhythm disturbances in animals.",
   },
   {
     id: "CommonChickweed",
