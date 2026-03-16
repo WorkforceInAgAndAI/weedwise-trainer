@@ -1540,7 +1540,7 @@ export const weeds: Weed[] = [
       "Flowers close by morning",
     ],
     habitat: "Disturbed areas, field margins, rangelands",
-    primaryHabitat: "Warm-Season / Full Sun",
+    primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Perennial tuberously rooted; deep rhizomes; difficult to control mechanically",
     management: "Repeated POST glyphosate, biological control, mechanical removal",
