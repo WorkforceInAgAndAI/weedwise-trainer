@@ -1649,6 +1649,7 @@ export const weeds: Weed[] = [
       difference: "Scouring-rush lacks whorled branches; Horsetail has prominent whorled branches",
     },
     memoryHook: "Field horsetail = jointed hollow stems + whorled branches + wet soils",
+    safetyNote: "⚠️ Contains thiaminase that destroys vitamin B1; chronic ingestion by horses and livestock can cause weakness, weight loss, and neurologic signs.",
   },
   {
     id: "Scouringrush",
