@@ -63,6 +63,7 @@ export const weeds: Weed[] = [
       difference: "Waterhemp has shorter petioles and elongated seed head without spines",
     },
     memoryHook: "Palmer grows like a palm tree — fast and tall",
+    safetyNote: "⚠️ Can accumulate high nitrates and sometimes oxalates; heavy consumption by ruminants can lead to nitrate poisoning and kidney damage.",
   },
   {
     id: "Redroot_pigweed",
