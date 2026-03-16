@@ -74,6 +74,15 @@ interface MiddleSortResult {
   status: 'correct' | 'partial' | 'incorrect';
 }
 
+interface HighSortResult {
+  weedId: string;
+  plantType: { selected: string; correct: string; isCorrect: boolean };
+  origin: { selected: string; correct: string; isCorrect: boolean };
+  lifeCycle: { selected: string; correct: string; isCorrect: boolean };
+  family: { selected: string; correct: string; isCorrect: boolean };
+  status: 'correct' | 'partial' | 'incorrect';
+}
+
 type SortCategory = 'monocot' | 'dicot' | 'annual' | 'perennial' | 'invasive';
 
 type FarmPhase = 'avatar' | 'overview' | 'scouting' | 'sorting' | 'sort-results' | 'categorize-review' | 'invasive-report' | 'management' | 'mgmt-feedback' | 'results';
