@@ -65,6 +65,15 @@ interface ElemSortResult {
   status: 'correct' | 'partial' | 'incorrect';
 }
 
+interface MiddleSortResult {
+  weedId: string;
+  plantType: { selected: string; correct: string; isCorrect: boolean };
+  origin: { selected: string; correct: string; isCorrect: boolean };
+  lifeCycle: { selected: string; correct: string; isCorrect: boolean };
+  habitat: { selected: string; correct: string; isCorrect: boolean };
+  status: 'correct' | 'partial' | 'incorrect';
+}
+
 type SortCategory = 'monocot' | 'dicot' | 'annual' | 'perennial' | 'invasive';
 
 type FarmPhase = 'avatar' | 'overview' | 'scouting' | 'sorting' | 'sort-results' | 'categorize-review' | 'invasive-report' | 'management' | 'mgmt-feedback' | 'results';
@@ -273,6 +282,68 @@ const ELEM_MANAGEMENT_METHODS = [
   'Water the weed',
 ];
 
+const MID_MANAGEMENT_METHODS = [
+  'Hand weeding',
+  'Pre-Emergent Herbicide',
+  'Post-Emergent Herbicide',
+  'Cover Crop/Mulch',
+  'Wait to act',
+  'Fertilize',
+];
+
+function isMidMethodEffective(method: string, groupLabel: string, weedIds: string[]): boolean {
+  const isGrassGroup = groupLabel.includes('Monocot') || groupLabel.includes('Grass');
+  const isBroadleafGroup = groupLabel.includes('Dicot') || groupLabel.includes('Broadlea');
+  const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
+  // Fertilize is never effective as weed management
+  if (method === 'Fertilize') return false;
+  if (method === 'Pre-Emergent Herbicide' && isAnnualGroup) return true;
+  if (method === 'Pre-Emergent Herbicide' && isPerennialGroup) return false;
+  if (method === 'Post-Emergent Herbicide') return true;
+  if (method === 'Hand weeding' && weedIds.length <= 3) return true;
+  if (method === 'Hand weeding') return true;
+  if (method === 'Cover Crop/Mulch') return true;
+  if (method === 'Wait to act' && weedIds.length <= 2) return true;
+  if (method === 'Wait to act') return false;
+  return false;
+}
+
+function getMidBestMethod(groupLabel: string, weedIds: string[]): { method: string; explanation: string } {
+  const isPerennialGroup = groupLabel.includes('Perennial');
+  const isAnnualGroup = groupLabel.includes('Annual');
+  if (isAnnualGroup) return { method: 'Pre-Emergent Herbicide', explanation: 'Annual weeds are best stopped before they emerge. A pre-emergent herbicide prevents seeds from germinating.' };
+  if (isPerennialGroup) return { method: 'Post-Emergent Herbicide', explanation: 'Perennial weeds regrow from roots, so post-emergent herbicides applied to actively growing plants are most effective.' };
+  if (weedIds.length <= 2) return { method: 'Hand weeding', explanation: 'With only a few weeds, hand weeding is the most targeted and cost-effective approach.' };
+  return { method: 'Post-Emergent Herbicide', explanation: 'Post-emergent herbicides target actively growing weeds and are effective across many weed types.' };
+}
+
+function getCorrectHabitat(weed: Weed): string {
+  const h = weed.habitat.toLowerCase();
+  if (h.startsWith('warm-season') || h.startsWith('warm')) return 'warm';
+  if (h.startsWith('cool-season') || h.startsWith('cool')) return 'cool';
+  if (h.startsWith('wet') || h.includes('poorly drained')) return 'wet';
+  if (h.startsWith('dry') || h.includes('disturbed')) return 'dry';
+  return 'warm';
+}
+
+function getCorrectLifeCycle(weed: Weed): string {
+  const lc = weed.lifeCycle.toLowerCase();
+  if (lc.includes('perennial')) return 'perennial';
+  if (lc.includes('biennial')) return 'biennial';
+  return 'annual';
+}
+
+function habitatLabel(h: string): string {
+  switch (h) {
+    case 'warm': return 'Warm-Season / Full Sun';
+    case 'cool': return 'Cool-Season / Early Spring';
+    case 'wet': return 'Wet / Poorly Drained';
+    case 'dry': return 'Dry / Disturbed';
+    default: return h;
+  }
+}
+
 function isElemMethodEffective(method: string): boolean {
   return ['Hand weeding', 'Apply general herbicides', 'Mulch over the weed'].includes(method);
 }
@@ -382,6 +453,14 @@ export default function FarmMode({ onClose }: Props) {
   const [elemPlantType, setElemPlantType] = useState<string | null>(null);
   const [elemOrigin, setElemOrigin] = useState<string | null>(null);
   const [elemLifeStage, setElemLifeStage] = useState<string | null>(null);
+
+  // Middle school sorting state
+  const [midPlantType, setMidPlantType] = useState<string | null>(null);
+  const [midOrigin, setMidOrigin] = useState<string | null>(null);
+  const [midLifeCycle, setMidLifeCycle] = useState<string | null>(null);
+  const [midHabitat, setMidHabitat] = useState<string | null>(null);
+  const [midSortResults, setMidSortResults] = useState<MiddleSortResult[]>([]);
+  const [midSortFeedback, setMidSortFeedback] = useState<MiddleSortResult | null>(null);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
@@ -647,6 +726,45 @@ export default function FarmMode({ onClose }: Props) {
       return;
     }
 
+    if (grade === 'middle') {
+      if (!midPlantType || !midOrigin || !midLifeCycle || !midHabitat) { toast.error('Select one option in each row'); return; }
+      const current = unsortedWeeds[currentSortWeed];
+      if (!current) return;
+      const weed = weedMap[current.weedId];
+      if (!weed) return;
+      const correctPlantType = weed.plantType === 'Monocot' ? 'monocot' : 'dicot';
+      const correctOrigin = weed.origin === 'Native' ? 'native' : 'introduced';
+      const correctLC = getCorrectLifeCycle(weed);
+      const correctHab = getCorrectHabitat(weed);
+
+      const ptCorrect = midPlantType === correctPlantType;
+      const orCorrect = midOrigin === correctOrigin;
+      const lcCorrect = midLifeCycle === correctLC;
+      const habCorrect = midHabitat === correctHab;
+      const correctCount = [ptCorrect, orCorrect, lcCorrect, habCorrect].filter(Boolean).length;
+      const status: MiddleSortResult['status'] = correctCount === 4 ? 'correct' : correctCount > 0 ? 'partial' : 'incorrect';
+
+      const result: MiddleSortResult = {
+        weedId: current.weedId,
+        plantType: { selected: midPlantType, correct: correctPlantType, isCorrect: ptCorrect },
+        origin: { selected: midOrigin, correct: correctOrigin, isCorrect: orCorrect },
+        lifeCycle: { selected: midLifeCycle, correct: correctLC, isCorrect: lcCorrect },
+        habitat: { selected: midHabitat, correct: correctHab, isCorrect: habCorrect },
+        status,
+      };
+      setMidSortResults(prev => [...prev, result]);
+
+      if (status === 'correct') { setMoney(m => m + 150); setTotalEarnings(e => e + 150); }
+      else if (status === 'partial') { setMoney(m => m + 50); setTotalEarnings(e => e + 50); }
+
+      setMidPlantType(null);
+      setMidOrigin(null);
+      setMidLifeCycle(null);
+      setMidHabitat(null);
+      setMidSortFeedback(result);
+      return;
+    }
+
     if (selectedSortCats.length === 0) { toast.error('Select at least one category'); return; }
     const current = unsortedWeeds[currentSortWeed];
     if (!current) return;
@@ -680,11 +798,12 @@ export default function FarmMode({ onClose }: Props) {
 
     setSelectedSortCats([]);
     setSortFeedbackResult(result);
-  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields]);
+  }, [grade, selectedSortCats, currentSortWeed, unsortedWeeds, elemPlantType, elemOrigin, elemLifeStage, fields, midPlantType, midOrigin, midLifeCycle, midHabitat]);
 
   const handleSortFeedbackNext = useCallback(() => {
     setSortFeedbackResult(null);
     setElemSortFeedback(null);
+    setMidSortFeedback(null);
     if (currentSortWeed < unsortedWeeds.length - 1) {
       setCurrentSortWeed(i => i + 1);
     } else {
@@ -694,13 +813,33 @@ export default function FarmMode({ onClose }: Props) {
 
   const finishSorting = useCallback(() => {
     if (grade === 'elementary') {
-      // For elementary, group weeds by plant type for management
       const allWeedIds = unsortedWeeds.map(u => u.weedId);
       const monocotIds = allWeedIds.filter(id => weedMap[id]?.plantType === 'Monocot');
       const dicotIds = allWeedIds.filter(id => weedMap[id]?.plantType !== 'Monocot');
       const groupList: { label: string; weedIds: string[] }[] = [];
       if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
       if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
+      setGroups(groupList);
+      setCurrentMgmtGroup(0);
+      setSelectedMethod('');
+      setSelectedTiming('');
+      setMgmtFeedback(null);
+      setMgmtBest(null);
+      setPhase('management');
+      return;
+    }
+
+    if (grade === 'middle') {
+      const allWeedIds = unsortedWeeds.map(u => u.weedId);
+      const monocotIds = allWeedIds.filter(id => weedMap[id]?.plantType === 'Monocot');
+      const dicotIds = allWeedIds.filter(id => weedMap[id]?.plantType !== 'Monocot');
+      const annualIds = allWeedIds.filter(id => !weedMap[id]?.lifeCycle.toLowerCase().includes('perennial'));
+      const perennialIds = allWeedIds.filter(id => weedMap[id]?.lifeCycle.toLowerCase().includes('perennial'));
+      const groupList: { label: string; weedIds: string[] }[] = [];
+      if (monocotIds.length > 0) groupList.push({ label: '🌾 Monocots (Grasses)', weedIds: monocotIds });
+      if (dicotIds.length > 0) groupList.push({ label: '🍀 Dicots (Broadleaves)', weedIds: dicotIds });
+      if (annualIds.length > 0) groupList.push({ label: '📅 Annuals / Biennials', weedIds: annualIds });
+      if (perennialIds.length > 0) groupList.push({ label: '🔄 Perennials', weedIds: perennialIds });
       setGroups(groupList);
       setCurrentMgmtGroup(0);
       setSelectedMethod('');
@@ -751,6 +890,27 @@ export default function FarmMode({ onClose }: Props) {
       if (isBestChoice) { setMoney(m => m + 750); setTotalEarnings(e => e + 750); }
       else if (effective) { setMoney(m => m + 400); setTotalEarnings(e => e + 400); }
       else { setMoney(m => m - 150); }
+
+      setMgmtFeedback(action);
+      setMgmtBest({ ...best, timing: 'N/A' });
+      setPhase('mgmt-feedback');
+      return;
+    }
+
+    if (grade === 'middle') {
+      if (!selectedMethod) return;
+      const group = groups[currentMgmtGroup];
+      if (!group) return;
+      const effective = isMidMethodEffective(selectedMethod, group.label, group.weedIds);
+      const best = getMidBestMethod(group.label, group.weedIds);
+      const isBestChoice = selectedMethod === best.method;
+
+      const action: ManagementAction = { groupLabel: group.label, method: selectedMethod, timing: 'N/A', effective, bestChoice: isBestChoice };
+      setManagementActions(prev => [...prev, action]);
+
+      if (isBestChoice) { setMoney(m => m + 750); setTotalEarnings(e => e + 750); }
+      else if (effective) { setMoney(m => m + 400); setTotalEarnings(e => e + 400); }
+      else { setMoney(m => m - 200); }
 
       setMgmtFeedback(action);
       setMgmtBest({ ...best, timing: 'N/A' });
@@ -855,7 +1015,7 @@ export default function FarmMode({ onClose }: Props) {
     const yearlyTotal = totalEarnings + money;
     const profit = yearlyTotal - (TOTAL_EXPENSES * year);
     return (
-      <div className="fixed bottom-4 right-4 z-[60] bg-card/95 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-xl flex items-center gap-4 animate-in slide-in-from-bottom-2">
+      <div className="fixed bottom-4 right-4 z-[60] bg-card/95 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-xl flex items-center gap-4">
         <div className="text-center">
           <div className="text-[10px] text-muted-foreground uppercase tracking-wider">💰 Earnings</div>
           <div className="font-display font-bold text-base text-accent">${yearlyTotal.toLocaleString()}</div>
@@ -1422,7 +1582,183 @@ export default function FarmMode({ onClose }: Props) {
       );
     }
 
-    // Middle/High: existing multi-category sorting
+    // Middle: 4-row radio sorting
+    if (grade === 'middle') {
+      return (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <EarningsBar />
+          <div className="p-4 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="font-display font-bold text-xl text-foreground">🗂️ Sort Your Findings</h1>
+                <p className="text-xs text-muted-foreground">Classify each weed by selecting one option per row.</p>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-muted-foreground">{currentSortWeed + 1} / {unsortedWeeds.length}</div>
+              </div>
+            </div>
+
+            <div className="h-2 bg-muted rounded-full mb-6 overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
+            </div>
+
+            {/* Current weed card */}
+            <div className="bg-card border-2 border-border rounded-xl overflow-hidden mb-6">
+              <div className="aspect-square max-h-72 bg-muted overflow-hidden mx-auto flex items-center justify-center">
+                <WeedImage weedId={currentW.id} stage="whole" className="w-full h-full object-contain" />
+              </div>
+              <div className="p-4">
+                <div className="font-display font-bold text-lg text-foreground">{currentW.commonName}</div>
+                <div className="text-xs text-muted-foreground italic">{currentW.scientificName}</div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {currentW.traits.slice(0, 3).map((t, i) => (
+                    <span key={i} className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full">{t}</span>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{currentW.habitat}</p>
+              </div>
+            </div>
+
+            {/* Row 1: Monocot vs Dicot */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Plant Type</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ id: 'monocot', label: '🌾 Monocot' }, { id: 'dicot', label: '🍀 Dicot' }].map(opt => (
+                    <button key={opt.id} onClick={() => setMidPlantType(opt.id)}
+                      className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                        midPlantType === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 2: Native vs Introduced */}
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Origin</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ id: 'native', label: '🏡 Native' }, { id: 'introduced', label: '🌍 Introduced' }].map(opt => (
+                    <button key={opt.id} onClick={() => setMidOrigin(opt.id)}
+                      className={`px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                        midOrigin === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 3: Life Cycle */}
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Life Cycle</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'annual', label: '📅 Annual' },
+                    { id: 'perennial', label: '🔄 Perennial' },
+                    { id: 'biennial', label: '2️⃣ Biennial' },
+                  ].map(opt => (
+                    <button key={opt.id} onClick={() => setMidLifeCycle(opt.id)}
+                      className={`px-3 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                        midLifeCycle === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 4: Habitat/Climate */}
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-2">Habitat / Climate</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'warm', label: '☀️ Warm-Season / Full Sun' },
+                    { id: 'cool', label: '❄️ Cool-Season / Early Spring' },
+                    { id: 'wet', label: '💧 Wet / Poorly Drained' },
+                    { id: 'dry', label: '🏜️ Dry / Disturbed' },
+                  ].map(opt => (
+                    <button key={opt.id} onClick={() => setMidHabitat(opt.id)}
+                      className={`px-3 py-3 rounded-lg border-2 text-xs font-semibold transition-all text-center ${
+                        midHabitat === opt.id ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                      }`}>{opt.label}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button onClick={handleSortSubmit} disabled={!midPlantType || !midOrigin || !midLifeCycle || !midHabitat || !!midSortFeedback}
+              className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-display font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
+              Confirm Sorting ✓
+            </button>
+          </div>
+
+          {/* Middle sort feedback overlay */}
+          {midSortFeedback && (() => {
+            const fbWeed = weedMap[midSortFeedback.weedId];
+            const isCorrect = midSortFeedback.status === 'correct';
+            const isPartial = midSortFeedback.status === 'partial';
+            return (
+              <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
+                <div className={`bg-card border-2 rounded-xl max-w-sm w-full p-5 animate-scale-in ${
+                  isCorrect ? 'border-accent' : isPartial ? 'border-primary' : 'border-destructive'
+                }`}>
+                  <div className="text-center mb-4">
+                    <div className="text-4xl mb-2">{isCorrect ? '✅' : isPartial ? '🟡' : '❌'}</div>
+                    <div className="font-display font-bold text-lg text-foreground">
+                      {isCorrect ? 'All Correct!' : isPartial ? 'Partially Correct' : 'Incorrect'}
+                    </div>
+                    <div className={`text-sm font-semibold ${isCorrect ? 'text-accent' : isPartial ? 'text-primary' : 'text-destructive'}`}>
+                      {isCorrect ? '+$150' : isPartial ? '+$50' : '$0'}
+                    </div>
+                    <div className="text-sm text-foreground mt-1">{fbWeed?.commonName}</div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      midSortFeedback.plantType.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{midSortFeedback.plantType.isCorrect ? '✅' : '❌'}</span>
+                      <span>Plant Type: {midSortFeedback.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                      {!midSortFeedback.plantType.isCorrect && (
+                        <span className="ml-auto text-xs">→ {midSortFeedback.plantType.correct === 'monocot' ? 'Monocot' : 'Dicot'}</span>
+                      )}
+                    </div>
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      midSortFeedback.origin.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{midSortFeedback.origin.isCorrect ? '✅' : '❌'}</span>
+                      <span>Origin: {midSortFeedback.origin.selected === 'native' ? 'Native' : 'Introduced'}</span>
+                      {!midSortFeedback.origin.isCorrect && (
+                        <span className="ml-auto text-xs">→ {midSortFeedback.origin.correct === 'native' ? 'Native' : 'Introduced'}</span>
+                      )}
+                    </div>
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      midSortFeedback.lifeCycle.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{midSortFeedback.lifeCycle.isCorrect ? '✅' : '❌'}</span>
+                      <span>Life Cycle: {midSortFeedback.lifeCycle.selected.charAt(0).toUpperCase() + midSortFeedback.lifeCycle.selected.slice(1)}</span>
+                      {!midSortFeedback.lifeCycle.isCorrect && (
+                        <span className="ml-auto text-xs">→ {midSortFeedback.lifeCycle.correct.charAt(0).toUpperCase() + midSortFeedback.lifeCycle.correct.slice(1)}</span>
+                      )}
+                    </div>
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      midSortFeedback.habitat.isCorrect ? 'bg-accent/10 text-accent' : 'bg-destructive/10 text-destructive'
+                    }`}>
+                      <span>{midSortFeedback.habitat.isCorrect ? '✅' : '❌'}</span>
+                      <span>Habitat: {habitatLabel(midSortFeedback.habitat.selected)}</span>
+                      {!midSortFeedback.habitat.isCorrect && (
+                        <span className="ml-auto text-xs">→ {habitatLabel(midSortFeedback.habitat.correct)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <button onClick={handleSortFeedbackNext}
+                    className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold hover:opacity-90">
+                    {currentSortWeed < unsortedWeeds.length - 1 ? 'Next Weed →' : 'See Results Overview →'}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      );
+    }
+
+    // High: existing multi-category sorting
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <EarningsBar />
@@ -1528,18 +1864,23 @@ export default function FarmMode({ onClose }: Props) {
   // SORT RESULTS SCREEN
   // ═══════════════════════════════════════════════════════════
   if (phase === 'sort-results') {
-    // Use elementary results or standard results
     const isElem = grade === 'elementary';
-    const resultsToShow = isElem ? elemSortResults : sortResults;
+    const isMid = grade === 'middle';
     const correctCount = isElem
       ? elemSortResults.filter(r => r.status === 'correct').length
-      : sortResults.filter(r => r.status === 'correct').length;
+      : isMid
+        ? midSortResults.filter(r => r.status === 'correct').length
+        : sortResults.filter(r => r.status === 'correct').length;
     const partialCount = isElem
       ? elemSortResults.filter(r => r.status === 'partial').length
-      : sortResults.filter(r => r.status === 'partial').length;
+      : isMid
+        ? midSortResults.filter(r => r.status === 'partial').length
+        : sortResults.filter(r => r.status === 'partial').length;
     const incorrectCount = isElem
       ? elemSortResults.filter(r => r.status === 'incorrect').length
-      : sortResults.filter(r => r.status === 'incorrect').length;
+      : isMid
+        ? midSortResults.filter(r => r.status === 'incorrect').length
+        : sortResults.filter(r => r.status === 'incorrect').length;
     const totalMoney = correctCount * 150 + partialCount * 50;
 
     return (
@@ -1598,6 +1939,34 @@ export default function FarmMode({ onClose }: Props) {
                           {r.plantType.isCorrect ? '✅' : '❌'} {r.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}
                           {' • '}{r.origin.isCorrect ? '✅' : '❌'} {r.origin.selected === 'native' ? 'Native' : 'Introduced'}
                           {' • '}{r.lifeStage.isCorrect ? '✅' : '❌'} {lifeStageLabel(r.lifeStage.selected)}
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold shrink-0">
+                        {r.status === 'correct' ? '+$150' : r.status === 'partial' ? '+$50' : '$0'}
+                      </span>
+                    </div>
+                  );
+                })
+              ) : isMid ? (
+                midSortResults.map((r, idx) => {
+                  const w = weedMap[r.weedId];
+                  return (
+                    <div key={idx} className={`p-3 rounded-lg border flex items-center gap-3 ${
+                      r.status === 'correct' ? 'bg-accent/5 border-accent/30' :
+                      r.status === 'partial' ? 'bg-primary/5 border-primary/30' :
+                      'bg-destructive/5 border-destructive/30'
+                    }`}>
+                      <span className="text-lg shrink-0">{r.status === 'correct' ? '✅' : r.status === 'partial' ? '🟡' : '❌'}</span>
+                      <div className="w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
+                        <WeedImage weedId={r.weedId} stage="whole" className="w-full h-full" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-foreground">{w?.commonName}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {r.plantType.isCorrect ? '✅' : '❌'} {r.plantType.selected === 'monocot' ? 'Monocot' : 'Dicot'}
+                          {' • '}{r.origin.isCorrect ? '✅' : '❌'} {r.origin.selected === 'native' ? 'Native' : 'Introduced'}
+                          {' • '}{r.lifeCycle.isCorrect ? '✅' : '❌'} {r.lifeCycle.selected.charAt(0).toUpperCase() + r.lifeCycle.selected.slice(1)}
+                          {' • '}{r.habitat.isCorrect ? '✅' : '❌'} {habitatLabel(r.habitat.selected)}
                         </div>
                       </div>
                       <span className="text-xs font-bold shrink-0">
@@ -1870,6 +2239,62 @@ export default function FarmMode({ onClose }: Props) {
       );
     }
 
+    if (grade === 'middle') {
+      return (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <EarningsBar />
+          <div className="p-4 max-w-3xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="font-display font-bold text-xl text-foreground">🛠️ Management Plan</h1>
+                <p className="text-xs text-muted-foreground">Choose the best control method for each weed group</p>
+              </div>
+              <div className="text-sm text-muted-foreground">Group {currentMgmtGroup + 1}/{groups.length}</div>
+            </div>
+            <div className="flex gap-1 mb-6">
+              {groups.map((_, i) => (
+                <div key={i} className={`h-2 flex-1 rounded-full ${i <= currentMgmtGroup ? 'bg-accent' : 'bg-muted'}`} />
+              ))}
+            </div>
+            {group && (
+              <div className="space-y-4">
+                <div className="bg-card border border-border rounded-xl p-4">
+                  <h2 className="font-display font-bold text-lg text-foreground mb-2">{group.label}</h2>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {group.weedIds.map(wId => (
+                      <span key={wId} className="px-2 py-1 text-xs bg-muted text-foreground rounded-full">{weedMap[wId]?.commonName}</span>
+                    ))}
+                  </div>
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-muted-foreground">
+                    💡 <span className="font-semibold text-foreground">Tip:</span>{' '}
+                    {isGrassGroup && 'Grass weeds respond well to pre-emergent herbicides and mechanical cultivation.'}
+                    {isBroadleafGroup && 'Broadleaf weeds can be targeted with post-emergent herbicides when small.'}
+                    {!isGrassGroup && !isBroadleafGroup && 'Consider the life cycle when choosing your control method.'}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-sm text-foreground mb-2">Choose Management Method</h3>
+                  <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
+                    {MID_MANAGEMENT_METHODS.map(m => (
+                      <button key={m} onClick={() => setSelectedMethod(m)}
+                        className={`px-4 py-3 rounded-lg border text-left text-sm transition-all ${
+                          selectedMethod === m ? 'border-primary bg-primary/15 ring-2 ring-primary/30' : 'border-border bg-card hover:bg-secondary'
+                        }`}>{m}</button>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={submitManagement} disabled={!selectedMethod}
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Apply Management ✓
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // High school: method + timing
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <EarningsBar />

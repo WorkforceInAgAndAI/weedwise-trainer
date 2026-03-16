@@ -137,7 +137,7 @@ export default function LearningModule({ onClose }: Props) {
     { grade: 'high', icon: '🧪', color: 'border-grade-high' },
   ];
 
-  const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles' || selectedTopic === 'control-methods';
+  const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles';
 
   return (
     <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
@@ -678,13 +678,6 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
           label: 'Wait to Act',
           desc: 'Sometimes the best strategy is to wait and watch. Not every weed needs immediate action. Some weeds are not very competitive or may die on their own. Good scouts monitor the situation before spending money on control.',
           example: 'A few small weeds in a healthy, thick crop may not need treatment.',
-        },
-        {
-          key: 'fertilize',
-          icon: '🌱',
-          label: 'Fertilize',
-          desc: 'Making the crop stronger by adding nutrients to the soil. A healthy, fast-growing crop shades out weeds and outcompetes them for water and nutrients. This is an indirect way to fight weeds.',
-          example: 'Adding nitrogen fertilizer helps corn grow a thick canopy that blocks sunlight from reaching weed seedlings.',
         },
         {
           key: 'hand-weeding',
