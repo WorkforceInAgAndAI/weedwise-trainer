@@ -672,7 +672,7 @@ export const weeds: Weed[] = [
       "Can float or grow on shore",
     ],
     habitat: "Wetlands, rice fields, pond margins, ditches",
-    primaryHabitat: "Aquatic / Moist Habitats",
+    primaryHabitat: "Wet / Poorly Drained",
     actImmediately: false,
     actReason: "Limited threat in dry crops; problematic in rice and wetland management",
     management: "Water level management, POST herbicides, drainage",
