@@ -889,7 +889,7 @@ export const weeds: Weed[] = [
       "Fine delicate appearance overall",
     ],
     habitat: "Rangeland, pastures, roadsides, disturbed areas",
-    primaryHabitat: "Cool-Season / Winter Annual",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual; early season growth; late spring control difficult",
     management: "Fall POST herbicides, early spring control, reseeding, prescribed burning",
