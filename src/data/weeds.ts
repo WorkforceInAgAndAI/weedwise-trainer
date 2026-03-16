@@ -2007,7 +2007,7 @@ export const weeds: Weed[] = [
     emoji: "🌸",
     traits: ["Spiny leaves", "Creeping roots", "Small purple flowers", "Colonial growth"],
     habitat: "Pastures, roadsides, crop fields, disturbed areas",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Cool-Season / Early Spring",
     management: "Systemic herbicides at bud stage; repeated mowing to exhaust root reserves",
     controlTiming: "Bud to early flower stage for systemic translocation",
     actImmediately: true,
