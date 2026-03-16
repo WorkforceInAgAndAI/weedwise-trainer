@@ -444,6 +444,7 @@ export default function FarmMode({ onClose }: Props) {
   const [highFamily, setHighFamily] = useState<string | null>(null);
   const [highSortResults, setHighSortResults] = useState<HighSortResult[]>([]);
   const [highSortFeedback, setHighSortFeedback] = useState<HighSortResult | null>(null);
+  const highFamilyOptionsRef = useRef<string[]>([]);
 
   const [groups, setGroups] = useState<{ label: string; weedIds: string[] }[]>([]);
   const [invasiveReports, setInvasiveReports] = useState<InvasiveReport[]>([]);
