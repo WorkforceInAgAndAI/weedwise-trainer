@@ -405,6 +405,7 @@ export const weeds: Weed[] = [
       difference: "Jimsonweed has large trumpet flowers and spiny pods; Nightshade has small flowers and berries",
     },
     memoryHook: "Black nightshade = black berries + small white flowers + bushy compact form",
+    safetyNote: "⚠️ Contains toxic alkaloids in leaves and unripe berries; ingestion can cause gastrointestinal and neurological signs in people and livestock.",
   },
   {
     id: "horsenettle",
