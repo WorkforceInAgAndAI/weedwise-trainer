@@ -1447,7 +1447,7 @@ export const weeds: Weed[] = [
       "Seeds dispersed in head through winter",
     ],
     habitat: "Roadsides, field margins, disturbed areas, wet soils",
-    primaryHabitat: "Cool-Season / Biennial / Moist",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Biennial; weak competitor; responsive to herbicides if controlled in rosette",
     management: "POST herbicides fall or spring rosette, mowing before seed set",
