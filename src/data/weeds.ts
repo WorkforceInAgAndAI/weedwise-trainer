@@ -1754,6 +1754,7 @@ export const weeds: Weed[] = [
       difference: "Hemlock has purple-spotted stems; Wild Carrot has hairy stems without spots",
     },
     memoryHook: "Wild carrot = feathery leaves + flat-topped flowers + edible taproot",
+    safetyNote: "⚠️ Foliage can cause skin irritation in sensitive people; often confused with deadly look-alikes such as poison hemlock and water hemlock.",
   },
   {
     id: "Corn_speedwell",
