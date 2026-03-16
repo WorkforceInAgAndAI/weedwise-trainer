@@ -311,6 +311,7 @@ export const weeds: Weed[] = [
       difference: "Lettuce has different flower structure; Horseweed has wiry stems",
     },
     memoryHook: "Horseweed = wiry stem horses can browse, resistant populations common",
+    safetyNote: "⚠️ Can cause skin and respiratory irritation in sensitive people and may be mildly toxic to livestock if grazed heavily.",
   },
   {
     id: "Prickly_lettuce",
