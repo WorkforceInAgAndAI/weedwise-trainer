@@ -2287,7 +2287,7 @@ export const weeds: Weed[] = [
     emoji: "☠️",
     traits: ["Purple-spotted hollow stems", "Finely divided leaves", "White umbel flowers", "Musty odor"],
     habitat: "Roadsides, ditches, stream banks, waste areas",
-    primaryHabitat: "Wet / Poorly Drained",
+    primaryHabitat: "Dry / Disturbed",
     management: "Herbicide application to rosettes; mowing before seed set; WEAR GLOVES",
     controlTiming: "Rosette stage in first year; before flowering in second year",
     actImmediately: true,
