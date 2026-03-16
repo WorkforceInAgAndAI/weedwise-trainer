@@ -265,6 +265,40 @@ const MANAGEMENT_TIMING = [
   'Year-round monitoring',
 ];
 
+const ELEM_MANAGEMENT_METHODS = [
+  'Hand weeding',
+  'Ignore the weed',
+  'Apply general herbicides',
+  'Mulch over the weed',
+  'Water the weed',
+];
+
+function isElemMethodEffective(method: string): boolean {
+  return ['Hand weeding', 'Apply general herbicides', 'Mulch over the weed'].includes(method);
+}
+
+function getElemBestMethod(weedIds: string[]): { method: string; explanation: string } {
+  if (weedIds.length <= 2) return { method: 'Hand weeding', explanation: 'With only a few weeds, hand weeding is the most targeted and environmentally friendly approach.' };
+  return { method: 'Apply general herbicides', explanation: 'With many weeds present, applying herbicides is the most efficient way to control them across the field.' };
+}
+
+function imageStageToLifeStage(stage: string): string {
+  if (stage === 'seedling') return 'seedling';
+  if (stage === 'vegetative') return 'vegetative';
+  if (stage === 'flower') return 'reproductive';
+  return 'plant';
+}
+
+function lifeStageLabel(ls: string): string {
+  switch (ls) {
+    case 'seedling': return '🌱 Seedling';
+    case 'vegetative': return '🌿 Vegetative';
+    case 'reproductive': return '🌸 Reproductive';
+    case 'plant': return '🌳 Mature Plant';
+    default: return ls;
+  }
+}
+
 const SORT_CATEGORIES: { id: SortCategory; label: string; description: string; color: string }[] = [
   { id: 'monocot', label: '🌾 Monocots (Grasses)', description: 'Parallel veins, fibrous roots', color: 'border-primary/50 bg-primary/10' },
   { id: 'dicot', label: '🍀 Dicots (Broadleaves)', description: 'Branching veins, taproots', color: 'border-amber-600/50 bg-amber-600/10' },
