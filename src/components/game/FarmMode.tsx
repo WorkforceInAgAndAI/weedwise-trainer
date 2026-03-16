@@ -1820,10 +1820,8 @@ export default function FarmMode({ onClose }: Props) {
     }
 
     // High: 4-row radio sorting
-    const allFamilies = [...new Set(weeds.map(w => w.family))];
-    const correctFamily = currentW.family;
-    const distractorFamilies = shuffle(allFamilies.filter(f => f !== correctFamily)).slice(0, 2);
-    const familyOptions = shuffle([correctFamily, ...distractorFamilies]);
+    // familyOptions are memoized per-weed via highFamilyOptionsRef to prevent re-shuffle on every render
+    const familyOptions = highFamilyOptionsRef.current;
 
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
