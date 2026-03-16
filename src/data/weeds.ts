@@ -533,6 +533,7 @@ export const weeds: Weed[] = [
       difference: "Bindweed is perennial with smaller flowers; Morningglory is annual with large flowers",
     },
     memoryHook: "Morningglory = annual twining vine with large purple funnel flowers",
+    safetyNote: "⚠️ Seeds contain compounds that can cause digestive upset and, in large doses, neurological signs in livestock.",
   },
   {
     id: "Field_bindweed",
