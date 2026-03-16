@@ -269,7 +269,7 @@ export const weeds: Weed[] = [
       "Seedhead with numerous pappus bristles for wind dispersal",
     ],
     habitat: "Lawns, pastures, roadsides, disturbed areas",
-    primaryHabitat: "Cool-Season / Full Sun to Partial Shade",
+    primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Perennial with deep taproot; difficult to control but slow spreading",
     management: "POST herbicides (glyphosate, 2,4-D), hand pulling, repeated cutting",
