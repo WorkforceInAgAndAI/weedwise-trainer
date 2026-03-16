@@ -610,7 +610,7 @@ export const weeds: Weed[] = [
       "Covers large areas despite annual habit",
     ],
     habitat: "Row crops, disturbed areas, field margins",
-    primaryHabitat: "Cool-Season / Full Sun",
+    primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
     actReason: "Competes vigorously; difficult to control once vined; allelopathic; seeds persist 20+ years",
     management: "PRE residual herbicides, early POST, mechanical removal",
