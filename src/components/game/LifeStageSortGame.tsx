@@ -3,10 +3,9 @@ import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
 const LIFE_STAGES = [
-  { id: 'seedling', label: '🌱 Seedling', imageStage: 'seedling' },
-  { id: 'vegetative', label: '🌿 Vegetative', imageStage: 'vegetative' },
-  { id: 'reproductive', label: '🌸 Reproductive', imageStage: 'flower' },
-  { id: 'plant', label: '🌳 Mature Plant', imageStage: 'whole' },
+  { id: 'seedling', label: 'Seedling', imageStage: 'seedling' },
+  { id: 'vegetative', label: 'Vegetative', imageStage: 'vegetative' },
+  { id: 'reproductive', label: 'Reproductive', imageStage: 'flower' },
 ];
 
 interface Props {
