@@ -18,7 +18,7 @@ function pickRandom<T>(arr: T[], n: number): T[] {
 }
 
 // Phases that are batch mini-games (one question per pool, component picks weeds)
-const BATCH_PHASES = new Set(['e3', 'e4', 'm2', 'm3', 'm5', 'h2', 'h4', 'h5']);
+const BATCH_PHASES = new Set(['e3', 'e4', 'm2', 'm3', 'm4', 'm5', 'h2', 'h4', 'h5']);
 
 // How many correct answers at a tier before a species advances to next tier
 const TIER_ADVANCE_THRESHOLD = 2;
