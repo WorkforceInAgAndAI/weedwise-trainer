@@ -6,7 +6,6 @@ export const PHASES: Record<GradeLevel, PhaseConfig[]> = {
     { id: 'e2', name: 'Monocot or Dicot?', description: 'Classify plants by leaf type', xpRequired: 20, xpReward: 5, imageStage: 'whole', showName: false, showFamily: false },
     { id: 'e3', name: 'Card Flip Match', description: 'Memory game — match images to names', xpRequired: 50, xpReward: 4, imageStage: 'whole', showName: false, showFamily: false },
     { id: 'e4', name: 'Life Stage Sort', description: 'Sort weed images into their correct life stages', xpRequired: 80, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
-    { id: 'e5', name: 'Act Now or Wait?', description: 'Assess threat level and choose response', xpRequired: 120, xpReward: 6, imageStage: 'whole', showName: true, showFamily: false },
   ],
   middle: [
     { id: 'm1', name: 'Identify the Weed', description: 'Multiple choice from characteristics', xpRequired: 0, xpReward: 5, imageStage: 'vegetative', showName: false, showFamily: false },
