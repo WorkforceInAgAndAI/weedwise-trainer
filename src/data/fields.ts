@@ -62,11 +62,7 @@ export const fieldEnvironments: FieldEnvironment[] = [
 
 /** How many fields to show per grade */
 export function getFieldCount(grade: GradeLevel): number {
-  switch (grade) {
-    case 'elementary': return 2;
-    case 'middle': return 3;
-    case 'high': return 3;
-  }
+  return 1;
 }
 
 /** Scouting phases per grade */
