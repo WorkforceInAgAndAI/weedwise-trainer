@@ -136,21 +136,22 @@ function getSeasonStage(seasonIdx: number, totalSeasons: number): string {
 function generateDots(weedPool: Weed[], fieldId: string, imageStage: string, grade?: GradeLevel): WeedDot[] {
   const dots: WeedDot[] = [];
   let dotId = 0;
+  // Crop rows in the background image are roughly at these Y% bands
+  const cropRowBands = [
+    { yMin: 5, yMax: 18 },
+    { yMin: 22, yMax: 38 },
+    { yMin: 42, yMax: 58 },
+    { yMin: 62, yMax: 78 },
+    { yMin: 82, yMax: 95 },
+  ];
   weedPool.forEach(weed => {
     const isInvasive = weed.origin === 'Introduced' && weed.actImmediately;
     const occurrences = isInvasive ? 2 + Math.floor(Math.random() * 2) : 1 + Math.floor(Math.random() * 2);
-    const clustered = Math.random() > 0.4;
-    const baseX = 10 + Math.random() * 80;
-    const baseY = 10 + Math.random() * 80;
     for (let i = 0; i < occurrences; i++) {
-      let x: number, y: number;
-      if (clustered) {
-        x = Math.max(5, Math.min(95, baseX + (Math.random() - 0.5) * 12));
-        y = Math.max(5, Math.min(95, baseY + (Math.random() - 0.5) * 12));
-      } else {
-        x = 5 + Math.random() * 90;
-        y = 5 + Math.random() * 90;
-      }
+      // Place dots on crop rows where weeds would naturally appear
+      const band = cropRowBands[Math.floor(Math.random() * cropRowBands.length)];
+      const x = 5 + Math.random() * 90;
+      const y = band.yMin + Math.random() * (band.yMax - band.yMin);
       const imageVariant: 1 | 2 = Math.random() < 0.5 ? 1 : 2;
       let actualStage = imageStage === 'random'
         ? (['seedling', 'vegetative', 'flower', 'whole'])[Math.floor(Math.random() * 4)]
