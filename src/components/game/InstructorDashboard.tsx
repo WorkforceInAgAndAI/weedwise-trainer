@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { BADGES } from '@/data/badges';
+import { PHASES } from '@/data/phases';
+import { weeds, weedMap } from '@/data/weeds';
 import { useAuth } from '@/hooks/useAuth';
 import AuthModal from './AuthModal';
 import Glossary from './Glossary';
