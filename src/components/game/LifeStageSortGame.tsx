@@ -84,7 +84,6 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
             <button
               key={s.id}
               onClick={() => handleStageClick(s.id)}
-              disabled={!selected || checked}
               className={`p-3 rounded-xl border-2 text-center transition-all min-h-[90px] flex flex-col items-center gap-1
                 ${selected && !checked ? 'cursor-pointer hover:bg-muted/40 hover:border-primary/50' : 'cursor-default'}
                 ${checked ? 'border-border' : 'border-border bg-muted/20'}
@@ -109,12 +108,20 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
                       </div>
                       {item.name}
                       {!checked && (
-                        <button
-                          onClick={(e) => handleRemove(item.id, e)}
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => handleRemove(item.id, e as React.MouseEvent)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleRemove(item.id);
+                            }
+                          }}
                           className="text-muted-foreground ml-0.5 hover:text-destructive transition-colors cursor-pointer"
                         >
                           ✕
-                        </button>
+                        </span>
                       )}
                     </div>
                   );
