@@ -87,8 +87,7 @@ export default function LifecycleImageSort({ onComplete, onNext }: Props) {
           const catImgs = images.filter(img => placements[img.id] === cat.id);
           return (
             <button key={cat.id} onClick={() => handleCatClick(cat.id)}
-              disabled={checked || !selected}
-              className={`p-3 rounded-xl border-2 border-border text-left transition-all min-h-[100px] bg-secondary/30 ${selected ? 'hover:border-primary/50 cursor-pointer' : 'cursor-default'}`}>
+              className={`p-3 rounded-xl border-2 border-border text-left transition-all min-h-[100px] bg-secondary/30 ${selected && !checked ? 'hover:border-primary/50 cursor-pointer' : 'cursor-default'}`}>
               <div className="text-sm font-bold text-foreground mb-2">{cat.name}</div>
               <div className="grid grid-cols-3 gap-1">
                 {catImgs.map(img => (
