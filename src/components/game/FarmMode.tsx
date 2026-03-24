@@ -132,7 +132,7 @@ function getSeasonStage(seasonIdx: number, totalSeasons: number): string {
   return 'whole';
 }
 
-function generateDots(weedPool: Weed[], fieldId: string, imageStage: string): WeedDot[] {
+function generateDots(weedPool: Weed[], fieldId: string, imageStage: string, grade?: GradeLevel): WeedDot[] {
   const dots: WeedDot[] = [];
   let dotId = 0;
   weedPool.forEach(weed => {
@@ -151,9 +151,14 @@ function generateDots(weedPool: Weed[], fieldId: string, imageStage: string): We
         y = 5 + Math.random() * 90;
       }
       const imageVariant: 1 | 2 = Math.random() < 0.5 ? 1 : 2;
-      const actualStage = imageStage === 'random'
+      let actualStage = imageStage === 'random'
         ? (['seedling', 'vegetative', 'flower', 'whole'])[Math.floor(Math.random() * 4)]
         : imageStage;
+      // For 6-8 and 9-12, use ligule images for grasses instead of vegetative
+      const isGrass = weed.plantType === 'Monocot';
+      if (isGrass && grade && grade !== 'elementary' && actualStage === 'vegetative') {
+        actualStage = 'ligule';
+      }
       dots.push({ id: `${fieldId}-${dotId++}`, weedId: weed.id, x, y, found: false, imageVariant, imageStage: actualStage });
     }
   });
