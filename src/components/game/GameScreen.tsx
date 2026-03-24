@@ -76,12 +76,12 @@ export default function GameScreen(game: GameEngine) {
       case 'm2': return <HabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm5': return <ScientificNameFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'm6': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h2': return <HighSchoolLifeCycleSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h4': return <HighSchoolHabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h5': return <FamilyFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'e5': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'h7': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm4': return <LookAlikeChallenge key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'h6': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
     }
 
     return (
