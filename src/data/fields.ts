@@ -67,21 +67,7 @@ export function getFieldCount(grade: GradeLevel): number {
 
 /** Scouting phases per grade */
 export function getScoutingPhases(grade: GradeLevel): { id: string; name: string; imageStage: string }[] {
-  switch (grade) {
-    case 'elementary':
-      return [{ id: 'plant', name: 'Growing Season', imageStage: 'whole' }];
-    case 'middle':
-      return [
-        { id: 'plant', name: 'Early Season', imageStage: 'vegetative' },
-        { id: 'repro', name: 'Late Season', imageStage: 'flower' },
-      ];
-    case 'high':
-      return [
-        { id: 'seedling', name: 'Spring Scouting', imageStage: 'seedling' },
-        { id: 'veg', name: 'Vegetative Growth', imageStage: 'vegetative' },
-        { id: 'repro', name: 'Reproductive Stage', imageStage: 'flower' },
-      ];
-  }
+  return [{ id: 'plant', name: 'Growing Season', imageStage: grade === 'elementary' ? 'random' : 'whole' }];
 }
 
 export const fieldMap = Object.fromEntries(fieldEnvironments.map(f => [f.id, f]));
