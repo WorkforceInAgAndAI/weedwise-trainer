@@ -8,6 +8,7 @@ import WeedImage from './WeedImage';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import fieldBgImage from '@/assets/images/field-background.jpg';
 
 // ── Types ──────────────────────────────────────────────────
 interface WeedDot {
