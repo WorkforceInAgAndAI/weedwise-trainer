@@ -98,18 +98,24 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
                   return (
                     <div
                       key={item.id}
-                      onClick={(e) => { e.stopPropagation(); if (!checked) handleRemove(item.id); }}
-                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold cursor-pointer
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold
                         ${isCorrect ? 'bg-accent/20 text-accent border border-accent/30' : ''}
                         ${isWrong ? 'bg-destructive/20 text-destructive border border-destructive/30' : ''}
-                        ${!checked ? 'bg-primary/15 text-primary border border-primary/30 hover:bg-primary/25' : ''}
+                        ${!checked ? 'bg-primary/15 text-primary border border-primary/30' : ''}
                       `}
                     >
                       <div className="w-6 h-6 rounded overflow-hidden shrink-0">
                         <WeedImage weedId={item.weedId} stage={item.imageStage} className="w-full h-full" />
                       </div>
                       {item.name}
-                      {!checked && <span className="text-muted-foreground ml-0.5">✕</span>}
+                      {!checked && (
+                        <button
+                          onClick={(e) => handleRemove(item.id, e)}
+                          className="text-muted-foreground ml-0.5 hover:text-destructive transition-colors cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
                   );
                 })}
