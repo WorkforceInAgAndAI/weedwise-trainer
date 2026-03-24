@@ -8,7 +8,10 @@ import WeedImage from './WeedImage';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import fieldBgImage from '@/assets/images/field-background.jpg';
+import fieldBgImage1 from '@/assets/images/field-background.jpg';
+import fieldBgImage2 from '@/assets/images/field-background-2.jpg';
+const fieldBgImages = [fieldBgImage1, fieldBgImage2];
+const fieldBgImage = fieldBgImages[Math.floor(Math.random() * fieldBgImages.length)];
 
 // ── Types ──────────────────────────────────────────────────
 interface WeedDot {
