@@ -17,7 +17,7 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
   const items = useMemo(() => {
     const shuffled = [...weeds].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 8).map(w => {
-      const stageIdx = Math.floor(Math.random() * 4);
+      const stageIdx = Math.floor(Math.random() * LIFE_STAGES.length);
       const stage = LIFE_STAGES[stageIdx];
       return {
         id: `${w.id}-${stage.id}`,
