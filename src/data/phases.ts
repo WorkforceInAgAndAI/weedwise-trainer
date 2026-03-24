@@ -13,6 +13,7 @@ export const PHASES: Record<GradeLevel, PhaseConfig[]> = {
     { id: 'm3', name: 'Life Cycle Sort', description: 'Sort weeds by their life cycle type', xpRequired: 50, xpReward: 5, imageStage: 'whole', showName: true, showFamily: false },
     { id: 'm4', name: 'Look-Alike Challenge', description: 'Tell apart similar species from the same family', xpRequired: 80, xpReward: 6, imageStage: 'seedling', showName: false, showFamily: false },
     { id: 'm5', name: 'Scientific Name Match', description: 'Match common names to scientific names with card flip', xpRequired: 120, xpReward: 6, imageStage: 'whole', showName: true, showFamily: false },
+    { id: 'm6', name: 'Control Timing', description: 'Choose optimal timing and see population impact', xpRequired: 150, xpReward: 6, imageStage: 'flower', showName: true, showFamily: false },
   ],
   high: [
     { id: 'h1', name: 'Name the Weed', description: 'Multiple choice — identify by scientific name', xpRequired: 0, xpReward: 5, imageStage: 'seedling', showName: false, showFamily: false },
