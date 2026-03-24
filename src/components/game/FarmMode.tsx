@@ -543,7 +543,7 @@ export default function FarmMode({ onClose }: Props) {
       const start = i * perField;
       const fieldWeeds = weedSample.slice(start, Math.min(start + perField, weedSample.length));
       const cropId = env.suggestedCrops.length ? env.suggestedCrops[0] : undefined;
-      return { fieldId: env.id, dots: generateDots(fieldWeeds, env.id, stage), cropId };
+      return { fieldId: env.id, dots: generateDots(fieldWeeds, env.id, stage, g), cropId };
     });
     setFields(fieldStates);
   }, []);
