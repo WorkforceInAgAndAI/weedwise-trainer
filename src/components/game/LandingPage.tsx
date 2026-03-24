@@ -112,7 +112,7 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
         >
           <div className="text-3xl sm:text-4xl mb-2">🌾</div>
           <div className="font-display font-bold text-sm sm:text-base text-foreground">Play</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Manage your farm</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Land Steward</div>
         </button>
       </div>
 
