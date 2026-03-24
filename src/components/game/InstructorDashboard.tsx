@@ -754,6 +754,59 @@ export default function InstructorDashboard({ onClose }: Props) {
                     </div>
                   )}
 
+                  {/* Class-level Per-Phase Accuracy */}
+                  {classPhaseStats.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-foreground mb-3">Class Per-Phase Accuracy</h3>
+                      <div className="space-y-2">
+                        {classPhaseStats.map(p => {
+                          const pct = p.total > 0 ? (p.correct / p.total) * 100 : 0;
+                          return (
+                            <div key={p.id}>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-medium text-foreground">{p.name}</span>
+                                <span className={`text-xs font-bold ${pct >= 70 ? 'text-accent' : pct >= 40 ? 'text-foreground' : 'text-destructive'}`}>{pct.toFixed(0)}% ({p.correct}/{p.total})</span>
+                              </div>
+                              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div className={`h-full rounded-full ${pct >= 70 ? 'bg-accent' : pct >= 40 ? 'bg-primary' : 'bg-destructive'}`} style={{ width: `${pct}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Class-level Per-Weed Performance */}
+                  {classWeedStats.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-foreground mb-3">Class Per-Weed Performance (Top 15)</h3>
+                      <div className="overflow-x-auto rounded-lg border border-border max-h-64 overflow-y-auto">
+                        <table className="w-full text-xs">
+                          <thead className="sticky top-0 bg-muted">
+                            <tr>
+                              {['Weed', 'Shown', 'Correct', 'Wrong', 'Accuracy', 'Status'].map(h => (
+                                <th key={h} className="px-2 py-1.5 text-left text-muted-foreground font-medium">{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {classWeedStats.slice(0, 15).map(r => (
+                              <tr key={r.id} className={`border-t border-border ${r.status === 'Struggling' ? 'bg-destructive/10' : r.status === 'Mastered' ? 'bg-accent/10' : ''}`}>
+                                <td className="px-2 py-1.5 font-medium">{r.name}</td>
+                                <td className="px-2 py-1.5">{r.shown}</td>
+                                <td className="px-2 py-1.5 text-accent">{r.correct}</td>
+                                <td className="px-2 py-1.5 text-destructive">{r.wrong}</td>
+                                <td className="px-2 py-1.5">{r.acc >= 0 ? `${r.acc.toFixed(0)}%` : '—'}</td>
+                                <td className={`px-2 py-1.5 font-semibold ${r.status === 'Mastered' ? 'text-accent' : r.status === 'Struggling' ? 'text-destructive' : 'text-muted-foreground'}`}>{r.status}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
                   {students.length === 0 && (
                     <div className="text-center py-10 space-y-2">
                       <p className="text-muted-foreground">No students have joined yet.</p>
