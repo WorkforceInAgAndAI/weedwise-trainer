@@ -599,7 +599,7 @@ export default function FarmMode({ onClose }: Props) {
     
     // Collect unique found weeds for sorting
     const foundMap = new Map<string, string>();
-    fields.forEach(f => f.dots.filter(d => d.found && d.category).forEach(d => {
+    fields.forEach(f => f.dots.filter(d => d.found).forEach(d => {
       if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
     }));
     const unsorted: UnsortedWeed[] = [...foundMap.entries()].map(([weedId, dotId]) => ({ weedId, dotId }));
@@ -676,7 +676,7 @@ export default function FarmMode({ onClose }: Props) {
 
   const finishScouting = useCallback(() => {
     const foundMap = new Map<string, string>();
-    fields.forEach(f => f.dots.filter(d => d.found && d.category).forEach(d => {
+    fields.forEach(f => f.dots.filter(d => d.found).forEach(d => {
       if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
     }));
     const unsorted: UnsortedWeed[] = [...foundMap.entries()].map(([weedId, dotId]) => ({ weedId, dotId }));
@@ -1122,7 +1122,7 @@ export default function FarmMode({ onClose }: Props) {
           <button onClick={onClose} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground text-sm">← Back</button>
           <div className="text-center mb-8">
             <h1 className="font-display text-4xl font-extrabold text-primary mb-2">🌾 Farm Manager</h1>
-            <p className="text-muted-foreground">Scout fields, identify weeds, manage your farm, and turn a profit!</p>
+            <p className="text-muted-foreground">Scout the field, identify weeds, manage your farm, and turn a profit!</p>
           </div>
           {!grade ? (
             <div className="w-full space-y-4">
@@ -1134,7 +1134,7 @@ export default function FarmMode({ onClose }: Props) {
                     <span className="text-3xl">{g === 'elementary' ? '🌱' : g === 'middle' ? '🔬' : '🧪'}</span>
                     <div>
                       <div className="font-display font-bold text-foreground">{GRADE_NAMES[g]}</div>
-                      <div className="text-sm text-muted-foreground">Grades {GRADE_RANGES[g]} • {getFieldCount(g)} fields • {getScoutingPhases(g).length} scouting {getScoutingPhases(g).length === 1 ? 'phase' : 'phases'}</div>
+                      <div className="text-sm text-muted-foreground">Grades {GRADE_RANGES[g]} • {getFieldCount(g)} {getFieldCount(g) === 1 ? 'field' : 'fields'} • {getScoutingPhases(g).length} scouting {getScoutingPhases(g).length === 1 ? 'phase' : 'phases'}</div>
                     </div>
                   </button>
                 ))}
@@ -1192,8 +1192,8 @@ export default function FarmMode({ onClose }: Props) {
 
           <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6 text-center">
             <p className="text-sm text-foreground">
-              <span className="font-bold text-primary">🎯 Goal:</span> Scout fields, identify & sort weeds, apply management, and earn enough to cover ${TOTAL_EXPENSES.toLocaleString()} in annual expenses.
-              {hasMultipleSeasons && <span className="block mt-1 text-xs text-muted-foreground">You'll scout all fields each season, then sort and manage weeds before the next season begins.</span>}
+              <span className="font-bold text-primary">🎯 Goal:</span> Scout the field, identify & sort weeds, apply management, and earn enough to cover ${TOTAL_EXPENSES.toLocaleString()} in annual expenses.
+              {hasMultipleSeasons && <span className="block mt-1 text-xs text-muted-foreground">You'll scout the field each season, then sort and manage weeds before the next season begins.</span>}
               {hasTimer && <span className="block mt-1 text-xs text-destructive font-semibold">⏱️ 2-minute time limit per field!</span>}
             </p>
           </div>
@@ -2641,7 +2641,7 @@ export default function FarmMode({ onClose }: Props) {
         const emoji = profitable ? '🌟' : '💪';
         return (
           <div className="space-y-2 text-sm">
-            <p>{emoji} You found <span className="font-bold text-primary">{scoutPct}%</span> of the weeds in your fields!</p>
+            <p>{emoji} You found <span className="font-bold text-primary">{scoutPct}%</span> of the weeds in your field!</p>
             <p>You correctly identified <span className="font-bold text-accent">{correctDots}</span> weeds.</p>
             <p>You sorted <span className="font-bold text-primary">{unsortedWeeds.length}</span> species into groups.</p>
             <p><span className="font-bold">{mgmtBestCount}</span> best solutions and <span className="font-bold">{mgmtEffective - mgmtBestCount}</span> effective solutions chosen.</p>

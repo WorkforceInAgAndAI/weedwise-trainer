@@ -60,9 +60,8 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
         {/* Native zone */}
         <button
           onClick={() => handleZoneDrop('Native')}
-          disabled={checked || !selected}
           className={`p-3 rounded-xl border-2 text-left transition-all min-h-[140px] bg-green-900/15 border-green-600/50 ${
-            selected ? 'cursor-pointer ring-1 ring-green-500/40 hover:bg-green-900/25' : 'cursor-default'
+            selected && !checked ? 'cursor-pointer ring-1 ring-green-500/40 hover:bg-green-900/25' : 'cursor-default'
           }`}
         >
           <div className="flex items-center gap-2 mb-1">
@@ -92,9 +91,8 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
         {/* Introduced zone */}
         <button
           onClick={() => handleZoneDrop('Introduced')}
-          disabled={checked || !selected}
           className={`p-3 rounded-xl border-2 text-left transition-all min-h-[140px] bg-amber-900/15 border-amber-600/50 ${
-            selected ? 'cursor-pointer ring-1 ring-amber-500/40 hover:bg-amber-900/25' : 'cursor-default'
+            selected && !checked ? 'cursor-pointer ring-1 ring-amber-500/40 hover:bg-amber-900/25' : 'cursor-default'
           }`}
         >
           <div className="flex items-center gap-2 mb-1">

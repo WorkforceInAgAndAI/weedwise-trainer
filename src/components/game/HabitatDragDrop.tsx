@@ -86,7 +86,6 @@ export default function HabitatDragDrop({ onComplete, onNext }: Props) {
             <button
               key={h.id}
               onClick={() => handleZoneClick(h.id)}
-              disabled={!selected || checked}
               className={`p-3 rounded-xl border-2 text-center transition-all min-h-[90px] flex flex-col items-center gap-1
                 ${selected && !checked ? 'cursor-pointer hover:bg-muted/40 hover:border-primary/50' : 'cursor-default'}
                 ${checked ? 'border-border' : 'border-border bg-muted/20'}
