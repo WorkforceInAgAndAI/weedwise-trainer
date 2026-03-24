@@ -90,8 +90,7 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
                 ${checked ? 'border-border' : 'border-border bg-muted/20'}
               `}
             >
-              <span className="text-2xl">{s.label.split(' ')[0]}</span>
-              <span className="text-xs font-bold text-foreground">{s.label.split(' ').slice(1).join(' ')}</span>
+              <span className="text-xs font-bold text-foreground">{s.label}</span>
               <div className="flex flex-wrap gap-1 mt-1 justify-center">
                 {stageItems.map(item => {
                   const isCorrect = checked && item.correctStage === s.id;
