@@ -85,8 +85,7 @@ export default function HighSchoolLifeCycleSort({ onComplete, onNext }: Props) {
           const catWeeds = items.filter(i => placements[i.weedId] === cat.id);
           return (
             <button key={cat.id} onClick={() => handleCatClick(cat.id)}
-              disabled={checked || !selected}
-              className={`p-3 rounded-xl border-2 border-border text-left transition-all min-h-[100px] bg-secondary/30 ${selected ? 'hover:border-primary/50 cursor-pointer' : 'cursor-default'}`}>
+              className={`p-3 rounded-xl border-2 border-border text-left transition-all min-h-[100px] bg-secondary/30 ${selected && !checked ? 'hover:border-primary/50 cursor-pointer' : 'cursor-default'}`}>
               <div className="flex items-center gap-1 mb-1">
                 <span>{cat.icon}</span>
                 <span className="text-xs font-bold text-foreground">{cat.label}</span>
