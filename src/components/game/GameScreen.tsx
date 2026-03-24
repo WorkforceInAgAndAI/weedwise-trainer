@@ -76,12 +76,12 @@ export default function GameScreen(game: GameEngine) {
       case 'm2': return <HabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm3': return <LifeCycleDragDrop key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm5': return <ScientificNameFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'm6': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h2': return <HighSchoolLifeCycleSort key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h4': return <HighSchoolHabitatConnect key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'h5': return <FamilyFlipMatch key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'e5': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
+      case 'h7': return <ActNowScenario key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
       case 'm4': return <LookAlikeChallenge key={key} onComplete={onMinigameComplete} onNext={nextQuestion} />;
-      case 'h6': return <ControlTimingGame key={key} weed={weed} onComplete={onMinigameComplete} onNext={nextQuestion} />;
     }
 
     return (
@@ -235,10 +235,10 @@ export default function GameScreen(game: GameEngine) {
               )}
 
               {!feedback.correct && <p className="text-sm text-foreground"><span className="text-muted-foreground">Correct answer:</span> <span className="font-semibold text-accent">{feedback.correctAnswer}</span></p>}
-              {(current.phaseId === 'e2' || current.phaseId === 'h3') && (
+              {current.phaseId === 'e2' && (
                 <div className="text-sm text-foreground bg-muted/50 rounded-lg p-3 space-y-1">
-                  <p><span className="font-semibold text-primary">🌾 Monocot:</span> One seed leaf, parallel veins, fibrous roots.</p>
-                  <p><span className="font-semibold text-primary">🍀 Dicot:</span> Two seed leaves, branching veins, taproot.</p>
+                  <p><span className="font-semibold text-primary">Monocot:</span> One seed leaf, parallel veins, fibrous roots.</p>
+                  <p><span className="font-semibold text-primary">Dicot:</span> Two seed leaves, branching veins, taproot.</p>
                   <p className="text-muted-foreground mt-1"><strong>{feedback.weed.scientificName}</strong> ({feedback.weed.commonName}) is a <strong>{feedback.weed.plantType}</strong> ({feedback.weed.family}).</p>
                 </div>
               )}

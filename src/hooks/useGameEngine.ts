@@ -18,7 +18,7 @@ function pickRandom<T>(arr: T[], n: number): T[] {
 }
 
 // Phases that are batch mini-games (one question per pool, component picks weeds)
-const BATCH_PHASES = new Set(['e3', 'e4', 'm2', 'm3', 'm5', 'h2', 'h4', 'h5']);
+const BATCH_PHASES = new Set(['e3', 'e4', 'm2', 'm3', 'm4', 'm5', 'h2', 'h4', 'h5']);
 
 // How many correct answers at a tier before a species advances to next tier
 const TIER_ADVANCE_THRESHOLD = 2;
@@ -32,7 +32,7 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
   
   // For 6-8 and 9-12, use ligule images for grasses instead of vegetative
   const isGrass = weed.plantType === 'Monocot';
-  const adjustedImageStage = (phase.id === 'm1' || phase.id === 'h1' || phase.id === 'h3') && isGrass
+  const adjustedImageStage = (phase.id === 'm1' || phase.id === 'h1') && isGrass
     ? 'ligule' : phase.imageStage;
   
   const base = {
@@ -51,11 +51,11 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
       const opts = shuffle([weed.scientificName, ...pickRandom(others, 3).map(w => w.scientificName)]);
       return { ...base, type: 'mcq', text: 'Identify this weed by its scientific name based on the traits and image.', options: opts, correct: weed.scientificName };
     }
-    case 'e2': case 'h3': {
+    case 'e2': {
       return { ...base, type: 'binary', text: `Look at this plant. Is it a Monocot or a Dicot?`, options: ['Monocot', 'Dicot'], correct: weed.plantType === 'Monocot' ? 'Monocot' : 'Dicot' };
     }
     // Per-weed interactive phases
-    case 'e5': case 'm4': case 'h6': {
+    case 'm6': case 'h7': {
       return { ...base, type: 'minigame', text: phase.name, options: [], correct: '' };
     }
     default:
