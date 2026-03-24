@@ -245,7 +245,7 @@ export default function Glossary({ onClose }: Props) {
               </div>
               <div className="text-xs text-muted-foreground">
                 <p>{w.family} • {w.primaryHabitat}</p>
-                <p className="text-primary mt-0.5">💡 {w.memoryHook}</p>
+                <p className="text-primary mt-0.5">{w.memoryHook}</p>
               </div>
             </button>
           ))}

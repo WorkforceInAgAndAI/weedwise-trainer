@@ -62,6 +62,7 @@ const Index = () => {
       streak: game.streak,
       phasesCompleted: game.unlockedPhases.length,
       weedStats: game.weedStats,
+      phaseStats: game.phaseStats,
     });
   }, [game.totalCorrect, game.totalWrong, game.xp, game.streak]);
 

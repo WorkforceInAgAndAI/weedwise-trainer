@@ -29,9 +29,15 @@ function getPhaseIndex(grade: GradeLevel, phaseId: string): number {
 
 function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Question {
   const others = allWeeds.filter(w => w.id !== weed.id);
+  
+  // For 6-8 and 9-12, use ligule images for grasses instead of vegetative
+  const isGrass = weed.plantType === 'Monocot';
+  const adjustedImageStage = (phase.id === 'm1' || phase.id === 'h1' || phase.id === 'h3') && isGrass
+    ? 'ligule' : phase.imageStage;
+  
   const base = {
     weedId: weed.id, phaseId: phase.id, phaseName: phase.name,
-    xpReward: phase.xpReward, imageStage: phase.imageStage,
+    xpReward: phase.xpReward, imageStage: adjustedImageStage,
     showName: phase.showName, showFamily: phase.showFamily,
   };
 

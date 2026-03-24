@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { BADGES } from '@/data/badges';
+import { PHASES } from '@/data/phases';
+import { weeds, weedMap } from '@/data/weeds';
 import { useAuth } from '@/hooks/useAuth';
 import AuthModal from './AuthModal';
 import Glossary from './Glossary';
@@ -135,15 +137,52 @@ function CreateClassModal({ instructorId, instructorName, onCreated, onClose }: 
 }
 
 /* ─── Student Detail Modal ────────────────────────────────── */
+/* ─── Helper: extract per-weed and per-phase stats from session_data ── */
+function extractSessionStats(sessions: SessionRow[]) {
+  const weedAgg: Record<string, { shown: number; correct: number; wrong: number; totalTimeMs: number; mastered: boolean }> = {};
+  const phaseAgg: Record<string, { correct: number; wrong: number }> = {};
+
+  for (const sess of sessions) {
+    const data = sess.session_data as any;
+    if (!data) continue;
+    const ws = data.weedStats as Record<string, any> | undefined;
+    const ps = data.phaseStats as Record<string, any> | undefined;
+    if (ws) {
+      for (const [wid, stat] of Object.entries(ws)) {
+        const s = stat as any;
+        if (!weedAgg[wid]) weedAgg[wid] = { shown: 0, correct: 0, wrong: 0, totalTimeMs: 0, mastered: false };
+        weedAgg[wid].shown += s.timesShown || 0;
+        weedAgg[wid].correct += s.timesCorrect || 0;
+        weedAgg[wid].wrong += s.timesWrong || 0;
+        weedAgg[wid].totalTimeMs += s.totalTimeMs || 0;
+        if (s.mastered) weedAgg[wid].mastered = true;
+      }
+    }
+    if (ps) {
+      for (const [pid, stat] of Object.entries(ps)) {
+        const s = stat as any;
+        if (!phaseAgg[pid]) phaseAgg[pid] = { correct: 0, wrong: 0 };
+        phaseAgg[pid].correct += s.correct || 0;
+        phaseAgg[pid].wrong += s.wrong || 0;
+      }
+    }
+  }
+  return { weedAgg, phaseAgg };
+}
+
+/* ─── Student Detail Modal ────────────────────────────────── */
 function StudentDetailModal({ student, sessions, badges, onClose }: {
   student: { id: string; nickname: string; totalXp: number; totalCorrect: number; totalWrong: number; bestStreak: number; speciesMastered: number; accuracy: string; badgeCount: number; sessions: number; lastPlayed: string | null; };
   sessions: SessionRow[];
   badges: BadgeRow[];
   onClose: () => void;
 }) {
+  const [detailTab, setDetailTab] = useState<'overview' | 'weeds' | 'phases'>('overview');
   const earnedBadges = badges.filter(b => b.student_id === student.id)
     .map(b => BADGES.find(badge => badge.id === b.badge_id))
     .filter(Boolean);
+
+  const { weedAgg, phaseAgg } = useMemo(() => extractSessionStats(sessions), [sessions]);
 
   // Per-grade breakdown
   const gradeBreakdown = useMemo(() => {
@@ -158,19 +197,49 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
     return Object.entries(map).map(([grade, d]) => ({ grade, ...d }));
   }, [sessions]);
 
-  // Phases completed across all sessions
   const totalPhases = sessions.reduce((sum, s) => sum + s.phases_completed, 0);
-
-  // Estimate time spent: ~30s per question
   const totalQuestions = student.totalCorrect + student.totalWrong;
   const estimatedMinutes = Math.round((totalQuestions * 30) / 60);
 
+  // Weed rows for table
+  const weedRows = useMemo(() => {
+    return weeds.map(w => {
+      const stat = weedAgg[w.id];
+      const shown = stat?.shown ?? 0;
+      const correct = stat?.correct ?? 0;
+      const wrong = stat?.wrong ?? 0;
+      const acc = shown > 0 ? (correct / shown) * 100 : -1;
+      const mastered = stat?.mastered ?? false;
+      const status = mastered ? 'Mastered' : (shown >= 3 && acc < 50) ? 'Struggling' : shown > 0 ? 'In Progress' : 'Not Seen';
+      return { id: w.id, name: w.commonName, shown, correct, wrong, acc, mastered, status };
+    }).filter(r => r.shown > 0).sort((a, b) => b.shown - a.shown);
+  }, [weedAgg]);
+
+  const masteredWeeds = weedRows.filter(r => r.mastered);
+  const strugglingWeeds = weedRows.filter(r => r.status === 'Struggling');
+
+  // Phase rows
+  const phaseRows = useMemo(() => {
+    const allPhases = [...PHASES.elementary, ...PHASES.middle, ...PHASES.high];
+    const seen = new Set<string>();
+    return allPhases.filter(p => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return !!phaseAgg[p.id];
+    }).map(p => {
+      const stat = phaseAgg[p.id];
+      const total = stat.correct + stat.wrong;
+      const acc = total > 0 ? (stat.correct / total) * 100 : 0;
+      return { id: p.id, name: p.name, correct: stat.correct, wrong: stat.wrong, total, acc };
+    });
+  }, [phaseAgg]);
+
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-card border border-border rounded-2xl shadow-xl max-w-2xl w-full p-6 space-y-5 animate-scale-in my-4">
+      <div className="bg-card border border-border rounded-2xl shadow-xl max-w-3xl w-full p-6 space-y-5 animate-scale-in my-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-display font-bold text-foreground">👤 {student.nickname}</h2>
+            <h2 className="text-xl font-display font-bold text-foreground">{student.nickname}</h2>
             <p className="text-xs text-muted-foreground">
               Last active: {student.lastPlayed ? new Date(student.lastPlayed).toLocaleDateString() : 'Never'}
             </p>
@@ -178,110 +247,182 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">✕</button>
         </div>
 
-        {/* Key Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: 'Total XP', value: student.totalXp, icon: '⚡', color: 'text-primary' },
-            { label: 'Accuracy', value: `${student.accuracy}%`, icon: '🎯', color: 'text-accent' },
-            { label: 'Best Streak', value: `${student.bestStreak} 🔥`, icon: '', color: 'text-foreground' },
-            { label: 'Time Spent', value: `${estimatedMinutes} min`, icon: '⏱️', color: 'text-foreground' },
-          ].map(s => (
-            <div key={s.label} className="bg-muted rounded-lg p-3 text-center">
-              <div className={`text-lg font-display font-bold ${s.color}`}>{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
-            </div>
+        {/* Sub-tabs */}
+        <div className="flex gap-1 bg-muted rounded-lg p-1">
+          {(['overview', 'weeds', 'phases'] as const).map(t => (
+            <button key={t} onClick={() => setDetailTab(t)}
+              className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${detailTab === t ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}>
+              {t === 'weeds' ? 'Per-Weed' : t === 'phases' ? 'Per-Phase' : 'Overview'}
+            </button>
           ))}
         </div>
 
-        {/* Progress Bars */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">📚 Learning Progress</h3>
-          {[
-            { label: 'Species Mastered', value: student.speciesMastered, max: 25 },
-            { label: 'Quiz Levels Completed', value: totalPhases, max: sessions.length * 4 || 4 },
-            { label: 'Questions Answered', value: totalQuestions, max: Math.max(totalQuestions, 100) },
-            { label: 'Game Sessions', value: student.sessions, max: Math.max(student.sessions, 10) },
-          ].map(item => (
-            <div key={item.label}>
-              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                <span>{item.label}</span>
-                <span className="font-medium text-foreground">{item.value} / {item.max}</span>
-              </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Right/Wrong breakdown chart */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-2">📊 Questions by Grade Level</h3>
-          {gradeBreakdown.length > 0 ? (
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={gradeBreakdown} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
-                <XAxis dataKey="grade" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="correct" name="Correct" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="wrong" name="Wrong" fill="hsl(var(--destructive))" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-4">No grade-level data yet</p>
-          )}
-        </div>
-
-        {/* Badges */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-2">🏅 Badges Earned ({earnedBadges.length})</h3>
-          {earnedBadges.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {earnedBadges.map(badge => badge && (
-                <div key={badge.id} title={badge.description}
-                  className="flex items-center gap-1.5 bg-primary/10 border border-primary/30 rounded-full px-3 py-1 text-xs font-medium text-primary">
-                  <span>{badge.icon}</span><span>{badge.name}</span>
+        {detailTab === 'overview' && (
+          <div className="space-y-4">
+            {/* Key Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: 'Total XP', value: student.totalXp, color: 'text-primary' },
+                { label: 'Accuracy', value: `${student.accuracy}%`, color: 'text-accent' },
+                { label: 'Best Streak', value: student.bestStreak, color: 'text-foreground' },
+                { label: 'Time Spent', value: `${estimatedMinutes} min`, color: 'text-foreground' },
+              ].map(s => (
+                <div key={s.label} className="bg-muted rounded-lg p-3 text-center">
+                  <div className={`text-lg font-display font-bold ${s.color}`}>{s.value}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No badges earned yet</p>
-          )}
-        </div>
 
-        {/* Session Log */}
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-2">🗓️ Session History ({sessions.length})</h3>
-          <div className="overflow-x-auto rounded-lg border border-border max-h-44 overflow-y-auto">
-            <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-muted">
-                <tr>
-                  {['Date', 'Grade', 'XP', 'Correct', 'Wrong', 'Mastered', 'Phases'].map(h => (
-                    <th key={h} className="px-2 py-1.5 text-left text-muted-foreground font-medium">{h}</th>
+            {/* Species Mastered vs Struggling */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+                <h4 className="text-sm font-semibold text-accent mb-1">Excels At ({masteredWeeds.length})</h4>
+                {masteredWeeds.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {masteredWeeds.map(w => (
+                      <span key={w.id} className="text-[10px] px-1.5 py-0.5 rounded bg-accent/20 text-accent">{w.name}</span>
+                    ))}
+                  </div>
+                ) : <p className="text-xs text-muted-foreground">No species mastered yet</p>}
+              </div>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
+                <h4 className="text-sm font-semibold text-destructive mb-1">Struggling With ({strugglingWeeds.length})</h4>
+                {strugglingWeeds.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {strugglingWeeds.map(w => (
+                      <span key={w.id} className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/20 text-destructive">{w.name}</span>
+                    ))}
+                  </div>
+                ) : <p className="text-xs text-muted-foreground">No struggling species</p>}
+              </div>
+            </div>
+
+            {/* Grade breakdown chart */}
+            {gradeBreakdown.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2">Questions by Grade Level</h3>
+                <ResponsiveContainer width="100%" height={140}>
+                  <BarChart data={gradeBreakdown} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
+                    <XAxis dataKey="grade" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="correct" name="Correct" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="wrong" name="Wrong" fill="hsl(var(--destructive))" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Badges */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground mb-2">Badges Earned ({earnedBadges.length})</h3>
+              {earnedBadges.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {earnedBadges.map(badge => badge && (
+                    <div key={badge.id} title={badge.description}
+                      className="flex items-center gap-1.5 bg-primary/10 border border-primary/30 rounded-full px-3 py-1 text-xs font-medium text-primary">
+                      <span>{badge.icon}</span><span>{badge.name}</span>
+                    </div>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sessions.length === 0 && (
-                  <tr><td colSpan={7} className="px-2 py-4 text-center text-muted-foreground">No sessions yet</td></tr>
-                )}
-                {[...sessions].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).map(s => (
-                  <tr key={s.id} className="border-t border-border hover:bg-muted/50">
-                    <td className="px-2 py-1.5">{new Date(s.updated_at).toLocaleDateString()}</td>
-                    <td className="px-2 py-1.5 capitalize">{s.grade_level}</td>
-                    <td className="px-2 py-1.5 text-primary font-semibold">{s.total_xp}</td>
-                    <td className="px-2 py-1.5 text-accent">{s.total_correct}</td>
-                    <td className="px-2 py-1.5 text-destructive">{s.total_wrong}</td>
-                    <td className="px-2 py-1.5">{s.species_mastered}</td>
-                    <td className="px-2 py-1.5">{s.phases_completed}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </div>
+              ) : <p className="text-sm text-muted-foreground">No badges earned yet</p>}
+            </div>
+
+            {/* Session Log */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground mb-2">Session History ({sessions.length})</h3>
+              <div className="overflow-x-auto rounded-lg border border-border max-h-44 overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-muted">
+                    <tr>
+                      {['Date', 'Grade', 'XP', 'Correct', 'Wrong', 'Mastered', 'Phases'].map(h => (
+                        <th key={h} className="px-2 py-1.5 text-left text-muted-foreground font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sessions.length === 0 && (
+                      <tr><td colSpan={7} className="px-2 py-4 text-center text-muted-foreground">No sessions yet</td></tr>
+                    )}
+                    {[...sessions].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).map(s => (
+                      <tr key={s.id} className="border-t border-border hover:bg-muted/50">
+                        <td className="px-2 py-1.5">{new Date(s.updated_at).toLocaleDateString()}</td>
+                        <td className="px-2 py-1.5 capitalize">{s.grade_level}</td>
+                        <td className="px-2 py-1.5 text-primary font-semibold">{s.total_xp}</td>
+                        <td className="px-2 py-1.5 text-accent">{s.total_correct}</td>
+                        <td className="px-2 py-1.5 text-destructive">{s.total_wrong}</td>
+                        <td className="px-2 py-1.5">{s.species_mastered}</td>
+                        <td className="px-2 py-1.5">{s.phases_completed}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Per-Weed Tab */}
+        {detailTab === 'weeds' && (
+          <div className="space-y-3">
+            {weedRows.length === 0 ? (
+              <p className="text-center text-muted-foreground py-6">No per-weed data available yet. Data appears after the student answers questions.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-border max-h-[60vh] overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-muted">
+                    <tr>
+                      {['Weed', 'Shown', 'Correct', 'Wrong', 'Accuracy', 'Status'].map(h => (
+                        <th key={h} className="px-3 py-2 text-left text-muted-foreground font-medium text-xs">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {weedRows.map(r => (
+                      <tr key={r.id} className={`border-t border-border ${r.status === 'Struggling' ? 'bg-destructive/10' : r.status === 'Mastered' ? 'bg-accent/10' : ''}`}>
+                        <td className="px-3 py-2 font-medium text-foreground">{r.name}</td>
+                        <td className="px-3 py-2">{r.shown}</td>
+                        <td className="px-3 py-2 text-accent">{r.correct}</td>
+                        <td className="px-3 py-2 text-destructive">{r.wrong}</td>
+                        <td className="px-3 py-2">{r.acc >= 0 ? `${r.acc.toFixed(0)}%` : '—'}</td>
+                        <td className={`px-3 py-2 font-semibold text-xs ${r.status === 'Mastered' ? 'text-accent' : r.status === 'Struggling' ? 'text-destructive' : 'text-muted-foreground'}`}>{r.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Per-Phase Tab */}
+        {detailTab === 'phases' && (
+          <div className="space-y-3">
+            {phaseRows.length === 0 ? (
+              <p className="text-center text-muted-foreground py-6">No per-phase data available yet. Data appears after the student answers questions.</p>
+            ) : (
+              <div className="space-y-2">
+                {phaseRows.map(p => {
+                  const pct = p.total > 0 ? (p.correct / p.total) * 100 : 0;
+                  return (
+                    <div key={p.id} className="bg-muted/30 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-foreground">{p.name}</span>
+                        <span className={`text-xs font-bold ${pct >= 70 ? 'text-accent' : pct >= 40 ? 'text-foreground' : 'text-destructive'}`}>{pct.toFixed(0)}%</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-accent' : pct >= 40 ? 'bg-primary' : 'bg-destructive'}`} style={{ width: `${pct}%` }} />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground mt-1">{p.correct} correct, {p.wrong} wrong ({p.total} total)</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -382,6 +523,37 @@ export default function InstructorDashboard({ onClose }: Props) {
       XP: s.totalXp,
       Correct: s.totalCorrect,
     })), [studentStats]);
+
+  /* Class-level per-weed and per-phase aggregation */
+  const classWeedStats = useMemo(() => {
+    const { weedAgg } = extractSessionStats(sessions);
+    return weeds.map(w => {
+      const stat = weedAgg[w.id];
+      const shown = stat?.shown ?? 0;
+      const correct = stat?.correct ?? 0;
+      const wrong = stat?.wrong ?? 0;
+      const acc = shown > 0 ? (correct / shown) * 100 : -1;
+      const mastered = stat?.mastered ?? false;
+      const status = mastered ? 'Mastered' : (shown >= 3 && acc < 50) ? 'Struggling' : shown > 0 ? 'In Progress' : 'Not Seen';
+      return { id: w.id, name: w.commonName, shown, correct, wrong, acc, mastered, status };
+    }).filter(r => r.shown > 0).sort((a, b) => b.shown - a.shown);
+  }, [sessions]);
+
+  const classPhaseStats = useMemo(() => {
+    const { phaseAgg } = extractSessionStats(sessions);
+    const allPhases = [...PHASES.elementary, ...PHASES.middle, ...PHASES.high];
+    const seen = new Set<string>();
+    return allPhases.filter(p => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return !!phaseAgg[p.id];
+    }).map(p => {
+      const stat = phaseAgg[p.id];
+      const total = stat.correct + stat.wrong;
+      const acc = total > 0 ? (stat.correct / total) * 100 : 0;
+      return { id: p.id, name: p.name, correct: stat.correct, wrong: stat.wrong, total, acc };
+    });
+  }, [sessions]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'overview', label: '📊 Overview' },
@@ -579,6 +751,59 @@ export default function InstructorDashboard({ onClose }: Props) {
                           <Bar dataKey="Correct" fill="hsl(var(--accent))" radius={[3, 3, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {/* Class-level Per-Phase Accuracy */}
+                  {classPhaseStats.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-foreground mb-3">Class Per-Phase Accuracy</h3>
+                      <div className="space-y-2">
+                        {classPhaseStats.map(p => {
+                          const pct = p.total > 0 ? (p.correct / p.total) * 100 : 0;
+                          return (
+                            <div key={p.id}>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-medium text-foreground">{p.name}</span>
+                                <span className={`text-xs font-bold ${pct >= 70 ? 'text-accent' : pct >= 40 ? 'text-foreground' : 'text-destructive'}`}>{pct.toFixed(0)}% ({p.correct}/{p.total})</span>
+                              </div>
+                              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div className={`h-full rounded-full ${pct >= 70 ? 'bg-accent' : pct >= 40 ? 'bg-primary' : 'bg-destructive'}`} style={{ width: `${pct}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Class-level Per-Weed Performance */}
+                  {classWeedStats.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-4">
+                      <h3 className="text-sm font-semibold text-foreground mb-3">Class Per-Weed Performance (Top 15)</h3>
+                      <div className="overflow-x-auto rounded-lg border border-border max-h-64 overflow-y-auto">
+                        <table className="w-full text-xs">
+                          <thead className="sticky top-0 bg-muted">
+                            <tr>
+                              {['Weed', 'Shown', 'Correct', 'Wrong', 'Accuracy', 'Status'].map(h => (
+                                <th key={h} className="px-2 py-1.5 text-left text-muted-foreground font-medium">{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {classWeedStats.slice(0, 15).map(r => (
+                              <tr key={r.id} className={`border-t border-border ${r.status === 'Struggling' ? 'bg-destructive/10' : r.status === 'Mastered' ? 'bg-accent/10' : ''}`}>
+                                <td className="px-2 py-1.5 font-medium">{r.name}</td>
+                                <td className="px-2 py-1.5">{r.shown}</td>
+                                <td className="px-2 py-1.5 text-accent">{r.correct}</td>
+                                <td className="px-2 py-1.5 text-destructive">{r.wrong}</td>
+                                <td className="px-2 py-1.5">{r.acc >= 0 ? `${r.acc.toFixed(0)}%` : '—'}</td>
+                                <td className={`px-2 py-1.5 font-semibold ${r.status === 'Mastered' ? 'text-accent' : r.status === 'Struggling' ? 'text-destructive' : 'text-muted-foreground'}`}>{r.status}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
 

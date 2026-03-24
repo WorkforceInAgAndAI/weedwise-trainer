@@ -3,10 +3,9 @@ import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
 const LIFE_STAGES = [
-  { id: 'seedling', label: '🌱 Seedling', imageStage: 'seedling' },
-  { id: 'vegetative', label: '🌿 Vegetative', imageStage: 'vegetative' },
-  { id: 'reproductive', label: '🌸 Reproductive', imageStage: 'flower' },
-  { id: 'plant', label: '🌳 Mature Plant', imageStage: 'whole' },
+  { id: 'seedling', label: 'Seedling', imageStage: 'seedling' },
+  { id: 'vegetative', label: 'Vegetative', imageStage: 'vegetative' },
+  { id: 'reproductive', label: 'Reproductive', imageStage: 'flower' },
 ];
 
 interface Props {
@@ -18,7 +17,7 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
   const items = useMemo(() => {
     const shuffled = [...weeds].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 8).map(w => {
-      const stageIdx = Math.floor(Math.random() * 4);
+      const stageIdx = Math.floor(Math.random() * LIFE_STAGES.length);
       const stage = LIFE_STAGES[stageIdx];
       return {
         id: `${w.id}-${stage.id}`,
@@ -43,7 +42,8 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
     setSelected(null);
   };
 
-  const handleRemove = (itemId: string) => {
+  const handleRemove = (itemId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (checked) return;
     setPlacements(prev => {
       const next = { ...prev };
@@ -90,8 +90,7 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
                 ${checked ? 'border-border' : 'border-border bg-muted/20'}
               `}
             >
-              <span className="text-2xl">{s.label.split(' ')[0]}</span>
-              <span className="text-xs font-bold text-foreground">{s.label.split(' ').slice(1).join(' ')}</span>
+              <span className="text-xs font-bold text-foreground">{s.label}</span>
               <div className="flex flex-wrap gap-1 mt-1 justify-center">
                 {stageItems.map(item => {
                   const isCorrect = checked && item.correctStage === s.id;
@@ -99,18 +98,24 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
                   return (
                     <div
                       key={item.id}
-                      onClick={(e) => { e.stopPropagation(); if (!checked) handleRemove(item.id); }}
-                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold cursor-pointer
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold
                         ${isCorrect ? 'bg-accent/20 text-accent border border-accent/30' : ''}
                         ${isWrong ? 'bg-destructive/20 text-destructive border border-destructive/30' : ''}
-                        ${!checked ? 'bg-primary/15 text-primary border border-primary/30 hover:bg-primary/25' : ''}
+                        ${!checked ? 'bg-primary/15 text-primary border border-primary/30' : ''}
                       `}
                     >
                       <div className="w-6 h-6 rounded overflow-hidden shrink-0">
                         <WeedImage weedId={item.weedId} stage={item.imageStage} className="w-full h-full" />
                       </div>
                       {item.name}
-                      {!checked && <span className="text-muted-foreground ml-0.5">✕</span>}
+                      {!checked && (
+                        <button
+                          onClick={(e) => handleRemove(item.id, e)}
+                          className="text-muted-foreground ml-0.5 hover:text-destructive transition-colors cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
                   );
                 })}
