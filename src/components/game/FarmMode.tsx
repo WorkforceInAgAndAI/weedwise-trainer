@@ -8,7 +8,10 @@ import WeedImage from './WeedImage';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import fieldBgImage from '@/assets/images/field-background.jpg';
+import fieldBgImage1 from '@/assets/images/field-background.jpg';
+import fieldBgImage2 from '@/assets/images/field-background-2.jpg';
+const fieldBgImages = [fieldBgImage1, fieldBgImage2];
+const fieldBgImage = fieldBgImages[Math.floor(Math.random() * fieldBgImages.length)];
 
 // ── Types ──────────────────────────────────────────────────
 interface WeedDot {
@@ -1123,7 +1126,7 @@ export default function FarmMode({ onClose }: Props) {
         <div className="min-h-screen flex flex-col items-center justify-center p-6 max-w-2xl mx-auto">
           <button onClick={onClose} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground text-sm">← Back</button>
           <div className="text-center mb-8">
-            <h1 className="font-display text-4xl font-extrabold text-primary mb-2">🌾 Farm Manager</h1>
+            <h1 className="font-display text-4xl font-extrabold text-primary mb-2">🌾 Land Steward</h1>
             <p className="text-muted-foreground">Scout the field, identify weeds, manage your farm, and turn a profit!</p>
           </div>
           {!grade ? (
