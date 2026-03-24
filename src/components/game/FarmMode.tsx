@@ -1075,7 +1075,7 @@ export default function FarmMode({ onClose }: Props) {
     setFields(prev => prev.map((f, i) => {
       const start = i * perField;
       const fieldWeeds = weedSample.slice(start, Math.min(start + perField, weedSample.length));
-      return { ...f, dots: generateDots(fieldWeeds, f.fieldId, stage) };
+      return { ...f, dots: generateDots(fieldWeeds, f.fieldId, stage, grade) };
     }));
     setPhase('overview');
     setGroups([]);
