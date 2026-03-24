@@ -42,7 +42,8 @@ export default function LifeStageSortGame({ onComplete, onNext }: Props) {
     setSelected(null);
   };
 
-  const handleRemove = (itemId: string) => {
+  const handleRemove = (itemId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (checked) return;
     setPlacements(prev => {
       const next = { ...prev };
