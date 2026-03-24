@@ -32,7 +32,7 @@ function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Que
   
   // For 6-8 and 9-12, use ligule images for grasses instead of vegetative
   const isGrass = weed.plantType === 'Monocot';
-  const adjustedImageStage = (phase.id === 'm1' || phase.id === 'h1' || phase.id === 'h3') && isGrass
+  const adjustedImageStage = (phase.id === 'm1' || phase.id === 'h1') && isGrass
     ? 'ligule' : phase.imageStage;
   
   const base = {
