@@ -524,6 +524,37 @@ export default function InstructorDashboard({ onClose }: Props) {
       Correct: s.totalCorrect,
     })), [studentStats]);
 
+  /* Class-level per-weed and per-phase aggregation */
+  const classWeedStats = useMemo(() => {
+    const { weedAgg } = extractSessionStats(sessions);
+    return weeds.map(w => {
+      const stat = weedAgg[w.id];
+      const shown = stat?.shown ?? 0;
+      const correct = stat?.correct ?? 0;
+      const wrong = stat?.wrong ?? 0;
+      const acc = shown > 0 ? (correct / shown) * 100 : -1;
+      const mastered = stat?.mastered ?? false;
+      const status = mastered ? 'Mastered' : (shown >= 3 && acc < 50) ? 'Struggling' : shown > 0 ? 'In Progress' : 'Not Seen';
+      return { id: w.id, name: w.commonName, shown, correct, wrong, acc, mastered, status };
+    }).filter(r => r.shown > 0).sort((a, b) => b.shown - a.shown);
+  }, [sessions]);
+
+  const classPhaseStats = useMemo(() => {
+    const { phaseAgg } = extractSessionStats(sessions);
+    const allPhases = [...PHASES.elementary, ...PHASES.middle, ...PHASES.high];
+    const seen = new Set<string>();
+    return allPhases.filter(p => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return !!phaseAgg[p.id];
+    }).map(p => {
+      const stat = phaseAgg[p.id];
+      const total = stat.correct + stat.wrong;
+      const acc = total > 0 ? (stat.correct / total) * 100 : 0;
+      return { id: p.id, name: p.name, correct: stat.correct, wrong: stat.wrong, total, acc };
+    });
+  }, [sessions]);
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'overview', label: '📊 Overview' },
     { key: 'students', label: '👨‍🎓 Students' },
