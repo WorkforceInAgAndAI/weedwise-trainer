@@ -35,6 +35,10 @@ export function useSessionPersistence(studentId: string | null) {
         species_mastered: stats.masteredCount,
         streak_best: stats.streak,
         phases_completed: stats.phasesCompleted,
+        session_data: {
+          weedStats: stats.weedStats,
+          phaseStats: stats.phaseStats || {},
+        } as any,
       })
       .eq('id', sessionIdRef.current);
   }, [studentId]);
