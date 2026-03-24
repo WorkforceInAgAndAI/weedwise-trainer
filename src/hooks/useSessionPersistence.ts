@@ -24,6 +24,7 @@ export function useSessionPersistence(studentId: string | null) {
     streak: number;
     phasesCompleted: number;
     weedStats: Record<string, WeedStat>;
+    phaseStats?: Record<string, { correct: number; wrong: number }>;
   }) => {
     if (!studentId || !sessionIdRef.current) return;
     await supabase
