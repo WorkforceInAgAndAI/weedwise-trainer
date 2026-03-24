@@ -8,6 +8,7 @@ import WeedImage from './WeedImage';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import fieldBgImage from '@/assets/images/field-background.jpg';
 
 // ── Types ──────────────────────────────────────────────────
 interface WeedDot {
@@ -135,21 +136,22 @@ function getSeasonStage(seasonIdx: number, totalSeasons: number): string {
 function generateDots(weedPool: Weed[], fieldId: string, imageStage: string, grade?: GradeLevel): WeedDot[] {
   const dots: WeedDot[] = [];
   let dotId = 0;
+  // Crop rows in the background image are roughly at these Y% bands
+  const cropRowBands = [
+    { yMin: 5, yMax: 18 },
+    { yMin: 22, yMax: 38 },
+    { yMin: 42, yMax: 58 },
+    { yMin: 62, yMax: 78 },
+    { yMin: 82, yMax: 95 },
+  ];
   weedPool.forEach(weed => {
     const isInvasive = weed.origin === 'Introduced' && weed.actImmediately;
     const occurrences = isInvasive ? 2 + Math.floor(Math.random() * 2) : 1 + Math.floor(Math.random() * 2);
-    const clustered = Math.random() > 0.4;
-    const baseX = 10 + Math.random() * 80;
-    const baseY = 10 + Math.random() * 80;
     for (let i = 0; i < occurrences; i++) {
-      let x: number, y: number;
-      if (clustered) {
-        x = Math.max(5, Math.min(95, baseX + (Math.random() - 0.5) * 12));
-        y = Math.max(5, Math.min(95, baseY + (Math.random() - 0.5) * 12));
-      } else {
-        x = 5 + Math.random() * 90;
-        y = 5 + Math.random() * 90;
-      }
+      // Place dots on crop rows where weeds would naturally appear
+      const band = cropRowBands[Math.floor(Math.random() * cropRowBands.length)];
+      const x = 5 + Math.random() * 90;
+      const y = band.yMin + Math.random() * (band.yMax - band.yMin);
       const imageVariant: 1 | 2 = Math.random() < 0.5 ? 1 : 2;
       let actualStage = imageStage === 'random'
         ? (['seedling', 'vegetative', 'flower', 'whole'])[Math.floor(Math.random() * 4)]
@@ -2824,136 +2826,15 @@ function FieldPreview({ fieldId, className }: { fieldId: string; className?: str
 }
 
 function FieldBackground({ fieldId }: { fieldId: string }) {
-  switch (fieldId) {
-    case 'row-crop':
-      return (
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-300/30 via-amber-700/20 to-amber-900/40">
-          <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-400/20 to-transparent" />
-          <div className="absolute inset-x-0 top-[20%] bottom-0">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="flex items-end justify-around" style={{ height: '6.25%' }}>
-                {Array.from({ length: 12 }).map((_, j) => (
-                  <span key={j} className="text-sm select-none pointer-events-none opacity-40"
-                    style={{ transform: `translateY(${Math.sin(i + j) * 2}px)` }}>
-                    {(i + j) % 4 === 0 ? '🌽' : '🌿'}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-[15%] bg-gradient-to-t from-amber-900/30 to-transparent" />
-          <div className="absolute inset-y-[25%] left-[20%] w-px bg-amber-800/15" />
-          <div className="absolute inset-y-[25%] left-[22%] w-px bg-amber-800/15" />
-          <div className="absolute inset-y-[25%] right-[20%] w-px bg-amber-800/15" />
-          <div className="absolute inset-y-[25%] right-[22%] w-px bg-amber-800/15" />
-        </div>
-      );
-
-    case 'pasture':
-      return (
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-300/25 via-green-600/25 to-green-800/35">
-          <div className="absolute top-0 left-0 right-0 h-[30%] bg-gradient-to-b from-sky-400/20 to-transparent" />
-          <div className="absolute top-[5%] left-[15%] text-xl opacity-20 select-none pointer-events-none">☁️</div>
-          <div className="absolute top-[8%] right-[25%] text-lg opacity-15 select-none pointer-events-none">☁️</div>
-          <div className="absolute top-[30%] inset-x-0 bottom-0 opacity-30">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <div key={i} className="flex items-end justify-around" style={{ height: '5%' }}>
-                {Array.from({ length: 10 }).map((_, j) => (
-                  <span key={j} className="text-xs select-none pointer-events-none">
-                    {(i * 10 + j) % 7 === 0 ? '🌾' : '🌿'}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="absolute top-[40%] left-[10%] text-2xl opacity-40 select-none pointer-events-none">🐄</div>
-          <div className="absolute top-[55%] right-[15%] text-xl opacity-35 select-none pointer-events-none">🐄</div>
-          <div className="absolute top-[65%] left-[45%] text-lg opacity-30 select-none pointer-events-none">🐄</div>
-          <div className="absolute top-[50%] right-[40%] text-sm opacity-25 select-none pointer-events-none">🐂</div>
-          <div className="absolute bottom-[10%] left-0 right-0 h-px bg-amber-800/20" />
-          <div className="absolute bottom-[12%] left-0 right-0 h-px bg-amber-800/15" />
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="absolute bottom-[8%] w-0.5 h-[6%] bg-amber-800/20" style={{ left: `${12 + i * 11}%` }} />
-          ))}
-          <div className="absolute top-[25%] right-[10%] text-lg opacity-25 select-none pointer-events-none">🏚️</div>
-        </div>
-      );
-
-    case 'small-grain':
-      return (
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-200/20 via-yellow-600/25 to-amber-700/30">
-          <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-300/20 to-transparent" />
-          <div className="absolute top-[22%] inset-x-0 bottom-0 opacity-35">
-            {Array.from({ length: 18 }).map((_, i) => (
-              <div key={i} className="flex items-end justify-around" style={{ height: '5.5%' }}>
-                {Array.from({ length: 14 }).map((_, j) => (
-                  <span key={j} className="text-xs select-none pointer-events-none"
-                    style={{ transform: `rotate(${Math.sin(i + j) * 8}deg)` }}>
-                    🌾
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="absolute top-[18%] left-[8%] text-sm opacity-20 select-none pointer-events-none">🏗️</div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/5 to-transparent" />
-        </div>
-      );
-
-    case 'wetland-edge':
-      return (
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-400/20 via-teal-700/25 to-blue-800/40">
-          <div className="absolute top-0 left-0 right-0 h-[20%] bg-gradient-to-b from-sky-400/25 to-transparent" />
-          <div className="absolute top-[15%] inset-x-0 bottom-[30%] opacity-30">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="absolute" style={{ left: `${5 + i * 12}%`, top: `${10 + Math.sin(i) * 15}%`, bottom: '0' }}>
-                <span className="text-lg select-none pointer-events-none">🌿</span>
-              </div>
-            ))}
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-gradient-to-t from-blue-900/40 via-blue-700/25 to-transparent">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="absolute text-xs opacity-20 select-none pointer-events-none"
-                style={{ left: `${10 + i * 18}%`, top: `${20 + i * 12}%` }}>
-                〰️
-              </div>
-            ))}
-          </div>
-          <div className="absolute bottom-[25%] left-[30%] text-lg opacity-30 select-none pointer-events-none">🦆</div>
-          <div className="absolute bottom-[20%] right-[20%] text-sm opacity-25 select-none pointer-events-none">🦆</div>
-          <div className="absolute bottom-[35%] right-[35%] text-lg opacity-20 select-none pointer-events-none">🦢</div>
-        </div>
-      );
-
-    case 'field-edge':
-      return (
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-300/25 via-green-700/20 to-amber-800/30">
-          <div className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-sky-400/20 to-transparent" />
-          <div className="absolute top-[20%] left-0 w-[40%] bottom-0 opacity-25">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="flex items-end justify-around" style={{ height: '8%' }}>
-                {Array.from({ length: 4 }).map((_, j) => (
-                  <span key={j} className="text-lg select-none pointer-events-none">🌳</span>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="absolute top-[25%] right-0 w-[55%] bottom-0">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <div key={i} className="flex items-end justify-around opacity-30" style={{ height: '7%' }}>
-                {Array.from({ length: 8 }).map((_, j) => (
-                  <span key={j} className="text-xs select-none pointer-events-none">
-                    {(i + j) % 3 === 0 ? '🌾' : '🌿'}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="absolute top-[20%] left-[38%] w-1 bottom-0 bg-amber-700/15" />
-        </div>
-      );
-
-    default:
-      return <div className="absolute inset-0 bg-gradient-to-b from-sky-300/20 via-green-600/20 to-green-800/30" />;
-  }
+  return (
+    <div className="absolute inset-0">
+      <img
+        src={fieldBgImage}
+        alt="Crop field"
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
+      />
+      <div className="absolute inset-0 bg-black/10" />
+    </div>
+  );
 }
