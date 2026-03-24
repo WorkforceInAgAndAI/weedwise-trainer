@@ -179,7 +179,6 @@ export default function InstructorPanel(game: GameEngine) {
             {weeds.map(w => (
               <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">{w.emoji}</span>
                   <div>
                     <div className="font-display font-bold text-foreground">{w.commonName}</div>
                     <div className="text-xs text-primary italic">{w.scientificName}</div>
@@ -196,7 +195,7 @@ export default function InstructorPanel(game: GameEngine) {
                   <p><span className="text-foreground">Management:</span> {w.management}</p>
                   <p><span className="text-foreground">Timing:</span> {w.controlTiming}</p>
                   <p><span className="text-foreground">Look-alike:</span> {w.lookAlike.species} — {w.lookAlike.difference}</p>
-                  <p><span className="text-primary">💡</span> {w.memoryHook}</p>
+                  <p><span className="text-primary">{w.memoryHook}</span></p>
                 </div>
                 {w.safetyNote && <div className="text-xs bg-destructive/15 text-destructive-foreground p-2 rounded">{w.safetyNote}</div>}
               </div>
