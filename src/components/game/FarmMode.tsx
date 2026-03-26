@@ -531,7 +531,7 @@ export default function FarmMode({ onClose }: Props) {
         finishScouting();
       }
     }
-  }, [activeFieldIdx, fields.length, hasMultipleSeasons]);
+  }, [activeFieldIdx, fields.length, hasMultipleSeasons, finishSeasonScouting, finishScouting, closeDotPopup]);
 
   // ── Grade + avatar ──────────────────────────────────────
   const handleGradeSelect = useCallback((g: GradeLevel) => {
