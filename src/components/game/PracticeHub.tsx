@@ -100,7 +100,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
     return <GameComp onBack={backToGames} />;
   }
 
-  const games = selectedGrade === 'k5' ? k5Games : [];
+  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : [];
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
