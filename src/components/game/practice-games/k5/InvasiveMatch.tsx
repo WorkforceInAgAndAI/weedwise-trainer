@@ -26,6 +26,9 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [selectedWeed, setSelectedWeed] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+
+  const restart = () => { setMatches({}); setSelectedWeed(null); setChecked(false); setShowReview(false); };
 
   const handleEffectClick = (weedId: string) => {
     if (!selectedWeed || checked) return;
@@ -35,6 +38,44 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
 
   const allMatched = Object.keys(matches).length === items.length;
   const correctCount = checked ? items.filter(i => matches[i.weed.id] === i.weed.id).length : 0;
+
+  // Review screen
+  if (showReview) return (
+    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b border-border">
+        <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+        <h1 className="font-bold text-foreground text-lg flex-1">Answer Review</h1>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="max-w-lg mx-auto space-y-3">
+          <p className={`text-center text-lg font-bold mb-4 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>
+            {correctCount}/{items.length} correct!
+          </p>
+          {items.map(i => {
+            const userMatch = matches[i.weed.id];
+            const isCorrect = userMatch === i.weed.id;
+            const userEffect = userMatch ? shuffledEffects.find(e => e.weedId === userMatch)?.effect : 'No answer';
+            return (
+              <div key={i.weed.id} className={`rounded-xl border-2 p-4 ${isCorrect ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{isCorrect ? '✅' : '❌'}</span>
+                  <span className="font-bold text-foreground">{i.weed.commonName}</span>
+                </div>
+                {!isCorrect && (
+                  <p className="text-sm text-destructive mb-1">Your answer: {userEffect}</p>
+                )}
+                <p className="text-sm text-green-600">Correct: {i.effect}</p>
+              </div>
+            );
+          })}
+          <div className="flex gap-3 justify-center pt-4">
+            <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -64,7 +105,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
               return (
                 <button key={e.weedId} onClick={() => handleEffectClick(e.weedId)}
                   className={`w-full py-2 px-3 rounded-lg border-2 text-xs text-left transition-all ${
-                    matchedBy ? (checked ? (matchedBy === e.weedId ? 'border-primary bg-primary/10' : 'border-destructive bg-destructive/10') : 'border-primary/30 bg-primary/5') : 
+                    matchedBy ? (checked ? (matchedBy === e.weedId ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10') : 'border-primary/30 bg-primary/5') : 
                     selectedWeed ? 'border-border hover:border-primary cursor-pointer' : 'border-border'
                   } text-foreground`}>
                   {e.effect}
@@ -79,7 +120,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
         {checked && (
           <div className="text-center mt-4">
             <p className="text-lg font-bold text-foreground mb-3">{correctCount}/{items.length} correct!</p>
-            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            <button onClick={() => setShowReview(true)} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Review Answers →</button>
           </div>
         )}
       </div>

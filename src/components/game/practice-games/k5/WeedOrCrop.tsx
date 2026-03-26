@@ -5,19 +5,35 @@ import WeedImage from '@/components/game/WeedImage';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const crops = [
-  { name: 'Corn', emoji: '🌽' }, { name: 'Soybeans', emoji: '🫘' },
-  { name: 'Wheat', emoji: '🌾' }, { name: 'Oats', emoji: '🌾' },
-  { name: 'Alfalfa', emoji: '🍀' }, { name: 'Sorghum', emoji: '🌿' },
-  { name: 'Sunflower', emoji: '🌻' }, { name: 'Barley', emoji: '🌾' },
+  { name: 'Corn', searchTerm: 'corn plant field' },
+  { name: 'Soybeans', searchTerm: 'soybean plant field' },
+  { name: 'Wheat', searchTerm: 'wheat plant field' },
+  { name: 'Oats', searchTerm: 'oat plant field' },
+  { name: 'Alfalfa', searchTerm: 'alfalfa plant field' },
+  { name: 'Sorghum', searchTerm: 'sorghum plant field' },
+  { name: 'Sunflower', searchTerm: 'sunflower plant field' },
+  { name: 'Barley', searchTerm: 'barley plant field' },
 ];
 
-interface RoundItem { type: 'weed' | 'crop'; name: string; weedId?: string; emoji?: string; }
+// Use Wikimedia Commons images for real crop photos
+const CROP_IMAGES: Record<string, string> = {
+  'Corn': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Corn_plantation_in_Thailand.jpg/320px-Corn_plantation_in_Thailand.jpg',
+  'Soybeans': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Soybean.USDA.jpg/320px-Soybean.USDA.jpg',
+  'Wheat': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Wheat_close-up.JPG/320px-Wheat_close-up.JPG',
+  'Oats': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Haverkorrels_Avena_sativa.jpg/320px-Haverkorrels_Avena_sativa.jpg',
+  'Alfalfa': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Medicago_sativa_-_Luzerne_-_Alfalfa.jpg/320px-Medicago_sativa_-_Luzerne_-_Alfalfa.jpg',
+  'Sorghum': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Grain_Sorghum_%28Milo%29.jpg/320px-Grain_Sorghum_%28Milo%29.jpg',
+  'Sunflower': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Sunflower_sky_backdrop.jpg/320px-Sunflower_sky_backdrop.jpg',
+  'Barley': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Barley_%28Hordeum_vulgare%29%2C_Osaka%2C_Japan.jpg/320px-Barley_%28Hordeum_vulgare%29%2C_Osaka%2C_Japan.jpg',
+};
+
+interface RoundItem { type: 'weed' | 'crop'; name: string; weedId?: string; cropImage?: string; }
 
 export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
   const rounds = useMemo(() => {
     const items: RoundItem[] = [];
     shuffle(weeds).slice(0, 5).forEach(w => items.push({ type: 'weed', name: w.commonName, weedId: w.id }));
-    shuffle(crops).slice(0, 5).forEach(c => items.push({ type: 'crop', name: c.name, emoji: c.emoji }));
+    shuffle(crops).slice(0, 5).forEach(c => items.push({ type: 'crop', name: c.name, cropImage: CROP_IMAGES[c.name] }));
     return shuffle(items);
   }, []);
 
@@ -27,6 +43,8 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
   const [answered, setAnswered] = useState(false);
   const [correct, setCorrect] = useState<boolean | null>(null);
   const [done, setDone] = useState(false);
+
+  const restart = () => { setRound(0); setScore(0); setTimer(10); setAnswered(false); setCorrect(null); setDone(false); };
 
   useEffect(() => {
     if (answered || done) return;
@@ -54,7 +72,10 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
         <div className="text-5xl mb-4">🏆</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Game Over!</h2>
         <p className="text-lg text-muted-foreground mb-6">You scored {score} / {rounds.length}</p>
-        <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        <div className="flex gap-3 justify-center">
+          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        </div>
       </div>
     </div>
   );
@@ -76,7 +97,11 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
           <p className="text-center text-sm text-muted-foreground mt-1">{timer}s</p>
         </div>
         <div className="w-44 h-44 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-border">
-          {item.weedId ? <WeedImage weedId={item.weedId} stage="vegetative" className="w-full h-full object-cover" /> : <span className="text-7xl">{item.emoji}</span>}
+          {item.weedId ? (
+            <WeedImage weedId={item.weedId} stage="vegetative" className="w-full h-full object-cover" />
+          ) : (
+            <img src={item.cropImage} alt={item.name} className="w-full h-full object-cover" crossOrigin="anonymous" />
+          )}
         </div>
         <p className="text-xl font-bold text-foreground">{item.name}</p>
         {!answered ? (
@@ -86,7 +111,7 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
           </div>
         ) : (
           <div className="text-center">
-            <p className={`text-xl font-bold mb-3 ${correct ? 'text-primary' : 'text-destructive'}`}>
+            <p className={`text-xl font-bold mb-3 ${correct ? 'text-green-500' : 'text-destructive'}`}>
               {correct ? 'Correct!' : `Wrong — it's a ${item.type}!`}
             </p>
             <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>

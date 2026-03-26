@@ -63,7 +63,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
               <div className="flex flex-wrap gap-1.5 min-h-[32px]">
                 {items.filter(i => placements[i.id] === cat.id).map(i => (
                   <span key={i.id} className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    checked ? (i.category === cat.id ? 'bg-primary/20 text-primary' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'
+                    checked ? (i.category === cat.id ? 'bg-green-500/20 text-green-500' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'
                   }`}>
                     {i.icon} {i.label}
                     {!checked && <button onClick={(e) => { e.stopPropagation(); handleRemove(i.id); }} className="ml-1 text-muted-foreground hover:text-foreground">✕</button>}
@@ -90,10 +90,13 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
         )}
         {checked && (
           <div className="text-center mt-4">
-            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-primary' : 'text-foreground'}`}>
+            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>
               {correctCount} / {items.length} correct!
             </p>
-            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => { setChecked(false); setPlacements({}); setSelected(null); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+              <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            </div>
           </div>
         )}
       </div>

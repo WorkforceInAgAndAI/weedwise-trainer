@@ -31,6 +31,8 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
   const target = pair ? pair.weed : null;
   const options = pair ? (targetIsFirst ? [pair.weed, pair.alike] : [pair.alike, pair.weed]) : [];
 
+  const restart = () => { setRound(0); setSelected(null); setSubmitted(false); setScore(0); };
+
   const submit = () => {
     if (!selected || !target) return;
     setSubmitted(true);
@@ -45,7 +47,10 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
         <div className="text-5xl mb-4">👀</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Challenge Complete!</h2>
         <p className="text-muted-foreground mb-6">Score: {score} / {pairs.length}</p>
-        <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        <div className="flex gap-3 justify-center">
+          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        </div>
       </div>
     </div>
   );
@@ -64,11 +69,14 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
             <button key={w.id} onClick={() => !submitted && setSelected(w.id)}
               className={`w-36 sm:w-44 rounded-xl overflow-hidden border-3 transition-all ${
                 selected === w.id ? 'border-primary scale-105 shadow-lg' : 'border-border'
-              } ${submitted && w.id === target?.id ? 'ring-2 ring-primary' : ''} ${submitted && selected === w.id && w.id !== target?.id ? 'ring-2 ring-destructive' : ''}`}>
+              } ${submitted && w.id === target?.id ? 'ring-2 ring-green-500' : ''} ${submitted && selected === w.id && w.id !== target?.id ? 'ring-2 ring-destructive' : ''}`}>
               <div className="aspect-square bg-secondary">
                 <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
               </div>
-              <p className="text-xs font-medium text-foreground p-2 text-center">{w.commonName}</p>
+              {/* Only show name after submission */}
+              {submitted && (
+                <p className={`text-xs font-medium p-2 text-center ${w.id === target?.id ? 'text-green-500 font-bold' : 'text-foreground'}`}>{w.commonName}</p>
+              )}
             </button>
           ))}
         </div>
@@ -77,7 +85,7 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
             className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-50">Confirm</button>
         ) : (
           <div className="text-center max-w-sm">
-            <p className={`text-lg font-bold mb-2 ${selected === target?.id ? 'text-primary' : 'text-destructive'}`}>
+            <p className={`text-lg font-bold mb-2 ${selected === target?.id ? 'text-green-500' : 'text-destructive'}`}>
               {selected === target?.id ? 'Correct!' : 'Not quite!'}
             </p>
             <p className="text-sm text-muted-foreground mb-3">Key difference: {pair?.difference}</p>

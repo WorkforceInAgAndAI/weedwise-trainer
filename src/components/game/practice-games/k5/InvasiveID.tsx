@@ -4,7 +4,18 @@ import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const MIDWEST_STATES = ['Iowa', 'Illinois', 'Indiana', 'Ohio', 'Minnesota', 'Wisconsin', 'Missouri', 'Kansas', 'Nebraska'];
+const MIDWEST_STATES: { name: string; x: number; y: number }[] = [
+  { name: 'Minnesota', x: 38, y: 18 },
+  { name: 'Wisconsin', x: 52, y: 22 },
+  { name: 'Iowa', x: 40, y: 38 },
+  { name: 'Illinois', x: 55, y: 42 },
+  { name: 'Indiana', x: 65, y: 44 },
+  { name: 'Ohio', x: 75, y: 40 },
+  { name: 'Missouri', x: 45, y: 58 },
+  { name: 'Kansas', x: 28, y: 55 },
+  { name: 'Nebraska', x: 25, y: 35 },
+];
+
 const ORIGINS: Record<string, string> = {};
 weeds.forEach(w => {
   if (w.origin === 'Introduced') {
@@ -14,16 +25,22 @@ weeds.forEach(w => {
 });
 
 export default function InvasiveID({ onBack }: { onBack: () => void }) {
-  const rounds = useMemo(() => shuffle(weeds).slice(0, 8).map(w => ({
-    weed: w,
-    foundIn: MIDWEST_STATES[Math.floor(Math.random() * MIDWEST_STATES.length)],
-    originRegion: w.origin === 'Introduced' ? (ORIGINS[w.id] || 'Europe') : 'North America',
-  })), []);
+  const rounds = useMemo(() => shuffle(weeds).slice(0, 8).map((w, i) => {
+    const state = MIDWEST_STATES[i % MIDWEST_STATES.length];
+    return {
+      weed: w,
+      state,
+      originRegion: w.origin === 'Introduced' ? (ORIGINS[w.id] || 'Europe') : 'North America',
+    };
+  }), []);
 
   const [round, setRound] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [choice, setChoice] = useState<string | null>(null);
+  const [clickedDot, setClickedDot] = useState(false);
+
+  const restart = () => { setRound(0); setAnswered(false); setScore(0); setChoice(null); setClickedDot(false); };
 
   const done = round >= rounds.length;
   const r = !done ? rounds[round] : null;
@@ -36,7 +53,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
     if (correct) setScore(s => s + 1);
   };
 
-  const next = () => { setRound(i => i + 1); setAnswered(false); setChoice(null); };
+  const next = () => { setRound(i => i + 1); setAnswered(false); setChoice(null); setClickedDot(false); };
 
   if (done) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
@@ -44,7 +61,10 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
         <div className="text-5xl mb-4">🌐</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
         <p className="text-muted-foreground mb-6">Score: {score}/{rounds.length}</p>
-        <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        <div className="flex gap-3 justify-center">
+          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        </div>
       </div>
     </div>
   );
@@ -59,30 +79,71 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
         <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
-        <div className="w-36 h-36 rounded-xl overflow-hidden border-2 border-border bg-secondary">
-          <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-3">
+        {/* Map with dots */}
+        <div className="relative w-full max-w-md aspect-[4/3] bg-secondary rounded-2xl border-2 border-border overflow-hidden">
+          {/* Simple US midwest outline hint */}
+          <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-green-800/30" />
+          <p className="absolute top-2 left-3 text-[10px] text-muted-foreground font-medium">U.S. Midwest</p>
+
+          {/* State labels */}
+          {MIDWEST_STATES.map(s => (
+            <span key={s.name} className="absolute text-[8px] text-muted-foreground/60 font-medium" style={{ left: `${s.x}%`, top: `${s.y - 5}%`, transform: 'translateX(-50%)' }}>
+              {s.name}
+            </span>
+          ))}
+
+          {/* All dots */}
+          {MIDWEST_STATES.map((s, i) => {
+            const isCurrentDot = r && s.name === r.state.name;
+            const isPast = i < round && MIDWEST_STATES[i % MIDWEST_STATES.length].name === rounds[i]?.state.name;
+            return (
+              <button key={s.name}
+                onClick={() => isCurrentDot && !clickedDot && setClickedDot(true)}
+                className={`absolute w-5 h-5 rounded-full border-2 transition-all ${
+                  isCurrentDot
+                    ? clickedDot ? 'bg-primary border-primary scale-125' : 'bg-primary/60 border-primary animate-pulse scale-110 cursor-pointer'
+                    : 'bg-muted-foreground/30 border-border/50'
+                }`}
+                style={{ left: `${s.x}%`, top: `${s.y}%`, transform: 'translate(-50%, -50%)' }}
+              />
+            );
+          })}
         </div>
-        <h2 className="text-xl font-bold text-foreground">{r!.weed.commonName}</h2>
-        <div className="bg-secondary/50 rounded-xl p-4 text-center max-w-sm">
-          <p className="text-sm text-foreground">Originally from: <strong>{r!.originRegion}</strong></p>
-          <p className="text-sm text-foreground">Found growing in: <strong>{r!.foundIn}</strong></p>
-        </div>
-        {!answered ? (
-          <div className="flex gap-4">
-            <button onClick={() => submit('native')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold">Native</button>
-            <button onClick={() => submit('invasive')} className="px-8 py-4 rounded-xl bg-destructive/90 text-destructive-foreground text-lg font-bold">Invasive</button>
-          </div>
+
+        {!clickedDot ? (
+          <p className="text-sm text-muted-foreground text-center animate-pulse">Tap the glowing dot on the map to investigate!</p>
         ) : (
-          <div className="text-center max-w-sm">
-            <p className={`text-lg font-bold mb-2 ${correct ? 'text-primary' : 'text-destructive'}`}>
-              {correct ? 'Correct!' : `Not quite — this plant is ${isInvasive ? 'invasive' : 'native'}!`}
-            </p>
-            <p className="text-sm text-muted-foreground mb-3">
-              {isInvasive ? `${r!.weed.commonName} was brought from ${r!.originRegion} and doesn't naturally belong in ${r!.foundIn}.` : `${r!.weed.commonName} naturally grows in North America.`}
-            </p>
-            <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
-          </div>
+          <>
+            {/* Plant info card */}
+            <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center">
+              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border bg-secondary flex-shrink-0">
+                <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-bold text-foreground">{r!.weed.commonName}</h2>
+                <p className="text-sm text-muted-foreground">Found in: <strong>{r!.state.name}</strong></p>
+                <p className="text-sm text-muted-foreground">Originally from: <strong>{r!.originRegion}</strong></p>
+              </div>
+            </div>
+
+            {!answered ? (
+              <div className="flex gap-4">
+                <button onClick={() => submit('native')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold">Native</button>
+                <button onClick={() => submit('invasive')} className="px-8 py-4 rounded-xl bg-destructive/90 text-destructive-foreground text-lg font-bold">Invasive</button>
+              </div>
+            ) : (
+              <div className="text-center max-w-sm">
+                <p className={`text-lg font-bold mb-2 ${correct ? 'text-green-500' : 'text-destructive'}`}>
+                  {correct ? 'Correct!' : `Not quite — this plant is ${isInvasive ? 'invasive' : 'native'}!`}
+                </p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {isInvasive ? `${r!.weed.commonName} was brought from ${r!.originRegion} and doesn't naturally belong in ${r!.state.name}.` : `${r!.weed.commonName} naturally grows in North America.`}
+                </p>
+                <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

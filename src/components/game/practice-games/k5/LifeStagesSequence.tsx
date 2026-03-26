@@ -3,8 +3,11 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
-const STAGES = ['seedling', 'vegetative', 'reproductive', 'mature'];
-const STAGE_LABELS: Record<string, string> = { seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive', mature: 'Mature Plant' };
+
+// Map stages to the correct WeedImage stage prop which maps to file prefixes
+// seedling → seedling (seedling_#), vegetative → vegetative (veg_#), reproductive → flower (repro_#), mature → whole (plant_#)
+const STAGES = ['seedling', 'vegetative', 'flower', 'whole'];
+const STAGE_LABELS: Record<string, string> = { seedling: 'Seedling', vegetative: 'Vegetative', flower: 'Reproductive', whole: 'Mature Plant' };
 
 export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
   const targets = useMemo(() => shuffle(weeds).slice(0, 4), []);
@@ -15,6 +18,8 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
 
   const target = targets[targetIdx];
   const done = targetIdx >= targets.length;
+
+  const restart = () => { setTargetIdx(0); setOrder(shuffle([...STAGES])); setChecked(false); setScore(0); };
 
   const swap = (i: number, j: number) => {
     if (checked) return;
@@ -43,7 +48,10 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
         <div className="text-5xl mb-4">🔄</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">All Done!</h2>
         <p className="text-muted-foreground mb-6">You got {score} / {targets.length} correct!</p>
-        <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        <div className="flex gap-3 justify-center">
+          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        </div>
       </div>
     </div>
   );
@@ -64,7 +72,7 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
                 {i > 0 && <button onClick={() => swap(i, i - 1)} className="text-xs px-2 py-1 rounded bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground">←</button>}
                 {i < order.length - 1 && <button onClick={() => swap(i, i + 1)} className="text-xs px-2 py-1 rounded bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground">→</button>}
               </div>
-              <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-2 ${checked ? (stage === STAGES[i] ? 'border-primary' : 'border-destructive') : 'border-border'}`}>
+              <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-2 ${checked ? (stage === STAGES[i] ? 'border-green-500' : 'border-destructive') : 'border-border'}`}>
                 <WeedImage weedId={target.id} stage={stage} className="w-full h-full object-cover" />
               </div>
               <span className="text-[10px] font-medium text-muted-foreground">{STAGE_LABELS[stage]}</span>
@@ -76,7 +84,7 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
           <button onClick={check} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">Check Order</button>
         ) : (
           <div className="text-center">
-            <p className={`text-lg font-bold mb-3 ${isCorrect ? 'text-primary' : 'text-destructive'}`}>
+            <p className={`text-lg font-bold mb-3 ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
               {isCorrect ? 'Perfect order!' : `Not quite — correct: ${STAGES.map(s => STAGE_LABELS[s]).join(' → ')}`}
             </p>
             <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
