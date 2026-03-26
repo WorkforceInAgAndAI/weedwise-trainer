@@ -1,28 +1,61 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 interface Card { id: string; content: string; type: 'weed' | 'cycle'; weedId: string; flipped: boolean; matched: boolean; }
 
+function getCycleType(w: typeof weeds[0]): string {
+  if (w.lifeCycle.includes('Biennial')) return 'Biennial';
+  if (w.lifeCycle.includes('Perennial')) return 'Perennial';
+  return 'Annual';
+}
+
+function pickThreeWeeds(): typeof weeds[0][] {
+  const annuals = shuffle(weeds.filter(w => getCycleType(w) === 'Annual'));
+  const biennials = shuffle(weeds.filter(w => getCycleType(w) === 'Biennial'));
+  const perennials = shuffle(weeds.filter(w => getCycleType(w) === 'Perennial'));
+  const picks: typeof weeds[0][] = [];
+  if (annuals.length) picks.push(annuals[0]);
+  if (biennials.length) picks.push(biennials[0]);
+  else picks.push(shuffle(weeds.filter(w => !picks.find(p => p.id === w.id)))[0]);
+  if (perennials.length) picks.push(perennials[0]);
+  else picks.push(shuffle(weeds.filter(w => !picks.find(p => p.id === w.id)))[0]);
+  return picks;
+}
+
 export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
-  const selected = useMemo(() => shuffle(weeds).slice(0, 6), []);
+  const [roundNum, setRoundNum] = useState(0);
+  const totalRounds = 3;
+
+  const selected = useMemo(() => pickThreeWeeds(), [roundNum]);
   const [cards, setCards] = useState<Card[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
   const [locked, setLocked] = useState(false);
   const [matchCount, setMatchCount] = useState(0);
+  const [totalMatched, setTotalMatched] = useState(0);
 
   useEffect(() => {
     const c: Card[] = [];
     selected.forEach(w => {
       c.push({ id: `w-${w.id}`, content: w.commonName, type: 'weed', weedId: w.id, flipped: false, matched: false });
-      const cycle = w.lifeCycle.includes('Annual') ? 'Annual' : w.lifeCycle.includes('Biennial') ? 'Biennial' : 'Perennial';
-      c.push({ id: `c-${w.id}`, content: cycle, type: 'cycle', weedId: w.id, flipped: false, matched: false });
+      c.push({ id: `c-${w.id}`, content: getCycleType(w), type: 'cycle', weedId: w.id, flipped: false, matched: false });
     });
     setCards(shuffle(c));
+    setMatchCount(0);
+    setPicks([]);
+    setLocked(false);
   }, [selected]);
 
-  const done = matchCount === selected.length && cards.length > 0;
+  const roundDone = matchCount === selected.length && cards.length > 0;
+  const allDone = roundNum >= totalRounds;
+
+  const restart = () => { setRoundNum(0); setTotalMatched(0); };
+
+  const nextRound = useCallback(() => {
+    setTotalMatched(t => t + matchCount);
+    setRoundNum(r => r + 1);
+  }, [matchCount]);
 
   const handleClick = (cardId: string) => {
     if (locked) return;
@@ -52,13 +85,29 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
     }
   };
 
-  if (done) return (
+  if (allDone) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
         <div className="text-5xl mb-4">🃏</div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">All Matched!</h2>
-        <p className="text-muted-foreground mb-6">You matched all {selected.length} pairs!</p>
-        <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
+        <p className="text-muted-foreground mb-6">You matched {totalMatched} / {totalRounds * 3} pairs across {totalRounds} rounds!</p>
+        <div className="flex gap-3 justify-center">
+          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (roundDone) return (
+    <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
+      <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
+        <div className="text-5xl mb-4">✅</div>
+        <h2 className="text-2xl font-bold text-green-500 mb-2">Round {roundNum + 1} Complete!</h2>
+        <p className="text-muted-foreground mb-6">All {selected.length} pairs matched!</p>
+        <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+          {roundNum + 1 < totalRounds ? `Round ${roundNum + 2} →` : 'See Results'}
+        </button>
       </div>
     </div>
   );
@@ -68,14 +117,15 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Life Cycle Matching</h1>
-        <span className="text-sm text-primary font-bold">{matchCount}/{selected.length} matched</span>
+        <span className="text-sm text-muted-foreground">Round {roundNum + 1}/{totalRounds}</span>
+        <span className="text-sm text-primary font-bold ml-2">{matchCount}/{selected.length} matched</span>
       </div>
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 max-w-lg">
+        <div className="grid grid-cols-3 gap-3 max-w-sm">
           {cards.map(c => (
             <button key={c.id} onClick={() => handleClick(c.id)}
               className={`aspect-square rounded-xl text-sm font-bold flex items-center justify-center p-2 transition-all border-2 ${
-                c.matched ? 'bg-primary/20 border-primary text-primary' :
+                c.matched ? 'bg-green-500/20 border-green-500 text-green-500' :
                 c.flipped ? 'bg-card border-primary text-foreground' :
                 'bg-secondary border-border text-muted-foreground hover:border-primary/50'
               }`}>
