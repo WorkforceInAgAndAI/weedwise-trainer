@@ -739,8 +739,8 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
         },
         {
           key: 'wait', icon: '⏳', label: 'Wait to Act',
-          desc: 'Sometimes the best strategy is to wait and watch. Not every weed needs immediate action. Some weeds are not very competitive or may die on their own. Good scouts monitor the situation before spending money on control.',
-          example: 'A few small weeds in a healthy, thick crop may not need treatment.',
+          desc: 'Sometimes the best strategy is to wait and watch. Not every weed needs immediate action — this is where the pest threshold comes in. The pest threshold is the specific number of weeds (or amount of damage) at which you MUST take action to prevent serious harm to the crop or economic loss. If weed numbers are below that threshold, the crop can handle the competition on its own. Good scouts count weeds and compare the numbers to the threshold before spending money on control.',
+          example: 'A farmer scouts and finds only 2 small foxtail plants per square meter in a thick, healthy soybean field. The pest threshold for foxtail in soybeans is much higher, so no action is needed yet — the crop will outcompete them.',
         },
         {
           key: 'hand-weeding', icon: '🧤', label: 'Hand Weeding',
