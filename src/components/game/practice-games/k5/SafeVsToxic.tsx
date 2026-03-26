@@ -109,7 +109,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
             {(removalChoice || !foundCorrect) && (
               <div className="text-center mt-3">
                 {removalChoice && (
-                  <p className={`text-sm font-bold mb-2 ${REMOVAL_METHODS.find(m => m.id === removalChoice)?.safe ? 'text-primary' : 'text-destructive'}`}>
+                  <p className={`text-sm font-bold mb-2 ${REMOVAL_METHODS.find(m => m.id === removalChoice)?.safe ? 'text-green-500' : 'text-destructive'}`}>
                     {REMOVAL_METHODS.find(m => m.id === removalChoice)?.safe ? 'Smart and safe choice!' : 'Not safe! Always tell an adult and wear protection.'}
                   </p>
                 )}

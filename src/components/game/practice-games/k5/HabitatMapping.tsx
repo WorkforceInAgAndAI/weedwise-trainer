@@ -100,8 +100,11 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
         )}
         {checked && (
           <div className="text-center mt-4">
-            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-primary' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
-            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => { setChecked(false); setPlacements({}); setSelected(null); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+              <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            </div>
           </div>
         )}
       </div>

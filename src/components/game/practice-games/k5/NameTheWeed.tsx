@@ -62,7 +62,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
             <button key={opt} onClick={() => !submitted && submit(opt)}
               className={`py-3 px-4 rounded-lg text-sm font-bold transition-all border-2 ${
                 submitted
-                  ? opt === r!.weed.commonName ? 'bg-primary/20 border-primary text-primary' : opt === selected ? 'bg-destructive/20 border-destructive text-destructive' : 'border-border text-muted-foreground'
+                  ? opt === r!.weed.commonName ? 'bg-green-500/20 border-green-500 text-green-500' : opt === selected ? 'bg-destructive/20 border-destructive text-destructive' : 'border-border text-muted-foreground'
                   : 'border-border bg-card text-foreground hover:border-primary'
               }`}>{opt}</button>
           ))}

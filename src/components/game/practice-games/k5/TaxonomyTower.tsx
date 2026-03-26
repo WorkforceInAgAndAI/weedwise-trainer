@@ -110,7 +110,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
 
         {found && (
           <div className="text-center mt-2">
-            <p className="text-lg font-bold text-primary mb-3">You found {target.commonName}!</p>
+            <p className="text-lg font-bold text-green-500 mb-3">You found {target.commonName}!</p>
             <button onClick={nextTarget} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Weed →</button>
           </div>
         )}
