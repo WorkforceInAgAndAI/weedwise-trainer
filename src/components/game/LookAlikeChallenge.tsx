@@ -106,7 +106,12 @@ export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
             </div>
             <div className="p-3 bg-secondary/50">
               {submitted ? (
-                <div className="text-sm font-semibold text-foreground">{w.commonName}</div>
+                <div>
+                  <div className="text-sm font-semibold text-foreground">{w.commonName}</div>
+                  <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${w.origin === 'Introduced' ? 'bg-destructive/15 text-destructive' : 'bg-accent/15 text-accent'}`}>
+                    {w.origin === 'Introduced' ? '🚢 Introduced' : '🏡 Native'}
+                  </span>
+                </div>
               ) : (
                 <div className="text-sm text-muted-foreground">Tap to select</div>
               )}
