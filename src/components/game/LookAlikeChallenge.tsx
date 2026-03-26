@@ -90,7 +90,6 @@ export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
           }
         </p>
       </div>
-      </div>
 
       {/* Side by side images */}
       <div className="grid grid-cols-2 gap-4">
