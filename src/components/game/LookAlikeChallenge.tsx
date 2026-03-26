@@ -80,8 +80,16 @@ export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
       <div>
-        <h2 className="font-display font-bold text-lg text-foreground">🔍 Look-Alike Challenge</h2>
-        <p className="text-sm text-muted-foreground">Both species are in the <span className="text-primary font-semibold">{pair.weedA.family}</span> family. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</p>
+        <h2 className="font-display font-bold text-lg text-foreground">
+          {pair.isInvasiveVsNative ? '⚠️ Invasive vs Native Challenge' : '🔍 Look-Alike Challenge'}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {pair.isInvasiveVsNative
+            ? <>One is <span className="text-destructive font-semibold">invasive</span> and the other is <span className="text-accent font-semibold">native</span>. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
+            : <>Both species are in the <span className="text-primary font-semibold">{pair.weedA.family}</span> family. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
+          }
+        </p>
+      </div>
       </div>
 
       {/* Side by side images */}
