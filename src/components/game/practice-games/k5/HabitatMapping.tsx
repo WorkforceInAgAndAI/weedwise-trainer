@@ -70,7 +70,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
               <div className="space-y-1 min-h-[40px]">
                 {items.filter(i => placements[i.weed.id] === z.id).map(i => (
                   <div key={i.weed.id} className={`flex items-center gap-1 px-2 py-1 rounded bg-background/80 text-xs font-medium ${
-                    checked ? (i.zone === z.id ? 'text-primary' : 'text-destructive') : 'text-foreground'
+                    checked ? (i.zone === z.id ? 'text-green-500' : 'text-destructive') : 'text-foreground'
                   }`}>
                     <span className="truncate flex-1">{i.weed.commonName}</span>
                     {!checked && <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-muted-foreground hover:text-foreground">✕</button>}
