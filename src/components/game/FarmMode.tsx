@@ -521,17 +521,27 @@ export default function FarmMode({ onClose }: Props) {
     // Auto-advance when timer runs out
     if (activeFieldIdx < fields.length - 1) {
       setActiveFieldIdx(i => i + 1);
-      closeDotPopup();
+      setSelectedDot(null);
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+      quizOptionsRef.current = null;
       setFieldStartTime(Date.now());
     } else {
-      // For upper levels with seasonal flow: finish this season's scouting of all fields
-      if (hasMultipleSeasons) {
-        finishSeasonScouting();
-      } else {
-        finishScouting();
-      }
+      // Collect found weeds and transition to sorting
+      const foundMap = new Map<string, string>();
+      fields.forEach(f => f.dots.filter(d => d.found).forEach(d => {
+        if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
+      }));
+      const unsorted: UnsortedWeed[] = [...foundMap.entries()].map(([weedId, dotId]) => ({ weedId, dotId }));
+      setUnsortedWeeds(shuffle(unsorted));
+      setCurrentSortWeed(0);
+      setSelectedSortCats([]);
+      setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+      setSortResults([]);
+      setPhase('sorting');
+      toast.success('Time is up! Now sort your findings.');
     }
-  }, [activeFieldIdx, fields.length, hasMultipleSeasons, finishSeasonScouting, finishScouting, closeDotPopup]);
+  }, [activeFieldIdx, fields]);
 
   // ── Grade + avatar ──────────────────────────────────────
   const handleGradeSelect = useCallback((g: GradeLevel) => {
