@@ -677,7 +677,7 @@ export default function FarmMode({ onClose }: Props) {
       // Upper levels: all fields scouted for this season → sort & manage
       finishSeasonScouting();
     }
-  }, [activeFieldIdx, fields.length, scoutPhaseIdx, scoutPhases, closeDotPopup, hasMultipleSeasons, hasTimer]);
+  }, [activeFieldIdx, fields.length, scoutPhaseIdx, scoutPhases, closeDotPopup, hasMultipleSeasons, hasTimer, finishScouting, finishSeasonScouting]);
 
   const finishScouting = useCallback(() => {
     const foundMap = new Map<string, string>();
