@@ -364,9 +364,10 @@ export function useGameEngine() {
   const endSession = useCallback(() => setScreen('results'), []);
   const resetToLanding = useCallback(() => {
     setScreen('landing');
-    setGrade(null);
     setCurrent(null);
     setFeedback(null);
+    // NOTE: Do NOT reset grade, weedStats, phaseStats, questionLog, xp, streak, etc.
+    // so the Session Overview retains progress during a single sitting.
   }, []);
 
   const totalCorrect = Object.values(weedStats).reduce((s, w) => s + w.timesCorrect, 0);
