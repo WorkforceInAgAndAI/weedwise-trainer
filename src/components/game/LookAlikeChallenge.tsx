@@ -22,6 +22,23 @@ function getFamilyPairs(): Array<[Weed, Weed]> {
   return pairs;
 }
 
+// Invasive vs native pairs from the same family
+function getInvasiveNativePairs(): Array<[Weed, Weed]> {
+  const invasive = weeds.filter(w => w.origin === 'Introduced');
+  const native = weeds.filter(w => w.origin === 'Native');
+  const pairs: Array<[Weed, Weed]> = [];
+  const used = new Set<string>();
+  invasive.forEach(inv => {
+    const match = native.find(nat => nat.family === inv.family && !used.has(nat.id));
+    if (match) {
+      used.add(match.id);
+      used.add(inv.id);
+      pairs.push([inv, match]);
+    }
+  });
+  return pairs;
+}
+
 interface Props {
   onComplete: (results: Array<{ weedId: string; correct: boolean }>) => void;
   onNext: () => void;
