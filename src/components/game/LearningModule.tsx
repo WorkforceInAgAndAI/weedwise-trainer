@@ -777,8 +777,8 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
         },
         {
           key: 'wait', icon: '⏳', label: 'Wait to Act',
-          desc: 'Economic threshold-based decision making: not every weed population justifies the cost of control. Scouting data should inform whether weed density and species composition warrant intervention. Low-density populations of non-competitive species may not reduce yield enough to justify herbicide costs. However, waiting too long on aggressive species like Palmer amaranth or waterhemp can be catastrophic.',
-          example: 'A scout finds 1-2 common chickweed plants per square meter in a vigorous winter wheat stand — the crop canopy will likely suppress them without intervention.',
+          desc: 'Economic threshold-based decision making is central to IPM. The pest threshold (also called the economic threshold) is the specific population density of a pest, or level of crop damage, at which control action must be taken to prevent unacceptable harm or economic loss. Below this threshold, the cost of control exceeds the potential yield loss — so intervention is not justified. Scouting data (weed counts per unit area, species ID, and growth stage) should be compared against published thresholds for specific crop-weed combinations. However, thresholds vary by weed competitiveness: a single Palmer amaranth plant can produce 500,000+ seeds, making its threshold near zero, while less aggressive species like common chickweed tolerate much higher densities before yield impact.',
+          example: 'A scout records 1-2 common chickweed plants per square meter in a vigorous winter wheat stand. Published thresholds indicate chickweed at this density causes less than 1% yield loss — well below the cost of a herbicide application. No action is warranted. Conversely, finding even 1 Palmer amaranth seedling per 10 meters of row exceeds the threshold due to its explosive seed production and resistance potential.',
         },
         {
           key: 'hand-weeding', icon: '🧤', label: 'Hand Weeding',
