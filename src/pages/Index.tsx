@@ -16,6 +16,7 @@ import StudentLeaderboard from '@/components/game/StudentLeaderboard';
 import CompetitionMode from '@/components/game/CompetitionMode';
 import AuthModal from '@/components/game/AuthModal';
 import FarmMode from '@/components/game/FarmMode';
+import PracticeHub from '@/components/game/PracticeHub';
 import type { GradeLevel } from '@/types/game';
 import { useEffect, useRef } from 'react';
 
@@ -31,6 +32,7 @@ const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCompetition, setShowCompetition] = useState(false);
   const [showFarmMode, setShowFarmMode] = useState(false);
+  const [showPracticeHub, setShowPracticeHub] = useState(false);
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
   const { createSession, updateSession } = useSessionPersistence(session?.studentId ?? null);
@@ -93,6 +95,7 @@ const Index = () => {
           onOpenAuth={() => setShowAuthModal(true)}
           onOpenCompetition={() => setShowCompetition(true)}
           onOpenFarmMode={() => setShowFarmMode(true)}
+          onOpenPracticeHub={() => setShowPracticeHub(true)}
           studentSession={session}
           auth={auth}
         />
@@ -109,6 +112,7 @@ const Index = () => {
       {showLeaderboard && <StudentLeaderboard onClose={() => setShowLeaderboard(false)} />}
       {showCompetition && <CompetitionMode onClose={() => setShowCompetition(false)} />}
       {showFarmMode && <FarmMode onClose={() => setShowFarmMode(false)} />}
+      {showPracticeHub && <PracticeHub onClose={() => setShowPracticeHub(false)} />}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} onAuthenticated={handleAuthComplete} />
       )}
