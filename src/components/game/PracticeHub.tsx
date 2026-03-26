@@ -15,6 +15,25 @@ import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import WeedControl from './practice-games/k5/WeedControl';
 
+// 6-8 Middle School games
+import MSNameTheWeed from './practice-games/middle/NameTheWeed';
+import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
+import FieldScout from './practice-games/middle/FieldScout';
+import PestID from './practice-games/middle/PestID';
+import MSHabitatMapping from './practice-games/middle/HabitatMapping';
+import WeedOrigins from './practice-games/middle/WeedOrigins';
+import NativeLookAlike from './practice-games/middle/NativeLookAlike';
+import WeedCompetitors from './practice-games/middle/WeedCompetitors';
+import InvasiveQuiz from './practice-games/middle/InvasiveQuiz';
+import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
+import LifeStageControl from './practice-games/middle/LifeStageControl';
+import MSLifeCycleMatching from './practice-games/middle/LifeCycleMatching';
+import EconomicThreshold from './practice-games/middle/EconomicThreshold';
+import MSWeedControl from './practice-games/middle/WeedControl';
+import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
+import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
+import LiguleLens from './practice-games/middle/LiguleLens';
+
 interface GameDef {
   id: string;
   name: string;
@@ -44,6 +63,26 @@ const k5Games: GameDef[] = [
   { id: 'weed-control', name: 'Weed Control', icon: '🧑‍🌾', gradient: 'from-orange-500 to-red-500', category: 'Control Methods', description: 'You are the agronomist — manage weeds before time runs out!', howToPlay: 'Weeds appear in a field. Click each weed, identify it, then choose the right control method. You only have a few minutes!', component: WeedControl },
 ];
 
+const middleGames: GameDef[] = [
+  { id: 'ms-name-weed', name: 'Name the Weed', icon: '🏷️', gradient: 'from-blue-500 to-cyan-500', category: 'Names', description: 'Identify weeds from images and descriptions!', howToPlay: 'Look at the weed image and read the clue. Choose the correct common name from four options.', component: MSNameTheWeed },
+  { id: 'ms-taxonomy', name: 'Taxonomy Tower', icon: '🏗️', gradient: 'from-amber-500 to-orange-500', category: 'Taxonomy', description: 'Climb the Plant Kingdom tower using a dichotomous key!', howToPlay: 'Navigate a dichotomous key tower to identify plant families and species.', component: MSTaxonomyTower },
+  { id: 'field-scout', name: 'Field Scout', icon: '🥾', gradient: 'from-green-600 to-emerald-700', category: 'Field Methods', description: 'Choose the best scouting pattern for each field!', howToPlay: 'Analyze each field and select the most efficient walking pattern for counting weeds.', component: FieldScout },
+  { id: 'pest-id', name: 'Pest ID', icon: '🔬', gradient: 'from-teal-500 to-cyan-600', category: 'Ecology', description: 'Classify weeds as aquatic, terrestrial, or parasitic!', howToPlay: 'Look at the weed and its habitat, then classify it into the correct ecological category.', component: PestID },
+  { id: 'ms-habitat', name: 'Habitat Mapping', icon: '🗺️', gradient: 'from-sky-500 to-blue-600', category: 'Habitats', description: 'Place weeds in temperate, arid, tropical, or wetland regions!', howToPlay: 'Drag each weed to the region where it grows best, then check your answers.', component: MSHabitatMapping },
+  { id: 'weed-origins', name: 'Weed Origins', icon: '🌍', gradient: 'from-indigo-500 to-purple-600', category: 'Origin', description: 'Drag weeds to their continent of origin!', howToPlay: 'A weed appears over a world map. Click the continent where it originally came from.', component: WeedOrigins },
+  { id: 'native-lookalike', name: 'Native vs. Introduced', icon: '👀', gradient: 'from-red-500 to-rose-500', category: 'Look-Alikes', description: 'Tell native plants apart from introduced look-alikes!', howToPlay: 'Two similar plants are shown. Pick the one that is native.', component: NativeLookAlike },
+  { id: 'weed-competitors', name: 'Weed Competitors', icon: '⚔️', gradient: 'from-orange-500 to-red-600', category: 'Competition', description: 'Compete as a weed for resources against rivals!', howToPlay: 'You are a weed! Make strategic decisions about leaves, roots, and reproduction to out-compete your opponent.', component: WeedCompetitors },
+  { id: 'invasive-quiz', name: 'Invasive Quiz', icon: '📋', gradient: 'from-red-600 to-orange-500', category: 'Invasive Weeds', description: 'Test your knowledge of invasive species impacts!', howToPlay: 'Answer quiz questions about invasive species, environmental harm, and population disturbances.', component: InvasiveQuiz },
+  { id: 'ms-safe-toxic', name: 'Safe vs. Toxic', icon: '☠️', gradient: 'from-violet-600 to-purple-600', category: 'Safety', description: 'Spot the toxic weed hiding among look-alikes!', howToPlay: 'Find the dangerous weed among similar-looking plants, then decide how to safely remove it.', component: MSSafeVsToxic },
+  { id: 'life-stage-control', name: 'Life Stage Control', icon: '🎯', gradient: 'from-emerald-500 to-green-600', category: 'Life Stages', description: 'Choose the best management for each growth stage!', howToPlay: 'A weed appears at a specific life stage. Pick the best control method for that stage.', component: LifeStageControl },
+  { id: 'ms-lifecycle', name: 'Life Cycle Matching', icon: '🃏', gradient: 'from-indigo-500 to-blue-500', category: 'Life Cycles', description: 'Flip cards to match weeds with their life cycle type!', howToPlay: 'Match weed names with Annual, Biennial, or Perennial across 3 rounds.', component: MSLifeCycleMatching },
+  { id: 'economic-threshold', name: 'Economic Threshold', icon: '💰', gradient: 'from-yellow-500 to-amber-600', category: 'Thresholds', description: 'Decide which weeds are most critical to control!', howToPlay: 'You have 20 weeds but can only control 10. Select the highest priority ones based on their traits.', component: EconomicThreshold },
+  { id: 'ms-weed-control', name: 'Weed Control', icon: '🧑‍🌾', gradient: 'from-orange-500 to-red-500', category: 'Control Methods', description: 'Manage weeds in the field using equipment and techniques!', howToPlay: 'Click weeds in the field, identify them, and choose the right control method before time runs out!', component: MSWeedControl },
+  { id: 'control-matching', name: 'Control Method Matching', icon: '🧪', gradient: 'from-cyan-500 to-teal-500', category: 'Chemical Control', description: 'Match herbicide groups to the weeds they target!', howToPlay: 'Identify whether the weed is a grass or broadleaf, then pick the correct herbicide group.', component: ControlMethodMatching },
+  { id: 'herbicide-applicator', name: 'Herbicide Applicator', icon: '💊', gradient: 'from-lime-500 to-green-600', category: 'Herbicide Resistance', description: 'Choose the right herbicide type for each weed!', howToPlay: 'Click weeds in a field and select the appropriate herbicide type (pre-emergent, post-emergent, etc.).', component: HerbicideApplicator },
+  { id: 'ligule-lens', name: 'Ligule Lens', icon: '🔍', gradient: 'from-green-500 to-emerald-600', category: 'Grass ID', description: 'Zoom in on ligules to identify grass species!', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species from four options.', component: LiguleLens },
+];
+
 type Screen = 'grades' | 'games' | 'info' | 'playing';
 
 export default function PracticeHub({ onClose }: { onClose: () => void }) {
@@ -61,7 +100,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
     return <GameComp onBack={backToGames} />;
   }
 
-  const games = selectedGrade === 'k5' ? k5Games : [];
+  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : [];
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
@@ -88,7 +127,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
             <h2 className="text-center text-lg text-muted-foreground mb-2">Choose Your Level</h2>
             {[
               { id: 'k5', label: 'Grades K–5', sub: 'Explorer', icon: '🌱', gradient: 'from-green-500 to-emerald-600', count: 15 },
-              { id: '68', label: 'Grades 6–8', sub: 'Investigator', icon: '🔬', gradient: 'from-blue-500 to-indigo-600', count: 0 },
+              { id: '68', label: 'Grades 6–8', sub: 'Investigator', icon: '🔬', gradient: 'from-blue-500 to-indigo-600', count: 17 },
               { id: '912', label: 'Grades 9–12', sub: 'Specialist', icon: '🧪', gradient: 'from-amber-500 to-orange-600', count: 0 },
             ].map(g => (
               <button
