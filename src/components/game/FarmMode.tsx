@@ -521,17 +521,27 @@ export default function FarmMode({ onClose }: Props) {
     // Auto-advance when timer runs out
     if (activeFieldIdx < fields.length - 1) {
       setActiveFieldIdx(i => i + 1);
-      closeDotPopup();
+      setSelectedDot(null);
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+      quizOptionsRef.current = null;
       setFieldStartTime(Date.now());
     } else {
-      // For upper levels with seasonal flow: finish this season's scouting of all fields
-      if (hasMultipleSeasons) {
-        finishSeasonScouting();
-      } else {
-        finishScouting();
-      }
+      // Collect found weeds and transition to sorting
+      const foundMap = new Map<string, string>();
+      fields.forEach(f => f.dots.filter(d => d.found).forEach(d => {
+        if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
+      }));
+      const unsorted: UnsortedWeed[] = [...foundMap.entries()].map(([weedId, dotId]) => ({ weedId, dotId }));
+      setUnsortedWeeds(shuffle(unsorted));
+      setCurrentSortWeed(0);
+      setSelectedSortCats([]);
+      setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+      setSortResults([]);
+      setPhase('sorting');
+      toast.success('Time is up! Now sort your findings.');
     }
-  }, [activeFieldIdx, fields.length, hasMultipleSeasons]);
+  }, [activeFieldIdx, fields]);
 
   // ── Grade + avatar ──────────────────────────────────────
   const handleGradeSelect = useCallback((g: GradeLevel) => {
@@ -659,25 +669,50 @@ export default function FarmMode({ onClose }: Props) {
 
   // ── Move to next field (elementary: linear; upper: all fields then sort) ──
   const handleFinishField = useCallback(() => {
+    const closePopup = () => {
+      setSelectedDot(null);
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+      quizOptionsRef.current = null;
+    };
+    const transitionToSorting = () => {
+      const foundMap = new Map<string, string>();
+      fields.forEach(f => f.dots.filter(d => d.found).forEach(d => {
+        if (!foundMap.has(d.weedId)) foundMap.set(d.weedId, d.id);
+      }));
+      const unsorted: UnsortedWeed[] = [...foundMap.entries()].map(([weedId, dotId]) => ({ weedId, dotId }));
+      setUnsortedWeeds(shuffle(unsorted));
+      setCurrentSortWeed(0);
+      setSelectedSortCats([]);
+      setSortedWeeds({ monocot: [], dicot: [], annual: [], perennial: [], invasive: [] });
+      setSortResults([]);
+      setPhase('sorting');
+      toast.success('Scouting complete! Now sort your findings into categories.');
+    };
+
     if (activeFieldIdx < fields.length - 1) {
       setActiveFieldIdx(i => i + 1);
-      closeDotPopup();
+      closePopup();
       if (hasTimer) setFieldStartTime(Date.now());
     } else if (!hasMultipleSeasons) {
-      // Elementary: single season, proceed as before
       if (scoutPhaseIdx < scoutPhases.length - 1) {
         setScoutPhaseIdx(i => i + 1);
         setActiveFieldIdx(0);
-        closeDotPopup();
+        closePopup();
         toast('🌱 Season advancing...', { description: scoutPhases[scoutPhaseIdx + 1]?.name });
       } else {
-        finishScouting();
+        transitionToSorting();
       }
     } else {
-      // Upper levels: all fields scouted for this season → sort & manage
-      finishSeasonScouting();
+      // Track missed weeds
+      const missed: string[] = [];
+      fields.forEach(f => f.dots.filter(d => !d.found).forEach(d => {
+        if (!missed.includes(d.weedId)) missed.push(d.weedId);
+      }));
+      setMissedWeedIds(prev => [...prev, ...missed.filter(id => !prev.includes(id))]);
+      transitionToSorting();
     }
-  }, [activeFieldIdx, fields.length, scoutPhaseIdx, scoutPhases, closeDotPopup, hasMultipleSeasons, hasTimer]);
+  }, [activeFieldIdx, fields, scoutPhaseIdx, scoutPhases, hasMultipleSeasons, hasTimer]);
 
   const finishScouting = useCallback(() => {
     const foundMap = new Map<string, string>();

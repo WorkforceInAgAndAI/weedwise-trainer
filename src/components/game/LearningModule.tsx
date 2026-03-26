@@ -581,6 +581,25 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
         }
       });
 
+      // Build invasive vs native look-alike pairs for 6-8 and 9-12
+      const invasiveNativePairs: [Weed, Weed][] = [];
+      if (grade === 'middle' || grade === 'high') {
+        const invasiveWeeds = weeds.filter(w => w.origin === 'Introduced');
+        const nativeWeeds = weeds.filter(w => w.origin === 'Native');
+        const invNatSeen = new Set<string>();
+        // Match invasive species with native look-alikes from the same family
+        invasiveWeeds.forEach(inv => {
+          const nativeLookAlike = nativeWeeds.find(nat => 
+            nat.family === inv.family && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id)
+          );
+          if (nativeLookAlike) {
+            invNatSeen.add(inv.id);
+            invNatSeen.add(nativeLookAlike.id);
+            invasiveNativePairs.push([inv, nativeLookAlike]);
+          }
+        });
+      }
+
       const stages = [
         { stage: 'seedling', label: '🌱 Seedling' },
         { stage: 'vegetative', label: '🌿 Vegetative' },
@@ -588,70 +607,99 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
         { stage: 'whole', label: '🪴 Whole Plant' },
       ];
 
+      const renderPairCard = (a: Weed, b: Weed, key: string) => {
+        const aIsGrass = a.plantType === 'Monocot';
+        const bIsGrass = b.plantType === 'Monocot';
+        const showLigule = aIsGrass || bIsGrass;
+        return (
+          <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
+            {/* Header */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <ClickableWeedName weed={a} onSelect={onSelectWeed} className="text-sm font-bold" />
+                {grade !== 'elementary' && <div className="text-xs text-primary italic">{a.scientificName}</div>}
+                <div className="text-[10px] text-muted-foreground">{a.family}</div>
+                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${a.origin === 'Introduced' ? 'bg-destructive/15 text-destructive' : 'bg-accent/15 text-accent'}`}>
+                  {a.origin === 'Introduced' ? '🚢 Introduced' : '🏡 Native'}
+                </span>
+              </div>
+              <div className="text-center">
+                <ClickableWeedName weed={b} onSelect={onSelectWeed} className="text-sm font-bold" />
+                {grade !== 'elementary' && <div className="text-xs text-primary italic">{b.scientificName}</div>}
+                <div className="text-[10px] text-muted-foreground">{b.family}</div>
+                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${b.origin === 'Introduced' ? 'bg-destructive/15 text-destructive' : 'bg-accent/15 text-accent'}`}>
+                  {b.origin === 'Introduced' ? '🚢 Introduced' : '🏡 Native'}
+                </span>
+              </div>
+            </div>
+
+            {/* All growth stages side by side */}
+            {stages.map(s => (
+              <div key={s.stage}>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                    <WeedImage weedId={a.id} stage={s.stage} className="w-full h-full" />
+                  </div>
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                    <WeedImage weedId={b.id} stage={s.stage} className="w-full h-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Ligule comparison for grasses */}
+            {showLigule && (
+              <div>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">🔍 Ligule</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                    {aIsGrass ? <WeedImage weedId={a.id} stage="ligule" className="w-full h-full" /> : <div className="flex items-center justify-center h-full text-xs text-muted-foreground">Not a grass</div>}
+                  </div>
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                    {bIsGrass ? <WeedImage weedId={b.id} stage="ligule" className="w-full h-full" /> : <div className="flex items-center justify-center h-full text-xs text-muted-foreground">Not a grass</div>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Difference explanation */}
+            <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
+              <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
+              <p>{a.lookAlike.difference}</p>
+            </div>
+          </div>
+        );
+      };
+
       return (
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-2">📝 Look-Alike Species</p>
             <p>Some weeds look very similar but require different management. Compare them at every growth stage to learn the key differences.</p>
           </div>
-          {pairs.map(([a, b]) => {
-            const aIsGrass = a.plantType === 'Monocot';
-            const bIsGrass = b.plantType === 'Monocot';
-            const showLigule = aIsGrass || bIsGrass;
-            return (
-              <div key={a.id} className="bg-card border border-border rounded-lg p-4 space-y-4">
-                {/* Header */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <ClickableWeedName weed={a} onSelect={onSelectWeed} className="text-sm font-bold" />
-                    {grade !== 'elementary' && <div className="text-xs text-primary italic">{a.scientificName}</div>}
-                    <div className="text-[10px] text-muted-foreground">{a.family}</div>
-                  </div>
-                  <div className="text-center">
-                    <ClickableWeedName weed={b} onSelect={onSelectWeed} className="text-sm font-bold" />
-                    {grade !== 'elementary' && <div className="text-xs text-primary italic">{b.scientificName}</div>}
-                    <div className="text-[10px] text-muted-foreground">{b.family}</div>
-                  </div>
-                </div>
 
-                {/* All growth stages side by side */}
-                {stages.map(s => (
-                  <div key={s.stage}>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                        <WeedImage weedId={a.id} stage={s.stage} className="w-full h-full" />
-                      </div>
-                      <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                        <WeedImage weedId={b.id} stage={s.stage} className="w-full h-full" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Ligule comparison for grasses */}
-                {showLigule && (
-                  <div>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">🔍 Ligule</div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                        {aIsGrass ? <WeedImage weedId={a.id} stage="ligule" className="w-full h-full" /> : <div className="flex items-center justify-center h-full text-xs text-muted-foreground">Not a grass</div>}
-                      </div>
-                      <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                        {bIsGrass ? <WeedImage weedId={b.id} stage="ligule" className="w-full h-full" /> : <div className="flex items-center justify-center h-full text-xs text-muted-foreground">Not a grass</div>}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Difference explanation */}
-                <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
-                  <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
-                  <p>{a.lookAlike.difference}</p>
-                </div>
+          {/* Invasive vs Native Look-Alikes section for 6-8 and 9-12 */}
+          {invasiveNativePairs.length > 0 && (
+            <div className="space-y-4">
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+                <h3 className="font-display font-bold text-foreground text-base mb-2">⚠️ Invasive vs Native Look-Alikes</h3>
+                <p className="text-sm text-foreground">
+                  These pairs contain an <strong className="text-destructive">invasive (introduced)</strong> species that closely resembles a <strong className="text-accent">native</strong> species. 
+                  Correctly identifying invasive species is critical — they require immediate action to prevent spread, while their native counterparts are part of the natural ecosystem.
+                </p>
               </div>
-            );
-          })}
+              {invasiveNativePairs.map(([a, b]) => renderPairCard(a, b, `inv-${a.id}-${b.id}`))}
+            </div>
+          )}
+
+          {/* Family-based Look-Alikes */}
+          {invasiveNativePairs.length > 0 && (
+            <div className="border-t border-border pt-4">
+              <h3 className="font-display font-bold text-foreground text-base mb-4">🔀 Family-Based Look-Alikes</h3>
+            </div>
+          )}
+          {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
         </div>
       );
     }

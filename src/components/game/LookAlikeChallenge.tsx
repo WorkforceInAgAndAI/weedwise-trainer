@@ -22,6 +22,23 @@ function getFamilyPairs(): Array<[Weed, Weed]> {
   return pairs;
 }
 
+// Invasive vs native pairs from the same family
+function getInvasiveNativePairs(): Array<[Weed, Weed]> {
+  const invasive = weeds.filter(w => w.origin === 'Introduced');
+  const native = weeds.filter(w => w.origin === 'Native');
+  const pairs: Array<[Weed, Weed]> = [];
+  const used = new Set<string>();
+  invasive.forEach(inv => {
+    const match = native.find(nat => nat.family === inv.family && !used.has(nat.id));
+    if (match) {
+      used.add(match.id);
+      used.add(inv.id);
+      pairs.push([inv, match]);
+    }
+  });
+  return pairs;
+}
+
 interface Props {
   onComplete: (results: Array<{ weedId: string; correct: boolean }>) => void;
   onNext: () => void;
@@ -30,11 +47,15 @@ interface Props {
 export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
   const STAGES = ['seedling', 'vegetative', 'flower', 'whole'] as const;
   const pair = useMemo(() => {
-    const pairs = getFamilyPairs();
-    const p = pairs[Math.floor(Math.random() * pairs.length)];
+    // 40% chance to get an invasive vs native pair
+    const useInvasiveNative = Math.random() < 0.4;
+    const invNatPairs = useInvasiveNative ? getInvasiveNativePairs() : [];
+    const allPairs = invNatPairs.length > 0 ? invNatPairs : getFamilyPairs();
+    const p = allPairs[Math.floor(Math.random() * allPairs.length)];
     const flipped = Math.random() < 0.5;
     const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
-    return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage };
+    const isInvasiveVsNative = invNatPairs.length > 0 && useInvasiveNative;
+    return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage, isInvasiveVsNative };
   }, []);
 
   const [choice, setChoice] = useState<string | null>(null);
@@ -59,8 +80,15 @@ export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
       <div>
-        <h2 className="font-display font-bold text-lg text-foreground">🔍 Look-Alike Challenge</h2>
-        <p className="text-sm text-muted-foreground">Both species are in the <span className="text-primary font-semibold">{pair.weedA.family}</span> family. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</p>
+        <h2 className="font-display font-bold text-lg text-foreground">
+          {pair.isInvasiveVsNative ? '⚠️ Invasive vs Native Challenge' : '🔍 Look-Alike Challenge'}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {pair.isInvasiveVsNative
+            ? <>One is <span className="text-destructive font-semibold">invasive</span> and the other is <span className="text-accent font-semibold">native</span>. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
+            : <>Both species are in the <span className="text-primary font-semibold">{pair.weedA.family}</span> family. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
+          }
+        </p>
       </div>
 
       {/* Side by side images */}
@@ -78,7 +106,12 @@ export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
             </div>
             <div className="p-3 bg-secondary/50">
               {submitted ? (
-                <div className="text-sm font-semibold text-foreground">{w.commonName}</div>
+                <div>
+                  <div className="text-sm font-semibold text-foreground">{w.commonName}</div>
+                  <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${w.origin === 'Introduced' ? 'bg-destructive/15 text-destructive' : 'bg-accent/15 text-accent'}`}>
+                    {w.origin === 'Introduced' ? '🚢 Introduced' : '🏡 Native'}
+                  </span>
+                </div>
               ) : (
                 <div className="text-sm text-muted-foreground">Tap to select</div>
               )}

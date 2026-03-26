@@ -153,14 +153,6 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
             <span>🏫</span> <span>Class</span>
           </button>
-          <button onClick={onOpenCompetition}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
-            <span>⚔️</span> <span>Compete</span>
-          </button>
-          <button onClick={onOpenLeaderboard}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
-            <span>🏆</span> <span>Leaderboard</span>
-          </button>
         </div>
         {/* Tools row */}
         <div className="flex gap-2 justify-center">
