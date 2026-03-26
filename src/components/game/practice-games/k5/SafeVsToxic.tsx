@@ -44,13 +44,18 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
     setRound(i => i + 1); setSelected(null); setIdentified(false); setRemovalChoice(null);
   };
 
+  const restart = () => { setRound(0); setSelected(null); setIdentified(false); setRemovalChoice(null); setScore(0); };
+
   if (done) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
         <div className="text-5xl mb-4">☠️</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Safety Expert!</h2>
         <p className="text-muted-foreground mb-6">You identified {score}/{rounds.length} toxic weeds!</p>
-        <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        <div className="flex gap-3 justify-center">
+          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+        </div>
       </div>
     </div>
   );
