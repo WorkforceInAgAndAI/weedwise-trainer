@@ -15,6 +15,25 @@ import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import WeedControl from './practice-games/k5/WeedControl';
 
+// 6-8 Middle School games
+import MSNameTheWeed from './practice-games/middle/NameTheWeed';
+import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
+import FieldScout from './practice-games/middle/FieldScout';
+import PestID from './practice-games/middle/PestID';
+import MSHabitatMapping from './practice-games/middle/HabitatMapping';
+import WeedOrigins from './practice-games/middle/WeedOrigins';
+import NativeLookAlike from './practice-games/middle/NativeLookAlike';
+import WeedCompetitors from './practice-games/middle/WeedCompetitors';
+import InvasiveQuiz from './practice-games/middle/InvasiveQuiz';
+import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
+import LifeStageControl from './practice-games/middle/LifeStageControl';
+import MSLifeCycleMatching from './practice-games/middle/LifeCycleMatching';
+import EconomicThreshold from './practice-games/middle/EconomicThreshold';
+import MSWeedControl from './practice-games/middle/WeedControl';
+import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
+import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
+import LiguleLens from './practice-games/middle/LiguleLens';
+
 interface GameDef {
   id: string;
   name: string;
