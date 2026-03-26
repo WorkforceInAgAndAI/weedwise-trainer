@@ -141,7 +141,7 @@ export default function LearningModule({ onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className="max-w-5xl mx-auto p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             {selectedTopic && (
@@ -182,14 +182,33 @@ export default function LearningModule({ onClose }: Props) {
             ))}
           </div>
         ) : (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-display font-bold text-foreground">
-                {TOPICS.find(t => t.id === selectedTopic)?.icon} {TOPICS.find(t => t.id === selectedTopic)?.name}
-              </h2>
-              {topicNeedsViewToggle && <ViewToggle view={viewMode} onChange={setViewMode} />}
+          <div className="flex gap-4">
+            {/* Topic sidebar */}
+            <nav className="hidden sm:flex flex-col gap-1.5 w-44 shrink-0 sticky top-24 self-start">
+              {availableTopics.map(topic => (
+                <button
+                  key={topic.id}
+                  onClick={() => { setSelectedTopic(topic.id); setViewMode('list'); }}
+                  className={`px-3 py-2 rounded-full text-xs font-medium text-left transition-all truncate ${
+                    selectedTopic === topic.id
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground'
+                  }`}
+                >
+                  {topic.icon} {topic.name}
+                </button>
+              ))}
+            </nav>
+            {/* Topic content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-display font-bold text-foreground">
+                  {TOPICS.find(t => t.id === selectedTopic)?.icon} {TOPICS.find(t => t.id === selectedTopic)?.name}
+                </h2>
+                {topicNeedsViewToggle && <ViewToggle view={viewMode} onChange={setViewMode} />}
+              </div>
+              <TopicContent topicId={selectedTopic} grade={selectedGrade} topicWeeds={getTopicWeeds(selectedTopic)} onSelectWeed={setSelectedWeed} viewMode={viewMode} />
             </div>
-            <TopicContent topicId={selectedTopic} grade={selectedGrade} topicWeeds={getTopicWeeds(selectedTopic)} onSelectWeed={setSelectedWeed} viewMode={viewMode} />
           </div>
         )}
       </div>
