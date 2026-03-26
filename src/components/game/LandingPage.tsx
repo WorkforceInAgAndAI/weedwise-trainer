@@ -1,15 +1,7 @@
 import { useState } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
-import { GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
-import type { GradeLevel } from '@/types/game';
 import { Switch } from '@/components/ui/switch';
 import type { useAuth } from '@/hooks/useAuth';
-
-const gradeCards: { grade: GradeLevel; icon: string; colorClass: string; borderClass: string }[] = [
-  { grade: 'elementary', icon: '🌱', colorClass: 'text-grade-elementary', borderClass: 'border-grade-elementary hover:shadow-[0_0_20px_hsl(95_57%_46%/0.3)]' },
-  { grade: 'middle', icon: '🔬', colorClass: 'text-grade-middle', borderClass: 'border-grade-middle hover:shadow-[0_0_20px_hsl(210_60%_50%/0.3)]' },
-  { grade: 'high', icon: '🧪', colorClass: 'text-grade-high', borderClass: 'border-grade-high hover:shadow-[0_0_20px_hsl(46_72%_45%/0.3)]' },
-];
 
 interface Props extends GameEngine {
   onOpenLearning: () => void;
@@ -20,12 +12,12 @@ interface Props extends GameEngine {
   onOpenAuth: () => void;
   onOpenCompetition: () => void;
   onOpenFarmMode: () => void;
+  onOpenPracticeHub: () => void;
   studentSession: { nickname: string; className: string } | null;
   auth: ReturnType<typeof useAuth>;
 }
 
-export default function LandingPage({ startGame, setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenLeaderboard, onOpenAuth, onOpenCompetition, onOpenFarmMode, studentSession, auth }: Props) {
-  const [showGradePicker, setShowGradePicker] = useState(false);
+export default function LandingPage({ setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenAuth, onOpenFarmMode, onOpenPracticeHub, studentSession, auth }: Props) {
   const [isLightMode, setIsLightMode] = useState(() => {
     if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
       document.documentElement.classList.add('light');
@@ -99,51 +91,22 @@ export default function LandingPage({ startGame, setShowInstructor, onOpenLearni
           <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Study weeds by topic</div>
         </button>
         <button
-          onClick={() => setShowGradePicker(true)}
+          onClick={onOpenPracticeHub}
           className="bg-card border-2 border-accent/30 rounded-xl p-5 text-center hover:border-accent hover:scale-[1.02] transition-all"
         >
           <div className="text-3xl sm:text-4xl mb-2">🎯</div>
           <div className="font-display font-bold text-sm sm:text-base text-foreground">Practice</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Quiz & mini-games</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Mini-games by level</div>
         </button>
         <button
           onClick={onOpenFarmMode}
-          className="bg-card border-2 border-grade-high/30 rounded-xl p-5 text-center hover:border-grade-high hover:scale-[1.02] transition-all relative overflow-hidden"
+          className="bg-card border-2 border-grade-high/30 rounded-xl p-5 text-center hover:border-grade-high hover:scale-[1.02] transition-all"
         >
           <div className="text-3xl sm:text-4xl mb-2">🌾</div>
           <div className="font-display font-bold text-sm sm:text-base text-foreground">Play</div>
           <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Land Steward</div>
         </button>
       </div>
-
-      {/* Grade picker modal */}
-      {showGradePicker && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowGradePicker(false)}>
-          <div className="bg-card border border-border rounded-xl p-6 max-w-lg w-full animate-scale-in" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display font-bold text-xl text-foreground">Choose Your Level</h2>
-              <button onClick={() => setShowGradePicker(false)} className="text-muted-foreground hover:text-foreground text-xl">✕</button>
-            </div>
-            <div className="grid gap-4">
-              {gradeCards.map(({ grade, icon, colorClass, borderClass }) => (
-                <button
-                  key={grade}
-                  onClick={() => { setShowGradePicker(false); startGame(grade); }}
-                  className={`bg-secondary/50 border-2 ${borderClass} rounded-lg p-5 text-left transition-all duration-300 hover:scale-[1.02] flex items-center gap-4`}
-                >
-                  <div className="text-4xl">{icon}</div>
-                  <div className="flex-1">
-                    <h3 className={`text-lg font-display font-bold ${colorClass}`}>{GRADE_NAMES[grade]}</h3>
-                    <p className="text-sm text-muted-foreground">Grades {GRADE_RANGES[grade]}</p>
-                    <p className="text-xs text-muted-foreground mt-1">5 phases • 88 species • XP rewards</p>
-                  </div>
-                  <span className="text-muted-foreground text-lg">→</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Organized secondary actions */}
       <div className="max-w-xl w-full space-y-3">
