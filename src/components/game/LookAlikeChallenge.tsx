@@ -47,11 +47,15 @@ interface Props {
 export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
   const STAGES = ['seedling', 'vegetative', 'flower', 'whole'] as const;
   const pair = useMemo(() => {
-    const pairs = getFamilyPairs();
-    const p = pairs[Math.floor(Math.random() * pairs.length)];
+    // 40% chance to get an invasive vs native pair
+    const useInvasiveNative = Math.random() < 0.4;
+    const invNatPairs = useInvasiveNative ? getInvasiveNativePairs() : [];
+    const allPairs = invNatPairs.length > 0 ? invNatPairs : getFamilyPairs();
+    const p = allPairs[Math.floor(Math.random() * allPairs.length)];
     const flipped = Math.random() < 0.5;
     const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
-    return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage };
+    const isInvasiveVsNative = invNatPairs.length > 0 && useInvasiveNative;
+    return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage, isInvasiveVsNative };
   }, []);
 
   const [choice, setChoice] = useState<string | null>(null);
