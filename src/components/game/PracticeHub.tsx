@@ -163,7 +163,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
             {[
               { id: 'k5', label: 'Grades K–5', sub: 'Explorer', icon: '🌱', gradient: 'from-green-500 to-emerald-600', count: 15 },
               { id: '68', label: 'Grades 6–8', sub: 'Investigator', icon: '🔬', gradient: 'from-blue-500 to-indigo-600', count: 17 },
-              { id: '912', label: 'Grades 9–12', sub: 'Specialist', icon: '🧪', gradient: 'from-amber-500 to-orange-600', count: 0 },
+              { id: '912', label: 'Grades 9–12', sub: 'Specialist', icon: '🧪', gradient: 'from-amber-500 to-orange-600', count: 15 },
             ].map(g => (
               <button
                 key={g.id}
