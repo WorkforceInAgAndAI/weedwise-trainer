@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
+import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -121,15 +122,26 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-primary font-bold ml-2">{matchCount}/{selected.length} matched</span>
       </div>
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="grid grid-cols-3 gap-3 max-w-sm">
+        <div className="grid grid-cols-3 gap-3 max-w-md w-full">
           {cards.map(c => (
             <button key={c.id} onClick={() => handleClick(c.id)}
-              className={`aspect-square rounded-xl text-sm font-bold flex items-center justify-center p-2 transition-all border-2 ${
-                c.matched ? 'bg-green-500/20 border-green-500 text-green-500' :
-                c.flipped ? 'bg-card border-primary text-foreground' :
-                'bg-secondary border-border text-muted-foreground hover:border-primary/50'
+              className={`h-28 rounded-xl font-bold flex flex-col items-center justify-center p-2 transition-all border-2 ${
+                c.matched ? 'bg-green-500/20 border-green-500' :
+                c.flipped ? 'bg-card border-primary' :
+                'bg-secondary border-border hover:border-primary/50'
               }`}>
-              {c.flipped || c.matched ? c.content : '?'}
+              {c.flipped || c.matched ? (
+                <>
+                  {c.type === 'weed' && (
+                    <div className="w-12 h-12 rounded-lg overflow-hidden mb-1">
+                      <WeedImage weedId={c.weedId} stage="plant" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <span className={`text-xs text-foreground ${c.type === 'cycle' ? 'text-base' : ''}`}>{c.content}</span>
+                </>
+              ) : (
+                <span className="text-2xl text-muted-foreground">?</span>
+              )}
             </button>
           ))}
         </div>

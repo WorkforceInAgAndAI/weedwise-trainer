@@ -13,9 +13,8 @@ function buildTower(target: typeof weeds[0]): TowerLevel[] {
   levels.push({ question: 'Class?', options: isMono ? ['Monocotyledon', 'Dicotyledon'] : ['Dicotyledon', 'Monocotyledon'], correct: 0 });
   const families = [...new Set(weeds.map(w => w.family))];
   const wrongFam = shuffle(families.filter(f => f !== target.family))[0] || 'Unknown';
-  levels.push({ question: 'Family?', options: shuffle([target.family, wrongFam]) as [string, string], correct: shuffle([target.family, wrongFam]).indexOf(target.family) });
-  // fix correct index
-  levels[2].correct = levels[2].options.indexOf(target.family);
+  const famOpts = shuffle([target.family, wrongFam]) as [string, string];
+  levels.push({ question: 'Family?', options: famOpts, correct: famOpts.indexOf(target.family) });
   const wrongGenus = shuffle(weeds.filter(w => w.id !== target.id).map(w => w.scientificName.split(' ')[0])).filter(g => g !== target.scientificName.split(' ')[0])[0] || 'Other';
   const genus = target.scientificName.split(' ')[0];
   const genusOpts = shuffle([genus, wrongGenus]) as [string, string];
@@ -72,7 +71,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
             <WeedImage weedId={t.id} stage="plant" className="w-full h-full object-cover" />
           </div>
         </div>
-        <p className="text-center text-sm text-muted-foreground mb-4">Find: <strong className="text-foreground italic">{t.scientificName}</strong></p>
+        <p className="text-center text-sm text-muted-foreground mb-4">Find: <strong className="text-foreground">{t.commonName}</strong></p>
         <div className="flex flex-col-reverse gap-2">
           {tower.map((lv, i) => (
             <div key={i} className={`p-3 rounded-xl border-2 ${i < level ? 'border-green-500 bg-green-500/10' : i === level ? 'border-primary bg-primary/10' : 'border-border bg-secondary/30 opacity-50'}`}>

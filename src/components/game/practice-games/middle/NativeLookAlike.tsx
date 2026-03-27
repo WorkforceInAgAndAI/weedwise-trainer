@@ -15,7 +15,6 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
       }
       if (result.length >= 5) break;
     }
-    // Fill remaining with family pairs
     if (result.length < 5) {
       const families = [...new Set(weeds.map(w => w.family))];
       for (const fam of shuffle(families)) {
@@ -91,7 +90,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
                 <div className="w-32 h-32 rounded-lg overflow-hidden bg-secondary mb-2">
                   <WeedImage weedId={weed.id} stage="vegetative" className="w-full h-full object-cover" />
                 </div>
-                {submitted && <p className="text-sm font-bold text-foreground">{weed.commonName}</p>}
+                <p className="text-sm font-bold text-foreground">{weed.commonName}</p>
                 {submitted && <p className={`text-xs font-medium ${weed.origin === 'Native' ? 'text-green-500' : 'text-amber-500'}`}>{weed.origin}</p>}
               </button>
             );
