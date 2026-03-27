@@ -34,6 +34,23 @@ import ControlMethodMatching from './practice-games/middle/ControlMethodMatching
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
 import LiguleLens from './practice-games/middle/LiguleLens';
 
+// 9-12 High School games
+import HSNameTheWeed from './practice-games/high/NameTheWeed';
+import HSTaxonomyTower from './practice-games/high/TaxonomyTower';
+import SpotTheDifferences from './practice-games/high/SpotTheDifferences';
+import HSHabitatMapping from './practice-games/high/HabitatMapping';
+import InvasiveHabitatMapping from './practice-games/high/InvasiveHabitatMapping';
+import FieldScoutTools from './practice-games/high/FieldScoutTools';
+import LifeCycleSort from './practice-games/high/LifeCycleSort';
+import SleepySeeds from './practice-games/high/SleepySeeds';
+import AllelopathyAttack from './practice-games/high/AllelopathyAttack';
+import FormYourFarm from './practice-games/high/FormYourFarm';
+import HSWeedControl from './practice-games/high/WeedControl';
+import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
+import CropDoctor from './practice-games/high/CropDoctor';
+import HerbicideResistor from './practice-games/high/HerbicideResistor';
+import LifeStageMaze from './practice-games/high/LifeStageMaze';
+
 interface GameDef {
   id: string;
   name: string;
@@ -83,6 +100,24 @@ const middleGames: GameDef[] = [
   { id: 'ligule-lens', name: 'Ligule Lens', icon: '🔍', gradient: 'from-green-500 to-emerald-600', category: 'Grass ID', description: 'Zoom in on ligules to identify grass species!', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species from four options.', component: LiguleLens },
 ];
 
+const highGames: GameDef[] = [
+  { id: 'hs-name-weed', name: 'Name the Weed', icon: '🎓', gradient: 'from-blue-600 to-indigo-600', category: 'Scientific Names', description: 'Identify weeds by their scientific name!', howToPlay: 'Look at the image and traits, then choose the correct scientific name from four options.', component: HSNameTheWeed },
+  { id: 'hs-taxonomy', name: 'Taxonomy Tower', icon: '🏗️', gradient: 'from-amber-600 to-orange-600', category: 'Taxonomy', description: 'Navigate genus and species using a dichotomous key!', howToPlay: 'Climb the tower from Kingdom to Species, making binary decisions at each level.', component: HSTaxonomyTower },
+  { id: 'spot-differences', name: 'Spot the Differences', icon: '🔍', gradient: 'from-pink-500 to-rose-500', category: 'Intra-species', description: 'Find differences between male and female plants!', howToPlay: 'Compare male and female plants of the same species and tap each difference you can spot.', component: SpotTheDifferences },
+  { id: 'hs-habitat', name: 'Habitat Mapping', icon: '🗺️', gradient: 'from-sky-500 to-blue-600', category: 'Habitats', description: 'Map weeds to habitat regions with country-level detail!', howToPlay: 'Place weeds into temperate, arid, tropical, or wetland zones and check your answers.', component: HSHabitatMapping },
+  { id: 'invasive-habitat', name: 'Invasive Habitat Map', icon: '⚠️', gradient: 'from-red-500 to-orange-500', category: 'Invasive Habitats', description: 'Map invasive species to the habitats they have invaded!', howToPlay: 'Place each invasive weed into the habitat zone it has colonized.', component: InvasiveHabitatMapping },
+  { id: 'hs-field-scout', name: 'Field Scout Tools', icon: '🛸', gradient: 'from-green-600 to-emerald-700', category: 'Scouting Tools', description: 'Choose the right scouting tool for each field!', howToPlay: 'Evaluate field conditions and select from drones, rovers, manual scouting, or satellite imagery.', component: FieldScoutTools },
+  { id: 'hs-lifecycle', name: 'Life Cycle Sort', icon: '❄️', gradient: 'from-cyan-500 to-blue-500', category: 'Life Cycles', description: 'Sort winter annuals, summer annuals, and more!', howToPlay: 'Classify weeds into winter annual, summer annual, perennial, or biennial categories.', component: LifeCycleSort },
+  { id: 'sleepy-seeds', name: 'Sleepy Seeds', icon: '😴', gradient: 'from-purple-500 to-indigo-500', category: 'Seed Dormancy', description: 'Choose the right dormancy mechanism to survive!', howToPlay: 'You are a seed facing environmental challenges. Pick the best dormancy strategy to survive.', component: SleepySeeds },
+  { id: 'allelopathy', name: 'Allelopathy Attack', icon: '⚔️', gradient: 'from-emerald-500 to-teal-600', category: 'Allelopathy', description: 'Use chemical warfare to suppress competing weeds!', howToPlay: 'Choose an allelopathy strategy (root exudates, leaf leachate, etc.) to outcompete an enemy weed.', component: AllelopathyAttack },
+  { id: 'form-farm', name: 'Form Your Farm', icon: '🌾', gradient: 'from-yellow-500 to-amber-600', category: 'Economic Thresholds', description: 'Design a farm and defend it against weeds!', howToPlay: 'Choose your crop, season, and threshold, then decide which weeds to treat or wait on.', component: FormYourFarm },
+  { id: 'hs-weed-control', name: 'Weed Control', icon: '🧑‍🌾', gradient: 'from-orange-500 to-red-500', category: 'Control Methods', description: 'Manage weeds in the field as an agronomist!', howToPlay: 'Click weeds in the field, identify them, and choose the right control method before time runs out.', component: HSWeedControl },
+  { id: 'hs-control-match', name: 'Mode of Action Match', icon: '🧪', gradient: 'from-teal-500 to-cyan-600', category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action!', howToPlay: 'For each weed, select the correct herbicide mode of action (ALS, ACCase, PSII, etc.).', component: HSControlMethodMatching },
+  { id: 'crop-doctor', name: 'Crop Doctor', icon: '💊', gradient: 'from-red-600 to-rose-600', category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops!', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Earn money for correct diagnoses.', component: CropDoctor },
+  { id: 'herbicide-resistor', name: 'Herbicide Resistor', icon: '🧬', gradient: 'from-violet-500 to-purple-600', category: 'Resistance', description: 'Build a 3-year plan to prevent herbicide resistance!', howToPlay: 'Choose crop-herbicide combos across 3 years to maximize diversity and minimize resistance risk.', component: HerbicideResistor },
+  { id: 'life-stage-maze', name: 'Life Stage Maze', icon: '🧩', gradient: 'from-lime-500 to-green-600', category: 'Life Stages', description: 'Connect life stages to the best control methods!', howToPlay: 'Match each weed life stage (seedling, vegetative, reproductive, mature) to the best control method.', component: LifeStageMaze },
+];
+
 type Screen = 'grades' | 'games' | 'info' | 'playing';
 
 export default function PracticeHub({ onClose }: { onClose: () => void }) {
@@ -100,7 +135,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
     return <GameComp onBack={backToGames} />;
   }
 
-  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : [];
+  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : selectedGrade === '912' ? highGames : [];
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
@@ -128,7 +163,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
             {[
               { id: 'k5', label: 'Grades K–5', sub: 'Explorer', icon: '🌱', gradient: 'from-green-500 to-emerald-600', count: 15 },
               { id: '68', label: 'Grades 6–8', sub: 'Investigator', icon: '🔬', gradient: 'from-blue-500 to-indigo-600', count: 17 },
-              { id: '912', label: 'Grades 9–12', sub: 'Specialist', icon: '🧪', gradient: 'from-amber-500 to-orange-600', count: 0 },
+              { id: '912', label: 'Grades 9–12', sub: 'Specialist', icon: '🧪', gradient: 'from-amber-500 to-orange-600', count: 15 },
             ].map(g => (
               <button
                 key={g.id}
