@@ -32,6 +32,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
   const [found, setFound] = useState<string[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
+  const [idChoice, setIdChoice] = useState<string | null>(null);
   const [identified, setIdentified] = useState(false);
   const [methodPick, setMethodPick] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -50,11 +51,23 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     setCurrent(id);
     setIdentified(false);
     setMethodPick(null);
+    setIdChoice(null);
   };
 
   const fw = current ? fieldWeeds.find(f => f.weed.id === current) : null;
 
-  const identify = () => setIdentified(true);
+  // Generate multiple choice options for identification
+  const idOptions = useMemo(() => {
+    if (!fw) return [];
+    const wrong = shuffle(fieldWeeds.filter(f => f.weed.id !== fw.weed.id)).slice(0, 3).map(f => f.weed.commonName);
+    return shuffle([fw.weed.commonName, ...wrong]);
+  }, [fw, fieldWeeds]);
+
+  const identify = (name: string) => {
+    setIdChoice(name);
+    setIdentified(true);
+  };
+
   const pickMethod = (mId: string) => {
     setMethodPick(mId);
     if (mId === fw?.best) setScore(s => s + 1);
@@ -62,12 +75,12 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     setTimeout(() => { setCurrent(null); }, 1200);
   };
 
-  const restart = () => { setFound([]); setCurrent(null); setIdentified(false); setMethodPick(null); setScore(0); setTimeLeft(120); };
+  const restart = () => { setFound([]); setCurrent(null); setIdentified(false); setMethodPick(null); setIdChoice(null); setScore(0); setTimeLeft(120); };
 
   if (done) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{timeLeft <= 0 ? 'Time\'s Up!' : 'Field Clear!'}</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{timeLeft <= 0 ? "Time's Up!" : 'Field Clear!'}</h2>
         <p className="text-lg text-foreground mb-6">{score}/{fieldWeeds.length} correct methods</p>
         <div className="flex gap-3">
           <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
@@ -103,23 +116,41 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary">
               <WeedImage weedId={fw.weed.id} stage="vegetative" className="w-full h-full object-cover" />
             </div>
-            <div>
+            <div className="flex-1">
               {!identified ? (
-                <button onClick={identify} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm">Identify: {fw.weed.commonName}</button>
+                <p className="text-sm font-bold text-foreground">Identify this weed:</p>
               ) : (
-                <p className="font-bold text-foreground text-lg">{fw.weed.commonName}</p>
+                <div>
+                  <p className="font-bold text-foreground text-lg">{fw.weed.commonName}</p>
+                  {idChoice !== fw.weed.commonName && (
+                    <p className="text-xs text-destructive">You guessed: {idChoice}</p>
+                  )}
+                </div>
               )}
             </div>
           </div>
-          {identified && !methodPick && (
-            <div className="grid grid-cols-3 gap-2">
-              {METHODS.map(m => (
-                <button key={m.id} onClick={() => pickMethod(m.id)}
-                  className="p-2 rounded-lg border-2 border-border bg-background text-xs font-bold text-foreground hover:border-primary transition-all">
-                  {m.label}
+          {!identified && (
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {idOptions.map(name => (
+                <button key={name} onClick={() => identify(name)}
+                  className="p-3 rounded-lg border-2 border-border bg-background text-sm font-bold text-foreground hover:border-primary transition-all">
+                  {name}
                 </button>
               ))}
             </div>
+          )}
+          {identified && !methodPick && (
+            <>
+              <p className="text-sm font-bold text-foreground mb-2">Choose control method:</p>
+              <div className="grid grid-cols-3 gap-2">
+                {METHODS.map(m => (
+                  <button key={m.id} onClick={() => pickMethod(m.id)}
+                    className="p-2 rounded-lg border-2 border-border bg-background text-xs font-bold text-foreground hover:border-primary transition-all">
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
           {methodPick && (
             <p className={`font-bold text-center ${methodPick === fw.best ? 'text-green-500' : 'text-destructive'}`}>

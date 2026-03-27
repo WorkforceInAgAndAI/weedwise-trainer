@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { weeds } from '@/data/weeds';
+import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -32,6 +33,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   const [roundWeeds, setRoundWeeds] = useState<typeof weeds[0][]>([]);
   const [cards, setCards] = useState<Card[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
+  const [locked, setLocked] = useState(false);
   const [matchCount, setMatchCount] = useState(0);
   const [totalMatches, setTotalMatches] = useState(0);
 
@@ -46,29 +48,32 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
     setCards(shuffle(newCards));
     setPicks([]);
     setMatchCount(0);
+    setLocked(false);
   }, [roundNum]);
 
   const handleClick = (cardId: string) => {
+    if (locked) return;
     const card = cards.find(c => c.id === cardId);
-    if (!card || card.flipped || card.matched || picks.length >= 2) return;
+    if (!card || card.flipped || card.matched) return;
     const updated = cards.map(c => c.id === cardId ? { ...c, flipped: true } : c);
     setCards(updated);
     const newPicks = [...picks, cardId];
     setPicks(newPicks);
 
     if (newPicks.length === 2) {
+      setLocked(true);
       const [a, b] = newPicks.map(id => updated.find(c => c.id === id)!);
       if (a.weedId === b.weedId && a.type !== b.type) {
         setTimeout(() => {
-          setCards(prev => prev.map(c => c.weedId === a.weedId ? { ...c, matched: true } : c));
+          setCards(prev => prev.map(c => c.weedId === a.weedId ? { ...c, matched: true, flipped: true } : c));
           setMatchCount(m => m + 1);
           setTotalMatches(t => t + 1);
-          setPicks([]);
+          setPicks([]); setLocked(false);
         }, 500);
       } else {
         setTimeout(() => {
           setCards(prev => prev.map(c => newPicks.includes(c.id) ? { ...c, flipped: false } : c));
-          setPicks([]);
+          setPicks([]); setLocked(false);
         }, 800);
       }
     }
@@ -108,16 +113,23 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-4 text-center">Match each weed with its life cycle type</p>
-        <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
+        <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
           {cards.map(card => (
             <button key={card.id} onClick={() => handleClick(card.id)}
-              className={`aspect-square rounded-xl border-2 flex items-center justify-center p-2 text-center transition-all ${
+              className={`h-28 rounded-xl border-2 flex flex-col items-center justify-center p-2 text-center transition-all ${
                 card.matched ? 'border-green-500 bg-green-500/20' :
                 card.flipped ? 'border-primary bg-primary/10' :
                 'border-border bg-card hover:border-primary/50'
               }`}>
               {card.flipped || card.matched ? (
-                <span className="text-xs font-bold text-foreground">{card.content}</span>
+                <>
+                  {card.type === 'name' && (
+                    <div className="w-12 h-12 rounded-lg overflow-hidden mb-1">
+                      <WeedImage weedId={card.weedId} stage="vegetative" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <span className={`text-xs font-bold text-foreground ${card.type === 'cycle' ? 'text-base' : ''}`}>{card.content}</span>
+                </>
               ) : (
                 <span className="text-2xl">?</span>
               )}

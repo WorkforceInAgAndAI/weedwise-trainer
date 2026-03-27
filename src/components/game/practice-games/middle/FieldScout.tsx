@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import fieldBg from '@/assets/images/field-background.jpg';
+import fieldBg2 from '@/assets/images/field-background-2.jpg';
 
 const PATTERNS = [
   { id: 'w', name: 'W-Pattern', desc: 'Walk in a "W" shape across the field — covers center and edges efficiently.', best: ['mixed'] },
@@ -6,6 +8,8 @@ const PATTERNS = [
   { id: 'x', name: 'X-Pattern', desc: 'Walk from corner to corner in an "X" — covers all quadrants.', best: ['square'] },
   { id: 'edge', name: 'Edge Walk', desc: 'Walk around the perimeter — good for spotting boundary-specific weeds.', best: ['edges'] },
 ];
+
+const FIELD_IMAGES = [fieldBg, fieldBg2, fieldBg, fieldBg2];
 
 const FIELDS = [
   { id: 1, shape: 'square', label: 'Square corn field with mixed weed patches throughout', bestPattern: 'w', weedCount: 14, note: 'The W-pattern crosses the most ground for mixed fields.' },
@@ -65,15 +69,16 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">Field {round + 1}/{FIELDS.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        {/* Field visualization */}
-        <div className="relative w-full aspect-[3/2] bg-green-900/30 rounded-xl border-2 border-border mb-4 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-800/40 to-green-600/20" />
+        {/* Field visualization with real aerial photo */}
+        <div className="relative w-full aspect-[3/2] rounded-xl border-2 border-border mb-4 overflow-hidden">
+          <img src={FIELD_IMAGES[round % FIELD_IMAGES.length]} alt="Aerial field view" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/10" />
           {scouting && chosen && (
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 200">
-              {chosen === 'w' && <polyline points="20,180 75,40 150,160 225,40 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray="8" className="animate-pulse" />}
-              {chosen === 'z' && <polyline points="20,40 280,40 20,180 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray="8" className="animate-pulse" />}
-              {chosen === 'x' && <><line x1="20" y1="20" x2="280" y2="180" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray="8" className="animate-pulse" /><line x1="280" y1="20" x2="20" y2="180" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray="8" className="animate-pulse" /></>}
-              {chosen === 'edge' && <rect x="20" y="20" width="260" height="160" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeDasharray="8" className="animate-pulse" />}
+              {chosen === 'w' && <polyline points="20,180 75,40 150,160 225,40 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" />}
+              {chosen === 'z' && <polyline points="20,40 280,40 20,180 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" />}
+              {chosen === 'x' && <><line x1="20" y1="20" x2="280" y2="180" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" /><line x1="280" y1="20" x2="20" y2="180" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" /></>}
+              {chosen === 'edge' && <rect x="20" y="20" width="260" height="160" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" />}
             </svg>
           )}
           <div className="absolute bottom-2 left-2 right-2 bg-background/80 rounded-lg p-2">

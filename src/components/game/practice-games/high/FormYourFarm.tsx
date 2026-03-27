@@ -15,8 +15,19 @@ const SEASONS = [
   { id: 'summer', name: 'Summer', factor: 0.9 },
 ];
 
+function getIdealDecision(severity: number, threshold: number, cropComp: number, seasonFactor: number): { decision: 'treat' | 'wait'; reason: string } {
+  const canCropCompete = cropComp * (1 - seasonFactor) > 0.3;
+  if (severity > threshold && !canCropCompete) {
+    return { decision: 'treat', reason: `Density (${severity}/acre) exceeds your threshold (${threshold}/acre) and the crop can't outcompete at this time of year. Treatment is needed.` };
+  }
+  if (severity > threshold && canCropCompete) {
+    return { decision: 'wait', reason: `Although density (${severity}/acre) exceeds threshold, the crop is competitive enough this season to suppress these weeds naturally.` };
+  }
+  return { decision: 'wait', reason: `Density (${severity}/acre) is below your threshold (${threshold}/acre). The crop can manage — no treatment needed yet.` };
+}
+
 export default function FormYourFarm({ onBack }: { onBack: () => void }) {
-  const [phase, setPhase] = useState<'design' | 'attack' | 'result'>('design');
+  const [phase, setPhase] = useState<'design' | 'attack' | 'review' | 'result'>('design');
   const [crop, setCrop] = useState(CROPS[0]);
   const [season, setSeason] = useState(SEASONS[0]);
   const [threshold, setThreshold] = useState(10);
@@ -35,19 +46,18 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
 
   const allDecided = Object.keys(decisions).length === attackWeeds.length;
 
-  const evaluate = () => setPhase('result');
+  const evaluate = () => setPhase('review');
 
-  const score = useMemo(() => {
-    if (phase !== 'result') return 0;
-    let pts = 0;
-    attackWeeds.forEach(aw => {
-      const shouldTreat = aw.severity > threshold;
-      const canCropCompete = crop.competitiveness * (1 - season.factor) > 0.3;
-      const ideal = shouldTreat && !canCropCompete ? 'treat' : aw.severity <= threshold ? 'wait' : 'treat';
-      if (decisions[aw.weed.id] === ideal) pts++;
+  const results = useMemo(() => {
+    return attackWeeds.map(aw => {
+      const ideal = getIdealDecision(aw.severity, threshold, crop.competitiveness, season.factor);
+      const userChoice = decisions[aw.weed.id];
+      const correct = userChoice === ideal.decision;
+      return { ...aw, ideal: ideal.decision, reason: ideal.reason, userChoice, correct };
     });
-    return pts;
-  }, [phase, decisions]);
+  }, [attackWeeds, decisions, threshold, crop, season]);
+
+  const score = results.filter(r => r.correct).length;
 
   const restart = () => { setPhase('design'); setDecisions({}); };
 
@@ -91,15 +101,44 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
     </div>
   );
 
-  if (phase === 'result') return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
-      <p className="text-4xl mb-2">🌾</p>
-      <h2 className="font-display font-bold text-2xl text-foreground mb-2">Season Over!</h2>
-      <p className="text-foreground mb-2">Correct decisions: {score} / {attackWeeds.length}</p>
-      <p className="text-sm text-muted-foreground mb-6">Crop: {crop.name} · Season: {season.name} · Threshold: {threshold}/acre</p>
-      <div className="flex gap-3">
-        <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
-        <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+  if (phase === 'review') return (
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+      <div className="max-w-lg mx-auto p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+          <h1 className="font-display font-bold text-lg text-foreground">Season Results</h1>
+        </div>
+        <div className="bg-card rounded-xl border border-border p-4 mb-4 text-center">
+          <p className="text-4xl mb-2">🌾</p>
+          <p className="font-bold text-foreground text-xl">{score}/{attackWeeds.length} correct decisions</p>
+          <p className="text-sm text-muted-foreground">Crop: {crop.name} · Season: {season.name} · Threshold: {threshold}/acre</p>
+        </div>
+        <div className="space-y-3 mb-4">
+          {results.map(r => (
+            <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.correct ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                  <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
+                  <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-xs font-bold ${r.correct ? 'text-green-500' : 'text-destructive'}`}>
+                    You: {r.userChoice} {r.correct ? '✓' : '✗'}
+                  </p>
+                  {!r.correct && <p className="text-[10px] text-muted-foreground">Best: {r.ideal}</p>}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">{r.reason}</p>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3">
+          <button onClick={restart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+        </div>
       </div>
     </div>
   );
