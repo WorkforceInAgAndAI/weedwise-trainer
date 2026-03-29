@@ -3,6 +3,7 @@ import type { GameEngine } from '@/hooks/useGameEngine';
 import { weeds } from '@/data/weeds';
 import { PHASES, GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
 import type { GradeLevel } from '@/types/game';
+import { X } from 'lucide-react';
 
 type SortKey = 'name' | 'shown' | 'correct' | 'wrong' | 'accuracy' | 'avgTime' | 'status';
 
