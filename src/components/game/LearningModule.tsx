@@ -157,7 +157,7 @@ export default function LearningModule({ onClose }: Props) {
         </div>
 
         <div className="flex gap-2 mb-6">
-          {gradeCards.map(({ grade, icon, color }) => (
+          {gradeCards.map(({ grade, label, color }) => (
             <button
               key={grade}
               onClick={() => { setSelectedGrade(grade); setSelectedTopic(null); }}
