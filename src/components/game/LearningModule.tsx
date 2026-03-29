@@ -5,6 +5,7 @@ import { GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
 import WeedImage from './WeedImage';
 import WeedDetailPopup from './WeedDetailPopup';
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from '@/data/familyDescriptions';
+import { ArrowLeft, X } from 'lucide-react';
 
 type TopicId = 'names' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods';
 
