@@ -1192,10 +1192,10 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
                 {/* Bright colored dot */}
                 <div className={`w-7 h-7 rounded-full border-[3px] flex items-center justify-center shadow-lg ${
                   fw.identified
-                    ? 'border-success bg-success/50 shadow-success/30'
+                    ? 'border-weed-identified bg-weed-identified/50 shadow-weed-identified/30'
                     : fw.scouted
-                    ? 'border-amber-400 bg-amber-400/50 shadow-amber-400/30 animate-pulse'
-                    : 'border-rose-400 bg-rose-400/50 shadow-rose-400/30 animate-pulse'
+                    ? 'border-weed-scouted bg-weed-scouted/50 shadow-weed-scouted/30 animate-pulse'
+                    : 'border-weed-unscouted bg-weed-unscouted/50 shadow-weed-unscouted/30 animate-pulse'
                 }`}>
                   {fw.identified && <Sprout className="w-3.5 h-3.5 text-white" />}
                   {!fw.identified && fw.scouted && <span className="text-white text-[10px] font-bold">?</span>}
