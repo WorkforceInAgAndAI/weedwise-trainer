@@ -91,13 +91,12 @@ function SubheadingBox({ icon, label, count, description, weeds: groupWeeds, gra
   }
 
   return (
-    <div className="bg-card border border-primary/30 rounded-xl p-5 col-span-full space-y-4">
+    <div className="bg-card border border-primary/30 rounded-lg p-5 col-span-full space-y-4">
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-2xl mb-1">{icon}</div>
           <h3 className="font-display font-bold text-foreground text-lg">{label}</h3>
         </div>
-        <button onClick={() => setExpanded(false)} className="px-3 py-1 rounded-lg border border-border hover:bg-secondary text-sm">✕ Close</button>
+        <button onClick={() => setExpanded(false)} className="px-3 py-1 rounded-md border border-border hover:bg-secondary text-sm font-medium">Close</button>
       </div>
       <div className="bg-muted/30 rounded-lg p-3 text-sm text-muted-foreground">{description}</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
