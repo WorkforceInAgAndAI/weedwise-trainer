@@ -33,6 +33,9 @@ export default {
         warning: { DEFAULT: "hsl(var(--warning))", foreground: "hsl(var(--warning-foreground))" },
         error: { DEFAULT: "hsl(var(--error))", foreground: "hsl(var(--error-foreground))" },
         info: { DEFAULT: "hsl(var(--info))", foreground: "hsl(var(--info-foreground))" },
+        'weed-unscouted': "hsl(var(--weed-unscouted))",
+        'weed-scouted': "hsl(var(--weed-scouted))",
+        'weed-identified': "hsl(var(--weed-identified))",
         grade: {
           elementary: "hsl(var(--grade-elementary))",
           middle: "hsl(var(--grade-middle))",
