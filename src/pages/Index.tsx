@@ -17,6 +17,7 @@ import CompetitionMode from '@/components/game/CompetitionMode';
 import AuthModal from '@/components/game/AuthModal';
 import FarmMode from '@/components/game/FarmMode';
 import PracticeHub from '@/components/game/PracticeHub';
+import StatsPanel from '@/components/game/StatsPanel';
 import type { GradeLevel } from '@/types/game';
 import { useEffect, useRef } from 'react';
 
@@ -33,14 +34,14 @@ const Index = () => {
   const [showCompetition, setShowCompetition] = useState(false);
   const [showFarmMode, setShowFarmMode] = useState(false);
   const [showPracticeHub, setShowPracticeHub] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [globalGrade, setGlobalGrade] = useState<GradeLevel>('elementary');
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
   const { createSession, updateSession } = useSessionPersistence(session?.studentId ?? null);
 
-  // Load earned badges on mount
   useEffect(() => { loadEarned(); }, [loadEarned]);
 
-  // Persist session data periodically and check badges after each answer
   const prevCorrectRef = useRef(0);
   useEffect(() => {
     const total = game.totalCorrect + game.totalWrong;
@@ -68,7 +69,6 @@ const Index = () => {
     });
   }, [game.totalCorrect, game.totalWrong, game.xp, game.streak]);
 
-  // Create session when game starts
   const handleStartGame = (g: GradeLevel) => {
     game.startGame(g);
     if (session) createSession(g);
@@ -76,9 +76,7 @@ const Index = () => {
 
   const handleAuthComplete = (role: 'instructor' | 'student') => {
     setShowAuthModal(false);
-    if (role === 'instructor') {
-      setShowDashboard(true);
-    }
+    if (role === 'instructor') setShowDashboard(true);
   };
 
   return (
@@ -96,8 +94,11 @@ const Index = () => {
           onOpenCompetition={() => setShowCompetition(true)}
           onOpenFarmMode={() => setShowFarmMode(true)}
           onOpenPracticeHub={() => setShowPracticeHub(true)}
+          onOpenStats={() => setShowStats(true)}
           studentSession={session}
           auth={auth}
+          grade={globalGrade}
+          onGradeChange={setGlobalGrade}
         />
       )}
       {game.screen === 'playing' && <GameScreen {...game} />}
@@ -113,6 +114,7 @@ const Index = () => {
       {showCompetition && <CompetitionMode onClose={() => setShowCompetition(false)} />}
       {showFarmMode && <FarmMode onClose={() => setShowFarmMode(false)} />}
       {showPracticeHub && <PracticeHub onClose={() => setShowPracticeHub(false)} />}
+      {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} onAuthenticated={handleAuthComplete} />
       )}
