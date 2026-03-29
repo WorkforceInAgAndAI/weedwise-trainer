@@ -140,16 +140,21 @@ export default function LearningModule({ onClose }: Props) {
   const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles';
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
+    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
             {selectedTopic && (
-              <button onClick={() => { setSelectedTopic(null); setViewMode('list'); }} className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary transition-colors text-sm">← Back</button>
+              <button onClick={() => { setSelectedTopic(null); setViewMode('list'); }}
+                className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+              </button>
             )}
-            <h1 className="text-2xl font-display font-bold text-primary">📚 Learning Module</h1>
+            <h1 className="text-xl font-display font-bold text-foreground">Learning Module</h1>
           </div>
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-sm">✕ Close</button>
+          <button onClick={onClose} className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="flex gap-2 mb-6">
@@ -157,11 +162,11 @@ export default function LearningModule({ onClose }: Props) {
             <button
               key={grade}
               onClick={() => { setSelectedGrade(grade); setSelectedTopic(null); }}
-              className={`flex-1 py-2.5 rounded-lg border-2 text-center text-sm font-semibold transition-all ${
-                selectedGrade === grade ? `${color} bg-card` : 'border-border text-muted-foreground hover:border-primary/30'
+              className={`flex-1 py-2.5 rounded-md border text-center text-sm font-medium transition-all duration-200 ${
+                selectedGrade === grade ? `${color} bg-card shadow-subtle` : 'border-border text-muted-foreground hover:bg-secondary'
               }`}
             >
-              {icon} {GRADE_NAMES[grade]} ({GRADE_RANGES[grade]})
+              {GRADE_NAMES[grade]} ({GRADE_RANGES[grade]})
             </button>
           ))}
         </div>
@@ -172,38 +177,37 @@ export default function LearningModule({ onClose }: Props) {
               <button
                 key={topic.id}
                 onClick={() => setSelectedTopic(topic.id)}
-                className="bg-card border border-border rounded-lg p-5 text-left hover:border-primary/50 hover:scale-[1.02] transition-all"
+                className="bg-card border border-border rounded-lg p-6 text-left shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
               >
-                <div className="text-3xl mb-2">{topic.icon}</div>
                 <div className="font-display font-bold text-foreground mb-1">{topic.name}</div>
-                <div className="text-sm text-muted-foreground">{topic.description}</div>
-                <div className="text-xs text-primary mt-2">{getTopicWeeds(topic.id).length} species →</div>
+                <div className="text-sm text-muted-foreground leading-relaxed">{topic.description}</div>
+                <div className="text-xs text-primary mt-3 font-medium">{getTopicWeeds(topic.id).length} species →</div>
               </button>
             ))}
           </div>
         ) : (
           <div>
             {/* Topic bubbles at top */}
-            <div className="flex flex-wrap gap-2 mb-5">
+            <div className="flex flex-wrap gap-2 mb-6">
               {availableTopics.map(topic => (
                 <button
                   key={topic.id}
                   onClick={() => { setSelectedTopic(topic.id); setViewMode('list'); }}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                     selectedTopic === topic.id
-                      ? 'bg-primary text-primary-foreground shadow-md scale-105'
-                      : 'bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground'
+                      ? 'bg-primary text-primary-foreground shadow-subtle'
+                      : 'bg-card border border-border text-muted-foreground hover:bg-secondary hover:text-foreground'
                   }`}
                 >
-                  {topic.icon} {topic.name}
+                  {topic.name}
                 </button>
               ))}
             </div>
             {/* Topic content */}
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-display font-bold text-foreground">
-                  {TOPICS.find(t => t.id === selectedTopic)?.icon} {TOPICS.find(t => t.id === selectedTopic)?.name}
+                  {TOPICS.find(t => t.id === selectedTopic)?.name}
                 </h2>
                 {topicNeedsViewToggle && <ViewToggle view={viewMode} onChange={setViewMode} />}
               </div>
