@@ -51,18 +51,20 @@ export default function InstructorPanel(game: GameEngine) {
   const tabs = ['Session Overview', 'Species Reference', 'Phase Guide'];
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur overflow-y-auto">
-      <div className="max-w-6xl mx-auto p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-display font-bold text-primary"><h1 className="text-2xl font-display font-bold text-primary">📊 Session Overview</h1></h1>
-          <button onClick={() => setShowInstructor(false)} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-sm">✕ Close</button>
+          <h1 className="text-xl font-display font-bold text-foreground">Session Overview</h1>
+          <button onClick={() => setShowInstructor(false)} className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-muted rounded-lg p-1">
+        <div className="flex gap-1 mb-6 bg-secondary rounded-md p-1">
           {tabs.map((t, i) => (
             <button key={i} onClick={() => setTab(i)}
-              className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${tab === i ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}>
+              className={`flex-1 px-3 py-2 rounded-sm text-sm font-medium transition-colors duration-200 ${tab === i ? 'bg-card text-foreground shadow-subtle' : 'text-muted-foreground hover:text-foreground'}`}>
               {t}
             </button>
           ))}
