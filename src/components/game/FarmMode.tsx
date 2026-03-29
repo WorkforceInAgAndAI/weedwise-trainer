@@ -1229,9 +1229,9 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
           <div className="border-t border-border bg-card px-4 py-3">
             <p className="text-sm text-foreground">{seasonInfo.description}</p>
             <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" /> Unscouted: {fieldWeeds.filter(w => w.alive && !w.scouted).length}</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" /> Scouted: {scoutedCount - identifiedCount}</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-success inline-block" /> Identified: {identifiedCount}</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-weed-unscouted inline-block" /> Unscouted: {fieldWeeds.filter(w => w.alive && !w.scouted).length}</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-weed-scouted inline-block" /> Scouted: {scoutedCount - identifiedCount}</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-weed-identified inline-block" /> Identified: {identifiedCount}</span>
               <span>Controlled: {weedsKilled}</span>
             </div>
           </div>
