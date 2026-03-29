@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 import type { GradeLevel, Weed } from '@/types/game';
 import WeedImage from './WeedImage';
-import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout } from 'lucide-react';
+import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler } from 'lucide-react';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 
 // ── Types ──────────────────────────────────────────────────
@@ -56,19 +56,15 @@ const SEASONS: Record<Season, SeasonData> = {
 };
 const SEASON_ORDER: Season[] = ['spring', 'early-summer', 'mid-summer', 'late-summer', 'fall'];
 const WEED_STAGE_BY_SEASON: Record<Season, FieldWeed['stage']> = {
-  'spring': 'seedling',
-  'early-summer': 'seedling',
-  'mid-summer': 'vegetative',
-  'late-summer': 'reproductive',
-  'fall': 'mature',
+  'spring': 'seedling', 'early-summer': 'seedling', 'mid-summer': 'vegetative', 'late-summer': 'reproductive', 'fall': 'mature',
 };
 
 const BASE_YIELD = 50;
 
-const SCOUT_METHODS: { id: ScoutMethod; label: string; icon: React.ComponentType<{ className?: string }>; cost: number; timeHours: number; accuracy: number; description: string; gradeDesc: Record<GradeLevel, string> }[] = [
-  { id: 'manual', label: 'Manual Scouting', icon: Camera, cost: 0, timeHours: 3, accuracy: 0.7, description: 'Walk the field on foot, take photos, and visually identify weeds.', gradeDesc: { elementary: 'Walk through the field and take pictures of any plants you see.', middle: 'Walk a W-pattern through the field photographing weeds in sample quadrats.', high: 'Systematic W-pattern scouting with GPS-tagged photos and quadrat sampling.' } },
-  { id: 'drone', label: 'Drone Survey', icon: Plane, cost: 25, timeHours: 0.5, accuracy: 0.9, description: 'Fly a drone over the field for aerial imaging. Fast but costly.', gradeDesc: { elementary: 'Fly a camera over the field to see weeds from above.', middle: 'Multispectral drone survey detects weed patches by color differences.', high: 'NDVI-enabled drone survey with AI patch detection and density mapping.' } },
-  { id: 'rover', label: 'Soil Rover', icon: Bot, cost: 15, timeHours: 1.5, accuracy: 0.85, description: 'Deploy a ground rover to find weeds at soil level, including seedlings.', gradeDesc: { elementary: 'Send a little robot to drive through the field and find baby weeds.', middle: 'Ground-based rover scans soil level detecting seedlings missed by aerial views.', high: 'Autonomous rover with close-range imaging for seedling detection and soil seed bank sampling.' } },
+const SCOUT_METHODS: { id: ScoutMethod; label: string; icon: React.ComponentType<{ className?: string }>; cost: number; timeHours: number; accuracy: number; gradeDesc: Record<GradeLevel, string> }[] = [
+  { id: 'manual', label: 'Manual Scouting', icon: Camera, cost: 0, timeHours: 3, accuracy: 0.7, gradeDesc: { elementary: 'Walk through the field and take pictures of any plants you see.', middle: 'Walk a W-pattern through the field photographing weeds in sample quadrats.', high: 'Systematic W-pattern scouting with GPS-tagged photos and quadrat sampling.' } },
+  { id: 'drone', label: 'Drone Survey', icon: Plane, cost: 25, timeHours: 0.5, accuracy: 0.9, gradeDesc: { elementary: 'Fly a camera over the field to see weeds from above.', middle: 'Multispectral drone survey detects weed patches by color differences.', high: 'NDVI-enabled drone survey with AI patch detection and density mapping.' } },
+  { id: 'rover', label: 'Soil Rover', icon: Bot, cost: 15, timeHours: 1.5, accuracy: 0.85, gradeDesc: { elementary: 'Send a little robot to drive through the field and find baby weeds.', middle: 'Ground-based rover scans soil level detecting seedlings missed by aerial views.', high: 'Autonomous rover with close-range imaging for seedling detection and soil seed bank sampling.' } },
 ];
 
 const HERBICIDE_PRODUCTS = [
@@ -89,6 +85,12 @@ const SPRAY_SPEEDS = [
   { id: 'slow', label: 'Slow & Careful', driftMult: 0.7, timeMult: 2.0, coverageMult: 1.1 },
   { id: 'medium', label: 'Medium Pace', driftMult: 1.0, timeMult: 1.0, coverageMult: 1.0 },
   { id: 'fast', label: 'Fast', driftMult: 1.5, timeMult: 0.5, coverageMult: 0.85 },
+];
+
+const SPRAY_HEIGHTS = [
+  { id: 'low', label: '12 inches', driftMult: 0.6, coverageMult: 0.9, desc: 'Low boom — minimal drift, tighter coverage pattern.' },
+  { id: 'standard', label: '20 inches', driftMult: 1.0, coverageMult: 1.0, desc: 'Standard height — balanced coverage and drift.' },
+  { id: 'high', label: '30 inches', driftMult: 1.4, coverageMult: 1.05, desc: 'High boom — wider coverage but increased drift risk.' },
 ];
 
 const TILLAGE_TYPES = [
@@ -117,7 +119,7 @@ function generateFieldWeeds(season: Season, count: number): FieldWeed[] {
   }));
 }
 
-// ── Event Cards (same as before) ──────────────────────────
+// ── Event Cards ──────────────────────────────────────────
 const ALL_EVENTS: EventCard[] = [
   { id: 'e1', title: 'Weed or Crop?', description: 'Your scout shows unknown plants in the field. Are these soybeans or weeds?', question: 'Which plant is the CROP (soybean)?', options: [
     { id: 'a', label: 'The plant growing in the crop row with broad trifoliate leaves', correct: true, feedback: 'Correct! Soybeans grow in rows with distinctive trifoliate (three-part) leaves.' },
@@ -234,6 +236,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
   const [herbProduct, setHerbProduct] = useState(HERBICIDE_PRODUCTS[0].id);
   const [herbNozzle, setHerbNozzle] = useState(NOZZLE_TYPES[0].id);
   const [herbSpeed, setHerbSpeed] = useState(SPRAY_SPEEDS[1].id);
+  const [herbHeight, setHerbHeight] = useState(SPRAY_HEIGHTS[1].id);
   const [tillageType, setTillageType] = useState(TILLAGE_TYPES[0].id);
   const [mgmtFeedback, setMgmtFeedback] = useState<string | null>(null);
   const [driftWarning, setDriftWarning] = useState(false);
@@ -259,16 +262,15 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     setTotalHours(prev => prev + sm.timeHours);
     setActionLog(prev => [...prev, { season: currentSeason, action: `Scouted (${sm.label})`, detail: `Cost: $${sm.cost}, Time: ${sm.timeHours}h`, cost: sm.cost }]);
 
-    // Animate scouting
     setTimeout(() => {
-      setFieldWeeds(prev => prev.map(w => ({
-        ...w,
-        scouted: w.alive ? (Math.random() < sm.accuracy ? true : w.scouted) : w.scouted,
-      })));
+      setFieldWeeds(prev => prev.map(w => {
+        if (!w.alive) return w;
+        return { ...w, scouted: Math.random() < sm.accuracy };
+      }));
       setScoutAnimating(false);
       setHasScouted(true);
-      setPhase('identifying');
-    }, 1500);
+      setPhase('playing');
+    }, 2500);
   };
 
   // ── Identification ────
@@ -277,19 +279,20 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     setIdPicked(null);
     setIdResult(null);
     const correctName = grade === 'high' ? fw.weed.scientificName : fw.weed.commonName;
-    const wrongPool = shuffle(weeds.filter(w => w.id !== fw.weed.id));
-    const wrongNames = wrongPool.slice(0, 3).map(w => grade === 'high' ? w.scientificName : w.commonName);
-    setIdOptions(shuffle([correctName, ...wrongNames]));
+    const pool = shuffle(weeds.filter(w => w.id !== fw.weed.id)).slice(0, 3).map(w => grade === 'high' ? w.scientificName : w.commonName);
+    const options = shuffle([correctName, ...pool]);
+    setIdOptions(options);
   }, [grade]);
 
   const submitId = (picked: string) => {
     if (!idTarget) return;
-    const correct = grade === 'high' ? idTarget.weed.scientificName : idTarget.weed.commonName;
-    const isCorrect = picked === correct;
     setIdPicked(picked);
-    setIdResult(isCorrect ? 'correct' : 'wrong');
-    if (isCorrect) {
+    const correctName = grade === 'high' ? idTarget.weed.scientificName : idTarget.weed.commonName;
+    if (picked === correctName) {
+      setIdResult('correct');
       setFieldWeeds(prev => prev.map(w => w.id === idTarget.id ? { ...w, identified: true } : w));
+    } else {
+      setIdResult('wrong');
     }
   };
 
@@ -310,23 +313,27 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     if (action === 'herbicide') setMgmtMode('herbicide-config');
     else if (action === 'tillage') setMgmtMode('tillage-config');
     else if (action === 'hand-pull') setMgmtMode('hand-pull');
-    else if (action === 'wait') {
-      applyWait();
-    }
+    else if (action === 'wait') applyWait();
   };
 
-  const applyHerbicide = () => {
+  // Herbicide preview calculation
+  const herbPreview = useMemo(() => {
     const product = HERBICIDE_PRODUCTS.find(p => p.id === herbProduct)!;
     const nozzle = NOZZLE_TYPES.find(n => n.id === herbNozzle)!;
     const speed = SPRAY_SPEEDS.find(s => s.id === herbSpeed)!;
-
-    const effectiveCoverage = nozzle.coverage * speed.coverageMult;
-    const driftRisk = nozzle.driftRisk * speed.driftMult;
+    const height = SPRAY_HEIGHTS.find(h => h.id === herbHeight)!;
+    const effectiveCoverage = Math.min(nozzle.coverage * speed.coverageMult * height.coverageMult, 1);
+    const driftRisk = Math.min(nozzle.driftRisk * speed.driftMult * height.driftMult, 1);
     const timeHours = 0.5 * speed.timeMult;
+    const targetable = fieldWeeds.filter(w => w.alive && ((w.weed.plantType === 'Dicot' && product.broadleaf) || (w.weed.plantType === 'Monocot' && product.grass))).length;
+    const estKill = Math.round(targetable * product.effectiveness * effectiveCoverage);
+    return { product, nozzle, speed, height, effectiveCoverage, driftRisk, timeHours, targetable, estKill };
+  }, [herbProduct, herbNozzle, herbSpeed, herbHeight, fieldWeeds]);
 
+  const applyHerbicide = () => {
+    const { product, effectiveCoverage, driftRisk, timeHours } = herbPreview;
     setMgmtMode('applying');
     setDriftWarning(driftRisk > 0.25);
-
     setTotalCost(prev => prev + product.cost);
     setTotalHours(prev => prev + timeHours);
 
@@ -345,28 +352,18 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
         return w;
       }));
       setWeedsKilled(prev => prev + killed);
-
       feedback.push(`${product.label}: ${killed} weeds controlled.`);
-      if (!product.broadleaf && fieldWeeds.some(w => w.alive && w.weed.plantType === 'Dicot')) {
-        feedback.push('Note: This herbicide does not target broadleaf weeds. Some broadleaf weeds survived.');
-      }
-      if (!product.grass && fieldWeeds.some(w => w.alive && w.weed.plantType === 'Monocot')) {
-        feedback.push('Note: This herbicide does not target grass weeds. Some grasses survived.');
-      }
-
       setMgmtFeedback(feedback.join(' '));
       setMgmtMode('result');
-      setActionLog(prev => [...prev, { season: currentSeason, action: `Herbicide: ${product.label}`, detail: `Nozzle: ${nozzle.label}, Speed: ${speed.label}, Cost: $${product.cost}`, cost: product.cost }]);
+      setActionLog(prev => [...prev, { season: currentSeason, action: `Herbicide: ${product.label}`, detail: `Nozzle: ${herbPreview.nozzle.label}, Speed: ${herbPreview.speed.label}, Height: ${herbPreview.height.label}, Cost: $${product.cost}`, cost: product.cost }]);
     }, 2000);
   };
 
   const applyTillage = () => {
     const till = TILLAGE_TYPES.find(t => t.id === tillageType)!;
     setMgmtMode('applying');
-
     setTotalCost(prev => prev + till.cost);
     setTotalHours(prev => prev + till.timeHours);
-
     setTimeout(() => {
       let killed = 0;
       setFieldWeeds(prev => prev.map(w => {
@@ -385,7 +382,6 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     setMgmtMode('applying');
     const timeHours = 3;
     setTotalHours(prev => prev + timeHours);
-
     setTimeout(() => {
       let killed = 0;
       setFieldWeeds(prev => prev.map(w => {
@@ -398,7 +394,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
         return w;
       }));
       setWeedsKilled(prev => prev + killed);
-      setMgmtFeedback(`Hand pulling: ${killed} weeds removed. Most effective on seedlings and small vegetative plants. Larger weeds are harder to pull.`);
+      setMgmtFeedback(`Hand pulling: ${killed} weeds removed. Most effective on seedlings and small vegetative plants.`);
       setMgmtMode('result');
       setActionLog(prev => [...prev, { season: currentSeason, action: 'Hand Pull', detail: `Time: ${timeHours}h, no cost`, cost: 0 }]);
     }, 1500);
@@ -414,10 +410,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
       } else {
         setMgmtFeedback('You waited. No new weeds appeared this time, but existing weeds continued growing.');
       }
-      setFieldWeeds(prev => prev.map(w => ({
-        ...w,
-        density: w.alive ? Math.min(w.density + 2, 20) : w.density,
-      })));
+      setFieldWeeds(prev => prev.map(w => ({ ...w, density: w.alive ? Math.min(w.density + 2, 20) : w.density })));
       setMgmtMode('result');
       setActionLog(prev => [...prev, { season: currentSeason, action: 'Wait & Observe', detail: 'No cost, no time', cost: 0 }]);
     }, 1000);
@@ -431,32 +424,22 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     setPhase('playing');
   };
 
-  // Advance season
   const advanceSeason = () => {
     const nextIdx = seasonIdx + 1;
-    if (nextIdx >= SEASON_ORDER.length) {
-      setPhase('harvest');
-      return;
-    }
+    if (nextIdx >= SEASON_ORDER.length) { setPhase('harvest'); return; }
     const nextSeason = SEASON_ORDER[nextIdx];
     setCurrentSeason(nextSeason);
     setHasScouted(false);
     setSelectedWeed(null);
-
     setFieldWeeds(prev => prev.map(w => ({
-      ...w,
-      stage: WEED_STAGE_BY_SEASON[nextSeason],
+      ...w, stage: WEED_STAGE_BY_SEASON[nextSeason],
       density: w.alive ? Math.min(w.density + Math.floor(Math.random() * 3), 20) : w.density,
-      scouted: false,
-      identified: false,
+      scouted: false, identified: false,
     })));
-
     if (nextSeason !== 'fall') {
       const extras = generateFieldWeeds(nextSeason, grade === 'elementary' ? 3 : 5);
       setFieldWeeds(prev => [...prev, ...extras]);
     }
-
-    // Trigger event
     const gradeEvents = ALL_EVENTS.filter(e => e.grades.includes(grade!) && e.season === nextSeason);
     if (gradeEvents.length > 0) {
       const event = gradeEvents[Math.floor(Math.random() * gradeEvents.length)];
@@ -481,7 +464,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
   // ── Setup Screen ─────────────────────────────────────────
   if (phase === 'setup') {
     return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
         <div className="max-w-lg mx-auto px-5 py-12 text-center">
           <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
             <X className="w-4 h-4" />
@@ -491,7 +474,6 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
           </div>
           <h1 className="font-display font-bold text-3xl text-foreground mb-2">Soybean Farm Simulator</h1>
           <p className="text-muted-foreground mb-8 leading-relaxed">Manage a soybean field through a full growing season. Scout for weeds, identify them, choose management strategies, and harvest your crop.</p>
-
           <h2 className="font-display font-bold text-lg text-foreground mb-4">Select Difficulty</h2>
           <div className="grid gap-3">
             {([
@@ -511,108 +493,12 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     );
   }
 
-  // ── Event Card Screen ────────────────────────────────────
-  if (phase === 'event' && currentEvent) {
-    const answered = eventAnswer !== null;
-    return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-        <div className="max-w-lg mx-auto px-5 py-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-warning/15 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-warning" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Event Card — {seasonInfo.label}</p>
-              <h2 className="font-display font-bold text-xl text-foreground">{currentEvent.title}</h2>
-            </div>
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-5 mb-6 shadow-card">
-            <p className="text-foreground leading-relaxed mb-4">{currentEvent.description}</p>
-            <p className="font-semibold text-foreground">{currentEvent.question}</p>
-          </div>
-
-          <div className="space-y-2 mb-6">
-            {currentEvent.options.map(opt => (
-              <button key={opt.id} onClick={() => {
-                if (!answered) {
-                  setEventAnswer(opt.id);
-                  setEventsAnswered(p => p + 1);
-                  if (opt.correct) setEventsCorrect(p => p + 1);
-                }
-              }} disabled={answered}
-                className={`w-full text-left p-4 rounded-lg border transition-all ${
-                  !answered ? 'border-border bg-card hover:border-primary/30 hover:shadow-subtle' :
-                  opt.correct ? 'border-success bg-success/5' :
-                  opt.id === eventAnswer ? 'border-error bg-error/5' :
-                  'border-border bg-card opacity-60'
-                }`}>
-                <div className="flex items-start gap-3">
-                  {answered && opt.correct && <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />}
-                  {answered && !opt.correct && opt.id === eventAnswer && <XCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />}
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                    {answered && (opt.correct || opt.id === eventAnswer) && (
-                      <p className="text-xs text-muted-foreground mt-1">{opt.feedback}</p>
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {answered && (
-            <div className="animate-fade-in">
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
-                <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1">Teaching Point</p>
-                <p className="text-sm text-foreground">{currentEvent.teachingPoint}</p>
-              </div>
-              <button onClick={() => setPhase('playing')}
-                className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold hover:opacity-90 transition-opacity">
-                Continue Managing Field <ChevronRight className="w-4 h-4 inline ml-1" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // ── Harvest Screen ───────────────────────────────────────
-  if (phase === 'harvest') {
-    return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-        <div className="max-w-lg mx-auto px-5 py-12 text-center">
-          <div className="w-16 h-16 rounded-xl bg-success/10 flex items-center justify-center mx-auto mb-6">
-            <Wheat className="w-8 h-8 text-success" />
-          </div>
-          <h1 className="font-display font-bold text-3xl text-foreground mb-2">Harvest Time</h1>
-          <p className="text-muted-foreground mb-8">The combine is rolling through your soybean field.</p>
-          <div className="bg-card border border-border rounded-lg overflow-hidden shadow-card mb-8">
-            <div className="relative h-48">
-              <img src={fieldBgImage} alt="Soybean field" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-0 right-0 text-center">
-                <p className="font-display font-bold text-4xl text-foreground">{finalYield.toFixed(1)} bu/acre</p>
-                <p className="text-sm text-muted-foreground">{finalYield >= 45 ? 'Excellent yield' : finalYield >= 38 ? 'Good yield' : 'Below average — weeds impacted production'}</p>
-              </div>
-            </div>
-          </div>
-          <button onClick={() => setPhase('results')}
-            className="w-full py-3 rounded-md bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
-            View Season Summary
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Results Screen ───────────────────────────────────────
+  // ── Results Screen (no field) ────────────────────────────
   if (phase === 'results') {
     const matureWeeds = fieldWeeds.filter(w => w.alive && w.stage === 'mature');
     const seedsProduced = matureWeeds.length * 5000;
     return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-5 py-8">
           <h1 className="font-display font-bold text-2xl text-foreground mb-6">Season Summary</h1>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
@@ -667,7 +553,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
             </button>
             <button onClick={onClose}
               className="flex-1 py-3 rounded-md border border-border bg-card text-foreground font-semibold hover:bg-secondary transition-colors">
-              Back to Home
+              Back to Menu
             </button>
           </div>
         </div>
@@ -675,285 +561,221 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
     );
   }
 
-  // ── Scouting Phase ───────────────────────────────────────
-  if (phase === 'scouting') {
-    return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-        <div className="max-w-lg mx-auto px-5 py-8">
-          <div className="flex items-center gap-3 mb-6">
-            <button onClick={() => setPhase('playing')} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">{seasonInfo.label}</p>
-              <h2 className="font-display font-bold text-xl text-foreground">Choose Scouting Method</h2>
-            </div>
-          </div>
+  // ── ALL OTHER PHASES: Field always visible ────────────────
+  // The field background + weed dots are rendered constantly.
+  // Side panel and overlay panels change based on phase.
 
-          <p className="text-sm text-muted-foreground mb-6">
-            {grade === 'elementary' ? 'How do you want to find the weeds in your field?'
-              : grade === 'middle' ? 'Select a scouting method. Each has different cost, time, and accuracy trade-offs.'
-              : 'Select a scouting method. Consider cost-benefit analysis and detection accuracy for your field conditions.'}
-          </p>
+  const renderSidePanel = () => {
+    // ── Scouting phase in side panel ──
+    if (phase === 'scouting') {
+      return (
+        <div className="p-4 space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Eye className="w-5 h-5 text-primary" />
+            <h3 className="font-display font-bold text-foreground">Scout Your Field</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">Choose a scouting method to find weeds in your field. Each method has different costs, time, and accuracy.</p>
 
           {scoutAnimating ? (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-              <p className="font-semibold text-foreground">Scouting in progress...</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {scoutMethod === 'manual' ? 'Walking the field and photographing weeds...' :
-                 scoutMethod === 'drone' ? 'Flying drone over field, capturing aerial images...' :
-                 'Deploying ground rover to scan soil level...'}
+            <div className="text-center py-8">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+              <p className="font-semibold text-foreground text-sm">Scouting in progress...</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {scoutMethod === 'manual' ? 'Walking the field...' : scoutMethod === 'drone' ? 'Flying drone overhead...' : 'Deploying ground rover...'}
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {SCOUT_METHODS.map(sm => (
                 <button key={sm.id} onClick={() => startScouting(sm.id)}
-                  className="w-full text-left p-5 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-card-hover transition-all">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <sm.icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{sm.label}</h3>
-                      <p className="text-xs text-muted-foreground">{sm.gradeDesc[grade!]}</p>
-                    </div>
+                  className="w-full text-left p-3 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-subtle transition-all">
+                  <div className="flex items-center gap-2 mb-1">
+                    <sm.icon className="w-4 h-4 text-primary" />
+                    <span className="font-semibold text-foreground text-sm">{sm.label}</span>
                   </div>
-                  <div className="flex items-center gap-4 mt-3 text-xs">
-                    <span className="px-2 py-1 rounded bg-secondary text-foreground">Cost: ${sm.cost}</span>
-                    <span className="px-2 py-1 rounded bg-secondary text-foreground">Time: {sm.timeHours}h</span>
-                    <span className="px-2 py-1 rounded bg-secondary text-foreground">Accuracy: {Math.round(sm.accuracy * 100)}%</span>
+                  <p className="text-xs text-muted-foreground mb-2">{sm.gradeDesc[grade!]}</p>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">${sm.cost}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{sm.timeHours}h</span>
+                    <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(sm.accuracy * 100)}%</span>
                   </div>
                 </button>
               ))}
             </div>
           )}
+          <button onClick={() => setPhase('playing')} className="w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-3 h-3 inline mr-1" /> Cancel
+          </button>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  // ── Identifying Phase ────────────────────────────────────
-  if (phase === 'identifying') {
-    const unidentified = fieldWeeds.filter(w => w.alive && w.scouted && !w.identified);
-    const alreadyIdentified = fieldWeeds.filter(w => w.alive && w.identified);
+    // ── Identifying phase in side panel ──
+    if (phase === 'identifying') {
+      const unidentified = fieldWeeds.filter(w => w.alive && w.scouted && !w.identified);
+      const alreadyIdentified = fieldWeeds.filter(w => w.alive && w.identified);
 
-    if (idTarget) {
-      const correctName = grade === 'high' ? idTarget.weed.scientificName : idTarget.weed.commonName;
-      return (
-        <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-          <div className="max-w-lg mx-auto px-5 py-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Crosshair className="w-5 h-5 text-primary" />
-              <h2 className="font-display font-bold text-xl text-foreground">
+      if (idTarget) {
+        const correctName = grade === 'high' ? idTarget.weed.scientificName : idTarget.weed.commonName;
+        return (
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Crosshair className="w-4 h-4 text-primary" />
+              <h3 className="font-display font-bold text-foreground text-sm">
                 {grade === 'high' ? 'Identify by Scientific Name' : 'Identify This Weed'}
-              </h2>
+              </h3>
             </div>
-
-            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-card mb-6">
-              <div className="aspect-[4/3] bg-muted">
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="aspect-[3/2] bg-muted">
                 <WeedImage weedId={idTarget.weed.id} stage={idTarget.stage} className="w-full h-full object-cover" />
               </div>
-              <div className="p-4">
-                <p className="text-sm text-muted-foreground">Stage: {idTarget.stage} · Density: {idTarget.density} plants/sq ft</p>
-                <p className="text-sm text-muted-foreground">Type: {idTarget.weed.plantType} · {idTarget.weed.lifeCycle}</p>
+              <div className="p-2 text-xs text-muted-foreground">
+                Stage: {idTarget.stage} · {idTarget.density}/sq ft · {idTarget.weed.plantType}
               </div>
             </div>
-
-            <p className="font-semibold text-foreground mb-3">
-              {grade === 'elementary' ? 'What is this weed called?' :
-               grade === 'middle' ? 'Identify this weed species:' :
-               'What is the scientific name of this weed?'}
-            </p>
-
-            <div className="space-y-2 mb-6">
+            <div className="space-y-1.5">
               {idOptions.map(opt => (
-                <button key={opt} onClick={() => !idPicked && submitId(opt)}
-                  disabled={!!idPicked}
-                  className={`w-full text-left p-4 rounded-lg border transition-all ${
+                <button key={opt} onClick={() => !idPicked && submitId(opt)} disabled={!!idPicked}
+                  className={`w-full text-left p-2.5 rounded-lg border text-sm transition-all ${
                     !idPicked ? 'border-border bg-card hover:border-primary/30' :
                     opt === correctName ? 'border-success bg-success/8' :
-                    opt === idPicked ? 'border-error bg-error/8' :
-                    'border-border bg-card opacity-50'
+                    opt === idPicked ? 'border-error bg-error/8' : 'border-border bg-card opacity-50'
                   }`}>
-                  <div className="flex items-center gap-3">
-                    {idPicked && opt === correctName && <CheckCircle2 className="w-5 h-5 text-success shrink-0" />}
-                    {idPicked && opt === idPicked && opt !== correctName && <XCircle className="w-5 h-5 text-error shrink-0" />}
-                    <span className={`text-sm font-medium ${grade === 'high' ? 'italic' : ''}`}>{opt}</span>
+                  <div className="flex items-center gap-2">
+                    {idPicked && opt === correctName && <CheckCircle2 className="w-4 h-4 text-success shrink-0" />}
+                    {idPicked && opt === idPicked && opt !== correctName && <XCircle className="w-4 h-4 text-error shrink-0" />}
+                    <span className={grade === 'high' ? 'italic' : ''}>{opt}</span>
                   </div>
                 </button>
               ))}
             </div>
-
             {idResult && (
-              <div className="animate-fade-in">
-                <div className={`rounded-lg p-4 mb-4 ${idResult === 'correct' ? 'bg-success/8 border border-success/20' : 'bg-error/8 border border-error/20'}`}>
-                  <p className="font-semibold text-foreground mb-1">{idResult === 'correct' ? 'Correct!' : 'Incorrect'}</p>
-                  <p className="text-sm text-muted-foreground">
+              <div className="animate-fade-in space-y-2">
+                <div className={`rounded-lg p-3 text-xs ${idResult === 'correct' ? 'bg-success/8 border border-success/20' : 'bg-error/8 border border-error/20'}`}>
+                  <p className="font-semibold text-foreground">{idResult === 'correct' ? 'Correct!' : 'Incorrect'}</p>
+                  <p className="text-muted-foreground mt-1">
                     This is <span className="font-medium text-foreground">{idTarget.weed.commonName}</span>
                     {grade !== 'elementary' && <> (<span className="italic">{idTarget.weed.scientificName}</span>)</>}.
-                    {' '}{idTarget.weed.traits[0]}
                   </p>
                 </div>
-                <button onClick={finishIdRound} className="w-full py-3 rounded-md bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity">
+                <button onClick={finishIdRound} className="w-full py-2 rounded-md bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90">
                   Continue
                 </button>
               </div>
             )}
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-        <div className="max-w-lg mx-auto px-5 py-8">
-          <div className="flex items-center gap-3 mb-6">
-            <button onClick={() => setPhase('playing')} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Scouting Results</p>
-              <h2 className="font-display font-bold text-xl text-foreground">Identify the Weeds</h2>
-            </div>
+      return (
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Crosshair className="w-4 h-4 text-primary" />
+            <h3 className="font-display font-bold text-foreground text-sm">Identify Weeds</h3>
           </div>
-
-          <p className="text-sm text-muted-foreground mb-4">
-            Your scout found {scoutedCount} weeds. Tap each weed to identify it.
-            {unidentified.length === 0 ? ' All scouted weeds identified!' : ` ${unidentified.length} remaining.`}
+          <p className="text-xs text-muted-foreground">
+            Found {scoutedCount} weeds. {unidentified.length > 0 ? `${unidentified.length} remaining.` : 'All identified!'}
           </p>
-
-          {unidentified.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 mb-6">
+          {unidentified.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
               {unidentified.map(fw => (
                 <button key={fw.id} onClick={() => startIdentify(fw)}
-                  className="rounded-lg border border-border bg-card overflow-hidden hover:shadow-card-hover hover:border-primary/30 transition-all">
+                  className="rounded-lg border border-border bg-card overflow-hidden hover:shadow-subtle hover:border-primary/30 transition-all">
                   <div className="aspect-square bg-muted">
                     <WeedImage weedId={fw.weed.id} stage={fw.stage} className="w-full h-full object-cover" />
                   </div>
-                  <div className="p-3">
-                    <p className="text-sm font-medium text-foreground">Unknown Weed</p>
-                    <p className="text-xs text-muted-foreground">{fw.stage} · {fw.density}/sq ft</p>
+                  <div className="p-2">
+                    <p className="text-xs font-medium text-foreground">Unknown Weed</p>
+                    <p className="text-[10px] text-muted-foreground">{fw.stage} · {fw.density}/sq ft</p>
                   </div>
                 </button>
               ))}
             </div>
-          ) : null}
-
+          )}
           {alreadyIdentified.length > 0 && (
-            <div className="mb-6">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Identified</p>
-              <div className="flex flex-wrap gap-2">
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Identified</p>
+              <div className="flex flex-wrap gap-1">
                 {alreadyIdentified.map(fw => (
-                  <span key={fw.id} className="px-3 py-1.5 rounded-md bg-success/8 border border-success/20 text-sm text-foreground">
-                    {fw.weed.commonName}
-                  </span>
+                  <span key={fw.id} className="px-2 py-1 rounded bg-success/8 border border-success/20 text-[11px] text-foreground">{fw.weed.commonName}</span>
                 ))}
               </div>
             </div>
           )}
-
-          <button onClick={doneIdentifying}
-            className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold hover:opacity-90 transition-opacity">
-            {unidentified.length > 0 ? 'Skip to Management' : 'Proceed to Management'} <ChevronRight className="w-4 h-4 inline ml-1" />
+          <button onClick={doneIdentifying} className="w-full py-2.5 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90">
+            {unidentified.length > 0 ? 'Skip to Management' : 'Proceed to Management'} <ChevronRight className="w-3 h-3 inline ml-1" />
           </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Managing Phase ───────────────────────────────────────
-  if (phase === 'managing') {
-    // Applying animation
-    if (mgmtMode === 'applying') {
-      return (
-        <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
-          <div className="text-center px-5">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-            <p className="font-semibold text-foreground">
-              {mgmtAction === 'herbicide' ? 'Applying herbicide...' :
-               mgmtAction === 'tillage' ? 'Running tillage equipment...' :
-               mgmtAction === 'hand-pull' ? 'Hand pulling weeds...' : 'Waiting...'}
-            </p>
-          </div>
         </div>
       );
     }
 
-    // Result feedback
-    if (mgmtMode === 'result' && mgmtFeedback) {
-      return (
-        <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-          <div className="max-w-lg mx-auto px-5 py-8">
-            <div className="flex items-center gap-3 mb-6">
-              {driftWarning ? (
-                <div className="w-10 h-10 rounded-lg bg-warning/15 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-warning" />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-lg bg-success/15 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-success" />
-                </div>
-              )}
-              <h2 className="font-display font-bold text-xl text-foreground">Management Result</h2>
-            </div>
-
-            <div className={`rounded-lg p-5 mb-6 border ${driftWarning ? 'bg-warning/5 border-warning/20' : 'bg-success/5 border-success/20'}`}>
-              <p className="text-foreground leading-relaxed">{mgmtFeedback}</p>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-card">
-              <p className="text-sm text-muted-foreground">
-                Remaining weeds: <span className="font-semibold text-foreground">{fieldWeeds.filter(w => w.alive).length}</span> ·
-                Total controlled: <span className="font-semibold text-foreground">{weedsKilled}</span> ·
-                Cost so far: <span className="font-semibold text-foreground">${totalCost}/acre</span>
+    // ── Managing phase in side panel ──
+    if (phase === 'managing') {
+      if (mgmtMode === 'applying') {
+        return (
+          <div className="p-4 flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+              <p className="font-semibold text-foreground text-sm">
+                {mgmtAction === 'herbicide' ? 'Applying herbicide...' :
+                 mgmtAction === 'tillage' ? 'Running tillage...' :
+                 mgmtAction === 'hand-pull' ? 'Hand pulling...' : 'Waiting...'}
               </p>
             </div>
+          </div>
+        );
+      }
 
-            <div className="flex gap-3">
+      if (mgmtMode === 'result' && mgmtFeedback) {
+        return (
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              {driftWarning ? <AlertTriangle className="w-5 h-5 text-warning" /> : <CheckCircle2 className="w-5 h-5 text-success" />}
+              <h3 className="font-display font-bold text-foreground text-sm">Management Result</h3>
+            </div>
+            <div className={`rounded-lg p-3 border text-sm ${driftWarning ? 'bg-warning/5 border-warning/20' : 'bg-success/5 border-success/20'}`}>
+              <p className="text-foreground">{mgmtFeedback}</p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-3 text-xs text-muted-foreground">
+              Remaining: <span className="font-semibold text-foreground">{fieldWeeds.filter(w => w.alive).length}</span> ·
+              Controlled: <span className="font-semibold text-foreground">{weedsKilled}</span> ·
+              Cost: <span className="font-semibold text-foreground">${totalCost}</span>
+            </div>
+            <div className="flex gap-2">
               <button onClick={() => { setMgmtMode('choose'); setMgmtFeedback(null); setDriftWarning(false); }}
-                className="flex-1 py-3 rounded-md border border-border bg-card text-foreground font-semibold hover:bg-secondary transition-colors">
+                className="flex-1 py-2 rounded-md border border-border bg-card text-foreground text-sm font-semibold hover:bg-secondary">
                 More Actions
               </button>
               <button onClick={finishManagement}
-                className="flex-1 py-3 rounded-md bg-success text-success-foreground font-semibold hover:opacity-90 transition-opacity">
-                Back to Field
+                className="flex-1 py-2 rounded-md bg-success text-success-foreground text-sm font-semibold hover:opacity-90">
+                Done
               </button>
             </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // Herbicide configuration
-    if (mgmtMode === 'herbicide-config') {
-      return (
-        <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-          <div className="max-w-lg mx-auto px-5 py-8">
-            <div className="flex items-center gap-3 mb-6">
-              <button onClick={() => setMgmtMode('choose')} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="w-4 h-4" />
+      // Herbicide configuration with PREVIEW
+      if (mgmtMode === 'herbicide-config') {
+        return (
+          <div className="p-4 space-y-3 overflow-y-auto">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setMgmtMode('choose')} className="w-6 h-6 rounded border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-3 h-3" />
               </button>
-              <div>
-                <Droplets className="w-5 h-5 text-primary inline mr-2" />
-                <span className="font-display font-bold text-xl text-foreground">Configure Herbicide</span>
-              </div>
+              <Droplets className="w-4 h-4 text-primary" />
+              <h3 className="font-display font-bold text-foreground text-sm">Configure Herbicide</h3>
             </div>
 
             {/* Product */}
-            <div className="mb-5">
-              <label className="text-sm font-semibold text-foreground block mb-2">Herbicide Product</label>
-              <div className="space-y-2">
+            <div>
+              <label className="text-xs font-semibold text-foreground block mb-1">Product</label>
+              <div className="space-y-1">
                 {HERBICIDE_PRODUCTS.map(p => (
                   <button key={p.id} onClick={() => setHerbProduct(p.id)}
-                    className={`w-full text-left p-3 rounded-lg border transition-all ${herbProduct === p.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
-                    <p className="text-sm font-medium text-foreground">{p.label}</p>
-                    <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
-                      <span>${p.cost}/acre</span>
-                      <span>{Math.round(p.effectiveness * 100)}% effective</span>
-                      <span>{p.broadleaf ? 'Broadleaf' : ''}{p.broadleaf && p.grass ? ' + ' : ''}{p.grass ? 'Grass' : ''}</span>
-                    </div>
+                    className={`w-full text-left p-2 rounded-lg border text-xs transition-all ${herbProduct === p.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
+                    <p className="font-medium text-foreground">{p.label}</p>
+                    <p className="text-muted-foreground">${p.cost} · {Math.round(p.effectiveness * 100)}% · {p.broadleaf ? 'Broadleaf' : ''}{p.broadleaf && p.grass ? '+' : ''}{p.grass ? 'Grass' : ''}</p>
                   </button>
                 ))}
               </div>
@@ -961,18 +783,32 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
 
             {/* Nozzle */}
             {(grade === 'middle' || grade === 'high') && (
-              <div className="mb-5">
-                <label className="text-sm font-semibold text-foreground block mb-2">Nozzle Type</label>
-                <div className="space-y-2">
+              <div>
+                <label className="text-xs font-semibold text-foreground block mb-1">Nozzle Type</label>
+                <div className="space-y-1">
                   {NOZZLE_TYPES.map(n => (
                     <button key={n.id} onClick={() => setHerbNozzle(n.id)}
-                      className={`w-full text-left p-3 rounded-lg border transition-all ${herbNozzle === n.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
-                      <p className="text-sm font-medium text-foreground">{n.label}</p>
-                      <p className="text-xs text-muted-foreground">{n.desc}</p>
-                      <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
-                        <span>Drift risk: {Math.round(n.driftRisk * 100)}%</span>
-                        <span>Coverage: {Math.round(n.coverage * 100)}%</span>
-                      </div>
+                      className={`w-full text-left p-2 rounded-lg border text-xs transition-all ${herbNozzle === n.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
+                      <p className="font-medium text-foreground">{n.label}</p>
+                      <p className="text-muted-foreground">{n.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Boom Height */}
+            {(grade === 'middle' || grade === 'high') && (
+              <div>
+                <label className="text-xs font-semibold text-foreground block mb-1">
+                  <Ruler className="w-3 h-3 inline mr-1" />Boom Height
+                </label>
+                <div className="grid grid-cols-3 gap-1">
+                  {SPRAY_HEIGHTS.map(h => (
+                    <button key={h.id} onClick={() => setHerbHeight(h.id)}
+                      className={`p-2 rounded-lg border text-center text-xs transition-all ${herbHeight === h.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
+                      <p className="font-medium text-foreground">{h.label}</p>
+                      <p className="text-muted-foreground text-[10px]">{h.id === 'low' ? 'Low drift' : h.id === 'high' ? 'More drift' : 'Standard'}</p>
                     </button>
                   ))}
                 </div>
@@ -981,164 +817,308 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
 
             {/* Speed */}
             {(grade === 'middle' || grade === 'high') && (
-              <div className="mb-6">
-                <label className="text-sm font-semibold text-foreground block mb-2">Application Speed</label>
-                <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="text-xs font-semibold text-foreground block mb-1">Application Speed</label>
+                <div className="grid grid-cols-3 gap-1">
                   {SPRAY_SPEEDS.map(s => (
                     <button key={s.id} onClick={() => setHerbSpeed(s.id)}
-                      className={`p-3 rounded-lg border text-center transition-all ${herbSpeed === s.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
-                      <p className="text-sm font-medium text-foreground">{s.label}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Drift: {s.driftMult > 1 ? 'High' : s.driftMult < 1 ? 'Low' : 'Normal'}</p>
+                      className={`p-2 rounded-lg border text-center text-xs transition-all ${herbSpeed === s.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
+                      <p className="font-medium text-foreground">{s.label}</p>
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* ── PREVIEW BOX ── */}
+            <div className="rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-3 space-y-1">
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">Decision Preview</p>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                <span className="text-muted-foreground">Coverage:</span>
+                <span className="font-medium text-foreground">{Math.round(herbPreview.effectiveCoverage * 100)}%</span>
+                <span className="text-muted-foreground">Drift Risk:</span>
+                <span className={`font-medium ${herbPreview.driftRisk > 0.25 ? 'text-warning' : 'text-foreground'}`}>
+                  {Math.round(herbPreview.driftRisk * 100)}%{herbPreview.driftRisk > 0.25 ? ' ⚠' : ''}
+                </span>
+                <span className="text-muted-foreground">Est. Weeds Killed:</span>
+                <span className="font-medium text-foreground">~{herbPreview.estKill} of {herbPreview.targetable} targetable</span>
+                <span className="text-muted-foreground">Time:</span>
+                <span className="font-medium text-foreground">{herbPreview.timeHours.toFixed(1)}h</span>
+                <span className="text-muted-foreground">Cost:</span>
+                <span className="font-medium text-foreground">${herbPreview.product.cost}/acre</span>
+              </div>
+              {herbPreview.driftRisk > 0.25 && (
+                <p className="text-[10px] text-warning mt-1">High drift risk may damage neighboring crops. Consider lower speed or drift-reducing nozzle.</p>
+              )}
+            </div>
+
             <button onClick={applyHerbicide}
-              className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold hover:opacity-90 transition-opacity">
+              className="w-full py-2.5 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90">
               Apply Herbicide
             </button>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // Tillage configuration
-    if (mgmtMode === 'tillage-config') {
-      return (
-        <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-          <div className="max-w-lg mx-auto px-5 py-8">
-            <div className="flex items-center gap-3 mb-6">
-              <button onClick={() => setMgmtMode('choose')} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="w-4 h-4" />
+      // Tillage configuration
+      if (mgmtMode === 'tillage-config') {
+        const selectedTill = TILLAGE_TYPES.find(t => t.id === tillageType)!;
+        return (
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setMgmtMode('choose')} className="w-6 h-6 rounded border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-3 h-3" />
               </button>
-              <div>
-                <Tractor className="w-5 h-5 text-primary inline mr-2" />
-                <span className="font-display font-bold text-xl text-foreground">Choose Tillage Equipment</span>
-              </div>
+              <Tractor className="w-4 h-4 text-primary" />
+              <h3 className="font-display font-bold text-foreground text-sm">Choose Tillage</h3>
             </div>
-
-            <div className="space-y-3 mb-6">
+            <div className="space-y-1.5">
               {TILLAGE_TYPES.map(t => (
                 <button key={t.id} onClick={() => setTillageType(t.id)}
-                  className={`w-full text-left p-4 rounded-lg border transition-all ${tillageType === t.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
-                  <h3 className="font-semibold text-foreground">{t.label}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{t.desc}</p>
-                  <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
-                    <span>${t.cost}/acre</span>
-                    <span>{t.timeHours}h</span>
-                    <span>{Math.round(t.effectiveness * 100)}% effective</span>
+                  className={`w-full text-left p-2.5 rounded-lg border text-xs transition-all ${tillageType === t.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
+                  <p className="font-semibold text-foreground">{t.label}</p>
+                  <p className="text-muted-foreground">{t.desc}</p>
+                  <div className="flex gap-2 mt-1">
+                    <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">${t.cost}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{t.timeHours}h</span>
+                    <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(t.effectiveness * 100)}%</span>
                   </div>
                 </button>
               ))}
             </div>
-
-            <button onClick={applyTillage}
-              className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold hover:opacity-90 transition-opacity">
+            {/* Preview */}
+            <div className="rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-3 space-y-1">
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">Decision Preview</p>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                <span className="text-muted-foreground">Equipment:</span>
+                <span className="font-medium text-foreground">{selectedTill.label}</span>
+                <span className="text-muted-foreground">Effectiveness:</span>
+                <span className="font-medium text-foreground">{Math.round(selectedTill.effectiveness * 100)}%</span>
+                <span className="text-muted-foreground">Time:</span>
+                <span className="font-medium text-foreground">{selectedTill.timeHours}h</span>
+                <span className="text-muted-foreground">Cost:</span>
+                <span className="font-medium text-foreground">${selectedTill.cost}/acre</span>
+              </div>
+            </div>
+            <button onClick={applyTillage} className="w-full py-2.5 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90">
               Run Tillage
             </button>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // Hand pull confirmation
-    if (mgmtMode === 'hand-pull') {
+      // Hand pull confirmation
+      if (mgmtMode === 'hand-pull') {
+        return (
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setMgmtMode('choose')} className="w-6 h-6 rounded border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-3 h-3" />
+              </button>
+              <Hand className="w-4 h-4 text-primary" />
+              <h3 className="font-display font-bold text-foreground text-sm">Hand Pull Weeds</h3>
+            </div>
+            <div className="rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-3 space-y-1">
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">Decision Preview</p>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                <span className="text-muted-foreground">Method:</span>
+                <span className="font-medium text-foreground">Manual removal</span>
+                <span className="text-muted-foreground">Best for:</span>
+                <span className="font-medium text-foreground">Seedlings & small plants</span>
+                <span className="text-muted-foreground">Time:</span>
+                <span className="font-medium text-foreground">~3 hours</span>
+                <span className="text-muted-foreground">Cost:</span>
+                <span className="font-medium text-foreground">Free (labor only)</span>
+              </div>
+            </div>
+            <button onClick={applyHandPull} className="w-full py-2.5 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90">
+              Start Hand Pulling
+            </button>
+          </div>
+        );
+      }
+
+      // Management choice menu
       return (
-        <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-          <div className="max-w-lg mx-auto px-5 py-8 text-center">
-            <Hand className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="font-display font-bold text-xl text-foreground mb-2">Hand Pull Weeds</h2>
-            <p className="text-muted-foreground mb-2">Walk the field and physically remove weeds by hand.</p>
-            <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-card text-left">
-              <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Time:</span> ~3 hours</p>
-              <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Cost:</span> $0 (labor only)</p>
-              <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Best for:</span> Seedlings and small vegetative weeds</p>
-              <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Note:</span> Less effective on large, established weeds</p>
-            </div>
-            <div className="flex gap-3">
-              <button onClick={() => setMgmtMode('choose')}
-                className="flex-1 py-3 rounded-md border border-border bg-card text-foreground font-semibold hover:bg-secondary transition-colors">
-                Back
-              </button>
-              <button onClick={applyHandPull}
-                className="flex-1 py-3 rounded-md bg-success text-success-foreground font-semibold hover:opacity-90 transition-opacity">
-                Start Pulling
-              </button>
-            </div>
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Settings2 className="w-4 h-4 text-primary" />
+            <h3 className="font-display font-bold text-foreground text-sm">Manage Weeds</h3>
           </div>
+          <p className="text-xs text-muted-foreground">Choose a management strategy. You can preview the impact before applying.</p>
+          <div className="space-y-2">
+            <button onClick={() => chooseManagement('herbicide')} className="w-full text-left p-3 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-subtle transition-all">
+              <div className="flex items-center gap-2 mb-0.5"><Droplets className="w-4 h-4 text-primary" /><span className="font-semibold text-foreground text-sm">Apply Herbicide</span></div>
+              <p className="text-xs text-muted-foreground">Select product, nozzle, height, and speed.</p>
+            </button>
+            <button onClick={() => chooseManagement('tillage')} className="w-full text-left p-3 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-subtle transition-all">
+              <div className="flex items-center gap-2 mb-0.5"><Tractor className="w-4 h-4 text-primary" /><span className="font-semibold text-foreground text-sm">Mechanical Tillage</span></div>
+              <p className="text-xs text-muted-foreground">Choose tillage equipment.</p>
+            </button>
+            <button onClick={() => chooseManagement('hand-pull')} className="w-full text-left p-3 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-subtle transition-all">
+              <div className="flex items-center gap-2 mb-0.5"><Hand className="w-4 h-4 text-primary" /><span className="font-semibold text-foreground text-sm">Hand Pull</span></div>
+              <p className="text-xs text-muted-foreground">Free but labor-intensive.</p>
+            </button>
+            <button onClick={() => chooseManagement('wait')} className="w-full text-left p-3 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-subtle transition-all">
+              <div className="flex items-center gap-2 mb-0.5"><Clock className="w-4 h-4 text-primary" /><span className="font-semibold text-foreground text-sm">Wait & Observe</span></div>
+              <p className="text-xs text-muted-foreground">Skip intervention this season.</p>
+            </button>
+          </div>
+          <button onClick={finishManagement} className="w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-3 h-3 inline mr-1" /> Back to Field
+          </button>
         </div>
       );
     }
 
-    // Management choice screen
-    return (
-      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-        <div className="max-w-lg mx-auto px-5 py-8">
-          <div className="flex items-center gap-3 mb-6">
-            <button onClick={finishManagement} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-            </button>
+    // ── Event phase overlay in side panel ──
+    if (phase === 'event' && currentEvent) {
+      const answered = eventAnswer !== null;
+      return (
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-warning" />
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Management Decisions</p>
-              <h2 className="font-display font-bold text-xl text-foreground">Choose a Control Method</h2>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Event — {seasonInfo.label}</p>
+              <h3 className="font-display font-bold text-foreground text-sm">{currentEvent.title}</h3>
             </div>
           </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-card">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Alive weeds: <span className="font-semibold text-foreground">{aliveCount}</span></span>
-              <span className="text-muted-foreground">Identified: <span className="font-semibold text-foreground">{identifiedCount}</span></span>
+          <div className="bg-card border border-border rounded-lg p-3 text-sm">
+            <p className="text-foreground">{currentEvent.description}</p>
+            <p className="font-semibold text-foreground mt-2">{currentEvent.question}</p>
+          </div>
+          <div className="space-y-1.5">
+            {currentEvent.options.map(opt => (
+              <button key={opt.id} onClick={() => {
+                if (!answered) {
+                  setEventAnswer(opt.id);
+                  setEventsAnswered(p => p + 1);
+                  if (opt.correct) setEventsCorrect(p => p + 1);
+                }
+              }} disabled={answered}
+                className={`w-full text-left p-2.5 rounded-lg border text-xs transition-all ${
+                  !answered ? 'border-border bg-card hover:border-primary/30' :
+                  opt.correct ? 'border-success bg-success/5' :
+                  opt.id === eventAnswer ? 'border-error bg-error/5' : 'border-border bg-card opacity-60'
+                }`}>
+                <div className="flex items-start gap-2">
+                  {answered && opt.correct && <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />}
+                  {answered && !opt.correct && opt.id === eventAnswer && <XCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />}
+                  <div>
+                    <p className="text-foreground">{opt.label}</p>
+                    {answered && (opt.correct || opt.id === eventAnswer) && (
+                      <p className="text-muted-foreground mt-0.5">{opt.feedback}</p>
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+          {answered && (
+            <div className="animate-fade-in space-y-2">
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                <p className="text-[10px] text-primary font-semibold uppercase tracking-wider mb-0.5">Teaching Point</p>
+                <p className="text-xs text-foreground">{currentEvent.teachingPoint}</p>
+              </div>
+              <button onClick={() => setPhase('playing')} className="w-full py-2.5 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90">
+                Continue <ChevronRight className="w-3 h-3 inline ml-1" />
+              </button>
             </div>
+          )}
+        </div>
+      );
+    }
+
+    // ── Harvest in side panel ──
+    if (phase === 'harvest') {
+      return (
+        <div className="p-4 space-y-4 flex flex-col items-center justify-center h-full">
+          <div className="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center">
+            <Wheat className="w-7 h-7 text-success" />
           </div>
-
-          <div className="space-y-3">
-            <button onClick={() => chooseManagement('herbicide')}
-              className="w-full text-left p-5 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-card-hover transition-all">
-              <div className="flex items-center gap-3 mb-1">
-                <Droplets className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-foreground">Apply Herbicide</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Select product, nozzle type, and application speed. Chemical control.</p>
-            </button>
-
-            <button onClick={() => chooseManagement('tillage')}
-              className="w-full text-left p-5 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-card-hover transition-all">
-              <div className="flex items-center gap-3 mb-1">
-                <Tractor className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-foreground">Mechanical Tillage</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Choose tillage equipment to physically bury or uproot weeds.</p>
-            </button>
-
-            <button onClick={() => chooseManagement('hand-pull')}
-              className="w-full text-left p-5 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-card-hover transition-all">
-              <div className="flex items-center gap-3 mb-1">
-                <Hand className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-foreground">Hand Pull Weeds</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Physically remove weeds. Free but labor-intensive.</p>
-            </button>
-
-            <button onClick={() => chooseManagement('wait')}
-              className="w-full text-left p-5 rounded-lg border border-border bg-card hover:border-primary/30 hover:shadow-card-hover transition-all">
-              <div className="flex items-center gap-3 mb-1">
-                <Clock className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-foreground">Wait & Observe</span>
-              </div>
-              <p className="text-sm text-muted-foreground">Skip intervention. More weeds may emerge — or the crop may outcompete them.</p>
-            </button>
+          <h3 className="font-display font-bold text-2xl text-foreground">Harvest Time</h3>
+          <p className="text-sm text-muted-foreground text-center">The combine is rolling through your field.</p>
+          <div className="bg-card border border-border rounded-lg p-5 text-center w-full">
+            <p className="font-display font-bold text-4xl text-foreground">{finalYield.toFixed(1)} bu/acre</p>
+            <p className="text-sm text-muted-foreground mt-1">{finalYield >= 45 ? 'Excellent yield' : finalYield >= 38 ? 'Good yield' : 'Below average — weeds impacted production'}</p>
           </div>
+          <button onClick={() => setPhase('results')} className="w-full py-3 rounded-md bg-primary text-primary-foreground font-semibold hover:opacity-90">
+            View Season Summary
+          </button>
+        </div>
+      );
+    }
+
+    // ── Default: Playing phase action panel ──
+    return (
+      <div className="flex flex-col h-full">
+        <div className="p-4 border-b border-border">
+          <h3 className="font-display font-bold text-foreground text-sm mb-1">Field Actions</h3>
+          <p className="text-xs text-muted-foreground">Follow the steps to manage your field</p>
+        </div>
+
+        <div className="p-4 space-y-3 flex-1">
+          {/* Step 1: Scout — highlighted prominently if not done */}
+          <button onClick={() => setPhase('scouting')}
+            className={`w-full text-left p-3 rounded-lg border transition-all ${
+              hasScouted ? 'border-success/30 bg-success/5' :
+              'border-primary border-2 bg-primary/8 shadow-subtle hover:shadow-card animate-pulse'
+            }`}>
+            <div className="flex items-center gap-2 mb-1">
+              <Eye className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground text-sm">1. Scout Field</span>
+              {hasScouted && <CheckCircle2 className="w-4 h-4 text-success ml-auto" />}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {hasScouted ? `Found ${scoutedCount} weeds` : 'Click here first! Choose how to survey the field.'}
+            </p>
+          </button>
+
+          {/* Step 2: Identify */}
+          <button onClick={() => { if (hasScouted) setPhase('identifying'); }}
+            disabled={!hasScouted}
+            className={`w-full text-left p-3 rounded-lg border transition-all ${
+              !hasScouted ? 'border-border bg-card opacity-50 cursor-not-allowed' :
+              identifiedCount >= scoutedCount ? 'border-success/30 bg-success/5' :
+              'border-primary bg-primary/5 hover:shadow-subtle'
+            }`}>
+            <div className="flex items-center gap-2 mb-1">
+              <Crosshair className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground text-sm">2. Identify Weeds</span>
+              {identifiedCount >= scoutedCount && scoutedCount > 0 && <CheckCircle2 className="w-4 h-4 text-success ml-auto" />}
+            </div>
+            <p className="text-xs text-muted-foreground">{identifiedCount > 0 ? `${identifiedCount} identified` : 'Identify scouted weeds'}</p>
+          </button>
+
+          {/* Step 3: Manage */}
+          <button onClick={() => { if (hasScouted) { setPhase('managing'); setMgmtMode('choose'); }}}
+            disabled={!hasScouted}
+            className={`w-full text-left p-3 rounded-lg border transition-all ${
+              !hasScouted ? 'border-border bg-card opacity-50 cursor-not-allowed' :
+              'border-primary bg-primary/5 hover:shadow-subtle'
+            }`}>
+            <div className="flex items-center gap-2 mb-1">
+              <Settings2 className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground text-sm">3. Manage Weeds</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Choose control method and apply</p>
+          </button>
+        </div>
+
+        <div className="p-4 border-t border-border">
+          <button onClick={advanceSeason}
+            className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90 flex items-center justify-center gap-2">
+            {currentSeason === 'late-summer' ? 'Harvest' : 'Next Season'} <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     );
-  }
+  };
 
-  // ── Main Playing Screen ──────────────────────────────────
+  // ── Main Layout: Field always visible + side panel ─────
   return (
-    <div className="fixed inset-0 bg-background z-50 overflow-hidden flex flex-col">
-      {/* Header */}
+    <div className="fixed inset-0 bg-background z-40 overflow-hidden flex flex-col">
+      {/* Top bar */}
       <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <button onClick={onClose} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
@@ -1162,34 +1142,27 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main content: Field + side panel */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left: Field */}
+        {/* Left: Field — ALWAYS VISIBLE */}
         <div className="flex-[7] flex flex-col overflow-hidden">
           <div className="flex-1 relative">
             <img src={fieldBgImage} alt="Soybean field" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-foreground/10" />
 
-            {/* Weed indicators - bright and visible */}
+            {/* Weed indicators */}
             {fieldWeeds.map(fw => (
               <button
                 key={fw.id}
-                onClick={() => {
-                  if (fw.alive && fw.identified) setSelectedWeed(fw);
-                }}
+                onClick={() => { if (fw.alive && fw.identified) setSelectedWeed(fw); }}
                 className={`absolute transition-all duration-500 ${
-                  !fw.alive
-                    ? 'opacity-0 pointer-events-none scale-50'
-                    : fw.identified
-                    ? 'hover:scale-125 cursor-pointer'
-                    : fw.scouted
-                    ? 'cursor-default'
-                    : 'cursor-default'
+                  !fw.alive ? 'opacity-0 pointer-events-none scale-50' :
+                  fw.identified ? 'hover:scale-125 cursor-pointer' :
+                  'cursor-default'
                 }`}
                 style={{ left: `${fw.x}%`, top: `${fw.y}%`, transform: 'translate(-50%,-50%)' }}
                 title={fw.identified ? fw.weed.commonName : fw.scouted ? 'Scouted — needs ID' : 'Unscouted'}
               >
-                {/* Bright colored dot */}
                 <div className={`w-7 h-7 rounded-full border-[3px] flex items-center justify-center shadow-lg ${
                   fw.identified
                     ? 'border-weed-identified bg-weed-identified/50 shadow-weed-identified/30'
@@ -1203,7 +1176,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
               </button>
             ))}
 
-            {/* Selected weed detail popup */}
+            {/* Selected weed popup */}
             {selectedWeed && selectedWeed.alive && (
               <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-card border border-border rounded-lg p-4 shadow-card-hover animate-fade-in z-10">
                 <div className="flex items-start gap-3">
@@ -1214,8 +1187,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
                     <p className="font-semibold text-foreground">{selectedWeed.weed.commonName}</p>
                     {grade !== 'elementary' && <p className="text-xs italic text-muted-foreground">{selectedWeed.weed.scientificName}</p>}
                     <p className="text-xs text-muted-foreground mt-1">{selectedWeed.weed.plantType} · {selectedWeed.weed.lifeCycle}</p>
-                    <p className="text-xs text-muted-foreground">Density: {selectedWeed.density} plants/sq ft</p>
-                    <p className="text-xs text-muted-foreground">Stage: {selectedWeed.stage}</p>
+                    <p className="text-xs text-muted-foreground">Density: {selectedWeed.density}/sq ft · Stage: {selectedWeed.stage}</p>
                   </div>
                   <button onClick={() => setSelectedWeed(null)} className="text-muted-foreground hover:text-foreground">
                     <X className="w-4 h-4" />
@@ -1237,65 +1209,9 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Right: Action Panel */}
+        {/* Right: Side Panel — content changes by phase */}
         <div className="flex-[3] border-l border-border bg-card overflow-y-auto hidden sm:flex flex-col">
-          <div className="p-4 border-b border-border">
-            <h3 className="font-display font-bold text-foreground text-sm mb-1">Field Actions</h3>
-            <p className="text-xs text-muted-foreground">Follow the steps to manage your field</p>
-          </div>
-
-          <div className="p-4 space-y-3 flex-1">
-            {/* Step 1: Scout */}
-            <button onClick={() => setPhase('scouting')}
-              className={`w-full text-left p-3 rounded-lg border transition-all ${
-                hasScouted ? 'border-success/30 bg-success/5' : 'border-primary bg-primary/5 hover:shadow-subtle'
-              }`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Eye className="w-4 h-4 text-primary" />
-                <span className="font-medium text-foreground text-sm">1. Scout Field</span>
-                {hasScouted && <CheckCircle2 className="w-4 h-4 text-success ml-auto" />}
-              </div>
-              <p className="text-xs text-muted-foreground">{hasScouted ? `Found ${scoutedCount} weeds` : 'Choose how to survey the field'}</p>
-            </button>
-
-            {/* Step 2: Identify */}
-            <button onClick={() => { if (hasScouted) setPhase('identifying'); }}
-              disabled={!hasScouted}
-              className={`w-full text-left p-3 rounded-lg border transition-all ${
-                !hasScouted ? 'border-border bg-card opacity-50 cursor-not-allowed' :
-                identifiedCount >= scoutedCount ? 'border-success/30 bg-success/5' :
-                'border-primary bg-primary/5 hover:shadow-subtle'
-              }`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Crosshair className="w-4 h-4 text-primary" />
-                <span className="font-medium text-foreground text-sm">2. Identify Weeds</span>
-                {identifiedCount >= scoutedCount && scoutedCount > 0 && <CheckCircle2 className="w-4 h-4 text-success ml-auto" />}
-              </div>
-              <p className="text-xs text-muted-foreground">{identifiedCount > 0 ? `${identifiedCount} identified` : 'Identify scouted weeds'}</p>
-            </button>
-
-            {/* Step 3: Manage */}
-            <button onClick={() => { if (hasScouted) { setPhase('managing'); setMgmtMode('choose'); }}}
-              disabled={!hasScouted}
-              className={`w-full text-left p-3 rounded-lg border transition-all ${
-                !hasScouted ? 'border-border bg-card opacity-50 cursor-not-allowed' :
-                'border-primary bg-primary/5 hover:shadow-subtle'
-              }`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Settings2 className="w-4 h-4 text-primary" />
-                <span className="font-medium text-foreground text-sm">3. Manage Weeds</span>
-              </div>
-              <p className="text-xs text-muted-foreground">Choose control method and apply</p>
-            </button>
-          </div>
-
-          {/* Advance */}
-          <div className="p-4 border-t border-border">
-            <button onClick={advanceSeason}
-              className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-              {currentSeason === 'late-summer' ? 'Harvest' : 'Next Season'} <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+          {renderSidePanel()}
         </div>
       </div>
 
@@ -1303,7 +1219,9 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
       <div className="sm:hidden border-t border-border bg-card p-3">
         <div className="flex gap-2 overflow-x-auto pb-1">
           <button onClick={() => setPhase('scouting')}
-            className={`shrink-0 px-3 py-2 rounded-md border text-xs font-medium flex items-center gap-1.5 transition-colors ${hasScouted ? 'border-success/30 bg-success/5 text-foreground' : 'border-primary bg-primary/5 text-foreground'}`}>
+            className={`shrink-0 px-3 py-2 rounded-md border text-xs font-medium flex items-center gap-1.5 transition-colors ${
+              hasScouted ? 'border-success/30 bg-success/5 text-foreground' : 'border-primary border-2 bg-primary/8 text-foreground animate-pulse'
+            }`}>
             <Eye className="w-3.5 h-3.5" /> Scout
           </button>
           <button onClick={() => hasScouted && setPhase('identifying')} disabled={!hasScouted}
