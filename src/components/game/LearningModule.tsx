@@ -130,10 +130,10 @@ export default function LearningModule({ onClose }: Props) {
     [selectedGrade]
   );
 
-  const gradeCards: { grade: GradeLevel; icon: string; color: string }[] = [
-    { grade: 'elementary', icon: '🌱', color: 'border-grade-elementary' },
-    { grade: 'middle', icon: '🔬', color: 'border-grade-middle' },
-    { grade: 'high', icon: '🧪', color: 'border-grade-high' },
+  const gradeCards: { grade: GradeLevel; label: string; color: string }[] = [
+    { grade: 'elementary', label: 'K-5', color: 'border-grade-elementary' },
+    { grade: 'middle', label: '6-8', color: 'border-grade-middle' },
+    { grade: 'high', label: '9-12', color: 'border-grade-high' },
   ];
 
   const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles';
