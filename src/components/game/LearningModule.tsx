@@ -58,13 +58,13 @@ function ViewToggle({ view, onChange }: { view: 'list' | 'box'; onChange: (v: 'l
         onClick={() => onChange('list')}
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'list' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
       >
-        📋 List View
+        List View
       </button>
       <button
         onClick={() => onChange('box')}
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'box' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
       >
-        📦 Box View
+        Grid View
       </button>
     </div>
   );
