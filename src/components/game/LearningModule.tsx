@@ -81,12 +81,11 @@ function SubheadingBox({ icon, label, count, description, weeds: groupWeeds, gra
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="bg-card border border-border rounded-xl p-6 text-left hover:border-primary/50 hover:shadow-lg transition-all"
+        className="bg-card border border-border rounded-lg p-6 text-left hover:border-primary/30 hover:shadow-card-hover transition-all"
       >
-        <div className="text-3xl mb-2">{icon}</div>
         <div className="font-display font-bold text-foreground text-lg">{label}</div>
         <div className="text-sm text-muted-foreground mt-1">{count} species</div>
-        <div className="text-xs text-primary mt-2">Click to explore →</div>
+        <div className="text-xs text-primary mt-2 font-medium">Explore →</div>
       </button>
     );
   }
