@@ -55,6 +55,11 @@
     --ring: 100 52% 20%;
     --radius: 0.5rem;
 
+    /* Weed indicator colors (bright, visible on field) */
+    --weed-unscouted: 350 75% 65%;
+    --weed-scouted: 40 95% 55%;
+    --weed-identified: 93 52% 33%;
+
     /* Grade-level colors (muted, professional) */
     --grade-elementary: 130 12% 55%;
     --grade-middle: 209 37% 47%;
