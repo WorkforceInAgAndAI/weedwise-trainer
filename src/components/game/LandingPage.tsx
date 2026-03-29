@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import { Switch } from '@/components/ui/switch';
 import type { useAuth } from '@/hooks/useAuth';
+import { Leaf, BookOpen, Target, Sprout, Users, BookMarked, BarChart3, LayoutDashboard } from 'lucide-react';
 
 interface Props extends GameEngine {
   onOpenLearning: () => void;
@@ -18,121 +19,138 @@ interface Props extends GameEngine {
 }
 
 export default function LandingPage({ setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin, onOpenDashboard, onOpenAuth, onOpenFarmMode, onOpenPracticeHub, studentSession, auth }: Props) {
-  const [isLightMode, setIsLightMode] = useState(() => {
-    if (!document.documentElement.classList.contains('light') && !document.documentElement.classList.contains('dark')) {
-      document.documentElement.classList.add('light');
-      return true;
-    }
-    return document.documentElement.classList.contains('light');
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark');
   });
 
   const toggleTheme = (checked: boolean) => {
-    setIsLightMode(checked);
+    setIsDarkMode(checked);
     if (checked) {
-      document.documentElement.classList.add('light');
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('light');
+      document.documentElement.classList.remove('dark');
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 relative">
-      {/* Top bar: theme toggle + auth */}
-      <div className="absolute top-4 right-4 flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">🌙</span>
-        <Switch checked={isLightMode} onCheckedChange={toggleTheme} />
-        <span className="text-sm text-muted-foreground">☀️</span>
-
-        <div className="w-px h-6 bg-border mx-1" />
-
-        {auth.isAuthenticated ? (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-foreground font-medium">
-              {auth.role === 'instructor' ? `📊 ${auth.instructor?.display_name}` : `👤 ${auth.user?.email?.split('@')[0]}`}
-            </span>
-            <button onClick={auth.logout}
-              className="px-3 py-1.5 rounded-lg border border-destructive/30 text-destructive text-xs font-medium hover:bg-destructive/10 transition-colors">
-              Sign Out
-            </button>
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="w-full border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-20">
+        <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Leaf className="w-6 h-6 text-primary" strokeWidth={2.5} />
+            <span className="font-display font-bold text-lg text-foreground tracking-tight">WeedID</span>
           </div>
-        ) : (
-          <button onClick={onOpenAuth}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
-            Log In
-          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <span className="text-xs">Light</span>
+              <Switch checked={isDarkMode} onCheckedChange={toggleTheme} />
+              <span className="text-xs">Dark</span>
+            </div>
+
+            <div className="w-px h-5 bg-border" />
+
+            {auth.isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-foreground font-medium">
+                  {auth.role === 'instructor' ? auth.instructor?.display_name : auth.user?.email?.split('@')[0]}
+                </span>
+                <button onClick={auth.logout}
+                  className="px-3 py-1.5 rounded-md border border-border text-muted-foreground text-xs font-medium hover:bg-secondary transition-colors">
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button onClick={onOpenAuth}
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
+                Log In
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-5 sm:px-10 py-12 sm:py-20">
+        <div className="text-center mb-12 animate-fade-in max-w-xl">
+          <h1 className="text-4xl sm:text-5xl font-display font-bold text-foreground mb-4 tracking-tight leading-tight">
+            Midwest Weed<br />Identification Trainer
+          </h1>
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+            Learn to identify 88 weed species through interactive quizzes, practice games, and farm simulation.
+          </p>
+        </div>
+
+        {/* Student session indicator */}
+        {studentSession && (
+          <div className="mb-8 px-5 py-2.5 rounded-md bg-secondary border border-border text-sm flex items-center gap-2">
+            <Users className="w-4 h-4 text-muted-foreground" />
+            <span className="text-foreground font-medium">{studentSession.nickname}</span>
+            <span className="text-muted-foreground">in</span>
+            <span className="text-primary font-medium">{studentSession.className}</span>
+          </div>
         )}
-      </div>
 
-      <div className="text-center mb-8 animate-fade-in">
-        <div className="text-6xl mb-4">🌿</div>
-        <h1 className="text-5xl sm:text-6xl font-display font-extrabold text-primary mb-3 tracking-tight">WeedID</h1>
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-md mx-auto">Midwest Weed Identification Trainer</p>
-        <p className="text-sm text-muted-foreground mt-2">Learn to identify 88 weed species through gamified quizzes & farm simulation</p>
-      </div>
-
-      {/* Student session indicator */}
-      {studentSession && (
-        <div className="mb-6 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-sm flex items-center gap-2">
-          <span className="text-primary">👤</span>
-          <span className="text-foreground font-medium">{studentSession.nickname}</span>
-          <span className="text-muted-foreground">in</span>
-          <span className="text-primary font-medium">{studentSession.className}</span>
-        </div>
-      )}
-
-      {/* Three main mode cards */}
-      <div className="grid grid-cols-3 gap-4 mb-10 max-w-xl w-full">
-        <button
-          onClick={onOpenLearning}
-          className="bg-card border-2 border-primary/30 rounded-xl p-5 text-center hover:border-primary hover:scale-[1.02] transition-all"
-        >
-          <div className="text-3xl sm:text-4xl mb-2">📚</div>
-          <div className="font-display font-bold text-sm sm:text-base text-foreground">Learn</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Study weeds by topic</div>
-        </button>
-        <button
-          onClick={onOpenPracticeHub}
-          className="bg-card border-2 border-accent/30 rounded-xl p-5 text-center hover:border-accent hover:scale-[1.02] transition-all"
-        >
-          <div className="text-3xl sm:text-4xl mb-2">🎯</div>
-          <div className="font-display font-bold text-sm sm:text-base text-foreground">Practice</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Mini-games by level</div>
-        </button>
-        <button
-          onClick={onOpenFarmMode}
-          className="bg-card border-2 border-grade-high/30 rounded-xl p-5 text-center hover:border-grade-high hover:scale-[1.02] transition-all"
-        >
-          <div className="text-3xl sm:text-4xl mb-2">🌾</div>
-          <div className="font-display font-bold text-sm sm:text-base text-foreground">Play</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Land Steward</div>
-        </button>
-      </div>
-
-      {/* Organized secondary actions */}
-      <div className="max-w-xl w-full space-y-3">
-        {/* Community row */}
-        <div className="flex gap-2 justify-center">
-          <button onClick={onOpenClassJoin}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
-            <span>🏫</span> <span>Class</span>
+        {/* Three main mode cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12 max-w-2xl w-full">
+          <button
+            onClick={onOpenLearning}
+            className="group bg-card border border-border rounded-lg p-6 text-left shadow-card hover:shadow-card-hover hover:border-primary/40 transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
+              <BookOpen className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="font-display font-bold text-foreground text-lg mb-1">Learn</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">Study weeds by topic with detailed guides and images</p>
+          </button>
+          <button
+            onClick={onOpenPracticeHub}
+            className="group bg-card border border-border rounded-lg p-6 text-left shadow-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/15 transition-colors">
+              <Target className="w-5 h-5 text-accent" />
+            </div>
+            <h3 className="font-display font-bold text-foreground text-lg mb-1">Practice</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">Mini-games organized by grade level, K–12</p>
+          </button>
+          <button
+            onClick={onOpenFarmMode}
+            className="group bg-card border border-border rounded-lg p-6 text-left shadow-card hover:shadow-card-hover hover:border-terracotta/40 transition-all duration-200"
+          >
+            <div className="w-10 h-10 rounded-lg bg-terracotta/10 flex items-center justify-center mb-4 group-hover:bg-terracotta/15 transition-colors">
+              <Sprout className="w-5 h-5 text-terracotta" />
+            </div>
+            <h3 className="font-display font-bold text-foreground text-lg mb-1">Play</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">Land Steward farm management simulation</p>
           </button>
         </div>
-        {/* Tools row */}
-        <div className="flex gap-2 justify-center">
+
+        {/* Secondary actions */}
+        <div className="flex flex-wrap gap-2 justify-center">
+          <button onClick={onOpenClassJoin}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200">
+            <Users className="w-4 h-4 text-muted-foreground" /> Class
+          </button>
           <button onClick={onOpenGlossary}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
-            <span>📖</span> <span>Glossary</span>
+            className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200">
+            <BookMarked className="w-4 h-4 text-muted-foreground" /> Glossary
           </button>
           <button onClick={() => setShowInstructor(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
-            <span>📈</span> <span>Stats</span>
+            className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200">
+            <BarChart3 className="w-4 h-4 text-muted-foreground" /> Stats
           </button>
           <button onClick={onOpenDashboard}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary transition-colors">
-            <span>📊</span> <span>Dashboard</span>
+            className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200">
+            <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Dashboard
           </button>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full border-t border-border py-6 text-center">
+        <p className="text-xs text-muted-foreground">WeedID — An educational tool for weed science</p>
+      </footer>
     </div>
   );
 }
