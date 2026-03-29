@@ -4,6 +4,7 @@ import { useStudent } from '@/contexts/StudentContext';
 import { useBadgeChecker } from '@/hooks/useBadgeChecker';
 import { useSessionPersistence } from '@/hooks/useSessionPersistence';
 import { useAuth } from '@/hooks/useAuth';
+import AppHeader from '@/components/game/AppHeader';
 import LandingPage from '@/components/game/LandingPage';
 import GameScreen from '@/components/game/GameScreen';
 import ResultsScreen from '@/components/game/ResultsScreen';
@@ -79,8 +80,21 @@ const Index = () => {
     if (role === 'instructor') setShowDashboard(true);
   };
 
+  // Common header props
+  const headerProps = {
+    onOpenLearning: () => setShowLearning(true),
+    onOpenFarmMode: () => setShowFarmMode(true),
+    onOpenPracticeHub: () => setShowPracticeHub(true),
+    onOpenGlossary: () => setShowGlossaryDirect(true),
+    onOpenAuth: () => setShowAuthModal(true),
+    auth,
+  };
+
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Persistent header on all pages */}
+      <AppHeader {...headerProps} />
+
       {game.screen === 'landing' && (
         <LandingPage
           {...game}
@@ -118,7 +132,7 @@ const Index = () => {
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} onAuthenticated={handleAuthComplete} />
       )}
-    </>
+    </div>
   );
 };
 

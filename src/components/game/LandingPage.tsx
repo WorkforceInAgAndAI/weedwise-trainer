@@ -3,7 +3,7 @@ import type { GameEngine } from '@/hooks/useGameEngine';
 import type { useAuth } from '@/hooks/useAuth';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
-import { Leaf, BookOpen, Gamepad2, Target, BookMarked, Users, LayoutDashboard, BarChart3, ChevronRight, User, LogOut } from 'lucide-react';
+import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
 
 const CAROUSEL_WEEDS = ['waterhemp', 'palmer-amaranth', 'giant-ragweed', 'lambsquarters', 'velvetleaf', 'marestail', 'kochia', 'morningglory'];
 
@@ -24,16 +24,10 @@ interface Props extends GameEngine {
   onGradeChange: (g: GradeLevel) => void;
 }
 
-const GRADES: { id: GradeLevel; label: string; short: string }[] = [
-  { id: 'elementary', label: 'Elementary', short: 'K-5' },
-  { id: 'middle', label: 'Middle School', short: '6-8' },
-  { id: 'high', label: 'High School', short: '9-12' },
-];
-
 export default function LandingPage({
-  setShowInstructor, onOpenLearning, onOpenGlossary, onOpenClassJoin,
-  onOpenDashboard, onOpenAuth, onOpenFarmMode, onOpenPracticeHub,
-  onOpenStats, studentSession, auth, grade, onGradeChange,
+  onOpenLearning, onOpenGlossary, onOpenClassJoin,
+  onOpenDashboard, onOpenFarmMode, onOpenPracticeHub,
+  onOpenStats, studentSession,
 }: Props) {
   const [carouselIdx, setCarouselIdx] = useState(0);
   const [fadeClass, setFadeClass] = useState('opacity-100');
@@ -52,115 +46,34 @@ export default function LandingPage({
   }, [nextSlide]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {/* ─── Sticky Header ─── */}
-      <header className="w-full border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-30">
-        <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-3 flex items-center justify-between gap-4">
-          {/* Logo */}
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 shrink-0">
-            <Leaf className="w-6 h-6 text-primary" strokeWidth={2.5} />
-            <span className="font-display font-bold text-lg text-primary hidden sm:inline">The Living Laboratory</span>
-            <span className="font-display font-bold text-lg text-primary sm:hidden">TLL</span>
-          </button>
-
-          {/* Center Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {[
-              { label: 'Learn', action: onOpenLearning, icon: BookOpen },
-              { label: 'Play', action: onOpenFarmMode, icon: Gamepad2 },
-              { label: 'Practice', action: onOpenPracticeHub, icon: Target },
-              { label: 'Glossary', action: onOpenGlossary, icon: BookMarked },
-            ].map(item => (
-              <button
-                key={item.label}
-                onClick={item.action}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary"
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          {/* Right: Grade Selector + User */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Grade Selector Pill */}
-            <div className="hidden sm:flex items-center bg-secondary rounded-md p-0.5">
-              {GRADES.map(g => (
-                <button
-                  key={g.id}
-                  onClick={() => onGradeChange(g.id)}
-                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 ${
-                    grade === g.id
-                      ? 'bg-card text-foreground shadow-subtle'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {g.short}
-                </button>
-              ))}
-            </div>
-
-            {/* User */}
-            {auth.isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-sm text-foreground font-medium hidden lg:inline">
-                  {auth.role === 'instructor' ? auth.instructor?.display_name : auth.user?.email?.split('@')[0]}
-                </span>
-                <button onClick={auth.logout} className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors" title="Sign Out">
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <button onClick={onOpenAuth} className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
-                Log In
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
-
+    <div className="flex flex-col bg-background">
       {/* ─── Hero Section ─── */}
       <section className="relative overflow-hidden" style={{ minHeight: '480px' }}>
-        {/* Background carousel image */}
         <div className="absolute inset-0">
           <div className={`absolute inset-0 transition-opacity duration-200 ${fadeClass}`}>
             <WeedImage weedId={CAROUSEL_WEEDS[carouselIdx]} stage="plant" className="w-full h-full object-cover" />
           </div>
-          {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
         </div>
 
-        {/* Hero content */}
         <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10 py-16 sm:py-24 flex items-center min-h-[480px]">
           <div className="max-w-xl animate-fade-in">
-            <p className="text-primary font-semibold text-sm uppercase tracking-wider mb-3">The Living Laboratory</p>
+            <p className="text-primary font-semibold text-sm uppercase tracking-wider mb-3">WeedNet</p>
             <h1 className="text-4xl sm:text-5xl font-display font-bold text-foreground mb-4 leading-tight">
               Weed Science<br />for Every Age
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8 max-w-md">
               Learn, practice, and play in our interactive agricultural simulation. Explore the intricate world of botany through a researcher's lens.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={onOpenFarmMode}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-success text-success-foreground font-semibold text-base hover:opacity-90 transition-opacity shadow-card"
-              >
-                Start Your Journey <ChevronRight className="w-4 h-4" />
-              </button>
-              <button
-                onClick={onOpenLearning}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-md border-2 border-primary text-primary font-semibold text-base hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                View Curriculum
-              </button>
-            </div>
+            <button
+              onClick={onOpenLearning}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-success text-success-foreground font-semibold text-base hover:opacity-90 transition-opacity shadow-card"
+            >
+              Start Your Journey <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* Carousel dots */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
           {CAROUSEL_WEEDS.map((_, i) => (
             <button
@@ -227,28 +140,11 @@ export default function LandingPage({
             </button>
           ))}
         </div>
-
-        {/* Mobile grade selector */}
-        <div className="sm:hidden mt-6 flex justify-center">
-          <div className="flex items-center bg-secondary rounded-md p-0.5">
-            {GRADES.map(g => (
-              <button
-                key={g.id}
-                onClick={() => onGradeChange(g.id)}
-                className={`px-4 py-2 rounded text-xs font-medium transition-all ${
-                  grade === g.id ? 'bg-card text-foreground shadow-subtle' : 'text-muted-foreground'
-                }`}
-              >
-                {g.short}
-              </button>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* ─── Footer ─── */}
       <footer className="w-full border-t border-border py-8 text-center mt-auto">
-        <p className="text-xs text-muted-foreground">The Living Laboratory — An educational tool for weed science</p>
+        <p className="text-xs text-muted-foreground">WeedNet — An educational tool for weed science</p>
       </footer>
     </div>
   );
