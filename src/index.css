@@ -39,7 +39,15 @@
     --success: 93 52% 33%;
     --success-foreground: 30 18% 96%;
 
-    --destructive: 0 58% 50%;
+    /* Colorblind-friendly functional colors — NO red-green combos */
+    --warning: 43 55% 51%;
+    --warning-foreground: 0 0% 17%;
+    --error: 275 24% 39%;
+    --error-foreground: 30 18% 96%;
+    --info: 209 37% 47%;
+    --info-foreground: 30 18% 96%;
+
+    --destructive: 275 24% 39%;
     --destructive-foreground: 30 18% 96%;
 
     --border: 30 12% 86%;
@@ -49,7 +57,7 @@
 
     /* Grade-level colors (muted, professional) */
     --grade-elementary: 130 12% 55%;
-    --grade-middle: 210 30% 48%;
+    --grade-middle: 209 37% 47%;
     --grade-high: 20 44% 44%;
 
     --sidebar-background: 30 14% 95%;
@@ -80,13 +88,19 @@
     --terracotta: 20 44% 50%;
     --success: 93 52% 40%;
     --success-foreground: 100 20% 5%;
-    --destructive: 0 58% 56%;
+    --warning: 43 55% 55%;
+    --warning-foreground: 100 20% 5%;
+    --error: 275 24% 50%;
+    --error-foreground: 30 10% 95%;
+    --info: 209 37% 55%;
+    --info-foreground: 100 20% 5%;
+    --destructive: 275 24% 50%;
     --destructive-foreground: 30 10% 95%;
     --border: 100 10% 20%;
     --input: 100 10% 20%;
     --ring: 100 40% 35%;
     --grade-elementary: 130 15% 45%;
-    --grade-middle: 210 30% 50%;
+    --grade-middle: 209 37% 50%;
     --grade-high: 20 44% 50%;
     --sidebar-background: 100 15% 9%;
     --sidebar-foreground: 30 10% 90%;
@@ -134,4 +148,11 @@
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
+}
+@keyframes heroFade {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  25% { opacity: 1; }
+  33% { opacity: 0; }
+  100% { opacity: 0; }
 }

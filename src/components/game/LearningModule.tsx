@@ -18,16 +18,16 @@ interface Topic {
 }
 
 const TOPICS: Topic[] = [
-  { id: 'names', name: 'Weed Names & ID', icon: '🏷️', description: 'Learn common names, scientific names, and key traits', grades: ['elementary', 'middle', 'high'] },
-  { id: 'monocot-dicot', name: 'Monocot vs Dicot', icon: '🌾', description: 'Understand the difference between monocots and dicots', grades: ['elementary', 'middle', 'high'] },
-  { id: 'life-stages', name: 'Life Stages', icon: '📸', description: 'Learn to identify weeds at seedling, vegetative, and reproductive stages', grades: ['elementary', 'middle', 'high'] },
-  { id: 'native-introduced', name: 'Native vs Introduced', icon: '🌍', description: 'Which species are native and which were introduced', grades: ['elementary', 'middle', 'high'] },
-  { id: 'families', name: 'Plant Families', icon: '🧬', description: 'Group weeds by their botanical families', grades: ['high'] },
-  { id: 'habitats', name: 'Habitats & Climate', icon: '🗺️', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['middle', 'high'] },
-  { id: 'life-cycles', name: 'Life Cycles', icon: '🔄', description: 'Annual, biennial, and perennial growth patterns', grades: ['middle', 'high'] },
-  { id: 'control-methods', name: 'Control Methods', icon: '🛠️', description: 'Learn about different ways to manage weeds — from hand weeding to herbicides', grades: ['middle', 'high'] },
-  { id: 'look-alikes', name: 'Look-Alike Species', icon: '🔀', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
-  { id: 'safety', name: 'Safety & Toxicity', icon: '⚠️', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
+  { id: 'names', name: 'Weed Names & ID', icon: 'names', description: 'Learn common names, scientific names, and key traits', grades: ['elementary', 'middle', 'high'] },
+  { id: 'monocot-dicot', name: 'Monocot vs Dicot', icon: 'monocot', description: 'Understand the difference between monocots and dicots', grades: ['elementary', 'middle', 'high'] },
+  { id: 'life-stages', name: 'Life Stages', icon: 'stages', description: 'Learn to identify weeds at seedling, vegetative, and reproductive stages', grades: ['elementary', 'middle', 'high'] },
+  { id: 'native-introduced', name: 'Native vs Introduced', icon: 'origin', description: 'Which species are native and which were introduced', grades: ['elementary', 'middle', 'high'] },
+  { id: 'families', name: 'Plant Families', icon: 'families', description: 'Group weeds by their botanical families', grades: ['high'] },
+  { id: 'habitats', name: 'Habitats & Climate', icon: 'habitats', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['middle', 'high'] },
+  { id: 'life-cycles', name: 'Life Cycles', icon: 'cycles', description: 'Annual, biennial, and perennial growth patterns', grades: ['middle', 'high'] },
+  { id: 'control-methods', name: 'Control Methods', icon: 'control', description: 'Learn about different ways to manage weeds — from hand weeding to herbicides', grades: ['middle', 'high'] },
+  { id: 'look-alikes', name: 'Look-Alike Species', icon: 'lookalike', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
+  { id: 'safety', name: 'Safety & Toxicity', icon: 'safety', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
 ];
 
 function getTopicWeeds(topicId: TopicId): Weed[] {
@@ -58,13 +58,13 @@ function ViewToggle({ view, onChange }: { view: 'list' | 'box'; onChange: (v: 'l
         onClick={() => onChange('list')}
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'list' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
       >
-        📋 List View
+        List View
       </button>
       <button
         onClick={() => onChange('box')}
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'box' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
       >
-        📦 Box View
+        Grid View
       </button>
     </div>
   );
@@ -81,24 +81,22 @@ function SubheadingBox({ icon, label, count, description, weeds: groupWeeds, gra
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="bg-card border border-border rounded-xl p-6 text-left hover:border-primary/50 hover:shadow-lg transition-all"
+        className="bg-card border border-border rounded-lg p-6 text-left hover:border-primary/30 hover:shadow-card-hover transition-all"
       >
-        <div className="text-3xl mb-2">{icon}</div>
         <div className="font-display font-bold text-foreground text-lg">{label}</div>
         <div className="text-sm text-muted-foreground mt-1">{count} species</div>
-        <div className="text-xs text-primary mt-2">Click to explore →</div>
+        <div className="text-xs text-primary mt-2 font-medium">Explore →</div>
       </button>
     );
   }
 
   return (
-    <div className="bg-card border border-primary/30 rounded-xl p-5 col-span-full space-y-4">
+    <div className="bg-card border border-primary/30 rounded-lg p-5 col-span-full space-y-4">
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-2xl mb-1">{icon}</div>
           <h3 className="font-display font-bold text-foreground text-lg">{label}</h3>
         </div>
-        <button onClick={() => setExpanded(false)} className="px-3 py-1 rounded-lg border border-border hover:bg-secondary text-sm">✕ Close</button>
+        <button onClick={() => setExpanded(false)} className="px-3 py-1 rounded-md border border-border hover:bg-secondary text-sm font-medium">Close</button>
       </div>
       <div className="bg-muted/30 rounded-lg p-3 text-sm text-muted-foreground">{description}</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -132,10 +130,10 @@ export default function LearningModule({ onClose }: Props) {
     [selectedGrade]
   );
 
-  const gradeCards: { grade: GradeLevel; icon: string; color: string }[] = [
-    { grade: 'elementary', icon: '🌱', color: 'border-grade-elementary' },
-    { grade: 'middle', icon: '🔬', color: 'border-grade-middle' },
-    { grade: 'high', icon: '🧪', color: 'border-grade-high' },
+  const gradeCards: { grade: GradeLevel; label: string; color: string }[] = [
+    { grade: 'elementary', label: 'K-5', color: 'border-grade-elementary' },
+    { grade: 'middle', label: '6-8', color: 'border-grade-middle' },
+    { grade: 'high', label: '9-12', color: 'border-grade-high' },
   ];
 
   const topicNeedsViewToggle = selectedTopic === 'families' || selectedTopic === 'habitats' || selectedTopic === 'life-cycles';
@@ -159,7 +157,7 @@ export default function LearningModule({ onClose }: Props) {
         </div>
 
         <div className="flex gap-2 mb-6">
-          {gradeCards.map(({ grade, icon, color }) => (
+          {gradeCards.map(({ grade, label, color }) => (
             <button
               key={grade}
               onClick={() => { setSelectedGrade(grade); setSelectedTopic(null); }}
