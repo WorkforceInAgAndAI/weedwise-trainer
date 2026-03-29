@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArrowLeft, Play, Leaf, Microscope, FlaskConical } from 'lucide-react';
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
 import LeafArtist from './practice-games/k5/LeafArtist';
 import TaxonomyTower from './practice-games/k5/TaxonomyTower';
@@ -137,20 +138,31 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
 
   const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : selectedGrade === '912' ? highGames : [];
 
+  // Grade-specific accent color for active state
+  const gradeAccent = selectedGrade === 'k5' ? 'text-grade-elementary border-grade-elementary' :
+    selectedGrade === '68' ? 'text-grade-middle border-grade-middle' :
+    'text-grade-high border-grade-high';
+
+  const gradeBg = selectedGrade === 'k5' ? 'bg-grade-elementary/10' :
+    selectedGrade === '68' ? 'bg-grade-middle/10' :
+    'bg-grade-high/10';
+
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-8">
           <button
             onClick={screen === 'grades' ? onClose : screen === 'games' ? backToGrades : backToGames}
-            className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground hover:bg-secondary/80 transition-colors text-lg"
-          >←</button>
+            className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
           <div>
             <h1 className="font-display font-bold text-xl text-foreground">Practice Games</h1>
             {screen !== 'grades' && (
               <p className="text-sm text-muted-foreground">
-                {selectedGrade === 'k5' ? 'Grades K–5' : selectedGrade === '68' ? 'Grades 6–8' : 'Grades 9–12'}
+                {selectedGrade === 'k5' ? 'Grades K–5 · Explorer' : selectedGrade === '68' ? 'Grades 6–8 · Investigator' : 'Grades 9–12 · Specialist'}
               </p>
             )}
           </div>
@@ -159,31 +171,25 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
         {/* Grade Selection */}
         {screen === 'grades' && (
           <div className="grid gap-4 max-w-lg mx-auto mt-8">
-            <h2 className="text-center text-lg text-muted-foreground mb-2">Choose Your Level</h2>
+            <h2 className="text-center text-muted-foreground mb-4 text-sm font-medium uppercase tracking-wider">Choose Your Level</h2>
             {[
-              { id: 'k5', label: 'Grades K–5', sub: 'Explorer', icon: '🌱', gradient: 'from-green-500 to-emerald-600', count: 15 },
-              { id: '68', label: 'Grades 6–8', sub: 'Investigator', icon: '🔬', gradient: 'from-blue-500 to-indigo-600', count: 17 },
-              { id: '912', label: 'Grades 9–12', sub: 'Specialist', icon: '🧪', gradient: 'from-amber-500 to-orange-600', count: 15 },
+              { id: 'k5', label: 'Grades K–5', sub: 'Explorer', Icon: Leaf, count: 15, borderColor: 'hover:border-grade-elementary', iconBg: 'bg-grade-elementary/15 text-grade-elementary' },
+              { id: '68', label: 'Grades 6–8', sub: 'Investigator', Icon: Microscope, count: 17, borderColor: 'hover:border-grade-middle', iconBg: 'bg-grade-middle/15 text-grade-middle' },
+              { id: '912', label: 'Grades 9–12', sub: 'Specialist', Icon: FlaskConical, count: 15, borderColor: 'hover:border-grade-high', iconBg: 'bg-grade-high/15 text-grade-high' },
             ].map(g => (
               <button
                 key={g.id}
-                onClick={() => g.count > 0 ? selectGrade(g.id) : undefined}
-                className={`flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${
-                  g.count > 0
-                    ? 'border-border bg-card hover:scale-[1.02] hover:border-primary cursor-pointer'
-                    : 'border-border/50 bg-card/50 opacity-60 cursor-not-allowed'
-                }`}
+                onClick={() => selectGrade(g.id)}
+                className={`flex items-center gap-4 p-5 rounded-lg border border-border bg-card shadow-card ${g.borderColor} hover:shadow-card-hover transition-all duration-200 text-left`}
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${g.gradient} flex items-center justify-center text-2xl shadow-md`}>
-                  {g.icon}
+                <div className={`w-12 h-12 rounded-lg ${g.iconBg} flex items-center justify-center`}>
+                  <g.Icon className="w-6 h-6" />
                 </div>
-                <div className="flex-1 text-left">
+                <div className="flex-1">
                   <h3 className="font-display font-bold text-foreground">{g.label}</h3>
                   <p className="text-sm text-muted-foreground">{g.sub}</p>
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  {g.count > 0 ? `${g.count} games` : 'Coming Soon'}
-                </span>
+                <span className="text-sm text-muted-foreground">{g.count} games</span>
               </button>
             ))}
           </div>
@@ -191,17 +197,20 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
 
         {/* Game Grid */}
         {screen === 'games' && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {games.map(g => (
               <button
                 key={g.id}
                 onClick={() => selectGame(g)}
-                className="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-secondary/50 transition-colors"
+                className="group flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-card shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
               >
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${g.gradient} flex items-center justify-center text-2xl sm:text-3xl shadow-lg hover:scale-105 transition-transform`}>
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br ${g.gradient} flex items-center justify-center text-2xl shadow-subtle group-hover:scale-105 transition-transform duration-200`}>
                   {g.icon}
                 </div>
-                <span className="text-[11px] sm:text-xs font-medium text-foreground text-center leading-tight">{g.name}</span>
+                <div className="text-center">
+                  <span className="text-xs sm:text-sm font-semibold text-foreground leading-tight block">{g.name}</span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5 block">{g.category}</span>
+                </div>
               </button>
             ))}
           </div>
@@ -209,22 +218,22 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
 
         {/* Game Info / Launcher */}
         {screen === 'info' && selectedGame && (
-          <div className="max-w-md mx-auto mt-8 text-center">
-            <div className={`w-28 h-28 rounded-3xl bg-gradient-to-br ${selectedGame.gradient} flex items-center justify-center text-5xl shadow-xl mx-auto mb-6`}>
+          <div className="max-w-md mx-auto mt-8 text-center animate-fade-in">
+            <div className={`w-24 h-24 rounded-2xl bg-gradient-to-br ${selectedGame.gradient} flex items-center justify-center text-4xl shadow-card mx-auto mb-6`}>
               {selectedGame.icon}
             </div>
             <h2 className="font-display font-bold text-2xl text-foreground mb-1">{selectedGame.name}</h2>
-            <span className="inline-block px-3 py-1 rounded-full bg-secondary text-xs text-muted-foreground font-medium mb-4">{selectedGame.category}</span>
-            <p className="text-foreground mb-4">{selectedGame.description}</p>
-            <div className="bg-secondary/50 rounded-xl p-4 mb-6 text-left">
-              <h3 className="font-bold text-sm text-foreground mb-2">How to Play</h3>
-              <p className="text-sm text-muted-foreground">{selectedGame.howToPlay}</p>
+            <span className="inline-block px-3 py-1 rounded-md bg-secondary text-xs text-muted-foreground font-medium mb-4">{selectedGame.category}</span>
+            <p className="text-foreground mb-5 leading-relaxed">{selectedGame.description}</p>
+            <div className="bg-card border border-border rounded-lg p-5 mb-6 text-left shadow-subtle">
+              <h3 className="font-semibold text-sm text-foreground mb-2">How to Play</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{selectedGame.howToPlay}</p>
             </div>
             <button
               onClick={() => setScreen('playing')}
-              className="px-10 py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 transition-opacity shadow-lg"
+              className="inline-flex items-center gap-2 px-10 py-3.5 rounded-md bg-success text-success-foreground font-bold text-base hover:opacity-90 transition-opacity shadow-card"
             >
-              Play
+              <Play className="w-5 h-5" /> Play
             </button>
           </div>
         )}
