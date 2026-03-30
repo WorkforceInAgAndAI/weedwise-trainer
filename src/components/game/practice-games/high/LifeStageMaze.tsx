@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, Spray, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle } from 'lucide-react';
+import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle } from 'lucide-react';
 
 const STAGES = [
   { id: 'seedling', label: 'Seedling', Icon: Sprout },
