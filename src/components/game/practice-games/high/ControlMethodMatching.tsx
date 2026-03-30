@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { FlaskConical } from 'lucide-react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 
