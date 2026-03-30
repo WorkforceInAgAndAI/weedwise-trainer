@@ -101,9 +101,11 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <div className="absolute inset-0 bg-black/20" />
         {items.map((w, i) => !w.managed && (
           <button key={i} onClick={() => clickWeed(i)}
-            className={`absolute w-12 h-12 rounded-full border-2 transition-all ${active === i ? 'border-primary scale-125 z-10' : 'border-yellow-400 animate-pulse'}`}
+            className={`absolute w-14 h-14 rounded-full transition-all ${active === i ? 'scale-125 z-10' : 'animate-pulse'}`}
             style={{ left: `${w.x}%`, top: `${w.y}%` }}>
-            <WeedImage weedId={w.weed.id} stage="plant" className="w-full h-full object-cover rounded-full" />
+            <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
+              <WeedImage weedId={w.weed.id} stage="plant" className="w-full h-full object-cover" />
+            </div>
           </button>
         ))}
       </div>

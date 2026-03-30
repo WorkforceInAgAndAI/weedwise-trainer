@@ -104,8 +104,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
           <button key={fw.weed.id} onClick={() => clickWeed(fw.weed.id)}
             style={{ left: `${fw.x}%`, top: `${fw.y}%` }}
             className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${found.includes(fw.weed.id) ? 'opacity-30 pointer-events-none' : 'animate-pulse'}`}>
-            <div className="w-12 h-12 rounded-full border-3 border-destructive bg-background/80 overflow-hidden">
-              <WeedImage weedId={fw.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
+              <WeedImage weedId={fw.weed.id} stage="seedling" className="w-full h-full object-cover" />
             </div>
           </button>
         ))}
