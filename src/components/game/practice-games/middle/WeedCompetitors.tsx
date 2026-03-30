@@ -81,7 +81,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
   if (done) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-        <p className="text-5xl mb-3">🏆</p>
         <h2 className="text-2xl font-bold text-foreground mb-2">Competition Over!</h2>
         <p className="text-lg text-foreground mb-6">{totalPoints}/{matchups.length * 3} advantages won</p>
         <div className="flex gap-3">
@@ -103,15 +102,13 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
         {/* Boxing match header */}
         <div className="w-full max-w-md bg-gradient-to-r from-destructive/20 via-secondary to-primary/20 rounded-2xl p-4 mb-4">
           <div className="flex items-center justify-between">
-            {/* Your corner */}
             <div className="text-center flex-1">
               <div className="w-20 h-20 mx-auto rounded-full overflow-hidden bg-card border-3 border-destructive mb-2 shadow-lg">
                 <WeedImage weedId={match!.you.id} stage="vegetative" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-bold text-foreground">{match!.you.commonName}</p>
-              <p className="text-[10px] text-destructive font-bold uppercase">🥊 You</p>
+              <p className="text-[10px] text-destructive font-bold uppercase">You</p>
             </div>
-            {/* VS */}
             <div className="flex flex-col items-center px-2">
               <span className="text-3xl font-black text-foreground">VS</span>
               <div className="flex gap-1 mt-1">
@@ -121,13 +118,12 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
               </div>
               <p className="text-[10px] text-muted-foreground mt-1">Round {step + 1}/3</p>
             </div>
-            {/* Opponent corner */}
             <div className="text-center flex-1">
               <div className="w-20 h-20 mx-auto rounded-full overflow-hidden bg-card border-3 border-primary mb-2 shadow-lg">
                 <WeedImage weedId={match!.opponent.id} stage="vegetative" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-bold text-foreground">{match!.opponent.commonName}</p>
-              <p className="text-[10px] text-primary font-bold uppercase">🥊 Rival</p>
+              <p className="text-[10px] text-primary font-bold uppercase">Rival</p>
             </div>
           </div>
         </div>

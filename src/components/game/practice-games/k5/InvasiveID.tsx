@@ -1,19 +1,24 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import midwestMap from '@/assets/images/midwest-map.jpg';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+// Coordinates aligned to the actual Midwest.jpg map image
 const MIDWEST_STATES: { name: string; x: number; y: number }[] = [
-  { name: 'Minnesota', x: 38, y: 18 },
-  { name: 'Wisconsin', x: 52, y: 22 },
-  { name: 'Iowa', x: 40, y: 38 },
-  { name: 'Illinois', x: 55, y: 42 },
-  { name: 'Indiana', x: 65, y: 44 },
-  { name: 'Ohio', x: 75, y: 40 },
-  { name: 'Missouri', x: 45, y: 58 },
-  { name: 'Kansas', x: 28, y: 55 },
-  { name: 'Nebraska', x: 25, y: 35 },
+  { name: 'Minnesota', x: 52, y: 24 },
+  { name: 'Wisconsin', x: 60, y: 28 },
+  { name: 'Iowa', x: 50, y: 42 },
+  { name: 'Illinois', x: 58, y: 50 },
+  { name: 'Indiana', x: 65, y: 50 },
+  { name: 'Ohio', x: 72, y: 46 },
+  { name: 'Missouri', x: 52, y: 60 },
+  { name: 'Kansas', x: 40, y: 58 },
+  { name: 'Nebraska', x: 38, y: 40 },
+  { name: 'Michigan', x: 67, y: 30 },
+  { name: 'North Dakota', x: 42, y: 18 },
+  { name: 'South Dakota', x: 42, y: 28 },
 ];
 
 const ORIGINS: Record<string, string> = {};
@@ -58,7 +63,6 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
   if (done) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
-        <div className="text-5xl mb-4">🌐</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
         <p className="text-muted-foreground mb-6">Score: {score}/{rounds.length}</p>
         <div className="flex gap-3 justify-center">
@@ -80,32 +84,23 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
         <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-4 gap-3">
-        {/* Map with dots */}
-        <div className="relative w-full max-w-md aspect-[4/3] bg-secondary rounded-2xl border-2 border-border overflow-hidden">
-          {/* Simple US midwest outline hint */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-green-800/30" />
-          <p className="absolute top-2 left-3 text-[10px] text-muted-foreground font-medium">U.S. Midwest</p>
+        {/* Map with real Midwest background */}
+        <div className="relative w-full max-w-lg aspect-[16/10] rounded-2xl border-2 border-border overflow-hidden">
+          <img src={midwestMap} alt="U.S. Midwest map" className="absolute inset-0 w-full h-full object-cover" />
 
-          {/* State labels */}
-          {MIDWEST_STATES.map(s => (
-            <span key={s.name} className="absolute text-[8px] text-muted-foreground/60 font-medium" style={{ left: `${s.x}%`, top: `${s.y - 5}%`, transform: 'translateX(-50%)' }}>
-              {s.name}
-            </span>
-          ))}
-
-          {/* All dots */}
-          {MIDWEST_STATES.map((s, i) => {
+          {/* State dots */}
+          {MIDWEST_STATES.map(s => {
             const isCurrentDot = r && s.name === r.state.name;
-            const isPast = i < round && MIDWEST_STATES[i % MIDWEST_STATES.length].name === rounds[i]?.state.name;
             return (
               <button key={s.name}
                 onClick={() => isCurrentDot && !clickedDot && setClickedDot(true)}
                 className={`absolute w-5 h-5 rounded-full border-2 transition-all ${
                   isCurrentDot
-                    ? clickedDot ? 'bg-primary border-primary scale-125' : 'bg-primary/60 border-primary animate-pulse scale-110 cursor-pointer'
+                    ? clickedDot ? 'bg-primary border-primary scale-125' : 'bg-rose-500 border-rose-400 animate-pulse scale-110 cursor-pointer'
                     : 'bg-muted-foreground/30 border-border/50'
                 }`}
                 style={{ left: `${s.x}%`, top: `${s.y}%`, transform: 'translate(-50%, -50%)' }}
+                title={s.name}
               />
             );
           })}
@@ -115,7 +110,6 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
           <p className="text-sm text-muted-foreground text-center animate-pulse">Tap the glowing dot on the map to investigate!</p>
         ) : (
           <>
-            {/* Plant info card */}
             <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center">
               <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border bg-secondary flex-shrink-0">
                 <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />

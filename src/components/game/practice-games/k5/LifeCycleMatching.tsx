@@ -89,7 +89,6 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   if (allDone) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
-        <div className="text-5xl mb-4">🃏</div>
         <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
         <p className="text-muted-foreground mb-6">You matched {totalMatched} / {totalRounds * 3} pairs across {totalRounds} rounds!</p>
         <div className="flex gap-3 justify-center">
@@ -103,7 +102,6 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   if (roundDone) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
-        <div className="text-5xl mb-4">✅</div>
         <h2 className="text-2xl font-bold text-green-500 mb-2">Round {roundNum + 1} Complete!</h2>
         <p className="text-muted-foreground mb-6">All {selected.length} pairs matched!</p>
         <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
@@ -121,7 +119,10 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">Round {roundNum + 1}/{totalRounds}</span>
         <span className="text-sm text-primary font-bold ml-2">{matchCount}/{selected.length} matched</span>
       </div>
-      <div className="flex-1 flex items-center justify-center p-4">
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
+        <div className="bg-secondary/50 rounded-lg px-4 py-2 mb-4 max-w-md text-center">
+          <p className="text-sm text-muted-foreground">Flip two tiles to find matching pairs. Match each weed name with its life cycle type (Annual, Biennial, or Perennial).</p>
+        </div>
         <div className="grid grid-cols-3 gap-3 max-w-md w-full">
           {cards.map(c => (
             <button key={c.id} onClick={() => handleClick(c.id)}
