@@ -4,17 +4,15 @@ import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-interface TowerLevel { question: string; options: [string, string]; correctIdx: number; }
+interface PyramidLevel { question: string; options: [string, string]; correctIdx: number; }
 
-function buildTower(target: typeof weeds[0]): TowerLevel[] {
+function buildPyramid(target: typeof weeds[0]): PyramidLevel[] {
   const isMonocot = target.plantType === 'Monocot';
-  const families = [...new Set(weeds.filter(w => w.plantType === target.plantType).map(w => w.family))];
-  const wrongFamily = families.find(f => f !== target.family) || 'Poaceae';
+  // Bottom to top: Kingdom → Monocot/Dicot → Flowering/Non-flowering
   return [
     { question: 'Is this organism a plant or animal?', options: ['Plant', 'Animal'], correctIdx: 0 },
-    { question: 'Does this plant produce flowers?', options: ['Yes — Flowering', 'No — Non-flowering'], correctIdx: 0 },
     { question: 'What type of leaf veins does it have?', options: ['Parallel veins (Monocot)', 'Branching veins (Dicot)'], correctIdx: isMonocot ? 0 : 1 },
-    { question: 'Which plant family does it belong to?', options: isMonocot ? [target.family, wrongFamily] as [string, string] : [wrongFamily, target.family] as [string, string], correctIdx: isMonocot ? 0 : 1 },
+    { question: 'Does this plant produce flowers?', options: ['Yes — Flowering', 'No — Non-flowering'], correctIdx: 0 },
   ];
 }
 
@@ -26,13 +24,13 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
   const [found, setFound] = useState(false);
 
   const target = targets[targetIdx];
-  const tower = useMemo(() => buildTower(target), [target]);
+  const pyramid = useMemo(() => buildPyramid(target), [target]);
   const done = targetIdx >= targets.length;
 
   const choose = (idx: number) => {
     if (wrong) return;
-    if (idx === tower[level].correctIdx) {
-      if (level + 1 >= tower.length) { setFound(true); }
+    if (idx === pyramid[level].correctIdx) {
+      if (level + 1 >= pyramid.length) { setFound(true); }
       else { setLevel(l => l + 1); }
     } else {
       setWrong(true);
@@ -50,8 +48,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
   if (done) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
-        <div className="text-5xl mb-4">🏗️</div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Tower Complete!</h2>
+        <h2 className="text-2xl font-display font-bold text-foreground mb-2">Pyramid Complete!</h2>
         <p className="text-muted-foreground mb-6">You classified {targets.length} weeds!</p>
         <div className="flex gap-3 justify-center">
           <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
@@ -61,56 +58,69 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
     </div>
   );
 
+  // Pyramid renders bottom-up: level 0 (widest) at bottom, level 2 (narrowest) at top
+  const pyramidLevels = [...pyramid].reverse(); // display top-to-bottom in DOM but styled as pyramid
+
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Taxonomy Tower</h1>
+        <h1 className="font-display font-bold text-foreground text-lg flex-1">Taxonomy Tower</h1>
         <span className="text-sm text-muted-foreground">{targetIdx + 1}/{targets.length}</span>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
         <div className="bg-secondary/50 rounded-xl p-3 text-center">
-          <p className="text-sm text-muted-foreground">Find this weed:</p>
-          <p className="font-bold text-foreground text-lg">{target.commonName}</p>
+          <p className="text-sm text-muted-foreground">Classify this weed:</p>
+          <p className="font-display font-bold text-foreground text-lg">{target.commonName}</p>
         </div>
-        <div className="w-28 h-28 rounded-xl overflow-hidden border-2 border-primary/30">
+        <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-primary/30">
           <WeedImage weedId={target.id} stage="vegetative" className="w-full h-full object-cover" />
         </div>
 
-        {/* Tower visualization */}
-        <div className="w-full max-w-sm space-y-2">
-          {tower.map((lvl, i) => (
-            <div key={i} className={`rounded-lg p-3 border-2 transition-all ${
-              i < level ? 'bg-primary/10 border-primary/30' :
-              i === level && !found ? 'bg-card border-primary animate-pulse' :
-              found ? 'bg-primary/10 border-primary/30' : 'bg-secondary/30 border-border/50 opacity-40'
-            }`}>
-              {i <= level || found ? (
-                <>
-                  <p className="text-xs text-muted-foreground mb-2">{lvl.question}</p>
-                  {i < level || found ? (
-                    <p className="text-sm font-bold text-primary">{lvl.options[lvl.correctIdx]}</p>
+        {/* Pyramid visualization — widest at bottom, narrow at top */}
+        <div className="w-full max-w-md flex flex-col items-center gap-2">
+          {pyramid.map((lvl, i) => {
+            // i=0 is bottom (widest), i=2 is top (narrowest)
+            const displayIdx = pyramid.length - 1 - i; // reverse for DOM order (top first)
+            const actualLevel = pyramid[displayIdx];
+            const actualIdx = displayIdx;
+            const widthPercent = 60 + (pyramid.length - 1 - actualIdx) * 15; // bottom=90%, top=60%
+
+            return (
+              <div key={actualIdx} className="w-full flex justify-center" style={{ maxWidth: `${widthPercent}%` }}>
+                <div className={`w-full rounded-lg p-3 border-2 transition-all ${
+                  actualIdx < level ? 'bg-primary/10 border-primary/30' :
+                  actualIdx === level && !found ? 'bg-card border-primary animate-pulse' :
+                  found ? 'bg-primary/10 border-primary/30' : 'bg-secondary/30 border-border/50 opacity-40'
+                }`}>
+                  {actualIdx <= level || found ? (
+                    <>
+                      <p className="text-xs text-muted-foreground mb-2 text-center">{actualLevel.question}</p>
+                      {actualIdx < level || found ? (
+                        <p className="text-sm font-bold text-primary text-center">{actualLevel.options[actualLevel.correctIdx]}</p>
+                      ) : (
+                        <div className="flex gap-2">
+                          {actualLevel.options.map((opt, oi) => (
+                            <button key={oi} onClick={() => choose(oi)}
+                              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${wrong ? 'bg-destructive/20 text-destructive' : 'bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground'}`}>
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <div className="flex gap-2">
-                      {lvl.options.map((opt, oi) => (
-                        <button key={oi} onClick={() => choose(oi)}
-                          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${wrong ? 'bg-destructive/20 text-destructive' : 'bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground'}`}>
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
+                    <p className="text-sm text-muted-foreground text-center">Level {actualIdx + 1}</p>
                   )}
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center">Level {i + 1}</p>
-              )}
-            </div>
-          ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {found && (
           <div className="text-center mt-2">
-            <p className="text-lg font-bold text-green-500 mb-3">You found {target.commonName}!</p>
+            <p className="text-lg font-bold text-success mb-3">You found {target.commonName}!</p>
             <button onClick={nextTarget} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Weed →</button>
           </div>
         )}
