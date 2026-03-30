@@ -3,19 +3,19 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 
 const STAGES = [
-  { id: 'seedling', label: 'Seedling', icon: '🌱' },
-  { id: 'vegetative', label: 'Vegetative', icon: '🌿' },
-  { id: 'reproductive', label: 'Reproductive', icon: '🌸' },
-  { id: 'mature', label: 'Mature', icon: '🌾' },
+  { id: 'seedling', label: 'Seedling', icon: 'S' },
+  { id: 'vegetative', label: 'Vegetative', icon: 'V' },
+  { id: 'reproductive', label: 'Reproductive', icon: 'R' },
+  { id: 'mature', label: 'Mature', icon: 'M' },
 ];
 
 const CONTROLS = [
-  { id: 'pre-herb', label: 'Pre-emergent Herbicide', icon: '💧', bestStage: 'seedling' },
-  { id: 'cultivation', label: 'Cultivation', icon: '🚜', bestStage: 'seedling' },
-  { id: 'post-herb', label: 'Post-emergent Herbicide', icon: '🧪', bestStage: 'vegetative' },
-  { id: 'mowing', label: 'Mowing', icon: '✂️', bestStage: 'reproductive' },
-  { id: 'hand-pull', label: 'Hand Removal', icon: '🤚', bestStage: 'vegetative' },
-  { id: 'harvest-mgmt', label: 'Harvest Management', icon: '🌾', bestStage: 'mature' },
+  { id: 'pre-herb', label: 'Pre-emergent Herbicide', icon: 'PH', bestStage: 'seedling' },
+  { id: 'cultivation', label: 'Cultivation', icon: 'CU', bestStage: 'seedling' },
+  { id: 'post-herb', label: 'Post-emergent Herbicide', icon: 'PO', bestStage: 'vegetative' },
+  { id: 'mowing', label: 'Mowing', icon: 'MW', bestStage: 'reproductive' },
+  { id: 'hand-pull', label: 'Hand Removal', icon: 'HR', bestStage: 'vegetative' },
+  { id: 'harvest-mgmt', label: 'Harvest Management', icon: 'HM', bestStage: 'mature' },
 ];
 
 const GRID_SIZE = 6;
