@@ -1,14 +1,16 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { ArrowUpDown, Snowflake, Sun, RefreshCw, Calendar } from 'lucide-react';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const CATEGORIES = [
-  { id: 'winter-annual', label: 'Winter Annual', icon: '❄️', desc: 'Germinates fall, overwinters, seeds spring' },
-  { id: 'summer-annual', label: 'Summer Annual', icon: '☀️', desc: 'Germinates spring, seeds summer/fall' },
-  { id: 'perennial', label: 'Perennial', icon: '♻️', desc: 'Lives 3+ years' },
-  { id: 'biennial', label: 'Biennial', icon: '📅', desc: '2-year life cycle' },
+  { id: 'winter-annual', label: 'Winter Annual', Icon: Snowflake, desc: 'Germinates fall, overwinters, seeds spring' },
+  { id: 'summer-annual', label: 'Summer Annual', Icon: Sun, desc: 'Germinates spring, seeds summer/fall' },
+  { id: 'perennial', label: 'Perennial', Icon: RefreshCw, desc: 'Lives 3+ years' },
+  { id: 'biennial', label: 'Biennial', Icon: Calendar, desc: '2-year life cycle' },
 ];
 
 const WINTER_ANNUALS = ['wild-oat'];
@@ -22,6 +24,7 @@ function getCategory(w: typeof weeds[0]): string {
 }
 
 export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const items = useMemo(() => shuffle(weeds).slice(0, 10).map(w => ({ weed: w, correct: getCategory(w) })), []);
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
@@ -32,6 +35,10 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
   const correctCount = items.filter(it => placements[it.weed.id] === it.correct).length;
   const restart = () => { setPlacements({}); setSelected(null); setChecked(false); };
 
+  if (checked) {
+    addBadge({ gameId: 'hs-lifecycle', gameName: 'Life Cycle Sort', level: 'HS', score: correctCount, total: items.length });
+  }
+
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
       <div className="max-w-2xl mx-auto p-4">
@@ -40,22 +47,25 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
           <h1 className="font-display font-bold text-lg text-foreground">Life Cycle Sort</h1>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-          {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => place(c.id)}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10' : 'border-border'}`}>
-              <p className="text-2xl">{c.icon}</p>
-              <p className="text-xs font-bold text-foreground">{c.label}</p>
-              <p className="text-[10px] text-muted-foreground">{c.desc}</p>
-              <div className="mt-1 flex flex-wrap gap-1 justify-center">
-                {items.filter(it => placements[it.weed.id] === c.id).map(it => (
-                  <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full cursor-pointer ${checked ? (it.correct === c.id ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'}`}>
-                    {it.weed.commonName} ×
-                  </span>
-                ))}
-              </div>
-            </button>
-          ))}
+          {CATEGORIES.map(c => {
+            const CatIcon = c.Icon;
+            return (
+              <button key={c.id} onClick={() => place(c.id)}
+                className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10' : 'border-border'}`}>
+                <CatIcon className="w-6 h-6 mx-auto mb-1 text-foreground" />
+                <p className="text-xs font-bold text-foreground">{c.label}</p>
+                <p className="text-[10px] text-muted-foreground">{c.desc}</p>
+                <div className="mt-1 flex flex-wrap gap-1 justify-center">
+                  {items.filter(it => placements[it.weed.id] === c.id).map(it => (
+                    <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full cursor-pointer ${checked ? (it.correct === c.id ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'}`}>
+                      {it.weed.commonName} x
+                    </span>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           {items.filter(it => !placements[it.weed.id]).map(it => (

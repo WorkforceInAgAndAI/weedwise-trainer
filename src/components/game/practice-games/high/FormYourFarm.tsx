@@ -1,13 +1,15 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { Leaf, Wheat, Tractor } from 'lucide-react';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const CROPS = [
-  { id: 'corn', name: 'Corn', icon: '🌽', competitiveness: 0.7 },
-  { id: 'soybean', name: 'Soybean', icon: '🫘', competitiveness: 0.4 },
-  { id: 'wheat', name: 'Wheat', icon: '🌾', competitiveness: 0.6 },
+  { id: 'corn', name: 'Corn', competitiveness: 0.7 },
+  { id: 'soybean', name: 'Soybean', competitiveness: 0.4 },
+  { id: 'wheat', name: 'Wheat', competitiveness: 0.6 },
 ];
 const SEASONS = [
   { id: 'early-spring', name: 'Early Spring', factor: 0.3 },
@@ -27,7 +29,8 @@ function getIdealDecision(severity: number, threshold: number, cropComp: number,
 }
 
 export default function FormYourFarm({ onBack }: { onBack: () => void }) {
-  const [phase, setPhase] = useState<'design' | 'attack' | 'review' | 'result'>('design');
+  const { addBadge } = useGameProgress();
+  const [phase, setPhase] = useState<'design' | 'attack' | 'review'>('design');
   const [crop, setCrop] = useState(CROPS[0]);
   const [season, setSeason] = useState(SEASONS[0]);
   const [threshold, setThreshold] = useState(10);
@@ -75,8 +78,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
             {CROPS.map(c => (
               <button key={c.id} onClick={() => setCrop(c)}
                 className={`flex-1 p-3 rounded-xl border-2 text-center ${crop.id === c.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-                <p className="text-2xl">{c.icon}</p>
-                <p className="text-xs font-bold text-foreground">{c.name}</p>
+                <p className="text-sm font-bold text-foreground">{c.name}</p>
               </button>
             ))}
           </div>
@@ -101,47 +103,50 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
     </div>
   );
 
-  if (phase === 'review') return (
-    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-      <div className="max-w-lg mx-auto p-4">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-          <h1 className="font-display font-bold text-lg text-foreground">Season Results</h1>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4 mb-4 text-center">
-          <p className="text-4xl mb-2">🌾</p>
-          <p className="font-bold text-foreground text-xl">{score}/{attackWeeds.length} correct decisions</p>
-          <p className="text-sm text-muted-foreground">Crop: {crop.name} · Season: {season.name} · Threshold: {threshold}/acre</p>
-        </div>
-        <div className="space-y-3 mb-4">
-          {results.map(r => (
-            <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.correct ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                  <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+  if (phase === 'review') {
+    addBadge({ gameId: 'form-farm', gameName: 'Form Your Farm', level: 'HS', score, total: attackWeeds.length });
+    return (
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+        <div className="max-w-lg mx-auto p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+            <h1 className="font-display font-bold text-lg text-foreground">Season Results</h1>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-4 mb-4 text-center">
+            <Leaf className="w-8 h-8 text-primary mx-auto mb-2" />
+            <p className="font-bold text-foreground text-xl">{score}/{attackWeeds.length} correct decisions</p>
+            <p className="text-sm text-muted-foreground">Crop: {crop.name} — Season: {season.name} — Threshold: {threshold}/acre</p>
+          </div>
+          <div className="space-y-3 mb-4">
+            {results.map(r => (
+              <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.correct ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                    <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
+                    <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre</p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-xs font-bold ${r.correct ? 'text-green-500' : 'text-destructive'}`}>
+                      You: {r.userChoice}
+                    </p>
+                    {!r.correct && <p className="text-[10px] text-muted-foreground">Best: {r.ideal}</p>}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
-                  <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre</p>
-                </div>
-                <div className="text-right">
-                  <p className={`text-xs font-bold ${r.correct ? 'text-green-500' : 'text-destructive'}`}>
-                    You: {r.userChoice} {r.correct ? '✓' : '✗'}
-                  </p>
-                  {!r.correct && <p className="text-[10px] text-muted-foreground">Best: {r.ideal}</p>}
-                </div>
+                <p className="text-xs text-muted-foreground">{r.reason}</p>
               </div>
-              <p className="text-xs text-muted-foreground">{r.reason}</p>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-3">
-          <button onClick={restart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+            ))}
+          </div>
+          <div className="flex gap-3">
+            <button onClick={restart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
+            <button onClick={onBack} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">

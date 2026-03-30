@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { Dna } from 'lucide-react';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -27,15 +29,15 @@ function getYearExplanation(crop: string, herb: string, yearIdx: number, allChoi
   const parts: string[] = [];
 
   if (!compatible) {
-    parts.push(`⚠️ ${herbDef?.name} is not compatible with ${cropDef?.name}. This would damage your crop in practice.`);
+    parts.push(`${herbDef?.name} is not compatible with ${cropDef?.name}. This would damage your crop in practice.`);
   } else {
-    parts.push(`✓ ${herbDef?.name} is compatible with ${cropDef?.name}.`);
+    parts.push(`${herbDef?.name} is compatible with ${cropDef?.name}.`);
   }
 
   if (herbDef?.risk === 'high') {
     const prevSameHerb = allChoices.slice(0, yearIdx).filter(c => c.herb === herb).length;
     if (prevSameHerb > 0) {
-      parts.push(`⚠️ You used this high-risk herbicide ${prevSameHerb + 1} times now. Repeated use of a single mode of action greatly increases resistance risk.`);
+      parts.push(`You used this high-risk herbicide ${prevSameHerb + 1} times now. Repeated use of a single mode of action greatly increases resistance risk.`);
     } else {
       parts.push(`This herbicide has high resistance risk. Avoid using it repeatedly.`);
     }
@@ -56,6 +58,7 @@ function getYearExplanation(crop: string, herb: string, yearIdx: number, allChoi
 }
 
 export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const [year, setYear] = useState(0);
   const [choices, setChoices] = useState<{ crop: string; herb: string }[]>([]);
   const [crop, setCrop] = useState<string | null>(null);
@@ -97,27 +100,30 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
 
   const restart = () => { setYear(0); setChoices([]); setCrop(null); setHerb(null); setDone(false); setShowReview(false); };
 
-  if (done) return (
-    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-      <div className="max-w-lg mx-auto p-4 flex flex-col items-center justify-center min-h-full text-center">
-        <p className="text-4xl mb-2">🧬</p>
-        <h2 className="font-display font-bold text-2xl text-foreground mb-2">3-Year Plan Complete!</h2>
-        <p className="text-foreground mb-2">Resistance Prevention Score: {score}</p>
-        <div className="text-left bg-secondary/50 rounded-xl p-4 mb-4 max-w-sm w-full space-y-3">
-          {choices.map((c, i) => (
-            <div key={i} className="border-b border-border pb-2 last:border-0">
-              <p className="text-sm font-bold text-foreground">Year {i + 1}: {CROPS_LIST.find(cr => cr.id === c.crop)?.name} + {HERBICIDES.find(h => h.id === c.herb)?.name}</p>
-              <p className="text-xs text-muted-foreground mt-1">{getYearExplanation(c.crop, c.herb, i, choices)}</p>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-3">
-          <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+  if (done) {
+    addBadge({ gameId: 'herbicide-resistor', gameName: 'Herbicide Resistor', level: 'HS', score, total: 15 });
+    return (
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+        <div className="max-w-lg mx-auto p-4 flex flex-col items-center justify-center min-h-full text-center">
+          <Dna className="w-10 h-10 text-primary mb-3" />
+          <h2 className="font-display font-bold text-2xl text-foreground mb-2">3-Year Plan Complete!</h2>
+          <p className="text-foreground mb-2">Resistance Prevention Score: {score}</p>
+          <div className="text-left bg-secondary/50 rounded-xl p-4 mb-4 max-w-sm w-full space-y-3">
+            {choices.map((c, i) => (
+              <div key={i} className="border-b border-border pb-2 last:border-0">
+                <p className="text-sm font-bold text-foreground">Year {i + 1}: {CROPS_LIST.find(cr => cr.id === c.crop)?.name} + {HERBICIDES.find(h => h.id === c.herb)?.name}</p>
+                <p className="text-xs text-muted-foreground mt-1">{getYearExplanation(c.crop, c.herb, i, choices)}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-3">
+            <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
+            <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   if (showReview) {
     const lastChoice = choices[choices.length - 1];

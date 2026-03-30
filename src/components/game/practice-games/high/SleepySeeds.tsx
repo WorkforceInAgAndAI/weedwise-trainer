@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
+import { Shield, Dna, FlaskConical, Sprout } from 'lucide-react';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const MECHANISMS = [
-  { id: 'physical', label: 'Physical Dormancy', icon: '🛡️', desc: 'Hard seed coat prevents water absorption' },
-  { id: 'physiological', label: 'Physiological Dormancy', icon: '🧬', desc: 'Internal hormones inhibit germination until conditions change' },
-  { id: 'chemical', label: 'Chemical Dormancy', icon: '🧪', desc: 'Chemical inhibitors prevent germination until leached out' },
-  { id: 'morphological', label: 'Morphological Dormancy', icon: '🌱', desc: 'Embryo not fully developed at seed maturity' },
+  { id: 'physical', label: 'Physical Dormancy', Icon: Shield, desc: 'Hard seed coat prevents water absorption' },
+  { id: 'physiological', label: 'Physiological Dormancy', Icon: Dna, desc: 'Internal hormones inhibit germination until conditions change' },
+  { id: 'chemical', label: 'Chemical Dormancy', Icon: FlaskConical, desc: 'Chemical inhibitors prevent germination until leached out' },
+  { id: 'morphological', label: 'Morphological Dormancy', Icon: Sprout, desc: 'Embryo not fully developed at seed maturity' },
 ];
 
 const SCENARIOS = [
@@ -19,6 +21,7 @@ const SCENARIOS = [
 ];
 
 export default function SleepySeeds({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const rounds = useMemo(() => shuffle(SCENARIOS).slice(0, 4), []);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
@@ -30,17 +33,20 @@ export default function SleepySeeds({ onBack }: { onBack: () => void }) {
   const next = () => { setIdx(i => i + 1); setPicked(null); setAnswered(false); };
   const restart = () => { setIdx(0); setPicked(null); setAnswered(false); setScore(0); };
 
-  if (done) return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
-      <p className="text-4xl mb-2">😴</p>
-      <h2 className="font-display font-bold text-2xl text-foreground mb-2">Seeds Survived!</h2>
-      <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
-      <div className="flex gap-3">
-        <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
-        <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+  if (done) {
+    addBadge({ gameId: 'sleepy-seeds', gameName: 'Sleepy Seeds', level: 'HS', score, total: rounds.length });
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+        <Shield className="w-10 h-10 text-primary mb-3" />
+        <h2 className="font-display font-bold text-2xl text-foreground mb-2">Seeds Survived!</h2>
+        <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
+        <div className="flex gap-3">
+          <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   const s = rounds[idx];
   return (
@@ -57,6 +63,7 @@ export default function SleepySeeds({ onBack }: { onBack: () => void }) {
         </div>
         <div className="grid grid-cols-2 gap-3 mb-4">
           {MECHANISMS.map(m => {
+            const MIcon = m.Icon;
             let cls = 'border-border bg-card';
             if (answered && m.id === s.best) cls = 'border-green-500 bg-green-500/20';
             else if (answered && m.id === picked) cls = 'border-destructive bg-destructive/20';
@@ -64,7 +71,7 @@ export default function SleepySeeds({ onBack }: { onBack: () => void }) {
             return (
               <button key={m.id} onClick={() => submit(m.id)}
                 className={`p-3 rounded-xl border-2 text-center transition-all ${cls}`}>
-                <p className="text-2xl mb-1">{m.icon}</p>
+                <MIcon className="w-6 h-6 mx-auto mb-1 text-foreground" />
                 <p className="text-xs font-bold text-foreground">{m.label}</p>
                 <p className="text-[10px] text-muted-foreground">{m.desc}</p>
               </button>
