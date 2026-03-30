@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const ZONES = [
-  { id: 'temperate', label: 'Temperate', icon: '🌿', color: 'from-green-400 to-emerald-500' },
-  { id: 'arid', label: 'Arid / Dry', icon: '🏜️', color: 'from-yellow-400 to-amber-500' },
-  { id: 'tropical', label: 'Tropical / Warm', icon: '☀️', color: 'from-orange-400 to-red-400' },
-  { id: 'wetland', label: 'Wetland / Riparian', icon: '💧', color: 'from-blue-400 to-blue-600' },
+  { id: 'temperate', label: 'Temperate', Icon: Sun, color: 'from-green-400 to-emerald-500' },
+  { id: 'arid', label: 'Arid / Dry', Icon: Wind, color: 'from-yellow-400 to-amber-500' },
+  { id: 'tropical', label: 'Tropical / Warm', Icon: Thermometer, color: 'from-orange-400 to-red-400' },
+  { id: 'wetland', label: 'Wetland / Riparian', Icon: Droplets, color: 'from-blue-400 to-blue-600' },
 ];
 
 function getZone(w: typeof weeds[0]): string {
@@ -59,25 +60,28 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-3 text-center">Place each weed in its correct habitat region</p>
         <div className="grid grid-cols-2 gap-3 mb-4">
-          {ZONES.map(z => (
-            <button key={z.id} onClick={() => handleZone(z.id)}
-              className={`rounded-xl border-2 border-border p-3 bg-gradient-to-br ${z.color} bg-opacity-20 text-left transition-all ${selected ? 'hover:scale-[1.02] cursor-pointer' : ''}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">{z.icon}</span>
-                <span className="font-bold text-foreground text-sm drop-shadow-sm">{z.label}</span>
-              </div>
-              <div className="space-y-1 min-h-[40px]">
-                {items.filter(i => placements[i.weed.id] === z.id).map(i => (
-                  <div key={i.weed.id} className={`flex items-center gap-1 px-2 py-1 rounded bg-background/80 text-xs font-medium ${
-                    checked ? (i.zone === z.id ? 'text-green-500' : 'text-destructive') : 'text-foreground'
-                  }`}>
-                    <span className="truncate flex-1">{i.weed.commonName}</span>
-                    {!checked && <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-muted-foreground hover:text-foreground">✕</button>}
-                  </div>
-                ))}
-              </div>
-            </button>
-          ))}
+          {ZONES.map(z => {
+            const ZoneIcon = z.Icon;
+            return (
+              <button key={z.id} onClick={() => handleZone(z.id)}
+                className={`rounded-xl border-2 border-border p-3 bg-gradient-to-br ${z.color} bg-opacity-20 text-left transition-all ${selected ? 'hover:scale-[1.02] cursor-pointer' : ''}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <ZoneIcon className="w-5 h-5 text-foreground" />
+                  <span className="font-bold text-foreground text-sm drop-shadow-sm">{z.label}</span>
+                </div>
+                <div className="space-y-1 min-h-[40px]">
+                  {items.filter(i => placements[i.weed.id] === z.id).map(i => (
+                    <div key={i.weed.id} className={`flex items-center gap-1 px-2 py-1 rounded bg-background/80 text-xs font-medium ${
+                      checked ? (i.zone === z.id ? 'text-green-500' : 'text-destructive') : 'text-foreground'
+                    }`}>
+                      <span className="truncate flex-1">{i.weed.commonName}</span>
+                      {!checked && <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-muted-foreground hover:text-foreground">✕</button>}
+                    </div>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
         </div>
         {unplaced.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center mb-4">

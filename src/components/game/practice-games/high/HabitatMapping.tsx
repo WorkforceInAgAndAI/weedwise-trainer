@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { Trees, Sun, Droplets, Wind } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const ZONES = [
-  { id: 'temperate', label: 'Temperate Forest', icon: '🌲', color: 'bg-green-600', countries: 'USA, Canada, Europe', keywords: ['temperate', 'cool', 'corn', 'soybean', 'field', 'crop'] },
-  { id: 'arid', label: 'Arid / Semi-Arid', icon: '🏜️', color: 'bg-amber-600', countries: 'SW USA, Australia, Middle East', keywords: ['dry', 'arid', 'desert', 'sand', 'hot'] },
-  { id: 'tropical', label: 'Tropical', icon: '🌴', color: 'bg-emerald-600', countries: 'Brazil, SE Asia, Central America', keywords: ['tropic', 'warm', 'humid', 'wet season', 'cotton'] },
-  { id: 'wetland', label: 'Wetland / Riparian', icon: '💧', color: 'bg-blue-600', countries: 'River basins worldwide', keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch', 'marsh'] },
+  { id: 'temperate', label: 'Temperate Forest', Icon: Trees, color: 'bg-green-600', countries: 'USA, Canada, Europe', keywords: ['temperate', 'cool', 'corn', 'soybean', 'field', 'crop'] },
+  { id: 'arid', label: 'Arid / Semi-Arid', Icon: Sun, color: 'bg-amber-600', countries: 'SW USA, Australia, Middle East', keywords: ['dry', 'arid', 'desert', 'sand', 'hot'] },
+  { id: 'tropical', label: 'Tropical', Icon: Wind, color: 'bg-emerald-600', countries: 'Brazil, SE Asia, Central America', keywords: ['tropic', 'warm', 'humid', 'wet season', 'cotton'] },
+  { id: 'wetland', label: 'Wetland / Riparian', Icon: Droplets, color: 'bg-blue-600', countries: 'River basins worldwide', keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch', 'marsh'] },
 ];
 
 function getZone(w: typeof weeds[0]) {
@@ -38,25 +39,28 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
       <div className="max-w-2xl mx-auto p-4">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-          <h1 className="font-display font-bold text-lg text-foreground">Habitat Mapping</h1>
+          <h1 className="font-bold text-lg text-foreground">Habitat Mapping</h1>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-          {ZONES.map(z => (
-            <button key={z.id} onClick={() => place(z.id)}
-              className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10 cursor-pointer' : 'border-border cursor-default'}`}>
-              <p className="text-2xl">{z.icon}</p>
-              <p className="text-xs font-bold text-foreground">{z.label}</p>
-              <p className="text-[10px] text-muted-foreground">{z.countries}</p>
-              <div className="mt-1 flex flex-wrap gap-1 justify-center">
-                {items.filter(it => placements[it.weed.id] === z.id).map(it => (
-                  <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full cursor-pointer ${checked ? (it.correct === z.id ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'}`}>
-                    {it.weed.commonName} ×
-                  </span>
-                ))}
-              </div>
-            </button>
-          ))}
+          {ZONES.map(z => {
+            const ZoneIcon = z.Icon;
+            return (
+              <button key={z.id} onClick={() => place(z.id)}
+                className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10 cursor-pointer' : 'border-border cursor-default'}`}>
+                <ZoneIcon className="w-6 h-6 mx-auto text-foreground mb-1" />
+                <p className="text-xs font-bold text-foreground">{z.label}</p>
+                <p className="text-[10px] text-muted-foreground">{z.countries}</p>
+                <div className="mt-1 flex flex-wrap gap-1 justify-center">
+                  {items.filter(it => placements[it.weed.id] === z.id).map(it => (
+                    <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full cursor-pointer ${checked ? (it.correct === z.id ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'}`}>
+                      {it.weed.commonName} ×
+                    </span>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           {items.filter(it => !placements[it.weed.id]).map(it => (

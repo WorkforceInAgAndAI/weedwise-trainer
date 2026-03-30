@@ -9,12 +9,33 @@ const CATEGORIES = ['Terrestrial', 'Aquatic', 'Parasitic'] as const;
 function getCategory(w: typeof weeds[0]): string {
   const t = `${w.habitat} ${w.primaryHabitat}`.toLowerCase();
   if (t.match(/parasit/)) return 'Parasitic';
-  if (t.match(/aquatic|water|flood|wetland|pond|river|moist|bottom/)) return 'Aquatic';
+  if (t.match(/aquatic|water|flood|wetland|pond|river|moist|bottom|marsh|ditch|riparian/)) return 'Aquatic';
   return 'Terrestrial';
 }
 
 export default function PestID({ onBack }: { onBack: () => void }) {
-  const rounds = useMemo(() => shuffle(weeds).slice(0, 10).map(w => ({ weed: w, answer: getCategory(w) })), []);
+  const rounds = useMemo(() => {
+    // Ensure a mix of categories
+    const byCategory: Record<string, typeof weeds[0][]> = { Terrestrial: [], Aquatic: [], Parasitic: [] };
+    weeds.forEach(w => byCategory[getCategory(w)].push(w));
+
+    const picks: { weed: typeof weeds[0]; answer: string }[] = [];
+    // Get at least 3 from each available category
+    for (const cat of CATEGORIES) {
+      const pool = shuffle(byCategory[cat]);
+      const take = Math.min(pool.length, cat === 'Parasitic' ? 2 : 4);
+      pool.slice(0, take).forEach(w => picks.push({ weed: w, answer: cat }));
+    }
+    // Fill to 10 if needed
+    const usedIds = new Set(picks.map(p => p.weed.id));
+    const remaining = shuffle(weeds.filter(w => !usedIds.has(w.id)));
+    while (picks.length < 10 && remaining.length) {
+      const w = remaining.shift()!;
+      picks.push({ weed: w, answer: getCategory(w) });
+    }
+    return shuffle(picks).slice(0, 10);
+  }, []);
+
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState('');
   const [answered, setAnswered] = useState(false);

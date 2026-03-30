@@ -8,8 +8,8 @@ const STAGES = ['seedling', 'vegetative', 'reproductive'] as const;
 const STAGE_LABELS: Record<string, string> = { seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive' };
 
 const CONTROLS = [
-  { id: 'pre', label: 'Pre-emergent Herbicide', best: 'seedling' },
-  { id: 'post', label: 'Post-emergent Herbicide', best: 'vegetative' },
+  { id: 'pre', label: 'Pre-Plant Herbicide', best: 'seedling' },
+  { id: 'post', label: 'Post-Plant Herbicide', best: 'vegetative' },
   { id: 'mow', label: 'Mow / Cut', best: 'reproductive' },
   { id: 'pull', label: 'Hand Pull', best: 'seedling' },
   { id: 'cultivate', label: 'Cultivation / Tillage', best: 'seedling' },

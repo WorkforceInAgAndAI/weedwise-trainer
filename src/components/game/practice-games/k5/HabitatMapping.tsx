@@ -6,10 +6,10 @@ import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const ZONES = [
-  { id: 'hot', label: 'Hot & Sunny', Icon: Sun, color: 'from-amber-100 to-orange-100', keywords: ['warm', 'sun', 'hot', 'summer'] },
-  { id: 'cold', label: 'Cool & Temperate', Icon: Thermometer, color: 'from-blue-50 to-cyan-100', keywords: ['cool', 'cold', 'temperate', 'winter'] },
-  { id: 'wet', label: 'Wet & Moist', Icon: Droplets, color: 'from-blue-100 to-blue-200', keywords: ['wet', 'moist', 'water', 'flood', 'river', 'aquatic'] },
-  { id: 'dry', label: 'Dry & Arid', Icon: Wind, color: 'from-yellow-50 to-amber-100', keywords: ['dry', 'arid', 'drought', 'sandy'] },
+  { id: 'hot', label: 'Hot & Sunny', Icon: Sun, color: 'from-amber-100 to-orange-100' },
+  { id: 'cold', label: 'Cool & Temperate', Icon: Thermometer, color: 'from-blue-50 to-cyan-100' },
+  { id: 'wet', label: 'Wet & Moist', Icon: Droplets, color: 'from-blue-100 to-blue-200' },
+  { id: 'dry', label: 'Dry & Arid', Icon: Wind, color: 'from-yellow-50 to-amber-100' },
 ];
 
 function getZone(w: typeof weeds[0]): string {
@@ -56,7 +56,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-display font-bold text-foreground text-lg flex-1">Habitat Mapping</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">Habitat Mapping</h1>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-3 text-center">Place each weed in the habitat where it grows best</p>
@@ -73,7 +73,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
                 <div className="space-y-1 min-h-[40px]">
                   {items.filter(i => placements[i.weed.id] === z.id).map(i => (
                     <div key={i.weed.id} className={`flex items-center gap-1 px-2 py-1 rounded bg-background/80 text-xs font-medium ${
-                      checked ? (i.zone === z.id ? 'text-success' : 'text-destructive') : 'text-foreground'
+                      checked ? (i.zone === z.id ? 'text-green-500' : 'text-destructive') : 'text-foreground'
                     }`}>
                       <span className="truncate flex-1">{i.weed.commonName}</span>
                       {!checked && <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-muted-foreground hover:text-foreground">✕</button>}
@@ -104,7 +104,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
         )}
         {checked && (
           <div className="text-center mt-4">
-            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-success' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
+            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
             <div className="flex gap-3 justify-center">
               <button onClick={() => { setChecked(false); setPlacements({}); setSelected(null); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
               <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>

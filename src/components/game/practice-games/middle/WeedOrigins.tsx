@@ -1,16 +1,18 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import worldMap from '@/assets/images/world-map.jpg';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+// Coordinates aligned to the World.jpg map image
 const CONTINENTS = [
-  { id: 'north-america', label: 'N. America', x: 20, y: 35 },
-  { id: 'south-america', label: 'S. America', x: 28, y: 65 },
+  { id: 'north-america', label: 'N. America', x: 20, y: 38 },
+  { id: 'south-america', label: 'S. America', x: 28, y: 68 },
   { id: 'europe', label: 'Europe', x: 48, y: 28 },
   { id: 'africa', label: 'Africa', x: 50, y: 55 },
-  { id: 'asia', label: 'Asia', x: 70, y: 32 },
-  { id: 'australia', label: 'Australia', x: 80, y: 70 },
+  { id: 'asia', label: 'Asia', x: 70, y: 30 },
+  { id: 'australia', label: 'Australia', x: 82, y: 72 },
 ];
 
 function getOriginContinent(w: typeof weeds[0]): string {
@@ -65,7 +67,7 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        {/* Full weed info card */}
+        {/* Weed info card */}
         <div className="flex items-start gap-4 mb-4 bg-card rounded-xl border border-border p-3">
           <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary flex-shrink-0">
             <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
@@ -79,33 +81,15 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <p className="text-sm text-muted-foreground text-center mb-3">Where is this weed originally from? Click on the continent.</p>
-        {/* World map SVG */}
+        {/* World map with real image */}
         <div className="relative w-full aspect-[2/1] rounded-xl border-2 border-border mb-4 overflow-hidden">
-          <svg viewBox="0 0 1000 500" className="absolute inset-0 w-full h-full">
-            {/* Ocean */}
-            <rect width="1000" height="500" fill="hsl(210 60% 92%)" />
-            {/* Simplified continent shapes */}
-            {/* North America */}
-            <path d="M120,60 L220,50 L260,80 L280,120 L270,160 L250,200 L200,230 L160,250 L120,230 L100,200 L80,160 L70,120 L90,80 Z" fill="hsl(140 30% 60%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-            {/* Central America */}
-            <path d="M160,250 L180,260 L190,280 L200,310 L190,330 L170,320 L155,290 L150,270 Z" fill="hsl(140 30% 55%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-            {/* South America */}
-            <path d="M200,310 L240,300 L280,320 L310,370 L300,420 L270,450 L240,460 L210,440 L190,400 L180,360 L190,330 Z" fill="hsl(140 30% 58%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-            {/* Europe */}
-            <path d="M430,60 L500,50 L530,70 L540,100 L530,130 L510,150 L480,160 L450,150 L430,130 L420,100 L425,80 Z" fill="hsl(140 30% 62%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-            {/* Africa */}
-            <path d="M430,180 L490,170 L530,190 L550,230 L560,280 L550,330 L520,370 L480,380 L440,360 L420,320 L410,270 L420,220 Z" fill="hsl(140 30% 56%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-            {/* Asia */}
-            <path d="M540,50 L650,40 L730,60 L780,80 L800,120 L790,170 L760,200 L720,220 L670,210 L620,190 L580,160 L550,130 L540,100 Z" fill="hsl(140 30% 64%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-            {/* Australia */}
-            <path d="M730,310 L800,300 L840,320 L850,360 L830,390 L790,400 L750,380 L730,350 Z" fill="hsl(140 30% 60%)" stroke="hsl(140 20% 40%)" strokeWidth="1.5" />
-          </svg>
+          <img src={worldMap} alt="World map" className="absolute inset-0 w-full h-full object-cover" />
           {/* Clickable continent buttons */}
           {CONTINENTS.map(c => {
             const isCorrect = c.id === current!.continent;
-            const bg = !answered ? 'bg-secondary/90 hover:bg-primary hover:text-primary-foreground' :
+            const bg = !answered ? 'bg-card/90 hover:bg-primary hover:text-primary-foreground border border-border' :
               c.id === selected ? (isCorrect ? 'bg-green-500 text-white' : 'bg-destructive text-white') :
-              isCorrect ? 'bg-green-500 text-white' : 'bg-secondary/70';
+              isCorrect ? 'bg-green-500 text-white' : 'bg-card/70 border border-border';
             return (
               <button key={c.id} onClick={() => submit(c.id)}
                 style={{ left: `${c.x}%`, top: `${c.y}%` }}

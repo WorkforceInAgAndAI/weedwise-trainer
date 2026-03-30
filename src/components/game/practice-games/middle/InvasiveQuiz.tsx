@@ -1,40 +1,80 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { weeds } from '@/data/weeds';
+import WeedImage from '@/components/game/WeedImage';
 
-const QUESTIONS = [
-  { q: 'What is an invasive species?', options: ['A species that is native to an area', 'A species introduced to a new area where it causes harm', 'Any weed found in a garden', 'A rare endangered species'], correct: 1 },
-  { q: 'How do invasive plants typically enter new ecosystems?', options: ['They evolve naturally', 'Through human activities like trade and travel', 'They migrate on their own', 'Through natural disasters only'], correct: 1 },
-  { q: 'Which of these is a major impact of invasive weeds on waterways?', options: ['They improve water quality', 'They can clog waterways and reduce oxygen', 'They have no effect on water', 'They make water taste better'], correct: 1 },
-  { q: 'How can invasive weeds affect native plant populations?', options: ['They always help native plants grow', 'They compete for resources and can push out native species', 'They have no interaction with native plants', 'They only affect animals'], correct: 1 },
-  { q: 'What happens when invasive weeds reduce biodiversity?', options: ['Ecosystems become more resilient', 'Food webs can be disrupted', 'Nothing changes', 'More species appear'], correct: 1 },
-  { q: 'Why are invasive weeds often successful in new environments?', options: ['They have natural predators there', 'They often lack natural predators and diseases', 'The climate is always perfect', 'They grow very slowly'], correct: 1 },
-  { q: 'How can invasive weeds affect agriculture economically?', options: ['They always increase crop yields', 'They can reduce crop yields and increase management costs', 'They have no economic impact', 'They make farming easier'], correct: 1 },
-  { q: 'What is one way to help prevent the spread of invasive species?', options: ['Plant them in your garden', 'Clean equipment and boots when moving between areas', 'Ignore them', 'Spread their seeds widely'], correct: 1 },
-];
+const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
+
+type ArrivalMethod = 'accident' | 'purpose' | 'other-species';
+
+interface TravelerRound {
+  weed: typeof weeds[0];
+  method: ArrivalMethod;
+  story: string;
+}
+
+const ARRIVAL_LABELS: Record<ArrivalMethod, string> = {
+  accident: 'By Accident',
+  purpose: 'On Purpose',
+  'other-species': 'Through Other Species',
+};
+
+const ARRIVAL_DESCRIPTIONS: Record<ArrivalMethod, string> = {
+  accident: 'Arrived unintentionally through shipping, contaminated seed, or ballast water.',
+  purpose: 'Brought intentionally for agriculture, landscaping, or erosion control.',
+  'other-species': 'Spread by attaching to animals, livestock, or through other plant trade.',
+};
+
+function getArrivalMethod(w: typeof weeds[0]): ArrivalMethod {
+  const t = `${w.habitat} ${w.commonName} ${w.management}`.toLowerCase();
+  if (t.match(/ornament|garden|crop|forage|pasture|erosion|medicin|landscap/)) return 'purpose';
+  if (t.match(/animal|bird|livest|fur|attach|hitchhik/)) return 'other-species';
+  return 'accident';
+}
+
+function getStory(w: typeof weeds[0], method: ArrivalMethod): string {
+  switch (method) {
+    case 'purpose':
+      return `${w.commonName} was likely brought to the Midwest intentionally, possibly as a forage crop, ornamental plant, or for erosion control. It escaped cultivation and became invasive.`;
+    case 'other-species':
+      return `${w.commonName} likely spread to the Midwest by hitchhiking on animals, livestock, or through contaminated hay and feed. Its seeds can attach to fur or feathers.`;
+    case 'accident':
+    default:
+      return `${w.commonName} likely arrived in the Midwest accidentally through contaminated crop seed, shipping materials, or soil transported from other regions.`;
+  }
+}
 
 export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
-  const [qIdx, setQIdx] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
+  const rounds = useMemo(() => {
+    const introduced = shuffle(weeds.filter(w => w.origin === 'Introduced')).slice(0, 8);
+    return introduced.map(w => {
+      const method = getArrivalMethod(w);
+      return { weed: w, method, story: getStory(w, method) } as TravelerRound;
+    });
+  }, []);
+
+  const [round, setRound] = useState(0);
+  const [selected, setSelected] = useState<ArrivalMethod | null>(null);
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
 
-  const done = qIdx >= QUESTIONS.length;
-  const current = !done ? QUESTIONS[qIdx] : null;
+  const done = round >= rounds.length;
+  const current = !done ? rounds[round] : null;
 
-  const submit = (idx: number) => {
+  const submit = (method: ArrivalMethod) => {
     if (answered) return;
-    setSelected(idx);
+    setSelected(method);
     setAnswered(true);
-    if (idx === current!.correct) setScore(s => s + 1);
+    if (method === current!.method) setScore(s => s + 1);
   };
 
-  const next = () => { setQIdx(q => q + 1); setSelected(null); setAnswered(false); };
-  const restart = () => { setQIdx(0); setScore(0); setSelected(null); setAnswered(false); };
+  const next = () => { setRound(r => r + 1); setSelected(null); setAnswered(false); };
+  const restart = () => { setRound(0); setScore(0); setSelected(null); setAnswered(false); };
 
   if (done) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Quiz Complete!</h2>
-        <p className="text-lg text-foreground mb-6">{score}/{QUESTIONS.length} correct</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Journey Complete!</h2>
+        <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
         <div className="flex gap-3">
           <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
           <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
@@ -47,27 +87,47 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Invasive Quiz</h1>
-        <span className="text-sm text-muted-foreground">{qIdx + 1}/{QUESTIONS.length}</span>
+        <h1 className="font-bold text-foreground text-lg flex-1">Invasive Travelers</h1>
+        <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
-        <p className="font-bold text-foreground text-lg mb-6 text-center max-w-md">{current!.q}</p>
+        <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center mb-4">
+          <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary flex-shrink-0">
+            <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-foreground text-lg">{current!.weed.commonName}</p>
+            <p className="text-xs text-muted-foreground italic">{current!.weed.scientificName}</p>
+            <p className="text-xs text-muted-foreground mt-1">This weed is invasive in the Midwest.</p>
+          </div>
+        </div>
+
+        <p className="font-bold text-foreground text-center mb-4">How did this weed most likely arrive in the Midwest?</p>
+
         <div className="flex flex-col gap-3 w-full max-w-md">
-          {current!.options.map((opt, idx) => {
-            const isCorrect = idx === current!.correct;
+          {(Object.keys(ARRIVAL_LABELS) as ArrivalMethod[]).map(method => {
+            const isCorrect = method === current!.method;
             const bg = !answered ? 'border-border bg-card hover:border-primary' :
-              idx === selected ? (isCorrect ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
+              method === selected ? (isCorrect ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
               isCorrect ? 'border-green-500 bg-green-500/20' : 'border-border bg-card';
             return (
-              <button key={idx} onClick={() => submit(idx)}
-                className={`p-4 rounded-lg border-2 text-left text-sm font-medium text-foreground transition-all ${bg}`}>
-                {opt}
+              <button key={method} onClick={() => submit(method)}
+                className={`p-4 rounded-lg border-2 text-left transition-all ${bg}`}>
+                <p className="font-bold text-sm text-foreground">{ARRIVAL_LABELS[method]}</p>
+                <p className="text-xs text-muted-foreground mt-1">{ARRIVAL_DESCRIPTIONS[method]}</p>
               </button>
             );
           })}
         </div>
+
         {answered && (
-          <button onClick={next} className="mt-4 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
+          <div className="mt-4 bg-card border border-border rounded-xl p-4 max-w-md w-full">
+            <p className={`font-bold mb-2 ${selected === current!.method ? 'text-green-500' : 'text-destructive'}`}>
+              {selected === current!.method ? 'Correct!' : 'Not quite!'}
+            </p>
+            <p className="text-sm text-muted-foreground">{current!.story}</p>
+            <button onClick={next} className="mt-3 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold w-full">Next</button>
+          </div>
         )}
       </div>
     </div>
