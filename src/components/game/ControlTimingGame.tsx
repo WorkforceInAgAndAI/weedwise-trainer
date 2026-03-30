@@ -79,13 +79,13 @@ export default function ControlTimingGame({ weed, onComplete, onNext }: Props) {
  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
  step === 1 && !submitted ? 'bg-primary text-primary-foreground' : selectedStage ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'
  }`}>
- {selectedStage ? '' : '①'} Growth Stage
+ {selectedStage ? '' : ''} Growth Stage
  </div>
  <div className="w-6 h-0.5 bg-border" />
  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
  step === 2 && !submitted ? 'bg-primary text-primary-foreground' : selectedMethod ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'
  }`}>
- {selectedMethod ? '' : '②'} Control Method
+ {selectedMethod ? '' : ''} Control Method
  </div>
  </div>
 
