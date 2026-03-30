@@ -1,15 +1,22 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 export default function LiguleLens({ onBack }: { onBack: () => void }) {
-  const grasses = useMemo(() => shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, 8), []);
-  const rounds = useMemo(() => grasses.map(w => {
-    const wrong = shuffle(grasses.filter(g => g.id !== w.id)).slice(0, 3).map(g => g.commonName);
-    return { weed: w, options: shuffle([w.commonName, ...wrong]) };
-  }), [grasses]);
+  const { addBadge } = useGameProgress();
+  // Only include grasses (monocots)
+  const grasses = useMemo(() => shuffle(weeds.filter(w => w.plantType === 'Monocot')), []);
+  
+  const rounds = useMemo(() => {
+    const pool = grasses.slice(0, 8);
+    return pool.map(w => {
+      const wrong = shuffle(grasses.filter(g => g.id !== w.id)).slice(0, 3).map(g => g.commonName);
+      return { weed: w, options: shuffle([w.commonName, ...wrong]) };
+    });
+  }, [grasses]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState('');
@@ -30,6 +37,7 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
   const restart = () => { setRound(0); setScore(0); setSelected(''); setAnswered(false); };
 
   if (done) {
+    addBadge({ gameId: 'ligule-lens', gameName: 'Ligule Lens', level: 'MS', score, total: rounds.length });
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
         <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>

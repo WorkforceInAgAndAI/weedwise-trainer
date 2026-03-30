@@ -1,21 +1,17 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { Ship, Truck, Bug, Anchor, Package, TreePine } from 'lucide-react';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 type ArrivalMethod = 'accident' | 'purpose' | 'other-species';
 
-interface TravelerRound {
-  weed: typeof weeds[0];
-  method: ArrivalMethod;
-  story: string;
-}
-
-const ARRIVAL_LABELS: Record<ArrivalMethod, string> = {
-  accident: 'By Accident',
-  purpose: 'On Purpose',
-  'other-species': 'Through Other Species',
+const ARRIVAL_LABELS: Record<ArrivalMethod, { label: string; Icon: typeof Ship }> = {
+  accident: { label: 'By Accident', Icon: Ship },
+  purpose: { label: 'On Purpose', Icon: Package },
+  'other-species': { label: 'Through Other Species', Icon: Bug },
 };
 
 const ARRIVAL_DESCRIPTIONS: Record<ArrivalMethod, string> = {
@@ -31,24 +27,45 @@ function getArrivalMethod(w: typeof weeds[0]): ArrivalMethod {
   return 'accident';
 }
 
+// Weed-specific stories with real details
+const WEED_STORIES: Record<string, Record<ArrivalMethod, string>> = {
+  'johnsongrass': {
+    purpose: 'Johnsongrass (Sorghum halepense) was deliberately imported from the Mediterranean region in the 1830s as a forage crop. It escaped cultivation due to its aggressive rhizome system and is now one of the most problematic weeds in the southern United States.',
+    accident: 'Johnsongrass likely spread through contaminated sorghum seed shipments from the Mediterranean.',
+    'other-species': 'Johnsongrass seeds can spread via livestock that consume and pass viable seeds.',
+  },
+  'canada-thistle': {
+    purpose: 'Canada Thistle (Cirsium arvense) was likely introduced to North America by early European settlers, possibly as a contaminant in crop seed or packing materials. Despite its name, it originated in southeastern Europe.',
+    accident: 'Canada Thistle arrived in North America accidentally through contaminated crop seed brought by European colonists in the 1600s.',
+    'other-species': 'Canada Thistle seeds have feathery pappus for wind dispersal and can also be spread by birds.',
+  },
+  'kochia': {
+    purpose: 'Kochia (Bassia scoparia) was introduced to North America from Eurasia as an ornamental and drought-tolerant forage. It became naturalized and is now highly invasive in the Great Plains, with tumbleweed-like seed dispersal.',
+    accident: 'Kochia likely spread through contaminated grain shipments from central Asia.',
+    'other-species': 'Kochia plants break off at the base and tumble across landscapes, dispersing seeds over great distances.',
+  },
+};
+
 function getStory(w: typeof weeds[0], method: ArrivalMethod): string {
+  if (WEED_STORIES[w.id]?.[method]) return WEED_STORIES[w.id][method];
   switch (method) {
     case 'purpose':
-      return `${w.commonName} was likely brought to the Midwest intentionally, possibly as a forage crop, ornamental plant, or for erosion control. It escaped cultivation and became invasive.`;
+      return `${w.commonName} (${w.scientificName}) was likely brought to the Midwest intentionally for agricultural use, ornamental planting, or erosion control. Over time it escaped managed areas and established wild populations, becoming a persistent weed in ${w.habitat.toLowerCase()}.`;
     case 'other-species':
-      return `${w.commonName} likely spread to the Midwest by hitchhiking on animals, livestock, or through contaminated hay and feed. Its seeds can attach to fur or feathers.`;
+      return `${w.commonName} (${w.scientificName}) likely spread to the Midwest by hitchhiking on animals or livestock. Its seeds can attach to fur, feathers, or clothing. It is now commonly found in ${w.habitat.toLowerCase()}.`;
     case 'accident':
     default:
-      return `${w.commonName} likely arrived in the Midwest accidentally through contaminated crop seed, shipping materials, or soil transported from other regions.`;
+      return `${w.commonName} (${w.scientificName}) likely arrived in the Midwest accidentally through contaminated crop seed, shipping materials, or soil transported from ${w.origin === 'Introduced' ? 'its native range' : 'other regions'}. It now thrives in ${w.habitat.toLowerCase()}.`;
   }
 }
 
 export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const rounds = useMemo(() => {
     const introduced = shuffle(weeds.filter(w => w.origin === 'Introduced')).slice(0, 8);
     return introduced.map(w => {
       const method = getArrivalMethod(w);
-      return { weed: w, method, story: getStory(w, method) } as TravelerRound;
+      return { weed: w, method, story: getStory(w, method) };
     });
   }, []);
 
@@ -71,8 +88,10 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
   const restart = () => { setRound(0); setScore(0); setSelected(null); setAnswered(false); };
 
   if (done) {
+    addBadge({ gameId: 'invasive-travelers', gameName: 'Invasive Travelers', level: 'MS', score, total: rounds.length });
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
+        <Ship className="w-10 h-10 text-primary mb-3" />
         <h2 className="text-2xl font-bold text-foreground mb-2">Journey Complete!</h2>
         <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
         <div className="flex gap-3">
@@ -98,7 +117,7 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
           <div className="flex-1 min-w-0">
             <p className="font-bold text-foreground text-lg">{current!.weed.commonName}</p>
             <p className="text-xs text-muted-foreground italic">{current!.weed.scientificName}</p>
-            <p className="text-xs text-muted-foreground mt-1">This weed is invasive in the Midwest.</p>
+            <p className="text-xs text-muted-foreground mt-1">Family: {current!.weed.family}</p>
           </div>
         </div>
 
@@ -107,14 +126,18 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-3 w-full max-w-md">
           {(Object.keys(ARRIVAL_LABELS) as ArrivalMethod[]).map(method => {
             const isCorrect = method === current!.method;
+            const { label, Icon } = ARRIVAL_LABELS[method];
             const bg = !answered ? 'border-border bg-card hover:border-primary' :
               method === selected ? (isCorrect ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
               isCorrect ? 'border-green-500 bg-green-500/20' : 'border-border bg-card';
             return (
               <button key={method} onClick={() => submit(method)}
-                className={`p-4 rounded-lg border-2 text-left transition-all ${bg}`}>
-                <p className="font-bold text-sm text-foreground">{ARRIVAL_LABELS[method]}</p>
-                <p className="text-xs text-muted-foreground mt-1">{ARRIVAL_DESCRIPTIONS[method]}</p>
+                className={`p-4 rounded-lg border-2 text-left transition-all flex items-start gap-3 ${bg}`}>
+                <Icon className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-sm text-foreground">{label}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{ARRIVAL_DESCRIPTIONS[method]}</p>
+                </div>
               </button>
             );
           })}

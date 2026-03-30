@@ -19,6 +19,8 @@ import AuthModal from '@/components/game/AuthModal';
 import FarmMode from '@/components/game/FarmMode';
 import PracticeHub from '@/components/game/PracticeHub';
 import StatsPanel from '@/components/game/StatsPanel';
+import ReferencesPage from '@/components/game/ReferencesPage';
+import GameProgressSidebar from '@/components/game/GameProgressSidebar';
 import type { GradeLevel } from '@/types/game';
 import { useEffect, useRef } from 'react';
 
@@ -36,6 +38,7 @@ const Index = () => {
   const [showFarmMode, setShowFarmMode] = useState(false);
   const [showPracticeHub, setShowPracticeHub] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showReferences, setShowReferences] = useState(false);
   const [globalGrade, setGlobalGrade] = useState<GradeLevel>('elementary');
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
@@ -80,20 +83,20 @@ const Index = () => {
     if (role === 'instructor') setShowDashboard(true);
   };
 
-  // Common header props
   const headerProps = {
     onOpenLearning: () => setShowLearning(true),
     onOpenFarmMode: () => setShowFarmMode(true),
     onOpenPracticeHub: () => setShowPracticeHub(true),
     onOpenGlossary: () => setShowGlossaryDirect(true),
+    onOpenReferences: () => setShowReferences(true),
     onOpenAuth: () => setShowAuthModal(true),
     auth,
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Persistent header on all pages */}
       <AppHeader {...headerProps} />
+      <GameProgressSidebar />
 
       {game.screen === 'landing' && (
         <LandingPage
@@ -129,6 +132,7 @@ const Index = () => {
       {showFarmMode && <FarmMode onClose={() => setShowFarmMode(false)} />}
       {showPracticeHub && <PracticeHub onClose={() => setShowPracticeHub(false)} />}
       {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}
+      {showReferences && <ReferencesPage onClose={() => setShowReferences(false)} />}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} onAuthenticated={handleAuthComplete} />
       )}

@@ -1,4 +1,4 @@
-import { Leaf, BookOpen, Gamepad2, Target, BookMarked, User, LogOut } from 'lucide-react';
+import { Leaf, BookOpen, Gamepad2, Target, BookMarked, FileText, User, LogOut } from 'lucide-react';
 import type { useAuth } from '@/hooks/useAuth';
 
 interface Props {
@@ -6,13 +6,14 @@ interface Props {
   onOpenFarmMode: () => void;
   onOpenPracticeHub: () => void;
   onOpenGlossary: () => void;
+  onOpenReferences: () => void;
   onOpenAuth: () => void;
   auth: ReturnType<typeof useAuth>;
 }
 
 export default function AppHeader({
   onOpenLearning, onOpenFarmMode, onOpenPracticeHub, onOpenGlossary,
-  onOpenAuth, auth,
+  onOpenReferences, onOpenAuth, auth,
 }: Props) {
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
@@ -34,6 +35,7 @@ export default function AppHeader({
             { label: 'Play', action: onOpenFarmMode, icon: Gamepad2 },
             { label: 'Practice', action: onOpenPracticeHub, icon: Target },
             { label: 'Glossary', action: onOpenGlossary, icon: BookMarked },
+            { label: 'References', action: onOpenReferences, icon: FileText },
           ].map(item => (
             <button
               key={item.label}

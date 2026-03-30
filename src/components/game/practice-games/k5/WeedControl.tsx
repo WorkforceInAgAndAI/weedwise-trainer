@@ -8,7 +8,7 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const METHODS = [
   { id: 'pull', label: 'Pull by hand', icon: '✋' },
   { id: 'spray', label: 'Spray herbicide', icon: '🧴' },
-  { id: 'mow', label: 'Mow it down', icon: '🚜' },
+  { id: 'mow', label: 'Mow it down', icon: 'MW' },
   { id: 'leave', label: 'Leave it alone', icon: '🚫' },
 ];
 
@@ -82,7 +82,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   if (done) return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
-        <div className="text-5xl mb-4">🧑‍🌾</div>
+        
         <h2 className="text-2xl font-bold text-foreground mb-2">{timer > 0 ? 'Field Clear!' : "Time's Up!"}</h2>
         <p className="text-muted-foreground mb-2">Managed: {managed}/{weedState.length}</p>
         <p className="text-muted-foreground mb-6">Correct methods: {score}/{managed}</p>

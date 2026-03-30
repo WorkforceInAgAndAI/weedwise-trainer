@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import fieldBg from '@/assets/images/field-background.jpg';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -11,6 +13,7 @@ interface FieldWeed {
 }
 
 export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const fieldWeeds = useMemo(() => {
     const pool = shuffle(weeds).slice(0, 15);
     return pool.map(w => ({
@@ -20,7 +23,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
     }));
   }, []);
 
-  const threshold = useMemo(() => Math.floor(Math.random() * 5) + 6, []); // 6-10
+  const threshold = useMemo(() => Math.floor(Math.random() * 5) + 6, []);
 
   const [phase, setPhase] = useState<'count' | 'graph' | 'decide' | 'result'>('count');
   const [counted, setCounted] = useState<Set<string>>(new Set());
@@ -38,13 +41,13 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
     });
   };
 
-  const submitCount = () => {
-    setPhase('graph');
-  };
+  const submitCount = () => setPhase('graph');
 
   const submitDecision = (d: 'above' | 'below') => {
     setDecision(d);
     setPhase('result');
+    const correct = d === (isAbove ? 'above' : 'below');
+    addBadge({ gameId: 'economic-threshold', gameName: 'Economic Threshold', level: 'MS', score: correct ? 1 : 0, total: 1 });
   };
 
   const restart = () => {
@@ -53,7 +56,6 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
     setDecision(null);
   };
 
-  // Graph bars
   const barData = [
     { label: 'Your Count', value: counted.size, color: 'bg-primary' },
     { label: 'Threshold', value: threshold, color: 'bg-amber-500' },
@@ -71,10 +73,9 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
       {phase === 'count' && (
         <div className="flex-1 flex flex-col">
           <p className="text-sm text-muted-foreground p-3 text-center">Scout the field! Tap each weed you find to count them.</p>
-          <div className="flex-1 relative bg-gradient-to-b from-green-800/40 to-green-900/60 mx-4 mb-2 rounded-xl overflow-hidden border-2 border-border">
-            {/* Field background texture */}
-            <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover opacity-20" />
-            <div className="absolute inset-0 bg-gradient-to-b from-green-700/30 to-green-900/50" />
+          <div className="flex-1 relative mx-4 mb-2 rounded-xl overflow-hidden border-2 border-border">
+            <img src={fieldBg} alt="Field" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/10" />
             {fieldWeeds.map(fw => (
               <button key={fw.weed.id} onClick={() => toggleCount(fw.weed.id)}
                 className={`absolute transition-all ${counted.has(fw.weed.id) ? 'scale-110' : ''}`}
@@ -99,8 +100,6 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
           <h2 className="text-xl font-bold text-foreground">Your Field Survey</h2>
           <p className="text-sm text-muted-foreground text-center">You counted {counted.size} weeds. The economic threshold for this field is {threshold} weeds.</p>
-
-          {/* Bar chart */}
           <div className="w-full max-w-sm flex items-end gap-8 justify-center h-48">
             {barData.map(bar => (
               <div key={bar.label} className="flex flex-col items-center gap-2">
@@ -110,8 +109,6 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
               </div>
             ))}
           </div>
-
-          {/* Threshold line visualization */}
           <div className="w-full max-w-sm bg-card border border-border rounded-xl p-4">
             <p className="text-sm text-foreground font-bold mb-2">Is the weed population above or below the economic threshold?</p>
             <div className="flex gap-3">

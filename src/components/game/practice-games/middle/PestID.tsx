@@ -1,37 +1,54 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const CATEGORIES = ['Terrestrial', 'Aquatic', 'Parasitic'] as const;
 
+// Accurate categorization based on actual weed data
+const AQUATIC_IDS = ['yellow-nutsedge']; // nutsedge is wetland/aquatic-associated
+const PARASITIC_KEYWORDS = ['parasit'];
+
 function getCategory(w: typeof weeds[0]): string {
+  if (PARASITIC_KEYWORDS.some(k => `${w.habitat} ${w.primaryHabitat}`.toLowerCase().includes(k))) return 'Parasitic';
+  if (AQUATIC_IDS.includes(w.id)) return 'Aquatic';
   const t = `${w.habitat} ${w.primaryHabitat}`.toLowerCase();
-  if (t.match(/parasit/)) return 'Parasitic';
-  if (t.match(/aquatic|water|flood|wetland|pond|river|moist|bottom|marsh|ditch|riparian/)) return 'Aquatic';
+  if (t.match(/aquatic|water|flood|wetland|pond|river|moist|marsh|ditch|riparian|bottom/)) return 'Aquatic';
   return 'Terrestrial';
 }
 
+// Provide accurate explanations for each categorization
+function getExplanation(w: typeof weeds[0], correct: string): string {
+  switch (correct) {
+    case 'Aquatic':
+      return `${w.commonName} is categorized as Aquatic because it is commonly found in ${w.habitat.toLowerCase()}. Aquatic weeds grow in or near water and can thrive in saturated soils.`;
+    case 'Parasitic':
+      return `${w.commonName} is a parasitic weed that derives some or all of its nutrition from other plants, often attaching to host roots or stems.`;
+    default:
+      return `${w.commonName} is a terrestrial weed found in ${w.habitat.toLowerCase()}. It grows in typical upland soils and does not require aquatic conditions.`;
+  }
+}
+
 export default function PestID({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const rounds = useMemo(() => {
-    // Ensure a mix of categories
     const byCategory: Record<string, typeof weeds[0][]> = { Terrestrial: [], Aquatic: [], Parasitic: [] };
     weeds.forEach(w => byCategory[getCategory(w)].push(w));
 
-    const picks: { weed: typeof weeds[0]; answer: string }[] = [];
-    // Get at least 3 from each available category
+    const picks: { weed: typeof weeds[0]; answer: string; explanation: string }[] = [];
     for (const cat of CATEGORIES) {
       const pool = shuffle(byCategory[cat]);
       const take = Math.min(pool.length, cat === 'Parasitic' ? 2 : 4);
-      pool.slice(0, take).forEach(w => picks.push({ weed: w, answer: cat }));
+      pool.slice(0, take).forEach(w => picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) }));
     }
-    // Fill to 10 if needed
     const usedIds = new Set(picks.map(p => p.weed.id));
     const remaining = shuffle(weeds.filter(w => !usedIds.has(w.id)));
     while (picks.length < 10 && remaining.length) {
       const w = remaining.shift()!;
-      picks.push({ weed: w, answer: getCategory(w) });
+      const cat = getCategory(w);
+      picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) });
     }
     return shuffle(picks).slice(0, 10);
   }, []);
@@ -55,6 +72,7 @@ export default function PestID({ onBack }: { onBack: () => void }) {
   const restart = () => { setRound(0); setScore(0); setSelected(''); setAnswered(false); };
 
   if (done) {
+    addBadge({ gameId: 'pest-id', gameName: 'Pest ID', level: 'MS', score, total: rounds.length });
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
         <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
@@ -95,7 +113,13 @@ export default function PestID({ onBack }: { onBack: () => void }) {
           })}
         </div>
         {answered && (
-          <button onClick={next} className="mt-4 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
+          <div className="mt-4 bg-card border border-border rounded-xl p-4 max-w-md w-full">
+            <p className={`font-bold mb-2 ${selected === current!.answer ? 'text-green-500' : 'text-destructive'}`}>
+              {selected === current!.answer ? 'Correct!' : 'Not quite!'}
+            </p>
+            <p className="text-sm text-muted-foreground">{current!.explanation}</p>
+            <button onClick={next} className="mt-3 w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
+          </div>
         )}
       </div>
     </div>

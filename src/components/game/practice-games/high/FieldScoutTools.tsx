@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
+import { Scan, Radio, Footprints, Satellite } from 'lucide-react';
+import { useGameProgress } from '@/contexts/GameProgressContext';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const TOOLS = [
-  { id: 'drone', name: 'Drone', icon: '🛸', desc: 'Aerial survey — best for large open fields', best: ['large', 'open'] },
-  { id: 'rover', name: 'Rover', icon: '🤖', desc: 'Ground robot — best for row crops and precise mapping', best: ['row', 'precise'] },
-  { id: 'manual', name: 'Manual Scouting', icon: '🥾', desc: 'Walking with hand tools — best for small or irregular fields', best: ['small', 'irregular'] },
-  { id: 'satellite', name: 'Satellite / Remote', icon: '🛰️', desc: 'Satellite imagery — best for monitoring large areas over time', best: ['monitor', 'vast'] },
+  { id: 'drone', name: 'Drone', Icon: Radio, desc: 'Aerial survey — best for large open fields', best: ['large', 'open'] },
+  { id: 'rover', name: 'Rover', Icon: Scan, desc: 'Ground robot — best for row crops and precise mapping', best: ['row', 'precise'] },
+  { id: 'manual', name: 'Manual Scouting', Icon: Footprints, desc: 'Walking with hand tools — best for small or irregular fields', best: ['small', 'irregular'] },
+  { id: 'satellite', name: 'Satellite / Remote', Icon: Satellite, desc: 'Satellite imagery — best for monitoring large areas over time', best: ['monitor', 'vast'] },
 ];
 
 const FIELDS = [
@@ -18,6 +20,7 @@ const FIELDS = [
 ];
 
 export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
   const rounds = useMemo(() => shuffle(FIELDS).slice(0, 4), []);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
@@ -30,17 +33,20 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
   const next = () => { setIdx(i => i + 1); setPicked(null); setScouted(false); };
   const restart = () => { setIdx(0); setPicked(null); setScouted(false); setScore(0); };
 
-  if (done) return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
-      <p className="text-4xl mb-2">🥾</p>
-      <h2 className="font-display font-bold text-2xl text-foreground mb-2">Scouting Complete!</h2>
-      <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
-      <div className="flex gap-3">
-        <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
-        <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+  if (done) {
+    addBadge({ gameId: 'hs-field-scout', gameName: 'Field Scout Tools', level: 'HS', score, total: rounds.length });
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+        <Footprints className="w-10 h-10 text-primary mb-3" />
+        <h2 className="font-display font-bold text-2xl text-foreground mb-2">Scouting Complete!</h2>
+        <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
+        <div className="flex gap-3">
+          <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
+          <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   const f = rounds[idx];
   return (
@@ -57,6 +63,7 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
         <p className="text-sm text-muted-foreground mb-3 text-center">Which scouting tool is best for this field?</p>
         <div className="grid grid-cols-2 gap-3 mb-4">
           {TOOLS.map(t => {
+            const ToolIcon = t.Icon;
             let cls = 'border-border bg-card';
             if (scouted && t.id === f.bestTool) cls = 'border-green-500 bg-green-500/20';
             else if (scouted && t.id === picked) cls = 'border-destructive bg-destructive/20';
@@ -64,7 +71,7 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
             return (
               <button key={t.id} onClick={() => select(t.id)}
                 className={`p-4 rounded-xl border-2 text-center transition-all ${cls}`}>
-                <p className="text-3xl mb-1">{t.icon}</p>
+                <ToolIcon className="w-8 h-8 mx-auto mb-1 text-foreground" />
                 <p className="text-sm font-bold text-foreground">{t.name}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">{t.desc}</p>
               </button>
