@@ -73,7 +73,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
           <button key={i} onClick={() => !answered.has(i) && setCurrent(i)}
             style={{ left: `${item.x}%`, top: `${item.y}%` }}
             className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${answered.has(i) ? 'opacity-30 pointer-events-none' : current === i ? 'scale-125' : 'animate-pulse'}`}>
-            <div className="w-12 h-12 rounded-full border-3 border-amber-400 bg-background/80 overflow-hidden">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
               <WeedImage weedId={item.weed.id} stage="vegetative" className="w-full h-full object-cover" />
             </div>
           </button>

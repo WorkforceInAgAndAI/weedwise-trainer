@@ -1150,7 +1150,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
             <img src={fieldBgImage} alt="Soybean field" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-foreground/10" />
 
-            {/* Weed indicators */}
+            {/* Weed indicators — circular photos like K-5 WeedControl */}
             {fieldWeeds.map(fw => (
               <button
                 key={fw.id}
@@ -1158,20 +1158,25 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
                 className={`absolute transition-all duration-500 ${
                   !fw.alive ? 'opacity-0 pointer-events-none scale-50' :
                   fw.identified ? 'hover:scale-125 cursor-pointer' :
-                  'cursor-default'
+                  fw.scouted ? 'animate-pulse' : 'animate-pulse'
                 }`}
                 style={{ left: `${fw.x}%`, top: `${fw.y}%`, transform: 'translate(-50%,-50%)' }}
                 title={fw.identified ? fw.weed.commonName : fw.scouted ? 'Scouted — needs ID' : 'Unscouted'}
               >
-                <div className={`w-7 h-7 rounded-full border-[3px] flex items-center justify-center shadow-lg ${
+                <div className={`w-12 h-12 rounded-full overflow-hidden border-[3px] shadow-lg ${
                   fw.identified
-                    ? 'border-weed-identified bg-weed-identified/50 shadow-weed-identified/30'
+                    ? 'border-weed-identified shadow-weed-identified/30'
                     : fw.scouted
-                    ? 'border-weed-scouted bg-weed-scouted/50 shadow-weed-scouted/30 animate-pulse'
-                    : 'border-weed-unscouted bg-weed-unscouted/50 shadow-weed-unscouted/30 animate-pulse'
+                    ? 'border-weed-scouted shadow-weed-scouted/30'
+                    : 'border-weed-unscouted shadow-weed-unscouted/30'
                 }`}>
-                  {fw.identified && <Sprout className="w-3.5 h-3.5 text-white" />}
-                  {!fw.identified && fw.scouted && <span className="text-white text-[10px] font-bold">?</span>}
+                  {fw.scouted || fw.identified ? (
+                    <WeedImage weedId={fw.weed.id} stage={fw.stage} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-weed-unscouted/50 flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">?</span>
+                    </div>
+                  )}
                 </div>
               </button>
             ))}
