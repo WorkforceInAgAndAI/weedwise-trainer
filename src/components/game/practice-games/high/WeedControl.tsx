@@ -79,7 +79,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
   if (done) return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
-      <p className="text-4xl mb-2">🧑‍🌾</p>
+      
       <h2 className="font-display font-bold text-2xl text-foreground mb-2">Field Managed!</h2>
       <p className="text-foreground mb-6">Score: {score} / {items.length}</p>
       <div className="flex gap-3">

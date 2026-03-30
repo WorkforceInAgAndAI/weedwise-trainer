@@ -8,7 +8,7 @@ const ZONES = [
   { id: 'temperate', label: 'Temperate', icon: '🌲', keywords: ['temperate', 'cool', 'corn', 'soybean', 'field', 'crop'] },
   { id: 'arid', label: 'Arid', icon: '🏜️', keywords: ['dry', 'arid', 'desert', 'sand', 'hot'] },
   { id: 'tropical', label: 'Tropical', icon: '🌴', keywords: ['tropic', 'warm', 'humid', 'cotton'] },
-  { id: 'wetland', label: 'Wetland', icon: '💧', keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch'] },
+  { id: 'wetland', label: 'Wetland', icon: 'W', keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch'] },
 ];
 
 function getZone(w: typeof weeds[0]) {
