@@ -257,11 +257,12 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  );
 
  case 'life-stages': {
- const LIFE_STAGE_INFO = [
- { stage: 'seedling', label: ' Seedling', desc: 'The earliest growth stage after germination. Cotyledons (seed leaves) are visible, and the first true leaves are emerging.' },
- { stage: 'vegetative', label: ' Vegetative', desc: 'Active growth phase with expanding leaves and branching. Key ID features like leaf shape are most visible.' },
- { stage: 'flower', label: ' Reproductive', desc: 'The plant is flowering and/or setting seed. Flower structure is a critical ID feature.' },
- ];
+   const LIFE_STAGE_INFO = [
+    { stage: 'seed', label: 'Seed', desc: 'The dormant stage before germination. Seeds can persist in the soil seed bank for years. Identifying seeds helps predict future weed problems.' },
+    { stage: 'seedling', label: 'Seedling', desc: 'The earliest growth stage after germination. Cotyledons (seed leaves) are visible, and the first true leaves are emerging.' },
+    { stage: 'vegetative', label: 'Vegetative', desc: 'Active growth phase with expanding leaves and branching. Key ID features like leaf shape are most visible.' },
+    { stage: 'flower', label: 'Reproductive', desc: 'The plant is flowering and/or setting seed. Flower structure is a critical ID feature.' },
+   ];
  return (
  <div className="space-y-6">
  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
