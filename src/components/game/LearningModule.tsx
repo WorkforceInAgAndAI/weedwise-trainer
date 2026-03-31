@@ -273,13 +273,12 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  )}
  </div>
 
- <div className="grid grid-cols-3 gap-3">
+ <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
  {LIFE_STAGE_INFO.map(s => (
- <div key={s.stage} className="bg-card border border-border rounded-lg p-3 text-center">
- <div className="text-2xl mb-1">{s.label.split(' ')[0]}</div>
- <div className="text-xs font-bold text-foreground">{s.label.split(' ').slice(1).join(' ')}</div>
- <p className="text-[10px] text-muted-foreground mt-1">{s.desc.split('.')[0]}.</p>
- </div>
+  <div key={s.stage} className="bg-card border border-border rounded-lg p-3 text-center">
+   <div className="text-xs font-bold text-foreground">{s.label}</div>
+   <p className="text-[10px] text-muted-foreground mt-1">{s.desc.split('.')[0]}.</p>
+  </div>
  ))}
  </div>
 
