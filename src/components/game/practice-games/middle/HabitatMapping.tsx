@@ -63,8 +63,8 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  {ZONES.map(z => {
  const ZoneIcon = z.Icon;
  return (
- <button key={z.id} onClick={() => handleZone(z.id)}
- className={`rounded-xl border-2 border-border p-3 bg-gradient-to-br ${z.color} bg-opacity-20 text-left transition-all ${selected ? 'hover:scale-[1.02] cursor-pointer' : ''}`}>
+          <button key={z.id} onClick={() => handleZone(z.id)}
+            className={`rounded-xl border-2 border-border p-3 bg-card text-left transition-all ${selected ? 'hover:scale-[1.02] cursor-pointer hover:border-primary' : ''}`}>
  <div className="flex items-center gap-2 mb-2">
  <ZoneIcon className="w-5 h-5 text-foreground" />
  <span className="font-bold text-foreground text-sm drop-shadow-sm">{z.label}</span>

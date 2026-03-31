@@ -42,8 +42,8 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
  {ZONES.map(z => (
  <button key={z.id} onClick={() => place(z.id)}
  className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10' : 'border-border'}`}>
- <p className="text-2xl">{z.icon}</p>
- <p className="text-xs font-bold text-foreground">{z.label}</p>
+          <z.Icon className="w-6 h-6 text-foreground mx-auto" />
+          <p className="text-xs font-bold text-foreground">{z.label}</p>
  <div className="mt-1 flex flex-wrap gap-1 justify-center">
  {items.filter(it => placements[it.weed.id] === z.id).map(it => (
  <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
