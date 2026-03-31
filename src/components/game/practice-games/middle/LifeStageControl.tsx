@@ -4,8 +4,8 @@ import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const STAGES = ['seedling', 'vegetative', 'reproductive'] as const;
-const STAGE_LABELS: Record<string, string> = { seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive' };
+const STAGES = ['seed', 'seedling', 'vegetative', 'reproductive'] as const;
+const STAGE_LABELS: Record<string, string> = { seed: 'Seed', seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive' };
 
 const CONTROLS = [
  { id: 'pre', label: 'Pre-Plant Herbicide', best: 'seedling' },
