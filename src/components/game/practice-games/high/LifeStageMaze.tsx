@@ -211,7 +211,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
         {/* Legend */}
         <div className="flex flex-wrap gap-3 mb-3 text-xs">
           {stagePositions.map((s, i) => {
-            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-purple-400/20 border-purple-400'];
+            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-purple-400/20 border-purple-400', 'bg-emerald-500/20 border-emerald-500'];
             return (
               <div key={s.id} className={`flex items-center gap-1 px-2 py-1 rounded border ${colors[i]}`}>
                 <s.Icon className="w-3 h-3" />
