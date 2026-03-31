@@ -305,7 +305,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
               }
 
               // Regular path cell
-              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-purple-400/25'];
+              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-purple-400/25', 'bg-emerald-500/25'];
 
               return (
                 <button
