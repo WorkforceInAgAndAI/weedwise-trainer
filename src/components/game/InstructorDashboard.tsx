@@ -177,7 +177,7 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
  badges: BadgeRow[];
  onClose: () => void;
 }) {
- const [detailTab, setDetailTab] = useState<'overview' | 'weeds' | 'phases'>('overview');
+ const [detailTab, setDetailTab] = useState<'overview' | 'weeds'>('overview');
  const earnedBadges = badges.filter(b => b.student_id === student.id)
  .map(b => BADGES.find(badge => badge.id === b.badge_id))
  .filter(Boolean);
