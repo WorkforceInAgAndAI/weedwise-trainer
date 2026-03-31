@@ -25,7 +25,7 @@ interface SessionRow {
 interface BadgeRow { id: string; student_id: string; badge_id: string; earned_at: string; }
 interface Props { onClose: () => void; }
 
-type Tab = 'overview' | 'students' | 'leaderboard' | 'badges' | 'glossary';
+type Tab = 'overview' | 'students' | 'glossary';
 
 /* Create-Class Modal */
 function CreateClassModal({ instructorId, instructorName, onCreated, onClose }: {
@@ -177,7 +177,7 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
  badges: BadgeRow[];
  onClose: () => void;
 }) {
- const [detailTab, setDetailTab] = useState<'overview' | 'weeds' | 'phases'>('overview');
+ const [detailTab, setDetailTab] = useState<'overview' | 'weeds'>('overview');
  const earnedBadges = badges.filter(b => b.student_id === student.id)
  .map(b => BADGES.find(badge => badge.id === b.badge_id))
  .filter(Boolean);
@@ -244,18 +244,18 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
  Last active: {student.lastPlayed ? new Date(student.lastPlayed).toLocaleDateString() : 'Never'}
  </p>
  </div>
- <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl"></button>
+  <button onClick={onClose} className="px-3 py-1.5 rounded-md border border-border text-sm hover:bg-secondary transition-colors">Exit</button>
+  <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">x</button>
  </div>
 
- {/* Sub-tabs */}
- <div className="flex gap-1 bg-muted rounded-lg p-1">
- {(['overview', 'weeds', 'phases'] as const).map(t => (
- <button key={t} onClick={() => setDetailTab(t)}
- className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${detailTab === t ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}>
- {t === 'weeds' ? 'Per-Weed' : t === 'phases' ? 'Per-Phase' : 'Overview'}
- </button>
- ))}
- </div>
+  <div className="flex gap-1 bg-muted rounded-lg p-1">
+   {(['overview', 'weeds'] as const).map(t => (
+    <button key={t} onClick={() => setDetailTab(t)}
+     className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${detailTab === t ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}>
+     {t === 'weeds' ? 'Per-Weed' : 'Overview'}
+    </button>
+   ))}
+  </div>
 
  {detailTab === 'overview' && (
  <div className="space-y-4">
@@ -397,32 +397,6 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
  </div>
  )}
 
- {/* Per-Phase Tab */}
- {detailTab === 'phases' && (
- <div className="space-y-3">
- {phaseRows.length === 0 ? (
- <p className="text-center text-muted-foreground py-6">No per-phase data available yet. Data appears after the student answers questions.</p>
- ) : (
- <div className="space-y-2">
- {phaseRows.map(p => {
- const pct = p.total > 0 ? (p.correct / p.total) * 100 : 0;
- return (
- <div key={p.id} className="bg-muted/30 rounded-lg p-3">
- <div className="flex items-center justify-between mb-1">
- <span className="text-sm font-medium text-foreground">{p.name}</span>
- <span className={`text-xs font-bold ${pct >= 70 ? 'text-accent' : pct >= 40 ? 'text-foreground' : 'text-destructive'}`}>{pct.toFixed(0)}%</span>
- </div>
- <div className="h-2 bg-muted rounded-full overflow-hidden">
- <div className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-accent' : pct >= 40 ? 'bg-primary' : 'bg-destructive'}`} style={{ width: `${pct}%` }} />
- </div>
- <div className="text-[10px] text-muted-foreground mt-1">{p.correct} correct, {p.wrong} wrong ({p.total} total)</div>
- </div>
- );
- })}
- </div>
- )}
- </div>
- )}
  </div>
  </div>
  );
@@ -556,11 +530,9 @@ export default function InstructorDashboard({ onClose }: Props) {
  }, [sessions]);
 
  const tabs: { key: Tab; label: string }[] = [
- { key: 'overview', label: ' Overview' },
- { key: 'students', label: ' Students' },
- { key: 'leaderboard', label: ' Leaderboard' },
- { key: 'badges', label: ' Badges' },
- { key: 'glossary', label: ' Glossary' },
+  { key: 'overview', label: 'Overview' },
+  { key: 'students', label: 'Students' },
+  { key: 'glossary', label: 'Glossary' },
  ];
 
  /* Loading / Auth guards */
@@ -851,57 +823,6 @@ export default function InstructorDashboard({ onClose }: Props) {
  )}
  </tbody>
  </table>
- </div>
- )}
-
- {/* LEADERBOARD TAB */}
- {tab === 'leaderboard' && (
- <div className="max-w-lg mx-auto space-y-3">
- {studentStats.length === 0 && <p className="text-center text-muted-foreground py-8">No data yet</p>}
- {studentStats.map((s, i) => (
- <div key={s.id} onClick={() => setSelectedStudentId(s.id)} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${i === 0 ? 'border-primary bg-primary/5' : i === 1 ? 'border-accent/50 bg-accent/5' : i === 2 ? 'border-orange-400/50 bg-orange-400/5' : 'border-border bg-card hover:bg-muted/50'}`}>
- <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-lg flex-shrink-0 ${i === 0 ? 'bg-primary text-primary-foreground' : i === 1 ? 'bg-accent text-accent-foreground' : i === 2 ? 'bg-orange-400 text-white' : 'bg-muted text-muted-foreground'}`}>
- {i + 1}
- </div>
- <div className="flex-1 min-w-0">
- <div className="font-display font-bold text-foreground truncate">{s.nickname}</div>
- <div className="text-xs text-muted-foreground">{s.speciesMastered} mastered · {s.accuracy}% accuracy · {s.badgeCount} badges</div>
- </div>
- <div className="text-right flex-shrink-0">
- <div className="font-display font-bold text-primary text-lg">{s.totalXp}</div>
- <div className="text-xs text-muted-foreground">XP</div>
- </div>
- </div>
- ))}
- </div>
- )}
-
- {/* BADGES TAB */}
- {tab === 'badges' && (
- <div className="space-y-4">
- <p className="text-sm text-muted-foreground">Badges earned by students in <strong>{selectedClassInfo?.name}</strong></p>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
- {BADGES.map(badge => {
- const earnedBy = badges.filter(b => b.badge_id === badge.id);
- const earners = earnedBy.map(e => students.find(s => s.id === e.student_id)?.nickname).filter(Boolean);
- return (
- <div key={badge.id} className={`bg-card border rounded-xl p-4 ${earners.length > 0 ? 'border-primary/30' : 'border-border opacity-50'}`}>
- <div className="flex items-center gap-3">
- <span className="text-3xl">{badge.icon}</span>
- <div>
- <div className="font-display font-bold text-foreground text-sm">{badge.name}</div>
- <div className="text-xs text-muted-foreground">{badge.description}</div>
- </div>
- </div>
- {earners.length > 0 ? (
- <div className="mt-2 text-xs text-primary"> Earned by: {earners.join(', ')}</div>
- ) : (
- <div className="mt-2 text-xs text-muted-foreground">Not yet earned</div>
- )}
- </div>
- );
- })}
- </div>
  </div>
  )}
 

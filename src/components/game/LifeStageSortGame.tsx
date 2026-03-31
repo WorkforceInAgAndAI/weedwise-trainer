@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
 const LIFE_STAGES = [
+ { id: 'seed', label: 'Seed', imageStage: 'seed' },
  { id: 'seedling', label: 'Seedling', imageStage: 'seedling' },
  { id: 'vegetative', label: 'Vegetative', imageStage: 'vegetative' },
  { id: 'reproductive', label: 'Reproductive', imageStage: 'flower' },

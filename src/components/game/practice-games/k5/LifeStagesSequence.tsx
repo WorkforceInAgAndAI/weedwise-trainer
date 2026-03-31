@@ -4,9 +4,8 @@ import WeedImage from '@/components/game/WeedImage';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-// Removed 'whole' (mature plant) per requirements
-const STAGES = ['seedling', 'vegetative', 'flower'];
-const STAGE_LABELS: Record<string, string> = { seedling: 'Seedling', vegetative: 'Vegetative', flower: 'Reproductive' };
+const STAGES = ['seed', 'seedling', 'vegetative', 'flower'];
+const STAGE_LABELS: Record<string, string> = { seed: 'Seed', seedling: 'Seedling', vegetative: 'Vegetative', flower: 'Reproductive' };
 
 export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
  const targets = useMemo(() => shuffle(weeds).slice(0, 4), []);

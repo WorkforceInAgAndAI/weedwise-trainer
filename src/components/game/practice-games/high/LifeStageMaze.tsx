@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle } from 'lucide-react';
 
 const STAGES = [
+  { id: 'seed', label: 'Seed', Icon: Droplets },
   { id: 'seedling', label: 'Seedling', Icon: Sprout },
   { id: 'vegetative', label: 'Vegetative', Icon: Leaf },
   { id: 'reproductive', label: 'Reproductive', Icon: Flower2 },
@@ -9,16 +10,17 @@ const STAGES = [
 ];
 
 const CONTROLS = [
+  { id: 'seed-treat', label: 'Seed Treatment', Icon: Droplets, bestStage: 'seed' },
   { id: 'pre-herb', label: 'Pre-emergent Herbicide', Icon: Droplets, bestStage: 'seedling' },
   { id: 'cultivation', label: 'Cultivation', Icon: Shovel, bestStage: 'seedling' },
   { id: 'post-herb', label: 'Post-emergent Herbicide', Icon: SprayCan, bestStage: 'vegetative' },
-  { id: 'mowing', label: 'Mowing', Icon: Scissors, bestStage: 'reproductive' },
   { id: 'hand-pull', label: 'Hand Removal', Icon: Hand, bestStage: 'vegetative' },
+  { id: 'mowing', label: 'Mowing', Icon: Scissors, bestStage: 'reproductive' },
   { id: 'harvest-mgmt', label: 'Harvest Management', Icon: Warehouse, bestStage: 'mature' },
 ];
 
-const ROWS = 8;
-const COLS = 8;
+const ROWS = 10;
+const COLS = 10;
 
 interface GridCell { row: number; col: number; }
 interface Connection { stageId: string; controlId: string; path: GridCell[]; }
@@ -28,17 +30,9 @@ function getStageExplanation(stageId: string, controlId: string): string {
   const stage = STAGES.find(s => s.id === stageId);
   if (!ctrl || !stage) return '';
   if (ctrl.bestStage === stageId) {
-    const explanations: Record<string, string> = {
-      'seedling-pre-herb': 'Pre-emergent herbicides target seeds and young seedlings before they establish -- the seedling stage is ideal.',
-      'seedling-cultivation': 'Cultivation disrupts tiny seedlings effectively before roots take hold.',
-      'vegetative-post-herb': 'Post-emergent herbicides are most effective on actively growing vegetative plants before they set seed.',
-      'vegetative-hand-pull': 'Hand removal works well on vegetative plants -- they are large enough to grab but have not seeded yet.',
-      'reproductive-mowing': 'Mowing at the reproductive stage prevents seed production, cutting off the plant reproduction.',
-      'mature-harvest-mgmt': 'Harvest management (chaff collection, seed capture) targets mature plants to prevent seeds entering the seed bank.',
-    };
-    return explanations[`${stageId}-${controlId}`] || `${ctrl.label} is most effective at the ${stage.label} stage.`;
+    return `${ctrl.label} is most effective at the ${stage.label} stage.`;
   }
-  return `${ctrl.label} works best at the ${STAGES.find(s => s.id === ctrl.bestStage)?.label} stage, not ${stage.label}. At the ${stage.label} stage, weeds are ${stageId === 'seedling' ? 'too young for this method' : stageId === 'mature' ? 'too established for this to be effective' : 'not at the optimal growth phase for this control'}.`;
+  return `${ctrl.label} works best at the ${STAGES.find(s => s.id === ctrl.bestStage)?.label} stage, not ${stage.label}.`;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -52,42 +46,41 @@ function shuffle<T>(arr: T[]): T[] {
 
 // Generate maze layout with stages on left edge and controls scattered
 function generateLayout() {
-  // Stages always on col 0, spread across rows
-  const stageRows = [0, 2, 5, 7];
+  const stageRows = [0, 2, 4, 7, 9];
   const stagePositions = STAGES.map((s, i) => ({ ...s, row: stageRows[i], col: 0 }));
 
-  // Pick one control per stage (best match)
   const picked: typeof CONTROLS[number][] = [];
   for (const s of STAGES) {
     const match = CONTROLS.find(c => c.bestStage === s.id && !picked.find(p => p.id === c.id));
     if (match) picked.push(match);
   }
 
-  // Scatter controls around the grid (not on col 0, not on stage positions)
   const controlSlots: GridCell[] = shuffle([
-    { row: 1, col: 5 },
-    { row: 6, col: 7 },
-    { row: 3, col: 7 },
-    { row: 7, col: 4 },
+    { row: 0, col: 7 },
+    { row: 3, col: 9 },
+    { row: 5, col: 8 },
+    { row: 8, col: 6 },
+    { row: 9, col: 9 },
   ]);
 
   const controlPositions = picked.map((c, i) => ({ ...c, row: controlSlots[i].row, col: controlSlots[i].col }));
 
-  // Generate wall cells to create maze corridors
   const occupied = new Set<string>();
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
   controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
 
   const walls = new Set<string>();
-  // Add strategic walls to force maze-like navigation
   const wallCoords: GridCell[] = [
-    { row: 0, col: 3 }, { row: 1, col: 1 }, { row: 1, col: 3 },
-    { row: 2, col: 3 }, { row: 2, col: 5 }, { row: 2, col: 7 },
-    { row: 3, col: 1 }, { row: 3, col: 3 }, { row: 3, col: 5 },
-    { row: 4, col: 0 }, { row: 4, col: 2 }, { row: 4, col: 4 }, { row: 4, col: 6 },
-    { row: 5, col: 3 }, { row: 5, col: 5 }, { row: 5, col: 7 },
-    { row: 6, col: 1 }, { row: 6, col: 3 }, { row: 6, col: 5 },
-    { row: 7, col: 2 }, { row: 7, col: 6 },
+    { row: 0, col: 3 }, { row: 0, col: 5 },
+    { row: 1, col: 1 }, { row: 1, col: 3 }, { row: 1, col: 5 }, { row: 1, col: 8 },
+    { row: 2, col: 3 }, { row: 2, col: 5 }, { row: 2, col: 7 }, { row: 2, col: 9 },
+    { row: 3, col: 1 }, { row: 3, col: 3 }, { row: 3, col: 5 }, { row: 3, col: 7 },
+    { row: 4, col: 2 }, { row: 4, col: 4 }, { row: 4, col: 6 }, { row: 4, col: 8 },
+    { row: 5, col: 0 }, { row: 5, col: 3 }, { row: 5, col: 5 },
+    { row: 6, col: 1 }, { row: 6, col: 3 }, { row: 6, col: 5 }, { row: 6, col: 7 }, { row: 6, col: 9 },
+    { row: 7, col: 2 }, { row: 7, col: 5 }, { row: 7, col: 7 },
+    { row: 8, col: 0 }, { row: 8, col: 3 }, { row: 8, col: 8 },
+    { row: 9, col: 2 }, { row: 9, col: 5 }, { row: 9, col: 7 },
   ];
   wallCoords.forEach(w => {
     const key = `${w.row},${w.col}`;
@@ -174,7 +167,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   const restart = () => { setConnections([]); setDrawing(null); setChecked(false); };
 
   const getPathColor = (stageId: string): string => {
-    const colors = ['hsl(var(--primary))', 'hsl(200, 70%, 50%)', 'hsl(30, 80%, 50%)', 'hsl(280, 60%, 50%)'];
+    const colors = ['hsl(var(--primary))', 'hsl(200, 70%, 50%)', 'hsl(30, 80%, 50%)', 'hsl(280, 60%, 50%)', 'hsl(150, 60%, 40%)'];
     const idx = stagePositions.findIndex(s => s.id === stageId);
     return colors[idx % colors.length];
   };
@@ -218,7 +211,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
         {/* Legend */}
         <div className="flex flex-wrap gap-3 mb-3 text-xs">
           {stagePositions.map((s, i) => {
-            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-purple-400/20 border-purple-400'];
+            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-purple-400/20 border-purple-400', 'bg-emerald-500/20 border-emerald-500'];
             return (
               <div key={s.id} className={`flex items-center gap-1 px-2 py-1 rounded border ${colors[i]}`}>
                 <s.Icon className="w-3 h-3" />
@@ -267,8 +260,8 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
                 const isCorrect = checked && conn && CONTROLS.find(c => c.id === conn.controlId)?.bestStage === s.id;
                 const isWrong = checked && conn && !isCorrect;
                 const idx = stagePositions.findIndex(st => st.id === s.id);
-                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-purple-400'];
-                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-purple-400/15'];
+                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-purple-400', 'border-emerald-500'];
+                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-purple-400/15', 'bg-emerald-500/15'];
 
                 return (
                   <button
@@ -312,7 +305,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
               }
 
               // Regular path cell
-              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-purple-400/25'];
+              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-purple-400/25', 'bg-emerald-500/25'];
 
               return (
                 <button
