@@ -46,42 +46,41 @@ function shuffle<T>(arr: T[]): T[] {
 
 // Generate maze layout with stages on left edge and controls scattered
 function generateLayout() {
-  // Stages always on col 0, spread across rows
-  const stageRows = [0, 2, 5, 7];
+  const stageRows = [0, 2, 4, 7, 9];
   const stagePositions = STAGES.map((s, i) => ({ ...s, row: stageRows[i], col: 0 }));
 
-  // Pick one control per stage (best match)
   const picked: typeof CONTROLS[number][] = [];
   for (const s of STAGES) {
     const match = CONTROLS.find(c => c.bestStage === s.id && !picked.find(p => p.id === c.id));
     if (match) picked.push(match);
   }
 
-  // Scatter controls around the grid (not on col 0, not on stage positions)
   const controlSlots: GridCell[] = shuffle([
-    { row: 1, col: 5 },
-    { row: 6, col: 7 },
-    { row: 3, col: 7 },
-    { row: 7, col: 4 },
+    { row: 0, col: 7 },
+    { row: 3, col: 9 },
+    { row: 5, col: 8 },
+    { row: 8, col: 6 },
+    { row: 9, col: 9 },
   ]);
 
   const controlPositions = picked.map((c, i) => ({ ...c, row: controlSlots[i].row, col: controlSlots[i].col }));
 
-  // Generate wall cells to create maze corridors
   const occupied = new Set<string>();
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
   controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
 
   const walls = new Set<string>();
-  // Add strategic walls to force maze-like navigation
   const wallCoords: GridCell[] = [
-    { row: 0, col: 3 }, { row: 1, col: 1 }, { row: 1, col: 3 },
-    { row: 2, col: 3 }, { row: 2, col: 5 }, { row: 2, col: 7 },
-    { row: 3, col: 1 }, { row: 3, col: 3 }, { row: 3, col: 5 },
-    { row: 4, col: 0 }, { row: 4, col: 2 }, { row: 4, col: 4 }, { row: 4, col: 6 },
-    { row: 5, col: 3 }, { row: 5, col: 5 }, { row: 5, col: 7 },
-    { row: 6, col: 1 }, { row: 6, col: 3 }, { row: 6, col: 5 },
-    { row: 7, col: 2 }, { row: 7, col: 6 },
+    { row: 0, col: 3 }, { row: 0, col: 5 },
+    { row: 1, col: 1 }, { row: 1, col: 3 }, { row: 1, col: 5 }, { row: 1, col: 8 },
+    { row: 2, col: 3 }, { row: 2, col: 5 }, { row: 2, col: 7 }, { row: 2, col: 9 },
+    { row: 3, col: 1 }, { row: 3, col: 3 }, { row: 3, col: 5 }, { row: 3, col: 7 },
+    { row: 4, col: 2 }, { row: 4, col: 4 }, { row: 4, col: 6 }, { row: 4, col: 8 },
+    { row: 5, col: 0 }, { row: 5, col: 3 }, { row: 5, col: 5 },
+    { row: 6, col: 1 }, { row: 6, col: 3 }, { row: 6, col: 5 }, { row: 6, col: 7 }, { row: 6, col: 9 },
+    { row: 7, col: 2 }, { row: 7, col: 5 }, { row: 7, col: 7 },
+    { row: 8, col: 0 }, { row: 8, col: 3 }, { row: 8, col: 8 },
+    { row: 9, col: 2 }, { row: 9, col: 5 }, { row: 9, col: 7 },
   ];
   wallCoords.forEach(w => {
     const key = `${w.row},${w.col}`;
