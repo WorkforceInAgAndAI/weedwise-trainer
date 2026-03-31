@@ -167,7 +167,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   const restart = () => { setConnections([]); setDrawing(null); setChecked(false); };
 
   const getPathColor = (stageId: string): string => {
-    const colors = ['hsl(var(--primary))', 'hsl(200, 70%, 50%)', 'hsl(30, 80%, 50%)', 'hsl(280, 60%, 50%)'];
+    const colors = ['hsl(var(--primary))', 'hsl(200, 70%, 50%)', 'hsl(30, 80%, 50%)', 'hsl(280, 60%, 50%)', 'hsl(150, 60%, 40%)'];
     const idx = stagePositions.findIndex(s => s.id === stageId);
     return colors[idx % colors.length];
   };
