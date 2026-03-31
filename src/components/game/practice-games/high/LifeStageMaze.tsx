@@ -10,11 +10,12 @@ const STAGES = [
 ];
 
 const CONTROLS = [
+  { id: 'seed-treat', label: 'Seed Treatment', Icon: Droplets, bestStage: 'seed' },
   { id: 'pre-herb', label: 'Pre-emergent Herbicide', Icon: Droplets, bestStage: 'seedling' },
   { id: 'cultivation', label: 'Cultivation', Icon: Shovel, bestStage: 'seedling' },
   { id: 'post-herb', label: 'Post-emergent Herbicide', Icon: SprayCan, bestStage: 'vegetative' },
-  { id: 'mowing', label: 'Mowing', Icon: Scissors, bestStage: 'reproductive' },
   { id: 'hand-pull', label: 'Hand Removal', Icon: Hand, bestStage: 'vegetative' },
+  { id: 'mowing', label: 'Mowing', Icon: Scissors, bestStage: 'reproductive' },
   { id: 'harvest-mgmt', label: 'Harvest Management', Icon: Warehouse, bestStage: 'mature' },
 ];
 
