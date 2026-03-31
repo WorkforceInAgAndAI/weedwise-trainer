@@ -530,11 +530,9 @@ export default function InstructorDashboard({ onClose }: Props) {
  }, [sessions]);
 
  const tabs: { key: Tab; label: string }[] = [
- { key: 'overview', label: ' Overview' },
- { key: 'students', label: ' Students' },
- { key: 'leaderboard', label: ' Leaderboard' },
- { key: 'badges', label: ' Badges' },
- { key: 'glossary', label: ' Glossary' },
+  { key: 'overview', label: 'Overview' },
+  { key: 'students', label: 'Students' },
+  { key: 'glossary', label: 'Glossary' },
  ];
 
  /* Loading / Auth guards */
