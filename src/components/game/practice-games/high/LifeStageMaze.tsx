@@ -260,8 +260,8 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
                 const isCorrect = checked && conn && CONTROLS.find(c => c.id === conn.controlId)?.bestStage === s.id;
                 const isWrong = checked && conn && !isCorrect;
                 const idx = stagePositions.findIndex(st => st.id === s.id);
-                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-purple-400'];
-                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-purple-400/15'];
+                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-purple-400', 'border-emerald-500'];
+                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-purple-400/15', 'bg-emerald-500/15'];
 
                 return (
                   <button
