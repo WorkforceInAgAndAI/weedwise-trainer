@@ -30,17 +30,9 @@ function getStageExplanation(stageId: string, controlId: string): string {
   const stage = STAGES.find(s => s.id === stageId);
   if (!ctrl || !stage) return '';
   if (ctrl.bestStage === stageId) {
-    const explanations: Record<string, string> = {
-      'seedling-pre-herb': 'Pre-emergent herbicides target seeds and young seedlings before they establish -- the seedling stage is ideal.',
-      'seedling-cultivation': 'Cultivation disrupts tiny seedlings effectively before roots take hold.',
-      'vegetative-post-herb': 'Post-emergent herbicides are most effective on actively growing vegetative plants before they set seed.',
-      'vegetative-hand-pull': 'Hand removal works well on vegetative plants -- they are large enough to grab but have not seeded yet.',
-      'reproductive-mowing': 'Mowing at the reproductive stage prevents seed production, cutting off the plant reproduction.',
-      'mature-harvest-mgmt': 'Harvest management (chaff collection, seed capture) targets mature plants to prevent seeds entering the seed bank.',
-    };
-    return explanations[`${stageId}-${controlId}`] || `${ctrl.label} is most effective at the ${stage.label} stage.`;
+    return `${ctrl.label} is most effective at the ${stage.label} stage.`;
   }
-  return `${ctrl.label} works best at the ${STAGES.find(s => s.id === ctrl.bestStage)?.label} stage, not ${stage.label}. At the ${stage.label} stage, weeds are ${stageId === 'seedling' ? 'too young for this method' : stageId === 'mature' ? 'too established for this to be effective' : 'not at the optimal growth phase for this control'}.`;
+  return `${ctrl.label} works best at the ${STAGES.find(s => s.id === ctrl.bestStage)?.label} stage, not ${stage.label}.`;
 }
 
 function shuffle<T>(arr: T[]): T[] {
