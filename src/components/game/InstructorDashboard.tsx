@@ -248,15 +248,14 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
   <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">x</button>
  </div>
 
- {/* Sub-tabs */}
- <div className="flex gap-1 bg-muted rounded-lg p-1">
- {(['overview', 'weeds', 'phases'] as const).map(t => (
- <button key={t} onClick={() => setDetailTab(t)}
- className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${detailTab === t ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}>
- {t === 'weeds' ? 'Per-Weed' : t === 'phases' ? 'Per-Phase' : 'Overview'}
- </button>
- ))}
- </div>
+  <div className="flex gap-1 bg-muted rounded-lg p-1">
+   {(['overview', 'weeds'] as const).map(t => (
+    <button key={t} onClick={() => setDetailTab(t)}
+     className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${detailTab === t ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}>
+     {t === 'weeds' ? 'Per-Weed' : 'Overview'}
+    </button>
+   ))}
+  </div>
 
  {detailTab === 'overview' && (
  <div className="space-y-4">
