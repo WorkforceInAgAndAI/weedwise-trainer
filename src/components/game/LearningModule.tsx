@@ -19,8 +19,9 @@ interface Topic {
 
 const TOPICS: Topic[] = [
  { id: 'names', name: 'Weed Names & ID', icon: 'names', description: 'Learn common names, scientific names, and key traits', grades: ['elementary', 'middle', 'high'] },
+ { id: 'seeds', name: 'Seeds & Seed Banks', icon: 'seeds', description: 'Learn about weed seeds, how they look, spread, and persist in the soil', grades: ['elementary', 'middle', 'high'] },
  { id: 'monocot-dicot', name: 'Monocot vs Dicot', icon: 'monocot', description: 'Understand the difference between monocots and dicots', grades: ['elementary', 'middle', 'high'] },
- { id: 'life-stages', name: 'Life Stages', icon: 'stages', description: 'Learn to identify weeds at seedling, vegetative, and reproductive stages', grades: ['elementary', 'middle', 'high'] },
+ { id: 'life-stages', name: 'Life Stages', icon: 'stages', description: 'Learn to identify weeds at seed, seedling, vegetative, and reproductive stages', grades: ['elementary', 'middle', 'high'] },
  { id: 'native-introduced', name: 'Native vs Introduced', icon: 'origin', description: 'Which species are native and which were introduced', grades: ['elementary', 'middle', 'high'] },
  { id: 'families', name: 'Plant Families', icon: 'families', description: 'Group weeds by their botanical families', grades: ['high'] },
  { id: 'habitats', name: 'Habitats & Climate', icon: 'habitats', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['middle', 'high'] },
