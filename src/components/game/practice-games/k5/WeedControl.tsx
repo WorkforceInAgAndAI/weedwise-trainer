@@ -127,7 +127,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
  <p className="text-base font-bold text-foreground mb-3">What weed is this?</p>
  <div className="flex items-center gap-4 mb-4">
  <div className="w-20 h-20 rounded-lg overflow-hidden border border-border bg-secondary">
- <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={active.weed.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  <p className="text-sm text-muted-foreground flex-1">{active.weed.traits[0]}</p>
  </div>
