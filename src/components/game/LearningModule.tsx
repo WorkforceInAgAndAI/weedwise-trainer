@@ -256,8 +256,49 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  </div>
  );
 
+ case 'seeds':
+  return (
+   <div className="space-y-4">
+    <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+     <p className="font-semibold text-primary">About Weed Seeds</p>
+     {grade === 'elementary' && (
+      <>
+       <p>Every weed starts as a tiny <strong>seed</strong>. Some seeds are round, some are flat, and some have tiny hooks or wings to help them travel.</p>
+       <p>Seeds can hide in the soil for a long time — this is called a <strong>seed bank</strong>. Even if you remove all the weeds you see, seeds underground can sprout later!</p>
+      </>
+     )}
+     {grade === 'middle' && (
+      <>
+       <p>Weed seeds are remarkably diverse in shape, size, and color. Understanding seed morphology helps with identification before plants even emerge.</p>
+       <p>The <strong>soil seed bank</strong> is the reservoir of viable seeds in the soil. A single field can contain millions of weed seeds per acre. Some species produce over 100,000 seeds per plant.</p>
+       <p><strong>Seed dormancy</strong> allows seeds to survive unfavorable conditions. Some weed seeds can remain viable for decades in the soil.</p>
+      </>
+     )}
+     {grade === 'high' && (
+      <>
+       <p>Seed biology is fundamental to weed management strategy. Key concepts include <strong>seed rain</strong> (annual seed input), <strong>seed bank dynamics</strong> (persistence and decay rates), and <strong>dormancy mechanisms</strong> (physical, physiological, and chemical).</p>
+       <p>Understanding seed dispersal vectors — wind (anemochory), water (hydrochory), animals (zoochory), and machinery (anthropochory) — is critical for predicting weed spread and designing management plans.</p>
+       <p>The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank replenishment. Allowing even a few plants to set seed can negate years of control efforts.</p>
+      </>
+     )}
+    </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+     {topicWeeds.map(w => (
+      <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+       <div className="w-16 h-16 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
+        <WeedImage weedId={w.id} stage="seed" className="w-full h-full" />
+       </div>
+       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+       {grade !== 'elementary' && <div className="text-[10px] text-primary italic">{w.scientificName}</div>}
+       <div className="text-[10px] text-muted-foreground">{w.family}</div>
+      </div>
+     ))}
+    </div>
+   </div>
+  );
+
  case 'life-stages': {
-   const LIFE_STAGE_INFO = [
+    const LIFE_STAGE_INFO = [
     { stage: 'seed', label: 'Seed', desc: 'The dormant stage before germination. Seeds can persist in the soil seed bank for years. Identifying seeds helps predict future weed problems.' },
     { stage: 'seedling', label: 'Seedling', desc: 'The earliest growth stage after germination. Cotyledons (seed leaves) are visible, and the first true leaves are emerging.' },
     { stage: 'vegetative', label: 'Vegetative', desc: 'Active growth phase with expanding leaves and branching. Key ID features like leaf shape are most visible.' },
