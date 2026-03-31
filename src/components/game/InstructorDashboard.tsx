@@ -826,57 +826,6 @@ export default function InstructorDashboard({ onClose }: Props) {
  </div>
  )}
 
- {/* LEADERBOARD TAB */}
- {tab === 'leaderboard' && (
- <div className="max-w-lg mx-auto space-y-3">
- {studentStats.length === 0 && <p className="text-center text-muted-foreground py-8">No data yet</p>}
- {studentStats.map((s, i) => (
- <div key={s.id} onClick={() => setSelectedStudentId(s.id)} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${i === 0 ? 'border-primary bg-primary/5' : i === 1 ? 'border-accent/50 bg-accent/5' : i === 2 ? 'border-orange-400/50 bg-orange-400/5' : 'border-border bg-card hover:bg-muted/50'}`}>
- <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-lg flex-shrink-0 ${i === 0 ? 'bg-primary text-primary-foreground' : i === 1 ? 'bg-accent text-accent-foreground' : i === 2 ? 'bg-orange-400 text-white' : 'bg-muted text-muted-foreground'}`}>
- {i + 1}
- </div>
- <div className="flex-1 min-w-0">
- <div className="font-display font-bold text-foreground truncate">{s.nickname}</div>
- <div className="text-xs text-muted-foreground">{s.speciesMastered} mastered · {s.accuracy}% accuracy · {s.badgeCount} badges</div>
- </div>
- <div className="text-right flex-shrink-0">
- <div className="font-display font-bold text-primary text-lg">{s.totalXp}</div>
- <div className="text-xs text-muted-foreground">XP</div>
- </div>
- </div>
- ))}
- </div>
- )}
-
- {/* BADGES TAB */}
- {tab === 'badges' && (
- <div className="space-y-4">
- <p className="text-sm text-muted-foreground">Badges earned by students in <strong>{selectedClassInfo?.name}</strong></p>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
- {BADGES.map(badge => {
- const earnedBy = badges.filter(b => b.badge_id === badge.id);
- const earners = earnedBy.map(e => students.find(s => s.id === e.student_id)?.nickname).filter(Boolean);
- return (
- <div key={badge.id} className={`bg-card border rounded-xl p-4 ${earners.length > 0 ? 'border-primary/30' : 'border-border opacity-50'}`}>
- <div className="flex items-center gap-3">
- <span className="text-3xl">{badge.icon}</span>
- <div>
- <div className="font-display font-bold text-foreground text-sm">{badge.name}</div>
- <div className="text-xs text-muted-foreground">{badge.description}</div>
- </div>
- </div>
- {earners.length > 0 ? (
- <div className="mt-2 text-xs text-primary"> Earned by: {earners.join(', ')}</div>
- ) : (
- <div className="mt-2 text-xs text-muted-foreground">Not yet earned</div>
- )}
- </div>
- );
- })}
- </div>
- </div>
- )}
-
  {/* GLOSSARY TAB */}
  {tab === 'glossary' && (
  <div className="rounded-xl border border-border overflow-hidden" style={{ height: '70vh' }}>
