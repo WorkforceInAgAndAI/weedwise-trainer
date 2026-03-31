@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import { Sun, Wind, Thermometer, Droplets } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const ZONES = [
- { id: 'temperate', label: 'Temperate', icon: '', keywords: ['temperate', 'cool', 'corn', 'soybean', 'field', 'crop'] },
- { id: 'arid', label: 'Arid', icon: '', keywords: ['dry', 'arid', 'desert', 'sand', 'hot'] },
- { id: 'tropical', label: 'Tropical', icon: '', keywords: ['tropic', 'warm', 'humid', 'cotton'] },
- { id: 'wetland', label: 'Wetland', icon: 'W', keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch'] },
+  { id: 'temperate', label: 'Temperate', Icon: Sun, keywords: ['temperate', 'cool', 'corn', 'soybean', 'field', 'crop'] },
+  { id: 'arid', label: 'Arid', Icon: Wind, keywords: ['dry', 'arid', 'desert', 'sand', 'hot'] },
+  { id: 'tropical', label: 'Tropical', Icon: Thermometer, keywords: ['tropic', 'warm', 'humid', 'cotton'] },
+  { id: 'wetland', label: 'Wetland', Icon: Droplets, keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch'] },
 ];
 
 function getZone(w: typeof weeds[0]) {
@@ -41,8 +42,8 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
  {ZONES.map(z => (
  <button key={z.id} onClick={() => place(z.id)}
  className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10' : 'border-border'}`}>
- <p className="text-2xl">{z.icon}</p>
- <p className="text-xs font-bold text-foreground">{z.label}</p>
+          <z.Icon className="w-6 h-6 text-foreground mx-auto" />
+          <p className="text-xs font-bold text-foreground">{z.label}</p>
  <div className="mt-1 flex flex-wrap gap-1 justify-center">
  {items.filter(it => placements[it.weed.id] === z.id).map(it => (
  <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}

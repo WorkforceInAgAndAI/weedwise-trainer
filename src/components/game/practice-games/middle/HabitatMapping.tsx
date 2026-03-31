@@ -6,10 +6,10 @@ import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const ZONES = [
- { id: 'temperate', label: 'Temperate', Icon: Sun, color: 'from-green-400 to-emerald-500' },
- { id: 'arid', label: 'Arid / Dry', Icon: Wind, color: 'from-yellow-400 to-amber-500' },
- { id: 'tropical', label: 'Tropical / Warm', Icon: Thermometer, color: 'from-orange-400 to-red-400' },
- { id: 'wetland', label: 'Wetland / Riparian', Icon: Droplets, color: 'from-blue-400 to-blue-600' },
+  { id: 'temperate', label: 'Temperate', Icon: Sun },
+  { id: 'arid', label: 'Arid / Dry', Icon: Wind },
+  { id: 'tropical', label: 'Tropical / Warm', Icon: Thermometer },
+  { id: 'wetland', label: 'Wetland / Riparian', Icon: Droplets },
 ];
 
 function getZone(w: typeof weeds[0]): string {
@@ -63,8 +63,8 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  {ZONES.map(z => {
  const ZoneIcon = z.Icon;
  return (
- <button key={z.id} onClick={() => handleZone(z.id)}
- className={`rounded-xl border-2 border-border p-3 bg-gradient-to-br ${z.color} bg-opacity-20 text-left transition-all ${selected ? 'hover:scale-[1.02] cursor-pointer' : ''}`}>
+          <button key={z.id} onClick={() => handleZone(z.id)}
+            className={`rounded-xl border-2 border-border p-3 bg-card text-left transition-all ${selected ? 'hover:scale-[1.02] cursor-pointer hover:border-primary' : ''}`}>
  <div className="flex items-center gap-2 mb-2">
  <ZoneIcon className="w-5 h-5 text-foreground" />
  <span className="font-bold text-foreground text-sm drop-shadow-sm">{z.label}</span>

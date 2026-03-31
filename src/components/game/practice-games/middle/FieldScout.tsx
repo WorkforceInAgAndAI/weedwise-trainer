@@ -10,34 +10,54 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const WEED_IDS = ['waterhemp', 'palmer-amaranth', 'lambsquarters', 'giant-ragweed', 'velvetleaf', 'kochia', 'morningglory', 'marestail', 'large-crabgrass', 'green-foxtail'];
 
+const MIN_DIST = 10; // minimum % distance between weed circles
+
 function generateWeedSpots(layout: 'mixed' | 'rows' | 'center' | 'edges', count: number, seed: number): Array<{ x: number; y: number; weedId: string }> {
   const rng = (i: number) => ((seed * 9301 + 49297 + i * 1277) % 233280) / 233280;
   const spots: Array<{ x: number; y: number; weedId: string }> = [];
   const ids = shuffle(WEED_IDS);
+  const maxAttempts = 80;
   for (let i = 0; i < count; i++) {
-    let x: number, y: number;
-    switch (layout) {
-      case 'mixed':
-        x = 8 + rng(i * 2) * 84;
-        y = 8 + rng(i * 2 + 1) * 84;
+    let placed = false;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      let x: number, y: number;
+      const r1 = rng(i * 2 + attempt * 97);
+      const r2 = rng(i * 2 + 1 + attempt * 97);
+      switch (layout) {
+        case 'mixed':
+          x = 8 + r1 * 84;
+          y = 8 + r2 * 84;
+          break;
+        case 'rows':
+          x = 10 + r1 * 80;
+          y = 15 + Math.floor(i / 3) * 22 + (r2 * 8 - 4);
+          break;
+        case 'center':
+          x = 25 + r1 * 50;
+          y = 20 + r2 * 60;
+          break;
+        case 'edges':
+          const side = (i + attempt) % 4;
+          if (side === 0) { x = 3 + r1 * 10; y = 10 + r2 * 80; }
+          else if (side === 1) { x = 87 + r1 * 10; y = 10 + r2 * 80; }
+          else if (side === 2) { x = 10 + r1 * 80; y = 3 + r2 * 10; }
+          else { x = 10 + r1 * 80; y = 87 + r2 * 10; }
+          break;
+      }
+      const tooClose = spots.some(s => {
+        const dx = s.x - x!; const dy = s.y - y!;
+        return Math.sqrt(dx * dx + dy * dy) < MIN_DIST;
+      });
+      if (!tooClose) {
+        spots.push({ x: x!, y: y!, weedId: ids[i % ids.length] });
+        placed = true;
         break;
-      case 'rows':
-        x = 10 + rng(i * 2) * 80;
-        y = 15 + Math.floor(i / 3) * 22 + (rng(i * 3) * 8 - 4);
-        break;
-      case 'center':
-        x = 25 + rng(i * 2) * 50;
-        y = 20 + rng(i * 2 + 1) * 60;
-        break;
-      case 'edges':
-        const side = i % 4;
-        if (side === 0) { x = 3 + rng(i) * 10; y = 10 + rng(i + 1) * 80; }
-        else if (side === 1) { x = 87 + rng(i) * 10; y = 10 + rng(i + 1) * 80; }
-        else if (side === 2) { x = 10 + rng(i) * 80; y = 3 + rng(i + 1) * 10; }
-        else { x = 10 + rng(i) * 80; y = 87 + rng(i + 1) * 10; }
-        break;
+      }
     }
-    spots.push({ x: x!, y: y!, weedId: ids[i % ids.length] });
+    if (!placed) {
+      // fallback: place anyway with offset
+      spots.push({ x: 5 + (i * 11) % 85, y: 5 + (i * 13) % 85, weedId: ids[i % ids.length] });
+    }
   }
   return spots;
 }
