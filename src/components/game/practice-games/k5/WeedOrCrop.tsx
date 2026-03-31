@@ -98,7 +98,7 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
  </div>
  <div className="w-44 h-44 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-border">
  {item.weedId ? (
- <WeedImage weedId={item.weedId} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={item.weedId} stage="plant" className="w-full h-full object-cover" />
  ) : (
  <img src={item.cropImage} alt={item.name} className="w-full h-full object-cover" crossOrigin="anonymous" />
  )}

@@ -175,7 +175,7 @@ export default function LeafArtist({ onBack }: { onBack: () => void }) {
  <div className="text-center space-y-3">
  <p className="text-sm font-medium text-foreground">Study this leaf — {studyTimer}s remaining</p>
  <div className="w-full max-w-xs mx-auto aspect-square rounded-xl overflow-hidden border-2 border-primary/30 bg-secondary">
- <WeedImage weedId={round.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={round.weed.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  <p className="text-xs text-muted-foreground">{round.weed.commonName}</p>
  <button onClick={() => { setStudyTimer(0); setStudyDone(true); }}
