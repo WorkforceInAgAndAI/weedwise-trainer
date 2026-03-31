@@ -113,7 +113,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
  className={`absolute w-14 h-14 rounded-full transition-all ${fw.managed ? 'opacity-30 scale-75' : 'hover:scale-110'}`}
  style={{ left: `${fw.x}%`, top: `${fw.y}%` }}>
  <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
- <WeedImage weedId={fw.weed.id} stage="seedling" className="w-full h-full object-cover" />
+ <WeedImage weedId={fw.weed.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  {fw.managed && <span className="absolute -top-1 -right-1 text-sm">{fw.correct ? '' : ''}</span>}
  </button>
