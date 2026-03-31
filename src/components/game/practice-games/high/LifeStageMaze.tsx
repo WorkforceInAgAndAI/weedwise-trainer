@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle } from 'lucide-react';
 
 const STAGES = [
+  { id: 'seed', label: 'Seed', Icon: Droplets },
   { id: 'seedling', label: 'Seedling', Icon: Sprout },
   { id: 'vegetative', label: 'Vegetative', Icon: Leaf },
   { id: 'reproductive', label: 'Reproductive', Icon: Flower2 },

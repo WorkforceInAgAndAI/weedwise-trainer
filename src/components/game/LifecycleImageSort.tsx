@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import { getImageSrc } from './WeedImage';
 
-const STAGES = ['seedling', 'vegetative', 'flower'] as const;
+const STAGES = ['seed', 'seedling', 'vegetative', 'flower'] as const;
 
 interface SortImage {
  id: string;

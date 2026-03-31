@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { resolveImageUrl } from '@/lib/imageMap';
 
 const STAGE_PREFIX_MAP: Record<string, string> = {
+ seed: 'seed',
  seedling: 'seedling',
  vegetative: 'veg',
  flower: 'repro',
