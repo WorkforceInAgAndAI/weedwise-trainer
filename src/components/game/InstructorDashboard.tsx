@@ -25,7 +25,7 @@ interface SessionRow {
 interface BadgeRow { id: string; student_id: string; badge_id: string; earned_at: string; }
 interface Props { onClose: () => void; }
 
-type Tab = 'overview' | 'students' | 'leaderboard' | 'badges' | 'glossary';
+type Tab = 'overview' | 'students' | 'glossary';
 
 /* Create-Class Modal */
 function CreateClassModal({ instructorId, instructorName, onCreated, onClose }: {
