@@ -23,7 +23,7 @@ const GameProgressContext = createContext<GameProgressContextType | null>(null);
 
 export function GameProgressProvider({ children }: { children: ReactNode }) {
  const [badges, setBadges] = useState<GameBadge[]>([]);
- const [sidebarOpen, setSidebarOpen] = useState(false);
+ const [sidebarOpen, setSidebarOpen] = useState(true);
 
  const addBadge = useCallback((badge: Omit<GameBadge, 'earnedAt'>) => {
  setBadges(prev => {
