@@ -292,7 +292,7 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  {grade !== 'elementary' && <span className="text-xs text-primary italic">{w.scientificName}</span>}
  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">{w.family}</span>
  </div>
- <div className={`grid ${isGrass ? 'grid-cols-4' : 'grid-cols-3'} gap-3`}>
+ <div className={`grid ${isGrass ? 'grid-cols-5' : 'grid-cols-4'} gap-3`}>
  {LIFE_STAGE_INFO.map(s => (
  <div key={s.stage} className="space-y-1">
  <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
