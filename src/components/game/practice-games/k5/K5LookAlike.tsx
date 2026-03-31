@@ -71,7 +71,7 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
  selected === w.id ? 'border-primary scale-105 shadow-lg' : 'border-border'
  } ${submitted && w.id === target?.id ? 'ring-2 ring-green-500' : ''} ${submitted && selected === w.id && w.id !== target?.id ? 'ring-2 ring-destructive' : ''}`}>
  <div className="aspect-square bg-secondary">
- <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={w.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  {/* Only show name after submission */}
  {submitted && (

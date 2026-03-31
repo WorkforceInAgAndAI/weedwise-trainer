@@ -81,7 +81,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
  selected === w.id ? 'border-primary scale-105' : 'border-border hover:border-primary/50'
  }`}>
  <div className="aspect-square bg-secondary">
- <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={w.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  <p className="text-xs font-medium text-foreground p-1.5 text-center">{w.commonName}</p>
  </button>

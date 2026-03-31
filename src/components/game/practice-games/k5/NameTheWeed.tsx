@@ -54,7 +54,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  </div>
  <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
  <div className="w-40 h-40 rounded-xl overflow-hidden border-2 border-border bg-secondary">
- <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={r!.weed.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  <p className="text-sm text-muted-foreground text-center max-w-xs">{r!.weed.traits[0]}</p>
  <div className="grid grid-cols-2 gap-3 w-full max-w-sm">

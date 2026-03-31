@@ -92,7 +92,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  selected === i.weed.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
  }`}>
  <div className="w-8 h-8 rounded overflow-hidden bg-secondary">
- <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+ <WeedImage weedId={i.weed.id} stage="plant" className="w-full h-full object-cover" />
  </div>
  {i.weed.commonName}
  </button>
