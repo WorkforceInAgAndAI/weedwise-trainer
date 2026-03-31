@@ -19,8 +19,8 @@ const CONTROLS = [
   { id: 'harvest-mgmt', label: 'Harvest Management', Icon: Warehouse, bestStage: 'mature' },
 ];
 
-const ROWS = 8;
-const COLS = 8;
+const ROWS = 10;
+const COLS = 10;
 
 interface GridCell { row: number; col: number; }
 interface Connection { stageId: string; controlId: string; path: GridCell[]; }
