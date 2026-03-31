@@ -397,32 +397,6 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
  </div>
  )}
 
- {/* Per-Phase Tab */}
- {detailTab === 'phases' && (
- <div className="space-y-3">
- {phaseRows.length === 0 ? (
- <p className="text-center text-muted-foreground py-6">No per-phase data available yet. Data appears after the student answers questions.</p>
- ) : (
- <div className="space-y-2">
- {phaseRows.map(p => {
- const pct = p.total > 0 ? (p.correct / p.total) * 100 : 0;
- return (
- <div key={p.id} className="bg-muted/30 rounded-lg p-3">
- <div className="flex items-center justify-between mb-1">
- <span className="text-sm font-medium text-foreground">{p.name}</span>
- <span className={`text-xs font-bold ${pct >= 70 ? 'text-accent' : pct >= 40 ? 'text-foreground' : 'text-destructive'}`}>{pct.toFixed(0)}%</span>
- </div>
- <div className="h-2 bg-muted rounded-full overflow-hidden">
- <div className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-accent' : pct >= 40 ? 'bg-primary' : 'bg-destructive'}`} style={{ width: `${pct}%` }} />
- </div>
- <div className="text-[10px] text-muted-foreground mt-1">{p.correct} correct, {p.wrong} wrong ({p.total} total)</div>
- </div>
- );
- })}
- </div>
- )}
- </div>
- )}
  </div>
  </div>
  );
