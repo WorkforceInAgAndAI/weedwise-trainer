@@ -244,7 +244,8 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
  Last active: {student.lastPlayed ? new Date(student.lastPlayed).toLocaleDateString() : 'Never'}
  </p>
  </div>
- <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl"></button>
+  <button onClick={onClose} className="px-3 py-1.5 rounded-md border border-border text-sm hover:bg-secondary transition-colors">Exit</button>
+  <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">x</button>
  </div>
 
  {/* Sub-tabs */}
