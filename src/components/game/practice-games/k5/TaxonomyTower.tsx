@@ -23,9 +23,9 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  const [wrong, setWrong] = useState(false);
  const [found, setFound] = useState(false);
 
- const target = targets[targetIdx];
- const pyramid = useMemo(() => buildPyramid(target), [target]);
- const done = targetIdx >= targets.length;
+  const done = targetIdx >= targets.length;
+  const target = targets[done ? 0 : targetIdx];
+  const pyramid = useMemo(() => buildPyramid(target), [target]);
 
  const choose = (idx: number) => {
  if (wrong) return;
