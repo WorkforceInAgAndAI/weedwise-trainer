@@ -85,7 +85,7 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
  {checked && (
  <div className="text-center">
  <p className="text-foreground font-bold mb-3">{correctCount}/{items.length} correct</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  )}
  </div>

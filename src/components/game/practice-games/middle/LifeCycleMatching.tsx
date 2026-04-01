@@ -110,7 +110,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
  {checked && (
  <div className="text-center mt-4">
  <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  )}
  </div>

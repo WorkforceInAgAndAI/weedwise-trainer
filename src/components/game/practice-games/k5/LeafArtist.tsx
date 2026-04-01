@@ -143,7 +143,7 @@ export default function LeafArtist({ onBack }: { onBack: () => void }) {
  const gradeLabels = ['', 'Keep Practicing', 'Good Try', 'Great Job'];
  const gradeColors = ['', 'text-warning', 'text-primary', 'text-success'];
 
- if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+ if (done) return <LevelComplete level={level} score={0} total={1} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

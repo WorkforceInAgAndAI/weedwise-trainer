@@ -120,7 +120,7 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
  </div>
  ))}
  </div>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={score} total={10} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

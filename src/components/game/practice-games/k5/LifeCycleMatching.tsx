@@ -82,7 +82,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
           <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {TOTAL_ROUNDS} rounds!</p>
-          <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+          <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
         </div>
       </div>
     );

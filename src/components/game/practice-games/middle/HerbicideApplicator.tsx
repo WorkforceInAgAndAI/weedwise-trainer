@@ -124,7 +124,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
  ? 'Excellent resistance management! Rotating MOAs and using proper rates kept resistance low.'
  : 'Some weeds developed resistance. Try rotating herbicide modes of action and using label rates next time.'}
  </p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

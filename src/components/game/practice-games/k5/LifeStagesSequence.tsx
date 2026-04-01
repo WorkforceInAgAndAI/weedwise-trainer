@@ -44,7 +44,7 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
 
  const isCorrect = checked && order.every((s, i) => s === STAGES[i]);
 
- if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+ if (done) return <LevelComplete level={level} score={score} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

@@ -71,7 +71,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
  </div>
  );
  })}
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  </div>

@@ -40,7 +40,7 @@ export default function CropDoctor({ onBack }: { onBack: () => void }) {
  <Stethoscope className="w-10 h-10 text-primary mb-3" />
  <h2 className="font-display font-bold text-2xl text-foreground mb-2">Diagnosis Complete!</h2>
  <p className="text-foreground mb-6">Earned: ${money.toLocaleString()}</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={money} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }
