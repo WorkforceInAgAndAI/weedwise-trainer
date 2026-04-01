@@ -54,26 +54,16 @@ function generateLayout() {
     if (match) picked.push(match);
   }
 
-  // Shuffle control positions so they are NOT directly across from their matching stage
-  const controlRowSlots = [1, 3, 6, 8];
-  let shuffledSlots = shuffle([...controlRowSlots]);
-  // Ensure no control is directly across from its best stage
-  let attempts = 0;
-  while (attempts < 50) {
-    let conflict = false;
-    for (let i = 0; i < picked.length; i++) {
-      const bestStageIdx = STAGES.findIndex(s => s.id === picked[i].bestStage);
-      if (shuffledSlots[i] === stageRows[bestStageIdx]) {
-        conflict = true;
-        break;
-      }
-    }
-    if (!conflict) break;
-    shuffledSlots = shuffle([...controlRowSlots]);
-    attempts++;
-  }
+  // Use only order-preserving row layouts so all stage paths can be drawn without crossing,
+  // while still avoiding direct row-to-row matches.
+  const validControlLayouts = [
+    [0, 2, 7, 9],
+    [0, 4, 7, 9],
+    [2, 4, 7, 9],
+  ];
+  const chosenLayout = validControlLayouts[Math.floor(Math.random() * validControlLayouts.length)];
 
-  const controlPositions = picked.map((c, i) => ({ ...c, row: shuffledSlots[i], col: 9 }));
+  const controlPositions = picked.map((c, i) => ({ ...c, row: chosenLayout[i], col: 9 }));
 
   const occupied = new Set<string>();
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
