@@ -76,7 +76,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-    const total = TOTAL_ROUNDS * 6;
+    if (done) {
     addBadge({ gameId: 'lifecycle-matching-k5', gameName: 'Life Cycle Matching', level: 'K-5', score: totalScore, total });
     return (
       <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
