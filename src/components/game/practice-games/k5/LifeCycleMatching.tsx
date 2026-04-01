@@ -76,14 +76,15 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-    if (done) {
+  if (done) {
+    const total = TOTAL_ROUNDS * 6;
     addBadge({ gameId: 'lifecycle-matching-k5', gameName: 'Life Cycle Matching', level: 'K-5', score: totalScore, total });
     return (
       <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
           <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {TOTAL_ROUNDS} rounds!</p>
-          <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+          <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
         </div>
       </div>
     );
