@@ -54,56 +54,42 @@ function generateLayout() {
     if (match) picked.push(match);
   }
 
-  // Shuffle control positions so they are NOT directly across from their matching stage
-  const controlRowSlots = [1, 3, 6, 8];
-  let shuffledSlots = shuffle([...controlRowSlots]);
-  // Ensure no control is directly across from its best stage
-  let attempts = 0;
-  while (attempts < 50) {
-    let conflict = false;
-    for (let i = 0; i < picked.length; i++) {
-      const bestStageIdx = STAGES.findIndex(s => s.id === picked[i].bestStage);
-      if (shuffledSlots[i] === stageRows[bestStageIdx]) {
-        conflict = true;
-        break;
-      }
-    }
-    if (!conflict) break;
-    shuffledSlots = shuffle([...controlRowSlots]);
-    attempts++;
-  }
+  // Use only order-preserving row layouts so all stage paths can be drawn without crossing,
+  // while still avoiding direct row-to-row matches.
+  const validControlLayouts = [
+    [0, 2, 7, 9],
+    [0, 4, 7, 9],
+    [2, 4, 7, 9],
+  ];
+  const chosenLayout = validControlLayouts[Math.floor(Math.random() * validControlLayouts.length)];
 
-  const controlPositions = picked.map((c, i) => ({ ...c, row: shuffledSlots[i], col: 9 }));
+  const controlPositions = picked.map((c, i) => ({ ...c, row: chosenLayout[i], col: 9 }));
 
   const occupied = new Set<string>();
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
   controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
 
-  // Create meaningful walls that force path-finding but keep it winnable
-  // Walls form barriers in the middle columns that players must navigate around
+  // Create sparse obstacle islands so paths must navigate around roadblocks,
+  // while keeping enough open lanes for all stage-to-control connections.
   const walls = new Set<string>();
   const wallPatterns: GridCell[] = [
-    // Vertical barrier in col 2
-    { row: 0, col: 2 }, { row: 1, col: 2 }, { row: 2, col: 2 },
-    // Gap at row 3, col 2
+    // Left lane blockers (force first detour)
+    { row: 1, col: 2 }, { row: 2, col: 2 },
     { row: 4, col: 2 }, { row: 5, col: 2 },
-    // Gap at row 6, col 2
-    { row: 7, col: 2 },
-    // Vertical barrier in col 5
-    { row: 2, col: 5 }, { row: 3, col: 5 },
-    // Gap at row 4-5, col 5
-    { row: 6, col: 5 }, { row: 7, col: 5 }, { row: 8, col: 5 },
-    // Vertical barrier in col 7
-    { row: 0, col: 7 }, { row: 1, col: 7 },
-    // Gap at row 2-3
-    { row: 4, col: 7 }, { row: 5, col: 7 },
-    // Gap at row 6-7
-    { row: 8, col: 7 }, { row: 9, col: 7 },
-    // Horizontal barriers to create corridors
-    { row: 0, col: 4 },
-    { row: 9, col: 3 }, { row: 9, col: 4 },
-    { row: 4, col: 4 },
-    { row: 5, col: 8 },
+    { row: 7, col: 2 }, { row: 8, col: 2 },
+
+    // Mid lane blockers (second detour points)
+    { row: 2, col: 4 }, { row: 3, col: 4 },
+    { row: 6, col: 4 }, { row: 7, col: 4 },
+
+    // Right-mid lane blockers (third detour points)
+    { row: 1, col: 6 }, { row: 2, col: 6 },
+    { row: 4, col: 6 }, { row: 5, col: 6 },
+    { row: 7, col: 6 }, { row: 8, col: 6 },
+
+    // Near-control blockers (prevent straight final approach)
+    { row: 2, col: 8 }, { row: 3, col: 8 },
+    { row: 6, col: 8 }, { row: 7, col: 8 },
   ];
   wallPatterns.forEach(w => {
     const key = `${w.row},${w.col}`;
