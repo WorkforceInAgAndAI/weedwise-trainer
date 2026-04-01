@@ -378,10 +378,11 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
             })}
 
             <div className="flex gap-3">
-              <button onClick={restart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
-                <RotateCcw className="w-4 h-4" /> Play Again
+              <button onClick={nextLevel} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
+                Next Level <ChevronRight className="w-4 h-4" />
               </button>
-              <button onClick={onBack} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+              <button onClick={startOver} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Start Over</button>
+              <button onClick={onBack} className="flex-1 py-3 rounded-xl border border-border bg-card text-foreground font-bold">Back to Games</button>
             </div>
           </div>
         )}
