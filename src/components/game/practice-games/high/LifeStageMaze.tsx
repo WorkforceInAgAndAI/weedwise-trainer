@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle } from 'lucide-react';
+import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle, Info } from 'lucide-react';
 
 const STAGES = [
   { id: 'seed', label: 'Seed', Icon: Droplets },
@@ -44,9 +44,9 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// Generate maze layout with stages on left edge and controls scattered
+// Generate a solvable maze: stages on left, controls on right side, with sparse walls that leave open paths
 function generateLayout() {
-  const stageRows = [0, 2, 4, 7, 9];
+  const stageRows = [0, 2, 5, 7, 9];
   const stagePositions = STAGES.map((s, i) => ({ ...s, row: stageRows[i], col: 0 }));
 
   const picked: typeof CONTROLS[number][] = [];
@@ -55,13 +55,14 @@ function generateLayout() {
     if (match) picked.push(match);
   }
 
-  const controlSlots: GridCell[] = shuffle([
-    { row: 0, col: 7 },
-    { row: 3, col: 9 },
-    { row: 5, col: 8 },
-    { row: 8, col: 6 },
+  // Place controls on the right side with good spacing
+  const controlSlots: GridCell[] = [
+    { row: 0, col: 9 },
+    { row: 2, col: 9 },
+    { row: 5, col: 9 },
+    { row: 7, col: 9 },
     { row: 9, col: 9 },
-  ]);
+  ];
 
   const controlPositions = picked.map((c, i) => ({ ...c, row: controlSlots[i].row, col: controlSlots[i].col }));
 
@@ -69,18 +70,14 @@ function generateLayout() {
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
   controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
 
+  // Create sparse walls that leave clear corridors
   const walls = new Set<string>();
   const wallCoords: GridCell[] = [
-    { row: 0, col: 3 }, { row: 0, col: 5 },
-    { row: 1, col: 1 }, { row: 1, col: 3 }, { row: 1, col: 5 }, { row: 1, col: 8 },
-    { row: 2, col: 3 }, { row: 2, col: 5 }, { row: 2, col: 7 }, { row: 2, col: 9 },
-    { row: 3, col: 1 }, { row: 3, col: 3 }, { row: 3, col: 5 }, { row: 3, col: 7 },
-    { row: 4, col: 2 }, { row: 4, col: 4 }, { row: 4, col: 6 }, { row: 4, col: 8 },
-    { row: 5, col: 0 }, { row: 5, col: 3 }, { row: 5, col: 5 },
-    { row: 6, col: 1 }, { row: 6, col: 3 }, { row: 6, col: 5 }, { row: 6, col: 7 }, { row: 6, col: 9 },
-    { row: 7, col: 2 }, { row: 7, col: 5 }, { row: 7, col: 7 },
-    { row: 8, col: 0 }, { row: 8, col: 3 }, { row: 8, col: 8 },
-    { row: 9, col: 2 }, { row: 9, col: 5 }, { row: 9, col: 7 },
+    { row: 1, col: 2 }, { row: 1, col: 5 }, { row: 1, col: 7 },
+    { row: 3, col: 3 }, { row: 3, col: 6 },
+    { row: 4, col: 1 }, { row: 4, col: 4 }, { row: 4, col: 8 },
+    { row: 6, col: 2 }, { row: 6, col: 5 }, { row: 6, col: 7 },
+    { row: 8, col: 3 }, { row: 8, col: 6 },
   ];
   wallCoords.forEach(w => {
     const key = `${w.row},${w.col}`;
@@ -91,6 +88,7 @@ function generateLayout() {
 }
 
 export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
+  const [showInstructions, setShowInstructions] = useState(true);
   const layout = useMemo(() => generateLayout(), []);
   const { stagePositions, controlPositions, walls } = layout;
 
@@ -121,14 +119,12 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
 
     const node = findNode(row, col);
 
-    // Start drawing from a stage
     if (node?.type === 'stage') {
       setConnections(prev => prev.filter(c => c.stageId !== node.data.id));
       setDrawing({ stageId: node.data.id, path: [{ row, col }] });
       return;
     }
 
-    // End drawing at a control
     if (node?.type === 'control' && drawing) {
       const last = drawing.path[drawing.path.length - 1];
       if (Math.abs(row - last.row) + Math.abs(col - last.col) === 1) {
@@ -141,7 +137,6 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
       return;
     }
 
-    // Extend path
     if (drawing) {
       const last = drawing.path[drawing.path.length - 1];
       const dist = Math.abs(row - last.row) + Math.abs(col - last.col);
@@ -166,12 +161,6 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
 
   const restart = () => { setConnections([]); setDrawing(null); setChecked(false); };
 
-  const getPathColor = (stageId: string): string => {
-    const colors = ['hsl(var(--primary))', 'hsl(200, 70%, 50%)', 'hsl(30, 80%, 50%)', 'hsl(280, 60%, 50%)', 'hsl(150, 60%, 40%)'];
-    const idx = stagePositions.findIndex(s => s.id === stageId);
-    return colors[idx % colors.length];
-  };
-
   const getCellState = (row: number, col: number) => {
     if (drawing?.path.some(p => p.row === row && p.col === col)) return 'drawing';
     for (const conn of connections) {
@@ -194,6 +183,33 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
     return null;
   };
 
+  // Instructions screen
+  if (showInstructions) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+        <Info className="w-12 h-12 text-primary mb-4" />
+        <h2 className="text-2xl font-bold text-foreground mb-3">Life Stage Maze</h2>
+        <div className="max-w-md text-left space-y-3 mb-6">
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Goal:</strong> Draw paths through the maze to connect each weed life stage (left) to its best control method (right).
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">How to play:</strong> Click a life stage to start drawing. Click adjacent cells to extend your path. Click a control method to complete the connection.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Roadblocks:</strong> Dark cells are walls — you cannot draw through them. Plan your path around them!
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Rules:</strong> Paths cannot overlap with each other. Connect all 5 stages, then check your answers.
+          </p>
+        </div>
+        <button onClick={() => setShowInstructions(false)} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
+          Start Maze
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
       <div className="max-w-2xl mx-auto p-4">
@@ -202,10 +218,13 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div>
+          <div className="flex-1">
             <h1 className="font-display font-bold text-lg text-foreground">Life Stage Maze</h1>
-            <p className="text-xs text-muted-foreground">Draw paths through the maze to connect stages to controls. No overlapping!</p>
+            <p className="text-xs text-muted-foreground">Draw paths from stages → controls. Dark cells are roadblocks!</p>
           </div>
+          <button onClick={() => setShowInstructions(true)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <Info className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Legend */}
@@ -219,6 +238,10 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
               </div>
             );
           })}
+          <div className="flex items-center gap-1 px-2 py-1 rounded border border-foreground/40 bg-foreground/20">
+            <div className="w-3 h-3 rounded bg-foreground/60" />
+            <span className="text-foreground font-medium">Wall</span>
+          </div>
         </div>
 
         {/* Drawing controls */}
@@ -249,7 +272,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
 
               if (wall) {
                 return (
-                  <div key={`${row}-${col}`} className="aspect-square rounded bg-muted/80 border border-border/50" />
+                  <div key={`${row}-${col}`} className="aspect-square rounded bg-foreground/40 border border-foreground/20" />
                 );
               }
 
@@ -333,14 +356,14 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
 
         {!checked && connections.length < STAGES.length && (
           <p className="text-xs text-muted-foreground text-center">
-            {connections.length}/{STAGES.length} connections made. Click a stage (left edge) to start drawing.
+            {connections.length}/{STAGES.length} connections made. Click a stage (left) to start drawing around walls.
           </p>
         )}
 
         {/* Results */}
         {checked && (
           <div className="space-y-3 mb-4">
-            <div className={`text-center p-3 rounded-xl ${correctCount === STAGES.length ? 'bg-green-500/10 border border-green-500' : 'bg-accent/10 border border-accent'}`}>
+            <div className={`text-center p-3 rounded-xl ${correctCount === STAGES.length ? 'bg-green-500/10 border border-green-500' : 'bg-destructive/10 border border-destructive'}`}>
               <p className="text-foreground font-bold text-lg">{correctCount}/{STAGES.length} Correct</p>
               <p className="text-xs text-muted-foreground">{correctCount === STAGES.length ? 'Perfect maze navigation!' : 'Review the explanations below.'}</p>
             </div>
