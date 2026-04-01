@@ -9,17 +9,22 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const TOTAL_ROUNDS = 3;
 const NUM_WEED_TYPES = 6;
 const MIN_PER_TYPE = 2;
-const MAX_PER_TYPE = 9;
+const MAX_PER_TYPE = 7;
+const MAX_SEEDS = 30;
 
 function generateRound() {
   const chosen = shuffle(weeds).slice(0, NUM_WEED_TYPES);
   const seeds: { id: number; weed: typeof weeds[0]; x: number; y: number }[] = [];
   let id = 0;
 
-  // Assign random counts per weed type
-  const counts: number[] = chosen.map(() => MIN_PER_TYPE + Math.floor(Math.random() * (MAX_PER_TYPE - MIN_PER_TYPE + 1)));
+  // Assign random counts per weed type, then cap total at MAX_SEEDS
+  let counts: number[] = chosen.map(() => MIN_PER_TYPE + Math.floor(Math.random() * (MAX_PER_TYPE - MIN_PER_TYPE + 1)));
+  let total = counts.reduce((a, b) => a + b, 0);
+  while (total > MAX_SEEDS) {
+    const idx = Math.floor(Math.random() * counts.length);
+    if (counts[idx] > MIN_PER_TYPE) { counts[idx]--; total--; }
+  }
 
-  // Generate positioned seeds with collision avoidance
   const positions: { x: number; y: number }[] = [];
   chosen.forEach((w, wi) => {
     for (let c = 0; c < counts[wi]; c++) {
@@ -61,7 +66,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const totalSeeds = seeds.length;
   const foundSeeds = seeds.filter(s => found.has(s.id));
 
-  // Count found seeds by weed type
   const foundCounts = useMemo(() => {
     const map: Record<string, { weed: typeof weeds[0]; count: number }> = {};
     foundSeeds.forEach(s => {
@@ -70,6 +74,9 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     });
     return Object.values(map).sort((a, b) => b.count - a.count);
   }, [foundSeeds.length, round]);
+
+  // Shuffled versions for prediction screens — NOT sorted by count
+  const shuffledPredictionChoices = useMemo(() => shuffle([...foundCounts]), [foundCounts]);
 
   const weedTypeNames = useMemo(() => {
     return [...new Set(foundSeeds.map(s => s.weed.commonName))].sort();
@@ -180,7 +187,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Predict least prevalent
+  // Predict least prevalent — use SHUFFLED choices
   if (phase === 'predictLeast') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -192,7 +199,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         <div className="flex-1 overflow-y-auto p-4">
           <p className="text-sm text-muted-foreground mb-4 text-center">Which weed will be <span className="font-bold">least</span> prevalent next year? (Fewer seeds = fewer weeds)</p>
           <div className="grid gap-2 max-w-sm mx-auto mb-4">
-            {foundCounts.map(fc => {
+            {shuffledPredictionChoices.map(fc => {
               let cls = 'border-border bg-card text-foreground';
               if (predictLeastChecked && fc.weed.commonName === leastPrevalent) cls = 'border-green-500 bg-green-500/20 text-foreground';
               else if (predictLeastChecked && predictLeastAnswer === fc.weed.commonName && fc.weed.commonName !== leastPrevalent) cls = 'border-destructive bg-destructive/20 text-foreground';
@@ -204,7 +211,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
                     <WeedImage weedId={fc.weed.id} stage="seed" className="w-full h-full object-cover" />
                   </div>
                   <span className="flex-1 text-left">{fc.weed.commonName}</span>
-                  <span className="text-muted-foreground">{fc.count} seeds</span>
                 </button>
               );
             })}
@@ -225,7 +231,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Predict most prevalent
+  // Predict most prevalent — use SHUFFLED choices, hide seed counts
   if (phase === 'predictMost') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -237,7 +243,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         <div className="flex-1 overflow-y-auto p-4">
           <p className="text-sm text-muted-foreground mb-4 text-center">Which weed will be <span className="font-bold">most</span> prevalent next year? (More seeds = more weeds)</p>
           <div className="grid gap-2 max-w-sm mx-auto mb-4">
-            {foundCounts.map(fc => {
+            {shuffledPredictionChoices.map(fc => {
               let cls = 'border-border bg-card text-foreground';
               if (predictMostChecked && fc.weed.commonName === mostPrevalent) cls = 'border-green-500 bg-green-500/20 text-foreground';
               else if (predictMostChecked && predictMostAnswer === fc.weed.commonName && fc.weed.commonName !== mostPrevalent) cls = 'border-destructive bg-destructive/20 text-foreground';
@@ -249,7 +255,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
                     <WeedImage weedId={fc.weed.id} stage="seed" className="w-full h-full object-cover" />
                   </div>
                   <span className="flex-1 text-left">{fc.weed.commonName}</span>
-                  <span className="text-muted-foreground">{fc.count} seeds</span>
                 </button>
               );
             })}
@@ -300,7 +305,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Sorting phase - sort by weed type
+  // Sorting phase
   if (phase === 'sort') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
