@@ -52,7 +52,8 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Look-Alike Challenge</h1>
- <span className="text-sm text-muted-foreground">{round + 1}/{pairs.length}</span>
+ <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm text-muted-foreground">{round + 1}/{pairs.length}</span>
  </div>
  <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
  <p className="text-foreground font-bold text-lg">Which one is <span className="text-primary">{target?.commonName}</span>?</p>

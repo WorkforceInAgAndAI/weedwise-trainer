@@ -42,7 +42,8 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Name the Weed</h1>
  <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
- <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
+ <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
  </div>
  <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
  <div className="w-40 h-40 rounded-xl overflow-hidden border-2 border-border bg-secondary">

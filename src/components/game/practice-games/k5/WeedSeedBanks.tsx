@@ -197,6 +197,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-display font-bold text-foreground text-lg flex-1">Predict: Least Prevalent</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">

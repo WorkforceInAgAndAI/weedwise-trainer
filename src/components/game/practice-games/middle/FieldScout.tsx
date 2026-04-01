@@ -213,6 +213,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Field Scout</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         <div className="flex items-center gap-1 text-primary font-bold text-sm">
           <DollarSign className="w-4 h-4" />
           {money}

@@ -218,6 +218,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           </button>
           <div className="flex-1">
             <h1 className="font-display font-bold text-lg text-foreground">Life Stage Maze</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
             <p className="text-xs text-muted-foreground">Draw paths from stages → controls. Dark cells are roadblocks!</p>
           </div>
           <button onClick={() => setShowInstructions(true)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">

@@ -72,6 +72,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 mb-4">
  <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
  <h1 className="font-display font-bold text-lg text-foreground">Form Your Farm</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  </div>
  <p className="text-sm text-muted-foreground text-center mb-4">Design your farm, then defend it against weeds!</p>
  <div className="mb-4">

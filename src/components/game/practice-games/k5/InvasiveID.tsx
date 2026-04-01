@@ -74,7 +74,8 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Invasive ID</h1>
  <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
- <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
+ <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
  </div>
  <div className="flex-1 flex flex-col items-center justify-center p-4 gap-3">
  {/* Map with real Midwest background */}

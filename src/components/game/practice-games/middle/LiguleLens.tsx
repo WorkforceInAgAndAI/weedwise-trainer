@@ -56,7 +56,8 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Ligule Lens</h1>
- <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
+ <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
  </div>
  <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
  <p className="text-sm text-muted-foreground mb-2">Zoom in on the ligule — identify the grass!</p>
