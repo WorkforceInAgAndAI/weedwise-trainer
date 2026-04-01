@@ -175,7 +175,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
           </p>
           <p className="text-xs text-muted-foreground text-center mb-3">Select 3 needs:</p>
           <div className="grid grid-cols-1 gap-2 max-w-sm mx-auto mb-4">
-            {ALL_NEEDS.map(need => {
+            {shuffledNeeds.map(need => {
               const isSelected = weedSelected.includes(need.id);
               const isCorrect = correctNeeds.includes(need.id);
               let cls = 'border-border bg-card text-foreground';
