@@ -66,6 +66,8 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   };
 
   const restart = () => {
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
     setRound(0);
     setTotalScore(0);
     setPlacements({});

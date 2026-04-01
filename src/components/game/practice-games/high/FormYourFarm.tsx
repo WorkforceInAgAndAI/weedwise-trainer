@@ -65,6 +65,8 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
  const score = results.filter(r => r.correct).length;
 
  const restart = () => { setPhase('design'); setDecisions({}); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (phase === 'design') return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">

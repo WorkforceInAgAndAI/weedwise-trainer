@@ -36,6 +36,8 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
  const remove = (wId: string) => { if (checked) return; setPlacements(p => { const n = { ...p }; delete n[wId]; return n; }); };
  const correctCount = items.filter(it => placements[it.weed.id] === it.correct).length;
  const restart = () => { setPlacements({}); setSelected(null); setChecked(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (checked) {
  addBadge({ gameId: 'hs-lifecycle', gameName: 'Life Cycle Sort', level: 'HS', score: correctCount, total: items.length });

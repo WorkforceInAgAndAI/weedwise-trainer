@@ -31,6 +31,8 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
  const [showReview, setShowReview] = useState(false);
 
  const restart = () => { setMatches({}); setSelectedWeed(null); setChecked(false); setShowReview(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  const handleEffectClick = (weedId: string) => {
  if (!selectedWeed || checked) return;

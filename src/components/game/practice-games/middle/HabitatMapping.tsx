@@ -23,6 +23,8 @@ function getZone(w: typeof weeds[0]): string {
 
 export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const nextLevel = () => setLevel(l => l + 1);
+  const startOver = () => setLevel(1);
  const items = useMemo(() => {
  const byZone: Record<string, typeof weeds> = { temperate: [], arid: [], tropical: [], wetland: [] };
  weeds.forEach(w => byZone[getZone(w)].push(w));

@@ -78,6 +78,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setItems(fieldWeeds.map(w => ({ ...w, found: false, managed: false }))); setActive(null); setEnlarged(false); setMethodPick(null); setExplanation(''); setTime(120); setScore(0); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) return <LevelComplete level={level} score={score} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 

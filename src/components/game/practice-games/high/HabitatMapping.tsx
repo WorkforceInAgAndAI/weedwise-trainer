@@ -35,6 +35,8 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  const check = () => setChecked(true);
  const correctCount = items.filter(it => placements[it.weed.id] === it.correct).length;
  const restart = () => { setPlacements({}); setSelected(null); setChecked(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">

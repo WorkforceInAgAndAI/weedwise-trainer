@@ -46,6 +46,8 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
 
  const correctCount = checked ? items.filter(i => placements[i.weed.id] === i.correct).length : 0;
  const restart = () => { setPlacements({}); setSelected(null); setChecked(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

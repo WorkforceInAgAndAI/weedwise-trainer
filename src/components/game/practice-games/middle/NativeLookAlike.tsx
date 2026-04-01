@@ -100,6 +100,8 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   };
 
   const restart = () => { setRound(0); setScore(0); setChecked(false); setPlacements({}); setSelectedWeed(null); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   const totalPossible = TOTAL_ROUNDS * PAIRS_PER_ROUND;
 
