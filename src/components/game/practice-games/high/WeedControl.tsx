@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -34,6 +35,7 @@ function getMethodExplanation(weed: typeof weeds[0], chosen: string, best: strin
 }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const fieldWeeds = useMemo(() => shuffle(weeds).slice(0, 8).map((w, i) => ({
  weed: w, x: 15 + (i % 4) * 20 + Math.random() * 10, y: 20 + Math.floor(i / 4) * 35 + Math.random() * 15,
  best: getBestMethod(w),
@@ -77,23 +79,14 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
  const restart = () => { setItems(fieldWeeds.map(w => ({ ...w, found: false, managed: false }))); setActive(null); setEnlarged(false); setMethodPick(null); setExplanation(''); setTime(120); setScore(0); };
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
- 
- <h2 className="font-display font-bold text-2xl text-foreground mb-2">Field Managed!</h2>
- <p className="text-foreground mb-6">Score: {score} / {items.length}</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
- </div>
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
  <h1 className="font-display font-bold text-lg text-foreground">Weed Control</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  <span className="ml-auto text-sm font-mono text-foreground">{Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}</span>
  </div>
  <div className="flex-1 relative overflow-hidden">

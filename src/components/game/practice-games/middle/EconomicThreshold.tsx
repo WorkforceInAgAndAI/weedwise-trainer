@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -13,6 +14,7 @@ interface FieldWeed {
 }
 
 export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
  const fieldWeeds = useMemo(() => {
  const pool = shuffle(weeds).slice(0, 15);
@@ -21,7 +23,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
  x: 10 + Math.random() * 80,
  y: 10 + Math.random() * 80,
  }));
- }, []);
+ }, [level]);
 
  const threshold = useMemo(() => Math.floor(Math.random() * 5) + 6, []);
 
@@ -55,6 +57,8 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
  setPhase('count');
  setDecision(null);
  };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  const barData = [
  { label: 'Your Count', value: counted.size, color: 'bg-primary' },
@@ -67,6 +71,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Economic Threshold</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  {phase === 'count' && <span className="text-sm text-primary font-bold">{counted.size} counted</span>}
  </div>
 
@@ -141,10 +146,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
  : 'When the weed population is below the threshold, the cost of control may exceed the damage — monitoring is sufficient.'}
  </p>
  </div>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  )}
  </div>

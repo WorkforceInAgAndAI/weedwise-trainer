@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Layers } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -46,6 +47,8 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setTIdx(0); setLevel(0); setScore(0); setWrong(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  addBadge({ gameId: 'hs-taxonomy', gameName: 'Taxonomy Tower', level: 'HS', score, total: targets.length });
@@ -54,10 +57,11 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  <Layers className="w-10 h-10 text-primary mb-3" />
  <h2 className="font-display font-bold text-2xl text-foreground mb-2">Pyramid Complete!</h2>
  <p className="text-foreground mb-6">Score: {score} / {targets.length}</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
- </div>
+ <div className="flex gap-3 justify-center">
+      <button onClick={nextLevel} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Level</button>
+      <button onClick={startOver} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Start Over</button>
+      <button onClick={onBack} className="px-6 py-3 rounded-lg border border-border text-foreground font-bold">Back to Games</button>
+     </div>
  </div>
  );
  }
@@ -72,6 +76,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 mb-4">
  <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
  <h1 className="font-display font-bold text-lg text-foreground">Taxonomy Tower</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  <span className="ml-auto text-sm text-muted-foreground">{tIdx + 1}/{targets.length}</span>
  </div>
  <div className="flex justify-center mb-4">

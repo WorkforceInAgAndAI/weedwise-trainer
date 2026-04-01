@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -34,6 +35,7 @@ function buildRound(you: typeof weeds[0], opponent: typeof weeds[0]) {
 }
 
 export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const matchups = useMemo(() => {
  const pool = shuffle(weeds);
  const result: { you: typeof weeds[0]; opponent: typeof weeds[0] }[] = [];
@@ -77,16 +79,15 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setMatchIdx(0); setStep(0); setPoints(0); setTotalPoints(0); setPicked(null); setAnswered(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
  <h2 className="text-2xl font-bold text-foreground mb-2">Competition Over!</h2>
  <p className="text-lg text-foreground mb-6">{totalPoints}/{matchups.length * 3} advantages won</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }
@@ -96,6 +97,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Weed Competitors</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  <span className="text-sm text-muted-foreground">Match {matchIdx + 1}/{matchups.length}</span>
  </div>
  <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">

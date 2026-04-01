@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Leaf, Wheat, Tractor } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -29,6 +30,7 @@ function getIdealDecision(severity: number, threshold: number, cropComp: number,
 }
 
 export default function FormYourFarm({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
  const [phase, setPhase] = useState<'design' | 'attack' | 'review'>('design');
  const [crop, setCrop] = useState(CROPS[0]);
@@ -70,6 +72,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 mb-4">
  <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
  <h1 className="font-display font-bold text-lg text-foreground">Form Your Farm</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  </div>
  <p className="text-sm text-muted-foreground text-center mb-4">Design your farm, then defend it against weeds!</p>
  <div className="mb-4">
@@ -139,10 +142,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
  </div>
  ))}
  </div>
- <div className="flex gap-3">
- <button onClick={restart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

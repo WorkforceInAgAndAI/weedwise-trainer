@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import seedBankBg from '@/assets/images/seed-bank-bg.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -43,6 +44,7 @@ function generateRound() {
 }
 
 export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
 
   const rounds = useMemo(() => Array.from({ length: TOTAL_ROUNDS }, () => generateRound()), []);
@@ -158,8 +160,9 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <p className="text-muted-foreground mb-2">Total Score: {totalScore}</p>
           <p className="text-sm text-muted-foreground mb-6">Weed seed banks can hold thousands of seeds in the soil, waiting years to sprout! More seeds in the bank means more weeds next season.</p>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => { setRound(0); resetRound(); setTotalScore(0); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            <button onClick={() => { setLevel(l => l + 1); setRound(0); resetRound(); setTotalScore(0); }} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Level</button>
+            <button onClick={() => { setLevel(1); setRound(0); resetRound(); setTotalScore(0); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Start Over</button>
+            <button onClick={onBack} className="px-6 py-3 rounded-lg border border-border text-foreground font-bold">Back to Games</button>
           </div>
         </div>
       </div>
@@ -194,6 +197,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-display font-bold text-foreground text-lg flex-1">Predict: Least Prevalent</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">

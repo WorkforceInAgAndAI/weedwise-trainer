@@ -6,6 +6,7 @@ import cornField2 from '@/assets/images/corn_field_2.jpg';
 import soybeanField1 from '@/assets/images/soybean_field_1.jpg';
 import pastureField1 from '@/assets/images/pasture_field_1.jpg';
 import pastureField2 from '@/assets/images/pasture_field_2.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -111,6 +112,7 @@ const CORRECT_PAY = 50;
 const WRONG_PAY = 10;
 
 export default function FieldScout({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const fieldOrder = useMemo(() => {
     const shuffled = shuffle([...FIELDS]);
     const result: FieldDef[] = [];
@@ -165,6 +167,8 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
 
   const next = () => { setRound(r => r + 1); setChosen(null); setDone(false); };
   const restart = () => { setRound(0); setChosen(null); setDone(false); setScore(0); setMoney(0); setShowIntro(true); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   // Intro storyline
   if (showIntro) {
@@ -197,10 +201,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
         <p className="text-lg text-foreground mb-1">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
         <p className="text-2xl font-bold text-primary mb-2">${money} earned</p>
         <p className="text-sm text-muted-foreground mb-6">Out of a possible ${maxMoney}</p>
-        <div className="flex gap-3">
-          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
-        </div>
+        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }
@@ -212,6 +213,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Field Scout</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         <div className="flex items-center gap-1 text-primary font-bold text-sm">
           <DollarSign className="w-4 h-4" />
           {money}

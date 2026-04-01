@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Search } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -13,6 +14,7 @@ const DIOECIOUS = [
 ];
 
 export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
  const rounds = useMemo(() => shuffle(DIOECIOUS).slice(0, 3).map(sp => {
  const spots = shuffle(sp.differences).slice(0, 5);
@@ -37,6 +39,8 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
 
  const next = () => { setRIdx(r => r + 1); setFound(new Set()); };
  const restart = () => { setRIdx(0); setFound(new Set()); setScore(0); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  addBadge({ gameId: 'spot-differences', gameName: 'Spot the Differences', level: 'HS', score, total: rounds.length });
@@ -45,10 +49,7 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
  <Search className="w-10 h-10 text-primary mb-3" />
  <h2 className="font-display font-bold text-2xl text-foreground mb-2">Great Eye!</h2>
  <p className="text-foreground mb-6">You completed {score} / {rounds.length} species</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }
@@ -59,6 +60,7 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 mb-4">
  <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
  <h1 className="font-display font-bold text-lg text-foreground">Spot the Differences</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  <span className="ml-auto text-sm text-muted-foreground">{rIdx + 1}/{rounds.length}</span>
  </div>
 

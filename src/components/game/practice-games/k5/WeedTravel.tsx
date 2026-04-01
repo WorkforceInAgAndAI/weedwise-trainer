@@ -3,6 +3,7 @@ import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, 
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -107,6 +108,7 @@ function getNode(id: string): AdventureNode {
 }
 
 export default function WeedTravel({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const seedCharacters = useMemo(() => buildSeedCharacters(), []);
 
@@ -129,6 +131,7 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-display font-bold text-foreground text-lg flex-1">Weed Travel</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <h2 className="text-xl font-bold text-foreground text-center mb-2">Choose Your Seed!</h2>
@@ -171,9 +174,11 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
           <p className="text-muted-foreground mb-1">Playing as: {chosenSeed.name}</p>
           <p className="text-muted-foreground mb-6">Obstacles conquered: {score}/{totalSteps}</p>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => { setChosenSeed(null); setCurrentNodeId('start_hill'); setSelectedOption(null); setAnswered(false); setHistory([]); setGameOver(false); }}
-              className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+            <button onClick={() => { setLevel(l => l + 1); setCurrentNodeId('start_hill'); setSelectedOption(null); setAnswered(false); setHistory([]); setGameOver(false); }}
+              className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Level</button>
+            <button onClick={() => { setLevel(1); setCurrentNodeId('start_hill'); setSelectedOption(null); setAnswered(false); setHistory([]); setGameOver(false); }}
+              className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Start Over</button>
+            <button onClick={onBack} className="px-6 py-3 rounded-lg border border-border text-foreground font-bold">Back to Games</button>
           </div>
         </div>
       </div>

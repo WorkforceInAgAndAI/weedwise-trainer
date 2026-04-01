@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Sprout, Leaf, Flower2, TreeDeciduous, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle, Info } from 'lucide-react';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const STAGES = [
   { id: 'seedling', label: 'Seedling', Icon: Sprout },
@@ -82,6 +83,7 @@ function generateLayout() {
 }
 
 export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const [showInstructions, setShowInstructions] = useState(true);
   const layout = useMemo(() => generateLayout(), []);
   const { stagePositions, controlPositions, walls } = layout;
@@ -154,6 +156,8 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   }).length;
 
   const restart = () => { setConnections([]); setDrawing(null); setChecked(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   const getCellState = (row: number, col: number) => {
     if (drawing?.path.some(p => p.row === row && p.col === col)) return 'drawing';
@@ -214,6 +218,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           </button>
           <div className="flex-1">
             <h1 className="font-display font-bold text-lg text-foreground">Life Stage Maze</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
             <p className="text-xs text-muted-foreground">Draw paths from stages → controls. Dark cells are roadblocks!</p>
           </div>
           <button onClick={() => setShowInstructions(true)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
@@ -374,10 +379,11 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
             })}
 
             <div className="flex gap-3">
-              <button onClick={restart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
-                <RotateCcw className="w-4 h-4" /> Play Again
+              <button onClick={nextLevel} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
+                Next Level <ChevronRight className="w-4 h-4" />
               </button>
-              <button onClick={onBack} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
+              <button onClick={startOver} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Start Over</button>
+              <button onClick={onBack} className="flex-1 py-3 rounded-xl border border-border bg-card text-foreground font-bold">Back to Games</button>
             </div>
           </div>
         )}

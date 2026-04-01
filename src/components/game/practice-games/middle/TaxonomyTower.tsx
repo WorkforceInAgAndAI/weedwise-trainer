@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -51,6 +52,8 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setTargetIdx(0); setLevel(0); setFound(false); setWrong(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) return (
  <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
@@ -58,9 +61,10 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  <h2 className="text-2xl font-bold text-foreground mb-2">Pyramid Complete!</h2>
  <p className="text-muted-foreground mb-6">You classified {targets.length} weeds!</p>
  <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+      <button onClick={nextLevel} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Level</button>
+      <button onClick={startOver} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Start Over</button>
+      <button onClick={onBack} className="px-6 py-3 rounded-lg border border-border text-foreground font-bold">Back to Games</button>
+     </div>
  </div>
  </div>
  );
@@ -70,6 +74,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Taxonomy Tower</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  <span className="text-sm text-muted-foreground">{targetIdx + 1}/{targets.length}</span>
  </div>
  <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">

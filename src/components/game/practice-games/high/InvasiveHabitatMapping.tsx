@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Sun, Wind, Thermometer, Droplets } from 'lucide-react';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -19,6 +20,7 @@ function getZone(w: typeof weeds[0]) {
 }
 
 export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const invasive = useMemo(() => shuffle(weeds.filter(w => w.origin === 'Introduced')).slice(0, 8), []);
  const items = useMemo(() => invasive.map(w => ({ weed: w, correct: getZone(w) })), []);
  const [placements, setPlacements] = useState<Record<string, string>>({});
@@ -36,6 +38,7 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
  <div className="flex items-center gap-3 mb-4">
  <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
  <h1 className="font-display font-bold text-lg text-foreground">Invasive Habitat Mapping</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  </div>
  <p className="text-sm text-muted-foreground text-center mb-4">Place each <strong>invasive</strong> weed into the habitat it has invaded</p>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
@@ -70,10 +73,7 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
  {checked && (
  <div className="text-center">
  <p className="text-foreground font-bold mb-3">{correctCount}/{items.length} correct</p>
- <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  )}
  </div>

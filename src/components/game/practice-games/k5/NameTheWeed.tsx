@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 export default function NameTheWeed({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const rounds = useMemo(() => {
  return shuffle(weeds).slice(0, 10).map(w => {
  const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, 3).map(x => x.commonName);
@@ -29,20 +31,10 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  const next = () => { setRound(i => i + 1); setSelected(null); setSubmitted(false); };
 
  const restart = () => { setRound(0); setSelected(null); setSubmitted(false); setScore(0); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
- <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
- <div className="text-5xl mb-4"></div>
- <h2 className="text-2xl font-bold text-foreground mb-2">Well Done!</h2>
- <p className="text-muted-foreground mb-6">Score: {score} / {rounds.length}</p>
- <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
- </div>
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -50,7 +42,8 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Name the Weed</h1>
  <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
- <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
+ <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
  </div>
  <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
  <div className="w-40 h-40 rounded-xl overflow-hidden border-2 border-border bg-secondary">

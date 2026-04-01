@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -21,6 +22,7 @@ function getZone(w: typeof weeds[0]): string {
 }
 
 export default function HabitatMapping({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const items = useMemo(() => {
  const byZone: Record<string, typeof weeds> = { temperate: [], arid: [], tropical: [], wetland: [] };
  weeds.forEach(w => byZone[getZone(w)].push(w));
@@ -56,6 +58,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  <div className="flex items-center gap-3 p-4 border-b border-border">
  <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
  <h1 className="font-bold text-foreground text-lg flex-1">Habitat Mapping</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
  </div>
  <div className="flex-1 overflow-y-auto p-4">
  <p className="text-sm text-muted-foreground mb-3 text-center">Place each weed in its correct habitat region</p>
@@ -105,8 +108,9 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  <div className="text-center mt-4">
  <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
  <div className="flex gap-3 justify-center">
- <button onClick={() => { setChecked(false); setPlacements({}); setSelected(null); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
+ <button onClick={nextLevel} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Level</button>
+ <button onClick={startOver} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Start Over</button>
+ <button onClick={onBack} className="px-6 py-3 rounded-lg border border-border text-foreground font-bold">Back to Games</button>
  </div>
  </div>
  )}

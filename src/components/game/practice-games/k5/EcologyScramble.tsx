@@ -3,6 +3,7 @@ import { Droplets, TreePine, Link } from 'lucide-react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -34,6 +35,7 @@ function getWeedCategory(w: typeof weeds[0]): string {
 }
 
 export default function EcologyScramble({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const items = useMemo(() => shuffle([...ALL_NEEDS]), []);
   const [placements, setPlacements] = useState<Record<string, string>>({});
@@ -145,10 +147,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
         <h2 className="font-display font-bold text-2xl text-foreground mb-2">Ecology Expert!</h2>
         <p className="text-foreground mb-2">Sorting: {sortScore}/{items.length}</p>
         <p className="text-foreground mb-6">Weed Needs: {weedScore}/{weedRounds.length}</p>
-        <div className="flex gap-3">
-          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
-        </div>
+        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }
@@ -164,6 +163,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-display font-bold text-foreground text-lg flex-1">Ecology Scramble</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">{weedIdx + 1}/{weedRounds.length}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
