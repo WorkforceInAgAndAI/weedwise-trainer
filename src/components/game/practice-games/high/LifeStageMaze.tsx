@@ -1,8 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Sprout, Leaf, Flower2, TreeDeciduous, Droplets, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle, Info } from 'lucide-react';
+import { Sprout, Leaf, Flower2, TreeDeciduous, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle, Info } from 'lucide-react';
 
 const STAGES = [
-  { id: 'seed', label: 'Seed', Icon: Droplets },
   { id: 'seedling', label: 'Seedling', Icon: Sprout },
   { id: 'vegetative', label: 'Vegetative', Icon: Leaf },
   { id: 'reproductive', label: 'Reproductive', Icon: Flower2 },
@@ -10,8 +9,7 @@ const STAGES = [
 ];
 
 const CONTROLS = [
-  { id: 'seed-treat', label: 'Seed Treatment', Icon: Droplets, bestStage: 'seed' },
-  { id: 'pre-herb', label: 'Pre-emergent Herbicide', Icon: Droplets, bestStage: 'seedling' },
+  { id: 'pre-herb', label: 'Pre-emergent Herbicide', Icon: SprayCan, bestStage: 'seedling' },
   { id: 'cultivation', label: 'Cultivation', Icon: Shovel, bestStage: 'seedling' },
   { id: 'post-herb', label: 'Post-emergent Herbicide', Icon: SprayCan, bestStage: 'vegetative' },
   { id: 'hand-pull', label: 'Hand Removal', Icon: Hand, bestStage: 'vegetative' },
@@ -44,42 +42,70 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// Generate a solvable maze: stages on left, controls on right side, with sparse walls that leave open paths
 function generateLayout() {
-  const stageRows = [0, 2, 5, 7, 9];
+  // 4 stages on left at fixed rows
+  const stageRows = [1, 3, 6, 8];
   const stagePositions = STAGES.map((s, i) => ({ ...s, row: stageRows[i], col: 0 }));
 
+  // Pick one control per stage (best match)
   const picked: typeof CONTROLS[number][] = [];
   for (const s of STAGES) {
     const match = CONTROLS.find(c => c.bestStage === s.id && !picked.find(p => p.id === c.id));
     if (match) picked.push(match);
   }
 
-  // Place controls on the right side with good spacing
-  const controlSlots: GridCell[] = [
-    { row: 0, col: 9 },
-    { row: 2, col: 9 },
-    { row: 5, col: 9 },
-    { row: 7, col: 9 },
-    { row: 9, col: 9 },
-  ];
+  // Shuffle control positions so they are NOT directly across from their matching stage
+  const controlRowSlots = [1, 3, 6, 8];
+  let shuffledSlots = shuffle([...controlRowSlots]);
+  // Ensure no control is directly across from its best stage
+  let attempts = 0;
+  while (attempts < 50) {
+    let conflict = false;
+    for (let i = 0; i < picked.length; i++) {
+      const bestStageIdx = STAGES.findIndex(s => s.id === picked[i].bestStage);
+      if (shuffledSlots[i] === stageRows[bestStageIdx]) {
+        conflict = true;
+        break;
+      }
+    }
+    if (!conflict) break;
+    shuffledSlots = shuffle([...controlRowSlots]);
+    attempts++;
+  }
 
-  const controlPositions = picked.map((c, i) => ({ ...c, row: controlSlots[i].row, col: controlSlots[i].col }));
+  const controlPositions = picked.map((c, i) => ({ ...c, row: shuffledSlots[i], col: 9 }));
 
   const occupied = new Set<string>();
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
   controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
 
-  // Create sparse walls that leave clear corridors
+  // Create meaningful walls that force path-finding but keep it winnable
+  // Walls form barriers in the middle columns that players must navigate around
   const walls = new Set<string>();
-  const wallCoords: GridCell[] = [
-    { row: 1, col: 2 }, { row: 1, col: 5 }, { row: 1, col: 7 },
-    { row: 3, col: 3 }, { row: 3, col: 6 },
-    { row: 4, col: 1 }, { row: 4, col: 4 }, { row: 4, col: 8 },
-    { row: 6, col: 2 }, { row: 6, col: 5 }, { row: 6, col: 7 },
-    { row: 8, col: 3 }, { row: 8, col: 6 },
+  const wallPatterns: GridCell[] = [
+    // Vertical barrier in col 2
+    { row: 0, col: 2 }, { row: 1, col: 2 }, { row: 2, col: 2 },
+    // Gap at row 3, col 2
+    { row: 4, col: 2 }, { row: 5, col: 2 },
+    // Gap at row 6, col 2
+    { row: 7, col: 2 },
+    // Vertical barrier in col 5
+    { row: 2, col: 5 }, { row: 3, col: 5 },
+    // Gap at row 4-5, col 5
+    { row: 6, col: 5 }, { row: 7, col: 5 }, { row: 8, col: 5 },
+    // Vertical barrier in col 7
+    { row: 0, col: 7 }, { row: 1, col: 7 },
+    // Gap at row 2-3
+    { row: 4, col: 7 }, { row: 5, col: 7 },
+    // Gap at row 6-7
+    { row: 8, col: 7 }, { row: 9, col: 7 },
+    // Horizontal barriers to create corridors
+    { row: 0, col: 4 },
+    { row: 9, col: 3 }, { row: 9, col: 4 },
+    { row: 4, col: 4 },
+    { row: 5, col: 8 },
   ];
-  wallCoords.forEach(w => {
+  wallPatterns.forEach(w => {
     const key = `${w.row},${w.col}`;
     if (!occupied.has(key)) walls.add(key);
   });
@@ -183,7 +209,8 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
     return null;
   };
 
-  // Instructions screen
+  const stageCount = STAGES.length;
+
   if (showInstructions) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
@@ -200,7 +227,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
             <strong className="text-foreground">Roadblocks:</strong> Dark cells are walls — you cannot draw through them. Plan your path around them!
           </p>
           <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Rules:</strong> Paths cannot overlap with each other. Connect all 5 stages, then check your answers.
+            <strong className="text-foreground">Rules:</strong> Paths cannot overlap with each other. Connect all {stageCount} stages, then check your answers.
           </p>
         </div>
         <button onClick={() => setShowInstructions(false)} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
@@ -213,7 +240,6 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
       <div className="max-w-2xl mx-auto p-4">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-3">
           <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">
             <ChevronLeft className="w-5 h-5" />
@@ -227,10 +253,9 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        {/* Legend */}
         <div className="flex flex-wrap gap-3 mb-3 text-xs">
           {stagePositions.map((s, i) => {
-            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-purple-400/20 border-purple-400', 'bg-emerald-500/20 border-emerald-500'];
+            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-emerald-500/20 border-emerald-500'];
             return (
               <div key={s.id} className={`flex items-center gap-1 px-2 py-1 rounded border ${colors[i]}`}>
                 <s.Icon className="w-3 h-3" />
@@ -244,7 +269,6 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        {/* Drawing controls */}
         {drawing && (
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-muted-foreground">Drawing from: <strong className="text-foreground">{stagePositions.find(s => s.id === drawing.stageId)?.label}</strong></span>
@@ -257,7 +281,6 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        {/* Maze Grid */}
         <div
           className="grid gap-[2px] mb-4 bg-border rounded-xl p-[2px]"
           style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
@@ -283,8 +306,8 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
                 const isCorrect = checked && conn && CONTROLS.find(c => c.id === conn.controlId)?.bestStage === s.id;
                 const isWrong = checked && conn && !isCorrect;
                 const idx = stagePositions.findIndex(st => st.id === s.id);
-                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-purple-400', 'border-emerald-500'];
-                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-purple-400/15', 'bg-emerald-500/15'];
+                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-emerald-500'];
+                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-emerald-500/15'];
 
                 return (
                   <button
@@ -327,8 +350,7 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
                 );
               }
 
-              // Regular path cell
-              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-purple-400/25', 'bg-emerald-500/25'];
+              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-emerald-500/25'];
 
               return (
                 <button
@@ -347,25 +369,23 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
           ).flat()}
         </div>
 
-        {/* Check button */}
-        {!checked && connections.length >= STAGES.length && (
+        {!checked && connections.length >= stageCount && (
           <button onClick={check} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
             <Check className="w-5 h-5" /> Check Connections
           </button>
         )}
 
-        {!checked && connections.length < STAGES.length && (
+        {!checked && connections.length < stageCount && (
           <p className="text-xs text-muted-foreground text-center">
-            {connections.length}/{STAGES.length} connections made. Click a stage (left) to start drawing around walls.
+            {connections.length}/{stageCount} connections made. Click a stage (left) to start drawing around walls.
           </p>
         )}
 
-        {/* Results */}
         {checked && (
           <div className="space-y-3 mb-4">
-            <div className={`text-center p-3 rounded-xl ${correctCount === STAGES.length ? 'bg-green-500/10 border border-green-500' : 'bg-destructive/10 border border-destructive'}`}>
-              <p className="text-foreground font-bold text-lg">{correctCount}/{STAGES.length} Correct</p>
-              <p className="text-xs text-muted-foreground">{correctCount === STAGES.length ? 'Perfect maze navigation!' : 'Review the explanations below.'}</p>
+            <div className={`text-center p-3 rounded-xl ${correctCount === stageCount ? 'bg-green-500/10 border border-green-500' : 'bg-destructive/10 border border-destructive'}`}>
+              <p className="text-foreground font-bold text-lg">{correctCount}/{stageCount} Correct</p>
+              <p className="text-xs text-muted-foreground">{correctCount === stageCount ? 'Perfect maze navigation!' : 'Review the explanations below.'}</p>
             </div>
 
             {connections.map(conn => {

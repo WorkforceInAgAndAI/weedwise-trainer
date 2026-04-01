@@ -192,8 +192,8 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
           {TOOLS.map(t => {
             const ToolIcon = t.Icon;
             let cls = 'border-border bg-card';
-            if (scouted && t.id === f.bestTool) cls = 'border-green-500 bg-green-500/20';
-            else if (scouted && t.id === picked) cls = 'border-destructive bg-destructive/20';
+            if (scouted && !showToolAnim && t.id === f.bestTool) cls = 'border-green-500 bg-green-500/20';
+            else if (scouted && !showToolAnim && t.id === picked && t.id !== f.bestTool) cls = 'border-destructive bg-destructive/20';
             else if (picked === t.id) cls = 'border-primary bg-primary/10';
             return (
               <button key={t.id} onClick={() => select(t.id)}
