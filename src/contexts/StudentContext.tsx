@@ -14,6 +14,32 @@ interface StudentContextType {
  leaveClass: () => void;
 }
 
+function isValidStudentSession(value: unknown): value is StudentSession {
+ if (!value || typeof value !== 'object') return false;
+ const v = value as Record<string, unknown>;
+ return (
+  typeof v.studentId === 'string' &&
+  typeof v.nickname === 'string' &&
+  typeof v.classId === 'string' &&
+  typeof v.className === 'string'
+ );
+}
+
+function readSavedSession(): StudentSession | null {
+ const saved = localStorage.getItem('weedid_student');
+ if (!saved) return null;
+
+ try {
+  const parsed: unknown = JSON.parse(saved);
+  if (isValidStudentSession(parsed)) return parsed;
+ } catch {
+  // Invalid JSON in persisted storage should never crash app boot
+ }
+
+ localStorage.removeItem('weedid_student');
+ return null;
+}
+
 const StudentContext = createContext<StudentContextType | null>(null);
 
 export function useStudent() {
@@ -23,10 +49,7 @@ export function useStudent() {
 }
 
 export function StudentProvider({ children }: { children: ReactNode }) {
- const [session, setSession] = useState<StudentSession | null>(() => {
- const saved = localStorage.getItem('weedid_student');
- return saved ? JSON.parse(saved) : null;
- });
+ const [session, setSession] = useState<StudentSession | null>(() => readSavedSession());
 
  const joinClass = useCallback(async (joinCode: string, nickname: string) => {
  // Look up class by join code
