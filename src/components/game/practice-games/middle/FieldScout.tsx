@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { DollarSign, Briefcase } from 'lucide-react';
 import WeedImage from '@/components/game/WeedImage';
 import cornField1 from '@/assets/images/corn_field_1.jpg';
 import cornField2 from '@/assets/images/corn_field_2.jpg';
@@ -12,7 +13,7 @@ const WEED_IDS = ['waterhemp', 'palmer-amaranth', 'lambsquarters', 'giant-ragwee
 
 const MIN_DIST = 10;
 
-function generateWeedSpots(layout: 'mixed' | 'rows' | 'center' | 'edges' | 'clumped' | 'diagonal' | 'scattered', count: number, seed: number): Array<{ x: number; y: number; weedId: string }> {
+function generateWeedSpots(layout: WeedLayout, count: number, seed: number): Array<{ x: number; y: number; weedId: string }> {
   const rng = (i: number) => ((seed * 9301 + 49297 + i * 1277) % 233280) / 233280;
   const spots: Array<{ x: number; y: number; weedId: string }> = [];
   const ids = shuffle(WEED_IDS);
@@ -23,42 +24,30 @@ function generateWeedSpots(layout: 'mixed' | 'rows' | 'center' | 'edges' | 'clum
       let x: number, y: number;
       const r1 = rng(i * 3 + attempt * 97);
       const r2 = rng(i * 3 + 1 + attempt * 97);
-      const r3 = rng(i * 3 + 2 + attempt * 53);
       switch (layout) {
         case 'mixed':
-          x = 5 + r1 * 90;
-          y = 5 + r2 * 90;
-          break;
+          x = 5 + r1 * 90; y = 5 + r2 * 90; break;
         case 'rows':
-          x = 5 + r1 * 90;
-          y = 10 + Math.floor(i / 2) * 18 + (r2 * 12 - 6);
-          break;
+          x = 5 + r1 * 90; y = 10 + Math.floor(i / 2) * 18 + (r2 * 12 - 6); break;
         case 'center':
-          x = 20 + r1 * 60;
-          y = 15 + r2 * 70;
-          break;
-        case 'edges':
+          x = 20 + r1 * 60; y = 15 + r2 * 70; break;
+        case 'edges': {
           const side = (i + attempt) % 4;
           if (side === 0) { x = 2 + r1 * 12; y = 5 + r2 * 90; }
           else if (side === 1) { x = 86 + r1 * 12; y = 5 + r2 * 90; }
           else if (side === 2) { x = 5 + r1 * 90; y = 2 + r2 * 12; }
           else { x = 5 + r1 * 90; y = 86 + r2 * 12; }
           break;
+        }
         case 'clumped': {
           const cx = 20 + (i % 3) * 30;
           const cy = 25 + Math.floor(i / 3) * 30;
-          x = cx + (r1 * 20 - 10);
-          y = cy + (r2 * 20 - 10);
-          break;
+          x = cx + (r1 * 20 - 10); y = cy + (r2 * 20 - 10); break;
         }
         case 'diagonal':
-          x = 5 + (i / count) * 85 + (r1 * 15 - 7);
-          y = 5 + (i / count) * 85 + (r2 * 15 - 7);
-          break;
+          x = 5 + (i / count) * 85 + (r1 * 15 - 7); y = 5 + (i / count) * 85 + (r2 * 15 - 7); break;
         case 'scattered':
-          x = 3 + r1 * 94;
-          y = 3 + r2 * 94;
-          break;
+          x = 3 + r1 * 94; y = 3 + r2 * 94; break;
       }
       x = Math.max(3, Math.min(97, x!));
       y = Math.max(3, Math.min(97, y!));
@@ -118,11 +107,12 @@ const CROP_IMAGES: Record<string, string[]> = {
 };
 
 const TOTAL_ROUNDS = 10;
+const CORRECT_PAY = 50;
+const WRONG_PAY = 10;
 
 export default function FieldScout({ onBack }: { onBack: () => void }) {
   const fieldOrder = useMemo(() => {
     const shuffled = shuffle([...FIELDS]);
-    // Ensure we have 10 rounds — repeat if needed
     const result: FieldDef[] = [];
     for (let i = 0; i < TOTAL_ROUNDS; i++) {
       result.push(shuffled[i % shuffled.length]);
@@ -130,11 +120,13 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
     return result;
   }, []);
 
+  const [showIntro, setShowIntro] = useState(true);
   const [round, setRound] = useState(0);
   const [chosen, setChosen] = useState<string | null>(null);
   const [scouting, setScouting] = useState(false);
   const [done, setDone] = useState(false);
   const [score, setScore] = useState(0);
+  const [money, setMoney] = useState(0);
 
   const finished = round >= TOTAL_ROUNDS;
   const field = !finished ? fieldOrder[round] : fieldOrder[0];
@@ -161,19 +153,50 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
     setTimeout(() => {
       setScouting(false);
       setDone(true);
-      if (chosen === field.bestPattern) setScore(s => s + 1);
+      const correct = chosen === field.bestPattern;
+      if (correct) {
+        setScore(s => s + 1);
+        setMoney(m => m + CORRECT_PAY);
+      } else {
+        setMoney(m => m + WRONG_PAY);
+      }
     }, 2000);
   };
 
   const next = () => { setRound(r => r + 1); setChosen(null); setDone(false); };
-  const restart = () => { setRound(0); setChosen(null); setDone(false); setScore(0); };
+  const restart = () => { setRound(0); setChosen(null); setDone(false); setScore(0); setMoney(0); setShowIntro(true); };
+
+  // Intro storyline
+  if (showIntro) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+        <Briefcase className="w-14 h-14 text-primary mb-4" />
+        <h2 className="text-2xl font-bold text-foreground mb-3">Welcome, Field Scout!</h2>
+        <p className="text-muted-foreground max-w-md mb-2">
+          Local farmers have hired you to scout their fields for weeds. Your job is to choose the best scouting pattern for each field so you can find as many weeds as possible.
+        </p>
+        <p className="text-muted-foreground max-w-md mb-2">
+          You'll earn <span className="font-bold text-primary">${CORRECT_PAY}</span> for choosing the best pattern and <span className="font-bold text-muted-foreground">${WRONG_PAY}</span> for a less effective choice.
+        </p>
+        <p className="text-muted-foreground max-w-md mb-6">
+          Scout {TOTAL_ROUNDS} fields and earn as much as you can!
+        </p>
+        <button onClick={() => setShowIntro(false)} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+          Start Scouting
+        </button>
+      </div>
+    );
+  }
 
   if (finished) {
+    const maxMoney = TOTAL_ROUNDS * CORRECT_PAY;
     return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Scouting Complete!</h2>
-        <p className="text-lg text-foreground mb-6">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
-        <p className="text-sm text-muted-foreground mb-4">Fields are shuffled each time you play.</p>
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+        <DollarSign className="w-12 h-12 text-primary mb-3" />
+        <h2 className="text-2xl font-bold text-foreground mb-2">Scouting Season Complete!</h2>
+        <p className="text-lg text-foreground mb-1">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
+        <p className="text-2xl font-bold text-primary mb-2">${money} earned</p>
+        <p className="text-sm text-muted-foreground mb-6">Out of a possible ${maxMoney}</p>
         <div className="flex gap-3">
           <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
           <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
@@ -189,7 +212,11 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Field Scout</h1>
-        <span className="text-sm text-muted-foreground">Field {round + 1}/{TOTAL_ROUNDS}</span>
+        <div className="flex items-center gap-1 text-primary font-bold text-sm">
+          <DollarSign className="w-4 h-4" />
+          {money}
+        </div>
+        <span className="text-sm text-muted-foreground ml-2">Field {round + 1}/{TOTAL_ROUNDS}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <div className="relative w-full aspect-[3/2] rounded-xl border-2 border-border mb-4 overflow-hidden">
@@ -235,7 +262,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
         {done && (
           <div className="text-center">
             <p className={`font-bold mb-1 ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
-              {isCorrect ? 'Great choice!' : `The best pattern was: ${PATTERNS.find(p => p.id === field.bestPattern)?.name}`}
+              {isCorrect ? `Great choice! +$${CORRECT_PAY}` : `The best pattern was: ${PATTERNS.find(p => p.id === field.bestPattern)?.name} (+$${WRONG_PAY})`}
             </p>
             <p className="text-sm text-muted-foreground mb-1">Weeds spotted: {field.weedCount}</p>
             <p className="text-sm text-muted-foreground mb-4">{field.note}</p>

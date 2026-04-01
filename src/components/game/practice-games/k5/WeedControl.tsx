@@ -14,10 +14,14 @@ const METHODS = [
 
 function bestMethod(w: typeof weeds[0]): string {
   const m = w.management.toLowerCase();
-  if (m.includes('hand') || m.includes('pull')) return 'pull';
-  if (m.includes('mow') || m.includes('mechanical') || m.includes('tillage')) return 'mow';
-  if (m.includes('herbicide') || m.includes('pre') || m.includes('post')) return 'spray';
-  return 'pull';
+  if (m.includes('hand') || m.includes('pull') || m.includes('hoe')) return 'pull';
+  if (m.includes('mow') || m.includes('mechanical') || m.includes('tillage') || m.includes('cultivation')) return 'mow';
+  if (m.includes('cover crop') || m.includes('rotation') || m.includes('compete') || m.includes('cultural')) return 'leave';
+  if (m.includes('herbicide') || m.includes('pre') || m.includes('post') || m.includes('chemical')) return 'spray';
+  // Cycle through methods based on weed id hash to avoid all being the same
+  const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const fallbacks = ['pull', 'mow', 'leave', 'spray'];
+  return fallbacks[hash % fallbacks.length];
 }
 
 interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: boolean; managed: boolean; correct: boolean; }
