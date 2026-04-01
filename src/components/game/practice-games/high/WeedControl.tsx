@@ -79,14 +79,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
  const restart = () => { setItems(fieldWeeds.map(w => ({ ...w, found: false, managed: false }))); setActive(null); setEnlarged(false); setMethodPick(null); setExplanation(''); setTime(120); setScore(0); };
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
- 
- <h2 className="font-display font-bold text-2xl text-foreground mb-2">Field Managed!</h2>
- <p className="text-foreground mb-6">Score: {score} / {items.length}</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

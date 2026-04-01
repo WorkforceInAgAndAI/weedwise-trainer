@@ -35,14 +35,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
- <p className="text-4xl mb-2"></p>
- <h2 className="font-display font-bold text-2xl text-foreground mb-2">Well Done!</h2>
- <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">

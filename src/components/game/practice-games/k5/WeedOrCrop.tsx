@@ -70,16 +70,7 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
  setRound(r => r + 1); setTimer(10); setAnswered(false); setCorrect(null);
  };
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
- <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
- <div className="text-5xl mb-4"></div>
- <h2 className="text-2xl font-bold text-foreground mb-2">Game Over!</h2>
- <p className="text-lg text-muted-foreground mb-6">You scored {score} / {rounds.length}</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  const item = rounds[round];
  return (

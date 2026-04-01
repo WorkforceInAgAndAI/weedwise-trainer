@@ -38,14 +38,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
- <FlaskConical className="w-10 h-10 text-primary mb-3" />
- <h2 className="font-display font-bold text-2xl text-foreground mb-2">Complete!</h2>
- <p className="text-foreground mb-6">Score: {score} / {items.length}</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  const cur = items[idx];
  return (

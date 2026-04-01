@@ -114,16 +114,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     return shuffle([correct, ...wrongs]);
   }, [activeWeed, weedState]);
 
-  if (done) return (
-    <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
-      <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{timer > 0 ? 'Field Clear!' : "Time's Up!"}</h2>
-        <p className="text-muted-foreground mb-2">Managed: {managed}/{weedState.length}</p>
-        <p className="text-muted-foreground mb-6">Correct methods: {score}/{managed}</p>
-        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
-      </div>
-    </div>
-  );
+  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">

@@ -44,15 +44,7 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
 
  const isCorrect = checked && order.every((s, i) => s === STAGES[i]);
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
- <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
- <h2 className="text-2xl font-display font-bold text-foreground mb-2">All Done!</h2>
- <p className="text-muted-foreground mb-6">You got {score} / {targets.length} correct!</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

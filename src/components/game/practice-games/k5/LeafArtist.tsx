@@ -143,15 +143,7 @@ export default function LeafArtist({ onBack }: { onBack: () => void }) {
  const gradeLabels = ['', 'Keep Practicing', 'Good Try', 'Great Job'];
  const gradeColors = ['', 'text-warning', 'text-primary', 'text-success'];
 
- if (done) return (
- <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
- <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
- <h2 className="text-2xl font-display font-bold text-foreground mb-2">Great Drawing!</h2>
- <p className="text-muted-foreground mb-6">You completed all {rounds.length} leaf drawings.</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- </div>
- );
+ if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

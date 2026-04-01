@@ -104,13 +104,8 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const totalPossible = TOTAL_ROUNDS * PAIRS_PER_ROUND;
 
   if (done) {
-    return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Challenge Complete!</h2>
-        <p className="text-lg text-foreground mb-6">{score}/{totalPossible} pairs correct</p>
-        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
-      </div>
-    );
+    return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title="Level {level}" />;
+  }
   }
 
   return (
