@@ -86,7 +86,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
  <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
  <h2 className="text-2xl font-bold text-foreground mb-2">{timeLeft <= 0 ? "Time's Up!" : 'Field Clear!'}</h2>
  <p className="text-lg text-foreground mb-6">{score}/{fieldWeeds.length} correct methods</p>
- <LevelComplete level={level} score={score} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={score} total={fieldWeeds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

@@ -125,8 +125,6 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
   };
 
   const restart = () => {
-  const nextLevel = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); restart(); };
     setPlacements({});
     setSelected(null);
     setChecked(false);
