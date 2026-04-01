@@ -1,13 +1,12 @@
-import { Award, ChevronRight, ChevronLeft, Star, Trophy, Target } from 'lucide-react';
+import { Medal, ChevronRight, ChevronLeft, Target } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 
-const TIER_ICONS = [Target, Star, Award, Trophy];
-const TIER_LABELS = ['Bronze', 'Silver', 'Gold', 'Master'];
+const TIER_ICONS = [Medal, Medal, Medal];
+const TIER_LABELS = ['Bronze', 'Silver', 'Gold'];
 
 function getTier(score: number, total: number) {
  const pct = total > 0 ? score / total : 0;
- if (pct >= 0.95) return 3;
- if (pct >= 0.8) return 2;
+ if (pct >= 0.85) return 2;
  if (pct >= 0.6) return 1;
  return 0;
 }
@@ -35,7 +34,7 @@ export default function GameProgressSidebar() {
  <div className={`fixed right-0 top-0 h-full w-72 bg-card border-l border-border z-[59] shadow-xl transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
  <div className="p-4 border-b border-border">
  <div className="flex items-center gap-2">
- <Award className="w-5 h-5 text-primary" />
+  <Medal className="w-5 h-5 text-primary" />
  <h2 className="font-display font-bold text-foreground">Progress</h2>
  <span className="ml-auto text-xs text-muted-foreground font-medium">{totalBadges} badges</span>
  </div>
@@ -54,10 +53,9 @@ export default function GameProgressSidebar() {
  const tier = getTier(badge.score, badge.total);
  const TierIcon = TIER_ICONS[tier];
  const tierColors = [
- 'text-amber-700 bg-amber-100',
- 'text-slate-500 bg-slate-100',
- 'text-yellow-600 bg-yellow-100',
- 'text-primary bg-primary/10',
+  'text-amber-700 bg-amber-100 border border-amber-300',
+  'text-slate-600 bg-slate-100 border border-slate-300',
+  'text-yellow-700 bg-yellow-100 border border-yellow-300',
  ];
  return (
  <div key={`${badge.gameId}-${badge.level}-${i}`} className="flex items-center gap-3 p-2.5 rounded-lg bg-secondary/50 border border-border">
