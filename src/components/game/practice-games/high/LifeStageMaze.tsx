@@ -43,8 +43,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 function generateLayout() {
-  // 4 stages on left at fixed rows
-  const stageRows = [1, 3, 6, 8];
+  // 4 stages on left — shuffled rows so they aren't lined up with controls
+  const stageRows = shuffle([0, 2, 5, 8]);
   const stagePositions = STAGES.map((s, i) => ({ ...s, row: stageRows[i], col: 0 }));
 
   // Pick one control per stage (best match)
@@ -54,44 +54,26 @@ function generateLayout() {
     if (match) picked.push(match);
   }
 
-  // Use only order-preserving row layouts so all stage paths can be drawn without crossing,
-  // while still avoiding direct row-to-row matches.
-  const validControlLayouts = [
-    [0, 2, 7, 9],
-    [0, 4, 7, 9],
-    [2, 4, 7, 9],
-  ];
-  const chosenLayout = validControlLayouts[Math.floor(Math.random() * validControlLayouts.length)];
-
-  const controlPositions = picked.map((c, i) => ({ ...c, row: chosenLayout[i], col: 9 }));
+  // Shuffle control rows independently so they don't mirror stage rows
+  const controlRowPool = shuffle([1, 3, 6, 9]);
+  const controlPositions = picked.map((c, i) => ({ ...c, row: controlRowPool[i], col: 9 }));
 
   const occupied = new Set<string>();
   stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
   controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
 
-  // Create sparse obstacle islands so paths must navigate around roadblocks,
-  // while keeping enough open lanes for all stage-to-control connections.
+  // Sparse walls: small 1-2 cell clusters leaving wide 3-row open lanes
   const walls = new Set<string>();
-  const wallPatterns: GridCell[] = [
-    // Left lane blockers (force first detour)
-    { row: 1, col: 2 }, { row: 2, col: 2 },
-    { row: 4, col: 2 }, { row: 5, col: 2 },
-    { row: 7, col: 2 }, { row: 8, col: 2 },
-
-    // Mid lane blockers (second detour points)
-    { row: 2, col: 4 }, { row: 3, col: 4 },
-    { row: 6, col: 4 }, { row: 7, col: 4 },
-
-    // Right-mid lane blockers (third detour points)
-    { row: 1, col: 6 }, { row: 2, col: 6 },
-    { row: 4, col: 6 }, { row: 5, col: 6 },
-    { row: 7, col: 6 }, { row: 8, col: 6 },
-
-    // Near-control blockers (prevent straight final approach)
-    { row: 2, col: 8 }, { row: 3, col: 8 },
-    { row: 6, col: 8 }, { row: 7, col: 8 },
+  const candidates: GridCell[] = [
+    { row: 2, col: 3 }, { row: 3, col: 3 },
+    { row: 6, col: 3 }, { row: 7, col: 3 },
+    { row: 1, col: 5 },
+    { row: 4, col: 5 }, { row: 5, col: 5 },
+    { row: 8, col: 5 },
+    { row: 3, col: 7 },
+    { row: 6, col: 7 }, { row: 7, col: 7 },
   ];
-  wallPatterns.forEach(w => {
+  candidates.forEach(w => {
     const key = `${w.row},${w.col}`;
     if (!occupied.has(key)) walls.add(key);
   });

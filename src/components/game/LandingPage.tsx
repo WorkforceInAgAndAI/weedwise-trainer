@@ -8,20 +8,19 @@ import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Game
 const CAROUSEL_WEEDS = ['waterhemp', 'palmer-amaranth', 'giant-ragweed', 'lambsquarters', 'velvetleaf', 'marestail', 'kochia', 'morningglory'];
 
 interface Props extends GameEngine {
- onOpenLearning: () => void;
- onOpenGlossary: () => void;
- onOpenClassJoin: () => void;
- onOpenDashboard: () => void;
- onOpenLeaderboard: () => void;
- onOpenAuth: () => void;
- onOpenCompetition: () => void;
- onOpenFarmMode: () => void;
- onOpenPracticeHub: () => void;
- onOpenStats: () => void;
- studentSession: { nickname: string; className: string } | null;
- auth: ReturnType<typeof useAuth>;
- grade: GradeLevel;
- onGradeChange: (g: GradeLevel) => void;
+  onOpenLearning: () => void;
+  onOpenGlossary: () => void;
+  onOpenClassJoin: () => void;
+  onOpenDashboard: () => void;
+  onOpenLeaderboard: () => void;
+  onOpenCompetition: () => void;
+  onOpenFarmMode: () => void;
+  onOpenPracticeHub: () => void;
+  onOpenStats: () => void;
+  studentSession: { nickname: string; className: string } | null;
+  auth: ReturnType<typeof useAuth>;
+  grade: GradeLevel;
+  onGradeChange: (g: GradeLevel) => void;
 }
 
 export default function LandingPage({
