@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -17,10 +18,11 @@ const EFFECTS: Record<string, string> = {
 };
 
 export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const items = useMemo(() => {
  const invasive = weeds.filter(w => w.origin === 'Introduced' && EFFECTS[w.id]);
  return shuffle(invasive).slice(0, 5).map(w => ({ weed: w, effect: EFFECTS[w.id] }));
- }, []);
+ }, [level]);
 
  const shuffledEffects = useMemo(() => shuffle(items.map(i => ({ weedId: i.weed.id, effect: i.effect }))), [items]);
  const [matches, setMatches] = useState<Record<string, string>>({});
@@ -68,10 +70,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
  </div>
  );
  })}
- <div className="flex gap-3 justify-center pt-4">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  </div>

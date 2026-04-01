@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -34,6 +35,7 @@ function buildRound(you: typeof weeds[0], opponent: typeof weeds[0]) {
 }
 
 export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const matchups = useMemo(() => {
  const pool = shuffle(weeds);
  const result: { you: typeof weeds[0]; opponent: typeof weeds[0] }[] = [];
@@ -77,16 +79,15 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setMatchIdx(0); setStep(0); setPoints(0); setTotalPoints(0); setPicked(null); setAnswered(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
  <h2 className="text-2xl font-bold text-foreground mb-2">Competition Over!</h2>
  <p className="text-lg text-foreground mb-6">{totalPoints}/{matchups.length * 3} advantages won</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

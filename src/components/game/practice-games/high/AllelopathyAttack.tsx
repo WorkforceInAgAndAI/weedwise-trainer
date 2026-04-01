@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Leaf, Droplets, Layers, Wind, Swords, Flame, Bug, CloudRain, Sprout } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -48,6 +49,7 @@ function pickStrategies(bestId: string): typeof ALL_STRATEGIES {
 }
 
 export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const [phase, setPhase] = useState<'select' | 'play' | 'done'>('select');
   const [playerWeed, setPlayerWeed] = useState(PLAYER_WEEDS[0]);
@@ -65,6 +67,8 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
   const submit = (sId: string) => { if (answered) return; setPicked(sId); setAnswered(true); if (sId === rounds[idx].best) setScore(s => s + 1); };
   const next = () => { setIdx(i => i + 1); setPicked(null); setAnswered(false); };
   const restart = () => { setPhase('select'); setIdx(0); setPicked(null); setAnswered(false); setScore(0); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   // Character selection
   if (phase === 'select') {
@@ -100,10 +104,7 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
         <Swords className="w-10 h-10 text-primary mb-3" />
         <h2 className="font-display font-bold text-2xl text-foreground mb-2">Battle Won!</h2>
         <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
-        <div className="flex gap-3">
-          <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
-        </div>
+        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }

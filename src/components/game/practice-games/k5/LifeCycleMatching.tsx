@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -26,6 +27,7 @@ function pickRoundWeeds(): { weed: typeof weeds[0]; correct: string }[] {
 const TOTAL_ROUNDS = 4;
 
 export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -80,10 +82,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
           <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {TOTAL_ROUNDS} rounds!</p>
-          <div className="flex gap-3 justify-center">
-            <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-            <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
-          </div>
+          <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
         </div>
       </div>
     );

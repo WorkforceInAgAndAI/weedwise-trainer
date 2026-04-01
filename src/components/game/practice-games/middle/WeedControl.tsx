@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -25,6 +26,7 @@ function getBestMethod(w: typeof weeds[0]): string {
 }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const fieldWeeds = useMemo(() => shuffle(weeds).slice(0, 8).map((w, i) => ({
  weed: w, x: 15 + (i % 4) * 20 + Math.random() * 10, y: 20 + Math.floor(i / 4) * 35 + Math.random() * 15,
  best: getBestMethod(w),
@@ -76,16 +78,15 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setFound([]); setCurrent(null); setIdentified(false); setMethodPick(null); setIdChoice(null); setScore(0); setTimeLeft(120); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
  <h2 className="text-2xl font-bold text-foreground mb-2">{timeLeft <= 0 ? "Time's Up!" : 'Field Clear!'}</h2>
  <p className="text-lg text-foreground mb-6">{score}/{fieldWeeds.length} correct methods</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

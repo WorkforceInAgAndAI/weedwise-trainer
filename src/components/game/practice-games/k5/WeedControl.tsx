@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBgImage from '@/assets/images/field-background.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -27,6 +28,7 @@ function bestMethod(w: typeof weeds[0]): string {
 interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: boolean; managed: boolean; correct: boolean; }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const fieldWeeds = useMemo<FieldWeed[]>(() =>
     shuffle(weeds).slice(0, 8).map(w => ({
       weed: w, x: 10 + Math.random() * 75, y: 10 + Math.random() * 55,
@@ -42,6 +44,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [methodChoice, setMethodChoice] = useState<string | null>(null);
 
   const restart = () => { setWeedState(fieldWeeds); setTimer(90); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   useEffect(() => {
     if (done) return;
@@ -116,10 +120,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <h2 className="text-2xl font-bold text-foreground mb-2">{timer > 0 ? 'Field Clear!' : "Time's Up!"}</h2>
         <p className="text-muted-foreground mb-2">Managed: {managed}/{weedState.length}</p>
         <p className="text-muted-foreground mb-6">Correct methods: {score}/{managed}</p>
-        <div className="flex gap-3 justify-center">
-          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
-        </div>
+        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -8,6 +9,7 @@ const STAGES = ['seed', 'seedling', 'vegetative', 'flower'];
 const STAGE_LABELS: Record<string, string> = { seed: 'Seed', seedling: 'Seedling', vegetative: 'Vegetative', flower: 'Reproductive' };
 
 export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const targets = useMemo(() => shuffle(weeds).slice(0, 4), []);
  const [targetIdx, setTargetIdx] = useState(0);
  const [order, setOrder] = useState<string[]>(() => shuffle([...STAGES]));
@@ -18,6 +20,8 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
  const done = targetIdx >= targets.length;
 
  const restart = () => { setTargetIdx(0); setOrder(shuffle([...STAGES])); setChecked(false); setScore(0); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  const swap = (i: number, j: number) => {
  if (checked) return;
@@ -45,10 +49,7 @@ export default function LifeStagesSequence({ onBack }: { onBack: () => void }) {
  <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
  <h2 className="text-2xl font-display font-bold text-foreground mb-2">All Done!</h2>
  <p className="text-muted-foreground mb-6">You got {score} / {targets.length} correct!</p>
- <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

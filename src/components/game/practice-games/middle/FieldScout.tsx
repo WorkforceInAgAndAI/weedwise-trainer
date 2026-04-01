@@ -6,6 +6,7 @@ import cornField2 from '@/assets/images/corn_field_2.jpg';
 import soybeanField1 from '@/assets/images/soybean_field_1.jpg';
 import pastureField1 from '@/assets/images/pasture_field_1.jpg';
 import pastureField2 from '@/assets/images/pasture_field_2.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -111,6 +112,7 @@ const CORRECT_PAY = 50;
 const WRONG_PAY = 10;
 
 export default function FieldScout({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const fieldOrder = useMemo(() => {
     const shuffled = shuffle([...FIELDS]);
     const result: FieldDef[] = [];
@@ -165,6 +167,8 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
 
   const next = () => { setRound(r => r + 1); setChosen(null); setDone(false); };
   const restart = () => { setRound(0); setChosen(null); setDone(false); setScore(0); setMoney(0); setShowIntro(true); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   // Intro storyline
   if (showIntro) {
@@ -197,10 +201,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
         <p className="text-lg text-foreground mb-1">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
         <p className="text-2xl font-bold text-primary mb-2">${money} earned</p>
         <p className="text-sm text-muted-foreground mb-6">Out of a possible ${maxMoney}</p>
-        <div className="flex gap-3">
-          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
-        </div>
+        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }

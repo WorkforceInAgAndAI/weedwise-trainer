@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Sprout, Leaf, Flower2, TreeDeciduous, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle, Info } from 'lucide-react';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const STAGES = [
   { id: 'seedling', label: 'Seedling', Icon: Sprout },
@@ -82,6 +83,7 @@ function generateLayout() {
 }
 
 export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const [showInstructions, setShowInstructions] = useState(true);
   const layout = useMemo(() => generateLayout(), []);
   const { stagePositions, controlPositions, walls } = layout;
@@ -154,6 +156,8 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   }).length;
 
   const restart = () => { setConnections([]); setDrawing(null); setChecked(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   const getCellState = (row: number, col: number) => {
     if (drawing?.path.some(p => p.row === row && p.col === col)) return 'drawing';

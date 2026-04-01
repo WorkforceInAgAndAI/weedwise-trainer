@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import worldMap from '@/assets/images/world-map.jpg';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -27,6 +28,7 @@ function getOriginContinent(w: typeof weeds[0]): string {
 }
 
 export default function WeedOrigins({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const rounds = useMemo(() => shuffle(weeds).slice(0, 8).map(w => ({ weed: w, continent: getOriginContinent(w) })), []);
  const [round, setRound] = useState(0);
  const [selected, setSelected] = useState<string | null>(null);
@@ -45,16 +47,15 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
 
  const next = () => { setRound(r => r + 1); setSelected(null); setAnswered(false); };
  const restart = () => { setRound(0); setScore(0); setSelected(null); setAnswered(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
  <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
  <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

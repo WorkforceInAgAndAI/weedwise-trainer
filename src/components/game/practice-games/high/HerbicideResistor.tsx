@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Dna } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -58,6 +59,7 @@ function getYearExplanation(crop: string, herb: string, yearIdx: number, allChoi
 }
 
 export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
  const [year, setYear] = useState(0);
  const [choices, setChoices] = useState<{ crop: string; herb: string }[]>([]);
@@ -99,6 +101,8 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
  }, [choices]);
 
  const restart = () => { setYear(0); setChoices([]); setCrop(null); setHerb(null); setDone(false); setShowReview(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  addBadge({ gameId: 'herbicide-resistor', gameName: 'Herbicide Resistor', level: 'HS', score, total: 15 });
@@ -116,10 +120,7 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
  </div>
  ))}
  </div>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-xl bg-secondary text-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -12,6 +13,7 @@ const REMOVAL_METHODS = [
 ];
 
 export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const rounds = useMemo(() => {
  const toxic = weeds.filter(w => w.safetyNote);
  const safe = weeds.filter(w => !w.safetyNote);
@@ -45,6 +47,8 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
  };
 
  const restart = () => { setRound(0); setSelected(null); setIdentified(false); setRemovalChoice(null); setScore(0); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) return (
  <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
@@ -52,10 +56,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
  <div className="text-5xl mb-4"></div>
  <h2 className="text-2xl font-bold text-foreground mb-2">Safety Expert!</h2>
  <p className="text-muted-foreground mb-6">You identified {score}/{rounds.length} toxic weeds!</p>
- <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

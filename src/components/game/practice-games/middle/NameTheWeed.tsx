@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 export default function NameTheWeed({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const rounds = useMemo(() => {
  const pool = shuffle(weeds).slice(0, 10);
  return pool.map(w => {
@@ -31,16 +33,15 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
 
  const next = () => { setAnswered(false); setSelected(''); setRound(r => r + 1); };
  const restart = () => { setRound(0); setScore(0); setAnswered(false); setSelected(''); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
  <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
  <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

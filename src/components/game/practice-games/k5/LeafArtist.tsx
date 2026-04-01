@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { supabase } from '@/integrations/supabase/client';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -13,6 +14,7 @@ const venationTypes = [
 const STUDY_TIME = 8; // seconds to view the image
 
 export default function LeafArtist({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const canvasRef = useRef<HTMLCanvasElement>(null);
  const [drawing, setDrawing] = useState(false);
  const [submitted, setSubmitted] = useState(false);
@@ -135,6 +137,8 @@ export default function LeafArtist({ onBack }: { onBack: () => void }) {
  setStudyTimer(STUDY_TIME);
  setStudyDone(false);
  };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  const gradeLabels = ['', 'Keep Practicing', 'Good Try', 'Great Job'];
  const gradeColors = ['', 'text-warning', 'text-primary', 'text-success'];
@@ -144,10 +148,7 @@ export default function LeafArtist({ onBack }: { onBack: () => void }) {
  <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
  <h2 className="text-2xl font-display font-bold text-foreground mb-2">Great Drawing!</h2>
  <p className="text-muted-foreground mb-6">You completed all {rounds.length} leaf drawings.</p>
- <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

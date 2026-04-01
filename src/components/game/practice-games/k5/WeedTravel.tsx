@@ -3,6 +3,7 @@ import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, 
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -107,6 +108,7 @@ function getNode(id: string): AdventureNode {
 }
 
 export default function WeedTravel({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const seedCharacters = useMemo(() => buildSeedCharacters(), []);
 

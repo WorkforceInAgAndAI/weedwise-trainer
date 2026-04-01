@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
 import { Droplets, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -28,6 +29,7 @@ interface SprayRound {
 }
 
 export default function HerbicideApplicator({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
  const fieldItems = useMemo(() => shuffle(weeds).slice(0, 6).map((w, i) => ({
  weed: w,
@@ -107,6 +109,8 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
  setShowResults(false);
  setTotalScore(0);
  };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  if (done) {
  addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Resistance', level: 'MS', score: totalScore, total: items.length * MAX_ROUNDS });
@@ -120,10 +124,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
  ? 'Excellent resistance management! Rotating MOAs and using proper rates kept resistance low.'
  : 'Some weeds developed resistance. Try rotating herbicide modes of action and using label rates next time.'}
  </p>
- <div className="flex gap-3">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  );
  }

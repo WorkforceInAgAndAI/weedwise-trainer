@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -30,6 +31,7 @@ const CROP_IMAGES: Record<string, string> = {
 interface RoundItem { type: 'weed' | 'crop'; name: string; weedId?: string; cropImage?: string; }
 
 export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
  const rounds = useMemo(() => {
  const items: RoundItem[] = [];
  shuffle(weeds).slice(0, 5).forEach(w => items.push({ type: 'weed', name: w.commonName, weedId: w.id }));
@@ -45,6 +47,8 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
  const [done, setDone] = useState(false);
 
  const restart = () => { setRound(0); setScore(0); setTimer(10); setAnswered(false); setCorrect(null); setDone(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  useEffect(() => {
  if (answered || done) return;
@@ -72,10 +76,7 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
  <div className="text-5xl mb-4"></div>
  <h2 className="text-2xl font-bold text-foreground mb-2">Game Over!</h2>
  <p className="text-lg text-muted-foreground mb-6">You scored {score} / {rounds.length}</p>
- <div className="flex gap-3 justify-center">
- <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
- <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
- </div>
+ <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  );

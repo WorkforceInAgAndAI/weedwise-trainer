@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -71,6 +72,7 @@ function buildWordBank(correctItems: NeedItem[]): NeedItem[] {
 }
 
 export default function PestID({ onBack }: { onBack: () => void }) {
+  const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const rounds = useMemo(() => {
     const byCategory: Record<string, typeof weeds[0][]> = { Terrestrial: [], Aquatic: [], Parasitic: [] };
@@ -146,6 +148,8 @@ export default function PestID({ onBack }: { onBack: () => void }) {
 
   const next = () => { setRound(r => r + 1); setSelected(''); setAnswered(false); setPhase('classify'); };
   const restart = () => { setRound(0); setScore(0); setNeedsScore(0); setSelected(''); setAnswered(false); setPhase('classify'); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
     addBadge({ gameId: 'pest-id', gameName: 'Pest ID', level: 'MS', score, total: rounds.length });
@@ -154,10 +158,7 @@ export default function PestID({ onBack }: { onBack: () => void }) {
         <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
         <p className="text-lg text-foreground mb-2">{score}/{rounds.length} classifications correct</p>
         <p className="text-sm text-muted-foreground mb-6">{needsScore} bonus points from needs questions</p>
-        <div className="flex gap-3">
-          <button onClick={restart} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Play Again</button>
-          <button onClick={onBack} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Back to Games</button>
-        </div>
+        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }
