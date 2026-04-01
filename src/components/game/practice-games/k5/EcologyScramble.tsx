@@ -66,6 +66,9 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
   const [sortScore, setSortScore] = useState(0);
   const [weedScore, setWeedScore] = useState(0);
 
+  // Shuffle the answer bank for each weed round
+  const shuffledNeeds = useMemo(() => shuffle([...ALL_NEEDS]), [weedIdx]);
+
   const unplaced = items.filter(i => !placements[i.id]);
   const allPlaced = Object.keys(placements).length === items.length;
 
