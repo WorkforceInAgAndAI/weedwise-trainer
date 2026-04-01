@@ -6,10 +6,10 @@ import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const ZONES = [
- { id: 'hot', label: 'Hot & Sunny', Icon: Sun, color: 'from-amber-100 to-orange-100' },
- { id: 'cold', label: 'Cool & Temperate', Icon: Thermometer, color: 'from-blue-50 to-cyan-100' },
- { id: 'wet', label: 'Wet & Moist', Icon: Droplets, color: 'from-blue-100 to-blue-200' },
- { id: 'dry', label: 'Dry & Arid', Icon: Wind, color: 'from-yellow-50 to-amber-100' },
+  { id: 'hot', label: 'Hot & Sunny', Icon: Sun },
+  { id: 'cold', label: 'Cool & Temperate', Icon: Thermometer },
+  { id: 'wet', label: 'Wet & Moist', Icon: Droplets },
+  { id: 'dry', label: 'Dry & Arid', Icon: Wind },
 ];
 
 function getZone(w: typeof weeds[0]): string {
