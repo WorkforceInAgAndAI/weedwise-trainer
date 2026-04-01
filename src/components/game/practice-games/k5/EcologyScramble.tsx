@@ -135,8 +135,9 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
     setSortScore(0);
     setWeedScore(0);
   };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
-  // Done screen
   if (phase === 'done') {
     const total = items.length + weedRounds.length;
     const finalScore = sortScore + weedScore;
@@ -147,7 +148,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
         <h2 className="font-display font-bold text-2xl text-foreground mb-2">Ecology Expert!</h2>
         <p className="text-foreground mb-2">Sorting: {sortScore}/{items.length}</p>
         <p className="text-foreground mb-6">Weed Needs: {weedScore}/{weedRounds.length}</p>
-        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+        <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }

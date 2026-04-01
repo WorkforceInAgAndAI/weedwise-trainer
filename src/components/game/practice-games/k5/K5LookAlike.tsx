@@ -45,7 +45,7 @@ export default function K5LookAlike({ onBack }: { onBack: () => void }) {
 
  const next = () => { setRound(r => r + 1); setSelected(null); setSubmitted(false); };
 
- if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+ if (done) return <LevelComplete level={level} score={score} total={pairs.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  return (
  <div className="fixed inset-0 bg-background z-50 flex flex-col">

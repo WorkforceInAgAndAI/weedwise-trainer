@@ -38,7 +38,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
- if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+ if (done) return <LevelComplete level={level} score={score} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
  const cur = items[idx];
  return (

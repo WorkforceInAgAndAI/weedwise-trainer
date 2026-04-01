@@ -100,12 +100,13 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   };
 
   const restart = () => { setRound(0); setScore(0); setChecked(false); setPlacements({}); setSelectedWeed(null); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   const totalPossible = TOTAL_ROUNDS * PAIRS_PER_ROUND;
 
   if (done) {
-    return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title="Level {level}" />;
-  }
+    return <LevelComplete level={level} score={score} total={totalPossible} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title={`Native vs. Introduced Lv.${level}`} />;
   }
 
   return (

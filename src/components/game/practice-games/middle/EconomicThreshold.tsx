@@ -146,7 +146,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
  : 'When the weed population is below the threshold, the cost of control may exceed the damage — monitoring is sufficient.'}
  </p>
  </div>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={decision === (isAbove ? 'above' : 'below') ? 1 : 0} total={1} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  )}
  </div>

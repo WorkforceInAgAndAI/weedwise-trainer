@@ -114,7 +114,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     return shuffle([correct, ...wrongs]);
   }, [activeWeed, weedState]);
 
-  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  if (done) return <LevelComplete level={level} score={score} total={fieldWeeds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">

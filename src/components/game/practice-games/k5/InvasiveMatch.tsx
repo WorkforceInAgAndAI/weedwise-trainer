@@ -31,6 +31,8 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
  const [showReview, setShowReview] = useState(false);
 
  const restart = () => { setMatches({}); setSelectedWeed(null); setChecked(false); setShowReview(false); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
  const handleEffectClick = (weedId: string) => {
  if (!selectedWeed || checked) return;
@@ -71,7 +73,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
  </div>
  );
  })}
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+ <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
  </div>
  </div>
  </div>

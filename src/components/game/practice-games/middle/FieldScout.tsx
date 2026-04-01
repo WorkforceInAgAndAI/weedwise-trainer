@@ -201,7 +201,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
         <p className="text-lg text-foreground mb-1">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
         <p className="text-2xl font-bold text-primary mb-2">${money} earned</p>
         <p className="text-sm text-muted-foreground mb-6">Out of a possible ${maxMoney}</p>
-        <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+        <LevelComplete level={level} score={score} total={TOTAL_ROUNDS} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }

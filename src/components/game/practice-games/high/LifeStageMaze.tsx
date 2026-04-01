@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Sprout, Leaf, Flower2, TreeDeciduous, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, Check, X, AlertTriangle, Info } from 'lucide-react';
+import { Sprout, Leaf, Flower2, TreeDeciduous, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, ChevronRight, Check, X, AlertTriangle, Info } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const STAGES = [
