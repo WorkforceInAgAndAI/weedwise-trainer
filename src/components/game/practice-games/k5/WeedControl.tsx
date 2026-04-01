@@ -8,7 +8,7 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const METHODS = [
   { id: 'pull', label: 'Pull by hand', icon: '' },
   { id: 'spray', label: 'Spray herbicide', icon: '' },
-  { id: 'mow', label: 'Mow it down', icon: 'MW' },
+  { id: 'mow', label: 'Mow it down', icon: '' },
   { id: 'leave', label: 'Leave it alone', icon: '' },
 ];
 
