@@ -135,8 +135,9 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
     setSortScore(0);
     setWeedScore(0);
   };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
-  // Done screen
   if (phase === 'done') {
     const total = items.length + weedRounds.length;
     const finalScore = sortScore + weedScore;

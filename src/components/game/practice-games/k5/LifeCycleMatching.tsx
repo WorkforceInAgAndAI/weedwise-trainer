@@ -73,8 +73,9 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
     setChecked(false);
     setDraggedId(null);
   };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
-  if (done) {
     const total = TOTAL_ROUNDS * 6;
     addBadge({ gameId: 'lifecycle-matching-k5', gameName: 'Life Cycle Matching', level: 'K-5', score: totalScore, total });
     return (
