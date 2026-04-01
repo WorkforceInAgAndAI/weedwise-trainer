@@ -1221,28 +1221,32 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  </div>
 
  {/* Mobile bottom bar */}
- <div className="sm:hidden border-t border-border bg-card p-3">
- <div className="flex gap-2 overflow-x-auto pb-1">
- <button onClick={() => setPhase('scouting')}
- className={`shrink-0 px-3 py-2 rounded-md border text-xs font-medium flex items-center gap-1.5 transition-colors ${
- hasScouted ? 'border-success/30 bg-success/5 text-foreground' : 'border-primary border-2 bg-primary/8 text-foreground animate-pulse'
- }`}>
- <Eye className="w-3.5 h-3.5" /> Scout
- </button>
- <button onClick={() => hasScouted && setPhase('identifying')} disabled={!hasScouted}
- className="shrink-0 px-3 py-2 rounded-md border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors flex items-center gap-1.5 disabled:opacity-50">
- <Crosshair className="w-3.5 h-3.5" /> Identify
- </button>
- <button onClick={() => { if (hasScouted) { setPhase('managing'); setMgmtMode('choose'); }}} disabled={!hasScouted}
- className="shrink-0 px-3 py-2 rounded-md border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors flex items-center gap-1.5 disabled:opacity-50">
- <Settings2 className="w-3.5 h-3.5" /> Manage
- </button>
- <button onClick={advanceSeason}
- className="shrink-0 px-4 py-2 rounded-md bg-success text-success-foreground text-xs font-bold">
- {currentSeason === 'late-summer' ? 'Harvest' : 'Next'} <ChevronRight className="w-3 h-3 inline" />
- </button>
- </div>
- </div>
+  <div className="sm:hidden border-t border-border bg-card p-3">
+    <div className="flex gap-2 overflow-x-auto pb-1">
+      <button onClick={onClose}
+        className="shrink-0 px-3 py-2 rounded-md border border-destructive/30 text-xs font-medium text-destructive flex items-center gap-1.5">
+        <X className="w-3.5 h-3.5" /> Exit
+      </button>
+      <button onClick={() => setPhase('scouting')}
+        className={`shrink-0 px-3 py-2 rounded-md border text-xs font-medium flex items-center gap-1.5 transition-colors ${
+          hasScouted ? 'border-success/30 bg-success/5 text-foreground' : 'border-primary border-2 bg-primary/8 text-foreground animate-pulse'
+        }`}>
+        <Eye className="w-3.5 h-3.5" /> Scout
+      </button>
+      <button onClick={() => hasScouted && setPhase('identifying')} disabled={!hasScouted}
+        className="shrink-0 px-3 py-2 rounded-md border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors flex items-center gap-1.5 disabled:opacity-50">
+        <Crosshair className="w-3.5 h-3.5" /> Identify
+      </button>
+      <button onClick={() => { if (hasScouted) { setPhase('managing'); setMgmtMode('choose'); }}} disabled={!hasScouted}
+        className="shrink-0 px-3 py-2 rounded-md border border-border text-xs font-medium text-foreground hover:bg-secondary transition-colors flex items-center gap-1.5 disabled:opacity-50">
+        <Settings2 className="w-3.5 h-3.5" /> Manage
+      </button>
+      <button onClick={advanceSeason}
+        className="shrink-0 px-4 py-2 rounded-md bg-success text-success-foreground text-xs font-bold">
+        {currentSeason === 'late-summer' ? 'Harvest' : 'Next'} <ChevronRight className="w-3 h-3 inline" />
+      </button>
+    </div>
+  </div>
  </div>
  );
 }
