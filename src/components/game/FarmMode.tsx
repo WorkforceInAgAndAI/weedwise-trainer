@@ -1122,26 +1122,26 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
 
   // Main Layout: Field always visible + side panel 
   return (
-  <div className="fixed inset-0 bg-background z-40 overflow-hidden flex flex-col">
-  {/* Top bar */}
-  <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0">
-  <div className="flex items-center gap-3">
-  <button onClick={onClose} className="px-3 py-1.5 rounded-md border border-destructive/40 bg-destructive/10 text-destructive text-xs font-semibold flex items-center gap-1.5 hover:bg-destructive/20 transition-colors">
-  <X className="w-3.5 h-3.5" /> Exit
-  </button>
-  <div>
-  <p className="font-display font-bold text-foreground">{seasonInfo.label}</p>
-  <p className="text-xs text-muted-foreground">{seasonInfo.cropStage}</p>
-  </div>
-  </div>
-  <div className="flex items-center gap-1">
-  {SEASON_ORDER.map((s, i) => (
-  <div key={s} className={`w-8 h-1.5 rounded-full transition-colors ${
-  i < seasonIdx ? 'bg-success' : i === seasonIdx ? 'bg-primary' : 'bg-border'
-  }`} title={SEASONS[s].label} />
-  ))}
-  </div>
-  </div>
+   <div className="fixed inset-0 bg-background z-40 flex flex-col" style={{ overflow: 'hidden' }}>
+   {/* Top bar — always visible */}
+   <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0 z-10">
+   <div className="flex items-center gap-3">
+   <button onClick={onClose} className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground text-sm font-bold flex items-center gap-2 hover:bg-destructive/90 transition-colors shadow-md">
+   <X className="w-4 h-4" /> Exit
+   </button>
+   <div>
+   <p className="font-display font-bold text-foreground">{seasonInfo.label}</p>
+   <p className="text-xs text-muted-foreground">{seasonInfo.cropStage}</p>
+   </div>
+   </div>
+   <div className="flex items-center gap-1">
+   {SEASON_ORDER.map((s, i) => (
+   <div key={s} className={`w-8 h-1.5 rounded-full transition-colors ${
+   i < seasonIdx ? 'bg-success' : i === seasonIdx ? 'bg-primary' : 'bg-border'
+   }`} title={SEASONS[s].label} />
+   ))}
+   </div>
+   </div>
 
   {/* Main content: Left Status + Field + Right Action Panel */}
   <div className="flex-1 flex overflow-hidden">
