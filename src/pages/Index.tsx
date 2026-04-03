@@ -1,27 +1,27 @@
-import { useState } from 'react';
-import { useGameEngine } from '@/hooks/useGameEngine';
-import { useStudent } from '@/contexts/StudentContext';
-import { useBadgeChecker } from '@/hooks/useBadgeChecker';
-import { useSessionPersistence } from '@/hooks/useSessionPersistence';
-import { useAuth } from '@/hooks/useAuth';
-import AppHeader from '@/components/game/AppHeader';
-import LandingPage from '@/components/game/LandingPage';
-import GameScreen from '@/components/game/GameScreen';
-import ResultsScreen from '@/components/game/ResultsScreen';
-import InstructorPanel from '@/components/game/InstructorPanel';
-import InstructorDashboard from '@/components/game/InstructorDashboard';
-import Glossary from '@/components/game/Glossary';
-import LearningModule from '@/components/game/LearningModule';
-import ClassJoinFlow from '@/components/game/ClassJoinFlow';
-import StudentLeaderboard from '@/components/game/StudentLeaderboard';
-import CompetitionMode from '@/components/game/CompetitionMode';
-import FarmMode from '@/components/game/FarmMode';
-import PracticeHub from '@/components/game/PracticeHub';
-import StatsPanel from '@/components/game/StatsPanel';
-import ReferencesPage from '@/components/game/ReferencesPage';
-import GameProgressSidebar from '@/components/game/GameProgressSidebar';
-import type { GradeLevel } from '@/types/game';
-import { useEffect, useRef } from 'react';
+import { useState } from "react";
+import { useGameEngine } from "@/hooks/useGameEngine";
+import { useStudent } from "@/contexts/StudentContext";
+import { useBadgeChecker } from "@/hooks/useBadgeChecker";
+import { useSessionPersistence } from "@/hooks/useSessionPersistence";
+import { useAuth } from "@/hooks/useAuth";
+import AppHeader from "@/components/game/AppHeader";
+import LandingPage from "@/components/game/LandingPage";
+import GameScreen from "@/components/game/GameScreen";
+import ResultsScreen from "@/components/game/ResultsScreen";
+import InstructorPanel from "@/components/game/InstructorPanel";
+import InstructorDashboard from "@/components/game/InstructorDashboard";
+import Glossary from "@/components/game/Glossary";
+import LearningModule from "@/components/game/LearningModule";
+import ClassJoinFlow from "@/components/game/ClassJoinFlow";
+import StudentLeaderboard from "@/components/game/StudentLeaderboard";
+import CompetitionMode from "@/components/game/CompetitionMode";
+import FarmMode from "@/components/game/FarmMode";
+import PracticeHub from "@/components/game/PracticeHub";
+import StatsPanel from "@/components/game/StatsPanel";
+import ReferencesPage from "@/components/game/ReferencesPage";
+import GameProgressSidebar from "@/components/game/GameProgressSidebar";
+import type { GradeLevel } from "@/types/game";
+import { useEffect, useRef } from "react";
 
 const Index = () => {
   const game = useGameEngine();
@@ -37,12 +37,14 @@ const Index = () => {
   const [showPracticeHub, setShowPracticeHub] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showReferences, setShowReferences] = useState(false);
-  const [globalGrade, setGlobalGrade] = useState<GradeLevel>('elementary');
+  const [globalGrade, setGlobalGrade] = useState<GradeLevel>("elementary");
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
   const { createSession, updateSession } = useSessionPersistence(session?.studentId ?? null);
 
-  useEffect(() => { loadEarned(); }, [loadEarned]);
+  useEffect(() => {
+    loadEarned();
+  }, [loadEarned]);
 
   const prevCorrectRef = useRef(0);
   useEffect(() => {
@@ -91,7 +93,7 @@ const Index = () => {
       <AppHeader {...headerProps} />
       <GameProgressSidebar />
 
-      {game.screen === 'landing' && (
+      {game.screen === "landing" && (
         <LandingPage
           {...game}
           startGame={handleStartGame}
@@ -110,11 +112,16 @@ const Index = () => {
           onGradeChange={setGlobalGrade}
         />
       )}
-      {game.screen === 'playing' && <GameScreen {...game} />}
-      {game.screen === 'results' && <ResultsScreen {...game} />}
+      {game.screen === "playing" && <GameScreen {...game} />}
+      {game.screen === "results" && <ResultsScreen {...game} />}
       {game.showInstructor && <InstructorPanel {...game} />}
       {(game.showGlossary || showGlossaryDirect) && (
-        <Glossary onClose={() => { game.setShowGlossary(false); setShowGlossaryDirect(false); }} />
+        <Glossary
+          onClose={() => {
+            game.setShowGlossary(false);
+            setShowGlossaryDirect(false);
+          }}
+        />
       )}
       {showLearning && <LearningModule onClose={() => setShowLearning(false)} />}
       {showClassJoin && <ClassJoinFlow onClose={() => setShowClassJoin(false)} />}
