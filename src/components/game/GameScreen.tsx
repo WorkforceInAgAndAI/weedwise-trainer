@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import { PHASES, GRADE_NAMES, XP_PER_LEVEL } from '@/data/phases';
 import { weedMap, weeds } from '@/data/weeds';
@@ -15,6 +15,7 @@ import HighSchoolLifeCycleSort from './HighSchoolLifeCycleSort';
 import HighSchoolHabitatConnect from './HighSchoolHabitatConnect';
 import FamilyFlipMatch from './FamilyFlipMatch';
 import WeedImage from './WeedImage';
+import ImageReferencesBar from './ImageReferencesBar';
 import { filterTraitsForQuestion } from '@/lib/traitFilter';
 
 export default function GameScreen(game: GameEngine) {
@@ -27,7 +28,29 @@ export default function GameScreen(game: GameEngine) {
  const [fillInValue, setFillInValue] = useState('');
  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
  const [penaltyRemaining, setPenaltyRemaining] = useState(0);
- const [xpPopup, setXpPopup] = useState<{ amount: number; id: number } | null>(null);
+  const [xpPopup, setXpPopup] = useState<{ amount: number; id: number } | null>(null);
+  const seenWeedIds = useRef<Set<string>>(new Set());
+  const seenStages = useRef<Set<string>>(new Set());
+  const [seenWeedList, setSeenWeedList] = useState<string[]>([]);
+  const [seenStageList, setSeenStageList] = useState<string[]>([]);
+
+  // Track seen weeds and stages
+  useEffect(() => {
+    if (!current) return;
+    let changed = false;
+    if (!seenWeedIds.current.has(current.weedId)) {
+      seenWeedIds.current.add(current.weedId);
+      changed = true;
+    }
+    if (!seenStages.current.has(current.imageStage)) {
+      seenStages.current.add(current.imageStage);
+      changed = true;
+    }
+    if (changed) {
+      setSeenWeedList(Array.from(seenWeedIds.current));
+      setSeenStageList(Array.from(seenStages.current));
+    }
+  }, [current]);
 
  // Penalty timer
  useEffect(() => {
@@ -333,10 +356,11 @@ export default function GameScreen(game: GameEngine) {
  <span className="text-sm font-semibold text-primary">{GRADE_NAMES[grade]}</span>
  </header>
 
- <div className="flex-1 p-4 sm:p-6 max-w-3xl mx-auto w-full space-y-4">
- {renderActivity()}
- </div>
- </main>
+  <div className="flex-1 p-4 sm:p-6 max-w-3xl mx-auto w-full space-y-4 overflow-y-auto">
+  {renderActivity()}
+  </div>
+  <ImageReferencesBar weedIds={seenWeedList} stages={seenStageList} />
+  </main>
 
  {/* Global XP float animation styles */}
  <style>{`
