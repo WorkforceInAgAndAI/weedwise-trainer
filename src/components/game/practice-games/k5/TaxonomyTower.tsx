@@ -25,6 +25,10 @@ const FOLLOW_UP_POOL: FollowUp[] = [
   { question: 'Broadleaf weeds belong to which group?', options: ['Dicot', 'Monocot'], correctIdx: 0 },
   { question: 'Which group has scattered vascular bundles in the stem?', options: ['Monocot', 'Dicot'], correctIdx: 0 },
   { question: 'Which group has vascular bundles arranged in a ring?', options: ['Dicot', 'Monocot'], correctIdx: 0 },
+  { question: 'What does the prefix di- mean?', options: ['2', '1'], correctIdx: 0 },
+  { question: 'What does the prefix mono- mean?', options: ['1', '2'], correctIdx: 0 },
+  { question: 'What does the suffix -cot mean?', options: ['Cotyledon', 'Root'], correctIdx: 0 },
+  { question: 'What is a cotyledon?', options: ['A place where a seed stores food to give it energy to grow', 'The outer shell that protects a seed'], correctIdx: 0 },
 ];
 
 const ROUNDS_PER_LEVEL = 5;
