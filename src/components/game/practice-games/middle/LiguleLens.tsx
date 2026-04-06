@@ -62,15 +62,10 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
    </div>
    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
     <p className="text-sm text-muted-foreground mb-2">Zoom in on the ligule — identify the grass!</p>
-    <div className="relative w-48 h-48 rounded-full overflow-hidden bg-secondary mb-4 border-4 border-primary">
-     <img
-      src={`/weed-images/${current!.weed.id}/ligu_1.jpg`}
-      alt={`${current!.weed.commonName} ligule`}
-      className="w-full h-full object-cover scale-150"
-      onError={(e) => { (e.target as HTMLImageElement).src = `/weed-images/${current!.weed.id}/ligu_1.png`; }}
-     />
-     <div className="absolute inset-0 rounded-full border-4 border-primary/30" />
-    </div>
+     <div className="relative w-48 h-48 rounded-full overflow-hidden bg-secondary mb-4 border-4 border-primary">
+      <WeedImage weedId={current!.weed.id} stage="ligule" className="w-full h-full object-cover scale-150" />
+      <div className="absolute inset-0 rounded-full border-4 border-primary/30" />
+     </div>
     <p className="text-xs text-muted-foreground mb-4">{current!.weed.traits.find(t => t.toLowerCase().includes('ligule')) || current!.weed.traits[0]}</p>
     <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
      {current!.options.map(opt => {
