@@ -15,56 +15,50 @@ const WEED_IDS = ['waterhemp', 'palmer-amaranth', 'lambsquarters', 'giant-ragwee
 const MIN_DIST = 10;
 
 function generateWeedSpots(layout: WeedLayout, count: number, seed: number): Array<{ x: number; y: number; weedId: string }> {
-  const rng = (i: number) => ((seed * 9301 + 49297 + i * 1277) % 233280) / 233280;
   const spots: Array<{ x: number; y: number; weedId: string }> = [];
   const ids = shuffle(WEED_IDS);
   const maxAttempts = 100;
   for (let i = 0; i < count; i++) {
     let placed = false;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      let x: number, y: number;
-      const r1 = rng(i * 3 + attempt * 97);
-      const r2 = rng(i * 3 + 1 + attempt * 97);
-      switch (layout) {
-        case 'mixed':
-          x = 5 + r1 * 90; y = 5 + r2 * 90; break;
-        case 'rows':
-          x = 5 + r1 * 90; y = 10 + Math.floor(i / 2) * 18 + (r2 * 12 - 6); break;
-        case 'center':
-          x = 20 + r1 * 60; y = 15 + r2 * 70; break;
-        case 'edges': {
-          const side = (i + attempt) % 4;
-          if (side === 0) { x = 2 + r1 * 12; y = 5 + r2 * 90; }
-          else if (side === 1) { x = 86 + r1 * 12; y = 5 + r2 * 90; }
-          else if (side === 2) { x = 5 + r1 * 90; y = 2 + r2 * 12; }
-          else { x = 5 + r1 * 90; y = 86 + r2 * 12; }
-          break;
-        }
-        case 'clumped': {
-          const cx = 20 + (i % 3) * 30;
-          const cy = 25 + Math.floor(i / 3) * 30;
-          x = cx + (r1 * 20 - 10); y = cy + (r2 * 20 - 10); break;
-        }
-        case 'diagonal':
-          x = 5 + (i / count) * 85 + (r1 * 15 - 7); y = 5 + (i / count) * 85 + (r2 * 15 - 7); break;
-        case 'scattered':
-          x = 3 + r1 * 94; y = 3 + r2 * 94; break;
-      }
-      x = Math.max(3, Math.min(97, x!));
-      y = Math.max(3, Math.min(97, y!));
+      // True random scatter for all layouts — no straight lines
+      const x = 5 + Math.random() * 90;
+      const y = 5 + Math.random() * 90;
       const tooClose = spots.some(s => {
-        const dx = s.x - x!; const dy = s.y - y!;
+        const dx = s.x - x; const dy = s.y - y;
         return Math.sqrt(dx * dx + dy * dy) < MIN_DIST;
       });
       if (!tooClose) {
-        spots.push({ x: x!, y: y!, weedId: ids[i % ids.length] });
+        spots.push({ x, y, weedId: ids[i % ids.length] });
         placed = true;
         break;
       }
     }
     if (!placed) {
-      spots.push({ x: 5 + (i * 11) % 85, y: 5 + (i * 13) % 85, weedId: ids[i % ids.length] });
+      // Fallback with jitter to avoid lines
+      spots.push({ x: 5 + Math.random() * 90, y: 5 + Math.random() * 90, weedId: ids[i % ids.length] });
     }
+  }
+
+  // Apply layout-specific clustering after random placement
+  if (layout === 'center') {
+    return spots.map(s => ({ ...s, x: 15 + (s.x - 5) * 0.7, y: 15 + (s.y - 5) * 0.7 }));
+  }
+  if (layout === 'edges') {
+    return spots.map((s, i) => {
+      const side = i % 4;
+      if (side === 0) return { ...s, x: 2 + Math.random() * 12, y: s.y };
+      if (side === 1) return { ...s, x: 86 + Math.random() * 12, y: s.y };
+      if (side === 2) return { ...s, y: 2 + Math.random() * 12, x: s.x };
+      return { ...s, y: 86 + Math.random() * 12, x: s.x };
+    });
+  }
+  if (layout === 'clumped') {
+    const centers = [{ cx: 25, cy: 30 }, { cx: 60, cy: 40 }, { cx: 40, cy: 70 }];
+    return spots.map((s, i) => {
+      const c = centers[i % centers.length];
+      return { ...s, x: c.cx + (Math.random() * 20 - 10), y: c.cy + (Math.random() * 20 - 10) };
+    });
   }
   return spots;
 }
@@ -170,7 +164,6 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  // Intro storyline
   if (showIntro) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
