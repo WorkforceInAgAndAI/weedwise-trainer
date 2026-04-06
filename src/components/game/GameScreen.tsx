@@ -28,7 +28,29 @@ export default function GameScreen(game: GameEngine) {
  const [fillInValue, setFillInValue] = useState('');
  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
  const [penaltyRemaining, setPenaltyRemaining] = useState(0);
- const [xpPopup, setXpPopup] = useState<{ amount: number; id: number } | null>(null);
+  const [xpPopup, setXpPopup] = useState<{ amount: number; id: number } | null>(null);
+  const seenWeedIds = useRef<Set<string>>(new Set());
+  const seenStages = useRef<Set<string>>(new Set());
+  const [seenWeedList, setSeenWeedList] = useState<string[]>([]);
+  const [seenStageList, setSeenStageList] = useState<string[]>([]);
+
+  // Track seen weeds and stages
+  useEffect(() => {
+    if (!current) return;
+    let changed = false;
+    if (!seenWeedIds.current.has(current.weedId)) {
+      seenWeedIds.current.add(current.weedId);
+      changed = true;
+    }
+    if (!seenStages.current.has(current.imageStage)) {
+      seenStages.current.add(current.imageStage);
+      changed = true;
+    }
+    if (changed) {
+      setSeenWeedList(Array.from(seenWeedIds.current));
+      setSeenStageList(Array.from(seenStages.current));
+    }
+  }, [current]);
 
  // Penalty timer
  useEffect(() => {
