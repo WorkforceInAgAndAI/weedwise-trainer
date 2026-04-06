@@ -19,29 +19,29 @@ const ALL_STRATEGIES = [
 ];
 
 const ALL_PLAYER_WEEDS = [
- { id: 'waterhemp', name: 'Waterhemp', bio: 'Extremely fast-growing broadleaf with high seed production. Thrives in warm, moist conditions and is notorious for herbicide resistance.' },
- { id: 'kochia', name: 'Kochia', bio: 'Tumbleweed species that tolerates drought, heat, and saline soils. Disperses seeds by breaking off at the base and rolling in the wind.' },
- { id: 'palmer-amaranth', name: 'Palmer Amaranth', bio: 'The most aggressive pigweed species. Can grow 2-3 inches per day and produces up to 1 million seeds per plant.' },
- { id: 'marestail', name: 'Marestail', bio: 'Also called horseweed. Produces wind-dispersed seeds that can travel miles. One of the first weeds to develop glyphosate resistance.' },
- { id: 'giant-ragweed', name: 'Giant Ragweed', bio: 'One of the tallest annual weeds. Emerges very early in spring and can shade out crops within weeks.' },
- { id: 'canada-thistle', name: 'Canada Thistle', bio: 'Aggressive perennial that spreads by creeping roots. Very difficult to eradicate once established.' },
- { id: 'johnsongrass', name: 'Johnsongrass', bio: 'Tall perennial grass that spreads by rhizomes. Produces allelopathic chemicals that inhibit crop growth.' },
- { id: 'lambsquarters', name: 'Lambsquarters', bio: 'Highly adaptable broadleaf. Can produce 75,000+ seeds per plant and tolerates a wide range of conditions.' },
+ { id: 'waterhemp', name: 'Waterhemp', bio: 'Waterhemp (Amaranthus tuberculatus) is a dioecious annual broadleaf native to the Midwest. It produces 250,000-1,000,000+ tiny seeds per plant and can grow over 2 inches per day in midsummer. It is one of the most herbicide-resistant weeds in North America, with confirmed resistance to 7 herbicide sites of action (University of Illinois Extension).' },
+ { id: 'kochia', name: 'Kochia', bio: 'Kochia (Bassia scoparia) is an annual broadleaf introduced from Eurasia as an ornamental. It is drought- and salt-tolerant, thriving where other weeds cannot. At maturity, the plant breaks off at the base and tumbles across fields, dispersing up to 30,000 seeds. Kochia has developed resistance to ALS inhibitors, glyphosate, and synthetic auxins (Colorado State University).' },
+ { id: 'palmer-amaranth', name: 'Palmer Amaranth', bio: 'Palmer amaranth (Amaranthus palmeri) is native to the desert Southwest. It can grow 2-3 inches per day and reach over 8 feet tall. A single female plant can produce up to 1 million seeds, giving it enormous seed-bank replenishment potential. It has evolved resistance to at least 8 herbicide mechanisms of action (Purdue University Extension).' },
+ { id: 'marestail', name: 'Marestail', bio: 'Marestail / horseweed (Erigeron canadensis) is a winter or summer annual native to North America. Its tiny wind-dispersed seeds can travel hundreds of miles. It was among the first broadleaf weeds to evolve glyphosate resistance (2001 in Delaware). Fall-germinating rosettes are particularly difficult to control in no-till systems (Ohio State University Extension).' },
+ { id: 'giant-ragweed', name: 'Giant Ragweed', bio: 'Giant ragweed (Ambrosia trifida) is one of the earliest-emerging summer annuals. It can reach 12-15 feet and produces large seeds with high vigor that emerge from deep in the soil profile. Its rapid canopy closure allows it to shade out crops within weeks of emergence. It is a major driver of crop yield loss in the Corn Belt (University of Wisconsin Extension).' },
+ { id: 'canada-thistle', name: 'Canada Thistle', bio: 'Canada thistle (Cirsium arvense) is an aggressive creeping perennial introduced from Eurasia. It reproduces by wind-dispersed seeds and extensive lateral roots that can spread 10-12 feet per year. Root fragments as small as 0.25 inches can regenerate new plants. Its allelopathic root exudates suppress neighboring species (University of Minnesota Extension).' },
+ { id: 'johnsongrass', name: 'Johnsongrass', bio: 'Johnsongrass (Sorghum halepense) is a rhizomatous perennial grass introduced from the Mediterranean as a forage crop. It produces both seeds (up to 80,000 per plant) and vigorous rhizomes that spread laterally. It contains dhurrin, a cyanogenic glycoside that is allelopathic to surrounding plants. It is one of the world\'s ten worst weeds (USDA NRCS).' },
+ { id: 'lambsquarters', name: 'Lambsquarters', bio: 'Common lambsquarters (Chenopodium album) is a cosmopolitan annual broadleaf. A single plant can produce 75,000+ seeds that remain viable in soil for decades. Its seedlings are highly competitive for light and nutrients, and its waxy leaf surface reduces herbicide uptake. It is among the most common cropland weeds worldwide (University of Missouri Extension).' },
 ];
 
 const SCENARIOS = [
- { enemy: 'large-crabgrass', enemyName: 'Crabgrass', situation: 'A shallow-rooted grass is invading your territory by spreading rapidly at the soil surface.', best: 'root-exudate', why: 'Root exudates directly suppress shallow-rooted competitors by inhibiting their root growth in the surrounding soil.' },
- { enemy: 'morningglory', enemyName: 'Morning Glory', situation: 'A climbing vine is using your stem for support and stealing your sunlight from above.', best: 'leaf-leach', why: 'Leaf leachate compounds wash down onto the vine below during rain, inhibiting its growth at the contact point.' },
- { enemy: 'lambsquarters', enemyName: 'Lambsquarters', situation: 'A fast-growing broadleaf is taking over the area where your old leaves fell last autumn.', best: 'decomposition', why: 'Your decomposing leaf litter releases phenolic acids that prevent Lambsquarters seedlings from establishing.' },
- { enemy: 'green-foxtail', enemyName: 'Green Foxtail', situation: 'A grass is growing nearby but not touching you. You need to suppress it at a distance.', best: 'volatile', why: 'Volatile chemical emissions can travel through air to inhibit nearby plant growth without physical contact.' },
- { enemy: 'velvetleaf', enemyName: 'Velvetleaf', situation: "A competitor's roots are intertwined with yours underground, competing for water.", best: 'root-exudate', why: 'Exudates released directly from your roots create a chemical zone of inhibition around competing root systems.' },
- { enemy: 'giant-ragweed', enemyName: 'Giant Ragweed', situation: 'A competitor germinates each spring in the same soil patch where your biomass accumulated.', best: 'decomposition', why: 'The persistent allelopathic compounds from your decomposing tissues prevent seedling establishment in your territory.' },
- { enemy: 'yellow-foxtail', enemyName: 'Yellow Foxtail', situation: 'A grass seedling is emerging right next to the base of your stem.', best: 'root-crown', why: 'Crown exudates concentrate chemicals right where the seedling is trying to establish, suppressing it at close range.' },
- { enemy: 'johnsongrass', enemyName: 'Johnsongrass', situation: 'A tall, aggressive grass is spreading via rhizomes into your territory from 10 feet away.', best: 'volatile', why: 'Volatile emissions can travel through air to reach distant competitors without needing root-to-root contact.' },
- { enemy: 'kochia', enemyName: 'Kochia', situation: 'A low-growing competitor is germinating under your dense canopy of fallen leaves.', best: 'mulch-suppress', why: 'Your thick leaf mulch blocks light physically while releasing allelopathic compounds, creating a double barrier.' },
- { enemy: 'palmer-amaranth', enemyName: 'Palmer Amaranth', situation: 'A competitor is growing directly beneath your canopy in heavy shade.', best: 'canopy-shade', why: 'Combining dense shade with allelopathic leaf drip creates an environment too stressful for the competitor.' },
- { enemy: 'wild-oat', enemyName: 'Wild Oat', situation: 'A grass weed is flowering at the same time as you, and its pollen is landing on your territory.', best: 'pollen-inhibit', why: 'Your pollen carries growth-inhibiting compounds that affect nearby competitors during the flowering window.' },
- { enemy: 'marestail', enemyName: 'Marestail', situation: 'Small rosettes are forming in the soil crust around your base after a rain event.', best: 'leaf-leach', why: 'Rain washes allelopathic compounds from your leaves into the soil crust, inhibiting rosette establishment.' },
+ { enemy: 'large-crabgrass', enemyName: 'Crabgrass', situation: 'Crabgrass (Digitaria sanguinalis) is a shallow-rooted C4 annual grass spreading rapidly at the soil surface via prostrate stems. Its roots stay in the top 2 inches of soil.', best: 'root-exudate', why: 'Root exudates directly suppress shallow-rooted competitors by releasing phenolic acids and other allelochemicals that inhibit root elongation in the top soil layer where crabgrass roots concentrate.' },
+ { enemy: 'morningglory', enemyName: 'Morning Glory', situation: 'Ivyleaf morningglory (Ipomoea hederacea) is twining its stems up your canopy, using your structure for physical support while intercepting light above you.', best: 'leaf-leach', why: 'Leaf leachate compounds (phenolics and terpenes) wash downward during rain events onto the vine\'s contact points, inhibiting cell elongation where the vine grips your stems and leaves.' },
+ { enemy: 'lambsquarters', enemyName: 'Lambsquarters', situation: 'Lambsquarters seedlings are germinating densely in the decomposing leaf litter you shed last autumn, taking advantage of the nutrient-rich zone.', best: 'decomposition', why: 'Your decomposing tissues release phenolic acids (ferulic acid, p-coumaric acid) and other allelochemicals that accumulate in the litter layer and inhibit seed germination and radicle growth of Lambsquarters seedlings.' },
+ { enemy: 'green-foxtail', enemyName: 'Green Foxtail', situation: 'Green foxtail (Setaria viridis) is establishing several feet away in the same field row, beyond the reach of your root zone. No physical contact exists between you.', best: 'volatile', why: 'Volatile terpenes and other gaseous allelochemicals released from your leaf surfaces travel through air to reach competitors outside your root zone, inhibiting photosynthesis and growth at a distance.' },
+ { enemy: 'velvetleaf', enemyName: 'Velvetleaf', situation: 'Velvetleaf (Abutilon theophrasti) has its deep taproot intertwined with yours, directly competing for soil water and nutrients in the same root zone.', best: 'root-exudate', why: 'Root exudates create a chemical inhibition zone directly around your root system, releasing compounds like sorgoleone or juglone analogs that suppress competitor roots sharing the same soil space.' },
+ { enemy: 'giant-ragweed', enemyName: 'Giant Ragweed', situation: 'Giant ragweed germinates early each spring in the same patch where your plant biomass accumulated over winter, exploiting your nutrient-rich residue zone.', best: 'decomposition', why: 'Persistent allelopathic compounds from your decomposing tissues (hydroxamic acids, benzoxazinoids) accumulate over winter and create a hostile germination environment that persists into spring.' },
+ { enemy: 'yellow-foxtail', enemyName: 'Yellow Foxtail', situation: 'Yellow foxtail (Setaria pumila) seedlings are emerging immediately adjacent to the base of your stem, within inches of your crown.', best: 'root-crown', why: 'Crown exudates concentrate allelochemicals at the stem base where they are most potent, creating a high-concentration inhibition zone that suppresses seedlings emerging in your immediate vicinity.' },
+ { enemy: 'johnsongrass', enemyName: 'Johnsongrass', situation: 'Johnsongrass is advancing via rhizomes from 10+ feet away. Its underground stems are spreading toward your territory but are not yet in your root zone.', best: 'volatile', why: 'At this distance, only volatile emissions (terpenoids, essential oils) can reach the competitor through air, potentially slowing shoot emergence and photosynthetic efficiency before roots make contact.' },
+ { enemy: 'kochia', enemyName: 'Kochia', situation: 'Kochia seedlings are germinating under your dense, thick canopy of fallen leaves where light is blocked and moisture is trapped.', best: 'mulch-suppress', why: 'Your thick leaf mulch creates a dual barrier: physical light exclusion reduces photosynthesis, while leaching allelopathic compounds from the mulch layer inhibit germination and root growth simultaneously.' },
+ { enemy: 'palmer-amaranth', enemyName: 'Palmer Amaranth', situation: 'Palmer amaranth is growing directly beneath your dense canopy, in deep shade where your leaf drip continuously wets its foliage.', best: 'canopy-shade', why: 'Combining dense shade (reducing photosynthetically active radiation by 80-90%) with allelopathic leaf drip creates compounding stress that exceeds what either mechanism alone could achieve.' },
+ { enemy: 'wild-oat', enemyName: 'Wild Oat', situation: 'Wild oat (Avena fatua) is flowering simultaneously with you. Its pollen is landing on soil and plant surfaces throughout your territory.', best: 'pollen-inhibit', why: 'Your pollen carries water-soluble growth-inhibiting compounds that, when deposited on competitor surfaces during the shared flowering window, can suppress pollen germination and reduce seed set.' },
+ { enemy: 'marestail', enemyName: 'Marestail', situation: 'Small marestail rosettes are establishing in the soil crust around your base, germinating after a recent rain softened the surface.', best: 'leaf-leach', why: 'Rain events wash allelopathic phenolics from your leaf surfaces into the soil crust layer, creating inhibitory concentrations right where marestail rosettes are attempting to establish their root systems.' },
 ];
 
 const TOTAL_ROUNDS = 10;
@@ -58,7 +58,6 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
  const [phase, setPhase] = useState<'select' | 'bio' | 'play' | 'done'>('select');
  const [playerWeed, setPlayerWeed] = useState(ALL_PLAYER_WEEDS[0]);
 
- // Fresh mix of player weeds per level
  const availablePlayers = useMemo(() => {
   const pool = shuffle(ALL_PLAYER_WEEDS);
   const offset = ((level - 1) * 5) % pool.length;
@@ -82,7 +81,6 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
  const nextLevel = () => { setLevel(l => l + 1); restart(); };
  const startOver = () => { setLevel(1); restart(); };
 
- // Character selection
  if (phase === 'select') {
   return (
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
@@ -108,7 +106,6 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
   );
  }
 
- // Bio screen
  if (phase === 'bio') {
   return (
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
@@ -116,13 +113,12 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
      <WeedImage weedId={playerWeed.id} stage="plant" className="w-full h-full object-cover" />
     </div>
     <h2 className="font-display font-bold text-xl text-foreground mb-2">{playerWeed.name}</h2>
-    <p className="text-sm text-muted-foreground max-w-sm mb-6">{playerWeed.bio}</p>
+    <p className="text-sm text-muted-foreground max-w-md mb-6">{playerWeed.bio}</p>
     <button onClick={() => setPhase('play')} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">Start Battle</button>
    </div>
   );
  }
 
- // Done screen
  if (idx >= rounds.length) {
   addBadge({ gameId: 'allelopathy', gameName: 'Allelopathy Attack', level: 'HS', score, total: rounds.length });
   return (

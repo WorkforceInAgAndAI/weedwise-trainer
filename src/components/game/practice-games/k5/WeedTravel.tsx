@@ -184,7 +184,7 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <h2 className="text-xl font-bold text-foreground text-center mb-2">Choose Your Seed!</h2>
-          <p className="text-sm text-muted-foreground text-center mb-6">Each seed has different abilities. Pick wisely!</p>
+          <p className="text-sm text-muted-foreground text-center mb-6">Help a seed travel to a new location. Each seed has different abilities. Pick wisely!</p>
           <div className="grid gap-3 max-w-md mx-auto">
             {seedCharacters.map(sc => (
               <button key={sc.weedId} onClick={() => setChosenSeed(sc)}

@@ -180,50 +180,102 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
   );
  }
 
- if (phase === 'review') {
-  addBadge({ gameId: 'form-farm', gameName: 'Form Your Farm', level: 'HS', score, total });
-  return (
-   <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-    <div className="max-w-lg mx-auto p-4">
-     <div className="flex items-center gap-3 mb-4">
-      <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-      <h1 className="font-display font-bold text-lg text-foreground">Season Results</h1>
-     </div>
-     <div className="bg-card rounded-xl border border-border p-4 mb-4 text-center">
-      <Leaf className="w-8 h-8 text-primary mx-auto mb-2" />
-      <p className="font-bold text-foreground text-xl">{score}/{total} correct</p>
-      <p className="text-sm text-muted-foreground">Crop: {crop.name} -- Season: {season.name} -- Threshold: {threshold}/acre</p>
-     </div>
-     <div className="space-y-3 mb-4">
-      {results.map(r => (
-       <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.correct ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
-        <div className="flex items-center gap-3 mb-2">
-         <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-          <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
-         </div>
-         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
-          <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre</p>
-         </div>
-         <div className="text-right">
-          <p className={`text-xs font-bold ${r.correct ? 'text-green-500' : 'text-destructive'}`}>
-           Decision: {r.userChoice} {r.correct ? '(correct)' : `(best: ${r.ideal})`}
-          </p>
-          {r.managePick && (
-           <p className={`text-[10px] ${r.manageCorrect ? 'text-green-500' : 'text-destructive'}`}>
-            Method: {MANAGE_METHODS.find(m => m.id === r.managePick)?.label} {r.manageCorrect ? '(correct)' : `(best: ${MANAGE_METHODS.find(m => m.id === r.bestManage)?.label})`}
-           </p>
-          )}
-         </div>
+  if (phase === 'review') {
+   addBadge({ gameId: 'form-farm', gameName: 'Form Your Farm', level: 'HS', score, total });
+   const wrongDecisions = results.filter(r => !r.correct);
+   const wrongManage = results.filter(r => r.managePick && !r.manageCorrect);
+   return (
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+     <div className="max-w-lg mx-auto p-4">
+      <div className="flex items-center gap-3 mb-4">
+       <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+       <h1 className="font-display font-bold text-lg text-foreground">Season Results</h1>
+      </div>
+      <div className="bg-card rounded-xl border border-border p-4 mb-4 text-center">
+       <Leaf className="w-8 h-8 text-primary mx-auto mb-2" />
+       <p className="font-bold text-foreground text-xl">{score}/{total} correct</p>
+       <p className="text-sm text-muted-foreground">Crop: {crop.name} -- Season: {season.name} -- Threshold: {threshold}/acre</p>
+      </div>
+
+      {wrongDecisions.length > 0 && (
+       <div className="mb-4">
+        <p className="text-sm font-bold text-foreground mb-2">Threshold decisions to review:</p>
+        <div className="space-y-2">
+         {wrongDecisions.map(r => (
+          <div key={`dec-${r.weed.id}`} className="p-3 rounded-xl border-2 border-destructive bg-destructive/5">
+           <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+             <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1">
+             <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
+             <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre (Threshold: {threshold}/acre)</p>
+             <p className="text-xs text-destructive">You chose: {r.userChoice} -- Best: {r.ideal}</p>
+             <p className="text-[10px] text-muted-foreground mt-1">
+              {r.ideal === 'treat' ? `At ${r.severity}/acre, this exceeds your threshold of ${threshold} and should be treated.` : `At ${r.severity}/acre, this is below your threshold -- waiting is the economical choice.`}
+             </p>
+            </div>
+           </div>
+          </div>
+         ))}
         </div>
        </div>
-      ))}
+      )}
+
+      {wrongManage.length > 0 && (
+       <div className="mb-4">
+        <p className="text-sm font-bold text-foreground mb-2">Management methods to review:</p>
+        <div className="space-y-2">
+         {wrongManage.map(r => (
+          <div key={`mgmt-${r.weed.id}`} className="p-3 rounded-xl border-2 border-destructive bg-destructive/5">
+           <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+             <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1">
+             <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
+             <p className="text-xs text-destructive">You chose: {MANAGE_METHODS.find(m => m.id === r.managePick)?.label}</p>
+             <p className="text-xs text-green-600">Best: {MANAGE_METHODS.find(m => m.id === r.bestManage)?.label}</p>
+             <p className="text-[10px] text-muted-foreground mt-1">{r.weed.management}</p>
+            </div>
+           </div>
+          </div>
+         ))}
+        </div>
+       </div>
+      )}
+
+      <div className="space-y-3 mb-4">
+       <p className="text-sm font-bold text-foreground">All decisions:</p>
+       {results.map(r => (
+        <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.correct && (!r.managePick || r.manageCorrect) ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
+         <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+           <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+           <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
+           <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre</p>
+          </div>
+          <div className="text-right">
+           <p className={`text-xs font-bold ${r.correct ? 'text-green-500' : 'text-destructive'}`}>
+            {r.userChoice} {r.correct ? '(correct)' : `(best: ${r.ideal})`}
+           </p>
+           {r.managePick && (
+            <p className={`text-[10px] ${r.manageCorrect ? 'text-green-500' : 'text-destructive'}`}>
+             {MANAGE_METHODS.find(m => m.id === r.managePick)?.label} {r.manageCorrect ? '(correct)' : `(best: ${MANAGE_METHODS.find(m => m.id === r.bestManage)?.label})`}
+            </p>
+           )}
+          </div>
+         </div>
+        </div>
+       ))}
+      </div>
+      <LevelComplete level={level} score={score} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
      </div>
-     <LevelComplete level={level} score={score} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
     </div>
-   </div>
-  );
- }
+   );
+  }
 
  return (
   <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
