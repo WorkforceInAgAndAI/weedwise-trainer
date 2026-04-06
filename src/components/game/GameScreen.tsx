@@ -356,10 +356,11 @@ export default function GameScreen(game: GameEngine) {
  <span className="text-sm font-semibold text-primary">{GRADE_NAMES[grade]}</span>
  </header>
 
- <div className="flex-1 p-4 sm:p-6 max-w-3xl mx-auto w-full space-y-4">
- {renderActivity()}
- </div>
- </main>
+  <div className="flex-1 p-4 sm:p-6 max-w-3xl mx-auto w-full space-y-4 overflow-y-auto">
+  {renderActivity()}
+  </div>
+  <ImageReferencesBar weedIds={seenWeedList} stages={seenStageList} />
+  </main>
 
  {/* Global XP float animation styles */}
  <style>{`
