@@ -22,12 +22,12 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
       .slice(0, 5)
       .forEach(w => items.push({ type: 'weed', name: w.commonName, weedId: w.id }));
 
-    // Use local crop images
-    cropData.forEach(c => {
-      const images = getCropImages(c.name);
+    // Use local crop images from folder names
+    shuffle([...CROP_FOLDERS]).forEach(name => {
+      const images = getCropImages(name);
       if (images.length > 0) {
         const randomImg = images[Math.floor(Math.random() * images.length)];
-        items.push({ type: 'crop', name: c.name, cropImage: randomImg });
+        items.push({ type: 'crop', name, cropImage: randomImg });
       }
     });
 
