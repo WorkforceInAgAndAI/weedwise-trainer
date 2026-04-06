@@ -150,7 +150,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
   {/* Header */}
   <div className="flex items-center gap-3 mb-8">
-  <HomeButton />
+  <HomeButton onClose={onClose} />
   <span className="text-border mx-1">|</span>
   <button
   onClick={screen === 'grades' ? onClose : screen === 'games' ? backToGrades : backToGames}

@@ -131,7 +131,7 @@ export default function Glossary({ onClose }: Props) {
   <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
   <div className="flex items-center justify-between mb-6">
   <div className="flex items-center gap-3">
-  <HomeButton />
+  <HomeButton onClose={onClose} />
   <span className="text-border mx-1">|</span>
   <button onClick={onClose}
   className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
