@@ -500,7 +500,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  const matureWeeds = fieldWeeds.filter(w => w.alive && w.stage === 'mature');
  const seedsProduced = matureWeeds.length * 5000;
  return (
- <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
+ <div className="fixed inset-0 bg-background z-[60] overflow-y-auto">
  <div className="max-w-2xl mx-auto px-5 py-8">
  <h1 className="font-display font-bold text-2xl text-foreground mb-6">Season Summary</h1>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
