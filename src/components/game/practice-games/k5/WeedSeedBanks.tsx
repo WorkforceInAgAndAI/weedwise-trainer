@@ -111,6 +111,16 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     if (next.size === totalSeeds) setFindingDone(true);
   };
 
+  const handleSeedClick = (seedId: number) => {
+    if (sortChecked) return;
+    // If already selected, open inspect
+    if (selectedSeed === seedId) {
+      setInspectSeed(seedId);
+      return;
+    }
+    setSelectedSeed(seedId);
+  };
+
   const handleBinClick = (weedName: string) => {
     if (selectedSeed === null || sortChecked) return;
     setSortPlacements(p => ({ ...p, [selectedSeed]: weedName }));
@@ -141,7 +151,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     else { setRound(r => r + 1); resetRound(); }
   };
 
-  // Seed inspect popup
   const inspectedSeedData = inspectSeed !== null ? foundSeeds.find(s => s.id === inspectSeed) : null;
 
   if (phase === 'done') {
@@ -307,7 +316,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <p className="text-sm text-muted-foreground mb-4 text-center">Sort the seeds you found by weed type. Tap a seed to inspect it.</p>
+          <p className="text-sm text-muted-foreground mb-4 text-center">Sort the seeds you found by weed type. Need a hint? Click on the seed image.</p>
 
           {/* Seed inspect popup */}
           {inspectedSeedData && (
@@ -323,9 +332,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
                   <WeedImage weedId={inspectedSeedData.weed.id} stage="seed" className="w-full h-full object-cover" />
                 </div>
                 <p className="text-sm text-foreground text-center mb-1 font-medium">
-                  Family: {inspectedSeedData.weed.family}
-                </p>
-                <p className="text-sm text-muted-foreground text-center mb-1">
                   {inspectedSeedData.weed.plantType} — {inspectedSeedData.weed.lifeCycle}
                 </p>
                 <p className="text-xs text-muted-foreground text-center">
@@ -360,22 +366,15 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           {foundSeeds.filter(s => sortPlacements[s.id] === undefined).length > 0 && (
             <div className="flex flex-wrap gap-2 justify-center mb-4">
               {foundSeeds.filter(s => sortPlacements[s.id] === undefined).map(s => (
-                <div key={s.id} className="flex items-center gap-1">
-                  <button onClick={() => setSelectedSeed(selectedSeed === s.id ? null : s.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
-                      selectedSeed === s.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
-                    }`}>
-                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-border shadow-sm">
-                      <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
-                    </div>
-                    Seed #{s.id + 1}
-                  </button>
-                  <button onClick={() => setInspectSeed(s.id)}
-                    className="px-2 py-2 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
-                    title="Inspect seed">
-                    ?
-                  </button>
-                </div>
+                <button key={s.id} onClick={() => handleSeedClick(s.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
+                    selectedSeed === s.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
+                  }`}>
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-border shadow-sm">
+                    <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
+                  </div>
+                  Seed #{s.id + 1}
+                </button>
               ))}
             </div>
           )}
