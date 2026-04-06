@@ -96,7 +96,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
             {r.weed.traits[1] && <p className="text-sm text-muted-foreground">{r.weed.traits[1]}</p>}
           </div>
           <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 w-full">
-            <p className="text-sm font-bold text-primary mb-1">💡 Memory Hook</p>
+            <p className="text-sm font-bold text-primary mb-1">Memory Hook</p>
             <p className="text-sm text-foreground">{r.weed.memoryHook}</p>
           </div>
           <button onClick={next} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">
