@@ -41,11 +41,10 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  const [showSortAnswers, setShowSortAnswers] = useState(false);
 
-  // Phase 2: Weed needs identification
   const [phase, setPhase] = useState<'sort' | 'weedNeeds' | 'done'>('sort');
   const weedRounds = useMemo(() => {
-    // Pick 3 weeds, one for each category if possible
     const aquatic = shuffle(weeds.filter(w => getWeedCategory(w) === 'aquatic'));
     const terrestrial = shuffle(weeds.filter(w => getWeedCategory(w) === 'terrestrial'));
     const parasitic = shuffle(weeds.filter(w => getWeedCategory(w) === 'parasitic'));
@@ -53,7 +52,6 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
     if (aquatic.length) picks.push({ weed: aquatic[0], category: 'aquatic' });
     if (terrestrial.length) picks.push({ weed: terrestrial[0], category: 'terrestrial' });
     if (parasitic.length) picks.push({ weed: parasitic[0], category: 'parasitic' });
-    // Fill to 3 if needed
     while (picks.length < 3) {
       const extra = shuffle(weeds.filter(w => !picks.find(p => p.weed.id === w.id)))[0];
       if (extra) picks.push({ weed: extra, category: getWeedCategory(extra) });
@@ -65,10 +63,10 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
   const [weedIdx, setWeedIdx] = useState(0);
   const [weedSelected, setWeedSelected] = useState<string[]>([]);
   const [weedChecked, setWeedChecked] = useState(false);
+  const [showWeedAnswers, setShowWeedAnswers] = useState(false);
   const [sortScore, setSortScore] = useState(0);
   const [weedScore, setWeedScore] = useState(0);
 
-  // Shuffle the answer bank for each weed round
   const shuffledNeeds = useMemo(() => shuffle([...ALL_NEEDS]), [weedIdx]);
 
   const unplaced = items.filter(i => !placements[i.id]);
@@ -97,6 +95,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
     setWeedIdx(0);
     setWeedSelected([]);
     setWeedChecked(false);
+    setShowWeedAnswers(false);
   };
 
   const toggleWeedNeed = (needId: string) => {
@@ -121,19 +120,14 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
       setWeedIdx(i => i + 1);
       setWeedSelected([]);
       setWeedChecked(false);
+      setShowWeedAnswers(false);
     }
   };
 
   const restart = () => {
-    setPlacements({});
-    setSelected(null);
-    setChecked(false);
-    setPhase('sort');
-    setWeedIdx(0);
-    setWeedSelected([]);
-    setWeedChecked(false);
-    setSortScore(0);
-    setWeedScore(0);
+    setPlacements({}); setSelected(null); setChecked(false); setShowSortAnswers(false);
+    setPhase('sort'); setWeedIdx(0); setWeedSelected([]); setWeedChecked(false); setShowWeedAnswers(false);
+    setSortScore(0); setWeedScore(0);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
@@ -148,7 +142,51 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
         <h2 className="font-display font-bold text-2xl text-foreground mb-2">Ecology Expert!</h2>
         <p className="text-foreground mb-2">Sorting: {sortScore}/{items.length}</p>
         <p className="text-foreground mb-6">Weed Needs: {weedScore}/{weedRounds.length}</p>
-        <LevelComplete level={level} score={correctCount} total={items.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+        <LevelComplete level={level} score={finalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+      </div>
+    );
+  }
+
+  // Phase 2: Weed needs — answer response screen
+  if (phase === 'weedNeeds' && showWeedAnswers) {
+    const wr = weedRounds[weedIdx];
+    const correctNeeds = ALL_NEEDS.filter(n => n.category === wr.category);
+    const allCorrect = weedSelected.length === 3 && weedSelected.every(id => correctNeeds.map(n => n.id).includes(id));
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-display font-bold text-foreground text-lg flex-1">Answer Review</h1>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto">
+          <div className="flex justify-center mb-3">
+            <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-primary/30 bg-secondary">
+              <WeedImage weedId={wr.weed.id} stage="plant" className="w-full h-full object-cover" />
+            </div>
+          </div>
+          <p className="text-center font-bold text-foreground text-lg mb-2">{wr.weed.commonName}</p>
+          <p className={`text-center text-lg font-bold mb-4 ${allCorrect ? 'text-green-500' : 'text-destructive'}`}>
+            {allCorrect ? 'All correct!' : 'Not quite!'}
+          </p>
+          <div className="space-y-2 mb-4">
+            {ALL_NEEDS.map(need => {
+              const isCorrect = need.category === wr.category;
+              const wasSelected = weedSelected.includes(need.id);
+              let cls = 'border-border bg-card text-muted-foreground';
+              if (wasSelected && isCorrect) cls = 'border-green-500 bg-green-500/20 text-foreground';
+              else if (wasSelected && !isCorrect) cls = 'border-destructive bg-destructive/20 text-foreground';
+              else if (isCorrect) cls = 'border-green-500/50 bg-green-500/10 text-foreground';
+              return (
+                <div key={need.id} className={`px-4 py-2.5 rounded-lg border-2 text-sm font-medium ${cls}`}>
+                  {need.label} {isCorrect && '✓'}
+                </div>
+              );
+            })}
+          </div>
+          <button onClick={nextWeed} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+            {weedIdx + 1 < weedRounds.length ? 'Next Weed' : 'See Results'}
+          </button>
+        </div>
       </div>
     );
   }
@@ -164,7 +202,7 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-display font-bold text-foreground text-lg flex-1">Ecology Scramble</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">{weedIdx + 1}/{weedRounds.length}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
@@ -187,7 +225,6 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
               else if (weedChecked && isSelected && !isCorrect) cls = 'border-destructive bg-destructive/20 text-foreground';
               else if (weedChecked && !isSelected && isCorrect) cls = 'border-green-500/50 bg-green-500/10 text-muted-foreground';
               else if (isSelected) cls = 'border-primary bg-primary/10 text-primary';
-
               return (
                 <button key={need.id} onClick={() => toggleWeedNeed(need.id)}
                   className={`px-4 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${cls}`}>
@@ -200,10 +237,43 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
             <button onClick={checkWeedNeeds} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
           )}
           {weedChecked && (
-            <button onClick={nextWeed} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">
-              {weedIdx + 1 < weedRounds.length ? 'Next Weed' : 'See Results'}
+            <button onClick={() => setShowWeedAnswers(true)} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">
+              Review Answers →
             </button>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // Phase 1 answer review
+  if (showSortAnswers) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-display font-bold text-foreground text-lg flex-1">Sorting Review</h1>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto">
+          <p className={`text-center text-lg font-bold mb-4 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>
+            {correctCount}/{items.length} correct!
+          </p>
+          <div className="space-y-2 mb-4">
+            {items.map(i => {
+              const userCat = placements[i.id];
+              const isCorrect = userCat === i.category;
+              return (
+                <div key={i.id} className={`px-4 py-2.5 rounded-lg border-2 text-sm font-medium ${isCorrect ? 'border-green-500 bg-green-500/20 text-foreground' : 'border-destructive bg-destructive/20 text-foreground'}`}>
+                  <span className="font-bold">{i.label}</span>
+                  {!isCorrect && <span className="text-xs text-destructive ml-2">(You: {CATEGORIES.find(c => c.id === userCat)?.label})</span>}
+                  <span className="text-xs text-green-600 ml-2">→ {CATEGORIES.find(c => c.id === i.category)?.label}</span>
+                </div>
+              );
+            })}
+          </div>
+          <button onClick={goToWeedPhase} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+            Next: Identify Weed Needs →
+          </button>
         </div>
       </div>
     );
@@ -218,7 +288,6 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-4 text-center">Sort each survival need into the correct plant type</p>
-
         <div className="grid grid-cols-3 gap-3 mb-4">
           {CATEGORIES.map(cat => {
             const CatIcon = cat.Icon;
@@ -243,7 +312,6 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
             );
           })}
         </div>
-
         {unplaced.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center mb-4">
             {unplaced.map(i => (
@@ -256,7 +324,6 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         )}
-
         {allPlaced && !checked && (
           <button onClick={handleCheck} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
         )}
@@ -265,8 +332,8 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
             <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>
               {correctCount} / {items.length} correct!
             </p>
-            <button onClick={goToWeedPhase} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-              Next: Identify Weed Needs →
+            <button onClick={() => setShowSortAnswers(true)} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+              Review Answers →
             </button>
           </div>
         )}

@@ -37,7 +37,7 @@ export default function ReferencesPage({ onClose }: { onClose: () => void }) {
             <div key={species} className="border border-border rounded-lg overflow-hidden">
               <div className="bg-secondary/30 px-4 py-2.5 border-b border-border">
                 <h2 className="font-display font-semibold text-sm text-foreground">
-                  {species.replace(/[-_]/g, ' ')}
+                  {species.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </h2>
               </div>
               <div className="divide-y divide-border/50">
