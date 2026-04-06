@@ -465,7 +465,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  // Setup Screen 
  if (phase === 'setup') {
  return (
- <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
+ <div className="fixed inset-0 bg-background z-[60] overflow-y-auto">
   <div className="max-w-lg mx-auto px-5 py-12 text-center">
   <div className="absolute top-4 left-4"><HomeButton onClose={onClose} /></div>
   <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
@@ -500,7 +500,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  const matureWeeds = fieldWeeds.filter(w => w.alive && w.stage === 'mature');
  const seedsProduced = matureWeeds.length * 5000;
  return (
- <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
+ <div className="fixed inset-0 bg-background z-[60] overflow-y-auto">
  <div className="max-w-2xl mx-auto px-5 py-8">
  <h1 className="font-display font-bold text-2xl text-foreground mb-6">Season Summary</h1>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
@@ -1124,10 +1124,11 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
 
   // Main Layout: Field always visible + side panel 
   return (
-   <div className="fixed inset-0 bg-background z-40 flex flex-col" style={{ overflow: 'hidden' }}>
+   <div className="fixed inset-0 bg-background z-[60] flex flex-col" style={{ overflow: 'hidden' }}>
    {/* Top bar — always visible */}
    <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0 z-10">
    <div className="flex items-center gap-3">
+   <HomeButton onClose={onClose} />
    <button onClick={onClose} className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground text-sm font-bold flex items-center gap-2 hover:bg-destructive/90 transition-colors shadow-md">
    <X className="w-4 h-4" /> Exit
    </button>
