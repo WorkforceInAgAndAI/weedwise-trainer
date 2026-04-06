@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, Sprout, Snowflake, Flame, Zap, Bug, Shovel } from 'lucide-react';
+import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, Sprout, Snowflake, Flame, Zap, Bug, Shovel, Star } from 'lucide-react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
@@ -197,8 +197,8 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
                   <p className="text-xs text-muted-foreground mb-2">{sc.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {Object.entries(sc.traits).map(([key, val]) => (
-                      <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground">
-                        {key}: {'*'.repeat(val)}{'-'.repeat(3 - val)}
+                      <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground flex items-center gap-0.5">
+                        {key}: {Array.from({ length: val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 fill-primary text-primary inline" />)}{Array.from({ length: 3 - val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 text-muted-foreground/30 inline" />)}
                       </span>
                     ))}
                   </div>
@@ -298,8 +298,8 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
                   <OptIcon className="w-8 h-8 text-foreground shrink-0" />
                   <div className="flex-1">
                     <span className="text-sm font-medium text-foreground">{opt.label}</span>
-                    <span className="block text-[10px] text-muted-foreground mt-0.5">
-                      Your {opt.traitKey}: {'*'.repeat(traitVal)}{'-'.repeat(3 - traitVal)} (need {'*'.repeat(opt.threshold)})
+                    <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground mt-0.5">
+                       Your {opt.traitKey}: {Array.from({ length: traitVal }).map((_, si) => <Star key={`y${si}`} className="w-2.5 h-2.5 fill-primary text-primary inline" />)}{Array.from({ length: 3 - traitVal }).map((_, si) => <Star key={`n${si}`} className="w-2.5 h-2.5 text-muted-foreground/30 inline" />)} (need {Array.from({ length: opt.threshold }).map((_, si) => <Star key={`t${si}`} className="w-2.5 h-2.5 fill-amber-500 text-amber-500 inline" />)})
                     </span>
                   </div>
                 </button>
