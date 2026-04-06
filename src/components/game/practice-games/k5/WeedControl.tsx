@@ -19,7 +19,6 @@ function bestMethod(w: typeof weeds[0]): string {
   if (m.includes('mow') || m.includes('mechanical') || m.includes('tillage') || m.includes('cultivation')) return 'mow';
   if (m.includes('cover crop') || m.includes('rotation') || m.includes('compete') || m.includes('cultural')) return 'leave';
   if (m.includes('herbicide') || m.includes('pre') || m.includes('post') || m.includes('chemical')) return 'spray';
-  // Cycle through methods based on weed id hash to avoid all being the same
   const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
   const fallbacks = ['pull', 'mow', 'leave', 'spray'];
   return fallbacks[hash % fallbacks.length];
@@ -29,11 +28,15 @@ interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: b
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const fieldWeeds = useMemo<FieldWeed[]>(() =>
-    shuffle(weeds).slice(0, 8).map(w => ({
+
+  const fieldWeeds = useMemo<FieldWeed[]>(() => {
+    const offset = (level - 1) * 8;
+    const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
+    return shuffle(rotated).slice(0, 8).map(w => ({
       weed: w, x: 10 + Math.random() * 75, y: 10 + Math.random() * 55,
       identified: false, managed: false, correct: false,
-    })), []);
+    }));
+  }, [level]);
 
   const [weedState, setWeedState] = useState(fieldWeeds);
   const [timer, setTimer] = useState(90);
@@ -43,8 +46,11 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [idChoice, setIdChoice] = useState<string | null>(null);
   const [methodChoice, setMethodChoice] = useState<string | null>(null);
 
+  // Reset weedState when level changes
+  useEffect(() => { setWeedState(fieldWeeds); }, [fieldWeeds]);
+
   const restart = () => { setWeedState(fieldWeeds); setTimer(90); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
-  const nextLevel = () => { setLevel(l => l + 1); restart(); };
+  const nextLevel = () => { setLevel(l => l + 1); setTimer(90); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
   const startOver = () => { setLevel(1); restart(); };
 
   useEffect(() => {
@@ -75,13 +81,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const afterIdFeedback = () => {
     if (activeWeed === null) return;
     const correct = idChoice === weedState[activeWeed].weed.commonName;
-    if (correct) {
-      setPhase('manage');
-    } else {
-      // Wrong ID — dismiss, let them try again
-      setActiveWeed(null);
-      setPhase('identify');
-    }
+    if (correct) setPhase('manage');
+    else { setActiveWeed(null); setPhase('identify'); }
     setIdChoice(null);
   };
 
@@ -98,13 +99,10 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   };
 
   const afterManageFeedback = () => {
-    setActiveWeed(null);
-    setPhase('identify');
-    setMethodChoice(null);
+    setActiveWeed(null); setPhase('identify'); setMethodChoice(null);
   };
 
   const score = weedState.filter(w => w.managed && w.correct).length;
-  const managed = weedState.filter(w => w.managed).length;
   const active = activeWeed !== null ? weedState[activeWeed] : null;
 
   const idOptions = useMemo(() => {
@@ -128,19 +126,16 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
       <div className="flex-1 relative">
         <img src={fieldBgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/10" />
-
         {weedState.map((fw, i) => (
           <button key={i} onClick={() => clickWeed(i)}
             className={`absolute w-14 h-14 rounded-full transition-all ${fw.managed ? 'opacity-30 scale-75' : 'hover:scale-110'}`}
             style={{ left: `${fw.x}%`, top: `${fw.y}%` }}>
-            <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
+            <div className="w-full h-full rounded-full overflow-hidden border-2 border-border bg-secondary shadow-lg">
               <WeedImage weedId={fw.weed.id} stage="plant" className="w-full h-full object-cover" />
             </div>
             {fw.managed && <span className="absolute -top-1 -right-1 text-sm">{fw.correct ? '✓' : '✗'}</span>}
           </button>
         ))}
-
-        {/* Panels */}
         {active && (
           <div className="absolute bottom-0 left-0 right-0 bg-card/95 backdrop-blur border-t border-border p-5">
             {phase === 'identify' && (
@@ -162,7 +157,6 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
             )}
-
             {phase === 'idFeedback' && (
               <div className="text-center">
                 <div className="flex items-center gap-4 justify-center mb-3">
@@ -177,13 +171,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 {idChoice === active.weed.commonName ? (
                   <div>
                     <p className="text-green-500 font-bold text-lg mb-1">Correct!</p>
-                    <p className="text-sm text-muted-foreground mb-3">That's {active.weed.commonName}. It's in the {active.weed.family} family.</p>
+                    <p className="text-sm text-muted-foreground mb-3">It's in the {active.weed.family} family.</p>
                   </div>
                 ) : (
                   <div>
                     <p className="text-destructive font-bold text-lg mb-1">Not quite!</p>
                     <p className="text-sm text-muted-foreground mb-1">You guessed: {idChoice}</p>
-                    <p className="text-sm text-muted-foreground mb-3">This is actually <span className="font-bold text-foreground">{active.weed.commonName}</span>. Look for: {active.weed.traits[0]}</p>
+                    <p className="text-sm text-muted-foreground mb-3">This is <span className="font-bold text-foreground">{active.weed.commonName}</span>. Look for: {active.weed.traits[0]}</p>
                   </div>
                 )}
                 <button onClick={afterIdFeedback} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
@@ -191,7 +185,6 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 </button>
               </div>
             )}
-
             {phase === 'manage' && (
               <div>
                 <p className="text-base font-bold text-foreground mb-3">How should you manage <span className="text-primary">{active.weed.commonName}</span>?</p>
@@ -205,7 +198,6 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
             )}
-
             {phase === 'manageFeedback' && (
               <div className="text-center">
                 <p className="font-bold text-foreground mb-1">{active.weed.commonName}</p>
@@ -221,7 +213,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                     <p className="text-destructive font-bold text-lg mb-1">Not the best choice</p>
                     <p className="text-sm text-muted-foreground mb-1">You chose: {METHODS.find(m => m.id === methodChoice)?.label}</p>
                     <p className="text-sm text-muted-foreground mb-3">
-                      The best method is <span className="font-bold text-foreground">{METHODS.find(m => m.id === bestMethod(active.weed))?.label}</span> because: {active.weed.management}
+                      Best: <span className="font-bold text-foreground">{METHODS.find(m => m.id === bestMethod(active.weed))?.label}</span> — {active.weed.management}
                     </p>
                   </div>
                 )}

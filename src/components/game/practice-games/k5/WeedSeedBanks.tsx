@@ -13,12 +13,13 @@ const MIN_PER_TYPE = 2;
 const MAX_PER_TYPE = 7;
 const MAX_SEEDS = 30;
 
-function generateRound() {
-  const chosen = shuffle(weeds).slice(0, NUM_WEED_TYPES);
+function generateRound(level: number, roundIdx: number) {
+  const offset = ((level - 1) * TOTAL_ROUNDS + roundIdx) * NUM_WEED_TYPES;
+  const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
+  const chosen = shuffle(rotated).slice(0, NUM_WEED_TYPES);
   const seeds: { id: number; weed: typeof weeds[0]; x: number; y: number }[] = [];
   let id = 0;
 
-  // Assign random counts per weed type, then cap total at MAX_SEEDS
   let counts: number[] = chosen.map(() => MIN_PER_TYPE + Math.floor(Math.random() * (MAX_PER_TYPE - MIN_PER_TYPE + 1)));
   let total = counts.reduce((a, b) => a + b, 0);
   while (total > MAX_SEEDS) {
@@ -47,7 +48,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
 
-  const rounds = useMemo(() => Array.from({ length: TOTAL_ROUNDS }, () => generateRound()), []);
+  const rounds = useMemo(() => Array.from({ length: TOTAL_ROUNDS }, (_, i) => generateRound(level, i)), [level]);
 
   const [round, setRound] = useState(0);
   const [phase, setPhase] = useState<'find' | 'sort' | 'summary' | 'predictMost' | 'predictLeast' | 'roundResult' | 'done'>('find');
@@ -77,7 +78,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     return Object.values(map).sort((a, b) => b.count - a.count);
   }, [foundSeeds.length, round]);
 
-  // Shuffled versions for prediction screens — NOT sorted by count
   const shuffledPredictionChoices = useMemo(() => shuffle([...foundCounts]), [foundCounts]);
 
   const weedTypeNames = useMemo(() => {
@@ -88,17 +88,10 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const leastPrevalent = foundCounts.length > 0 ? foundCounts[foundCounts.length - 1].weed.commonName : '';
 
   const resetRound = useCallback(() => {
-    setFound(new Set());
-    setTimer(30);
-    setFindingDone(false);
-    setPhase('find');
-    setSortPlacements({});
-    setSortChecked(false);
-    setSelectedSeed(null);
-    setPredictMostAnswer(null);
-    setPredictLeastAnswer(null);
-    setPredictMostChecked(false);
-    setPredictLeastChecked(false);
+    setFound(new Set()); setTimer(30); setFindingDone(false); setPhase('find');
+    setSortPlacements({}); setSortChecked(false); setSelectedSeed(null);
+    setPredictMostAnswer(null); setPredictLeastAnswer(null);
+    setPredictMostChecked(false); setPredictLeastChecked(false);
   }, []);
 
   useEffect(() => {
@@ -142,15 +135,10 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   };
 
   const nextRound = () => {
-    if (round + 1 >= TOTAL_ROUNDS) {
-      setPhase('done');
-    } else {
-      setRound(r => r + 1);
-      resetRound();
-    }
+    if (round + 1 >= TOTAL_ROUNDS) setPhase('done');
+    else { setRound(r => r + 1); resetRound(); }
   };
 
-  // Done screen
   if (phase === 'done') {
     addBadge({ gameId: 'weed-seed-banks', gameName: 'Weed Seed Banks', level: 'K-5', score: totalScore, total: totalScore + 10 });
     return (
@@ -158,7 +146,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-display font-bold text-foreground mb-2">All Rounds Complete!</h2>
           <p className="text-muted-foreground mb-2">Total Score: {totalScore}</p>
-          <p className="text-sm text-muted-foreground mb-6">Weed seed banks can hold thousands of seeds in the soil, waiting years to sprout! More seeds in the bank means more weeds next season.</p>
+          <p className="text-sm text-muted-foreground mb-6">Weed seed banks can hold thousands of seeds in the soil, waiting years to sprout!</p>
           <div className="flex gap-3 justify-center">
             <button onClick={() => { setLevel(l => l + 1); setRound(0); resetRound(); setTotalScore(0); }} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Level</button>
             <button onClick={() => { setLevel(1); setRound(0); resetRound(); setTotalScore(0); }} className="px-6 py-3 rounded-lg bg-secondary text-foreground font-bold">Start Over</button>
@@ -169,7 +157,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Round result
   if (phase === 'roundResult') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
@@ -179,8 +166,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <p className="text-muted-foreground mb-1">Least Prevalent: <span className="font-bold text-foreground">{leastPrevalent}</span></p>
           <p className="text-sm text-muted-foreground mt-3 mb-6">
             {predictMostAnswer === mostPrevalent && predictLeastAnswer === leastPrevalent
-              ? 'Great predictions! You understand seed banks well!'
-              : 'Keep observing — seed counts tell us a lot about future weed pressure!'}
+              ? 'Great predictions!' : 'Keep observing — seed counts tell us about future weed pressure!'}
           </p>
           <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
             {round + 1 < TOTAL_ROUNDS ? 'Next Round' : 'See Final Results'}
@@ -190,18 +176,17 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Predict least prevalent — use SHUFFLED choices
   if (phase === 'predictLeast') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-display font-bold text-foreground text-lg flex-1">Predict: Least Prevalent</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <p className="text-sm text-muted-foreground mb-4 text-center">Which weed will be <span className="font-bold">least</span> prevalent next year? (Fewer seeds = fewer weeds)</p>
+          <p className="text-sm text-muted-foreground mb-4 text-center">Which weed will be <span className="font-bold">least</span> prevalent next year?</p>
           <div className="grid gap-2 max-w-sm mx-auto mb-4">
             {shuffledPredictionChoices.map(fc => {
               let cls = 'border-border bg-card text-foreground';
@@ -211,7 +196,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
               return (
                 <button key={fc.weed.id} onClick={() => !predictLeastChecked && setPredictLeastAnswer(fc.weed.commonName)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${cls}`}>
-                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-border shadow-sm shrink-0">
                     <WeedImage weedId={fc.weed.id} stage="seed" className="w-full h-full object-cover" />
                   </div>
                   <span className="flex-1 text-left">{fc.weed.commonName}</span>
@@ -235,7 +220,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Predict most prevalent — use SHUFFLED choices, hide seed counts
   if (phase === 'predictMost') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -245,7 +229,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <p className="text-sm text-muted-foreground mb-4 text-center">Which weed will be <span className="font-bold">most</span> prevalent next year? (More seeds = more weeds)</p>
+          <p className="text-sm text-muted-foreground mb-4 text-center">Which weed will be <span className="font-bold">most</span> prevalent next year?</p>
           <div className="grid gap-2 max-w-sm mx-auto mb-4">
             {shuffledPredictionChoices.map(fc => {
               let cls = 'border-border bg-card text-foreground';
@@ -255,7 +239,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
               return (
                 <button key={fc.weed.id} onClick={() => !predictMostChecked && setPredictMostAnswer(fc.weed.commonName)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${cls}`}>
-                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-border shadow-sm shrink-0">
                     <WeedImage weedId={fc.weed.id} stage="seed" className="w-full h-full object-cover" />
                   </div>
                   <span className="flex-1 text-left">{fc.weed.commonName}</span>
@@ -279,7 +263,6 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Summary phase
   if (phase === 'summary') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -289,11 +272,11 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <p className="text-sm text-muted-foreground mb-4 text-center">Here's what you found in the seed bank:</p>
+          <p className="text-sm text-muted-foreground mb-4 text-center">Here's what you found:</p>
           <div className="grid gap-2 max-w-sm mx-auto mb-6">
             {foundCounts.map(fc => (
               <div key={fc.weed.id} className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-card">
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-border shadow-sm shrink-0">
                   <WeedImage weedId={fc.weed.id} stage="seed" className="w-full h-full object-cover" />
                 </div>
                 <span className="flex-1 font-medium text-foreground text-sm">{fc.weed.commonName}</span>
@@ -309,7 +292,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Sorting phase
+  // Sorting phase — COLUMN layout
   if (phase === 'sort') {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -320,17 +303,18 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <p className="text-sm text-muted-foreground mb-4 text-center">Sort the seeds you found by weed type</p>
-          <div className="grid gap-3 mb-4">
+          {/* Column layout for weed bins */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             {weedTypeNames.map(name => (
               <button key={name} onClick={() => handleBinClick(name)}
-                className={`rounded-xl border-2 border-border p-3 text-left transition-all ${selectedSeed !== null ? 'hover:bg-secondary cursor-pointer' : ''}`}>
-                <span className="font-bold text-foreground text-sm">{name}</span>
-                <div className="flex flex-wrap gap-2 mt-2 min-h-[40px]">
+                className={`rounded-xl border-2 border-border p-3 text-center transition-all flex flex-col items-center min-h-[100px] ${selectedSeed !== null ? 'hover:bg-secondary cursor-pointer' : ''}`}>
+                <span className="font-bold text-foreground text-xs mb-2">{name}</span>
+                <div className="flex flex-col gap-1 w-full">
                   {foundSeeds.filter(s => sortPlacements[s.id] === name).map(s => (
-                    <span key={s.id} className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                    <span key={s.id} className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
                       sortChecked ? (s.weed.commonName === name ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'
                     }`}>
-                      <div className="w-5 h-5 rounded-full overflow-hidden border border-white shadow-sm">
+                      <div className="w-5 h-5 rounded-full overflow-hidden border border-border shadow-sm">
                         <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
                       </div>
                       Seed
@@ -348,7 +332,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
                     selectedSeed === s.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
                   }`}>
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-border shadow-sm">
                     <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
                   </div>
                   Seed #{s.id + 1}
@@ -392,7 +376,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
               <button key={s.id} onClick={() => clickSeed(s.id)}
                 className={`absolute transition-all duration-300 z-10 ${found.has(s.id) ? 'scale-75 opacity-40' : 'hover:scale-125'}`}
                 style={{ left: `${s.x}%`, top: `${s.y}%`, transform: 'translate(-50%,-50%)' }}>
-                <div className={`w-12 h-12 rounded-full overflow-hidden shadow-lg ${found.has(s.id) ? 'border-2 border-green-500 opacity-60' : 'border-2 border-white'}`}>
+                <div className={`w-12 h-12 rounded-full overflow-hidden shadow-lg ${found.has(s.id) ? 'border-2 border-green-500 opacity-60' : 'border-2 border-border'}`}>
                   <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
                 </div>
               </button>
