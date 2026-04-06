@@ -15,6 +15,7 @@ import HighSchoolLifeCycleSort from './HighSchoolLifeCycleSort';
 import HighSchoolHabitatConnect from './HighSchoolHabitatConnect';
 import FamilyFlipMatch from './FamilyFlipMatch';
 import WeedImage from './WeedImage';
+import ImageReferencesBar from './ImageReferencesBar';
 import { filterTraitsForQuestion } from '@/lib/traitFilter';
 
 export default function GameScreen(game: GameEngine) {
