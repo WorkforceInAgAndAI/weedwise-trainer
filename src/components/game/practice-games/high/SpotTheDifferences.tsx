@@ -4,22 +4,40 @@ import WeedImage from '@/components/game/WeedImage';
 import { Search } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import { hasImage } from '@/lib/imageMap';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const DIOECIOUS = [
+const DIOECIOUS_CANDIDATES = [
  { id: 'waterhemp', name: 'Waterhemp', differences: ['Male plants have pollen-producing tassels', 'Female plants have compact seed heads', 'Male flowers are drooping clusters', 'Female stems are thicker at maturity', 'Female plants produce thousands of tiny seeds'] },
  { id: 'palmer-amaranth', name: 'Palmer Amaranth', differences: ['Male seed heads are softer and droop', 'Female seed heads are long, spiny, and rigid', 'Male plants shed pollen in wind', 'Female plants have tightly packed seeds', 'Female seed heads feel prickly to touch'] },
  { id: 'giant-ragweed', name: 'Giant Ragweed', differences: ['Male flowers are in terminal racemes', 'Female flowers are in leaf axils', 'Male flowers release abundant pollen', 'Female flowers develop into bur-like fruits', 'Male racemes are longer and more visible'] },
+ { id: 'common-ragweed', name: 'Common Ragweed', differences: ['Male flowers form in terminal spikes', 'Female flowers are in upper leaf axils', 'Male flowers produce copious pollen', 'Female flowers develop small bur-like fruits', 'Male spikes are more prominent and visible'] },
 ];
 
 export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
- const rounds = useMemo(() => shuffle(DIOECIOUS).slice(0, 3).map(sp => {
- const spots = shuffle(sp.differences).slice(0, 5);
- return { ...sp, spots };
- }), []);
+
+ // Filter to only species that actually have male.jpg and female.jpg
+ const availableSpecies = useMemo(() =>
+   DIOECIOUS_CANDIDATES.filter(sp =>
+     hasImage(sp.id, 'male.jpg') && hasImage(sp.id, 'female.jpg')
+   ), []
+ );
+
+ const rounds = useMemo(() => {
+   if (availableSpecies.length === 0) return [];
+   const pool = shuffle(availableSpecies);
+   const count = Math.min(3, pool.length);
+   // Use level-based offset for variety
+   const offset = ((level - 1) * 3) % pool.length;
+   const selected = [...pool.slice(offset), ...pool].slice(0, count);
+   return selected.map(sp => {
+     const spots = shuffle(sp.differences).slice(0, 5);
+     return { ...sp, spots };
+   });
+ }, [level, availableSpecies]);
 
  const [rIdx, setRIdx] = useState(0);
  const [found, setFound] = useState<Set<number>>(new Set());
@@ -30,11 +48,11 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
  const allFound = !done && current && found.size >= current.spots.length;
 
  const clickSpot = (i: number) => {
- if (!current || found.has(i) || allFound) return;
- const next = new Set(found);
- next.add(i);
- setFound(next);
- if (next.size >= current.spots.length) setScore(s => s + 1);
+  if (!current || found.has(i) || allFound) return;
+  const next = new Set(found);
+  next.add(i);
+  setFound(next);
+  if (next.size >= current.spots.length) setScore(s => s + 1);
  };
 
  const next = () => { setRIdx(r => r + 1); setFound(new Set()); };
@@ -42,58 +60,69 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
+ if (availableSpecies.length === 0) {
+   return (
+     <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+       <Search className="w-10 h-10 text-muted-foreground mb-3" />
+       <h2 className="font-display font-bold text-xl text-foreground mb-2">No Dioecious Images Available</h2>
+       <p className="text-muted-foreground mb-4">Male and female images (male.jpg, female.jpg) need to be uploaded to weed image folders.</p>
+       <button onClick={onBack} className="px-6 py-2 rounded-md bg-primary text-primary-foreground font-bold">Go Back</button>
+     </div>
+   );
+ }
+
  if (done) {
- addBadge({ gameId: 'spot-differences', gameName: 'Spot the Differences', level: 'HS', score, total: rounds.length });
- return (
- <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
- <Search className="w-10 h-10 text-primary mb-3" />
- <h2 className="font-display font-bold text-2xl text-foreground mb-2">Great Eye!</h2>
- <p className="text-foreground mb-6">You completed {score} / {rounds.length} species</p>
- <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
- </div>
- );
+  addBadge({ gameId: 'spot-differences', gameName: 'Spot the Differences', level: 'HS', score, total: rounds.length });
+  return (
+   <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+    <Search className="w-10 h-10 text-primary mb-3" />
+    <h2 className="font-display font-bold text-2xl text-foreground mb-2">Great Eye!</h2>
+    <p className="text-foreground mb-6">You completed {score} / {rounds.length} species</p>
+    <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+   </div>
+  );
  }
 
  return (
- <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
- <div className="max-w-lg mx-auto p-4">
- <div className="flex items-center gap-3 mb-4">
- <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
- <h1 className="font-display font-bold text-lg text-foreground">Spot the Differences</h1>
+  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+   <div className="max-w-lg mx-auto p-4">
+    <div className="flex items-center gap-3 mb-4">
+     <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+     <h1 className="font-display font-bold text-lg text-foreground">Spot the Differences</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
- <span className="ml-auto text-sm text-muted-foreground">{rIdx + 1}/{rounds.length}</span>
- </div>
+     <span className="ml-auto text-sm text-muted-foreground">{rIdx + 1}/{rounds.length}</span>
+    </div>
 
- <p className="text-center font-bold text-foreground mb-1">{current!.name}</p>
- <p className="text-center text-sm text-muted-foreground mb-4">Find the differences between male and female plants</p>
+    <p className="text-center font-bold text-foreground mb-1">{current!.name}</p>
+    <p className="text-center text-sm text-muted-foreground mb-4">Find the differences between male and female plants</p>
 
- <div className="grid grid-cols-2 gap-3 mb-4">
- <div className="text-center">
- <div className="w-full aspect-square rounded-xl overflow-hidden border-2 border-blue-400 bg-secondary mb-1">
- <WeedImage weedId={current!.id} stage="plant" className="w-full h-full object-cover" />
- </div>
- <span className="text-xs font-medium text-blue-500">Male</span>
- </div>
- <div className="text-center">
- <div className="w-full aspect-square rounded-xl overflow-hidden border-2 border-pink-400 bg-secondary mb-1">
- <WeedImage weedId={current!.id} stage="repro" className="w-full h-full object-cover" />
- </div>
- <span className="text-xs font-medium text-pink-500">Female</span>
- </div>
- </div>
+    <div className="grid grid-cols-2 gap-3 mb-4">
+     <div className="text-center">
+      <div className="w-full aspect-square rounded-xl overflow-hidden border-2 border-blue-400 bg-secondary mb-1">
+       <WeedImage weedId={current!.id} stage="male" className="w-full h-full object-cover" />
+      </div>
+      <span className="text-xs font-medium text-blue-500">Male</span>
+     </div>
+     <div className="text-center">
+      <div className="w-full aspect-square rounded-xl overflow-hidden border-2 border-pink-400 bg-secondary mb-1">
+       <WeedImage weedId={current!.id} stage="female" className="w-full h-full object-cover" />
+      </div>
+      <span className="text-xs font-medium text-pink-500">Female</span>
+     </div>
+    </div>
 
- <p className="text-sm text-muted-foreground mb-2 text-center">Tap each difference you can spot ({found.size}/{current!.spots.length})</p>
- <div className="grid gap-2">
- {current!.spots.map((diff, i) => (
- <button key={i} onClick={() => clickSpot(i)}
- className={`p-3 rounded-xl border-2 text-left text-sm transition-all ${found.has(i) ? 'border-green-500 bg-green-500/20 text-green-700' : 'border-border bg-card hover:border-primary text-foreground'}`}>
- {found.has(i) ? diff : `Difference #${i + 1}`}
- </button>
- ))}
- </div>
+    <p className="text-sm text-muted-foreground mb-2 text-center">Tap each difference you can spot ({found.size}/{current!.spots.length})</p>
+    <div className="grid gap-2">
+     {current!.spots.map((diff, i) => (
+      <button key={i} onClick={() => clickSpot(i)}
+       className={`p-3 rounded-xl border-2 text-left text-sm transition-all ${found.has(i) ? 'border-green-500 bg-green-500/20 text-green-700' : 'border-border bg-card hover:border-primary text-foreground'}`}>
+       {found.has(i) ? diff : `Difference #${i + 1}`}
+      </button>
+     ))}
+    </div>
 
- {allFound && <button onClick={next} className="mt-4 w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">Next Species</button>}
- </div>
- </div>
+    {allFound && <button onClick={next} className="mt-4 w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">Next Species</button>}
+   </div>
+  </div>
  );
 }

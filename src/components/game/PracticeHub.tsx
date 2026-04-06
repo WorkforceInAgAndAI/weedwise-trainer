@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import HomeButton from './HomeButton';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
@@ -147,15 +148,17 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
- {/* Header */}
- <div className="flex items-center gap-3 mb-8">
- <button
- onClick={screen === 'grades' ? onClose : screen === 'games' ? backToGrades : backToGames}
- className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
- >
- <ArrowLeft className="w-4 h-4" />
- </button>
- <div>
+  {/* Header */}
+  <div className="flex items-center gap-3 mb-8">
+  <HomeButton />
+  <span className="text-border mx-1">|</span>
+  <button
+  onClick={screen === 'grades' ? onClose : screen === 'games' ? backToGrades : backToGames}
+  className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+  >
+  <ArrowLeft className="w-4 h-4" />
+  </button>
+  <div>
  <h1 className="font-display font-bold text-xl text-foreground">Practice Games</h1>
  {screen !== 'grades' && (
  <p className="text-sm text-muted-foreground">

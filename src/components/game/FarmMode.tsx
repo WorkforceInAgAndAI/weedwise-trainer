@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import type { GradeLevel, Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler } from 'lucide-react';
+import HomeButton from './HomeButton';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 
 // Types 
@@ -465,10 +466,11 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  if (phase === 'setup') {
  return (
  <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
- <div className="max-w-lg mx-auto px-5 py-12 text-center">
- <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
- <X className="w-4 h-4" />
- </button>
+  <div className="max-w-lg mx-auto px-5 py-12 text-center">
+  <div className="absolute top-4 left-4"><HomeButton /></div>
+  <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+  <X className="w-4 h-4" />
+  </button>
  <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
  <Wheat className="w-8 h-8 text-primary" />
  </div>
