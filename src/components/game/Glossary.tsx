@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 import WeedDetailPopup from './WeedDetailPopup';
+import HomeButton from './HomeButton';
 import type { Weed } from '@/types/game';
 import { ArrowLeft, Search, X } from 'lucide-react';
 

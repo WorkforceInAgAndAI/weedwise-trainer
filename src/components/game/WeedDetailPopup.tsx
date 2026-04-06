@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { X } from 'lucide-react';
+import { getSessionCitations } from '@/data/imageReferences';
 
 interface Props {
  weed: Weed;

@@ -4,6 +4,7 @@ import type { GradeLevel, Weed } from '@/types/game';
 import { GRADE_NAMES, GRADE_RANGES } from '@/data/phases';
 import WeedImage from './WeedImage';
 import WeedDetailPopup from './WeedDetailPopup';
+import HomeButton from './HomeButton';
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from '@/data/familyDescriptions';
 import { ArrowLeft, X } from 'lucide-react';
 
