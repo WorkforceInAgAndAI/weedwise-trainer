@@ -1,14 +1,20 @@
 import { Leaf } from 'lucide-react';
 
+interface Props {
+  onClose?: () => void;
+}
+
 /**
  * Persistent WeedNet logo button that navigates home from any screen.
- * Place at top-left of any fullscreen overlay.
  */
-export default function HomeButton() {
+export default function HomeButton({ onClose }: Props) {
   const goHome = () => {
-    // Close all overlays by reloading at root
-    window.location.hash = '';
-    window.location.reload();
+    if (onClose) {
+      onClose();
+    } else {
+      window.location.hash = '';
+      window.location.reload();
+    }
   };
 
   return (
