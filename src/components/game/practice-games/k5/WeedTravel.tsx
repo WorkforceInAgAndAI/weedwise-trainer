@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, Sprout, Snowflake, Flame, Zap, Bug, Shovel } from 'lucide-react';
+import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, Sprout, Snowflake, Flame, Zap, Bug, Shovel, Star } from 'lucide-react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
