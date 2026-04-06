@@ -5,7 +5,7 @@ import {
  RefreshCw, Globe, Map, Search, Wind, AlertTriangle,
  MapPin, ShieldAlert, Wrench, Target, TrendingUp,
  Droplets, ZoomIn, GraduationCap, Scan, Moon,
- Swords, Grid3X3, ClipboardList, Footprints, Stethoscope,
+ Swords, ClipboardList, Footprints, Stethoscope,
  Dna, FlaskRound
 } from 'lucide-react';
 
