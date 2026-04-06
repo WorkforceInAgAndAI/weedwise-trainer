@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import seedBankBg from '@/assets/images/seed-bank-bg.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
+import { X } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -58,6 +59,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const [sortPlacements, setSortPlacements] = useState<Record<number, string>>({});
   const [sortChecked, setSortChecked] = useState(false);
   const [selectedSeed, setSelectedSeed] = useState<number | null>(null);
+  const [inspectSeed, setInspectSeed] = useState<number | null>(null);
   const [predictMostAnswer, setPredictMostAnswer] = useState<string | null>(null);
   const [predictLeastAnswer, setPredictLeastAnswer] = useState<string | null>(null);
   const [predictMostChecked, setPredictMostChecked] = useState(false);
@@ -89,7 +91,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
 
   const resetRound = useCallback(() => {
     setFound(new Set()); setTimer(30); setFindingDone(false); setPhase('find');
-    setSortPlacements({}); setSortChecked(false); setSelectedSeed(null);
+    setSortPlacements({}); setSortChecked(false); setSelectedSeed(null); setInspectSeed(null);
     setPredictMostAnswer(null); setPredictLeastAnswer(null);
     setPredictMostChecked(false); setPredictLeastChecked(false);
   }, []);
@@ -138,6 +140,9 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     if (round + 1 >= TOTAL_ROUNDS) setPhase('done');
     else { setRound(r => r + 1); resetRound(); }
   };
+
+  // Seed inspect popup
+  const inspectedSeedData = inspectSeed !== null ? foundSeeds.find(s => s.id === inspectSeed) : null;
 
   if (phase === 'done') {
     addBadge({ gameId: 'weed-seed-banks', gameName: 'Weed Seed Banks', level: 'K-5', score: totalScore, total: totalScore + 10 });
@@ -285,7 +290,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
             ))}
           </div>
           <button onClick={() => setPhase('predictMost')} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-            Make Predictions →
+            Make Predictions
           </button>
         </div>
       </div>
@@ -302,7 +307,34 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <p className="text-sm text-muted-foreground mb-4 text-center">Sort the seeds you found by weed type</p>
+          <p className="text-sm text-muted-foreground mb-4 text-center">Sort the seeds you found by weed type. Tap a seed to inspect it.</p>
+
+          {/* Seed inspect popup */}
+          {inspectedSeedData && (
+            <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4" onClick={() => setInspectSeed(null)}>
+              <div className="bg-card border border-border rounded-xl p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-bold text-foreground">Seed Hint</h3>
+                  <button onClick={() => setInspectSeed(null)} className="text-muted-foreground hover:text-foreground">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="w-32 h-32 mx-auto rounded-xl overflow-hidden border-2 border-border bg-secondary mb-3">
+                  <WeedImage weedId={inspectedSeedData.weed.id} stage="seed" className="w-full h-full object-cover" />
+                </div>
+                <p className="text-sm text-foreground text-center mb-1 font-medium">
+                  Family: {inspectedSeedData.weed.family}
+                </p>
+                <p className="text-sm text-muted-foreground text-center mb-1">
+                  {inspectedSeedData.weed.plantType} — {inspectedSeedData.weed.lifeCycle}
+                </p>
+                <p className="text-xs text-muted-foreground text-center">
+                  {inspectedSeedData.weed.traits[0]}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Column layout for weed bins */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             {weedTypeNames.map(name => (
@@ -328,15 +360,22 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           {foundSeeds.filter(s => sortPlacements[s.id] === undefined).length > 0 && (
             <div className="flex flex-wrap gap-2 justify-center mb-4">
               {foundSeeds.filter(s => sortPlacements[s.id] === undefined).map(s => (
-                <button key={s.id} onClick={() => setSelectedSeed(selectedSeed === s.id ? null : s.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
-                    selectedSeed === s.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
-                  }`}>
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-border shadow-sm">
-                    <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
-                  </div>
-                  Seed #{s.id + 1}
-                </button>
+                <div key={s.id} className="flex items-center gap-1">
+                  <button onClick={() => setSelectedSeed(selectedSeed === s.id ? null : s.id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
+                      selectedSeed === s.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
+                    }`}>
+                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-border shadow-sm">
+                      <WeedImage weedId={s.weed.id} stage="seed" className="w-full h-full object-cover" />
+                    </div>
+                    Seed #{s.id + 1}
+                  </button>
+                  <button onClick={() => setInspectSeed(s.id)}
+                    className="px-2 py-2 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+                    title="Inspect seed">
+                    ?
+                  </button>
+                </div>
               ))}
             </div>
           )}

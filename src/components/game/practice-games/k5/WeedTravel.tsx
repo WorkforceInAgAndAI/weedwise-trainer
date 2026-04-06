@@ -55,7 +55,7 @@ interface AdventureNode {
   }[];
 }
 
-// Multiple obstacle sets that rotate by level
+// Each obstacle set has 7+ nodes so every path goes through at least 4 steps before finish
 const OBSTACLE_SETS: AdventureNode[][] = [
   [
     { id: 'start_hill', obstacle: 'Rocky Hillside', ObstacleIcon: Mountain, description: 'A steep rocky hill blocks your path. How will you get past?', options: [
@@ -67,16 +67,20 @@ const OBSTACLE_SETS: AdventureNode[][] = [
       { method: 'wind', label: 'Catch a gust across', MethodIcon: Wind, traitKey: 'wind', threshold: 3, successText: 'A strong gust launches you across!', failText: 'Not strong enough.', nextOnSuccess: 'forest', nextOnFail: 'hot_field' },
     ]},
     { id: 'forest', obstacle: 'Dense Forest', ObstacleIcon: TreePine, description: 'Thick trees block sunlight and wind.', options: [
-      { method: 'animal', label: "Stick to a deer's fur", MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'Your hooks latch onto a deer!', failText: 'Too smooth to stick.', nextOnSuccess: 'cold_snap', nextOnFail: 'meadow' },
-      { method: 'water', label: 'Follow a forest stream', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'You float along the stream!', failText: 'Stream too shallow.', nextOnSuccess: 'hot_field', nextOnFail: 'cold_snap' },
+      { method: 'animal', label: "Stick to a deer's fur", MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'Your hooks latch onto a deer!', failText: 'Too smooth to stick.', nextOnSuccess: 'bug_field', nextOnFail: 'meadow' },
+      { method: 'water', label: 'Follow a forest stream', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'You float along the stream!', failText: 'Stream too shallow.', nextOnSuccess: 'hot_field', nextOnFail: 'bug_field' },
     ]},
     { id: 'meadow', obstacle: 'Open Meadow', ObstacleIcon: Wheat, description: 'A wide open meadow with strong winds.', options: [
-      { method: 'wind', label: 'Ride the wind', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You soar across!', failText: 'Too heavy.', nextOnSuccess: 'cold_snap', nextOnFail: 'hot_field' },
-      { method: 'animal', label: 'Stick to a cow', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A cow carries you!', failText: 'You bounce off.', nextOnSuccess: 'finish', nextOnFail: 'cold_snap' },
+      { method: 'wind', label: 'Ride the wind', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You soar across!', failText: 'Too heavy.', nextOnSuccess: 'bug_field', nextOnFail: 'hot_field' },
+      { method: 'animal', label: 'Stick to a cow', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A cow carries you!', failText: 'You bounce off.', nextOnSuccess: 'cold_snap', nextOnFail: 'bug_field' },
+    ]},
+    { id: 'bug_field', obstacle: 'Insect Swarm', ObstacleIcon: Bug, description: 'Hungry insects are everywhere looking for seeds to eat!', options: [
+      { method: 'heat', label: 'Use your tough seed coat', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'Your hard coat protects you from being eaten!', failText: 'An insect nibbles your coat.', nextOnSuccess: 'cold_snap', nextOnFail: 'hot_field' },
+      { method: 'wind', label: 'Blow away from them', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You escape on a breeze!', failText: 'Not light enough to escape.', nextOnSuccess: 'cold_snap', nextOnFail: 'cold_snap' },
     ]},
     { id: 'hot_field', obstacle: 'Scorching Field', ObstacleIcon: Flame, description: 'The sun is blazing!', options: [
-      { method: 'heat', label: 'Tough it out', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'Your hard coat protects you!', failText: 'Too much heat!', nextOnSuccess: 'finish', nextOnFail: 'cold_snap' },
-      { method: 'water', label: 'Find shade near water', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'You find a cool puddle!', failText: 'No water nearby.', nextOnSuccess: 'finish', nextOnFail: 'finish' },
+      { method: 'heat', label: 'Tough it out', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'Your hard coat protects you!', failText: 'Too much heat!', nextOnSuccess: 'cold_snap', nextOnFail: 'cold_snap' },
+      { method: 'water', label: 'Find shade near water', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'You find a cool puddle!', failText: 'No water nearby.', nextOnSuccess: 'cold_snap', nextOnFail: 'cold_snap' },
     ]},
     { id: 'cold_snap', obstacle: 'Winter Freeze', ObstacleIcon: Snowflake, description: 'A cold snap hits!', options: [
       { method: 'cold', label: 'Hunker down and wait', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You survive the winter!', failText: 'The cold cracks your coat!', nextOnSuccess: 'finish', nextOnFail: 'finish' },
@@ -89,24 +93,54 @@ const OBSTACLE_SETS: AdventureNode[][] = [
       { method: 'animal', label: 'Ride on a frog', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A frog leaps you across!', failText: 'The frog ignores you.', nextOnSuccess: 'hot_field', nextOnFail: 'river' },
     ]},
     { id: 'river', obstacle: 'Thunderstorm', ObstacleIcon: Zap, description: 'Lightning and heavy rain! Can you use it to your advantage?', options: [
-      { method: 'water', label: 'Ride the rainwater', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'The rain carries you downstream!', failText: 'You get stuck in a puddle.', nextOnSuccess: 'meadow', nextOnFail: 'cold_snap' },
+      { method: 'water', label: 'Ride the rainwater', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'The rain carries you downstream!', failText: 'You get stuck in a puddle.', nextOnSuccess: 'meadow', nextOnFail: 'plow_zone' },
       { method: 'wind', label: 'Catch storm winds', MethodIcon: Wind, traitKey: 'wind', threshold: 3, successText: 'The wind hurls you far!', failText: 'Too chaotic to fly.', nextOnSuccess: 'forest', nextOnFail: 'hot_field' },
     ]},
     { id: 'forest', obstacle: 'Tall Grass Prairie', ObstacleIcon: Wheat, description: 'Endless tall grasses compete for space.', options: [
-      { method: 'heat', label: 'Use summer heat', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'You thrive in the warmth!', failText: 'Too much competition.', nextOnSuccess: 'cold_snap', nextOnFail: 'meadow' },
-      { method: 'animal', label: 'Stick to a rabbit', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A rabbit carries you out!', failText: 'You fall off.', nextOnSuccess: 'finish', nextOnFail: 'hot_field' },
+      { method: 'heat', label: 'Use summer heat', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'You thrive in the warmth!', failText: 'Too much competition.', nextOnSuccess: 'plow_zone', nextOnFail: 'meadow' },
+      { method: 'animal', label: 'Stick to a rabbit', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A rabbit carries you out!', failText: 'You fall off.', nextOnSuccess: 'cold_snap', nextOnFail: 'hot_field' },
     ]},
     { id: 'meadow', obstacle: 'Sandy Desert', ObstacleIcon: Wind, description: 'Hot sand and dry winds everywhere.', options: [
-      { method: 'heat', label: 'Endure the heat', MethodIcon: Flame, traitKey: 'heat', threshold: 3, successText: 'Your tough coat survives!', failText: 'The heat dries you out.', nextOnSuccess: 'finish', nextOnFail: 'cold_snap' },
-      { method: 'wind', label: 'Roll with the wind', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You tumble across!', failText: 'Too heavy to roll.', nextOnSuccess: 'cold_snap', nextOnFail: 'finish' },
+      { method: 'heat', label: 'Endure the heat', MethodIcon: Flame, traitKey: 'heat', threshold: 3, successText: 'Your tough coat survives!', failText: 'The heat dries you out.', nextOnSuccess: 'plow_zone', nextOnFail: 'cold_snap' },
+      { method: 'wind', label: 'Roll with the wind', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You tumble across!', failText: 'Too heavy to roll.', nextOnSuccess: 'cold_snap', nextOnFail: 'plow_zone' },
+    ]},
+    { id: 'plow_zone', obstacle: 'Plowed Field', ObstacleIcon: Shovel, description: 'A farmer is plowing the soil — seeds are being turned over!', options: [
+      { method: 'cold', label: 'Go dormant underground', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You survive buried deep!', failText: 'The plow exposes you.', nextOnSuccess: 'cold_snap', nextOnFail: 'hot_field' },
+      { method: 'water', label: 'Wash away with irrigation', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'Water carries you to safety!', failText: 'No water available.', nextOnSuccess: 'cold_snap', nextOnFail: 'cold_snap' },
     ]},
     { id: 'hot_field', obstacle: 'Farm Equipment', ObstacleIcon: Shovel, description: 'Farm machinery is tilling the soil!', options: [
-      { method: 'cold', label: 'Go dormant underground', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You survive buried deep!', failText: 'The plow exposes you.', nextOnSuccess: 'finish', nextOnFail: 'cold_snap' },
-      { method: 'animal', label: 'Hitch ride on equipment', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'You travel to a new field!', failText: 'You fall off the machine.', nextOnSuccess: 'finish', nextOnFail: 'finish' },
+      { method: 'cold', label: 'Go dormant underground', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You survive buried deep!', failText: 'The plow exposes you.', nextOnSuccess: 'cold_snap', nextOnFail: 'cold_snap' },
+      { method: 'animal', label: 'Hitch ride on equipment', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'You travel to a new field!', failText: 'You fall off the machine.', nextOnSuccess: 'cold_snap', nextOnFail: 'cold_snap' },
     ]},
     { id: 'cold_snap', obstacle: 'Early Frost', ObstacleIcon: Snowflake, description: 'An unexpected frost arrives early!', options: [
       { method: 'cold', label: 'Tough out the cold', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You go dormant and wait!', failText: 'The frost is too much.', nextOnSuccess: 'finish', nextOnFail: 'finish' },
       { method: 'water', label: 'Hide in a warm stream', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'The stream keeps you warm!', failText: 'No stream nearby.', nextOnSuccess: 'finish', nextOnFail: 'finish' },
+    ]},
+  ],
+  [
+    { id: 'start_hill', obstacle: 'Steep Ravine', ObstacleIcon: Mountain, description: 'A deep ravine cuts across your path!', options: [
+      { method: 'wind', label: 'Glide across on a breeze', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You float across the gap!', failText: 'Not enough wind.', nextOnSuccess: 'creek', nextOnFail: 'grassland' },
+      { method: 'water', label: 'Wash down and across', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'Rainwater carries you through!', failText: 'You get stuck at the bottom.', nextOnSuccess: 'grassland', nextOnFail: 'creek' },
+    ]},
+    { id: 'creek', obstacle: 'Winding Creek', ObstacleIcon: Waves, description: 'A gentle creek winds through the landscape.', options: [
+      { method: 'water', label: 'Float downstream', MethodIcon: Droplets, traitKey: 'water', threshold: 2, successText: 'The current takes you along!', failText: 'You waterlog and sink.', nextOnSuccess: 'insect_zone', nextOnFail: 'grassland' },
+      { method: 'animal', label: 'Stick to a duck', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A duck carries you out!', failText: 'Too slippery for the duck.', nextOnSuccess: 'grassland', nextOnFail: 'insect_zone' },
+    ]},
+    { id: 'grassland', obstacle: 'Windy Grassland', ObstacleIcon: Wheat, description: 'Strong gusts blow across an open grassland.', options: [
+      { method: 'wind', label: 'Sail with the gusts', MethodIcon: Wind, traitKey: 'wind', threshold: 2, successText: 'You fly across the field!', failText: 'You drop into the grass.', nextOnSuccess: 'insect_zone', nextOnFail: 'drought' },
+      { method: 'heat', label: 'Wait for calm and sprint', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'The warm sun helps you germinate quickly!', failText: 'Still too windy.', nextOnSuccess: 'drought', nextOnFail: 'insect_zone' },
+    ]},
+    { id: 'insect_zone', obstacle: 'Seed-Eating Insects', ObstacleIcon: Bug, description: 'Ground beetles are hunting for seeds!', options: [
+      { method: 'animal', label: 'Stick to an animal to escape', MethodIcon: PawPrint, traitKey: 'animal', threshold: 2, successText: 'A mouse carries you away!', failText: 'The beetles find you.', nextOnSuccess: 'drought', nextOnFail: 'frost' },
+      { method: 'cold', label: 'Go dormant to hide', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You play dead and they pass!', failText: 'They still find you.', nextOnSuccess: 'frost', nextOnFail: 'drought' },
+    ]},
+    { id: 'drought', obstacle: 'Summer Drought', ObstacleIcon: Flame, description: 'No rain for weeks — the soil is cracked and dry.', options: [
+      { method: 'heat', label: 'Endure the drought', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'Your tough coat holds moisture!', failText: 'You dry out.', nextOnSuccess: 'frost', nextOnFail: 'frost' },
+      { method: 'water', label: 'Find underground moisture', MethodIcon: Droplets, traitKey: 'water', threshold: 3, successText: 'You find a damp crack!', failText: 'Bone dry everywhere.', nextOnSuccess: 'frost', nextOnFail: 'frost' },
+    ]},
+    { id: 'frost', obstacle: 'Late Season Frost', ObstacleIcon: Snowflake, description: 'A hard frost blankets the ground!', options: [
+      { method: 'cold', label: 'Survive underground', MethodIcon: Snowflake, traitKey: 'cold', threshold: 2, successText: 'You emerge in spring!', failText: 'The freeze damages you.', nextOnSuccess: 'finish', nextOnFail: 'finish' },
+      { method: 'heat', label: 'Wait for a warm spell', MethodIcon: Flame, traitKey: 'heat', threshold: 2, successText: 'A warm day gives you a chance!', failText: 'No warm spell comes.', nextOnSuccess: 'finish', nextOnFail: 'finish' },
     ]},
   ],
 ];
@@ -164,7 +198,7 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
                   <div className="flex flex-wrap gap-1">
                     {Object.entries(sc.traits).map(([key, val]) => (
                       <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground">
-                        {key}: {'★'.repeat(val)}{'☆'.repeat(3 - val)}
+                        {key}: {'*'.repeat(val)}{'-'.repeat(3 - val)}
                       </span>
                     ))}
                   </div>
@@ -237,7 +271,7 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
         <div className="flex items-center gap-1 justify-center">
           {history.map((h, i) => (
             <div key={i} className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${h.success ? 'bg-green-500/20 text-green-600' : 'bg-destructive/20 text-destructive'}`}>
-              {h.success ? '✓' : '✗'}
+              {h.success ? '+' : 'x'}
             </div>
           ))}
           <div className="w-6 h-6 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
@@ -265,7 +299,7 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
                   <div className="flex-1">
                     <span className="text-sm font-medium text-foreground">{opt.label}</span>
                     <span className="block text-[10px] text-muted-foreground mt-0.5">
-                      Your {opt.traitKey}: {'★'.repeat(traitVal)}{'☆'.repeat(3 - traitVal)} (need {'★'.repeat(opt.threshold)})
+                      Your {opt.traitKey}: {'*'.repeat(traitVal)}{'-'.repeat(3 - traitVal)} (need {'*'.repeat(opt.threshold)})
                     </span>
                   </div>
                 </button>
@@ -282,7 +316,7 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
               <p className="text-sm text-muted-foreground mb-3">
                 {node.options[selectedOption!][succeeded ? 'successText' : 'failText']}
               </p>
-              <button onClick={handleContinue} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Continue Journey →</button>
+              <button onClick={handleContinue} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Continue Journey</button>
             </div>
           )}
         </div>

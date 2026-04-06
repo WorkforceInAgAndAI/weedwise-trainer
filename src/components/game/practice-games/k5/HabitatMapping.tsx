@@ -29,7 +29,6 @@ function getItemsForRound(level: number, roundNum: number) {
   weeds.forEach(w => byZone[getZone(w)].push(w));
   const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * WEEDS_PER_ROUND;
   const picks: { weed: typeof weeds[0]; zone: string }[] = [];
-  // Pick one from each zone
   for (const z of ZONES) {
     const pool = byZone[z.id];
     if (pool.length === 0) continue;
@@ -40,11 +39,16 @@ function getItemsForRound(level: number, roundNum: number) {
   return shuffle(picks);
 }
 
+function getZoneLabel(zoneId: string): string {
+  return ZONES.find(z => z.id === zoneId)?.label ?? zoneId;
+}
+
 export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const [roundNum, setRoundNum] = useState(0);
   const [roundScore, setRoundScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const [showReview, setShowReview] = useState(false);
 
   const items = useMemo(() => getItemsForRound(level, roundNum), [level, roundNum]);
 
@@ -72,6 +76,9 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
     setChecked(true);
     const correct = items.filter(i => placements[i.weed.id] === i.zone).length;
     setRoundScore(correct);
+    if (correct < items.length) {
+      setShowReview(true);
+    }
   };
 
   const nextRound = () => {
@@ -81,10 +88,11 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
     setSelected(null);
     setChecked(false);
     setRoundScore(0);
+    setShowReview(false);
   };
 
   const restart = () => {
-    setRoundNum(0); setPlacements({}); setSelected(null); setChecked(false); setRoundScore(0); setTotalScore(0);
+    setRoundNum(0); setPlacements({}); setSelected(null); setChecked(false); setRoundScore(0); setTotalScore(0); setShowReview(false);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
@@ -92,6 +100,53 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   if (done) {
     const total = ROUNDS_PER_LEVEL * WEEDS_PER_ROUND;
     return <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  }
+
+  // Answer review screen showing correct placements
+  if (showReview && checked) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-bold text-foreground text-lg flex-1">Habitat Mapping — Review</h1>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <p className="text-lg font-bold text-center mb-1 text-foreground">{correctCount}/{items.length} correct</p>
+          <p className="text-sm text-muted-foreground text-center mb-4">Here are the correct habitats for each weed:</p>
+          <div className="grid gap-3 max-w-md mx-auto mb-6">
+            {items.map(i => {
+              const userZone = placements[i.weed.id];
+              const isCorrect = userZone === i.zone;
+              return (
+                <div key={i.weed.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 ${isCorrect ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
+                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
+                    <WeedImage weedId={i.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-foreground text-sm">{i.weed.commonName}</p>
+                    {!isCorrect && (
+                      <p className="text-xs text-destructive">Your answer: {getZoneLabel(userZone)}</p>
+                    )}
+                    <p className={`text-xs ${isCorrect ? 'text-green-600' : 'text-foreground'}`}>
+                      Correct: {getZoneLabel(i.zone)}
+                    </p>
+                  </div>
+                  <span className={`text-sm font-bold ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
+                    {isCorrect ? 'Correct' : 'Wrong'}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-center">
+            <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+              {roundNum + 1 < ROUNDS_PER_LEVEL ? `Round ${roundNum + 2} →` : 'See Results'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -150,9 +205,9 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
         {allPlaced && !checked && (
           <button onClick={checkAnswers} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
         )}
-        {checked && (
+        {checked && !showReview && (
           <div className="text-center mt-4">
-            <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>{correctCount}/{items.length} correct!</p>
+            <p className="text-lg font-bold mb-3 text-green-500">{correctCount}/{items.length} correct!</p>
             <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
               {roundNum + 1 < ROUNDS_PER_LEVEL ? `Round ${roundNum + 2} →` : 'See Results'}
             </button>
