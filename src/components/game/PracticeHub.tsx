@@ -83,7 +83,7 @@ const k5Games: GameDef[] = [
  { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel from point A to point B.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle.', component: WeedTravel },
  { id: 'invasive-match', name: 'Invasive Match', Icon: AlertTriangle, category: 'Invasive Weeds', description: 'Match invasive weeds to the damage they cause.', howToPlay: 'Connect each invasive weed with the negative effect it has on the environment.', component: InvasiveMatch },
  { id: 'invasive-id', name: 'Invasive ID', Icon: MapPin, category: 'Origin', description: 'Is this plant native or invasive?', howToPlay: 'Given a weed, its origin, and where it was found, decide if it is native or invasive.', component: InvasiveID },
- { id: 'safe-vs-toxic', name: 'Safe vs. Toxic', Icon: ShieldAlert, category: 'Safety', description: 'Spot the toxic weed hiding among look-alikes.', howToPlay: 'Several similar-looking weeds are shown. Find the dangerous one and decide how to remove it.', component: SafeVsToxic },
+ { id: 'safe-vs-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Spot the toxic weed hiding among look-alikes.', howToPlay: 'Several similar-looking weeds are shown. Find the dangerous one and decide how to remove it.', component: SafeVsToxic },
  { id: 'weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'You are the agronomist — manage weeds before time runs out.', howToPlay: 'Weeds appear in a field. Click each, identify it, then choose the right control method.', component: WeedControl },
 ];
 
