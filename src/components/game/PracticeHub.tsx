@@ -122,7 +122,7 @@ const highGames: GameDef[] = [
  { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action.', component: HSControlMethodMatching },
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it.', component: CropDoctor },
  { id: 'herbicide-resistor', name: 'Herbicide Resistor', Icon: Dna, category: 'Resistance', description: 'Build a 3-year plan to prevent herbicide resistance.', howToPlay: 'Choose crop-herbicide combos across 3 years to maximize diversity.', component: HerbicideResistor },
- { id: 'life-stage-maze', name: 'Life Stage Maze', Icon: Grid3X3, category: 'Life Stages', description: 'Connect life stages to the best control methods.', howToPlay: 'Match each weed life stage to the best control method on a grid.', component: LifeStageMaze },
+ { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Grid3X3, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'Identify the life stage, the weed, then choose the best control method for that stage.', component: LifeStageMaze },
 ];
 
 type Screen = 'grades' | 'games' | 'info' | 'playing';

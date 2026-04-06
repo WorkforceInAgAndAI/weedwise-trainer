@@ -6,10 +6,10 @@ import LevelComplete from '@/components/game/LevelComplete';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const CONTINENTS = [
- { id: 'europe', label: 'Europe / Eurasia' },
- { id: 'asia', label: 'Asia' },
- { id: 'africa', label: 'Africa' },
- { id: 'americas', label: 'Americas (native spread)' },
+ { id: 'europe', label: 'Europe / Eurasia', x: 48, y: 28 },
+ { id: 'asia', label: 'Asia', x: 72, y: 32 },
+ { id: 'africa', label: 'Africa', x: 52, y: 55 },
+ { id: 'americas', label: 'Americas (native spread)', x: 22, y: 40 },
 ];
 
 const ARRIVAL_METHODS: Record<string, string> = {
@@ -57,6 +57,49 @@ const ARRIVAL_OPTIONS = [
  'Escaped cultivation',
 ];
 
+function WorldMap({ onSelect, selected, correctId, showResult }: {
+ onSelect: (id: string) => void;
+ selected: string | null;
+ correctId: string;
+ showResult: boolean;
+}) {
+ return (
+  <div className="relative w-full aspect-[2/1] bg-blue-100 dark:bg-blue-900/30 rounded-xl border-2 border-border overflow-hidden mb-3">
+   {/* Simple SVG world map outline */}
+   <svg viewBox="0 0 100 60" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+    {/* Ocean */}
+    <rect x="0" y="0" width="100" height="60" fill="none" />
+    {/* Americas */}
+    <path d="M15,10 L20,8 L25,12 L28,18 L30,25 L28,30 L25,35 L22,42 L20,50 L18,55 L15,52 L14,45 L12,38 L10,30 L12,22 L14,15 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
+    {/* Europe */}
+    <path d="M42,8 L48,6 L55,8 L56,12 L54,16 L52,20 L48,22 L44,20 L42,16 L40,12 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
+    {/* Africa */}
+    <path d="M44,24 L52,22 L58,28 L60,35 L58,42 L55,48 L50,52 L46,50 L42,44 L40,36 L42,28 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
+    {/* Asia */}
+    <path d="M56,6 L65,4 L75,6 L82,10 L88,16 L90,24 L86,30 L80,34 L74,36 L68,34 L62,28 L58,20 L56,14 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
+   </svg>
+   {/* Clickable continent labels */}
+   {CONTINENTS.map(c => {
+    let borderCls = 'border-border bg-card/90 hover:border-primary';
+    if (showResult && c.id === correctId) borderCls = 'border-green-500 bg-green-500/20';
+    else if (showResult && selected === c.id && c.id !== correctId) borderCls = 'border-destructive bg-destructive/20';
+    else if (!showResult && selected === c.id) borderCls = 'border-primary bg-primary/20';
+    return (
+     <button
+      key={c.id}
+      onClick={() => !showResult && onSelect(c.id)}
+      disabled={showResult}
+      className={`absolute transform -translate-x-1/2 -translate-y-1/2 px-2 py-1 rounded-lg border-2 text-[10px] font-bold text-foreground transition-all whitespace-nowrap ${borderCls}`}
+      style={{ left: `${c.x}%`, top: `${c.y}%` }}
+     >
+      {c.label.split('/')[0].trim()}
+     </button>
+    );
+   })}
+  </div>
+ );
+}
+
 export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const [idx, setIdx] = useState(0);
@@ -72,8 +115,7 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
  const current = items[idx];
  const done = idx >= QUESTIONS_PER_LEVEL;
 
- // Phases: id -> continent -> arrival -> feedback
- const [phase, setPhase] = useState<'id' | 'continent' | 'arrival' | 'feedback'>('id');
+ const [phase, setPhase] = useState<'id' | 'id-review' | 'continent' | 'continent-review' | 'arrival' | 'feedback'>('id');
  const [idOptions, setIdOptions] = useState<string[]>([]);
  const [idAnswer, setIdAnswer] = useState<string | null>(null);
  const [continentAnswer, setContinentAnswer] = useState<string | null>(null);
@@ -91,14 +133,22 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
 
  const submitId = (name: string) => {
   setIdAnswer(name);
-  if (name === current.commonName) setScore(s => s + 1);
-  setPhase('continent');
+  if (name === current.commonName) {
+   setScore(s => s + 1);
+   setPhase('continent');
+  } else {
+   setPhase('id-review');
+  }
  };
 
  const submitContinent = (cId: string) => {
   setContinentAnswer(cId);
-  if (cId === getContinent(current)) setScore(s => s + 1);
-  setPhase('arrival');
+  if (cId === getContinent(current)) {
+   setScore(s => s + 1);
+   setPhase('arrival');
+  } else {
+   setPhase('continent-review');
+  }
  };
 
  const submitArrival = (method: string) => {
@@ -151,27 +201,56 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
      </>
     )}
 
+    {phase === 'id-review' && (
+     <div className="text-center">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 mb-4">
+       <p className="text-sm font-bold text-destructive mb-1">Not quite!</p>
+       <p className="text-sm text-foreground">You guessed: <span className="font-bold">{idAnswer}</span></p>
+       <p className="text-sm text-foreground">Correct answer: <span className="font-bold text-green-600">{current.commonName}</span></p>
+       <p className="text-xs text-muted-foreground italic mt-1">{current.scientificName}</p>
+      </div>
+      <button onClick={() => setPhase('continent')} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Continue to Origin</button>
+     </div>
+    )}
+
     {phase === 'continent' && (
      <>
       <p className="text-center font-bold text-foreground mb-1">{current.commonName}</p>
-      {idAnswer !== current.commonName && <p className="text-xs text-destructive text-center mb-2">You guessed: {idAnswer}</p>}
-      <p className="text-sm text-muted-foreground text-center mb-3">Where did this weed originate from?</p>
-      <div className="grid grid-cols-2 gap-2">
-       {CONTINENTS.map(c => (
-        <button key={c.id} onClick={() => submitContinent(c.id)}
-         className="p-3 rounded-lg border-2 border-border bg-card text-sm font-bold text-foreground hover:border-primary transition-all">
-         {c.label}
-        </button>
-       ))}
-      </div>
+      {idAnswer === current.commonName && <p className="text-xs text-green-500 text-center mb-2">Correct identification!</p>}
+      <p className="text-sm text-muted-foreground text-center mb-3">Tap the continent where this weed originated from:</p>
+      <WorldMap
+       onSelect={submitContinent}
+       selected={null}
+       correctId={getContinent(current)}
+       showResult={false}
+      />
      </>
+    )}
+
+    {phase === 'continent-review' && (
+     <div className="text-center">
+      <p className="font-bold text-foreground mb-2">{current.commonName}</p>
+      <WorldMap
+       onSelect={() => {}}
+       selected={continentAnswer}
+       correctId={getContinent(current)}
+       showResult={true}
+      />
+      <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 mb-4">
+       <p className="text-sm font-bold text-destructive mb-1">Not quite!</p>
+       <p className="text-sm text-foreground">
+        This weed originates from <span className="font-bold text-green-600">{CONTINENTS.find(c => c.id === getContinent(current))?.label}</span>
+       </p>
+      </div>
+      <button onClick={() => setPhase('arrival')} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Continue to Arrival Method</button>
+     </div>
     )}
 
     {phase === 'arrival' && (
      <>
       <p className="text-center font-bold text-foreground mb-1">{current.commonName}</p>
       <div className="flex gap-2 justify-center mb-3">
-       <span className={`text-xs px-2 py-0.5 rounded ${continentAnswer === getContinent(current) ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive'}`}>
+       <span className={`text-xs px-2 py-0.5 rounded ${continentAnswer === getContinent(current) ? 'bg-green-500/20 text-green-700' : 'bg-primary/10 text-primary'}`}>
         Origin: {CONTINENTS.find(c => c.id === getContinent(current))?.label}
        </span>
       </div>
