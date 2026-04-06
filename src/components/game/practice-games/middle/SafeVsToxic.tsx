@@ -71,12 +71,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  // Summary screen after all rounds
-  if (finished && !showSummary) {
-    setShowSummary(true);
-  }
-
-  if (showSummary) {
+  if (finished) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-start p-6 overflow-y-auto">
         <h2 className="text-2xl font-bold text-foreground mb-2">Round Summary</h2>
