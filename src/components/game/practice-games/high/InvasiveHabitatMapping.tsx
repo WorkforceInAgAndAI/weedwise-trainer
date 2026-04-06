@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import worldMapImg from '@/assets/images/world.jpg';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -64,21 +65,9 @@ function WorldMap({ onSelect, selected, correctId, showResult }: {
  showResult: boolean;
 }) {
  return (
-  <div className="relative w-full aspect-[2/1] bg-blue-100 dark:bg-blue-900/30 rounded-xl border-2 border-border overflow-hidden mb-3">
-   {/* Simple SVG world map outline */}
-   <svg viewBox="0 0 100 60" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
-    {/* Ocean */}
-    <rect x="0" y="0" width="100" height="60" fill="none" />
-    {/* Americas */}
-    <path d="M15,10 L20,8 L25,12 L28,18 L30,25 L28,30 L25,35 L22,42 L20,50 L18,55 L15,52 L14,45 L12,38 L10,30 L12,22 L14,15 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
-    {/* Europe */}
-    <path d="M42,8 L48,6 L55,8 L56,12 L54,16 L52,20 L48,22 L44,20 L42,16 L40,12 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
-    {/* Africa */}
-    <path d="M44,24 L52,22 L58,28 L60,35 L58,42 L55,48 L50,52 L46,50 L42,44 L40,36 L42,28 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
-    {/* Asia */}
-    <path d="M56,6 L65,4 L75,6 L82,10 L88,16 L90,24 L86,30 L80,34 L74,36 L68,34 L62,28 L58,20 L56,14 Z" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="0.5" />
-   </svg>
-   {/* Clickable continent labels */}
+   <div className="relative w-full aspect-[2/1] rounded-xl border-2 border-border overflow-hidden mb-3">
+    <img src={worldMapImg} alt="World map" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1280} height={640} />
+    {/* Clickable continent labels */}
    {CONTINENTS.map(c => {
     let borderCls = 'border-border bg-card/90 hover:border-primary';
     if (showResult && c.id === correctId) borderCls = 'border-green-500 bg-green-500/20';

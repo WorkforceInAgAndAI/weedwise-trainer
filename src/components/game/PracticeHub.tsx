@@ -5,7 +5,7 @@ import {
  RefreshCw, Globe, Map, Search, Wind, AlertTriangle,
  MapPin, ShieldAlert, Wrench, Target, TrendingUp,
  Droplets, ZoomIn, GraduationCap, Scan, Moon,
- Swords, Grid3X3, ClipboardList, Footprints, Stethoscope,
+ Swords, ClipboardList, Footprints, Stethoscope,
  Dna, FlaskRound
 } from 'lucide-react';
 
@@ -80,7 +80,7 @@ const k5Games: GameDef[] = [
  { id: 'ecology-scramble', name: 'Ecology Scramble', Icon: Globe, category: 'Ecology', description: 'Sort the survival needs for different types of plants.', howToPlay: 'Sort icons into the correct category: aquatic, terrestrial, or parasitic.', component: EcologyScramble },
  { id: 'habitat-mapping', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Place weeds in the right habitat on the map.', howToPlay: 'A map shows different areas. Drag each weed to the habitat where it grows best.', component: HabitatMapping },
  { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Search the field and count the hidden seeds.', howToPlay: 'Seeds are scattered across the field. Tap each seed to collect it before time runs out.', component: WeedSeedBanks },
- { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel from point A to point B.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle.', component: WeedTravel },
+ { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel to a new location.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle.', component: WeedTravel },
  { id: 'invasive-match', name: 'Invasive Match', Icon: AlertTriangle, category: 'Invasive Weeds', description: 'Match invasive weeds to the damage they cause.', howToPlay: 'Connect each invasive weed with the negative effect it has on the environment.', component: InvasiveMatch },
  { id: 'invasive-id', name: 'Invasive ID', Icon: MapPin, category: 'Origin', description: 'Is this plant native or invasive?', howToPlay: 'Given a weed, its origin, and where it was found, decide if it is native or invasive.', component: InvasiveID },
  { id: 'safe-vs-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Spot the toxic weed hiding among look-alikes.', howToPlay: 'Several similar-looking weeds are shown. Find the dangerous one and decide how to remove it.', component: SafeVsToxic },
@@ -122,7 +122,7 @@ const highGames: GameDef[] = [
  { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action.', component: HSControlMethodMatching },
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it.', component: CropDoctor },
  { id: 'herbicide-resistor', name: 'Herbicide Resistor', Icon: Dna, category: 'Resistance', description: 'Build a 3-year plan to prevent herbicide resistance.', howToPlay: 'Choose crop-herbicide combos across 3 years to maximize diversity.', component: HerbicideResistor },
- { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Grid3X3, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'Identify the life stage, the weed, then choose the best control method for that stage.', component: LifeStageMaze },
+ { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'Identify the life stage, the weed, then choose the best control method for that stage.', component: LifeStageMaze },
 ];
 
 type Screen = 'grades' | 'games' | 'info' | 'playing';
