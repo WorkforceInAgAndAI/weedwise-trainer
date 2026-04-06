@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import { PHASES, GRADE_NAMES, XP_PER_LEVEL } from '@/data/phases';
 import { weedMap, weeds } from '@/data/weeds';
