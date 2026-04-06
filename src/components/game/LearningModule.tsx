@@ -142,20 +142,22 @@ export default function LearningModule({ onClose }: Props) {
  return (
  <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
- <div className="flex items-center justify-between mb-8">
- <div className="flex items-center gap-3">
- {selectedTopic && (
- <button onClick={() => { setSelectedTopic(null); setViewMode('list'); }}
- className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
- <ArrowLeft className="w-4 h-4" />
- </button>
- )}
- <h1 className="text-xl font-display font-bold text-foreground">Learning Module</h1>
- </div>
- <button onClick={onClose} className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
- <X className="w-4 h-4" />
- </button>
- </div>
+  <div className="flex items-center justify-between mb-8">
+  <div className="flex items-center gap-3">
+  <HomeButton />
+  <span className="text-border mx-1">|</span>
+  {selectedTopic && (
+  <button onClick={() => { setSelectedTopic(null); setViewMode('list'); }}
+  className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+  <ArrowLeft className="w-4 h-4" />
+  </button>
+  )}
+  <h1 className="text-xl font-display font-bold text-foreground">Learning Module</h1>
+  </div>
+  <button onClick={onClose} className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+  <X className="w-4 h-4" />
+  </button>
+  </div>
 
  <div className="flex gap-2 mb-6">
  {gradeCards.map(({ grade, label, color }) => (
