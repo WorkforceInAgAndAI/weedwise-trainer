@@ -197,8 +197,8 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
                   <p className="text-xs text-muted-foreground mb-2">{sc.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {Object.entries(sc.traits).map(([key, val]) => (
-                      <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground">
-                        {key}: {'*'.repeat(val)}{'-'.repeat(3 - val)}
+                      <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground flex items-center gap-0.5">
+                        {key}: {Array.from({ length: val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 fill-primary text-primary inline" />)}{Array.from({ length: 3 - val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 text-muted-foreground/30 inline" />)}
                       </span>
                     ))}
                   </div>
