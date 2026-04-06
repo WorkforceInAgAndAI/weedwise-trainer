@@ -90,11 +90,34 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  <p className="text-sm text-muted-foreground">{weed.lookAlike.difference}</p>
  </div>
 
- <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
- <h3 className="text-sm font-semibold text-primary mb-1">Memory Hook</h3>
- <p className="text-sm text-foreground">{weed.memoryHook}</p>
- </div>
- </div>
- </div>
- );
+  <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+  <h3 className="text-sm font-semibold text-primary mb-1">Memory Hook</h3>
+  <p className="text-sm text-foreground">{weed.memoryHook}</p>
+  </div>
+
+  {/* Image References for this species */}
+  <WeedCitations weedId={weed.id} />
+  </div>
+  </div>
+  );
+}
+
+function WeedCitations({ weedId }: { weedId: string }) {
+  const citations = useMemo(() => {
+    const stages = ['seed', 'seedling', 'vegetative', 'flower', 'whole', 'ligule'];
+    return getSessionCitations([weedId], stages);
+  }, [weedId]);
+
+  if (citations.length === 0) return null;
+
+  return (
+    <div className="border-t border-border pt-3">
+      <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Image References</h3>
+      <ol className="list-decimal list-inside space-y-0.5">
+        {citations.map((c, i) => (
+          <li key={i} className="text-[10px] leading-relaxed text-muted-foreground break-words">{c}</li>
+        ))}
+      </ol>
+    </div>
+  );
 }
