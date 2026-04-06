@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import type { GradeLevel, Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler } from 'lucide-react';
+import HomeButton from './HomeButton';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 
 // Types 
