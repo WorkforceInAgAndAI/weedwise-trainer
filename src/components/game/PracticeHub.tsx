@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import HomeButton from './HomeButton';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
