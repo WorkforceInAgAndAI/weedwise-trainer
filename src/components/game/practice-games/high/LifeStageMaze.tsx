@@ -28,7 +28,7 @@ const QUESTIONS_PER_ROUND = 10;
 function buildRounds(level: number) {
   const offset = ((level - 1) * QUESTIONS_PER_ROUND) % weeds.length;
   const rotated = [...weeds.slice(offset), ...weeds.slice(0, offset)];
-  const pool = shuffle(rotated).slice(0, QUESTIONS_PER_ROUND * 2);
+  const pool = shuffle(rotated.filter(w => w.id !== 'Field_Horsetail')).slice(0, QUESTIONS_PER_ROUND * 2);
 
   const items: { weed: typeof weeds[0]; stage: Stage }[] = [];
   let lastStage: Stage | null = null;

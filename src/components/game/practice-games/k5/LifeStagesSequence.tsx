@@ -8,9 +8,11 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const STAGES = ['seed', 'seedling', 'vegetative', 'flower'];
 const STAGE_LABELS: Record<string, string> = { seed: 'Seed', seedling: 'Seedling', vegetative: 'Vegetative', flower: 'Reproductive' };
 
+const seedWeeds = weeds.filter(w => w.id !== 'Field_Horsetail');
+
 function getWeedsForLevel(level: number): typeof weeds {
-  const offset = ((level - 1) * 4) % weeds.length;
-  const rotated = [...weeds.slice(offset), ...weeds.slice(0, offset)];
+  const offset = ((level - 1) * 4) % seedWeeds.length;
+  const rotated = [...seedWeeds.slice(offset), ...seedWeeds.slice(0, offset)];
   return shuffle(rotated).slice(0, 4);
 }
 
