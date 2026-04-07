@@ -27,11 +27,11 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  </div>
 
  {/* Image gallery */}
- <div className={`grid ${isGrass ? 'grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'} gap-2`}>
- {(['whole', 'seedling', 'vegetative', 'flower'] as const).map(stage => (
+  <div className={`grid ${isGrass ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-3 sm:grid-cols-5'} gap-2`}>
+  {(['seed', 'whole', 'seedling', 'vegetative', 'flower'] as const).map(stage => (
  <div key={stage} className="space-y-1">
  <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
- {stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+ {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
  </div>
  <div className="aspect-square rounded-md overflow-hidden bg-muted">
  <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
@@ -106,7 +106,7 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
 
 function WeedCitations({ weedId }: { weedId: string }) {
   const citations = useMemo(() => {
-    const stages = ['seed', 'seedling', 'vegetative', 'flower', 'whole', 'ligule'];
+    const stages = ['seed', 'whole', 'seedling', 'vegetative', 'flower', 'ligule'];
     return getSessionCitations([weedId], stages);
   }, [weedId]);
 
