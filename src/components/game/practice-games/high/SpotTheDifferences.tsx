@@ -11,8 +11,8 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const DIOECIOUS_CANDIDATES = [
  { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Has drooping, tassel-like flower clusters that shed pollen into the wind', femaleDesc: 'Has compact, dense seed heads packed tightly along the stem' },
  { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Has soft, drooping seed heads that release pollen', femaleDesc: 'Has long, spiny, rigid seed heads that feel prickly to touch' },
- { id: 'giant-ragweed', name: 'Giant Ragweed', maleDesc: 'Has terminal racemes (long flower spikes) that release abundant pollen', femaleDesc: 'Has flowers in leaf axils that develop into bur-like fruits' },
- { id: 'common-ragweed', name: 'Common Ragweed', maleDesc: 'Has prominent terminal flower spikes that produce copious pollen', femaleDesc: 'Has small flowers in upper leaf axils that form bur-like fruits' },
+ { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Has clusters of small white-pink bell-shaped flowers that attract pollinators', femaleDesc: 'Has paired slender seed pods (follicles) that split open to release seeds with silky hairs' },
+ { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Has loose, hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes' },
 ];
 
 interface Round {
@@ -20,7 +20,7 @@ interface Round {
   name: string;
   maleDesc: string;
   femaleDesc: string;
-  descriptionIsForMale: boolean; // true = description describes male, false = describes female
+  descriptionIsForMale: boolean;
 }
 
 export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
@@ -36,12 +36,11 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   const rounds = useMemo(() => {
     if (availableSpecies.length === 0) return [];
     const pool = [...availableSpecies];
-    // Build 3 rounds per level using rotation
+    // Build 4 rounds per level using rotation
     const result: Round[] = [];
-    for (let i = 0; i < 3; i++) {
-      const idx = ((level - 1) * 3 + i) % pool.length;
+    for (let i = 0; i < 4; i++) {
+      const idx = ((level - 1) * 4 + i) % pool.length;
       const sp = pool[idx];
-      // Randomly decide whether the description is for male or female
       const descIsForMale = Math.random() < 0.5;
       result.push({
         ...sp,
@@ -61,7 +60,6 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   const handleAnswer = (choice: 'male' | 'female') => {
     if (answer !== null) return;
     setAnswer(choice);
-    // The description describes one plant. If descriptionIsForMale, correct answer is 'male'
     const correctAnswer = current!.descriptionIsForMale ? 'male' : 'female';
     if (choice === correctAnswer) setScore(s => s + 1);
   };

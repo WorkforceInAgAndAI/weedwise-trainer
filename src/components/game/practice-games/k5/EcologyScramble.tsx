@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Droplets, TreePine, Link } from 'lucide-react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
@@ -27,12 +27,13 @@ const CATEGORIES = [
   { id: 'parasitic', label: 'Parasitic Plants', Icon: Link, borderColor: 'border-accent/50' },
 ];
 
+// All weeds are terrestrial except water smartweed which is aquatic
 function getWeedCategory(w: typeof weeds[0]): string {
-  const text = `${w.habitat} ${w.primaryHabitat}`.toLowerCase();
-  if (text.match(/water|aquatic|pond|lake|stream|river|flood|marsh|wet/)) return 'aquatic';
-  if (text.match(/parasit/)) return 'parasitic';
+  if (w.id === 'water-smartweed' || w.commonName.toLowerCase() === 'water smartweed') return 'aquatic';
   return 'terrestrial';
 }
+
+const TIMER_SECONDS = 10;
 
 export default function EcologyScramble({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
@@ -43,31 +44,60 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
   const [checked, setChecked] = useState(false);
   const [showSortAnswers, setShowSortAnswers] = useState(false);
 
-  const [phase, setPhase] = useState<'sort' | 'weedNeeds' | 'done'>('sort');
-  const weedRounds = useMemo(() => {
-    const aquatic = shuffle(weeds.filter(w => getWeedCategory(w) === 'aquatic'));
-    const terrestrial = shuffle(weeds.filter(w => getWeedCategory(w) === 'terrestrial'));
-    const parasitic = shuffle(weeds.filter(w => getWeedCategory(w) === 'parasitic'));
-    const picks: { weed: typeof weeds[0]; category: string }[] = [];
-    if (aquatic.length) picks.push({ weed: aquatic[0], category: 'aquatic' });
-    if (terrestrial.length) picks.push({ weed: terrestrial[0], category: 'terrestrial' });
-    if (parasitic.length) picks.push({ weed: parasitic[0], category: 'parasitic' });
-    while (picks.length < 3) {
-      const extra = shuffle(weeds.filter(w => !picks.find(p => p.weed.id === w.id)))[0];
-      if (extra) picks.push({ weed: extra, category: getWeedCategory(extra) });
-      else break;
-    }
-    return shuffle(picks);
-  }, []);
+  const [phase, setPhase] = useState<'sort' | 'quickID' | 'done'>('sort');
 
-  const [weedIdx, setWeedIdx] = useState(0);
-  const [weedSelected, setWeedSelected] = useState<string[]>([]);
-  const [weedChecked, setWeedChecked] = useState(false);
-  const [showWeedAnswers, setShowWeedAnswers] = useState(false);
+  // Phase 2: Quick ID — show a need, user picks terrestrial/aquatic/parasitic in 10 seconds
+  const quickIDRounds = useMemo(() => {
+    const pool = shuffle([...ALL_NEEDS]);
+    // Build 9 rounds (3 of each category)
+    return pool.map(need => ({
+      need,
+      correctCategory: need.category,
+    }));
+  }, [level]);
+
+  const [qIdx, setQIdx] = useState(0);
+  const [qAnswer, setQAnswer] = useState<string | null>(null);
+  const [qTimer, setQTimer] = useState(TIMER_SECONDS);
   const [sortScore, setSortScore] = useState(0);
-  const [weedScore, setWeedScore] = useState(0);
+  const [quickScore, setQuickScore] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const shuffledNeeds = useMemo(() => shuffle([...ALL_NEEDS]), [weedIdx]);
+  // Timer logic for quick ID phase
+  useEffect(() => {
+    if (phase !== 'quickID' || qAnswer !== null || qIdx >= quickIDRounds.length) return;
+    setQTimer(TIMER_SECONDS);
+    timerRef.current = setInterval(() => {
+      setQTimer(prev => {
+        if (prev <= 1) {
+          // Time's up — mark as wrong (no answer)
+          setQAnswer('timeout');
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [phase, qIdx, qAnswer, quickIDRounds.length]);
+
+  const handleQuickAnswer = (catId: string) => {
+    if (qAnswer !== null) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+    setQAnswer(catId);
+    if (catId === quickIDRounds[qIdx].correctCategory) {
+      setQuickScore(s => s + 1);
+    }
+  };
+
+  const nextQuickRound = () => {
+    if (qIdx + 1 >= quickIDRounds.length) {
+      setPhase('done');
+    } else {
+      setQIdx(i => i + 1);
+      setQAnswer(null);
+    }
+  };
 
   const unplaced = items.filter(i => !placements[i.id]);
   const allPlaced = Object.keys(placements).length === items.length;
@@ -90,156 +120,96 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
     setSortScore(items.filter(i => placements[i.id] === i.category).length);
   };
 
-  const goToWeedPhase = () => {
-    setPhase('weedNeeds');
-    setWeedIdx(0);
-    setWeedSelected([]);
-    setWeedChecked(false);
-    setShowWeedAnswers(false);
-  };
-
-  const toggleWeedNeed = (needId: string) => {
-    if (weedChecked) return;
-    setWeedSelected(prev =>
-      prev.includes(needId) ? prev.filter(id => id !== needId) : prev.length < 3 ? [...prev, needId] : prev
-    );
-  };
-
-  const checkWeedNeeds = () => {
-    setWeedChecked(true);
-    const currentCat = weedRounds[weedIdx].category;
-    const correctNeeds = ALL_NEEDS.filter(n => n.category === currentCat).map(n => n.id);
-    const allCorrect = weedSelected.length === 3 && weedSelected.every(id => correctNeeds.includes(id));
-    if (allCorrect) setWeedScore(s => s + 1);
-  };
-
-  const nextWeed = () => {
-    if (weedIdx + 1 >= weedRounds.length) {
-      setPhase('done');
-    } else {
-      setWeedIdx(i => i + 1);
-      setWeedSelected([]);
-      setWeedChecked(false);
-      setShowWeedAnswers(false);
-    }
+  const goToQuickPhase = () => {
+    setPhase('quickID');
+    setQIdx(0);
+    setQAnswer(null);
+    setQuickScore(0);
   };
 
   const restart = () => {
     setPlacements({}); setSelected(null); setChecked(false); setShowSortAnswers(false);
-    setPhase('sort'); setWeedIdx(0); setWeedSelected([]); setWeedChecked(false); setShowWeedAnswers(false);
-    setSortScore(0); setWeedScore(0);
+    setPhase('sort'); setQIdx(0); setQAnswer(null);
+    setSortScore(0); setQuickScore(0);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
   if (phase === 'done') {
-    const total = items.length + weedRounds.length;
-    const finalScore = sortScore + weedScore;
+    const total = items.length + quickIDRounds.length;
+    const finalScore = sortScore + quickScore;
     addBadge({ gameId: 'ecology-scramble', gameName: 'Ecology Scramble', level: 'K-5', score: finalScore, total });
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
         <TreePine className="w-10 h-10 text-primary mb-3" />
         <h2 className="font-display font-bold text-2xl text-foreground mb-2">Ecology Expert!</h2>
         <p className="text-foreground mb-2">Sorting: {sortScore}/{items.length}</p>
-        <p className="text-foreground mb-6">Weed Needs: {weedScore}/{weedRounds.length}</p>
+        <p className="text-foreground mb-6">Quick ID: {quickScore}/{quickIDRounds.length}</p>
         <LevelComplete level={level} score={finalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }
 
-  // Phase 2: Weed needs — answer response screen
-  if (phase === 'weedNeeds' && showWeedAnswers) {
-    const wr = weedRounds[weedIdx];
-    const correctNeeds = ALL_NEEDS.filter(n => n.category === wr.category);
-    const allCorrect = weedSelected.length === 3 && weedSelected.every(id => correctNeeds.map(n => n.id).includes(id));
-    return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col">
-        <div className="flex items-center gap-3 p-4 border-b border-border">
-          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-          <h1 className="font-display font-bold text-foreground text-lg flex-1">Answer Review</h1>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto">
-          <div className="flex justify-center mb-3">
-            <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-primary/30 bg-secondary">
-              <WeedImage weedId={wr.weed.id} stage="plant" className="w-full h-full object-cover" />
-            </div>
-          </div>
-          <p className="text-center font-bold text-foreground text-lg mb-2">{wr.weed.commonName}</p>
-          <p className={`text-center text-lg font-bold mb-4 ${allCorrect ? 'text-green-500' : 'text-destructive'}`}>
-            {allCorrect ? 'All correct!' : 'Not quite!'}
-          </p>
-          <div className="space-y-2 mb-4">
-            {ALL_NEEDS.map(need => {
-              const isCorrect = need.category === wr.category;
-              const wasSelected = weedSelected.includes(need.id);
-              let cls = 'border-border bg-card text-muted-foreground';
-              if (wasSelected && isCorrect) cls = 'border-green-500 bg-green-500/20 text-foreground';
-              else if (wasSelected && !isCorrect) cls = 'border-destructive bg-destructive/20 text-foreground';
-              else if (isCorrect) cls = 'border-green-500/50 bg-green-500/10 text-foreground';
-              return (
-                <div key={need.id} className={`px-4 py-2.5 rounded-lg border-2 text-sm font-medium ${cls}`}>
-                  {need.label} {isCorrect && '✓'}
-                </div>
-              );
-            })}
-          </div>
-          <button onClick={nextWeed} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-            {weedIdx + 1 < weedRounds.length ? 'Next Weed' : 'See Results'}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Phase 2: Weed needs identification
-  if (phase === 'weedNeeds' && weedIdx < weedRounds.length) {
-    const wr = weedRounds[weedIdx];
-    const catLabel = wr.category === 'aquatic' ? 'an aquatic' : wr.category === 'parasitic' ? 'a parasitic' : 'a terrestrial';
-    const correctNeeds = ALL_NEEDS.filter(n => n.category === wr.category).map(n => n.id);
+  // Phase 2: Quick ID
+  if (phase === 'quickID' && qIdx < quickIDRounds.length) {
+    const round = quickIDRounds[qIdx];
+    const isCorrect = qAnswer !== null && qAnswer === round.correctCategory;
+    const isTimeout = qAnswer === 'timeout';
+    const answered = qAnswer !== null;
 
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-          <h1 className="font-display font-bold text-foreground text-lg flex-1">Ecology Scramble</h1>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
-          <span className="text-sm text-muted-foreground">{weedIdx + 1}/{weedRounds.length}</span>
+          <h1 className="font-display font-bold text-foreground text-lg flex-1">Quick ID</h1>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+          <span className="text-sm text-muted-foreground">{qIdx + 1}/{quickIDRounds.length}</span>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="flex justify-center mb-3">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/30 bg-secondary">
-              <WeedImage weedId={wr.weed.id} stage="plant" className="w-full h-full object-cover" />
-            </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-md mx-auto w-full">
+          {/* Timer bar */}
+          <div className="w-full h-3 bg-secondary rounded-full mb-4 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-1000 ${qTimer <= 3 ? 'bg-destructive' : 'bg-primary'}`}
+              style={{ width: `${(qTimer / TIMER_SECONDS) * 100}%` }}
+            />
           </div>
-          <p className="text-center text-foreground font-bold text-lg mb-1">{wr.weed.commonName}</p>
-          <p className="text-center text-sm text-muted-foreground mb-4">
-            {wr.weed.commonName} is {catLabel} plant. What does it need to survive?
-          </p>
-          <p className="text-xs text-muted-foreground text-center mb-3">Select 3 needs:</p>
-          <div className="grid grid-cols-1 gap-2 max-w-sm mx-auto mb-4">
-            {shuffledNeeds.map(need => {
-              const isSelected = weedSelected.includes(need.id);
-              const isCorrect = correctNeeds.includes(need.id);
-              let cls = 'border-border bg-card text-foreground';
-              if (weedChecked && isSelected && isCorrect) cls = 'border-green-500 bg-green-500/20 text-foreground';
-              else if (weedChecked && isSelected && !isCorrect) cls = 'border-destructive bg-destructive/20 text-foreground';
-              else if (weedChecked && !isSelected && isCorrect) cls = 'border-green-500/50 bg-green-500/10 text-muted-foreground';
-              else if (isSelected) cls = 'border-primary bg-primary/10 text-primary';
+          <p className="text-sm text-muted-foreground mb-2">{qTimer}s remaining</p>
+
+          {/* Need card */}
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6 text-center w-full">
+            <p className="text-lg font-bold text-foreground">{round.need.label}</p>
+            <p className="text-sm text-muted-foreground mt-1">Is this need aquatic, terrestrial, or parasitic?</p>
+          </div>
+
+          {/* Category buttons */}
+          <div className="grid grid-cols-3 gap-3 w-full mb-6">
+            {CATEGORIES.map(cat => {
+              const CatIcon = cat.Icon;
+              let cls = 'border-border bg-card';
+              if (answered && cat.id === round.correctCategory) cls = 'border-green-500 bg-green-500/20';
+              else if (answered && qAnswer === cat.id && cat.id !== round.correctCategory) cls = 'border-destructive bg-destructive/20';
               return (
-                <button key={need.id} onClick={() => toggleWeedNeed(need.id)}
-                  className={`px-4 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${cls}`}>
-                  {need.label}
+                <button key={cat.id} onClick={() => handleQuickAnswer(cat.id)}
+                  disabled={answered}
+                  className={`rounded-xl border-2 p-4 text-center transition-all flex flex-col items-center ${cls} ${!answered ? 'hover:border-primary cursor-pointer' : ''}`}>
+                  <CatIcon className="w-6 h-6 text-foreground mb-1" />
+                  <span className="font-bold text-foreground text-xs">{cat.label}</span>
                 </button>
               );
             })}
           </div>
-          {!weedChecked && weedSelected.length === 3 && (
-            <button onClick={checkWeedNeeds} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
-          )}
-          {weedChecked && (
-            <button onClick={() => setShowWeedAnswers(true)} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">
-              Review Answers →
-            </button>
+
+          {/* Feedback */}
+          {answered && (
+            <div className="text-center w-full">
+              <p className={`text-lg font-bold mb-3 ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
+                {isTimeout ? `Time's up! The answer is ${CATEGORIES.find(c => c.id === round.correctCategory)?.label}.` :
+                  isCorrect ? 'Correct!' : `Incorrect -- the answer is ${CATEGORIES.find(c => c.id === round.correctCategory)?.label}.`}
+              </p>
+              <button onClick={nextQuickRound} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
+                {qIdx + 1 < quickIDRounds.length ? 'Next' : 'See Results'}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -271,8 +241,8 @@ export default function EcologyScramble({ onBack }: { onBack: () => void }) {
               );
             })}
           </div>
-          <button onClick={goToWeedPhase} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-            Next: Identify Weed Needs →
+          <button onClick={goToQuickPhase} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+            Next: Quick Category ID →
           </button>
         </div>
       </div>

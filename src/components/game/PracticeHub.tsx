@@ -7,7 +7,7 @@ import {
  MapPin, ShieldAlert, Wrench, Target, TrendingUp,
  Droplets, ZoomIn, GraduationCap, Scan, Moon,
  Swords, ClipboardList, Footprints, Stethoscope,
- Dna, FlaskRound
+ FlaskRound
 } from 'lucide-react';
 
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
@@ -57,7 +57,7 @@ import FormYourFarm from './practice-games/high/FormYourFarm';
 import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
-import HerbicideResistor from './practice-games/high/HerbicideResistor';
+
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 
 interface GameDef {
@@ -78,7 +78,7 @@ const k5Games: GameDef[] = [
  { id: 'name-the-weed', name: 'Name the Weed', Icon: Tag, category: 'Names', description: 'Identify weeds by their image and description.', howToPlay: 'Look at the weed image and read the clue. Choose the correct common name from four options.', component: NameTheWeed },
  { id: 'life-stages', name: 'Life Stages Sequence', Icon: ArrowUpDown, category: 'Life Stages', description: 'Put weed growth stages in the right order.', howToPlay: 'Images of the same weed at different life stages are jumbled. Drag them into correct order.', component: LifeStagesSequence },
  { id: 'life-cycle-match', name: 'Life Cycle Matching', Icon: RefreshCw, category: 'Life Cycles', description: 'Sort weeds into their correct life cycle category.', howToPlay: 'Drag each weed into the Annual, Biennial, or Perennial bin. Review any mistakes after each round.', component: LifeCycleMatching },
- { id: 'ecology-scramble', name: 'Ecology Scramble', Icon: Globe, category: 'Ecology', description: 'Sort survival needs for aquatic, terrestrial, and parasitic plants.', howToPlay: 'Sort survival needs into the correct category, then identify the weed and its habitat type.', component: EcologyScramble },
+ { id: 'ecology-scramble', name: 'Ecology Scramble', Icon: Globe, category: 'Ecology', description: 'Sort survival needs and quickly categorize them as aquatic, terrestrial, or parasitic.', howToPlay: 'First, sort survival needs into the correct plant type. Then, needs appear one at a time — you have 10 seconds to classify each as terrestrial, aquatic, or parasitic.', component: EcologyScramble },
  { id: 'habitat-mapping', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Sort weeds into the correct habitat area.', howToPlay: 'Select a weed and place it into the correct habitat — cropland, roadside, wetland, or pasture. Review any mistakes after each round.', component: HabitatMapping },
  { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Sort seeds and predict how many are hiding in the field.', howToPlay: 'Sort seed images into columns by species, then predict the count for each type. Click a seed for a hint!', component: WeedSeedBanks },
  { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel to a new location.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle on your journey.', component: WeedTravel },
@@ -122,7 +122,7 @@ const highGames: GameDef[] = [
  { id: 'hs-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field as an agronomist.', howToPlay: 'Click weeds in the field, identify them, choose the right control method. Review your answers after each round.', component: HSWeedControl },
  { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action. Review your answers at the end of each round.', component: HSControlMethodMatching },
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Review your diagnoses at the end.', component: CropDoctor },
- { id: 'herbicide-resistor', name: 'Herbicide Resistor', Icon: Dna, category: 'Resistance', description: 'Manage herbicide resistance across different crops.', howToPlay: 'Each level features a different crop. Choose herbicides for each weed and see if they are suppressed or develop resistance.', component: HerbicideResistor },
+ 
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
 ];
 
