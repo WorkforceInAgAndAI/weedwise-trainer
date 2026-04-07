@@ -113,7 +113,9 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
 
 function WeedCitations({ weedId }: { weedId: string }) {
   const citations = useMemo(() => {
-    const stages = ['seed', 'whole', 'seedling', 'vegetative', 'flower', 'ligule'];
+    const stages = weedId === 'Field_Horsetail'
+      ? ['whole', 'seedling', 'vegetative', 'flower', 'ligule']
+      : ['seed', 'whole', 'seedling', 'vegetative', 'flower', 'ligule'];
     return getSessionCitations([weedId], stages);
   }, [weedId]);
 
