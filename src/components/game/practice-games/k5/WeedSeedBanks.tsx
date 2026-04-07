@@ -14,9 +14,11 @@ const MIN_PER_TYPE = 2;
 const MAX_PER_TYPE = 7;
 const MAX_SEEDS = 30;
 
+const seedWeeds = weeds.filter(w => w.id !== 'Field_Horsetail');
+
 function generateRound(level: number, roundIdx: number) {
   const offset = ((level - 1) * TOTAL_ROUNDS + roundIdx) * NUM_WEED_TYPES;
-  const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
+  const rotated = [...seedWeeds.slice(offset % seedWeeds.length), ...seedWeeds.slice(0, offset % seedWeeds.length)];
   const chosen = shuffle(rotated).slice(0, NUM_WEED_TYPES);
   const seeds: { id: number; weed: typeof weeds[0]; x: number; y: number }[] = [];
   let id = 0;
