@@ -28,17 +28,17 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
 
  {/* Image gallery */}
   <div className={`grid ${isGrass ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-3 sm:grid-cols-5'} gap-2`}>
-  {(['seed', 'whole', 'seedling', 'vegetative', 'flower'] as const).map(stage => (
- <div key={stage} className="space-y-1">
- <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
- {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
- </div>
- <div className="aspect-square rounded-md overflow-hidden bg-muted">
- <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
- </div>
- </div>
- ))}
- {isGrass && (
+   {(['seed', 'seedling', 'vegetative', 'flower', 'whole'] as const).map(stage => (
+  <div key={stage} className="space-y-1">
+  <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
+  {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+  </div>
+  <div className="aspect-square rounded-md overflow-hidden bg-muted">
+  <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
+  </div>
+  </div>
+  ))}
+  {isGrass && (
  <div className="space-y-1">
  <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">Ligule</div>
  <div className="aspect-square rounded-md overflow-hidden bg-muted">

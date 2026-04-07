@@ -13,11 +13,9 @@ interface RoundItem { type: 'weed' | 'crop'; name: string; weedId?: string; crop
 export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const rounds = useMemo(() => {
-    const items: RoundItem[] = [];
-    const offset = (level - 1) * 5;
     const weedPool = shuffle([...weeds]);
     const selectedWeeds = weedPool.slice(0, 5);
-    selectedWeeds.forEach(w => items.push({ type: 'weed', name: w.commonName, weedId: w.id }));
+    const weedItems: RoundItem[] = selectedWeeds.map(w => ({ type: 'weed', name: w.commonName, weedId: w.id }));
 
     // Use local crop images from folder names
     const cropItems: RoundItem[] = [];
@@ -28,19 +26,11 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
         cropItems.push({ type: 'crop', name, cropImage: randomImg });
       }
     });
-    // Take 5 crops
-    cropItems.slice(0, 5).forEach(c => items.push(c));
+    const selectedCrops = cropItems.slice(0, 5);
 
-    // Interleave: alternate weed/crop for variety
-    const weedItems = items.filter(i => i.type === 'weed');
-    const cropList = items.filter(i => i.type === 'crop');
-    const interleaved: RoundItem[] = [];
-    const maxLen = Math.max(weedItems.length, cropList.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (i < weedItems.length) interleaved.push(weedItems[i]);
-      if (i < cropList.length) interleaved.push(cropList[i]);
-    }
-    return interleaved;
+    // Combine and randomly shuffle for a natural mix
+    const combined = shuffle([...weedItems, ...selectedCrops]);
+    return combined;
   }, [level]);
 
   const [round, setRound] = useState(0);
