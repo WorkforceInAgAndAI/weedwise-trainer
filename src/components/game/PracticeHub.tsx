@@ -7,7 +7,7 @@ import {
  MapPin, ShieldAlert, Wrench, Target, TrendingUp,
  Droplets, ZoomIn, GraduationCap, Scan, Moon,
  Swords, ClipboardList, Footprints, Stethoscope,
- Dna, FlaskRound
+ FlaskRound
 } from 'lucide-react';
 
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
