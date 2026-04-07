@@ -27,33 +27,35 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  </div>
 
  {/* Image gallery */}
-   {(() => {
+  {(() => {
     const hasSeeds = weed.id !== 'Field_Horsetail';
     const stages = hasSeeds ? ['seed', 'seedling', 'vegetative', 'flower', 'whole'] as const : ['seedling', 'vegetative', 'flower', 'whole'] as const;
     const colCount = stages.length + (isGrass ? 1 : 0);
     return (
-   <div className={`grid grid-cols-3 sm:grid-cols-${colCount} gap-2`}>
-    {stages.map(stage => (
-  <div key={stage} className="space-y-1">
-  <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
-  {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
-  </div>
-  <div className="aspect-square rounded-md overflow-hidden bg-muted">
-  <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
-  </div>
-  </div>
-   ))}
-   {isGrass && hasSeeds === hasSeeds && (
- <div className="space-y-1">
- <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">Ligule</div>
- <div className="aspect-square rounded-md overflow-hidden bg-muted">
- <WeedImage weedId={weed.id} stage="ligule" className="w-full h-full" />
- </div>
- </div>
- )}
- </div>
+      <div className={`grid grid-cols-3 sm:grid-cols-${colCount} gap-2`}>
+        {stages.map(stage => (
+          <div key={stage} className="space-y-1">
+            <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
+              {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+            </div>
+            <div className="aspect-square rounded-md overflow-hidden bg-muted">
+              <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
+            </div>
+          </div>
+        ))}
+        {isGrass && (
+          <div className="space-y-1">
+            <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">Ligule</div>
+            <div className="aspect-square rounded-md overflow-hidden bg-muted">
+              <WeedImage weedId={weed.id} stage="ligule" className="w-full h-full" />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  })()}
 
- {/* Tags */}
+  {/* Tags */}
  <div className="flex flex-wrap gap-1.5">
  <span className="text-xs px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">{weed.plantType}</span>
  <span className="text-xs px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">{weed.lifeCycle}</span>
