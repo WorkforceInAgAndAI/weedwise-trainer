@@ -39,11 +39,11 @@ export default function SleepySeeds({ onBack }: { onBack: () => void }) {
   return pool.slice(offset).concat(pool).slice(0, 10);
  }, [level]);
 
- const seedWeeds = useMemo(() => {
-  const pool = shuffle([...weeds]);
-  const offset = ((level - 1) * 10) % pool.length;
-  return pool.slice(offset).concat(pool).slice(0, 10);
- }, [level]);
+  const seedWeeds = useMemo(() => {
+   const pool = shuffle([...weeds].filter(w => w.id !== 'Field_Horsetail'));
+   const offset = ((level - 1) * 10) % pool.length;
+   return pool.slice(offset).concat(pool).slice(0, 10);
+  }, [level]);
 
  const [idx, setIdx] = useState(0);
  const [phase, setPhase] = useState<'seedId' | 'dormancy'>('seedId');
