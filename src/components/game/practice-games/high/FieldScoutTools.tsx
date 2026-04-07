@@ -13,42 +13,48 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const WEED_IDS = ['waterhemp', 'palmer-amaranth', 'lambsquarters', 'giant-ragweed', 'velvetleaf', 'kochia', 'morningglory', 'marestail', 'large-crabgrass', 'green-foxtail'];
 
-const MIN_DIST = 10;
+const MIN_DIST = 12;
 
 type WeedLayout = 'mixed' | 'rows' | 'center' | 'edges' | 'clumped' | 'diagonal' | 'scattered';
 
 function generateWeedSpots(layout: WeedLayout, count: number, seed: number): Array<{ x: number; y: number; weedId: string }> {
-  const rng = (i: number) => ((seed * 9301 + 49297 + i * 1277) % 233280) / 233280;
+  // Use truly random positions with minimum distance check (like Weed Seed Bank)
   const spots: Array<{ x: number; y: number; weedId: string }> = [];
   const ids = shuffle(WEED_IDS);
-  const maxAttempts = 100;
+  const maxAttempts = 200;
+
   for (let i = 0; i < count; i++) {
     let placed = false;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      // Use Math.random for truly random, non-linear placement
       let x: number, y: number;
-      const r1 = rng(i * 3 + attempt * 97);
-      const r2 = rng(i * 3 + 1 + attempt * 97);
       switch (layout) {
-        case 'mixed': x = 5 + r1 * 90; y = 5 + r2 * 90; break;
-        case 'rows': x = 5 + r1 * 90; y = 10 + Math.floor(i / 2) * 18 + (r2 * 12 - 6); break;
-        case 'center': x = 20 + r1 * 60; y = 15 + r2 * 70; break;
+        case 'center':
+          x = 15 + Math.random() * 70;
+          y = 10 + Math.random() * 80;
+          break;
         case 'edges': {
-          const side = (i + attempt) % 4;
-          if (side === 0) { x = 2 + r1 * 12; y = 5 + r2 * 90; }
-          else if (side === 1) { x = 86 + r1 * 12; y = 5 + r2 * 90; }
-          else if (side === 2) { x = 5 + r1 * 90; y = 2 + r2 * 12; }
-          else { x = 5 + r1 * 90; y = 86 + r2 * 12; }
+          const side = Math.floor(Math.random() * 4);
+          if (side === 0) { x = 2 + Math.random() * 15; y = 5 + Math.random() * 90; }
+          else if (side === 1) { x = 83 + Math.random() * 15; y = 5 + Math.random() * 90; }
+          else if (side === 2) { x = 5 + Math.random() * 90; y = 2 + Math.random() * 15; }
+          else { x = 5 + Math.random() * 90; y = 83 + Math.random() * 15; }
           break;
         }
         case 'clumped': {
-          const cx = 20 + (i % 3) * 30;
-          const cy = 25 + Math.floor(i / 3) * 30;
-          x = cx + (r1 * 20 - 10); y = cy + (r2 * 20 - 10); break;
+          // 2-3 cluster centers, weeds grouped around them
+          const clusterCount = 2 + (seed % 2);
+          const ci = i % clusterCount;
+          const cx = 20 + ci * (60 / (clusterCount - 1 || 1));
+          const cy = 25 + (ci % 2) * 40;
+          x = cx + (Math.random() * 24 - 12);
+          y = cy + (Math.random() * 24 - 12);
+          break;
         }
-        case 'diagonal':
-          x = 5 + (i / count) * 85 + (r1 * 15 - 7); y = 5 + (i / count) * 85 + (r2 * 15 - 7); break;
-        case 'scattered':
-          x = 3 + r1 * 94; y = 3 + r2 * 94; break;
+        default: // mixed, rows, diagonal, scattered — all use random scatter
+          x = 5 + Math.random() * 90;
+          y = 5 + Math.random() * 90;
+          break;
       }
       x = Math.max(3, Math.min(97, x!));
       y = Math.max(3, Math.min(97, y!));
@@ -57,12 +63,15 @@ function generateWeedSpots(layout: WeedLayout, count: number, seed: number): Arr
         return Math.sqrt(dx * dx + dy * dy) < MIN_DIST;
       });
       if (!tooClose) {
-        spots.push({ x: x!, y: y!, weedId: ids[i % ids.length] });
+        spots.push({ x, y, weedId: ids[i % ids.length] });
         placed = true;
         break;
       }
     }
-    if (!placed) spots.push({ x: 5 + (i * 11) % 85, y: 5 + (i * 13) % 85, weedId: ids[i % ids.length] });
+    if (!placed) {
+      // Fallback: place with offset
+      spots.push({ x: 5 + (i * 13 + seed * 7) % 85, y: 5 + (i * 17 + seed * 3) % 85, weedId: ids[i % ids.length] });
+    }
   }
   return spots;
 }

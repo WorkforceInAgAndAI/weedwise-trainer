@@ -47,7 +47,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
  const [items, setItems] = useState<SprayRound[]>(fieldItems);
  const [selectedWeed, setSelectedWeed] = useState<number | null>(null);
  const [selectedHerb, setSelectedHerb] = useState<string | null>(null);
- const [selectedRate, setSelectedRate] = useState<string>('standard');
+ const [selectedRate, setSelectedRate] = useState<string | null>(null);
  const [roundResults, setRoundResults] = useState<{ weedName: string; killed: boolean; resistanceGain: number }[]>([]);
  const [showResults, setShowResults] = useState(false);
  const [totalScore, setTotalScore] = useState(0);
@@ -59,7 +59,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
  const done = sprayRound > MAX_ROUNDS;
 
  const applyHerbicide = () => {
-  if (selectedWeed === null || !selectedHerb) return;
+  if (selectedWeed === null || !selectedHerb || !selectedRate) return;
   const weed = items[selectedWeed];
   const herb = HERBICIDE_MODES.find(h => h.id === selectedHerb)!;
   const rate = RATE_LEVELS.find(r => r.id === selectedRate)!;
@@ -77,7 +77,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   setSelectedWeed(null);
   setSelectedHerb(null);
-  setSelectedRate('standard');
+  setSelectedRate(null);
  };
 
  const finishRound = () => setShowResults(true);
@@ -98,7 +98,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   setItems(fieldItems);
   setSelectedWeed(null);
   setSelectedHerb(null);
-  setSelectedRate('standard');
+  setSelectedRate(null);
   setRoundResults([]);
   setShowResults(false);
   setTotalScore(0);
@@ -216,7 +216,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
         ))}
        </div>
        <div className="flex flex-col gap-2 mt-auto">
-        <button onClick={applyHerbicide} disabled={!selectedHerb}
+        <button onClick={applyHerbicide} disabled={!selectedHerb || !selectedRate}
          className="py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50">Apply</button>
         <button onClick={finishRound} className="py-2 rounded-lg bg-secondary text-foreground font-bold text-sm">End Round</button>
        </div>

@@ -37,10 +37,22 @@ function getIdealDecision(severity: number, threshold: number): 'treat' | 'wait'
  return severity > threshold ? 'treat' : 'wait';
 }
 
+function getManageExplanation(weed: typeof weeds[0], bestMethod: string): string {
+ const method = MANAGE_METHODS.find(m => m.id === bestMethod);
+ if (!method) return weed.management;
+ switch (bestMethod) {
+  case 'pre': return `${weed.commonName} is best controlled before emergence. Pre-emergent herbicides create a chemical barrier in the soil that prevents weed seedlings from establishing.`;
+  case 'post': return `${weed.commonName} responds well to post-emergent herbicides applied after the weed has emerged. Timing is critical — apply when the weed is young and actively growing.`;
+  case 'cultivate': return `Mechanical cultivation effectively controls ${weed.commonName} by uprooting or burying young plants. This works best in row crops where equipment can pass between rows.`;
+  case 'pull': return `Hand pulling is effective for ${weed.commonName}, especially in small infestations. Remove the entire root system to prevent regrowth.`;
+  default: return weed.management;
+ }
+}
+
 export default function FormYourFarm({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
- const [phase, setPhase] = useState<'design' | 'attack' | 'manage' | 'review'>('design');
+ const [phase, setPhase] = useState<'design' | 'attack' | 'manage' | 'manageReview' | 'review'>('design');
  const [crop, setCrop] = useState(CROPS[0]);
  const [season, setSeason] = useState(SEASONS[0]);
  const [threshold, setThreshold] = useState(10);
@@ -51,11 +63,9 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
   const pool = shuffle(weeds);
   const offset = ((level - 1) * 12) % pool.length;
   const selected = pool.slice(offset).concat(pool).slice(0, 12);
-  // Ensure some are above threshold
   return selected.map((w, i) => {
    let severity: number;
    if (i < 4) {
-    // Force above threshold
     severity = threshold + Math.floor(Math.random() * 10) + 1;
    } else {
     severity = Math.floor(Math.random() * 20) + 1;
@@ -81,7 +91,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
 
  const setManage = (wId: string, mId: string) => setManageDecisions(prev => ({ ...prev, [wId]: mId }));
 
- const evaluate = () => setPhase('review');
+ const evaluate = () => setPhase('manageReview');
 
  const results = useMemo(() => {
   return attackWeeds.map(aw => {
@@ -174,7 +184,66 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
        </div>
       ))}
      </div>
-     {allManaged && <button onClick={evaluate} className="mt-4 w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">Evaluate Season</button>}
+     {allManaged && <button onClick={evaluate} className="mt-4 w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">See Management Results</button>}
+    </div>
+   </div>
+  );
+ }
+
+ // Management answer response screen
+ if (phase === 'manageReview') {
+  const treatedResults = results.filter(r => r.managePick);
+  return (
+   <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+    <div className="max-w-lg mx-auto p-4">
+     <div className="flex items-center gap-3 mb-4">
+      <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+      <h1 className="font-display font-bold text-lg text-foreground">Management Results</h1>
+     </div>
+
+     <div className="bg-card rounded-xl border border-border p-4 mb-4">
+      <p className="text-sm font-bold text-foreground mb-2">Why treat weeds above the economic threshold?</p>
+      <p className="text-xs text-muted-foreground">
+       When weed density exceeds the economic threshold, the cost of crop yield loss from weed competition is greater than the cost of treatment. 
+       Treating at this point protects your investment. Below the threshold, treatment costs more than the yield you would save, so waiting is the economical choice.
+      </p>
+     </div>
+
+     <div className="space-y-3 mb-4">
+      {treatedResults.map(r => {
+       const bestMethod = MANAGE_METHODS.find(m => m.id === r.bestManage);
+       const pickedMethod = MANAGE_METHODS.find(m => m.id === r.managePick);
+       return (
+        <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.manageCorrect ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
+         <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+           <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1">
+           <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
+           <p className="text-[10px] text-muted-foreground">Density: {r.severity}/acre</p>
+          </div>
+          <span className={`text-xs font-bold ${r.manageCorrect ? 'text-green-500' : 'text-destructive'}`}>
+           {r.manageCorrect ? 'Correct' : 'Review'}
+          </span>
+         </div>
+         {!r.manageCorrect && (
+          <div className="text-xs space-y-1 mt-1">
+           <p className="text-destructive">You chose: {pickedMethod?.label}</p>
+           <p className="text-green-600">Best: {bestMethod?.label}</p>
+          </div>
+         )}
+         <p className="text-[10px] text-muted-foreground mt-2">
+          {getManageExplanation(r.weed, r.bestManage)}
+         </p>
+        </div>
+       );
+      })}
+     </div>
+
+     <button onClick={() => setPhase('review')} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">
+      See Season Summary
+     </button>
     </div>
    </div>
   );
