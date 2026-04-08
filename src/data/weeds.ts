@@ -1071,7 +1071,7 @@ export const weeds: Weed[] = [
  eppoCode: "COMCO",
  family: "Commelinaceae",
  plantType: "Monocot",
- lifeCycle: "Annual",
+  lifeCycle: "Summer Annual",
  origin: "Introduced",
  emoji: "",
  image: "/images/Asiatic_dayflower/plant_1.jpeg",
