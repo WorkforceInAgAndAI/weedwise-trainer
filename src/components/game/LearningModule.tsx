@@ -7,8 +7,9 @@ import WeedDetailPopup from './WeedDetailPopup';
 import HomeButton from './HomeButton';
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from '@/data/familyDescriptions';
 import { ArrowLeft, X } from 'lucide-react';
+import { hasImage } from '@/lib/imageMap';
 
-type TopicId = 'names' | 'seeds' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods';
+type TopicId = 'names' | 'seeds' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods' | 'taxonomy' | 'dioecious';
 
 interface Topic {
  id: TopicId;
@@ -27,9 +28,11 @@ const TOPICS: Topic[] = [
  { id: 'families', name: 'Plant Families', icon: 'families', description: 'Group weeds by their botanical families', grades: ['high'] },
  { id: 'habitats', name: 'Habitats & Climate', icon: 'habitats', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['middle', 'high'] },
  { id: 'life-cycles', name: 'Life Cycles', icon: 'cycles', description: 'Annual, biennial, and perennial growth patterns', grades: ['middle', 'high'] },
- { id: 'control-methods', name: 'Control Methods', icon: 'control', description: 'Learn about different ways to manage weeds — from hand weeding to herbicides', grades: ['middle', 'high'] },
- { id: 'look-alikes', name: 'Look-Alike Species', icon: 'lookalike', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
- { id: 'safety', name: 'Safety & Toxicity', icon: 'safety', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
+  { id: 'control-methods', name: 'Control Methods', icon: 'control', description: 'Learn about different ways to manage weeds — from hand weeding to herbicides', grades: ['middle', 'high'] },
+  { id: 'taxonomy', name: 'Taxonomy', icon: 'taxonomy', description: 'The scientific system for classifying and naming every living organism', grades: ['middle', 'high'] },
+  { id: 'dioecious', name: 'Dioecious Weeds', icon: 'dioecious', description: 'Learn about weeds with separate male and female plants', grades: ['high'] },
+  { id: 'look-alikes', name: 'Look-Alike Species', icon: 'lookalike', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
+  { id: 'safety', name: 'Safety & Toxicity', icon: 'safety', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
 ];
 
 function getTopicWeeds(topicId: TopicId): Weed[] {
@@ -230,34 +233,170 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  topicId: TopicId; grade: GradeLevel; topicWeeds: Weed[]; onSelectWeed: (w: Weed) => void; viewMode: 'list' | 'box';
 }) {
  switch (topicId) {
- case 'names':
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
- <p className="font-semibold text-primary mb-2"> What You'll Learn</p>
- <p>Every weed has a <strong>common name</strong> (like "Waterhemp") and a <strong>scientific name</strong> (like <em>Amaranthus tuberculatus</em>). Scientific names help scientists worldwide talk about the exact same plant.</p>
- {grade !== 'elementary' && <p className="mt-2">Each species also has an <strong>EPPO code</strong> — a short code used internationally for pest management databases.</p>}
- </div>
- {topicWeeds.map(w => (
- <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
- <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
- <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
- </div>
- <div className="space-y-1">
- <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
- {grade !== 'elementary' && <div className="text-sm text-primary italic">{w.scientificName}</div>}
- {grade === 'high' && <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode}</div>}
- <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
- {w.traits.slice(0, grade === 'elementary' ? 2 : 3).map((t, i) => (
- <li key={i}>• {t}</li>
- ))}
- </ul>
- <p className="text-xs text-primary"> {w.memoryHook}</p>
- </div>
- </div>
- ))}
- </div>
- );
+  case 'names':
+   if (grade === 'elementary') {
+    // K-5: Weed or Crop / Weed Identification
+    const cropExamples = ['Corn', 'Soybean', 'Wheat', 'Rice', 'Cotton'];
+    return (
+     <div className="space-y-5">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+       <p className="font-display font-bold text-primary text-base">What is a weed?</p>
+       <p>A weed is any plant growing where it is <strong>not wanted</strong>. Weeds are different from crops because crops are planted on purpose to be used for humans or animals.</p>
+       <p>Have you seen weeds growing before? Weeds can grow in lots of different areas. Weeds can grow in <strong>gardens, sidewalk cracks, fields, driveways, along buildings</strong>, and more.</p>
+      </div>
+
+      <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+       <p className="font-display font-bold text-accent text-base">Why is it important to know about weeds?</p>
+       <p>Weeds can <strong>hurt other plants</strong> we want to grow by taking away their resources and nutrients.</p>
+       <p>Some weeds can be <strong>dangerous</strong> and hurt humans and animals.</p>
+      </div>
+
+      {/* Weed vs Crop visual comparison */}
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-foreground text-base text-center">Weeds vs. Crops</p>
+       <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+         <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-center">
+          <p className="font-bold text-destructive text-sm">Weeds</p>
+          <p className="text-xs text-muted-foreground">Plants that grow where they are NOT wanted</p>
+         </div>
+         <div className="grid grid-cols-2 gap-2">
+          {topicWeeds.slice(0, 4).map(w => (
+           <div key={w.id} className="text-center">
+            <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+             <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+            </div>
+            <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+           </div>
+          ))}
+         </div>
+        </div>
+        <div className="space-y-2">
+         <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+          <p className="font-bold text-primary text-sm">Crops</p>
+          <p className="text-xs text-muted-foreground">Plants grown on purpose for humans or animals</p>
+         </div>
+         <div className="grid grid-cols-2 gap-2">
+          {cropExamples.slice(0, 4).map(name => (
+           <div key={name} className="text-center">
+            <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border flex items-center justify-center">
+             <span className="text-xs text-muted-foreground font-medium">{name}</span>
+            </div>
+            <p className="text-[10px] font-medium text-foreground mt-1">{name}</p>
+           </div>
+          ))}
+         </div>
+        </div>
+       </div>
+      </div>
+
+      {/* All weeds list */}
+      <h3 className="font-display font-bold text-foreground text-sm">All Weeds ({topicWeeds.length} species)</h3>
+      {topicWeeds.map(w => (
+       <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+        <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+        </div>
+        <div className="space-y-1">
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+         <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+          {w.traits.slice(0, 2).map((t, i) => (
+           <li key={i}>- {t}</li>
+          ))}
+         </ul>
+         <p className="text-xs text-primary">{w.memoryHook}</p>
+        </div>
+       </div>
+      ))}
+     </div>
+    );
+   }
+
+   if (grade === 'middle') {
+    // 6-8: Name the Weed / Common Names
+    return (
+     <div className="space-y-5">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+       <p className="font-display font-bold text-primary text-base">Common Names</p>
+       <p>A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or other plants for <strong>sunlight, water, and nutrients</strong>. While some plants are considered weeds in one place, the same plant might be perfectly welcome somewhere else, making "weed" less about what the plant is and more about <strong>where it is growing</strong>.</p>
+       <p>Weeds are frequently known by <strong>multiple common names</strong> that vary by region, state, and country, which can create significant confusion in identification and communication among farmers, scientists, and land managers.</p>
+       <p>A single plant species may carry entirely different names depending on geographic location, local tradition, or historical usage, and in some cases, the <strong>same common name</strong> may refer to two completely different plant species in different parts of the country.</p>
+      </div>
+
+      <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
+       <p className="font-bold text-accent">Why use scientific names?</p>
+       <p>Common names serve as a practical and accessible starting point for learning weed identification, but they have clear <strong>limitations when precision is required</strong>. This is why common names are always best used alongside <strong>scientific naming systems</strong> that provide a consistent, universally recognized identity for every plant species.</p>
+      </div>
+
+      {/* Split panel showing a weed with multiple common names */}
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-foreground text-sm text-center">One Plant, Many Names</p>
+       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {topicWeeds.filter(w => w.commonName.includes('/')).slice(0, 2).concat(
+         topicWeeds.filter(w => !w.commonName.includes('/')).slice(0, 2)
+        ).slice(0, 4).map(w => (
+         <div key={w.id} className="bg-secondary/30 border border-border rounded-lg p-3 text-center">
+          <div className="w-20 h-20 mx-auto rounded-lg overflow-hidden mb-2">
+           <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+          </div>
+          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
+          <div className="text-xs text-primary italic mt-1">{w.scientificName}</div>
+          <div className="text-[10px] text-muted-foreground">EPPO: {w.eppoCode}</div>
+         </div>
+        ))}
+       </div>
+      </div>
+
+      {/* All weeds with scientific names */}
+      {topicWeeds.map(w => (
+       <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+        <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+        </div>
+        <div className="space-y-1">
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+         <div className="text-sm text-primary italic">{w.scientificName}</div>
+         <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+          {w.traits.slice(0, 3).map((t, i) => (
+           <li key={i}>- {t}</li>
+          ))}
+         </ul>
+         <p className="text-xs text-primary">{w.memoryHook}</p>
+        </div>
+       </div>
+      ))}
+     </div>
+    );
+   }
+
+   // 9-12 (high) - original content
+   return (
+    <div className="space-y-4">
+     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+      <p className="font-semibold text-primary mb-2">What You'll Learn</p>
+      <p>Every weed has a <strong>common name</strong> (like "Waterhemp") and a <strong>scientific name</strong> (like <em>Amaranthus tuberculatus</em>). Scientific names help scientists worldwide talk about the exact same plant.</p>
+      <p className="mt-2">Each species also has an <strong>EPPO code</strong> -- a short code used internationally for pest management databases.</p>
+     </div>
+     {topicWeeds.map(w => (
+      <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+       <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+       </div>
+       <div className="space-y-1">
+        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+        <div className="text-sm text-primary italic">{w.scientificName}</div>
+        <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode}</div>
+        <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+         {w.traits.slice(0, 3).map((t, i) => (
+          <li key={i}>- {t}</li>
+         ))}
+        </ul>
+        <p className="text-xs text-primary">{w.memoryHook}</p>
+       </div>
+      </div>
+     ))}
+    </div>
+   );
 
  case 'seeds':
   return (
@@ -367,57 +506,202 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  );
  }
 
- case 'monocot-dicot': {
- const monocots = topicWeeds.filter(w => w.plantType === 'Monocot');
- const dicots = topicWeeds.filter(w => w.plantType === 'Dicot');
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
- <p className="font-semibold text-primary"> Monocots vs Dicots</p>
- <div className="grid grid-cols-2 gap-4">
- <div className="bg-card rounded-lg p-3 border border-border">
- <p className="font-bold text-foreground"> Monocots</p>
- <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
- <li>• One seed leaf (cotyledon)</li>
- <li>• Parallel leaf veins</li>
- <li>• Fibrous root system</li>
- <li>• Flower parts in multiples of 3</li>
- </ul>
- </div>
- <div className="bg-card rounded-lg p-3 border border-border">
- <p className="font-bold text-foreground"> Dicots</p>
- <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
- <li>• Two seed leaves (cotyledons)</li>
- <li>• Branching (net) leaf veins</li>
- <li>• Taproot system</li>
- <li>• Flower parts in multiples of 4 or 5</li>
- </ul>
- </div>
- </div>
- </div>
- <h3 className="font-semibold text-foreground text-sm"> Monocots ({monocots.length} species)</h3>
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
- {monocots.map(w => (
- <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
- <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
- <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
- <div className="text-[10px] text-muted-foreground">{w.family}</div>
- </div>
- ))}
- </div>
- <h3 className="font-semibold text-foreground text-sm"> Dicots ({dicots.length} species)</h3>
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
- {dicots.map(w => (
- <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
- <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
- <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
- <div className="text-[10px] text-muted-foreground">{w.family}</div>
- </div>
- ))}
- </div>
- </div>
- );
- }
+  case 'monocot-dicot': {
+  const monocots = topicWeeds.filter(w => w.plantType === 'Monocot');
+  const dicots = topicWeeds.filter(w => w.plantType === 'Dicot');
+
+  if (grade === 'elementary') {
+   // K-5: Detailed educational content about monocots vs dicots
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Monocots vs. Dicots</p>
+      <p>You may have noticed that some weeds look more different from each other than other weeds. Take a look at the two groups of weeds below.</p>
+     </div>
+
+     {/* Side-by-side example images */}
+     <div className="grid grid-cols-2 gap-4">
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-foreground text-sm text-center">Dicots (Broadleaves)</p>
+       <div className="grid grid-cols-2 gap-2">
+        {dicots.slice(0, 4).map(w => (
+         <div key={w.id} className="text-center">
+          <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+           <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+          </div>
+          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+         </div>
+        ))}
+       </div>
+      </div>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-foreground text-sm text-center">Monocots (Grasses)</p>
+       <div className="grid grid-cols-2 gap-2">
+        {monocots.slice(0, 4).map(w => (
+         <div key={w.id} className="text-center">
+          <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+           <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+          </div>
+          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+         </div>
+        ))}
+       </div>
+      </div>
+     </div>
+
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-bold text-foreground">What are some of the differences between the two groups?</p>
+      <p>The weeds on the left have <strong>broad leaves</strong>; the weeds on the right have <strong>thin, straight leaves</strong>. These two groups of weeds are called <strong>monocots</strong> (thin, straight leaves) and <strong>dicots</strong> (broad, wide leaves). You can distinguish them based on their physical characteristics or on what they look like as seedlings.</p>
+     </div>
+
+     {/* What the words mean */}
+     <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">What do these words mean?</p>
+      <p>Before we can understand the difference between monocots and dicots, we need to know what these words mean. Scientists like to use words in Latin to help describe plants and plant parts.</p>
+      <div className="grid grid-cols-2 gap-4 mt-3">
+       <div className="bg-card border border-border rounded-lg p-4 text-center space-y-2">
+        <p className="font-bold text-foreground text-lg">"Mono" = One</p>
+        <p className="text-xs text-muted-foreground">"Cot" = Cotyledon</p>
+        <div className="bg-secondary rounded-lg p-3 mt-2">
+         <p className="text-xs text-foreground">A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.</p>
+        </div>
+        <p className="text-xs font-bold text-foreground mt-2">Monocot = ONE cotyledon</p>
+       </div>
+       <div className="bg-card border border-border rounded-lg p-4 text-center space-y-2">
+        <p className="font-bold text-foreground text-lg">"Di" = Two</p>
+        <p className="text-xs text-muted-foreground">"Cot" = Cotyledon</p>
+        <div className="bg-secondary rounded-lg p-3 mt-2">
+         <p className="text-xs text-foreground">As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the plant looks like.</p>
+        </div>
+        <p className="text-xs font-bold text-foreground mt-2">Dicot = TWO cotyledons</p>
+       </div>
+      </div>
+     </div>
+
+     {/* Detailed monocot section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Monocots (Grasses)</p>
+      <p className="text-sm text-foreground">Monocots are plants with <strong>thin, straight leaves</strong>. They are also called <strong>grasses</strong>. As discussed above, monocots have <strong>one cotyledon</strong>.</p>
+      <ul className="text-xs text-muted-foreground space-y-1">
+       <li>- One seed leaf (cotyledon)</li>
+       <li>- Parallel leaf veins</li>
+       <li>- Fibrous root system</li>
+      </ul>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
+       {monocots.slice(0, 8).map(w => (
+        <div key={w.id} className="text-center">
+         <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+         </div>
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+        </div>
+       ))}
+      </div>
+     </div>
+
+     {/* Detailed dicot section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Dicots (Broadleaves)</p>
+      <p className="text-sm text-foreground">Dicots are plants with <strong>wide, broad leaves</strong>. They are also called <strong>broadleaves</strong>. As discussed above, dicots have <strong>two cotyledons</strong>.</p>
+      <ul className="text-xs text-muted-foreground space-y-1">
+       <li>- Two seed leaves (cotyledons)</li>
+       <li>- Branching (net) leaf veins</li>
+       <li>- Taproot system</li>
+      </ul>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
+       {dicots.slice(0, 8).map(w => (
+        <div key={w.id} className="text-center">
+         <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+         </div>
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+        </div>
+       ))}
+      </div>
+     </div>
+
+     {/* Seedling comparison */}
+     <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-3">
+      <p className="font-display font-bold text-accent text-sm">Seedling Comparison</p>
+      <p className="text-xs text-foreground">You can also tell monocots and dicots apart when they are seedlings! Monocot seedlings have one seed leaf; dicot seedlings have two.</p>
+      <div className="grid grid-cols-2 gap-4">
+       <div className="space-y-2">
+        <p className="text-xs font-bold text-center text-foreground">Monocot Seedling</p>
+        {monocots.slice(0, 2).map(w => (
+         <div key={w.id} className="flex gap-2 items-center">
+          <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
+           <WeedImage weedId={w.id} stage="seedling" className="w-full h-full" />
+          </div>
+          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+         </div>
+        ))}
+       </div>
+       <div className="space-y-2">
+        <p className="text-xs font-bold text-center text-foreground">Dicot Seedling</p>
+        {dicots.slice(0, 2).map(w => (
+         <div key={w.id} className="flex gap-2 items-center">
+          <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
+           <WeedImage weedId={w.id} stage="seedling" className="w-full h-full" />
+          </div>
+          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+         </div>
+        ))}
+       </div>
+      </div>
+     </div>
+    </div>
+   );
+  }
+
+  // 6-8 and 9-12: existing content
+  return (
+  <div className="space-y-4">
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+  <p className="font-semibold text-primary">Monocots vs Dicots</p>
+  <div className="grid grid-cols-2 gap-4">
+  <div className="bg-card rounded-lg p-3 border border-border">
+  <p className="font-bold text-foreground">Monocots</p>
+  <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+  <li>- One seed leaf (cotyledon)</li>
+  <li>- Parallel leaf veins</li>
+  <li>- Fibrous root system</li>
+  <li>- Flower parts in multiples of 3</li>
+  </ul>
+  </div>
+  <div className="bg-card rounded-lg p-3 border border-border">
+  <p className="font-bold text-foreground">Dicots</p>
+  <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
+  <li>- Two seed leaves (cotyledons)</li>
+  <li>- Branching (net) leaf veins</li>
+  <li>- Taproot system</li>
+  <li>- Flower parts in multiples of 4 or 5</li>
+  </ul>
+  </div>
+  </div>
+  </div>
+  <h3 className="font-semibold text-foreground text-sm">Monocots ({monocots.length} species)</h3>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  {monocots.map(w => (
+  <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+  <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
+  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+  <div className="text-[10px] text-muted-foreground">{w.family}</div>
+  </div>
+  ))}
+  </div>
+  <h3 className="font-semibold text-foreground text-sm">Dicots ({dicots.length} species)</h3>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  {dicots.map(w => (
+  <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+  <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
+  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+  <div className="text-[10px] text-muted-foreground">{w.family}</div>
+  </div>
+  ))}
+  </div>
+  </div>
+  );
+  }
 
  case 'native-introduced': {
  const natives = topicWeeds.filter(w => w.origin === 'Native');
@@ -573,67 +857,198 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  );
  }
 
- case 'life-cycles': {
- const lcGroups = [
- { key: 'Annual', icon: '', desc: 'Completes its life cycle in one growing season.' },
- { key: 'Biennial', icon: '2⃣', desc: 'Takes two years — rosette in year 1, flowers and seeds in year 2.' },
- { key: 'Perennial', icon: '', desc: 'Lives for multiple years, regrowing from roots, rhizomes, or tubers.' },
- ];
+  case 'life-cycles': {
+  const annuals = topicWeeds.filter(w => w.lifeCycle.includes('Annual') && !w.lifeCycle.includes('Perennial') && !w.lifeCycle.includes('Biennial'));
+  const summerAnnuals = annuals.filter(w => w.lifeCycle.toLowerCase().includes('summer'));
+  const winterAnnuals = annuals.filter(w => w.lifeCycle.toLowerCase().includes('winter'));
+  const otherAnnuals = annuals.filter(w => !w.lifeCycle.toLowerCase().includes('summer') && !w.lifeCycle.toLowerCase().includes('winter'));
+  const biennials = topicWeeds.filter(w => w.lifeCycle.includes('Biennial'));
+  const perennials = topicWeeds.filter(w => w.lifeCycle.includes('Perennial'));
+  const dualLifecycle = topicWeeds.filter(w => 
+   (w.lifeCycle.includes('Annual') && w.lifeCycle.includes('Perennial')) ||
+   (w.lifeCycle.includes('Biennial') && w.lifeCycle.includes('Perennial'))
+  );
 
- if (viewMode === 'box') {
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
- <p className="font-semibold text-primary mb-2"> Life Cycles</p>
- <p>Click a life cycle tile to learn about the growth pattern and see its species.</p>
- </div>
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
- {lcGroups.map(g => {
- const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
- return (
- <SubheadingBox
- key={g.key}
- icon={g.icon}
- label={g.key}
- count={grouped.length}
- description={LIFECYCLE_DESCRIPTIONS[g.key] || g.desc}
- weeds={grouped}
- grade={grade}
- onSelectWeed={onSelectWeed}
- />
- );
- })}
- </div>
- </div>
- );
- }
+  const lcGroups = [
+  { key: 'Annual', icon: '', desc: 'Completes its life cycle in one growing season.' },
+  { key: 'Biennial', icon: '', desc: 'Takes two years -- rosette in year 1, flowers and seeds in year 2.' },
+  { key: 'Perennial', icon: '', desc: 'Lives for multiple years, regrowing from roots, rhizomes, or tubers.' },
+  ];
 
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
- <p className="font-semibold text-primary mb-2"> Life Cycles</p>
- <p>A weed's life cycle determines when it germinates, when to scout for it, and the best time to control it.</p>
- </div>
- {lcGroups.map(g => {
- const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
- return (
- <div key={g.key}>
- <h3 className="font-semibold text-foreground text-sm mb-1">{g.icon} {g.key} ({grouped.length})</h3>
- <p className="text-xs text-muted-foreground mb-2">{g.desc}</p>
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
- {grouped.map(w => (
- <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
- <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
- <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
- <div className="text-[10px] text-muted-foreground">{w.controlTiming}</div>
- </div>
- ))}
- </div>
- </div>
- );
- })}
- </div>
- );
+  if (viewMode === 'box') {
+  return (
+  <div className="space-y-4">
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+  <p className="font-semibold text-primary mb-2">Life Cycles</p>
+  <p>Click a life cycle tile to learn about the growth pattern and see its species.</p>
+  </div>
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  {lcGroups.map(g => {
+  const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
+  return (
+  <SubheadingBox
+  key={g.key}
+  icon={g.icon}
+  label={g.key}
+  count={grouped.length}
+  description={LIFECYCLE_DESCRIPTIONS[g.key] || g.desc}
+  weeds={grouped}
+  grade={grade}
+  onSelectWeed={onSelectWeed}
+  />
+  );
+  })}
+  </div>
+  </div>
+  );
+  }
+
+  if (grade === 'high') {
+   // 9-12: Detailed life cycles with summer/winter annuals
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Life Cycles</p>
+      <p>Plants have unique systems to best enable them to reproduce and survive in varying conditions. One such system is how quickly or slowly plants complete a <strong>life cycle</strong>. A complete life cycle includes going through 6 stages: <strong>seed, germination, seedling growth, maturity (flowering), pollination/fertilization, and seed dispersal</strong>.</p>
+     </div>
+
+     {/* Life cycle flow chart */}
+     <div className="bg-card border border-border rounded-lg p-4">
+      <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Flow</p>
+      <div className="flex items-center justify-center gap-2 flex-wrap">
+       {['Seed', 'Germination', 'Seedling', 'Maturity', 'Pollination', 'Seed Dispersal'].map((stage, i) => (
+        <div key={stage} className="flex items-center gap-2">
+         <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">{stage}</div>
+         {i < 5 && <span className="text-muted-foreground font-bold">→</span>}
+        </div>
+       ))}
+      </div>
+     </div>
+
+     <p className="text-sm text-foreground">Common weeds have three general life cycle lengths.</p>
+
+     {/* Annual section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Annual Weeds</p>
+      <p className="text-sm text-foreground">Annual weeds complete their entire life cycle -- from seed germination to seed production and death -- within a <strong>single growing season</strong>. They rely entirely on prolific seed production for survival.</p>
+      <div className="grid grid-cols-2 gap-3">
+       <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-2">
+        <p className="font-bold text-foreground text-sm">Summer Annuals</p>
+        <p className="text-xs text-muted-foreground">Germinate in spring and die after frost.</p>
+        <div className="grid grid-cols-3 gap-1">
+         {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).slice(0, 6).map(w => (
+          <div key={w.id} className="text-center">
+           <div className="aspect-square rounded overflow-hidden bg-muted">
+            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+           </div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
+          </div>
+         ))}
+        </div>
+       </div>
+       <div className="bg-accent/5 border border-accent/20 rounded-lg p-3 space-y-2">
+        <p className="font-bold text-foreground text-sm">Winter Annuals</p>
+        <p className="text-xs text-muted-foreground">Germinate in fall, overwinter, and produce seed in spring.</p>
+        <div className="grid grid-cols-3 gap-1">
+         {winterAnnuals.slice(0, 6).map(w => (
+          <div key={w.id} className="text-center">
+           <div className="aspect-square rounded overflow-hidden bg-muted">
+            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+           </div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
+          </div>
+         ))}
+        </div>
+       </div>
+      </div>
+      <p className="text-xs text-muted-foreground">Examples: Asiatic dayflower, redroot pigweed, and barnyard grass.</p>
+     </div>
+
+     {/* Biennial section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Biennial Weeds</p>
+      <p className="text-sm text-foreground">Biennial weeds take <strong>two full years</strong> to complete their life cycle. In the first year, they grow as a low rosette of leaves, storing energy in a taproot. This is considered <strong>vegetative growth</strong>. In the second year, they bolt, flower, produce seeds, and die. Control is most effective during the <strong>rosette stage</strong>.</p>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+       {biennials.slice(0, 8).map(w => (
+        <div key={w.id} className="text-center">
+         <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+         </div>
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+        </div>
+       ))}
+      </div>
+      <p className="text-xs text-muted-foreground">Examples: Common burdock, garlic mustard, and wild parsnip.</p>
+     </div>
+
+     {/* Perennial section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Perennial Weeds</p>
+      <p className="text-sm text-foreground">Perennial weeds live for <strong>more than two years</strong> and can reproduce both by seed and vegetatively through <strong>rhizomes, stolons, tubers, or root fragments</strong>. They are often the most difficult weeds to manage because they can regrow from underground structures even after top growth is removed.</p>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+       {perennials.slice(0, 8).map(w => (
+        <div key={w.id} className="text-center">
+         <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+         </div>
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+        </div>
+       ))}
+      </div>
+      <p className="text-xs text-muted-foreground">Examples: Dandelion, curly dock, and Canada thistle.</p>
+     </div>
+
+     {/* Dual lifecycle */}
+     {dualLifecycle.length > 0 && (
+      <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-accent text-sm">Dual Life Cycles</p>
+       <p className="text-sm text-foreground">Some weeds function as <strong>both perennials and annuals</strong>! Their life cycle depends on multiple environmental factors, such as <strong>climate, location, and management</strong>.</p>
+       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {dualLifecycle.map(w => (
+         <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-2">
+          <div className="w-12 h-12 rounded overflow-hidden shrink-0">
+           <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+          </div>
+          <div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+           <div className="text-[10px] text-muted-foreground">{w.lifeCycle}</div>
+          </div>
+         </div>
+        ))}
+       </div>
+      </div>
+     )}
+    </div>
+   );
+  }
+
+  // 6-8: standard list view
+  return (
+  <div className="space-y-4">
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+  <p className="font-semibold text-primary mb-2">Life Cycles</p>
+  <p>A weed's life cycle determines when it germinates, when to scout for it, and the best time to control it.</p>
+  </div>
+  {lcGroups.map(g => {
+  const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
+  return (
+  <div key={g.key}>
+  <h3 className="font-semibold text-foreground text-sm mb-1">{g.key} ({grouped.length})</h3>
+  <p className="text-xs text-muted-foreground mb-2">{g.desc}</p>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  {grouped.map(w => (
+  <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+  <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
+  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+  <div className="text-[10px] text-muted-foreground">{w.controlTiming}</div>
+  </div>
+  ))}
+  </div>
+  </div>
+  );
+  })}
+  </div>
+  );
  }
 
  case 'look-alikes': {
@@ -892,7 +1307,163 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  }
 
 
- case 'safety':
+  case 'taxonomy': {
+   // Use Dandelion as the worked example
+   const exampleWeed = weeds.find(w => w.commonName === 'Dandelion') || weeds[0];
+   const taxonomyLevels = [
+    { level: 'Kingdom', value: 'Plantae', desc: 'All plants' },
+    { level: 'Division', value: 'Magnoliophyta', desc: 'Flowering plants (Angiosperms)' },
+    { level: 'Class', value: exampleWeed.plantType === 'Monocot' ? 'Monocotyledon' : 'Dicotyledon', desc: exampleWeed.plantType === 'Monocot' ? 'One seed leaf' : 'Two seed leaves' },
+    { level: 'Family', value: exampleWeed.family, desc: `Shared flower/leaf structure` },
+    { level: 'Genus', value: exampleWeed.scientificName.split(' ')[0], desc: 'Closely related species group' },
+    { level: 'Species', value: exampleWeed.scientificName, desc: `Unique organism: ${exampleWeed.commonName}` },
+   ];
+
+   // Group weeds by family for color-coded display
+   const familyGroups = new Map<string, Weed[]>();
+   topicWeeds.forEach(w => {
+    const list = familyGroups.get(w.family) || [];
+    list.push(w);
+    familyGroups.set(w.family, list);
+   });
+   const familyColors = ['bg-primary/10 border-primary/30', 'bg-accent/10 border-accent/30', 'bg-destructive/10 border-destructive/30', 'bg-secondary border-border'];
+
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Taxonomy</p>
+      {grade === 'middle' ? (
+       <>
+        <p>Taxonomy is the system scientists use to organize and name every living thing on Earth -- like a giant filing system for nature.</p>
+        <p>Taxonomy is the scientific discipline of classifying and naming living organisms by organizing them into a structured hierarchy based on shared characteristics and evolutionary relationships. In plant science, this hierarchy runs from broad categories like <strong>Kingdom</strong> and <strong>Division</strong> down through <strong>Family</strong>, <strong>Genus</strong>, and <strong>Species</strong> -- with each level becoming more specific.</p>
+        <p>Every weed species is assigned a two-part scientific name, known as a <strong>binomial</strong>, consisting of its genus and species, which remains consistent across all languages and regions. This standardized naming system allows scientists, agronomists, and farmers from different parts of the world to communicate precisely about the same plant without confusion.</p>
+        <p>A working knowledge of plant taxonomy also helps identify <strong>patterns among related weed species</strong>, which can inform predictions about shared biological behaviors, habitat preferences, and herbicide sensitivities.</p>
+       </>
+      ) : (
+       <>
+        <p>Taxonomy is the scientific discipline of classifying organisms into a hierarchical system. Understanding taxonomy helps predict weed behavior, herbicide response, and management strategies based on evolutionary relationships.</p>
+       </>
+      )}
+     </div>
+
+     {/* Taxonomy pyramid with worked example */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-sm text-center mb-1">Taxonomy Pyramid: {exampleWeed.commonName}</p>
+      <div className="flex justify-center mb-3">
+       <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border">
+        <WeedImage weedId={exampleWeed.id} stage="whole" className="w-full h-full" />
+       </div>
+      </div>
+      <div className="flex flex-col items-center gap-1">
+       {taxonomyLevels.map((t, i) => {
+        const widths = ['100%', '88%', '76%', '64%', '52%', '40%'];
+        return (
+         <div key={t.level} style={{ width: widths[i] }}
+          className="bg-primary/10 border border-primary/30 rounded-lg p-2 text-center transition-all">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">{t.level}</p>
+          <p className="text-sm font-bold text-foreground">{t.value}</p>
+          <p className="text-[10px] text-muted-foreground">{t.desc}</p>
+         </div>
+        );
+       })}
+      </div>
+     </div>
+
+     {/* Family groupings */}
+     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+      <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
+      <p className="text-xs text-muted-foreground mb-3">Weeds in the same family share characteristics. Color-coded groups show related species.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+       {Array.from(familyGroups.entries()).sort().slice(0, 8).map(([family, members], fi) => (
+        <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
+         <p className="font-bold text-foreground text-xs">{family} ({members.length})</p>
+         <div className="flex flex-wrap gap-1 mt-1">
+          {members.slice(0, 4).map(w => (
+           <ClickableWeedName key={w.id} weed={w} onSelect={onSelectWeed} className="text-[10px] bg-card px-1.5 py-0.5 rounded" />
+          ))}
+          {members.length > 4 && <span className="text-[10px] text-muted-foreground">+{members.length - 4} more</span>}
+         </div>
+        </div>
+       ))}
+      </div>
+     </div>
+    </div>
+   );
+  }
+
+  case 'dioecious': {
+   const DIOECIOUS_SPECIES = [
+    { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Has clusters of small white-pink bell-shaped flowers that attract pollinators', femaleDesc: 'Has paired slender seed pods (follicles) that split open to release seeds with silky hairs' },
+    { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Has loose, hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes' },
+    { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Has soft, drooping seed heads that release pollen', femaleDesc: 'Has long, spiny, rigid seed heads that feel prickly to touch' },
+    { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Has drooping, tassel-like flower clusters that shed pollen into the wind', femaleDesc: 'Has compact, dense seed heads packed tightly along the stem' },
+   ];
+
+   const availableDioecious = DIOECIOUS_SPECIES.filter(sp =>
+    hasImage(sp.id, 'male.jpg') && hasImage(sp.id, 'female.jpg')
+   );
+
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Dioecious Weeds</p>
+      <p>Dioecious weeds are plants that have distinct <strong>female and male individual plants</strong>. This means some plants have female flowers while other plants have male flowers, unlike monoecious plants, which have both male and female flowers on the same plant.</p>
+      <p>To reproduce, dioecious weeds must have female and male plants in <strong>close proximity</strong>. Without one or the other, these weeds struggle to reproduce.</p>
+      <p>However, because of their unique genetic makeups, dioecious plants can have <strong>significant genetic diversity</strong>, helping them become resistant to many herbicides. They can also produce <strong>vast amounts of seeds</strong>.</p>
+     </div>
+
+     <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+      <p className="font-bold text-accent">In this group of 88 weeds, there are 4 dioecious species:</p>
+      <p className="mt-1">Hemp Dogbane, Marijuana, Palmer Amaranth, and Waterhemp.</p>
+      <p className="mt-2 text-xs text-muted-foreground">Look at each species profile below to learn the key differences between the male and female plants.</p>
+     </div>
+
+     {/* Species profiles with male/female images */}
+     {availableDioecious.map(sp => {
+      const weedData = weeds.find(w => w.id === sp.id);
+      return (
+       <div key={sp.id} className="bg-card border border-border rounded-lg p-5 space-y-4">
+        <div className="text-center">
+         <p className="font-display font-bold text-foreground text-lg">{sp.name}</p>
+         {weedData && (
+          <button onClick={() => onSelectWeed(weedData)} className="text-xs text-primary italic hover:underline cursor-pointer">{weedData.scientificName}</button>
+         )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+         <div className="space-y-2">
+          <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-primary/30">
+           <WeedImage weedId={sp.id} stage="male" className="w-full h-full" />
+          </div>
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+           <p className="font-bold text-foreground text-sm">Male Plant</p>
+           <p className="text-xs text-muted-foreground mt-1">{sp.maleDesc}</p>
+          </div>
+         </div>
+         <div className="space-y-2">
+          <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-accent/30">
+           <WeedImage weedId={sp.id} stage="female" className="w-full h-full" />
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
+           <p className="font-bold text-foreground text-sm">Female Plant</p>
+           <p className="text-xs text-muted-foreground mt-1">{sp.femaleDesc}</p>
+          </div>
+         </div>
+        </div>
+       </div>
+      );
+     })}
+
+     {availableDioecious.length === 0 && (
+      <div className="bg-secondary rounded-lg p-6 text-center">
+       <p className="text-muted-foreground">Male and female images (male.jpg, female.jpg) need to be uploaded to weed image folders to display here.</p>
+      </div>
+     )}
+    </div>
+   );
+  }
+
+  case 'safety':
  return (
  <div className="space-y-4">
  <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-4 text-sm text-foreground">
