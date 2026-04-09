@@ -1319,6 +1319,56 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  );
  }
 
+/** Expandable family grouping for taxonomy section */
+function FamilyGroupings({ familyGroups, familyColors, onSelectWeed }: {
+ familyGroups: Map<string, Weed[]>;
+ familyColors: string[];
+ onSelectWeed: (w: Weed) => void;
+}) {
+ const [expandedFamilies, setExpandedFamilies] = useState<Set<string>>(new Set());
+ const toggleFamily = (family: string) => {
+  setExpandedFamilies(prev => {
+   const next = new Set(prev);
+   if (next.has(family)) next.delete(family);
+   else next.add(family);
+   return next;
+  });
+ };
+
+ return (
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+   <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
+   <p className="text-xs text-muted-foreground mb-3">Weeds in the same family share characteristics. Color-coded groups show related species. Tap "+X more" to expand.</p>
+   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    {Array.from(familyGroups.entries()).sort().map(([family, members], fi) => {
+     const isExpanded = expandedFamilies.has(family);
+     const shownMembers = isExpanded ? members : members.slice(0, 4);
+     return (
+      <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
+       <p className="font-bold text-foreground text-xs">{family} ({members.length})</p>
+       <div className="flex flex-wrap gap-1 mt-1">
+        {shownMembers.map(w => (
+         <ClickableWeedName key={w.id} weed={w} onSelect={onSelectWeed} className="text-[10px] bg-card px-1.5 py-0.5 rounded" />
+        ))}
+        {!isExpanded && members.length > 4 && (
+         <button onClick={() => toggleFamily(family)} className="text-[10px] text-primary font-medium hover:underline cursor-pointer">
+          +{members.length - 4} more
+         </button>
+        )}
+        {isExpanded && members.length > 4 && (
+         <button onClick={() => toggleFamily(family)} className="text-[10px] text-primary font-medium hover:underline cursor-pointer">
+          Show less
+         </button>
+        )}
+       </div>
+      </div>
+     );
+    })}
+   </div>
+  </div>
+ );
+}
+
 
   case 'taxonomy': {
    // Use Dandelion as the worked example
