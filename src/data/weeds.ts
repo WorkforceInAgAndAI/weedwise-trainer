@@ -11,7 +11,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Smooth_Witchgrass/plant_1.jpg",
+    image: "/images/smooth-witchgrass/plant_1.jpg",
     traits: [
       "Hairless leaf sheaths and blades on mature plants (seedlings can be hairy)",
       "Pyramidal to open panicle",
@@ -42,7 +42,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "",
-    image: "/images/Nimblewill/plant_1.jpeg",
+    image: "/images/nimblewill/plant_1.jpeg",
     traits: [
       "Fine delicate leaves and stems",
       "Fine panicle seed head",
@@ -73,7 +73,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "",
-    image: "/images/Foxtail_barley/plant_1.jpeg",
+    image: "/images/foxtail-barley/plant_1.jpeg",
     traits: [
       "Distinctive long awned seed head (fox-like)",
       "Fine delicate leaves",
@@ -107,7 +107,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Quackgrass/plant_1.jpg",
+    image: "/images/quackgrass/plant_1.jpg",
     traits: [
       "Rhizomatous creeping root system",
       "Coarse wide blades with prominent midvein",
@@ -139,7 +139,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Winter Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Downy_brome/plant_1.jpeg",
+    image: "/images/downy-brome/plant_1.jpeg",
     traits: [
       "Fine downy hairy leaves",
       "Drooping spike-like panicle with awns",
@@ -171,7 +171,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Wildbuckwheat/plant_1.jpg",
+    image: "/images/wild-buckwheat/plant_1.jpg",
     traits: [
       "Twining vines with arrowhead-shaped leaves",
       "Small greenish-white flowers in loose clusters",
@@ -202,7 +202,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Ladysthumb/plant_1.jpeg",
+    image: "/images/ladysthumb/plant_1.jpeg",
     traits: [
       "Red/purple thumbprint mark in leaf center",
       "Pink or red flower spikes",
@@ -233,7 +233,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "",
-    image: "/images/Watersmartweed/plant_1.jpg",
+    image: "/images/water-smartweed/plant_1.jpg",
     traits: [
       "Lance-shaped leaves without thumbprint",
       "Pink or red flower spikes",
@@ -264,7 +264,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Curlydock/plant_1.jpeg",
+    image: "/images/curly-dock/plant_1.jpeg",
     traits: [
       "Deeply curled/wavy leaf margins",
       "Large basal rosette with long petioles",
@@ -295,7 +295,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Witchgrass/plant_1.jpeg",
+    image: "/images/witchgrass/plant_1.jpeg",
     traits: [
       "Pyramidal open panicle seed head",
       "Hairy leaf sheaths and blades",
@@ -326,7 +326,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "",
-    image: "/images/Horsenettle/plant_1.jpg",
+    image: "/images/horsenettle/plant_1.jpg",
     traits: [
       "Yellow prickles and spines on stems and leaves",
       "Flowers are star-shaped and usually range from pale violet to white, but they always feature a distinctive cluster of bright yellow anthers in the center that stand out prominently",
@@ -359,7 +359,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Buffalobur/plant_1.jpg",
+    image: "/images/buffalobur/plant_1.jpg",
     traits: [
       "Dense yellow prickles and spines on stems and deeply lobed leaves",
       "Yellow five-petaled flowers",
@@ -392,7 +392,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "",
-    image: "/images/Smooth_Groundcherry/plant_1.jpg",
+    image: "/images/smooth-groundcherry/plant_1.jpg",
     traits: [
       "Yellow five-petaled bell-shaped or funnelform flowers with dark center",
       "Drooping lantern-shaped fruit capsule",
@@ -425,7 +425,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Tallmorningglory/plant_1.jpeg",
+    image: "/images/tall-morningglory/plant_1.jpeg",
     traits: [
       "Heart-shaped leaves",
       "Purple or white funnel-shaped flowers",
@@ -458,7 +458,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Fieldbindweed/plant_1.jpg",
+    image: "/images/field-bindweed/plant_1.jpg",
     traits: [
       "Twining or trailing vine",
       "Arrow-shaped leaves",
@@ -490,7 +490,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Hedgebindweed/plant_1.jpg",
+    image: "/images/hedge-bindweed/plant_1.jpg",
     traits: [
       "Twining vine with arrow-shaped leaves",
       "Large white funnel flowers (2-4 inches)",
@@ -521,7 +521,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Biennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Garlicmustard/plant_1.jpg",
+    image: "/images/garlic-mustard/plant_1.jpg",
     traits: [
       "Distinctive garlic odor when crushed",
       "Year 1: Low-growing basal rosette with kidney-shaped, scalloped leaves. These stay green all winter.",
@@ -553,7 +553,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Dandelion/plant_1.jpg",
+    image: "/images/dandelion/plant_1.jpg",
     traits: [
       "Yellow composite flower head; matures into round white puffball seedhead",
       "Basal rosette of deeply lobed leaves",
@@ -584,7 +584,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual/Winter Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Horseweed/plant_1.jpg",
+    image: "/images/horseweed/plant_1.jpg",
     traits: [
       "Erect hairy stems, densely leafy with small alternate leaves.",
       "Tiny white ray flowers with yellow centers in upper branching panicle",
@@ -617,7 +617,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual/Biennial",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Prickly_Lettuce/plant_1.jpg",
+    image: "/images/prickly-lettuce/plant_1.jpg",
     traits: [
       "Spiny bristles on underside of leaf midrib and leaf margins.",
       "Leaves with strong midvein",
@@ -648,7 +648,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Jimsonweed/plant_1.jpg",
+    image: "/images/jimsonweed/plant_1.jpg",
     traits: [
       "Large trumpet-shaped white, purple, or pink flowers",
       "Oval coarsely toothed leaves",
@@ -681,7 +681,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Eastern_Black_Nightshade/plant_1.jpg",
+    image: "/images/eastern-black-nightshade/plant_1.jpg",
     traits: [
       "Small white flowers in clusters",
       "Triangular to ovate leaves with irregular teeth",
@@ -715,7 +715,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Waterhemp/plant_1.jpg",
+    image: "/images/waterhemp/plant_1.jpg",
     traits: [
       "Smooth hairless stems often red-green striped",
       "Alternate lance-shaped leaves without hair",
@@ -747,7 +747,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Palmer_Amaranth/plant_1.jpg",
+    image: "/images/palmer-amaranth/plant_1.jpg",
     traits: [
       "Petioles longer than leaf blades — key feature",
       "Extremely fast growth (2+ inches per day)",
@@ -781,7 +781,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual",
     origin: "Native",
     emoji: "",
-    image: "/images/Redroot_Pigweed/plant_1.jpeg",
+    image: "/images/redroot-pigweed/plant_1.jpeg",
     traits: [
       "Red/pink root or lower stem may be present, but is not always definitive",
       "Hairy stems and leaves",
@@ -815,7 +815,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Biennial/Winter Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Yellow_Rocket/plant_1.jpg",
+    image: "/images/yellow-rocket/plant_1.jpg",
     traits: [
       "Basal rosette of deeply lobed leaves in first year",
       "Small yellow four-petaled flowers in clusters",
@@ -847,7 +847,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Biennial/Winter Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Wild_Mustard/plant_1.jpg",
+    image: "/images/wild-mustard/plant_1.jpg",
     traits: [
       "Bright yellow four-petaled flowers in terminal raceme",
       "Lobed lower leaves, narrow upper leaves",
@@ -878,7 +878,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual/Winter Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Shepherds_Purse/plant_1.jpeg",
+    image: "/images/shepherds-purse/plant_1.jpeg",
     traits: [
       "Distinctive heart-shaped seed pods (silicles)",
       "Arrow-shaped leaves that clasp the stem once the plant starts to bolt",
@@ -910,7 +910,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Annual/Winter Annual",
     origin: "Introduced",
     emoji: "",
-    image: "/images/Field_Pennycress/plant_1.jpg",
+    image: "/images/field-pennycress/plant_1.jpg",
     traits: [
       "Large round flat seed pods (silicles)",
       "Small white four-petaled flowers",
