@@ -1307,7 +1307,163 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  }
 
 
- case 'safety':
+  case 'taxonomy': {
+   // Use Dandelion as the worked example
+   const exampleWeed = weeds.find(w => w.commonName === 'Dandelion') || weeds[0];
+   const taxonomyLevels = [
+    { level: 'Kingdom', value: 'Plantae', desc: 'All plants' },
+    { level: 'Division', value: 'Magnoliophyta', desc: 'Flowering plants (Angiosperms)' },
+    { level: 'Class', value: exampleWeed.plantType === 'Monocot' ? 'Monocotyledon' : 'Dicotyledon', desc: exampleWeed.plantType === 'Monocot' ? 'One seed leaf' : 'Two seed leaves' },
+    { level: 'Family', value: exampleWeed.family, desc: `Shared flower/leaf structure` },
+    { level: 'Genus', value: exampleWeed.scientificName.split(' ')[0], desc: 'Closely related species group' },
+    { level: 'Species', value: exampleWeed.scientificName, desc: `Unique organism: ${exampleWeed.commonName}` },
+   ];
+
+   // Group weeds by family for color-coded display
+   const familyGroups = new Map<string, Weed[]>();
+   topicWeeds.forEach(w => {
+    const list = familyGroups.get(w.family) || [];
+    list.push(w);
+    familyGroups.set(w.family, list);
+   });
+   const familyColors = ['bg-primary/10 border-primary/30', 'bg-accent/10 border-accent/30', 'bg-destructive/10 border-destructive/30', 'bg-secondary border-border'];
+
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Taxonomy</p>
+      {grade === 'middle' ? (
+       <>
+        <p>Taxonomy is the system scientists use to organize and name every living thing on Earth -- like a giant filing system for nature.</p>
+        <p>Taxonomy is the scientific discipline of classifying and naming living organisms by organizing them into a structured hierarchy based on shared characteristics and evolutionary relationships. In plant science, this hierarchy runs from broad categories like <strong>Kingdom</strong> and <strong>Division</strong> down through <strong>Family</strong>, <strong>Genus</strong>, and <strong>Species</strong> -- with each level becoming more specific.</p>
+        <p>Every weed species is assigned a two-part scientific name, known as a <strong>binomial</strong>, consisting of its genus and species, which remains consistent across all languages and regions. This standardized naming system allows scientists, agronomists, and farmers from different parts of the world to communicate precisely about the same plant without confusion.</p>
+        <p>A working knowledge of plant taxonomy also helps identify <strong>patterns among related weed species</strong>, which can inform predictions about shared biological behaviors, habitat preferences, and herbicide sensitivities.</p>
+       </>
+      ) : (
+       <>
+        <p>Taxonomy is the scientific discipline of classifying organisms into a hierarchical system. Understanding taxonomy helps predict weed behavior, herbicide response, and management strategies based on evolutionary relationships.</p>
+       </>
+      )}
+     </div>
+
+     {/* Taxonomy pyramid with worked example */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-sm text-center mb-1">Taxonomy Pyramid: {exampleWeed.commonName}</p>
+      <div className="flex justify-center mb-3">
+       <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border">
+        <WeedImage weedId={exampleWeed.id} stage="whole" className="w-full h-full" />
+       </div>
+      </div>
+      <div className="flex flex-col items-center gap-1">
+       {taxonomyLevels.map((t, i) => {
+        const widths = ['100%', '88%', '76%', '64%', '52%', '40%'];
+        return (
+         <div key={t.level} style={{ width: widths[i] }}
+          className="bg-primary/10 border border-primary/30 rounded-lg p-2 text-center transition-all">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">{t.level}</p>
+          <p className="text-sm font-bold text-foreground">{t.value}</p>
+          <p className="text-[10px] text-muted-foreground">{t.desc}</p>
+         </div>
+        );
+       })}
+      </div>
+     </div>
+
+     {/* Family groupings */}
+     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+      <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
+      <p className="text-xs text-muted-foreground mb-3">Weeds in the same family share characteristics. Color-coded groups show related species.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+       {Array.from(familyGroups.entries()).sort().slice(0, 8).map(([family, members], fi) => (
+        <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
+         <p className="font-bold text-foreground text-xs">{family} ({members.length})</p>
+         <div className="flex flex-wrap gap-1 mt-1">
+          {members.slice(0, 4).map(w => (
+           <ClickableWeedName key={w.id} weed={w} onSelect={onSelectWeed} className="text-[10px] bg-card px-1.5 py-0.5 rounded" />
+          ))}
+          {members.length > 4 && <span className="text-[10px] text-muted-foreground">+{members.length - 4} more</span>}
+         </div>
+        </div>
+       ))}
+      </div>
+     </div>
+    </div>
+   );
+  }
+
+  case 'dioecious': {
+   const DIOECIOUS_SPECIES = [
+    { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Has clusters of small white-pink bell-shaped flowers that attract pollinators', femaleDesc: 'Has paired slender seed pods (follicles) that split open to release seeds with silky hairs' },
+    { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Has loose, hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes' },
+    { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Has soft, drooping seed heads that release pollen', femaleDesc: 'Has long, spiny, rigid seed heads that feel prickly to touch' },
+    { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Has drooping, tassel-like flower clusters that shed pollen into the wind', femaleDesc: 'Has compact, dense seed heads packed tightly along the stem' },
+   ];
+
+   const availableDioecious = DIOECIOUS_SPECIES.filter(sp =>
+    hasImage(sp.id, 'male.jpg') && hasImage(sp.id, 'female.jpg')
+   );
+
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Dioecious Weeds</p>
+      <p>Dioecious weeds are plants that have distinct <strong>female and male individual plants</strong>. This means some plants have female flowers while other plants have male flowers, unlike monoecious plants, which have both male and female flowers on the same plant.</p>
+      <p>To reproduce, dioecious weeds must have female and male plants in <strong>close proximity</strong>. Without one or the other, these weeds struggle to reproduce.</p>
+      <p>However, because of their unique genetic makeups, dioecious plants can have <strong>significant genetic diversity</strong>, helping them become resistant to many herbicides. They can also produce <strong>vast amounts of seeds</strong>.</p>
+     </div>
+
+     <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+      <p className="font-bold text-accent">In this group of 88 weeds, there are 4 dioecious species:</p>
+      <p className="mt-1">Hemp Dogbane, Marijuana, Palmer Amaranth, and Waterhemp.</p>
+      <p className="mt-2 text-xs text-muted-foreground">Look at each species profile below to learn the key differences between the male and female plants.</p>
+     </div>
+
+     {/* Species profiles with male/female images */}
+     {availableDioecious.map(sp => {
+      const weedData = weeds.find(w => w.id === sp.id);
+      return (
+       <div key={sp.id} className="bg-card border border-border rounded-lg p-5 space-y-4">
+        <div className="text-center">
+         <p className="font-display font-bold text-foreground text-lg">{sp.name}</p>
+         {weedData && (
+          <button onClick={() => onSelectWeed(weedData)} className="text-xs text-primary italic hover:underline cursor-pointer">{weedData.scientificName}</button>
+         )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+         <div className="space-y-2">
+          <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-primary/30">
+           <WeedImage weedId={sp.id} stage="male" className="w-full h-full" />
+          </div>
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+           <p className="font-bold text-foreground text-sm">Male Plant</p>
+           <p className="text-xs text-muted-foreground mt-1">{sp.maleDesc}</p>
+          </div>
+         </div>
+         <div className="space-y-2">
+          <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-accent/30">
+           <WeedImage weedId={sp.id} stage="female" className="w-full h-full" />
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
+           <p className="font-bold text-foreground text-sm">Female Plant</p>
+           <p className="text-xs text-muted-foreground mt-1">{sp.femaleDesc}</p>
+          </div>
+         </div>
+        </div>
+       </div>
+      );
+     })}
+
+     {availableDioecious.length === 0 && (
+      <div className="bg-secondary rounded-lg p-6 text-center">
+       <p className="text-muted-foreground">Male and female images (male.jpg, female.jpg) need to be uploaded to weed image folders to display here.</p>
+      </div>
+     )}
+    </div>
+   );
+  }
+
+  case 'safety':
  return (
  <div className="space-y-4">
  <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-4 text-sm text-foreground">
