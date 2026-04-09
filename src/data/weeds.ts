@@ -326,7 +326,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Native",
     emoji: "",
-    image: "/images/Horsenettle/plant_1.jpg",
+    image: "/images/horsenettle/plant_1.jpg",
     traits: [
       "Yellow prickles and spines on stems and leaves",
       "Flowers are star-shaped and usually range from pale violet to white, but they always feature a distinctive cluster of bright yellow anthers in the center that stand out prominently",
