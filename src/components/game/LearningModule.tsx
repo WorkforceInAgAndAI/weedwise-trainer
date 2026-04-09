@@ -857,67 +857,198 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  );
  }
 
- case 'life-cycles': {
- const lcGroups = [
- { key: 'Annual', icon: '', desc: 'Completes its life cycle in one growing season.' },
- { key: 'Biennial', icon: '2⃣', desc: 'Takes two years — rosette in year 1, flowers and seeds in year 2.' },
- { key: 'Perennial', icon: '', desc: 'Lives for multiple years, regrowing from roots, rhizomes, or tubers.' },
- ];
+  case 'life-cycles': {
+  const annuals = topicWeeds.filter(w => w.lifeCycle.includes('Annual') && !w.lifeCycle.includes('Perennial') && !w.lifeCycle.includes('Biennial'));
+  const summerAnnuals = annuals.filter(w => w.lifeCycle.toLowerCase().includes('summer'));
+  const winterAnnuals = annuals.filter(w => w.lifeCycle.toLowerCase().includes('winter'));
+  const otherAnnuals = annuals.filter(w => !w.lifeCycle.toLowerCase().includes('summer') && !w.lifeCycle.toLowerCase().includes('winter'));
+  const biennials = topicWeeds.filter(w => w.lifeCycle.includes('Biennial'));
+  const perennials = topicWeeds.filter(w => w.lifeCycle.includes('Perennial'));
+  const dualLifecycle = topicWeeds.filter(w => 
+   (w.lifeCycle.includes('Annual') && w.lifeCycle.includes('Perennial')) ||
+   (w.lifeCycle.includes('Biennial') && w.lifeCycle.includes('Perennial'))
+  );
 
- if (viewMode === 'box') {
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
- <p className="font-semibold text-primary mb-2"> Life Cycles</p>
- <p>Click a life cycle tile to learn about the growth pattern and see its species.</p>
- </div>
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
- {lcGroups.map(g => {
- const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
- return (
- <SubheadingBox
- key={g.key}
- icon={g.icon}
- label={g.key}
- count={grouped.length}
- description={LIFECYCLE_DESCRIPTIONS[g.key] || g.desc}
- weeds={grouped}
- grade={grade}
- onSelectWeed={onSelectWeed}
- />
- );
- })}
- </div>
- </div>
- );
- }
+  const lcGroups = [
+  { key: 'Annual', icon: '', desc: 'Completes its life cycle in one growing season.' },
+  { key: 'Biennial', icon: '', desc: 'Takes two years -- rosette in year 1, flowers and seeds in year 2.' },
+  { key: 'Perennial', icon: '', desc: 'Lives for multiple years, regrowing from roots, rhizomes, or tubers.' },
+  ];
 
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
- <p className="font-semibold text-primary mb-2"> Life Cycles</p>
- <p>A weed's life cycle determines when it germinates, when to scout for it, and the best time to control it.</p>
- </div>
- {lcGroups.map(g => {
- const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
- return (
- <div key={g.key}>
- <h3 className="font-semibold text-foreground text-sm mb-1">{g.icon} {g.key} ({grouped.length})</h3>
- <p className="text-xs text-muted-foreground mb-2">{g.desc}</p>
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
- {grouped.map(w => (
- <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
- <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
- <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
- <div className="text-[10px] text-muted-foreground">{w.controlTiming}</div>
- </div>
- ))}
- </div>
- </div>
- );
- })}
- </div>
- );
+  if (viewMode === 'box') {
+  return (
+  <div className="space-y-4">
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+  <p className="font-semibold text-primary mb-2">Life Cycles</p>
+  <p>Click a life cycle tile to learn about the growth pattern and see its species.</p>
+  </div>
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  {lcGroups.map(g => {
+  const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
+  return (
+  <SubheadingBox
+  key={g.key}
+  icon={g.icon}
+  label={g.key}
+  count={grouped.length}
+  description={LIFECYCLE_DESCRIPTIONS[g.key] || g.desc}
+  weeds={grouped}
+  grade={grade}
+  onSelectWeed={onSelectWeed}
+  />
+  );
+  })}
+  </div>
+  </div>
+  );
+  }
+
+  if (grade === 'high') {
+   // 9-12: Detailed life cycles with summer/winter annuals
+   return (
+    <div className="space-y-5">
+     <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+      <p className="font-display font-bold text-primary text-base">Life Cycles</p>
+      <p>Plants have unique systems to best enable them to reproduce and survive in varying conditions. One such system is how quickly or slowly plants complete a <strong>life cycle</strong>. A complete life cycle includes going through 6 stages: <strong>seed, germination, seedling growth, maturity (flowering), pollination/fertilization, and seed dispersal</strong>.</p>
+     </div>
+
+     {/* Life cycle flow chart */}
+     <div className="bg-card border border-border rounded-lg p-4">
+      <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Flow</p>
+      <div className="flex items-center justify-center gap-2 flex-wrap">
+       {['Seed', 'Germination', 'Seedling', 'Maturity', 'Pollination', 'Seed Dispersal'].map((stage, i) => (
+        <div key={stage} className="flex items-center gap-2">
+         <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">{stage}</div>
+         {i < 5 && <span className="text-muted-foreground font-bold">→</span>}
+        </div>
+       ))}
+      </div>
+     </div>
+
+     <p className="text-sm text-foreground">Common weeds have three general life cycle lengths.</p>
+
+     {/* Annual section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Annual Weeds</p>
+      <p className="text-sm text-foreground">Annual weeds complete their entire life cycle -- from seed germination to seed production and death -- within a <strong>single growing season</strong>. They rely entirely on prolific seed production for survival.</p>
+      <div className="grid grid-cols-2 gap-3">
+       <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-2">
+        <p className="font-bold text-foreground text-sm">Summer Annuals</p>
+        <p className="text-xs text-muted-foreground">Germinate in spring and die after frost.</p>
+        <div className="grid grid-cols-3 gap-1">
+         {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).slice(0, 6).map(w => (
+          <div key={w.id} className="text-center">
+           <div className="aspect-square rounded overflow-hidden bg-muted">
+            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+           </div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
+          </div>
+         ))}
+        </div>
+       </div>
+       <div className="bg-accent/5 border border-accent/20 rounded-lg p-3 space-y-2">
+        <p className="font-bold text-foreground text-sm">Winter Annuals</p>
+        <p className="text-xs text-muted-foreground">Germinate in fall, overwinter, and produce seed in spring.</p>
+        <div className="grid grid-cols-3 gap-1">
+         {winterAnnuals.slice(0, 6).map(w => (
+          <div key={w.id} className="text-center">
+           <div className="aspect-square rounded overflow-hidden bg-muted">
+            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+           </div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
+          </div>
+         ))}
+        </div>
+       </div>
+      </div>
+      <p className="text-xs text-muted-foreground">Examples: Asiatic dayflower, redroot pigweed, and barnyard grass.</p>
+     </div>
+
+     {/* Biennial section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Biennial Weeds</p>
+      <p className="text-sm text-foreground">Biennial weeds take <strong>two full years</strong> to complete their life cycle. In the first year, they grow as a low rosette of leaves, storing energy in a taproot. This is considered <strong>vegetative growth</strong>. In the second year, they bolt, flower, produce seeds, and die. Control is most effective during the <strong>rosette stage</strong>.</p>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+       {biennials.slice(0, 8).map(w => (
+        <div key={w.id} className="text-center">
+         <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+         </div>
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+        </div>
+       ))}
+      </div>
+      <p className="text-xs text-muted-foreground">Examples: Common burdock, garlic mustard, and wild parsnip.</p>
+     </div>
+
+     {/* Perennial section */}
+     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <p className="font-display font-bold text-foreground text-base">Perennial Weeds</p>
+      <p className="text-sm text-foreground">Perennial weeds live for <strong>more than two years</strong> and can reproduce both by seed and vegetatively through <strong>rhizomes, stolons, tubers, or root fragments</strong>. They are often the most difficult weeds to manage because they can regrow from underground structures even after top growth is removed.</p>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+       {perennials.slice(0, 8).map(w => (
+        <div key={w.id} className="text-center">
+         <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+         </div>
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+        </div>
+       ))}
+      </div>
+      <p className="text-xs text-muted-foreground">Examples: Dandelion, curly dock, and Canada thistle.</p>
+     </div>
+
+     {/* Dual lifecycle */}
+     {dualLifecycle.length > 0 && (
+      <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-accent text-sm">Dual Life Cycles</p>
+       <p className="text-sm text-foreground">Some weeds function as <strong>both perennials and annuals</strong>! Their life cycle depends on multiple environmental factors, such as <strong>climate, location, and management</strong>.</p>
+       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {dualLifecycle.map(w => (
+         <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-2">
+          <div className="w-12 h-12 rounded overflow-hidden shrink-0">
+           <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+          </div>
+          <div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+           <div className="text-[10px] text-muted-foreground">{w.lifeCycle}</div>
+          </div>
+         </div>
+        ))}
+       </div>
+      </div>
+     )}
+    </div>
+   );
+  }
+
+  // 6-8: standard list view
+  return (
+  <div className="space-y-4">
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+  <p className="font-semibold text-primary mb-2">Life Cycles</p>
+  <p>A weed's life cycle determines when it germinates, when to scout for it, and the best time to control it.</p>
+  </div>
+  {lcGroups.map(g => {
+  const grouped = topicWeeds.filter(w => w.lifeCycle.includes(g.key));
+  return (
+  <div key={g.key}>
+  <h3 className="font-semibold text-foreground text-sm mb-1">{g.key} ({grouped.length})</h3>
+  <p className="text-xs text-muted-foreground mb-2">{g.desc}</p>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  {grouped.map(w => (
+  <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+  <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1"><WeedImage weedId={w.id} stage="whole" className="w-full h-full" /></div>
+  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
+  <div className="text-[10px] text-muted-foreground">{w.controlTiming}</div>
+  </div>
+  ))}
+  </div>
+  </div>
+  );
+  })}
+  </div>
+  );
  }
 
  case 'look-alikes': {
