@@ -1382,24 +1382,8 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
       </div>
      </div>
 
-     {/* Family groupings */}
-     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-      <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
-      <p className="text-xs text-muted-foreground mb-3">Weeds in the same family share characteristics. Color-coded groups show related species.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-       {Array.from(familyGroups.entries()).sort().slice(0, 8).map(([family, members], fi) => (
-        <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
-         <p className="font-bold text-foreground text-xs">{family} ({members.length})</p>
-         <div className="flex flex-wrap gap-1 mt-1">
-          {members.slice(0, 4).map(w => (
-           <ClickableWeedName key={w.id} weed={w} onSelect={onSelectWeed} className="text-[10px] bg-card px-1.5 py-0.5 rounded" />
-          ))}
-          {members.length > 4 && <span className="text-[10px] text-muted-foreground">+{members.length - 4} more</span>}
-         </div>
-        </div>
-       ))}
-      </div>
-     </div>
+      {/* Family groupings */}
+      <FamilyGroupings familyGroups={familyGroups} familyColors={familyColors} onSelectWeed={onSelectWeed} />
     </div>
    );
   }
