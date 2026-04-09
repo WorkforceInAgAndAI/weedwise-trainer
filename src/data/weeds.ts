@@ -374,7 +374,7 @@ export const weeds: Weed[] = [
     management: "Early POST herbicides, hand removal, mowing before seed set",
     controlTiming: "Seedling to 6-inch height",
     lookAlike: {
-      id: "horsenettle",
+      id: "Horsenettle",
       species: "Horsenettle",
       difference: "Horsenettle is perennial with rhizomes; Buffalobur is annual",
     },

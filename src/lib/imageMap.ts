@@ -7,12 +7,15 @@ const weedModules = import.meta.glob<string>(
 // Build a lookup: key = "weedId/filename" → value = resolved URL
 // e.g. "Dandelion/veg_1.jpeg" → "/assets/images/Dandelion/veg_1-abc123.jpeg"
 const imageMap: Record<string, string> = {};
+// Also keep a lowercase-key lookup for case-insensitive resolution
+const imageMapLower: Record<string, string> = {};
 
 for (const [path, url] of Object.entries(weedModules)) {
  // path looks like "/src/assets/images/Dandelion/veg_1.jpeg"
  const match = path.match(/\/src\/assets\/images\/(.+)$/);
  if (match) {
   imageMap[match[1]] = url;
+  imageMapLower[match[1].toLowerCase()] = url;
  }
 }
 
@@ -32,7 +35,7 @@ for (const [path, url] of Object.entries(cropModules)) {
 
 export function resolveImageUrl(weedId: string, filename: string): string | null {
  const key = `${weedId}/${filename}`;
- return imageMap[key] || null;
+ return imageMap[key] || imageMapLower[key.toLowerCase()] || null;
 }
 
 /**
@@ -47,7 +50,8 @@ export function resolveCropImageUrl(cropName: string, filename: string): string 
  * Check if a weed has a specific image file (e.g. male.jpg, female.jpg)
  */
 export function hasImage(weedId: string, filename: string): boolean {
- return !!imageMap[`${weedId}/${filename}`];
+ const key = `${weedId}/${filename}`;
+ return !!(imageMap[key] || imageMapLower[key.toLowerCase()]);
 }
 
 /**

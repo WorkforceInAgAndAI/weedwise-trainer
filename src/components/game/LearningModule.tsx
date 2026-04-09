@@ -7,7 +7,7 @@ import WeedDetailPopup from './WeedDetailPopup';
 import HomeButton from './HomeButton';
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from '@/data/familyDescriptions';
 import { ArrowLeft, X } from 'lucide-react';
-import { hasImage } from '@/lib/imageMap';
+import { hasImage, resolveCropImageUrl } from '@/lib/imageMap';
 
 type TopicId = 'names' | 'seeds' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods' | 'taxonomy' | 'dioecious';
 
@@ -271,22 +271,29 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
           ))}
          </div>
         </div>
-        <div className="space-y-2">
-         <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
-          <p className="font-bold text-primary text-sm">Crops</p>
-          <p className="text-xs text-muted-foreground">Plants grown on purpose for humans or animals</p>
+         <div className="space-y-2">
+275:          <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+276:           <p className="font-bold text-primary text-sm">Crops</p>
+277:           <p className="text-xs text-muted-foreground">Plants grown on purpose for humans or animals</p>
+278:          </div>
+          <div className="grid grid-cols-2 gap-2">
+           {cropExamples.slice(0, 4).map(name => {
+            const imgUrl = resolveCropImageUrl(name, 'crop_1.jpg');
+            return (
+             <div key={name} className="text-center">
+              <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+               {imgUrl ? (
+                <img src={imgUrl} alt={name} className="w-full h-full object-cover" />
+               ) : (
+                <span className="flex items-center justify-center h-full text-xs text-muted-foreground font-medium">{name}</span>
+               )}
+              </div>
+              <p className="text-[10px] font-medium text-foreground mt-1">{name}</p>
+             </div>
+            );
+           })}
+          </div>
          </div>
-         <div className="grid grid-cols-2 gap-2">
-          {cropExamples.slice(0, 4).map(name => (
-           <div key={name} className="text-center">
-            <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border flex items-center justify-center">
-             <span className="text-xs text-muted-foreground font-medium">{name}</span>
-            </div>
-            <p className="text-[10px] font-medium text-foreground mt-1">{name}</p>
-           </div>
-          ))}
-         </div>
-        </div>
        </div>
       </div>
 
@@ -578,47 +585,53 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
       </div>
      </div>
 
-     {/* Detailed monocot section */}
-     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-      <p className="font-display font-bold text-foreground text-base">Monocots (Grasses)</p>
-      <p className="text-sm text-foreground">Monocots are plants with <strong>thin, straight leaves</strong>. They are also called <strong>grasses</strong>. As discussed above, monocots have <strong>one cotyledon</strong>.</p>
-      <ul className="text-xs text-muted-foreground space-y-1">
-       <li>- One seed leaf (cotyledon)</li>
-       <li>- Parallel leaf veins</li>
-       <li>- Fibrous root system</li>
-      </ul>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
-       {monocots.slice(0, 8).map(w => (
-        <div key={w.id} className="text-center">
-         <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-         </div>
-         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+      {/* Detailed monocot section */}
+      <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+       <p className="font-display font-bold text-foreground text-base">Monocots (Grasses) — All {monocots.length} Species</p>
+       <p className="text-sm text-foreground">Monocots are plants with <strong>thin, straight leaves</strong>. They are also called <strong>grasses</strong>. As discussed above, monocots have <strong>one cotyledon</strong>.</p>
+       <ul className="text-xs text-muted-foreground space-y-1">
+        <li>- One seed leaf (cotyledon)</li>
+        <li>- Parallel leaf veins</li>
+        <li>- Fibrous root system</li>
+       </ul>
+       <div className="overflow-x-auto pb-2">
+        <div className="flex gap-3" style={{ minWidth: `${monocots.length * 7}rem` }}>
+         {monocots.map(w => (
+          <div key={w.id} className="text-center shrink-0 w-24">
+           <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+           </div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+          </div>
+         ))}
         </div>
-       ))}
+       </div>
+       <p className="text-[10px] text-muted-foreground">← Scroll to see all monocots →</p>
       </div>
-     </div>
 
-     {/* Detailed dicot section */}
-     <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-      <p className="font-display font-bold text-foreground text-base">Dicots (Broadleaves)</p>
-      <p className="text-sm text-foreground">Dicots are plants with <strong>wide, broad leaves</strong>. They are also called <strong>broadleaves</strong>. As discussed above, dicots have <strong>two cotyledons</strong>.</p>
-      <ul className="text-xs text-muted-foreground space-y-1">
-       <li>- Two seed leaves (cotyledons)</li>
-       <li>- Branching (net) leaf veins</li>
-       <li>- Taproot system</li>
-      </ul>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
-       {dicots.slice(0, 8).map(w => (
-        <div key={w.id} className="text-center">
-         <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-         </div>
-         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+      {/* Detailed dicot section */}
+      <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+       <p className="font-display font-bold text-foreground text-base">Dicots (Broadleaves) — All {dicots.length} Species</p>
+       <p className="text-sm text-foreground">Dicots are plants with <strong>wide, broad leaves</strong>. They are also called <strong>broadleaves</strong>. As discussed above, dicots have <strong>two cotyledons</strong>.</p>
+       <ul className="text-xs text-muted-foreground space-y-1">
+        <li>- Two seed leaves (cotyledons)</li>
+        <li>- Branching (net) leaf veins</li>
+        <li>- Taproot system</li>
+       </ul>
+       <div className="overflow-x-auto pb-2">
+        <div className="flex gap-3" style={{ minWidth: `${dicots.length * 7}rem` }}>
+         {dicots.map(w => (
+          <div key={w.id} className="text-center shrink-0 w-24">
+           <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+           </div>
+           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+          </div>
+         ))}
         </div>
-       ))}
+       </div>
+       <p className="text-[10px] text-muted-foreground">← Scroll to see all dicots →</p>
       </div>
-     </div>
 
      {/* Seedling comparison */}
      <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-3">
@@ -1306,6 +1319,56 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  );
  }
 
+/** Expandable family grouping for taxonomy section */
+function FamilyGroupings({ familyGroups, familyColors, onSelectWeed }: {
+ familyGroups: Map<string, Weed[]>;
+ familyColors: string[];
+ onSelectWeed: (w: Weed) => void;
+}) {
+ const [expandedFamilies, setExpandedFamilies] = useState<Set<string>>(new Set());
+ const toggleFamily = (family: string) => {
+  setExpandedFamilies(prev => {
+   const next = new Set(prev);
+   if (next.has(family)) next.delete(family);
+   else next.add(family);
+   return next;
+  });
+ };
+
+ return (
+  <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+   <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
+   <p className="text-xs text-muted-foreground mb-3">Weeds in the same family share characteristics. Color-coded groups show related species. Tap "+X more" to expand.</p>
+   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    {Array.from(familyGroups.entries()).sort().map(([family, members], fi) => {
+     const isExpanded = expandedFamilies.has(family);
+     const shownMembers = isExpanded ? members : members.slice(0, 4);
+     return (
+      <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
+       <p className="font-bold text-foreground text-xs">{family} ({members.length})</p>
+       <div className="flex flex-wrap gap-1 mt-1">
+        {shownMembers.map(w => (
+         <ClickableWeedName key={w.id} weed={w} onSelect={onSelectWeed} className="text-[10px] bg-card px-1.5 py-0.5 rounded" />
+        ))}
+        {!isExpanded && members.length > 4 && (
+         <button onClick={() => toggleFamily(family)} className="text-[10px] text-primary font-medium hover:underline cursor-pointer">
+          +{members.length - 4} more
+         </button>
+        )}
+        {isExpanded && members.length > 4 && (
+         <button onClick={() => toggleFamily(family)} className="text-[10px] text-primary font-medium hover:underline cursor-pointer">
+          Show less
+         </button>
+        )}
+       </div>
+      </div>
+     );
+    })}
+   </div>
+  </div>
+ );
+}
+
 
   case 'taxonomy': {
    // Use Dandelion as the worked example
@@ -1369,24 +1432,8 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
       </div>
      </div>
 
-     {/* Family groupings */}
-     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-      <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
-      <p className="text-xs text-muted-foreground mb-3">Weeds in the same family share characteristics. Color-coded groups show related species.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-       {Array.from(familyGroups.entries()).sort().slice(0, 8).map(([family, members], fi) => (
-        <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
-         <p className="font-bold text-foreground text-xs">{family} ({members.length})</p>
-         <div className="flex flex-wrap gap-1 mt-1">
-          {members.slice(0, 4).map(w => (
-           <ClickableWeedName key={w.id} weed={w} onSelect={onSelectWeed} className="text-[10px] bg-card px-1.5 py-0.5 rounded" />
-          ))}
-          {members.length > 4 && <span className="text-[10px] text-muted-foreground">+{members.length - 4} more</span>}
-         </div>
-        </div>
-       ))}
-      </div>
-     </div>
+      {/* Family groupings */}
+      <FamilyGroupings familyGroups={familyGroups} familyColors={familyColors} onSelectWeed={onSelectWeed} />
     </div>
    );
   }
