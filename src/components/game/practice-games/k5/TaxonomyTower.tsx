@@ -118,8 +118,15 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
+  const badgeAwarded = useMemo(() => {
+    if (done) {
+      addBadge({ gameId: 'k5-taxonomy', gameName: 'Monocot or Dicot?', level: 'K-5', score, total: rounds.length * 2 });
+      return true;
+    }
+    return false;
+  }, [done]);
+
   if (done) {
-    addBadge({ gameId: 'k5-taxonomy', gameName: 'Monocot or Dicot?', level: 'K-5', score, total: rounds.length * 2 });
     return <LevelComplete level={level} score={score} total={rounds.length * 2} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 
