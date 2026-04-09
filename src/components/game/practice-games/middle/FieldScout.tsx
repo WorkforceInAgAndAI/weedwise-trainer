@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { DollarSign, Briefcase } from 'lucide-react';
 import WeedImage from '@/components/game/WeedImage';
+import { weeds } from '@/data/weeds';
 import cornField1 from '@/assets/images/corn_field_1.jpg';
 import cornField2 from '@/assets/images/corn_field_2.jpg';
 import soybeanField1 from '@/assets/images/soybean_field_1.jpg';
@@ -10,7 +11,7 @@ import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const WEED_IDS = ['waterhemp', 'palmer-amaranth', 'lambsquarters', 'giant-ragweed', 'velvetleaf', 'kochia', 'morningglory', 'marestail', 'large-crabgrass', 'green-foxtail'];
+const WEED_IDS = weeds.map(w => w.id);
 
 const MIN_DIST = 10;
 
