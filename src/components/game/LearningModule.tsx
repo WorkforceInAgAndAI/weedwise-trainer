@@ -28,9 +28,11 @@ const TOPICS: Topic[] = [
  { id: 'families', name: 'Plant Families', icon: 'families', description: 'Group weeds by their botanical families', grades: ['high'] },
  { id: 'habitats', name: 'Habitats & Climate', icon: 'habitats', description: 'Where each weed thrives — warm, cool, wet, or dry', grades: ['middle', 'high'] },
  { id: 'life-cycles', name: 'Life Cycles', icon: 'cycles', description: 'Annual, biennial, and perennial growth patterns', grades: ['middle', 'high'] },
- { id: 'control-methods', name: 'Control Methods', icon: 'control', description: 'Learn about different ways to manage weeds — from hand weeding to herbicides', grades: ['middle', 'high'] },
- { id: 'look-alikes', name: 'Look-Alike Species', icon: 'lookalike', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
- { id: 'safety', name: 'Safety & Toxicity', icon: 'safety', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
+  { id: 'control-methods', name: 'Control Methods', icon: 'control', description: 'Learn about different ways to manage weeds — from hand weeding to herbicides', grades: ['middle', 'high'] },
+  { id: 'taxonomy', name: 'Taxonomy', icon: 'taxonomy', description: 'The scientific system for classifying and naming every living organism', grades: ['middle', 'high'] },
+  { id: 'dioecious', name: 'Dioecious Weeds', icon: 'dioecious', description: 'Learn about weeds with separate male and female plants', grades: ['high'] },
+  { id: 'look-alikes', name: 'Look-Alike Species', icon: 'lookalike', description: 'Compare easily confused species pairs', grades: ['middle', 'high'] },
+  { id: 'safety', name: 'Safety & Toxicity', icon: 'safety', description: 'Identify dangerous species and safety precautions', grades: ['elementary', 'middle', 'high'] },
 ];
 
 function getTopicWeeds(topicId: TopicId): Weed[] {
