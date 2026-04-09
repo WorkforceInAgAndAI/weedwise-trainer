@@ -7,8 +7,9 @@ import WeedDetailPopup from './WeedDetailPopup';
 import HomeButton from './HomeButton';
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from '@/data/familyDescriptions';
 import { ArrowLeft, X } from 'lucide-react';
+import { hasImage } from '@/lib/imageMap';
 
-type TopicId = 'names' | 'seeds' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods';
+type TopicId = 'names' | 'seeds' | 'monocot-dicot' | 'native-introduced' | 'families' | 'habitats' | 'life-cycles' | 'life-stages' | 'look-alikes' | 'safety' | 'control-methods' | 'taxonomy' | 'dioecious';
 
 interface Topic {
  id: TopicId;
