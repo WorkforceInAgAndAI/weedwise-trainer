@@ -233,34 +233,170 @@ function TopicContent({ topicId, grade, topicWeeds, onSelectWeed, viewMode }: {
  topicId: TopicId; grade: GradeLevel; topicWeeds: Weed[]; onSelectWeed: (w: Weed) => void; viewMode: 'list' | 'box';
 }) {
  switch (topicId) {
- case 'names':
- return (
- <div className="space-y-4">
- <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
- <p className="font-semibold text-primary mb-2"> What You'll Learn</p>
- <p>Every weed has a <strong>common name</strong> (like "Waterhemp") and a <strong>scientific name</strong> (like <em>Amaranthus tuberculatus</em>). Scientific names help scientists worldwide talk about the exact same plant.</p>
- {grade !== 'elementary' && <p className="mt-2">Each species also has an <strong>EPPO code</strong> — a short code used internationally for pest management databases.</p>}
- </div>
- {topicWeeds.map(w => (
- <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
- <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
- <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
- </div>
- <div className="space-y-1">
- <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
- {grade !== 'elementary' && <div className="text-sm text-primary italic">{w.scientificName}</div>}
- {grade === 'high' && <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode}</div>}
- <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
- {w.traits.slice(0, grade === 'elementary' ? 2 : 3).map((t, i) => (
- <li key={i}>• {t}</li>
- ))}
- </ul>
- <p className="text-xs text-primary"> {w.memoryHook}</p>
- </div>
- </div>
- ))}
- </div>
- );
+  case 'names':
+   if (grade === 'elementary') {
+    // K-5: Weed or Crop / Weed Identification
+    const cropExamples = ['Corn', 'Soybean', 'Wheat', 'Rice', 'Cotton'];
+    return (
+     <div className="space-y-5">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+       <p className="font-display font-bold text-primary text-base">What is a weed?</p>
+       <p>A weed is any plant growing where it is <strong>not wanted</strong>. Weeds are different from crops because crops are planted on purpose to be used for humans or animals.</p>
+       <p>Have you seen weeds growing before? Weeds can grow in lots of different areas. Weeds can grow in <strong>gardens, sidewalk cracks, fields, driveways, along buildings</strong>, and more.</p>
+      </div>
+
+      <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+       <p className="font-display font-bold text-accent text-base">Why is it important to know about weeds?</p>
+       <p>Weeds can <strong>hurt other plants</strong> we want to grow by taking away their resources and nutrients.</p>
+       <p>Some weeds can be <strong>dangerous</strong> and hurt humans and animals.</p>
+      </div>
+
+      {/* Weed vs Crop visual comparison */}
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-foreground text-base text-center">Weeds vs. Crops</p>
+       <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+         <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-center">
+          <p className="font-bold text-destructive text-sm">Weeds</p>
+          <p className="text-xs text-muted-foreground">Plants that grow where they are NOT wanted</p>
+         </div>
+         <div className="grid grid-cols-2 gap-2">
+          {topicWeeds.slice(0, 4).map(w => (
+           <div key={w.id} className="text-center">
+            <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+             <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+            </div>
+            <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+           </div>
+          ))}
+         </div>
+        </div>
+        <div className="space-y-2">
+         <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+          <p className="font-bold text-primary text-sm">Crops</p>
+          <p className="text-xs text-muted-foreground">Plants grown on purpose for humans or animals</p>
+         </div>
+         <div className="grid grid-cols-2 gap-2">
+          {cropExamples.slice(0, 4).map(name => (
+           <div key={name} className="text-center">
+            <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted border border-border flex items-center justify-center">
+             <span className="text-xs text-muted-foreground font-medium">{name}</span>
+            </div>
+            <p className="text-[10px] font-medium text-foreground mt-1">{name}</p>
+           </div>
+          ))}
+         </div>
+        </div>
+       </div>
+      </div>
+
+      {/* All weeds list */}
+      <h3 className="font-display font-bold text-foreground text-sm">All Weeds ({topicWeeds.length} species)</h3>
+      {topicWeeds.map(w => (
+       <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+        <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+        </div>
+        <div className="space-y-1">
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+         <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+          {w.traits.slice(0, 2).map((t, i) => (
+           <li key={i}>- {t}</li>
+          ))}
+         </ul>
+         <p className="text-xs text-primary">{w.memoryHook}</p>
+        </div>
+       </div>
+      ))}
+     </div>
+    );
+   }
+
+   if (grade === 'middle') {
+    // 6-8: Name the Weed / Common Names
+    return (
+     <div className="space-y-5">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+       <p className="font-display font-bold text-primary text-base">Common Names</p>
+       <p>A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or other plants for <strong>sunlight, water, and nutrients</strong>. While some plants are considered weeds in one place, the same plant might be perfectly welcome somewhere else, making "weed" less about what the plant is and more about <strong>where it is growing</strong>.</p>
+       <p>Weeds are frequently known by <strong>multiple common names</strong> that vary by region, state, and country, which can create significant confusion in identification and communication among farmers, scientists, and land managers.</p>
+       <p>A single plant species may carry entirely different names depending on geographic location, local tradition, or historical usage, and in some cases, the <strong>same common name</strong> may refer to two completely different plant species in different parts of the country.</p>
+      </div>
+
+      <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
+       <p className="font-bold text-accent">Why use scientific names?</p>
+       <p>Common names serve as a practical and accessible starting point for learning weed identification, but they have clear <strong>limitations when precision is required</strong>. This is why common names are always best used alongside <strong>scientific naming systems</strong> that provide a consistent, universally recognized identity for every plant species.</p>
+      </div>
+
+      {/* Split panel showing a weed with multiple common names */}
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+       <p className="font-display font-bold text-foreground text-sm text-center">One Plant, Many Names</p>
+       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {topicWeeds.filter(w => w.commonName.includes('/')).slice(0, 2).concat(
+         topicWeeds.filter(w => !w.commonName.includes('/')).slice(0, 2)
+        ).slice(0, 4).map(w => (
+         <div key={w.id} className="bg-secondary/30 border border-border rounded-lg p-3 text-center">
+          <div className="w-20 h-20 mx-auto rounded-lg overflow-hidden mb-2">
+           <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+          </div>
+          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
+          <div className="text-xs text-primary italic mt-1">{w.scientificName}</div>
+          <div className="text-[10px] text-muted-foreground">EPPO: {w.eppoCode}</div>
+         </div>
+        ))}
+       </div>
+      </div>
+
+      {/* All weeds with scientific names */}
+      {topicWeeds.map(w => (
+       <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+        <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+        </div>
+        <div className="space-y-1">
+         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+         <div className="text-sm text-primary italic">{w.scientificName}</div>
+         <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+          {w.traits.slice(0, 3).map((t, i) => (
+           <li key={i}>- {t}</li>
+          ))}
+         </ul>
+         <p className="text-xs text-primary">{w.memoryHook}</p>
+        </div>
+       </div>
+      ))}
+     </div>
+    );
+   }
+
+   // 9-12 (high) - original content
+   return (
+    <div className="space-y-4">
+     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+      <p className="font-semibold text-primary mb-2">What You'll Learn</p>
+      <p>Every weed has a <strong>common name</strong> (like "Waterhemp") and a <strong>scientific name</strong> (like <em>Amaranthus tuberculatus</em>). Scientific names help scientists worldwide talk about the exact same plant.</p>
+      <p className="mt-2">Each species also has an <strong>EPPO code</strong> -- a short code used internationally for pest management databases.</p>
+     </div>
+     {topicWeeds.map(w => (
+      <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+       <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+       </div>
+       <div className="space-y-1">
+        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+        <div className="text-sm text-primary italic">{w.scientificName}</div>
+        <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode}</div>
+        <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+         {w.traits.slice(0, 3).map((t, i) => (
+          <li key={i}>- {t}</li>
+         ))}
+        </ul>
+        <p className="text-xs text-primary">{w.memoryHook}</p>
+       </div>
+      </div>
+     ))}
+    </div>
+   );
 
  case 'seeds':
   return (
