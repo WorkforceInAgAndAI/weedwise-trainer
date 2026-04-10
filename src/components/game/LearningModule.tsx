@@ -2963,12 +2963,26 @@ function TopicContent({
                 </p>
               </>
             ) : (
-              <p>
-                Systematic field scouting using structured patterns is essential for accurate weed assessment and
-                data-driven management decisions.
-              </p>
+              <>
+                <p>The average Iowa crop farm spans about <strong>345 acres</strong>, which is far too large for field scouts to cover on foot efficiently. By using field scouting tools such as <strong>drones, rovers, and satellites</strong>, agronomists can scout fields more efficiently with greater accuracy.</p>
+              </>
             )}
           </div>
+
+          {grade === "high" && (
+            <div className="space-y-3">
+              {[
+                { label: "Drones", desc: "Cover acres in minutes from above. Collect NDVI plant health maps, weed density and patch mapping, stand counts, nutrient deficiency patterns, and drainage/ponding issues. All information is sent live to smartphone apps for instant analysis." },
+                { label: "Rovers", desc: "Autonomous or remote-controlled machines that drive through fields using AI-powered cameras and sensors. They gather species-level weed identification, soil compaction measurements, root health via ground sensors, emergence uniformity, and disease scouting through close-up leaf images." },
+                { label: "Satellites", desc: "Especially useful for remote or large farms. Provide multi-spectral imagery (6-10 bands beyond visible light), historical yield potential maps, soil moisture, field boundary verification, and cover crop monitoring. Pinpoint exact hotspot zones of anomalies." },
+              ].map(t => (
+                <div key={t.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                  <p className="font-display font-bold text-foreground">{t.label}</p>
+                  <p className="text-sm text-muted-foreground">{t.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {PATTERNS.map((p) => (
@@ -2981,10 +2995,7 @@ function TopicContent({
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Why Consistent Scouting Matters</p>
-            <p className="mt-1">
-              Consistent and well-documented field walking is essential for tracking changes in weed populations over
-              multiple growing seasons, providing valuable data for long-term management planning.
-            </p>
+            <p className="mt-1">These tools help farmers find small weed patches early, ultimately reducing labor costs and yield losses from aggressive early-season weed competition.</p>
           </div>
         </div>
       );
