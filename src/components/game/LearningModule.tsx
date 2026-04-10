@@ -762,12 +762,10 @@ function TopicContent({
                   Weeds look very different at each growth stage. Learning to recognize them{" "}
                   <strong>early (seedling)</strong> is critical because that's when they're easiest to control.
                 </p>
-                {grade !== "elementary" && (
-                  <p>
-                    In IPM, <strong>scouting timing</strong> is everything. Knowing what a weed looks like at each stage
-                    lets you catch it early and choose the right control method.
-                  </p>
-                )}
+                <p>
+                  In IPM, <strong>scouting timing</strong> is everything. Knowing what a weed looks like at each stage
+                  lets you catch it early and choose the right control method.
+                </p>
               </>
             )}
           </div>
