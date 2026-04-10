@@ -2035,38 +2035,77 @@ function TopicContent({
         );
       }
 
-      // 9-12
-      return (
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-2">Habitats & Climate</p>
-            <p>
-              Weeds are adapted to specific growing conditions. Understanding where a weed thrives helps predict where
-              it will appear.
-            </p>
-          </div>
-          {habGroups.map((g) => {
-            const grouped = topicWeeds.filter((w) => w.primaryHabitat === g.key);
-            return (
-              <div key={g.key}>
-                <h3 className="font-semibold text-foreground text-sm mb-2">
-                  {g.label} ({grouped.length})
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {grouped.map((w) => (
-                    <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                      <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+      // 9-12 - Detailed habitats with phenotypic plasticity
+      {
+        const HIGH_HABITATS = [
+          {
+            key: "Warm-Season / Full Sun",
+            label: "Warm-Season Weeds",
+            desc: "Warm-season weeds thrive in hot summer conditions with full sun exposure. They germinate when soil temperatures rise in late spring and grow most vigorously during the hottest months. Warm-season weeds are common in corn, soybean, and sorghum fields across the Midwest.",
+          },
+          {
+            key: "Cool-Season / Early Spring",
+            label: "Cool-Season Weeds",
+            desc: "Cool-season weeds germinate in fall or early spring when temperatures are lower. They grow rapidly before warm-season crops are planted and can compete early in the growing season. Many are winter annuals that overwinter as rosettes.",
+          },
+          {
+            key: "Wet / Poorly Drained",
+            label: "Wet-Habitat Weeds",
+            desc: "Wet-habitat weeds are adapted to poorly drained soils, field edges near waterways, and areas with high water tables. They often have specialized tissues for waterlogged conditions and can indicate drainage problems in fields.",
+          },
+          {
+            key: "Dry / Disturbed",
+            label: "Dry-Habitat Weeds",
+            desc: "Dry-habitat weeds are adapted to well-drained, often sandy soils and disturbed areas like roadsides, construction sites, and field margins. They are typically drought-tolerant with deep root systems or water-conserving leaf structures.",
+          },
+        ];
+        return (
+          <div className="space-y-5">
+            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">Habitats</p>
+              <p>
+                Weeds are adapted to specific growing conditions. Understanding where a weed thrives helps predict where
+                it will appear. Weeds adapt through <strong>high genetic diversity, rapid reproduction</strong>, and high
+                <strong> phenotypic plasticity</strong>.
+              </p>
+              <p>
+                <strong>Phenotypic plasticity</strong> is the ability to change form in response to the environment.
+                Environmental factors such as sunlight exposure, rainfall, temperature, and weather effects all impact a
+                weed's adaptation to its environment.
+              </p>
+              <p>
+                These environmental factors can be found regionally across the globe, depending on the area's climate.
+                While a weed may be native to North America, it may also thrive in European areas where the climate is
+                similar.
+              </p>
+            </div>
+
+            {HIGH_HABITATS.map((h) => {
+              const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
+              return (
+                <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                  <p className="font-display font-bold text-foreground text-base">{h.label}</p>
+                  <p className="text-sm text-foreground">{h.desc}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Examples: {grouped.slice(0, 5).map(w => w.commonName).join(', ')}{grouped.length > 5 ? `, and ${grouped.length - 5} more` : ''}.
+                  </p>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {grouped.map((w) => (
+                      <div key={w.id} className="text-center">
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        </div>
+                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+                        <div className="text-[9px] text-primary italic">{w.scientificName}</div>
                       </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      );
+              );
+            })}
+          </div>
+        );
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════
