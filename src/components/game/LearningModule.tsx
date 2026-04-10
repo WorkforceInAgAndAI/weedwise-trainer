@@ -27,7 +27,12 @@ type TopicId =
   | "ecology"
   | "field-scouting"
   | "weed-competitors"
-  | "economic-threshold";
+  | "economic-threshold"
+  | "seed-dormancy"
+  | "allelopathy"
+  | "herbicide-moa"
+  | "crop-injury"
+  | "life-stage-control";
 
 interface Topic {
   id: TopicId;
@@ -136,7 +141,7 @@ const TOPICS: Topic[] = [
     description: "When is it worth treating weeds? Understanding cost vs. benefit",
     grades: ["middle", "high"],
   },
-  {
+   {
     id: "taxonomy",
     name: "Taxonomy",
     icon: "taxonomy",
@@ -155,6 +160,41 @@ const TOPICS: Topic[] = [
     name: "Dioecious Weeds",
     icon: "dioecious",
     description: "Learn about weeds with separate male and female plants",
+    grades: ["high"],
+  },
+  {
+    id: "seed-dormancy",
+    name: "Seed Dormancy",
+    icon: "dormancy",
+    description: "How seeds survive unfavorable conditions through physical, physiological, chemical, and morphological dormancy",
+    grades: ["high"],
+  },
+  {
+    id: "allelopathy",
+    name: "Allelopathy",
+    icon: "allelopathy",
+    description: "How weeds release chemicals to inhibit other plants' growth",
+    grades: ["high"],
+  },
+  {
+    id: "herbicide-moa",
+    name: "Herbicide MOA",
+    icon: "herbicide",
+    description: "Herbicide groups, modes of action, and how they affect weeds",
+    grades: ["high"],
+  },
+  {
+    id: "crop-injury",
+    name: "Crop Injury Symptoms",
+    icon: "injury",
+    description: "Recognize herbicide injury patterns by MOA group",
+    grades: ["high"],
+  },
+  {
+    id: "life-stage-control",
+    name: "Life Stage Control",
+    icon: "stagecontrol",
+    description: "Target weeds at their most vulnerable growth stage for effective management",
     grades: ["high"],
   },
 ];
@@ -560,41 +600,107 @@ function TopicContent({
         );
       }
 
-      // 9-12 (high)
-      return (
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-2">What You'll Learn</p>
-            <p>
-              Every weed has a <strong>common name</strong> (like "Waterhemp") and a <strong>scientific name</strong>{" "}
-              (like <em>Amaranthus tuberculatus</em>). Scientific names help scientists worldwide talk about the exact
-              same plant.
-            </p>
-            <p className="mt-2">
-              Each species also has an <strong>EPPO code</strong> -- a short code used internationally for pest
-              management databases.
-            </p>
-          </div>
-          {topicWeeds.map((w) => (
-            <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-              <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-              </div>
-              <div className="space-y-1">
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                <div className="text-sm text-primary italic">{w.scientificName}</div>
-                <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode}</div>
-                <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                  {w.traits.slice(0, 3).map((t, i) => (
-                    <li key={i}>- {t}</li>
-                  ))}
-                </ul>
-                <p className="text-xs text-primary">{w.memoryHook}</p>
+      // 9-12 (high) - Scientific Names / Binomial Nomenclature
+      {
+        const waterhemp = topicWeeds.find(w => w.commonName === "Waterhemp") || topicWeeds[0];
+        const foxtails = topicWeeds.filter(w => w.scientificName.startsWith("Setaria"));
+        return (
+          <div className="space-y-5">
+            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">Scientific Names</p>
+              <p>
+                Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
+                and overall farm success. According to the Weed Science Society of America, without weed control in corn,
+                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>.
+              </p>
+              <p>
+                At a national and global level, scientists need more precise terms to ensure they are discussing the same
+                plant. Scientific names are written in the form of <strong>binomial nomenclature</strong>.
+              </p>
+            </div>
+
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">What is Binomial Nomenclature?</p>
+              <p>
+                Binomial nomenclature is the formal, two-term scientific system for naming organisms, which uses terms
+                in Latin to state the <strong>genus</strong> and <strong>specific epithet</strong>. It was developed by
+                <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
+                worldwide.
+              </p>
+            </div>
+
+            {/* Waterhemp example */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
+              <div className="flex gap-4 items-start">
+                <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border-2 border-border">
+                  <WeedImage weedId={waterhemp.id} stage="whole" className="w-full h-full" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
+                  <p className="text-sm text-foreground">
+                    Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
+                    edges, known for its smooth hairless stems and distinct leaf shape.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-primary/10 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground">GENUS</p>
+                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
+                    </div>
+                    <div className="bg-accent/10 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground">SPECIES</p>
+                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      );
+
+            {/* Foxtail genus comparison */}
+            {foxtails.length >= 2 && (
+              <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">Genus Relationships: Foxtails</p>
+                <p className="text-sm text-foreground">
+                  Organisms with scientific names closer in form can be more closely related. These foxtails all share
+                  the genus <strong className="italic">Setaria</strong>, showing their common heritage and characteristics.
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {foxtails.slice(0, 3).map(w => (
+                    <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden mb-2">
+                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      </div>
+                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
+                      <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* All species with EPPO codes */}
+            <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
+            {topicWeeds.map((w) => (
+              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                </div>
+                <div className="space-y-1">
+                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+                  <div className="text-sm text-primary italic">{w.scientificName}</div>
+                  <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode} | Family: {w.family}</div>
+                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+                    {w.traits.slice(0, 3).map((t, i) => (
+                      <li key={i}>- {t}</li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-primary">{w.memoryHook}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      }
 
     /* ═══════════════════════════════════════════════════════════
        SEEDS
@@ -1736,18 +1842,27 @@ function TopicContent({
         );
       }
 
-      // 9-12
+      // 9-12 - Detailed invasive species content
       return (
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">Native vs Introduced Species</p>
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Invasive Species</p>
             <p>
-              <strong>Native</strong> species have been in the Midwest for thousands of years and are part of the
-              natural ecosystem.
+              Invasive weeds are non-native plants that spread prolifically and cause significant ecological or economic
+              harm to their new environment, often by <strong>crowding out native species, altering ecosystems</strong>,
+              or damaging agricultural interests.
             </p>
             <p>
-              <strong>Introduced</strong> species were brought from other regions (often accidentally). They can become
-              invasive because they have fewer natural predators.
+              They usually arrive because of human activity, even when it's completely accidental. Weed seeds hitchhike
+              on muddy tractor tires, hide in contaminated crop seed bags, cling to animal fur, or float downstream to
+              new areas. Sometimes people intentionally bring them in for farming, landscaping, or erosion control, only
+              for these plants to escape and spread wildly.
+            </p>
+            <p>
+              Once established, invasive weeds are incredibly hard and expensive to eradicate, which is why{" "}
+              <strong>preventative efforts</strong> like cleaning equipment and inspecting seed sources is the smartest
+              defense. Some invasive weeds may adapt to better suit their new environments, making it challenging to
+              find control solutions.
             </p>
           </div>
           <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
@@ -1759,6 +1874,7 @@ function TopicContent({
                 </div>
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
+                  <div className="text-xs text-primary italic">{w.scientificName}</div>
                   <div className="text-xs text-muted-foreground">{w.habitat}</div>
                 </div>
               </div>
@@ -1773,6 +1889,7 @@ function TopicContent({
                 </div>
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
+                  <div className="text-xs text-primary italic">{w.scientificName}</div>
                   <div className="text-xs text-muted-foreground">{w.habitat}</div>
                 </div>
               </div>
@@ -1929,38 +2046,77 @@ function TopicContent({
         );
       }
 
-      // 9-12
-      return (
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-2">Habitats & Climate</p>
-            <p>
-              Weeds are adapted to specific growing conditions. Understanding where a weed thrives helps predict where
-              it will appear.
-            </p>
-          </div>
-          {habGroups.map((g) => {
-            const grouped = topicWeeds.filter((w) => w.primaryHabitat === g.key);
-            return (
-              <div key={g.key}>
-                <h3 className="font-semibold text-foreground text-sm mb-2">
-                  {g.label} ({grouped.length})
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {grouped.map((w) => (
-                    <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                      <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+      // 9-12 - Detailed habitats with phenotypic plasticity
+      {
+        const HIGH_HABITATS = [
+          {
+            key: "Warm-Season / Full Sun",
+            label: "Warm-Season Weeds",
+            desc: "Warm-season weeds thrive in hot summer conditions with full sun exposure. They germinate when soil temperatures rise in late spring and grow most vigorously during the hottest months. Warm-season weeds are common in corn, soybean, and sorghum fields across the Midwest.",
+          },
+          {
+            key: "Cool-Season / Early Spring",
+            label: "Cool-Season Weeds",
+            desc: "Cool-season weeds germinate in fall or early spring when temperatures are lower. They grow rapidly before warm-season crops are planted and can compete early in the growing season. Many are winter annuals that overwinter as rosettes.",
+          },
+          {
+            key: "Wet / Poorly Drained",
+            label: "Wet-Habitat Weeds",
+            desc: "Wet-habitat weeds are adapted to poorly drained soils, field edges near waterways, and areas with high water tables. They often have specialized tissues for waterlogged conditions and can indicate drainage problems in fields.",
+          },
+          {
+            key: "Dry / Disturbed",
+            label: "Dry-Habitat Weeds",
+            desc: "Dry-habitat weeds are adapted to well-drained, often sandy soils and disturbed areas like roadsides, construction sites, and field margins. They are typically drought-tolerant with deep root systems or water-conserving leaf structures.",
+          },
+        ];
+        return (
+          <div className="space-y-5">
+            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">Habitats</p>
+              <p>
+                Weeds are adapted to specific growing conditions. Understanding where a weed thrives helps predict where
+                it will appear. Weeds adapt through <strong>high genetic diversity, rapid reproduction</strong>, and high
+                <strong> phenotypic plasticity</strong>.
+              </p>
+              <p>
+                <strong>Phenotypic plasticity</strong> is the ability to change form in response to the environment.
+                Environmental factors such as sunlight exposure, rainfall, temperature, and weather effects all impact a
+                weed's adaptation to its environment.
+              </p>
+              <p>
+                These environmental factors can be found regionally across the globe, depending on the area's climate.
+                While a weed may be native to North America, it may also thrive in European areas where the climate is
+                similar.
+              </p>
+            </div>
+
+            {HIGH_HABITATS.map((h) => {
+              const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
+              return (
+                <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                  <p className="font-display font-bold text-foreground text-base">{h.label}</p>
+                  <p className="text-sm text-foreground">{h.desc}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Examples: {grouped.slice(0, 5).map(w => w.commonName).join(', ')}{grouped.length > 5 ? `, and ${grouped.length - 5} more` : ''}.
+                  </p>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {grouped.map((w) => (
+                      <div key={w.id} className="text-center">
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        </div>
+                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+                        <div className="text-[9px] text-primary italic">{w.scientificName}</div>
                       </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      );
+              );
+            })}
+          </div>
+        );
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -2807,12 +2963,26 @@ function TopicContent({
                 </p>
               </>
             ) : (
-              <p>
-                Systematic field scouting using structured patterns is essential for accurate weed assessment and
-                data-driven management decisions.
-              </p>
+              <>
+                <p>The average Iowa crop farm spans about <strong>345 acres</strong>, which is far too large for field scouts to cover on foot efficiently. By using field scouting tools such as <strong>drones, rovers, and satellites</strong>, agronomists can scout fields more efficiently with greater accuracy.</p>
+              </>
             )}
           </div>
+
+          {grade === "high" && (
+            <div className="space-y-3">
+              {[
+                { label: "Drones", desc: "Cover acres in minutes from above. Collect NDVI plant health maps, weed density and patch mapping, stand counts, nutrient deficiency patterns, and drainage/ponding issues. All information is sent live to smartphone apps for instant analysis." },
+                { label: "Rovers", desc: "Autonomous or remote-controlled machines that drive through fields using AI-powered cameras and sensors. They gather species-level weed identification, soil compaction measurements, root health via ground sensors, emergence uniformity, and disease scouting through close-up leaf images." },
+                { label: "Satellites", desc: "Especially useful for remote or large farms. Provide multi-spectral imagery (6-10 bands beyond visible light), historical yield potential maps, soil moisture, field boundary verification, and cover crop monitoring. Pinpoint exact hotspot zones of anomalies." },
+              ].map(t => (
+                <div key={t.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                  <p className="font-display font-bold text-foreground">{t.label}</p>
+                  <p className="text-sm text-muted-foreground">{t.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {PATTERNS.map((p) => (
@@ -2825,10 +2995,7 @@ function TopicContent({
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Why Consistent Scouting Matters</p>
-            <p className="mt-1">
-              Consistent and well-documented field walking is essential for tracking changes in weed populations over
-              multiple growing seasons, providing valuable data for long-term management planning.
-            </p>
+            <p className="mt-1">These tools help farmers find small weed patches early, ultimately reducing labor costs and yield losses from aggressive early-season weed competition.</p>
           </div>
         </div>
       );
@@ -3180,6 +3347,224 @@ function TopicContent({
               </p>
             </div>
           )}
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SEED DORMANCY (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "seed-dormancy": {
+      const DORMANCY_TYPES = [
+        { label: "Physical Dormancy", desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, or microbial activity." },
+        { label: "Physiological Dormancy", desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Environmental cues like temperature shifts or light exposure can break this dormancy." },
+        { label: "Chemical Dormancy", desc: "Part of physiological dormancy, but focuses specifically on high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out or degraded before germination can occur." },
+        { label: "Morphological Dormancy", desc: "Determined by underdeveloped embryos at the time of seed release from the mature plant. By delaying embryo maturity and ability to germinate, seeds can last longer in the soil until they are morphologically ready to develop." },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Seed Dormancy</p>
+            <p>To survive in changing environments, weed seeds must adapt and know when to begin germination. To prevent germination in unfavorable conditions, such as the presence of herbicides or cold weather, seeds have developed adaptations to remain dormant.</p>
+            <p><strong>Seed dormancy</strong> is the incapacity of a viable seed to germinate under favorable conditions. For weed seeds under stress, seed dormancy is a good thing. For agronomists trying to eradicate weeds, it can be challenging.</p>
+          </div>
+          <div className="space-y-3">
+            {DORMANCY_TYPES.map(d => (
+              <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <p className="font-display font-bold text-foreground">{d.label}</p>
+                <p className="text-sm text-foreground">{d.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ALLELOPATHY (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "allelopathy": {
+      const PATHWAYS = [
+        { label: "Root Exudation", desc: "Chemicals are secreted directly from roots into the surrounding soil, disrupting nearby plant growth and nutrient uptake." },
+        { label: "Leaf Leachate", desc: "Rainfall or dew washes inhibitory compounds off leaves onto the soil surface, suppressing the germination of other plants." },
+        { label: "Decomposition Leaching", desc: "As plant residues break down, they release compounds into the soil that can linger and impact future crops." },
+        { label: "Volatilization", desc: "Chemicals are released into the air that may reduce germination or growth of seedlings nearby." },
+        { label: "Soil Accumulation", desc: "Allelopathic chemicals persist and build up over time, reducing soil health and crop vigor." },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Allelopathy</p>
+            <p>Allelopathy in weeds is the process where plants release biochemicals into the environment through their roots, leaves, or decaying tissues that <strong>inhibit the germination, growth, or development</strong> of neighboring plants.</p>
+            <p>This chemical interference gives weeds a competitive advantage over crops, native plants, and even other weeds. Understanding allelopathy helps farmers see that weed impacts aren't limited to physical crowding or nutrient competition.</p>
+          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Allelopathic Pathways</h3>
+          <div className="space-y-3">
+            {PATHWAYS.map(p => (
+              <div key={p.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <p className="font-bold text-foreground">{p.label}</p>
+                <p className="text-sm text-muted-foreground">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Connection to Economic Thresholds</p>
+            <p className="mt-1">These biochemical interactions may influence economic thresholds by intensifying crop stress, sometimes requiring earlier or more strategic management to prevent lasting soil and yield effects.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERBICIDE MOA (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "herbicide-moa": {
+      const MOA_EXAMPLES = [
+        { group: "1", name: "ACCase Inhibitors", desc: "Disrupt enzymes that produce fatty acids, stopping growth in grasses.", example: "clethodim" },
+        { group: "2", name: "ALS Inhibitors", desc: "Block amino acid production needed for proteins.", example: "imazethapyr" },
+        { group: "4", name: "Synthetic Auxins", desc: "Mimic plant growth hormones, causing abnormal growth and death.", example: "2,4-D" },
+        { group: "9", name: "EPSPS Inhibitors", desc: "Shut down amino acid synthesis pathways.", example: "glyphosate" },
+        { group: "14", name: "PPO Inhibitors", desc: "Interfere with chlorophyll production and burn plant leaves.", example: "fomesafen" },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Herbicide Mode of Action (MOA)</p>
+            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are also a <strong>multi-billion-dollar industry</strong> in the United States.</p>
+            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA is the specific way a herbicide affects a plant's growth or survival, similar to how medicine targets a specific part of the human body.</p>
+            <p>Herbicide groups share the same chemical foundation within each category. Because of that, weeds resistant to one herbicide in a group are often resistant to others with the same MOA.</p>
+          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Key Herbicide Groups</h3>
+          <div className="space-y-3">
+            {MOA_EXAMPLES.map(m => (
+              <div key={m.group} className="bg-card border border-border rounded-lg p-4">
+                <p className="font-bold text-foreground">Group {m.group}: {m.name}</p>
+                <p className="text-sm text-muted-foreground mt-1">{m.desc}</p>
+                <p className="text-xs text-primary mt-1">Example: {m.example}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary">Full MOA Reference Table</p>
+            <div className="overflow-x-auto mt-2">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-secondary/50">
+                    <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {HERBICIDE_MOA.map(h => (
+                    <tr key={h.id} className="even:bg-muted/20">
+                      <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
+                      <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
+                      <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
+                      <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
+                      <td className={`p-2 border border-border font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Key Takeaway</p>
+            <p className="mt-1">Learning how these MOAs work helps farmers apply herbicides strategically by <strong>rotating different groups</strong> instead of relying on one to manage weeds effectively and slow the spread of herbicide resistance.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CROP INJURY SYMPTOMS (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "crop-injury": {
+      const INJURY_PATTERNS = [
+        { group: "1", name: "ACCase Inhibitors", symptoms: "Yellowing in young grass leaves and death at the growing points." },
+        { group: "2", name: "ALS Inhibitors", symptoms: "Stunted plants with purpling on the veins or stems." },
+        { group: "4", name: "Synthetic Auxins", symptoms: "Leaf cupping, twisting, and bent stems (epinasty)." },
+        { group: "9", name: "EPSPS Inhibitors", symptoms: "Gradual yellowing and death starting from the oldest leaves." },
+        { group: "14", name: "PPO Inhibitors", symptoms: "Brown or scorched leaf spots soon after application." },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Herbicide Injury Symptoms</p>
+            <p>While herbicides are designed to kill weeds, sometimes they miss their target and harm crops or other nearby plants. Herbicide injury can range from <strong>mild discoloration to severe damage</strong> that reduces crop yield.</p>
+            <p>Each herbicide group damages plants in a specific way, depending on which process in the plant it disrupts. Because herbicides in the same group share the same MOA, they often cause <strong>similar injury symptoms</strong>.</p>
+          </div>
+          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+            <p className="font-bold text-foreground">Common Injury Types</p>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              {["Chlorosis (yellowing)", "Bleaching (whitening)", "Epinasty (twisting/curling)", "Necrosis (browning/death)", "Stunting (reduced growth)", "Purpling (anthocyanin)"].map(s => (
+                <div key={s} className="bg-secondary/30 border border-border rounded p-2 text-foreground text-center">{s}</div>
+              ))}
+            </div>
+          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Injury Patterns by Group</h3>
+          <div className="space-y-3">
+            {INJURY_PATTERNS.map(p => (
+              <div key={p.group} className="bg-card border border-border rounded-lg p-4">
+                <p className="font-bold text-foreground">Group {p.group}: {p.name}</p>
+                <p className="text-sm text-muted-foreground mt-1">{p.symptoms}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Diagnosis Tip</p>
+            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> -- whether it appears first on leaves, stems, or roots -- agronomists can often determine which herbicide group caused the injury.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       LIFE STAGE CONTROL (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "life-stage-control": {
+      const STAGE_CONTROL = [
+        { stage: "Seed (Seed Bank)", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
+        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal -- most cost-effective window" },
+        { stage: "Vegetative", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
+        { stage: "Reproductive", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
+        { stage: "Mature / Dispersal", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Weed Control Across Life Stages</p>
+            <p>Agronomists can use their knowledge of weed life stages and life cycles to target weeds and use control methods more effectively.</p>
+            <p>The general rule of thumb: <strong>control weeds early in their life cycle</strong>, before they have the chance to become established and reproduce.</p>
+          </div>
+          {/* Control timeline */}
+          <div className="bg-card border border-border rounded-lg p-4">
+            <p className="font-display font-bold text-foreground text-sm text-center mb-3">Control Effectiveness Timeline</p>
+            <div className="flex items-center gap-1">
+              {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((s, i) => (
+                <div key={s} className="flex-1 text-center">
+                  <div className={`rounded-lg p-2 text-xs font-bold ${i <= 1 ? 'bg-accent/20 text-accent border border-accent/30' : i <= 2 ? 'bg-primary/10 text-primary border border-primary/30' : 'bg-destructive/10 text-destructive border border-destructive/30'}`}>
+                    {s}
+                  </div>
+                  <p className="text-[9px] text-muted-foreground mt-1">{i <= 1 ? 'Easiest' : i <= 2 ? 'Moderate' : 'Hardest'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3">
+            {STAGE_CONTROL.map(s => (
+              <div key={s.stage} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <p className="font-display font-bold text-foreground">{s.stage}</p>
+                <p className="text-sm text-foreground">{s.desc}</p>
+                <div className="bg-primary/10 rounded-lg p-3">
+                  <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }

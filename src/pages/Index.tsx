@@ -70,6 +70,7 @@ const Index = () => {
       phasesCompleted: game.unlockedPhases.length,
       weedStats: game.weedStats,
       phaseStats: game.phaseStats,
+      grade: game.grade || undefined,
     });
   }, [game.totalCorrect, game.totalWrong, game.xp, game.streak]);
 
