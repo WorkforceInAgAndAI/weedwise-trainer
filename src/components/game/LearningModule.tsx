@@ -8,6 +8,7 @@ import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { ArrowLeft, X } from "lucide-react";
 import { hasImage, resolveCropImageUrl } from "@/lib/imageMap";
+import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 
 type TopicId =
   | "names"
