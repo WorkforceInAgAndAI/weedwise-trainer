@@ -8,6 +8,7 @@ import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { ArrowLeft, X } from "lucide-react";
 import { hasImage, resolveCropImageUrl } from "@/lib/imageMap";
+import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 
 type TopicId =
   | "names"
@@ -1748,8 +1749,82 @@ function TopicContent({
               ))}
             </div>
 
+            {/* ── Herbicide MOA Reference Table ── */}
+            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
+              <p className="font-semibold text-primary">Herbicide Modes of Action Reference</p>
+              {isHighSchool ? (
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    The table below lists the major herbicide MOA groups used in crop production. Understanding
+                    each group's target site, application timing, resistance risk, and symptomology is critical
+                    for building effective resistance management programs.
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-secondary/50">
+                          <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {HERBICIDE_MOA.map(h => (
+                          <tr key={h.id} className="even:bg-muted/20">
+                            <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
+                            <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
+                            <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
+                            <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
+                            <td className={`p-2 border border-border font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="font-semibold text-primary mt-3">Symptom Types</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => (
+                      <div key={key} className="bg-card border border-border rounded-lg p-3">
+                        <p className="font-bold text-foreground text-xs">{info.label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    Herbicides work in different ways to kill weeds. Scientists group them by their
+                    <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
+                    Each group has a number and causes a specific type of symptom.
+                  </p>
+                  <div className="space-y-2">
+                    {getMiddleSchoolMOAs().map(h => (
+                      <div key={h.id} className="bg-card border border-border rounded-lg p-3">
+                        <p className="font-bold text-foreground text-xs">{h.moa} (Group {h.group})</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          <span className="font-medium">Timing:</span> {h.timing === 'PRE' ? 'Pre-emergent (before weeds sprout)' : 'Post-emergent (after weeds are growing)'}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          <span className="font-medium">Targets:</span> {h.spectrum === 'Both' ? 'Grasses and broadleaves' : h.spectrum === 'Grass' ? 'Grasses (monocots)' : 'Broadleaves (dicots)'}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          <span className="font-medium">Brand example:</span> {h.brands[0]}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          <span className="font-medium">What it looks like:</span> {SYMPTOM_TYPES[h.symptomType]?.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-2">
-              <p className="font-semibold text-accent text-sm"> Key Takeaway</p>
+              <p className="font-semibold text-accent text-sm">Key Takeaway</p>
               {isHighSchool ? (
                 <p className="text-sm text-foreground">
                   Sustainable weed management requires <strong>diversifying tactics across multiple MOA groups</strong>,
