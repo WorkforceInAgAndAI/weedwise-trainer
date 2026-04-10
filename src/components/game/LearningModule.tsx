@@ -141,7 +141,7 @@ const TOPICS: Topic[] = [
     description: "When is it worth treating weeds? Understanding cost vs. benefit",
     grades: ["middle", "high"],
   },
-  {
+   {
     id: "taxonomy",
     name: "Taxonomy",
     icon: "taxonomy",
@@ -160,6 +160,41 @@ const TOPICS: Topic[] = [
     name: "Dioecious Weeds",
     icon: "dioecious",
     description: "Learn about weeds with separate male and female plants",
+    grades: ["high"],
+  },
+  {
+    id: "seed-dormancy",
+    name: "Seed Dormancy",
+    icon: "dormancy",
+    description: "How seeds survive unfavorable conditions through physical, physiological, chemical, and morphological dormancy",
+    grades: ["high"],
+  },
+  {
+    id: "allelopathy",
+    name: "Allelopathy",
+    icon: "allelopathy",
+    description: "How weeds release chemicals to inhibit other plants' growth",
+    grades: ["high"],
+  },
+  {
+    id: "herbicide-moa",
+    name: "Herbicide MOA",
+    icon: "herbicide",
+    description: "Herbicide groups, modes of action, and how they affect weeds",
+    grades: ["high"],
+  },
+  {
+    id: "crop-injury",
+    name: "Crop Injury Symptoms",
+    icon: "injury",
+    description: "Recognize herbicide injury patterns by MOA group",
+    grades: ["high"],
+  },
+  {
+    id: "life-stage-control",
+    name: "Life Stage Control",
+    icon: "stagecontrol",
+    description: "Target weeds at their most vulnerable growth stage for effective management",
     grades: ["high"],
   },
 ];
