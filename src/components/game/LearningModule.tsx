@@ -27,7 +27,12 @@ type TopicId =
   | "ecology"
   | "field-scouting"
   | "weed-competitors"
-  | "economic-threshold";
+  | "economic-threshold"
+  | "seed-dormancy"
+  | "allelopathy"
+  | "herbicide-moa"
+  | "crop-injury"
+  | "life-stage-control";
 
 interface Topic {
   id: TopicId;
