@@ -3340,6 +3340,224 @@ function TopicContent({
       );
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       SEED DORMANCY (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "seed-dormancy": {
+      const DORMANCY_TYPES = [
+        { label: "Physical Dormancy", desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, or microbial activity." },
+        { label: "Physiological Dormancy", desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Environmental cues like temperature shifts or light exposure can break this dormancy." },
+        { label: "Chemical Dormancy", desc: "Part of physiological dormancy, but focuses specifically on high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out or degraded before germination can occur." },
+        { label: "Morphological Dormancy", desc: "Determined by underdeveloped embryos at the time of seed release from the mature plant. By delaying embryo maturity and ability to germinate, seeds can last longer in the soil until they are morphologically ready to develop." },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Seed Dormancy</p>
+            <p>To survive in changing environments, weed seeds must adapt and know when to begin germination. To prevent germination in unfavorable conditions, such as the presence of herbicides or cold weather, seeds have developed adaptations to remain dormant.</p>
+            <p><strong>Seed dormancy</strong> is the incapacity of a viable seed to germinate under favorable conditions. For weed seeds under stress, seed dormancy is a good thing. For agronomists trying to eradicate weeds, it can be challenging.</p>
+          </div>
+          <div className="space-y-3">
+            {DORMANCY_TYPES.map(d => (
+              <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <p className="font-display font-bold text-foreground">{d.label}</p>
+                <p className="text-sm text-foreground">{d.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ALLELOPATHY (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "allelopathy": {
+      const PATHWAYS = [
+        { label: "Root Exudation", desc: "Chemicals are secreted directly from roots into the surrounding soil, disrupting nearby plant growth and nutrient uptake." },
+        { label: "Leaf Leachate", desc: "Rainfall or dew washes inhibitory compounds off leaves onto the soil surface, suppressing the germination of other plants." },
+        { label: "Decomposition Leaching", desc: "As plant residues break down, they release compounds into the soil that can linger and impact future crops." },
+        { label: "Volatilization", desc: "Chemicals are released into the air that may reduce germination or growth of seedlings nearby." },
+        { label: "Soil Accumulation", desc: "Allelopathic chemicals persist and build up over time, reducing soil health and crop vigor." },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Allelopathy</p>
+            <p>Allelopathy in weeds is the process where plants release biochemicals into the environment through their roots, leaves, or decaying tissues that <strong>inhibit the germination, growth, or development</strong> of neighboring plants.</p>
+            <p>This chemical interference gives weeds a competitive advantage over crops, native plants, and even other weeds. Understanding allelopathy helps farmers see that weed impacts aren't limited to physical crowding or nutrient competition.</p>
+          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Allelopathic Pathways</h3>
+          <div className="space-y-3">
+            {PATHWAYS.map(p => (
+              <div key={p.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <p className="font-bold text-foreground">{p.label}</p>
+                <p className="text-sm text-muted-foreground">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Connection to Economic Thresholds</p>
+            <p className="mt-1">These biochemical interactions may influence economic thresholds by intensifying crop stress, sometimes requiring earlier or more strategic management to prevent lasting soil and yield effects.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERBICIDE MOA (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "herbicide-moa": {
+      const MOA_EXAMPLES = [
+        { group: "1", name: "ACCase Inhibitors", desc: "Disrupt enzymes that produce fatty acids, stopping growth in grasses.", example: "clethodim" },
+        { group: "2", name: "ALS Inhibitors", desc: "Block amino acid production needed for proteins.", example: "imazethapyr" },
+        { group: "4", name: "Synthetic Auxins", desc: "Mimic plant growth hormones, causing abnormal growth and death.", example: "2,4-D" },
+        { group: "9", name: "EPSPS Inhibitors", desc: "Shut down amino acid synthesis pathways.", example: "glyphosate" },
+        { group: "14", name: "PPO Inhibitors", desc: "Interfere with chlorophyll production and burn plant leaves.", example: "fomesafen" },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Herbicide Mode of Action (MOA)</p>
+            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are also a <strong>multi-billion-dollar industry</strong> in the United States.</p>
+            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA is the specific way a herbicide affects a plant's growth or survival, similar to how medicine targets a specific part of the human body.</p>
+            <p>Herbicide groups share the same chemical foundation within each category. Because of that, weeds resistant to one herbicide in a group are often resistant to others with the same MOA.</p>
+          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Key Herbicide Groups</h3>
+          <div className="space-y-3">
+            {MOA_EXAMPLES.map(m => (
+              <div key={m.group} className="bg-card border border-border rounded-lg p-4">
+                <p className="font-bold text-foreground">Group {m.group}: {m.name}</p>
+                <p className="text-sm text-muted-foreground mt-1">{m.desc}</p>
+                <p className="text-xs text-primary mt-1">Example: {m.example}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary">Full MOA Reference Table</p>
+            <div className="overflow-x-auto mt-2">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-secondary/50">
+                    <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {HERBICIDE_MOA.map(h => (
+                    <tr key={h.id} className="even:bg-muted/20">
+                      <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
+                      <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
+                      <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
+                      <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
+                      <td className={`p-2 border border-border font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Key Takeaway</p>
+            <p className="mt-1">Learning how these MOAs work helps farmers apply herbicides strategically by <strong>rotating different groups</strong> instead of relying on one to manage weeds effectively and slow the spread of herbicide resistance.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CROP INJURY SYMPTOMS (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "crop-injury": {
+      const INJURY_PATTERNS = [
+        { group: "1", name: "ACCase Inhibitors", symptoms: "Yellowing in young grass leaves and death at the growing points." },
+        { group: "2", name: "ALS Inhibitors", symptoms: "Stunted plants with purpling on the veins or stems." },
+        { group: "4", name: "Synthetic Auxins", symptoms: "Leaf cupping, twisting, and bent stems (epinasty)." },
+        { group: "9", name: "EPSPS Inhibitors", symptoms: "Gradual yellowing and death starting from the oldest leaves." },
+        { group: "14", name: "PPO Inhibitors", symptoms: "Brown or scorched leaf spots soon after application." },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Herbicide Injury Symptoms</p>
+            <p>While herbicides are designed to kill weeds, sometimes they miss their target and harm crops or other nearby plants. Herbicide injury can range from <strong>mild discoloration to severe damage</strong> that reduces crop yield.</p>
+            <p>Each herbicide group damages plants in a specific way, depending on which process in the plant it disrupts. Because herbicides in the same group share the same MOA, they often cause <strong>similar injury symptoms</strong>.</p>
+          </div>
+          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+            <p className="font-bold text-foreground">Common Injury Types</p>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              {["Chlorosis (yellowing)", "Bleaching (whitening)", "Epinasty (twisting/curling)", "Necrosis (browning/death)", "Stunting (reduced growth)", "Purpling (anthocyanin)"].map(s => (
+                <div key={s} className="bg-secondary/30 border border-border rounded p-2 text-foreground text-center">{s}</div>
+              ))}
+            </div>
+          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Injury Patterns by Group</h3>
+          <div className="space-y-3">
+            {INJURY_PATTERNS.map(p => (
+              <div key={p.group} className="bg-card border border-border rounded-lg p-4">
+                <p className="font-bold text-foreground">Group {p.group}: {p.name}</p>
+                <p className="text-sm text-muted-foreground mt-1">{p.symptoms}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Diagnosis Tip</p>
+            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> -- whether it appears first on leaves, stems, or roots -- agronomists can often determine which herbicide group caused the injury.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       LIFE STAGE CONTROL (High School)
+    ═══════════════════════════════════════════════════════════ */
+    case "life-stage-control": {
+      const STAGE_CONTROL = [
+        { stage: "Seed (Seed Bank)", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
+        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal -- most cost-effective window" },
+        { stage: "Vegetative", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
+        { stage: "Reproductive", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
+        { stage: "Mature / Dispersal", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },
+      ];
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Weed Control Across Life Stages</p>
+            <p>Agronomists can use their knowledge of weed life stages and life cycles to target weeds and use control methods more effectively.</p>
+            <p>The general rule of thumb: <strong>control weeds early in their life cycle</strong>, before they have the chance to become established and reproduce.</p>
+          </div>
+          {/* Control timeline */}
+          <div className="bg-card border border-border rounded-lg p-4">
+            <p className="font-display font-bold text-foreground text-sm text-center mb-3">Control Effectiveness Timeline</p>
+            <div className="flex items-center gap-1">
+              {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((s, i) => (
+                <div key={s} className="flex-1 text-center">
+                  <div className={`rounded-lg p-2 text-xs font-bold ${i <= 1 ? 'bg-accent/20 text-accent border border-accent/30' : i <= 2 ? 'bg-primary/10 text-primary border border-primary/30' : 'bg-destructive/10 text-destructive border border-destructive/30'}`}>
+                    {s}
+                  </div>
+                  <p className="text-[9px] text-muted-foreground mt-1">{i <= 1 ? 'Easiest' : i <= 2 ? 'Moderate' : 'Hardest'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3">
+            {STAGE_CONTROL.map(s => (
+              <div key={s.stage} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                <p className="font-display font-bold text-foreground">{s.stage}</p>
+                <p className="text-sm text-foreground">{s.desc}</p>
+                <div className="bg-primary/10 rounded-lg p-3">
+                  <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     default:
       return null;
   }
