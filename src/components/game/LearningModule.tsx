@@ -600,41 +600,107 @@ function TopicContent({
         );
       }
 
-      // 9-12 (high)
-      return (
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-2">What You'll Learn</p>
-            <p>
-              Every weed has a <strong>common name</strong> (like "Waterhemp") and a <strong>scientific name</strong>{" "}
-              (like <em>Amaranthus tuberculatus</em>). Scientific names help scientists worldwide talk about the exact
-              same plant.
-            </p>
-            <p className="mt-2">
-              Each species also has an <strong>EPPO code</strong> -- a short code used internationally for pest
-              management databases.
-            </p>
-          </div>
-          {topicWeeds.map((w) => (
-            <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-              <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-              </div>
-              <div className="space-y-1">
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                <div className="text-sm text-primary italic">{w.scientificName}</div>
-                <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode}</div>
-                <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                  {w.traits.slice(0, 3).map((t, i) => (
-                    <li key={i}>- {t}</li>
-                  ))}
-                </ul>
-                <p className="text-xs text-primary">{w.memoryHook}</p>
+      // 9-12 (high) - Scientific Names / Binomial Nomenclature
+      {
+        const waterhemp = topicWeeds.find(w => w.commonName === "Waterhemp") || topicWeeds[0];
+        const foxtails = topicWeeds.filter(w => w.scientificName.startsWith("Setaria"));
+        return (
+          <div className="space-y-5">
+            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">Scientific Names</p>
+              <p>
+                Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
+                and overall farm success. According to the Weed Science Society of America, without weed control in corn,
+                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>.
+              </p>
+              <p>
+                At a national and global level, scientists need more precise terms to ensure they are discussing the same
+                plant. Scientific names are written in the form of <strong>binomial nomenclature</strong>.
+              </p>
+            </div>
+
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">What is Binomial Nomenclature?</p>
+              <p>
+                Binomial nomenclature is the formal, two-term scientific system for naming organisms, which uses terms
+                in Latin to state the <strong>genus</strong> and <strong>specific epithet</strong>. It was developed by
+                <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
+                worldwide.
+              </p>
+            </div>
+
+            {/* Waterhemp example */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
+              <div className="flex gap-4 items-start">
+                <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border-2 border-border">
+                  <WeedImage weedId={waterhemp.id} stage="whole" className="w-full h-full" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
+                  <p className="text-sm text-foreground">
+                    Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
+                    edges, known for its smooth hairless stems and distinct leaf shape.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-primary/10 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground">GENUS</p>
+                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
+                    </div>
+                    <div className="bg-accent/10 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground">SPECIES</p>
+                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      );
+
+            {/* Foxtail genus comparison */}
+            {foxtails.length >= 2 && (
+              <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">Genus Relationships: Foxtails</p>
+                <p className="text-sm text-foreground">
+                  Organisms with scientific names closer in form can be more closely related. These foxtails all share
+                  the genus <strong className="italic">Setaria</strong>, showing their common heritage and characteristics.
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {foxtails.slice(0, 3).map(w => (
+                    <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden mb-2">
+                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      </div>
+                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
+                      <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* All species with EPPO codes */}
+            <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
+            {topicWeeds.map((w) => (
+              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
+                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                </div>
+                <div className="space-y-1">
+                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
+                  <div className="text-sm text-primary italic">{w.scientificName}</div>
+                  <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode} | Family: {w.family}</div>
+                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
+                    {w.traits.slice(0, 3).map((t, i) => (
+                      <li key={i}>- {t}</li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-primary">{w.memoryHook}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      }
 
     /* ═══════════════════════════════════════════════════════════
        SEEDS
