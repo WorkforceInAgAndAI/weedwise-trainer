@@ -1842,18 +1842,27 @@ function TopicContent({
         );
       }
 
-      // 9-12
+      // 9-12 - Detailed invasive species content
       return (
-        <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">Native vs Introduced Species</p>
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Invasive Species</p>
             <p>
-              <strong>Native</strong> species have been in the Midwest for thousands of years and are part of the
-              natural ecosystem.
+              Invasive weeds are non-native plants that spread prolifically and cause significant ecological or economic
+              harm to their new environment, often by <strong>crowding out native species, altering ecosystems</strong>,
+              or damaging agricultural interests.
             </p>
             <p>
-              <strong>Introduced</strong> species were brought from other regions (often accidentally). They can become
-              invasive because they have fewer natural predators.
+              They usually arrive because of human activity, even when it's completely accidental. Weed seeds hitchhike
+              on muddy tractor tires, hide in contaminated crop seed bags, cling to animal fur, or float downstream to
+              new areas. Sometimes people intentionally bring them in for farming, landscaping, or erosion control, only
+              for these plants to escape and spread wildly.
+            </p>
+            <p>
+              Once established, invasive weeds are incredibly hard and expensive to eradicate, which is why{" "}
+              <strong>preventative efforts</strong> like cleaning equipment and inspecting seed sources is the smartest
+              defense. Some invasive weeds may adapt to better suit their new environments, making it challenging to
+              find control solutions.
             </p>
           </div>
           <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
@@ -1865,6 +1874,7 @@ function TopicContent({
                 </div>
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
+                  <div className="text-xs text-primary italic">{w.scientificName}</div>
                   <div className="text-xs text-muted-foreground">{w.habitat}</div>
                 </div>
               </div>
@@ -1879,6 +1889,7 @@ function TopicContent({
                 </div>
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
+                  <div className="text-xs text-primary italic">{w.scientificName}</div>
                   <div className="text-xs text-muted-foreground">{w.habitat}</div>
                 </div>
               </div>
