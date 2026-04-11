@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
-import type { useAuth } from '@/hooks/useAuth';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
 import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
@@ -18,7 +17,6 @@ interface Props extends GameEngine {
   onOpenPracticeHub: () => void;
   onOpenStats: () => void;
   studentSession: { nickname: string; className: string } | null;
-  auth: ReturnType<typeof useAuth>;
   grade: GradeLevel;
   onGradeChange: (g: GradeLevel) => void;
 }

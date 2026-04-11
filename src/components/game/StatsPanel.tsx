@@ -1,9 +1,8 @@
 import { BookOpen, Target, Gamepad2, TrendingUp, X, User } from 'lucide-react';
-import type { useAuth } from '@/hooks/useAuth';
+import { useStudent } from '@/contexts/StudentContext';
 
 interface Props {
  onClose: () => void;
- auth: ReturnType<typeof useAuth>;
 }
 
 const statCards = [
@@ -13,10 +12,9 @@ const statCards = [
  { label: 'Average Yield', value: '—', total: 'bu/acre', icon: TrendingUp, note: 'Your farm performance' },
 ];
 
-export default function StatsPanel({ onClose, auth }: Props) {
- const userName = auth.isAuthenticated
- ? (auth.role === 'instructor' ? auth.instructor?.display_name : auth.user?.email?.split('@')[0]) || 'Student'
- : 'Guest';
+export default function StatsPanel({ onClose }: Props) {
+ const { session } = useStudent();
+ const userName = session?.nickname ?? 'Guest';
 
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">

@@ -3,7 +3,6 @@ import { useGameEngine } from '@/hooks/useGameEngine';
 import { useStudent } from '@/contexts/StudentContext';
 import { useBadgeChecker } from '@/hooks/useBadgeChecker';
 import { useSessionPersistence } from '@/hooks/useSessionPersistence';
-import { useAuth } from '@/hooks/useAuth';
 import AppHeader from '@/components/game/AppHeader';
 import LandingPage from '@/components/game/LandingPage';
 import GameScreen from '@/components/game/GameScreen';
@@ -26,7 +25,6 @@ import { useEffect, useRef } from 'react';
 const Index = () => {
   const game = useGameEngine();
   const { session } = useStudent();
-  const auth = useAuth();
   const [showLearning, setShowLearning] = useState(false);
   const [showGlossaryDirect, setShowGlossaryDirect] = useState(false);
   const [showClassJoin, setShowClassJoin] = useState(false);
@@ -82,8 +80,7 @@ const Index = () => {
     onOpenPracticeHub: () => setShowPracticeHub(true),
     onOpenGlossary: () => setShowGlossaryDirect(true),
     onOpenReferences: () => setShowReferences(true),
-    onOpenInstructor: () => setShowClassJoin(true),
-    auth,
+    onOpenInstructor: () => setShowDashboard(true),
   };
 
   return (
@@ -105,7 +102,6 @@ const Index = () => {
           onOpenPracticeHub={() => setShowPracticeHub(true)}
           onOpenStats={() => setShowStats(true)}
           studentSession={session}
-          auth={auth}
           grade={globalGrade}
           onGradeChange={setGlobalGrade}
         />
@@ -123,7 +119,7 @@ const Index = () => {
       {showCompetition && <CompetitionMode onClose={() => setShowCompetition(false)} />}
       {showFarmMode && <FarmMode onClose={() => setShowFarmMode(false)} />}
       {showPracticeHub && <PracticeHub onClose={() => setShowPracticeHub(false)} />}
-      {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}
+      {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
       {showReferences && <ReferencesPage onClose={() => setShowReferences(false)} />}
     </div>
   );

@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface StudentSession {
  studentId: string;
@@ -105,6 +106,25 @@ export function StudentProvider({ children }: { children: ReactNode }) {
  setSession(null);
  localStorage.removeItem('weedid_student');
  }, []);
+
+ /* Poll every 20 seconds to detect if the instructor ended the session */
+ useEffect(() => {
+ if (!session) return;
+ const check = async () => {
+ const { data } = await supabase
+ .from('classes')
+ .select('id')
+ .eq('id', session.classId)
+ .maybeSingle();
+ if (!data) {
+ setSession(null);
+ localStorage.removeItem('weedid_student');
+ toast.info('Your class session has ended. Thanks for playing!', { duration: 6000 });
+ }
+ };
+ const interval = setInterval(check, 20000);
+ return () => clearInterval(interval);
+ }, [session]);
 
  return (
  <StudentContext.Provider value={{ session, joinClass, leaveClass }}>
