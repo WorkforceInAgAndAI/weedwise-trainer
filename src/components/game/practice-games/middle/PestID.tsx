@@ -30,7 +30,6 @@ function getExplanation(w: typeof weeds[0], correct: string): string {
   }
 }
 
-/* ── Word bank items for the follow-up needs question ── */
 interface NeedItem { id: string; label: string }
 
 const AQUATIC_NEEDS: NeedItem[] = [
@@ -71,35 +70,46 @@ function buildWordBank(correctItems: NeedItem[]): NeedItem[] {
   return shuffle([...correctItems, ...distractors]);
 }
 
+function getRoundsForLevel(level: number) {
+  const byCategory: Record<string, typeof weeds[0][]> = { Terrestrial: [], Aquatic: [], Parasitic: [] };
+  weeds.forEach(w => byCategory[getCategory(w)].push(w));
+
+  const offset = (level - 1) * 10;
+  const picks: { weed: typeof weeds[0]; answer: string; explanation: string }[] = [];
+
+  // Ensure mix of aquatic and terrestrial
+  for (const cat of CATEGORIES) {
+    const pool = byCategory[cat];
+    const catOffset = offset % pool.length;
+    const rotated = [...pool.slice(catOffset), ...pool.slice(0, catOffset)];
+    const shuffled = shuffle(rotated);
+    const take = cat === 'Parasitic' ? Math.min(shuffled.length, 2) : Math.min(shuffled.length, 4);
+    shuffled.slice(0, take).forEach(w => picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) }));
+  }
+
+  const usedIds = new Set(picks.map(p => p.weed.id));
+  const remaining = shuffle(weeds.filter(w => !usedIds.has(w.id)));
+  const remOffset = offset % Math.max(remaining.length, 1);
+  const remRotated = [...remaining.slice(remOffset), ...remaining.slice(0, remOffset)];
+  let ri = 0;
+  while (picks.length < 10 && ri < remRotated.length) {
+    const w = remRotated[ri++];
+    const cat = getCategory(w);
+    picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) });
+  }
+  return shuffle(picks).slice(0, 10);
+}
+
 export default function PestID({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
-  const rounds = useMemo(() => {
-    const byCategory: Record<string, typeof weeds[0][]> = { Terrestrial: [], Aquatic: [], Parasitic: [] };
-    weeds.forEach(w => byCategory[getCategory(w)].push(w));
-
-    const picks: { weed: typeof weeds[0]; answer: string; explanation: string }[] = [];
-    for (const cat of CATEGORIES) {
-      const pool = shuffle(byCategory[cat]);
-      const take = Math.min(pool.length, cat === 'Parasitic' ? 2 : 4);
-      pool.slice(0, take).forEach(w => picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) }));
-    }
-    const usedIds = new Set(picks.map(p => p.weed.id));
-    const remaining = shuffle(weeds.filter(w => !usedIds.has(w.id)));
-    while (picks.length < 10 && remaining.length) {
-      const w = remaining.shift()!;
-      const cat = getCategory(w);
-      picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) });
-    }
-    return shuffle(picks).slice(0, 10);
-  }, []);
+  const rounds = useMemo(() => getRoundsForLevel(level), [level]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState('');
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
 
-  // Follow-up needs phase
   const [phase, setPhase] = useState<'classify' | 'needs'>('classify');
   const [needsBank, setNeedsBank] = useState<NeedItem[]>([]);
   const [needsCorrectIds, setNeedsCorrectIds] = useState<Set<string>>(new Set());
@@ -178,7 +188,6 @@ export default function PestID({ onBack }: { onBack: () => void }) {
         <p className="font-bold text-foreground mb-1">{current!.weed.commonName}</p>
         <p className="text-xs text-muted-foreground mb-4 text-center max-w-sm">{current!.weed.habitat}</p>
 
-        {/* Phase 1: Classification */}
         {phase === 'classify' && (
           <>
             <div className="flex gap-3">
@@ -207,7 +216,6 @@ export default function PestID({ onBack }: { onBack: () => void }) {
           </>
         )}
 
-        {/* Phase 2: Needs word bank */}
         {phase === 'needs' && (
           <div className="mt-2 bg-card border border-border rounded-xl p-4 max-w-md w-full">
             <p className="font-bold text-foreground mb-3">{needsPrompt}</p>

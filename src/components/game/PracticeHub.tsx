@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import HomeButton from './HomeButton';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
  RefreshCw, Globe, Map, Search, Wind, AlertTriangle,
  MapPin, ShieldAlert, Wrench, Target, TrendingUp,
  Droplets, ZoomIn, GraduationCap, Scan, Moon,
- Swords, Grid3X3, ClipboardList, Footprints, Stethoscope,
- Dna, FlaskRound
+ Swords, ClipboardList, Footprints, Stethoscope,
+ FlaskRound
 } from 'lucide-react';
 
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
@@ -56,7 +57,7 @@ import FormYourFarm from './practice-games/high/FormYourFarm';
 import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
-import HerbicideResistor from './practice-games/high/HerbicideResistor';
+
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 
 interface GameDef {
@@ -72,38 +73,38 @@ interface GameDef {
 const k5Games: GameDef[] = [
  { id: 'weed-or-crop', name: 'Weed or Crop', Icon: Sprout, category: 'Identification', description: 'A plant image appears — is it a weed or a crop? Think fast!', howToPlay: 'You have 10 seconds per round to decide if the plant shown is a weed or a crop. Tap your answer before time runs out!', component: WeedOrCrop },
  { id: 'leaf-artist', name: 'Leaf Artist', Icon: Palette, category: 'Leaf Morphology', description: 'Draw leaves with the correct venation pattern.', howToPlay: 'Study the example leaf, then draw your own on the canvas. Focus on getting the venation and leaf shape correct.', component: LeafArtist },
- { id: 'taxonomy-tower', name: 'Taxonomy Tower', Icon: Layers, category: 'Taxonomy', description: 'Climb the Plant Kingdom tower using a dichotomous key.', howToPlay: 'Start at the bottom and make binary choices at each level to find the target weed at the top of the tower.', component: TaxonomyTower },
+ { id: 'taxonomy-tower', name: 'Monocot or Dicot?', Icon: Layers, category: 'Taxonomy', description: 'Look at two weeds and identify which is a monocot and which is a dicot.', howToPlay: 'Two weeds are shown side by side. Identify which is the monocot and which is the dicot, then answer a follow-up question about monocot and dicot traits.', component: TaxonomyTower },
  { id: 'look-alike', name: 'Look-Alike Challenge', Icon: Eye, category: 'Look-Alikes', description: 'Can you tell similar-looking plants apart?', howToPlay: 'Two similar weeds are shown side by side. Read the clue and pick which one matches the description.', component: K5LookAlike },
  { id: 'name-the-weed', name: 'Name the Weed', Icon: Tag, category: 'Names', description: 'Identify weeds by their image and description.', howToPlay: 'Look at the weed image and read the clue. Choose the correct common name from four options.', component: NameTheWeed },
  { id: 'life-stages', name: 'Life Stages Sequence', Icon: ArrowUpDown, category: 'Life Stages', description: 'Put weed growth stages in the right order.', howToPlay: 'Images of the same weed at different life stages are jumbled. Drag them into correct order.', component: LifeStagesSequence },
- { id: 'life-cycle-match', name: 'Life Cycle Matching', Icon: RefreshCw, category: 'Life Cycles', description: 'Flip cards to match weeds with their life cycle type.', howToPlay: 'Cards are face-down. Flip two at a time to match a weed name with its life cycle.', component: LifeCycleMatching },
- { id: 'ecology-scramble', name: 'Ecology Scramble', Icon: Globe, category: 'Ecology', description: 'Sort the survival needs for different types of plants.', howToPlay: 'Sort icons into the correct category: aquatic, terrestrial, or parasitic.', component: EcologyScramble },
- { id: 'habitat-mapping', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Place weeds in the right habitat on the map.', howToPlay: 'A map shows different areas. Drag each weed to the habitat where it grows best.', component: HabitatMapping },
- { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Search the field and count the hidden seeds.', howToPlay: 'Seeds are scattered across the field. Tap each seed to collect it before time runs out.', component: WeedSeedBanks },
- { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel from point A to point B.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle.', component: WeedTravel },
+ { id: 'life-cycle-match', name: 'Life Cycle Matching', Icon: RefreshCw, category: 'Life Cycles', description: 'Sort weeds into their correct life cycle category.', howToPlay: 'Drag each weed into the Annual, Biennial, or Perennial bin. Review any mistakes after each round.', component: LifeCycleMatching },
+ { id: 'ecology-scramble', name: 'Ecology Scramble', Icon: Globe, category: 'Ecology', description: 'Sort survival needs and quickly categorize them as aquatic, terrestrial, or parasitic.', howToPlay: 'First, sort survival needs into the correct plant type. Then, needs appear one at a time — you have 10 seconds to classify each as terrestrial, aquatic, or parasitic.', component: EcologyScramble },
+ { id: 'habitat-mapping', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Sort weeds into the correct habitat area.', howToPlay: 'Select a weed and place it into the correct habitat — cropland, roadside, wetland, or pasture. Review any mistakes after each round.', component: HabitatMapping },
+ { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Sort seeds and predict how many are hiding in the field.', howToPlay: 'Sort seed images into columns by species, then predict the count for each type. Click a seed for a hint!', component: WeedSeedBanks },
+ { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel to a new location.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle on your journey.', component: WeedTravel },
  { id: 'invasive-match', name: 'Invasive Match', Icon: AlertTriangle, category: 'Invasive Weeds', description: 'Match invasive weeds to the damage they cause.', howToPlay: 'Connect each invasive weed with the negative effect it has on the environment.', component: InvasiveMatch },
  { id: 'invasive-id', name: 'Invasive ID', Icon: MapPin, category: 'Origin', description: 'Is this plant native or invasive?', howToPlay: 'Given a weed, its origin, and where it was found, decide if it is native or invasive.', component: InvasiveID },
- { id: 'safe-vs-toxic', name: 'Safe vs. Toxic', Icon: ShieldAlert, category: 'Safety', description: 'Spot the toxic weed hiding among look-alikes.', howToPlay: 'Several similar-looking weeds are shown. Find the dangerous one and decide how to remove it.', component: SafeVsToxic },
- { id: 'weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'You are the agronomist — manage weeds before time runs out.', howToPlay: 'Weeds appear in a field. Click each, identify it, then choose the right control method.', component: WeedControl },
+ { id: 'safe-vs-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are toxic?', howToPlay: 'A group of weeds appears — identify which one is toxic, learn why it is dangerous, then decide how to safely manage it.', component: SafeVsToxic },
+ { id: 'weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'You are the agronomist — manage weeds in the field.', howToPlay: 'Weeds appear in a field. Click each, identify it, then choose the right control method.', component: WeedControl },
 ];
 
 const middleGames: GameDef[] = [
  { id: 'ms-name-weed', name: 'Name the Weed', Icon: Tag, category: 'Names', description: 'Identify weeds from images and descriptions.', howToPlay: 'Look at the weed image and read the clue. Choose the correct name.', component: MSNameTheWeed },
  { id: 'ms-taxonomy', name: 'Taxonomy Tower', Icon: Layers, category: 'Taxonomy', description: 'Climb the Plant Kingdom tower using a dichotomous key.', howToPlay: 'Navigate a dichotomous key tower to identify plant families.', component: MSTaxonomyTower },
- { id: 'field-scout', name: 'Field Scout', Icon: Footprints, category: 'Field Methods', description: 'Choose the best scouting pattern for each field.', howToPlay: 'Analyze each field and select the most efficient walking pattern.', component: FieldScout },
- { id: 'pest-id', name: 'Pest ID', Icon: Microscope, category: 'Ecology', description: 'Classify weeds as aquatic, terrestrial, or parasitic.', howToPlay: 'Look at the weed and its habitat, then classify it correctly.', component: PestID },
- { id: 'ms-habitat', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Place weeds in temperate, arid, tropical, or wetland regions.', howToPlay: 'Drag each weed to the region where it grows best.', component: MSHabitatMapping },
- { id: 'weed-origins', name: 'Weed Origins', Icon: Globe, category: 'Origin', description: 'Drag weeds to their continent of origin.', howToPlay: 'A weed appears over a world map. Click the continent where it came from.', component: WeedOrigins },
- { id: 'native-lookalike', name: 'Native vs. Introduced', Icon: Eye, category: 'Look-Alikes', description: 'Drag native and introduced look-alikes to the correct category.', howToPlay: 'Two similar plants are shown. Drag each to the Native or Introduced box.', component: NativeLookAlike },
- { id: 'weed-competitors', name: 'Weed Competitors', Icon: Swords, category: 'Competition', description: 'Compete as a weed for resources against rivals.', howToPlay: 'Make strategic decisions about leaves, roots, and reproduction to out-compete your opponent.', component: WeedCompetitors },
- { id: 'invasive-quiz', name: 'Invasive Travelers', Icon: ClipboardList, category: 'Invasive Weeds', description: 'Discover how invasive weeds traveled to the Midwest.', howToPlay: 'An invasive weed is shown. Decide if it arrived by accident, on purpose, or through other species.', component: InvasiveQuiz },
- { id: 'ms-safe-toxic', name: 'Safe vs. Toxic', Icon: ShieldAlert, category: 'Safety', description: 'Spot the toxic weed hiding among look-alikes.', howToPlay: 'Find the dangerous weed among similar-looking plants.', component: MSSafeVsToxic },
- { id: 'life-stage-control', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Choose the best management for each growth stage.', howToPlay: 'A weed appears at a specific life stage. Pick the best control method.', component: LifeStageControl },
- { id: 'ms-lifecycle', name: 'Life Cycle Sort', Icon: RefreshCw, category: 'Life Cycles', description: 'Sort weeds into Annual, Biennial, or Perennial categories.', howToPlay: 'Drag each weed image into the correct life cycle column.', component: MSLifeCycleMatching },
- { id: 'economic-threshold', name: 'Economic Threshold', Icon: TrendingUp, category: 'Thresholds', description: 'Scout a field, count weeds, and decide if the population exceeds the economic threshold.', howToPlay: 'Tap weeds in the field to count them, view a graph, then decide if action is needed.', component: EconomicThreshold },
- { id: 'ms-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field using equipment and techniques.', howToPlay: 'Click weeds in the field, identify them, then choose the right control method.', component: MSWeedControl },
+ { id: 'field-scout', name: 'Field Scout', Icon: Footprints, category: 'Field Methods', description: 'You are a hired scout — find and count weeds for pay.', howToPlay: 'Walk through fields, identify weeds, and earn money. Correct IDs earn $50, wrong ones earn $10. Complete 10 rounds!', component: FieldScout },
+ { id: 'pest-id', name: 'Pest ID', Icon: Microscope, category: 'Ecology', description: 'Classify weeds as aquatic, terrestrial, or parasitic.', howToPlay: 'Look at the weed and its habitat, classify it, then select its survival needs from a word bank.', component: PestID },
+ { id: 'ms-habitat', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Place weeds in temperate, arid, tropical, or wetland regions.', howToPlay: 'Sort weeds into the correct habitat region. Review any incorrect placements after each round.', component: MSHabitatMapping },
+ { id: 'weed-origins', name: 'Weed Origins', Icon: Globe, category: 'Origin', description: 'Identify weed continent of origin.', howToPlay: 'A weed appears over a world map. Click the continent where it came from.', component: WeedOrigins },
+ { id: 'native-lookalike', name: 'Native or Introduced?', Icon: Eye, category: 'Look-Alikes', description: 'Sort look-alike pairs into Native or Introduced.', howToPlay: 'Two similar plants are shown. Drag each to the Native or Introduced box.', component: NativeLookAlike },
+ { id: 'weed-competitors', name: 'Weed Competitors', Icon: Swords, category: 'Competition', description: 'Compete as a weed for resources against rivals.', howToPlay: 'Read the competitor intel, then make strategic decisions about leaves, roots, and reproduction to out-compete your opponent.', component: WeedCompetitors },
+ { id: 'invasive-quiz', name: 'Invasive Travelers', Icon: ClipboardList, category: 'Invasive Weeds', description: 'Discover how invasive weeds traveled to North America.', howToPlay: 'An invasive weed is shown. Learn its arrival story and identify how it was introduced.', component: InvasiveQuiz },
+ { id: 'ms-safe-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are toxic?', howToPlay: 'A group of weeds appears — identify which one is toxic, learn why it is dangerous, then decide how to safely manage it.', component: MSSafeVsToxic },
+ { id: 'life-stage-control', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify the growth stage, the weed, and choose the best management.', howToPlay: 'A weed appears at a specific life stage. First identify the stage, then the weed, then pick the best control method.', component: LifeStageControl },
+ { id: 'ms-lifecycle', name: 'Life Cycle Sort', Icon: RefreshCw, category: 'Life Cycles', description: 'Sort weeds into Annual, Biennial, or Perennial categories.', howToPlay: 'Sort weed images into the correct life cycle column. Review any mistakes after each round.', component: MSLifeCycleMatching },
+ { id: 'economic-threshold', name: 'Economic Threshold', Icon: TrendingUp, category: 'Thresholds', description: 'Scout fields, identify weeds, and decide if they exceed the economic threshold.', howToPlay: 'Count weeds in the field, identify them by name, check if the count exceeds the threshold, and choose management if needed. Complete 3 fields per level.', component: EconomicThreshold },
+ { id: 'ms-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field using the right techniques.', howToPlay: 'Click weeds in the field, identify them, then choose the right control method. Review your answers after each round.', component: MSWeedControl },
  { id: 'control-matching', name: 'Control Method Matching', Icon: FlaskConical, category: 'Chemical Control', description: 'Match herbicide groups to the weeds they target.', howToPlay: 'Identify grass vs broadleaf, then pick the correct herbicide group.', component: ControlMethodMatching },
- { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide type for each weed.', howToPlay: 'Click weeds in a field and select the appropriate herbicide type.', component: HerbicideApplicator },
+ { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
 ];
 
@@ -111,18 +112,18 @@ const highGames: GameDef[] = [
  { id: 'hs-name-weed', name: 'Name the Weed', Icon: GraduationCap, category: 'Scientific Names', description: 'Identify weeds by their scientific name.', howToPlay: 'Look at the image and traits, then choose the correct scientific name.', component: HSNameTheWeed },
  { id: 'hs-taxonomy', name: 'Taxonomy Tower', Icon: Layers, category: 'Taxonomy', description: 'Navigate genus and species using a dichotomous key.', howToPlay: 'Climb the tower from Kingdom to Species.', component: HSTaxonomyTower },
  { id: 'spot-differences', name: 'Spot the Differences', Icon: Search, category: 'Intra-species', description: 'Find differences between male and female plants.', howToPlay: 'Compare male and female plants and tap each difference.', component: SpotTheDifferences },
- { id: 'hs-habitat', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Map weeds to habitat regions with country-level detail.', howToPlay: 'Place weeds into the correct habitat zones.', component: HSHabitatMapping },
- { id: 'invasive-habitat', name: 'Invasive Habitat Map', Icon: AlertTriangle, category: 'Invasive Habitats', description: 'Map invasive species to the habitats they have invaded.', howToPlay: 'Place each invasive weed into its colonized habitat zone.', component: InvasiveHabitatMapping },
+ { id: 'hs-habitat', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Sort weeds into the correct habitat region.', howToPlay: 'Select a weed and place it into the correct habitat zone — temperate, arid, tropical, or wetland. Review any mistakes after each round.', component: HSHabitatMapping },
+ { id: 'invasive-habitat', name: 'Invasive ID', Icon: AlertTriangle, category: 'Invasive Species', description: 'Identify invasive weeds, their origin, and how they arrived.', howToPlay: 'First identify the weed, then select its continent of origin on the world map, then choose how it was introduced.', component: InvasiveHabitatMapping },
  { id: 'hs-field-scout', name: 'Field Scout Tools', Icon: Scan, category: 'Scouting Tools', description: 'Choose the right scouting tool for each field.', howToPlay: 'Evaluate field conditions and select from drones, rovers, manual scouting, or satellite imagery.', component: FieldScoutTools },
- { id: 'hs-lifecycle', name: 'Life Cycle Sort', Icon: ArrowUpDown, category: 'Life Cycles', description: 'Sort winter annuals, summer annuals, and more.', howToPlay: 'Classify weeds into winter annual, summer annual, perennial, or biennial.', component: LifeCycleSort },
- { id: 'sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Choose the right dormancy mechanism to survive.', howToPlay: 'You are a seed facing environmental challenges. Pick the best dormancy strategy.', component: SleepySeeds },
- { id: 'allelopathy', name: 'Allelopathy Attack', Icon: Swords, category: 'Allelopathy', description: 'Use chemical warfare to suppress competing weeds.', howToPlay: 'Choose an allelopathy strategy to outcompete an enemy weed.', component: AllelopathyAttack },
- { id: 'form-farm', name: 'Form Your Farm', Icon: Leaf, category: 'Economic Thresholds', description: 'Design a farm and defend it against weeds.', howToPlay: 'Choose your crop, season, and threshold, then decide which weeds to treat or wait on.', component: FormYourFarm },
- { id: 'hs-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field as an agronomist.', howToPlay: 'Click weeds in the field, identify them, choose the right control method.', component: HSWeedControl },
- { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action.', component: HSControlMethodMatching },
- { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it.', component: CropDoctor },
- { id: 'herbicide-resistor', name: 'Herbicide Resistor', Icon: Dna, category: 'Resistance', description: 'Build a 3-year plan to prevent herbicide resistance.', howToPlay: 'Choose crop-herbicide combos across 3 years to maximize diversity.', component: HerbicideResistor },
- { id: 'life-stage-maze', name: 'Life Stage Maze', Icon: Grid3X3, category: 'Life Stages', description: 'Connect life stages to the best control methods.', howToPlay: 'Match each weed life stage to the best control method on a grid.', component: LifeStageMaze },
+ { id: 'hs-lifecycle', name: 'Life Cycle Sort', Icon: ArrowUpDown, category: 'Life Cycles', description: 'Sort winter annuals, summer annuals, and more.', howToPlay: 'Classify weeds into winter annual, summer annual, perennial, or biennial. Review any mistakes after each round.', component: LifeCycleSort },
+ { id: 'sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
+ { id: 'allelopathy', name: 'Allelopathy Attack', Icon: Swords, category: 'Allelopathy', description: 'Pick your weed and use chemical warfare to suppress competitors.', howToPlay: 'Choose a weed to play as, learn its characteristics, then select the best allelopathy strategy for each enemy encounter.', component: AllelopathyAttack },
+ { id: 'form-farm', name: 'Form Your Farm', Icon: Leaf, category: 'Economic Thresholds', description: 'Design a farm and defend it against weeds.', howToPlay: 'Choose your crop, season, and threshold. Decide which weeds to treat, select management methods for each, then review your season results.', component: FormYourFarm },
+ { id: 'hs-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field as an agronomist.', howToPlay: 'Click weeds in the field, identify them, choose the right control method. Review your answers after each round.', component: HSWeedControl },
+ { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action. Review your answers at the end of each round.', component: HSControlMethodMatching },
+ { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Review your diagnoses at the end.', component: CropDoctor },
+ 
+ { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
 ];
 
 type Screen = 'grades' | 'games' | 'info' | 'playing';
@@ -147,15 +148,17 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
- {/* Header */}
- <div className="flex items-center gap-3 mb-8">
- <button
- onClick={screen === 'grades' ? onClose : screen === 'games' ? backToGrades : backToGames}
- className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
- >
- <ArrowLeft className="w-4 h-4" />
- </button>
- <div>
+  {/* Header */}
+  <div className="flex items-center gap-3 mb-8">
+  <HomeButton onClose={onClose} />
+  <span className="text-border mx-1">|</span>
+  <button
+  onClick={screen === 'grades' ? onClose : screen === 'games' ? backToGrades : backToGames}
+  className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+  >
+  <ArrowLeft className="w-4 h-4" />
+  </button>
+  <div>
  <h1 className="font-display font-bold text-xl text-foreground">Practice Games</h1>
  {screen !== 'grades' && (
  <p className="text-sm text-muted-foreground">

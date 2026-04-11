@@ -14,12 +14,16 @@ function getCycleType(w: typeof weeds[0]): string {
   return 'Annual';
 }
 
-function pickRoundWeeds(): { weed: typeof weeds[0]; correct: string }[] {
+function pickRoundWeeds(level: number, roundNum: number): { weed: typeof weeds[0]; correct: string }[] {
   const byType: Record<string, typeof weeds[0][]> = { Annual: [], Biennial: [], Perennial: [] };
   weeds.forEach(w => byType[getCycleType(w)].push(w));
+  const offset = ((level - 1) * 24 + roundNum * 6);
   const picks: { weed: typeof weeds[0]; correct: string }[] = [];
   for (const type of CYCLES) {
-    shuffle(byType[type]).slice(0, 2).forEach(w => picks.push({ weed: w, correct: type }));
+    const pool = byType[type];
+    const start = offset % Math.max(pool.length, 1);
+    const rotated = [...pool.slice(start), ...pool.slice(0, start)];
+    shuffle(rotated).slice(0, 2).forEach(w => picks.push({ weed: w, correct: type }));
   }
   return shuffle(picks).slice(0, 6);
 }
@@ -32,10 +36,11 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
 
-  const items = useMemo(() => pickRoundWeeds(), [round]);
+  const items = useMemo(() => pickRoundWeeds(level, round), [level, round]);
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
   const unplaced = items.filter(i => !placements[i.weed.id]);
@@ -62,16 +67,12 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
     setPlacements({});
     setSelected(null);
     setChecked(false);
+    setShowAnswers(false);
     setDraggedId(null);
   };
 
   const restart = () => {
-    setRound(0);
-    setTotalScore(0);
-    setPlacements({});
-    setSelected(null);
-    setChecked(false);
-    setDraggedId(null);
+    setRound(0); setTotalScore(0); setPlacements({}); setSelected(null); setChecked(false); setShowAnswers(false); setDraggedId(null);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
@@ -90,14 +91,56 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Round complete screen
+  // Answer response screen
+  if (showAnswers) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-bold text-foreground text-lg flex-1">Life Cycle Matching</h1>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
+          <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <p className={`text-center text-lg font-bold mb-4 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>
+            {correctCount}/{items.length} correct!
+          </p>
+          <div className="space-y-3 max-w-md mx-auto mb-4">
+            {items.map(i => {
+              const userAnswer = placements[i.weed.id];
+              const isCorrect = userAnswer === i.correct;
+              return (
+                <div key={i.weed.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 ${isCorrect ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary flex-shrink-0">
+                    <WeedImage weedId={i.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-foreground">{i.weed.commonName}</p>
+                    {!isCorrect && <p className="text-xs text-destructive">Your answer: {userAnswer}</p>}
+                    <p className="text-xs text-green-600">Correct: {i.correct} ({i.weed.lifeCycle})</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-center">
+            <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+              {round + 1 < TOTAL_ROUNDS ? `Round ${round + 2} →` : 'See Results'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Checked → show button to see answers
   if (checked) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-bold text-foreground text-lg flex-1">Life Cycle Matching</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
@@ -127,8 +170,8 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
             <p className={`text-lg font-bold mb-3 ${correctCount === items.length ? 'text-green-500' : 'text-foreground'}`}>
               {correctCount}/{items.length} correct!
             </p>
-            <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-              {round + 1 < TOTAL_ROUNDS ? `Round ${round + 2} →` : 'See Results'}
+            <button onClick={() => setShowAnswers(true)} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+              Review Answers →
             </button>
           </div>
         </div>
@@ -145,8 +188,6 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-3 text-center">Drag each weed into its life cycle category</p>
-
-        {/* Drop zones */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {CYCLES.map(cycle => {
             const placed = items.filter(i => placements[i.weed.id] === cycle);
@@ -174,8 +215,6 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
             );
           })}
         </div>
-
-        {/* Draggable weed cards */}
         {unplaced.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center mb-4">
             {unplaced.map(i => (
@@ -195,7 +234,6 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         )}
-
         {allPlaced && (
           <button onClick={() => setChecked(true)} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
         )}

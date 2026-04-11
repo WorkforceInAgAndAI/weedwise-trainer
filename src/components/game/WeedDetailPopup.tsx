@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { X } from 'lucide-react';
+import { getSessionCitations } from '@/data/imageReferences';
 
 interface Props {
  weed: Weed;
@@ -25,28 +27,35 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  </div>
 
  {/* Image gallery */}
- <div className={`grid ${isGrass ? 'grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'} gap-2`}>
- {(['whole', 'seedling', 'vegetative', 'flower'] as const).map(stage => (
- <div key={stage} className="space-y-1">
- <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
- {stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
- </div>
- <div className="aspect-square rounded-md overflow-hidden bg-muted">
- <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
- </div>
- </div>
- ))}
- {isGrass && (
- <div className="space-y-1">
- <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">Ligule</div>
- <div className="aspect-square rounded-md overflow-hidden bg-muted">
- <WeedImage weedId={weed.id} stage="ligule" className="w-full h-full" />
- </div>
- </div>
- )}
- </div>
+  {(() => {
+    const hasSeeds = weed.id !== 'Field_Horsetail';
+    const stages = hasSeeds ? ['seed', 'seedling', 'vegetative', 'flower', 'whole'] as const : ['seedling', 'vegetative', 'flower', 'whole'] as const;
+    const colCount = stages.length + (isGrass ? 1 : 0);
+    return (
+      <div className={`grid grid-cols-3 sm:grid-cols-${colCount} gap-2`}>
+        {stages.map(stage => (
+          <div key={stage} className="space-y-1">
+            <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
+              {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+            </div>
+            <div className="aspect-square rounded-md overflow-hidden bg-muted">
+              <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
+            </div>
+          </div>
+        ))}
+        {isGrass && (
+          <div className="space-y-1">
+            <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">Ligule</div>
+            <div className="aspect-square rounded-md overflow-hidden bg-muted">
+              <WeedImage weedId={weed.id} stage="ligule" className="w-full h-full" />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  })()}
 
- {/* Tags */}
+  {/* Tags */}
  <div className="flex flex-wrap gap-1.5">
  <span className="text-xs px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">{weed.plantType}</span>
  <span className="text-xs px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">{weed.lifeCycle}</span>
@@ -90,11 +99,36 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  <p className="text-sm text-muted-foreground">{weed.lookAlike.difference}</p>
  </div>
 
- <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
- <h3 className="text-sm font-semibold text-primary mb-1">Memory Hook</h3>
- <p className="text-sm text-foreground">{weed.memoryHook}</p>
- </div>
- </div>
- </div>
- );
+  <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+  <h3 className="text-sm font-semibold text-primary mb-1">Memory Hook</h3>
+  <p className="text-sm text-foreground">{weed.memoryHook}</p>
+  </div>
+
+  {/* Image References for this species */}
+  <WeedCitations weedId={weed.id} />
+  </div>
+  </div>
+  );
+}
+
+function WeedCitations({ weedId }: { weedId: string }) {
+  const citations = useMemo(() => {
+    const stages = weedId === 'Field_Horsetail'
+      ? ['whole', 'seedling', 'vegetative', 'flower', 'ligule']
+      : ['seed', 'whole', 'seedling', 'vegetative', 'flower', 'ligule'];
+    return getSessionCitations([weedId], stages);
+  }, [weedId]);
+
+  if (citations.length === 0) return null;
+
+  return (
+    <div className="border-t border-border pt-3">
+      <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Image References</h3>
+      <ol className="list-decimal list-inside space-y-0.5">
+        {citations.map((c, i) => (
+          <li key={i} className="text-[10px] leading-relaxed text-muted-foreground break-words">{c}</li>
+        ))}
+      </ol>
+    </div>
+  );
 }

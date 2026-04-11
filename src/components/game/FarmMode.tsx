@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import type { GradeLevel, Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler } from 'lucide-react';
+import HomeButton from './HomeButton';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 
 // Types 
@@ -464,11 +465,12 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  // Setup Screen 
  if (phase === 'setup') {
  return (
- <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
- <div className="max-w-lg mx-auto px-5 py-12 text-center">
- <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
- <X className="w-4 h-4" />
- </button>
+ <div className="fixed inset-0 bg-background z-[60] overflow-y-auto">
+  <div className="max-w-lg mx-auto px-5 py-12 text-center">
+  <div className="absolute top-4 left-4"><HomeButton onClose={onClose} /></div>
+  <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+  <X className="w-4 h-4" />
+  </button>
  <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
  <Wheat className="w-8 h-8 text-primary" />
  </div>
@@ -498,7 +500,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  const matureWeeds = fieldWeeds.filter(w => w.alive && w.stage === 'mature');
  const seedsProduced = matureWeeds.length * 5000;
  return (
- <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
+ <div className="fixed inset-0 bg-background z-[60] overflow-y-auto">
  <div className="max-w-2xl mx-auto px-5 py-8">
  <h1 className="font-display font-bold text-2xl text-foreground mb-6">Season Summary</h1>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
@@ -1115,110 +1117,145 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  );
  };
 
- // Main Layout: Field always visible + side panel 
- return (
- <div className="fixed inset-0 bg-background z-40 overflow-hidden flex flex-col">
- {/* Top bar */}
- <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0">
- <div className="flex items-center gap-3">
- <button onClick={onClose} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
- <ArrowLeft className="w-4 h-4" />
- </button>
- <div>
- <p className="font-display font-bold text-foreground">{seasonInfo.label}</p>
- <p className="text-xs text-muted-foreground">{seasonInfo.cropStage}</p>
- </div>
- </div>
- <div className="flex items-center gap-1">
- {SEASON_ORDER.map((s, i) => (
- <div key={s} className={`w-8 h-1.5 rounded-full transition-colors ${
- i < seasonIdx ? 'bg-success' : i === seasonIdx ? 'bg-primary' : 'bg-border'
- }`} title={SEASONS[s].label} />
- ))}
- </div>
- <div className="text-right text-xs text-muted-foreground">
- <div>Cost: ${totalCost}/acre</div>
- <div>Hours: {totalHours.toFixed(1)}</div>
- </div>
- </div>
+  // Derived data for status panel
+  const unscoutedCount = fieldWeeds.filter(w => w.alive && !w.scouted).length;
+  const scoutedOnlyCount = scoutedCount - identifiedCount;
+  const techniquesUsed = [...new Set(actionLog.map(a => a.action))];
 
- {/* Main content: Field + side panel */}
- <div className="flex-1 flex overflow-hidden">
- {/* Left: Field — ALWAYS VISIBLE */}
- <div className="flex-[7] flex flex-col overflow-hidden">
- <div className="flex-1 relative">
- <img src={fieldBgImage} alt="Soybean field" className="absolute inset-0 w-full h-full object-cover" />
- <div className="absolute inset-0 bg-foreground/10" />
+  // Main Layout: Field always visible + side panel 
+  return (
+   <div className="fixed inset-0 bg-background z-[60] flex flex-col" style={{ overflow: 'hidden' }}>
+   {/* Top bar — always visible */}
+   <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0 z-10">
+   <div className="flex items-center gap-3">
+   <HomeButton onClose={onClose} />
+   <button onClick={onClose} className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground text-sm font-bold flex items-center gap-2 hover:bg-destructive/90 transition-colors shadow-md">
+   <X className="w-4 h-4" /> Exit
+   </button>
+   <div>
+   <p className="font-display font-bold text-foreground">{seasonInfo.label}</p>
+   <p className="text-xs text-muted-foreground">{seasonInfo.cropStage}</p>
+   </div>
+   </div>
+   <div className="flex items-center gap-1">
+   {SEASON_ORDER.map((s, i) => (
+   <div key={s} className={`w-8 h-1.5 rounded-full transition-colors ${
+   i < seasonIdx ? 'bg-success' : i === seasonIdx ? 'bg-primary' : 'bg-border'
+   }`} title={SEASONS[s].label} />
+   ))}
+   </div>
+   </div>
 
- {/* Weed indicators — circular photos like K-5 WeedControl */}
- {fieldWeeds.map(fw => (
- <button
- key={fw.id}
- onClick={() => { if (fw.alive && fw.identified) setSelectedWeed(fw); }}
- className={`absolute transition-all duration-500 ${
- !fw.alive ? 'opacity-0 pointer-events-none scale-50' :
- fw.identified ? 'hover:scale-125 cursor-pointer' :
- fw.scouted ? 'animate-pulse' : 'animate-pulse'
- }`}
- style={{ left: `${fw.x}%`, top: `${fw.y}%`, transform: 'translate(-50%,-50%)' }}
- title={fw.identified ? fw.weed.commonName : fw.scouted ? 'Scouted — needs ID' : 'Unscouted'}
- >
- <div className={`w-12 h-12 rounded-full overflow-hidden border-[3px] shadow-lg ${
- fw.identified
- ? 'border-weed-identified shadow-weed-identified/30'
- : fw.scouted
- ? 'border-weed-scouted shadow-weed-scouted/30'
- : 'border-weed-unscouted shadow-weed-unscouted/30'
- }`}>
- {fw.scouted || fw.identified ? (
- <WeedImage weedId={fw.weed.id} stage={fw.stage} className="w-full h-full object-cover" />
- ) : (
- <div className="w-full h-full bg-weed-unscouted/50 flex items-center justify-center">
- <span className="text-white text-xs font-bold">?</span>
- </div>
- )}
- </div>
- </button>
- ))}
+  {/* Main content: Left Status + Field + Right Action Panel */}
+  <div className="flex-1 flex overflow-hidden">
+  {/* Left: Status Panel */}
+  <div className="flex-[2] border-r border-border bg-card overflow-y-auto hidden sm:flex flex-col p-3 space-y-3">
+  <div>
+  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Budget</p>
+  <div className="space-y-1 text-xs">
+  <div className="flex justify-between"><span className="text-muted-foreground">Money Spent:</span><span className="font-bold text-foreground">${totalCost}/acre</span></div>
+  <div className="flex justify-between"><span className="text-muted-foreground">Time Spent:</span><span className="font-bold text-foreground">{totalHours.toFixed(1)}h</span></div>
+  </div>
+  </div>
+  <div className="border-t border-border pt-3">
+  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Weed Status</p>
+  <div className="space-y-1.5 text-xs">
+  <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-weed-unscouted shrink-0" /><span className="text-muted-foreground">Unscouted:</span><span className="font-bold text-foreground ml-auto">{unscoutedCount}</span></div>
+  <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-weed-scouted shrink-0" /><span className="text-muted-foreground">Scouted:</span><span className="font-bold text-foreground ml-auto">{scoutedOnlyCount}</span></div>
+  <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-weed-identified shrink-0" /><span className="text-muted-foreground">Identified:</span><span className="font-bold text-foreground ml-auto">{identifiedCount}</span></div>
+  <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-success shrink-0" /><span className="text-muted-foreground">Controlled:</span><span className="font-bold text-foreground ml-auto">{weedsKilled}</span></div>
+  </div>
+  </div>
+  {identifiedCount > 0 && (
+  <div className="border-t border-border pt-3">
+  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Weeds Found</p>
+  <div className="flex flex-wrap gap-1">
+  {fieldWeeds.filter(w => w.identified && w.alive).map(fw => (
+  <span key={fw.id} className="px-1.5 py-0.5 rounded bg-primary/10 text-[10px] text-foreground">{fw.weed.commonName}</span>
+  ))}
+  </div>
+  </div>
+  )}
+  {techniquesUsed.length > 0 && (
+  <div className="border-t border-border pt-3">
+  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Techniques Used</p>
+  <div className="space-y-1">
+  {techniquesUsed.map(t => (
+  <p key={t} className="text-[11px] text-foreground">• {t}</p>
+  ))}
+  </div>
+  </div>
+  )}
+  <div className="border-t border-border pt-3">
+  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Season</p>
+  <p className="text-xs text-foreground">{seasonInfo.description}</p>
+  </div>
+  </div>
 
- {/* Selected weed popup */}
- {selectedWeed && selectedWeed.alive && (
- <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-card border border-border rounded-lg p-4 shadow-card-hover animate-fade-in z-10">
- <div className="flex items-start gap-3">
- <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-muted">
- <WeedImage weedId={selectedWeed.weed.id} stage={selectedWeed.stage} className="w-full h-full object-cover" />
- </div>
- <div className="flex-1 min-w-0">
- <p className="font-semibold text-foreground">{selectedWeed.weed.commonName}</p>
- {grade !== 'elementary' && <p className="text-xs italic text-muted-foreground">{selectedWeed.weed.scientificName}</p>}
- <p className="text-xs text-muted-foreground mt-1">{selectedWeed.weed.plantType} · {selectedWeed.weed.lifeCycle}</p>
- <p className="text-xs text-muted-foreground">Density: {selectedWeed.density}/sq ft · Stage: {selectedWeed.stage}</p>
- </div>
- <button onClick={() => setSelectedWeed(null)} className="text-muted-foreground hover:text-foreground">
- <X className="w-4 h-4" />
- </button>
- </div>
- </div>
- )}
- </div>
+  {/* Center: Field — ALWAYS VISIBLE */}
+  <div className="flex-[5] flex flex-col overflow-hidden">
+  <div className="flex-1 relative">
+  <img src={fieldBgImage} alt="Soybean field" className="absolute inset-0 w-full h-full object-cover" />
+  <div className="absolute inset-0 bg-foreground/10" />
 
- {/* Status bar */}
- <div className="border-t border-border bg-card px-4 py-3">
- <p className="text-sm text-foreground">{seasonInfo.description}</p>
- <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
- <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-weed-unscouted inline-block" /> Unscouted: {fieldWeeds.filter(w => w.alive && !w.scouted).length}</span>
- <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-weed-scouted inline-block" /> Scouted: {scoutedCount - identifiedCount}</span>
- <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-weed-identified inline-block" /> Identified: {identifiedCount}</span>
- <span>Controlled: {weedsKilled}</span>
- </div>
- </div>
- </div>
+  {/* Weed indicators */}
+  {fieldWeeds.map(fw => (
+  <button
+  key={fw.id}
+  onClick={() => { if (fw.alive && fw.identified) setSelectedWeed(fw); }}
+  className={`absolute transition-all duration-500 ${
+  !fw.alive ? 'opacity-0 pointer-events-none scale-50' :
+  fw.identified ? 'hover:scale-125 cursor-pointer' :
+  fw.scouted ? 'animate-pulse' : 'animate-pulse'
+  }`}
+  style={{ left: `${fw.x}%`, top: `${fw.y}%`, transform: 'translate(-50%,-50%)' }}
+  title={fw.identified ? fw.weed.commonName : fw.scouted ? 'Scouted — needs ID' : 'Unscouted'}
+  >
+  <div className={`w-12 h-12 rounded-full overflow-hidden border-[3px] shadow-lg ${
+  fw.identified
+  ? 'border-weed-identified shadow-weed-identified/30'
+  : fw.scouted
+  ? 'border-weed-scouted shadow-weed-scouted/30'
+  : 'border-weed-unscouted shadow-weed-unscouted/30'
+  }`}>
+  {fw.scouted || fw.identified ? (
+  <WeedImage weedId={fw.weed.id} stage={fw.stage} className="w-full h-full object-cover" />
+  ) : (
+  <div className="w-full h-full bg-weed-unscouted/50 flex items-center justify-center">
+  <span className="text-white text-xs font-bold">?</span>
+  </div>
+  )}
+  </div>
+  </button>
+  ))}
 
- {/* Right: Side Panel — content changes by phase */}
- <div className="flex-[3] border-l border-border bg-card overflow-y-auto hidden sm:flex flex-col">
- {renderSidePanel()}
- </div>
- </div>
+  {/* Selected weed popup */}
+  {selectedWeed && selectedWeed.alive && (
+  <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-card border border-border rounded-lg p-4 shadow-card-hover animate-fade-in z-10">
+  <div className="flex items-start gap-3">
+  <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-muted">
+  <WeedImage weedId={selectedWeed.weed.id} stage={selectedWeed.stage} className="w-full h-full object-cover" />
+  </div>
+  <div className="flex-1 min-w-0">
+  <p className="font-semibold text-foreground">{selectedWeed.weed.commonName}</p>
+  {grade !== 'elementary' && <p className="text-xs italic text-muted-foreground">{selectedWeed.weed.scientificName}</p>}
+  <p className="text-xs text-muted-foreground mt-1">{selectedWeed.weed.plantType} · {selectedWeed.weed.lifeCycle}</p>
+  <p className="text-xs text-muted-foreground">Density: {selectedWeed.density}/sq ft · Stage: {selectedWeed.stage}</p>
+  </div>
+  <button onClick={() => setSelectedWeed(null)} className="text-muted-foreground hover:text-foreground">
+  <X className="w-4 h-4" />
+  </button>
+  </div>
+  </div>
+  )}
+  </div>
+  </div>
+
+  {/* Right: Side Panel — content changes by phase */}
+  <div className="flex-[3] border-l border-border bg-card overflow-y-auto hidden sm:flex flex-col">
+  {renderSidePanel()}
+  </div>
+  </div>
 
  {/* Mobile bottom bar */}
   <div className="sm:hidden border-t border-border bg-card p-3">

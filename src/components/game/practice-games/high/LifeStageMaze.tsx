@@ -1,390 +1,230 @@
-import { useState, useMemo, useCallback } from 'react';
-import { Sprout, Leaf, Flower2, TreeDeciduous, Shovel, SprayCan, Scissors, Hand, Warehouse, RotateCcw, ChevronLeft, ChevronRight, Check, X, AlertTriangle, Info } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { weeds } from '@/data/weeds';
+import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 
-const STAGES = [
-  { id: 'seedling', label: 'Seedling', Icon: Sprout },
-  { id: 'vegetative', label: 'Vegetative', Icon: Leaf },
-  { id: 'reproductive', label: 'Reproductive', Icon: Flower2 },
-  { id: 'mature', label: 'Mature', Icon: TreeDeciduous },
-];
+const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
+
+const STAGES = ['seed', 'seedling', 'vegetative', 'reproductive'] as const;
+type Stage = typeof STAGES[number];
+const STAGE_LABELS: Record<Stage, string> = { seed: 'Seed', seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive' };
+const STAGE_IMAGE_MAP: Record<Stage, string> = { seed: 'seed', seedling: 'seedling', vegetative: 'vegetative', reproductive: 'flower' };
 
 const CONTROLS = [
-  { id: 'pre-herb', label: 'Pre-emergent Herbicide', Icon: SprayCan, bestStage: 'seedling' },
-  { id: 'cultivation', label: 'Cultivation', Icon: Shovel, bestStage: 'seedling' },
-  { id: 'post-herb', label: 'Post-emergent Herbicide', Icon: SprayCan, bestStage: 'vegetative' },
-  { id: 'hand-pull', label: 'Hand Removal', Icon: Hand, bestStage: 'vegetative' },
-  { id: 'mowing', label: 'Mowing', Icon: Scissors, bestStage: 'reproductive' },
-  { id: 'harvest-mgmt', label: 'Harvest Management', Icon: Warehouse, bestStage: 'mature' },
+  { id: 'pre-herb', label: 'Pre-emergence Herbicide', stages: ['seed', 'seedling'] },
+  { id: 'post-herb', label: 'Post-emergence Herbicide', stages: ['seedling', 'vegetative'] },
+  { id: 'mow', label: 'Mow / Cut', stages: ['vegetative', 'reproductive'] },
+  { id: 'hand-pull', label: 'Hand Pull', stages: ['seedling', 'vegetative'] },
+  { id: 'cultivate', label: 'Cultivation / Tillage', stages: ['seed', 'seedling'] },
+  { id: 'cover-crop', label: 'Cover Crops / Competition', stages: ['seed', 'seedling'] },
+  { id: 'spot-spray', label: 'Spot Spray Treatment', stages: ['vegetative', 'reproductive'] },
+  { id: 'biocontrol', label: 'Biological Control', stages: ['vegetative', 'reproductive'] },
+  { id: 'seed-bank-mgmt', label: 'Seed Bank Management', stages: ['seed'] },
+  { id: 'harvest-weed-seed', label: 'Harvest Weed Seed Control', stages: ['reproductive'] },
 ];
 
-const ROWS = 10;
-const COLS = 10;
+const QUESTIONS_PER_ROUND = 10;
 
-interface GridCell { row: number; col: number; }
-interface Connection { stageId: string; controlId: string; path: GridCell[]; }
+function buildRounds(level: number) {
+  const offset = ((level - 1) * QUESTIONS_PER_ROUND) % weeds.length;
+  const rotated = [...weeds.slice(offset), ...weeds.slice(0, offset)];
+  const pool = shuffle(rotated.filter(w => w.id !== 'Field_Horsetail')).slice(0, QUESTIONS_PER_ROUND * 2);
 
-function getStageExplanation(stageId: string, controlId: string): string {
-  const ctrl = CONTROLS.find(c => c.id === controlId);
-  const stage = STAGES.find(s => s.id === stageId);
-  if (!ctrl || !stage) return '';
-  if (ctrl.bestStage === stageId) {
-    return `${ctrl.label} is most effective at the ${stage.label} stage.`;
+  const items: { weed: typeof weeds[0]; stage: Stage }[] = [];
+  let lastStage: Stage | null = null;
+
+  for (let i = 0; i < QUESTIONS_PER_ROUND && pool.length > 0; i++) {
+    const availableStages = STAGES.filter(s => s !== lastStage);
+    const stage = shuffle([...availableStages])[0];
+    lastStage = stage;
+    items.push({ weed: pool.shift()!, stage });
   }
-  return `${ctrl.label} works best at the ${STAGES.find(s => s.id === ctrl.bestStage)?.label} stage, not ${stage.label}.`;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function generateLayout() {
-  // 4 stages on left — shuffled rows so they aren't lined up with controls
-  const stageRows = shuffle([0, 2, 5, 8]);
-  const stagePositions = STAGES.map((s, i) => ({ ...s, row: stageRows[i], col: 0 }));
-
-  // Pick one control per stage (best match)
-  const picked: typeof CONTROLS[number][] = [];
-  for (const s of STAGES) {
-    const match = CONTROLS.find(c => c.bestStage === s.id && !picked.find(p => p.id === c.id));
-    if (match) picked.push(match);
-  }
-
-  // Shuffle control rows independently so they don't mirror stage rows
-  const controlRowPool = shuffle([1, 3, 6, 9]);
-  const controlPositions = picked.map((c, i) => ({ ...c, row: controlRowPool[i], col: 9 }));
-
-  const occupied = new Set<string>();
-  stagePositions.forEach(s => occupied.add(`${s.row},${s.col}`));
-  controlPositions.forEach(c => occupied.add(`${c.row},${c.col}`));
-
-  // Sparse walls: small 1-2 cell clusters leaving wide 3-row open lanes
-  const walls = new Set<string>();
-  const candidates: GridCell[] = [
-    { row: 2, col: 3 }, { row: 3, col: 3 },
-    { row: 6, col: 3 }, { row: 7, col: 3 },
-    { row: 1, col: 5 },
-    { row: 4, col: 5 }, { row: 5, col: 5 },
-    { row: 8, col: 5 },
-    { row: 3, col: 7 },
-    { row: 6, col: 7 }, { row: 7, col: 7 },
-  ];
-  candidates.forEach(w => {
-    const key = `${w.row},${w.col}`;
-    if (!occupied.has(key)) walls.add(key);
-  });
-
-  return { stagePositions, controlPositions, walls };
+  return items;
 }
 
 export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const [showInstructions, setShowInstructions] = useState(true);
-  const layout = useMemo(() => generateLayout(), []);
-  const { stagePositions, controlPositions, walls } = layout;
+  const items = useMemo(() => buildRounds(level), [level]);
 
-  const [connections, setConnections] = useState<Connection[]>([]);
-  const [drawing, setDrawing] = useState<{ stageId: string; path: GridCell[] } | null>(null);
-  const [checked, setChecked] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const [step, setStep] = useState<'stage' | 'weed' | 'control' | 'feedback'>('stage');
+  const [stageAnswer, setStageAnswer] = useState<Stage | null>(null);
+  const [weedAnswer, setWeedAnswer] = useState<string | null>(null);
+  const [controlAnswer, setControlAnswer] = useState<string | null>(null);
+  const [score, setScore] = useState(0);
 
-  const isWall = useCallback((row: number, col: number) => walls.has(`${row},${col}`), [walls]);
+  const done = idx >= items.length;
+  const current = !done ? items[idx] : null;
 
-  const isOccupied = useCallback((row: number, col: number, excludeStage?: string) => {
-    return connections.some(c => {
-      if (excludeStage && c.stageId === excludeStage) return false;
-      return c.path.some(p => p.row === row && p.col === col);
-    });
-  }, [connections]);
+  const weedOptions = useMemo(() => {
+    if (!current) return [];
+    const others = shuffle(weeds.filter(w => w.id !== current.weed.id)).slice(0, 3);
+    return shuffle([current.weed, ...others]);
+  }, [idx, current?.weed.id]);
 
-  const findNode = useCallback((row: number, col: number) => {
-    const stage = stagePositions.find(s => s.row === row && s.col === col);
-    if (stage) return { type: 'stage' as const, data: stage };
-    const control = controlPositions.find(c => c.row === row && c.col === col);
-    if (control) return { type: 'control' as const, data: control };
-    return null;
-  }, [stagePositions, controlPositions]);
+  const controlOptions = useMemo(() => {
+    if (!current) return [];
+    const valid = CONTROLS.filter(c => c.stages.includes(current.stage));
+    const invalid = CONTROLS.filter(c => !c.stages.includes(current.stage));
+    const picked = [...valid, ...shuffle(invalid).slice(0, Math.max(0, 5 - valid.length))];
+    return shuffle(picked);
+  }, [idx, current?.stage]);
 
-  const handleCellClick = (row: number, col: number) => {
-    if (checked) return;
-    if (isWall(row, col)) return;
+  const validControlIds = current ? CONTROLS.filter(c => c.stages.includes(current.stage)).map(c => c.id) : [];
 
-    const node = findNode(row, col);
-
-    if (node?.type === 'stage') {
-      setConnections(prev => prev.filter(c => c.stageId !== node.data.id));
-      setDrawing({ stageId: node.data.id, path: [{ row, col }] });
-      return;
-    }
-
-    if (node?.type === 'control' && drawing) {
-      const last = drawing.path[drawing.path.length - 1];
-      if (Math.abs(row - last.row) + Math.abs(col - last.col) === 1) {
-        setConnections(prev => {
-          const filtered = prev.filter(c => c.controlId !== node.data.id);
-          return [...filtered, { stageId: drawing.stageId, controlId: node.data.id, path: [...drawing.path, { row, col }] }];
-        });
-        setDrawing(null);
-      }
-      return;
-    }
-
-    if (drawing) {
-      const last = drawing.path[drawing.path.length - 1];
-      const dist = Math.abs(row - last.row) + Math.abs(col - last.col);
-      if (dist === 1 && !isOccupied(row, col, drawing.stageId) && !drawing.path.some(p => p.row === row && p.col === col)) {
-        setDrawing({ ...drawing, path: [...drawing.path, { row, col }] });
-      }
-    }
+  const handleStage = (s: Stage) => {
+    setStageAnswer(s);
+    if (s === current!.stage) setScore(sc => sc + 1);
+    setStep('weed');
   };
 
-  const undoLast = () => {
-    if (!drawing || drawing.path.length <= 1) return;
-    setDrawing({ ...drawing, path: drawing.path.slice(0, -1) });
+  const handleWeed = (id: string) => {
+    setWeedAnswer(id);
+    if (id === current!.weed.id) setScore(sc => sc + 1);
+    setStep('control');
   };
 
-  const cancelDraw = () => setDrawing(null);
+  const handleControl = (cId: string) => {
+    setControlAnswer(cId);
+    if (validControlIds.includes(cId)) setScore(sc => sc + 1);
+    setStep('feedback');
+  };
 
-  const check = () => setChecked(true);
-  const correctCount = connections.filter(c => {
-    const ctrl = CONTROLS.find(ct => ct.id === c.controlId);
-    return ctrl?.bestStage === c.stageId;
-  }).length;
+  const next = () => {
+    setIdx(i => i + 1);
+    setStep('stage');
+    setStageAnswer(null);
+    setWeedAnswer(null);
+    setControlAnswer(null);
+  };
 
-  const restart = () => { setConnections([]); setDrawing(null); setChecked(false); };
+  const restart = () => {
+    setIdx(0); setScore(0); setStep('stage');
+    setStageAnswer(null); setWeedAnswer(null); setControlAnswer(null);
+  };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  const getCellState = (row: number, col: number) => {
-    if (drawing?.path.some(p => p.row === row && p.col === col)) return 'drawing';
-    for (const conn of connections) {
-      if (conn.path.some(p => p.row === row && p.col === col)) {
-        if (checked) {
-          const ctrl = CONTROLS.find(c => c.id === conn.controlId);
-          return ctrl?.bestStage === conn.stageId ? 'correct' : 'wrong';
-        }
-        return 'connected';
-      }
-    }
-    return 'empty';
-  };
-
-  const getConnectionForCell = (row: number, col: number) => {
-    if (drawing?.path.some(p => p.row === row && p.col === col)) return drawing.stageId;
-    for (const conn of connections) {
-      if (conn.path.some(p => p.row === row && p.col === col)) return conn.stageId;
-    }
-    return null;
-  };
-
-  const stageCount = STAGES.length;
-
-  if (showInstructions) {
+  if (done) {
+    const maxScore = items.length * 3;
     return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
-        <Info className="w-12 h-12 text-primary mb-4" />
-        <h2 className="text-2xl font-bold text-foreground mb-3">Life Stage Maze</h2>
-        <div className="max-w-md text-left space-y-3 mb-6">
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Goal:</strong> Draw paths through the maze to connect each weed life stage (left) to its best control method (right).
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">How to play:</strong> Click a life stage to start drawing. Click adjacent cells to extend your path. Click a control method to complete the connection.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Roadblocks:</strong> Dark cells are walls — you cannot draw through them. Plan your path around them!
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Rules:</strong> Paths cannot overlap with each other. Connect all {stageCount} stages, then check your answers.
-          </p>
-        </div>
-        <button onClick={() => setShowInstructions(false)} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
-          Start Maze
-        </button>
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
+        <p className="text-lg text-foreground mb-6">{score}/{maxScore} points</p>
+        <LevelComplete level={level} score={score} total={maxScore} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }
 
+  const stageCorrect = stageAnswer === current!.stage;
+  const weedCorrect = weedAnswer === current!.weed.id;
+  const controlCorrect = controlAnswer ? validControlIds.includes(controlAnswer) : false;
+
   return (
-    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-      <div className="max-w-2xl mx-auto p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1">
-            <h1 className="font-display font-bold text-lg text-foreground">Life Stage Maze</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
-            <p className="text-xs text-muted-foreground">Draw paths from stages → controls. Dark cells are roadblocks!</p>
-          </div>
-          <button onClick={() => setShowInstructions(true)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
-            <Info className="w-4 h-4" />
-          </button>
+    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b border-border">
+        <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+        <h1 className="font-bold text-foreground text-lg flex-1">Life Stage Control</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm text-muted-foreground">{idx + 1}/{items.length}</span>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
+        <div className="w-48 h-48 rounded-xl overflow-hidden bg-secondary mb-3">
+          <WeedImage weedId={current!.weed.id} stage={STAGE_IMAGE_MAP[current!.stage]} className="w-full h-full object-cover" />
         </div>
 
-        <div className="flex flex-wrap gap-3 mb-3 text-xs">
-          {stagePositions.map((s, i) => {
-            const colors = ['bg-primary/20 border-primary', 'bg-blue-400/20 border-blue-400', 'bg-orange-400/20 border-orange-400', 'bg-emerald-500/20 border-emerald-500'];
+        <div className="flex gap-2 mb-4">
+          {['Stage', 'Weed', 'Control'].map((label, i) => {
+            const stepNames = ['stage', 'weed', 'control', 'feedback'] as const;
+            const currentIdx = stepNames.indexOf(step);
+            const isComplete = currentIdx > i;
+            const isCurrent = currentIdx === i;
             return (
-              <div key={s.id} className={`flex items-center gap-1 px-2 py-1 rounded border ${colors[i]}`}>
-                <s.Icon className="w-3 h-3" />
-                <span className="text-foreground font-medium">{s.label}</span>
-              </div>
+              <span key={label} className={`px-3 py-1 rounded-full text-xs font-bold ${
+                isComplete ? 'bg-green-500/20 text-green-500' :
+                isCurrent ? 'bg-primary text-primary-foreground' :
+                'bg-secondary text-muted-foreground'
+              }`}>{i + 1}. {label}</span>
             );
           })}
-          <div className="flex items-center gap-1 px-2 py-1 rounded border border-foreground/40 bg-foreground/20">
-            <div className="w-3 h-3 rounded bg-foreground/60" />
-            <span className="text-foreground font-medium">Wall</span>
-          </div>
         </div>
 
-        {drawing && (
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs text-muted-foreground">Drawing from: <strong className="text-foreground">{stagePositions.find(s => s.id === drawing.stageId)?.label}</strong></span>
-            <button onClick={undoLast} className="text-xs px-2 py-1 rounded bg-secondary text-foreground flex items-center gap-1">
-              <RotateCcw className="w-3 h-3" /> Undo
-            </button>
-            <button onClick={cancelDraw} className="text-xs px-2 py-1 rounded bg-destructive/10 text-destructive flex items-center gap-1">
-              <X className="w-3 h-3" /> Cancel
-            </button>
-          </div>
-        )}
-
-        <div
-          className="grid gap-[2px] mb-4 bg-border rounded-xl p-[2px]"
-          style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
-        >
-          {Array.from({ length: ROWS }, (_, row) =>
-            Array.from({ length: COLS }, (_, col) => {
-              const node = findNode(row, col);
-              const wall = isWall(row, col);
-              const state = getCellState(row, col);
-              const connStage = getConnectionForCell(row, col);
-              const pathIdx = connStage ? stagePositions.findIndex(s => s.id === connStage) : -1;
-
-              if (wall) {
-                return (
-                  <div key={`${row}-${col}`} className="aspect-square rounded bg-foreground/40 border border-foreground/20" />
-                );
-              }
-
-              if (node?.type === 'stage') {
-                const s = node.data;
-                const conn = connections.find(c => c.stageId === s.id);
-                const isDrawing = drawing?.stageId === s.id;
-                const isCorrect = checked && conn && CONTROLS.find(c => c.id === conn.controlId)?.bestStage === s.id;
-                const isWrong = checked && conn && !isCorrect;
-                const idx = stagePositions.findIndex(st => st.id === s.id);
-                const borderColors = ['border-primary', 'border-blue-400', 'border-orange-400', 'border-emerald-500'];
-                const bgColors = ['bg-primary/15', 'bg-blue-400/15', 'bg-orange-400/15', 'bg-emerald-500/15'];
-
-                return (
-                  <button
-                    key={`${row}-${col}`}
-                    onClick={() => handleCellClick(row, col)}
-                    className={`aspect-square rounded-lg border-2 flex flex-col items-center justify-center transition-all cursor-pointer ${
-                      isCorrect ? 'border-green-500 bg-green-500/10' :
-                      isWrong ? 'border-destructive bg-destructive/10' :
-                      isDrawing ? `${borderColors[idx]} ${bgColors[idx]} ring-2 ring-primary/30` :
-                      conn ? `${borderColors[idx]} ${bgColors[idx]}` :
-                      'border-border bg-card hover:bg-secondary/50'
-                    }`}
-                  >
-                    <s.Icon className="w-4 h-4 text-foreground" />
-                    <span className="text-[8px] font-bold text-foreground leading-tight mt-0.5">{s.label}</span>
-                  </button>
-                );
-              }
-
-              if (node?.type === 'control') {
-                const c = node.data;
-                const conn = connections.find(cn => cn.controlId === c.id);
-                const isCorrect = checked && conn && c.bestStage === conn.stageId;
-                const isWrong = checked && conn && !isCorrect;
-
-                return (
-                  <button
-                    key={`${row}-${col}`}
-                    onClick={() => handleCellClick(row, col)}
-                    className={`aspect-square rounded-lg border-2 flex flex-col items-center justify-center transition-all cursor-pointer ${
-                      isCorrect ? 'border-green-500 bg-green-500/10' :
-                      isWrong ? 'border-destructive bg-destructive/10' :
-                      conn ? 'border-accent bg-accent/10' :
-                      'border-border bg-card hover:bg-secondary/50'
-                    }`}
-                  >
-                    <c.Icon className="w-4 h-4 text-foreground" />
-                    <span className="text-[7px] font-bold text-foreground leading-tight mt-0.5 text-center">{c.label.split(' ')[0]}</span>
-                  </button>
-                );
-              }
-
-              const pathColors = ['bg-primary/25', 'bg-blue-400/25', 'bg-orange-400/25', 'bg-emerald-500/25'];
-
-              return (
-                <button
-                  key={`${row}-${col}`}
-                  onClick={() => handleCellClick(row, col)}
-                  className={`aspect-square rounded transition-all ${
-                    state === 'drawing' ? `${pathColors[pathIdx >= 0 ? pathIdx : 0]} border border-primary/50` :
-                    state === 'correct' ? 'bg-green-500/20 border border-green-500/50' :
-                    state === 'wrong' ? 'bg-destructive/20 border border-destructive/50' :
-                    state === 'connected' ? `${pathColors[pathIdx >= 0 ? pathIdx : 0]} border border-muted-foreground/20` :
-                    'bg-card border border-border/30 hover:bg-secondary/30 cursor-pointer'
-                  }`}
-                />
-              );
-            })
-          ).flat()}
-        </div>
-
-        {!checked && connections.length >= stageCount && (
-          <button onClick={check} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
-            <Check className="w-5 h-5" /> Check Connections
-          </button>
-        )}
-
-        {!checked && connections.length < stageCount && (
-          <p className="text-xs text-muted-foreground text-center">
-            {connections.length}/{stageCount} connections made. Click a stage (left) to start drawing around walls.
-          </p>
-        )}
-
-        {checked && (
-          <div className="space-y-3 mb-4">
-            <div className={`text-center p-3 rounded-xl ${correctCount === stageCount ? 'bg-green-500/10 border border-green-500' : 'bg-destructive/10 border border-destructive'}`}>
-              <p className="text-foreground font-bold text-lg">{correctCount}/{stageCount} Correct</p>
-              <p className="text-xs text-muted-foreground">{correctCount === stageCount ? 'Perfect maze navigation!' : 'Review the explanations below.'}</p>
+        {step === 'stage' && (
+          <>
+            <p className="font-bold text-foreground mb-3 text-center">What life stage is shown in the image?</p>
+            <div className="flex flex-col gap-2 w-full max-w-sm">
+              {STAGES.map(s => (
+                <button key={s} onClick={() => handleStage(s)}
+                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all">
+                  {STAGE_LABELS[s]}
+                </button>
+              ))}
             </div>
+          </>
+        )}
 
-            {connections.map(conn => {
-              const ctrl = CONTROLS.find(c => c.id === conn.controlId);
-              const stage = STAGES.find(s => s.id === conn.stageId);
-              const correct = ctrl?.bestStage === conn.stageId;
-              return (
-                <div key={conn.stageId} className={`p-3 rounded-xl border-2 ${correct ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    {correct ? <Check className="w-4 h-4 text-green-600" /> : <AlertTriangle className="w-4 h-4 text-destructive" />}
-                    <p className="text-sm font-bold text-foreground">
-                      {stage?.label} → {ctrl?.label}
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{getStageExplanation(conn.stageId, conn.controlId)}</p>
+        {step === 'weed' && (
+          <>
+            <p className={`text-sm font-bold mb-1 ${stageCorrect ? 'text-green-500' : 'text-destructive'}`}>
+              {stageCorrect ? 'Correct stage!' : `Not quite -- it's the ${STAGE_LABELS[current!.stage]} stage.`}
+            </p>
+            <p className="font-bold text-foreground mb-3 text-center">Which weed is shown in the image?</p>
+            <div className="flex flex-col gap-2 w-full max-w-sm">
+              {weedOptions.map(w => (
+                <button key={w.id} onClick={() => handleWeed(w.id)}
+                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all">
+                  {w.commonName}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 'control' && (
+          <>
+            <p className={`text-sm font-bold mb-1 ${weedCorrect ? 'text-green-500' : 'text-destructive'}`}>
+              {weedCorrect ? 'Correct weed!' : `That's ${current!.weed.commonName}.`}
+            </p>
+            <p className="font-bold text-foreground mb-3 text-center">
+              How should you manage {current!.weed.commonName} at the {STAGE_LABELS[current!.stage].toLowerCase()} stage?
+            </p>
+            <div className="flex flex-col gap-2 w-full max-w-sm">
+              {controlOptions.map(c => (
+                <button key={c.id} onClick={() => handleControl(c.id)}
+                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all">
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 'feedback' && (
+          <div className="w-full max-w-sm">
+            <div className="bg-card border border-border rounded-xl p-4 mb-4">
+              <p className="font-bold text-foreground mb-2">{current!.weed.commonName}</p>
+              <p className="text-xs text-muted-foreground italic mb-2">{current!.weed.scientificName}</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className={`font-bold ${stageCorrect ? 'text-green-500' : 'text-destructive'}`}>
+                    {stageCorrect ? 'Stage: Correct' : `Stage: ${STAGE_LABELS[current!.stage]}`}
+                  </span>
                 </div>
-              );
-            })}
-
-            <div className="flex gap-3">
-              <button onClick={nextLevel} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2">
-                Next Level <ChevronRight className="w-4 h-4" />
-              </button>
-              <button onClick={startOver} className="flex-1 py-3 rounded-xl bg-secondary text-foreground font-bold">Start Over</button>
-              <button onClick={onBack} className="flex-1 py-3 rounded-xl border border-border bg-card text-foreground font-bold">Back to Games</button>
+                <div className="flex items-center gap-2">
+                  <span className={`font-bold ${weedCorrect ? 'text-green-500' : 'text-destructive'}`}>
+                    {weedCorrect ? 'Weed ID: Correct' : `Weed: ${current!.weed.commonName}`}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`font-bold ${controlCorrect ? 'text-green-500' : 'text-destructive'}`}>
+                    {controlCorrect ? 'Control: Correct' : `Best: ${CONTROLS.filter(c => c.stages.includes(current!.stage)).map(c => c.label).join(', ')}`}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">{current!.weed.management}</p>
+              <p className="text-xs text-muted-foreground mt-1">Timing: {current!.weed.controlTiming}</p>
             </div>
+            <button onClick={next} className="w-full px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
           </div>
         )}
       </div>

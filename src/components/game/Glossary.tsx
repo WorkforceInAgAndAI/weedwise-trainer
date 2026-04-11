@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 import WeedDetailPopup from './WeedDetailPopup';
+import HomeButton from './HomeButton';
 import type { Weed } from '@/types/game';
 import { ArrowLeft, Search, X } from 'lucide-react';
 
@@ -125,17 +126,19 @@ export default function Glossary({ onClose }: Props) {
  return map;
  }, []);
 
- return (
- <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
- <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
- <div className="flex items-center justify-between mb-6">
- <div className="flex items-center gap-3">
- <button onClick={onClose}
- className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
- <ArrowLeft className="w-4 h-4" />
- </button>
- <h1 className="text-xl font-display font-bold text-foreground">Weed Glossary</h1>
- </div>
+  return (
+  <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
+  <div className="flex items-center justify-between mb-6">
+  <div className="flex items-center gap-3">
+  <HomeButton onClose={onClose} />
+  <span className="text-border mx-1">|</span>
+  <button onClick={onClose}
+  className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+  <ArrowLeft className="w-4 h-4" />
+  </button>
+  <h1 className="text-xl font-display font-bold text-foreground">Weed Glossary</h1>
+  </div>
  <span className="text-sm text-muted-foreground">{filtered.length} of {weeds.length} species</span>
  </div>
 

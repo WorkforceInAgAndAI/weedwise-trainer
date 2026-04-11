@@ -5,28 +5,31 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StudentProvider } from "@/contexts/StudentContext";
 import { GameProgressProvider } from "@/contexts/GameProgressContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
- <QueryClientProvider client={queryClient}>
- <TooltipProvider>
- <StudentProvider>
- <GameProgressProvider>
- <Toaster />
- <Sonner />
- <BrowserRouter>
- <Routes>
- <Route path="/" element={<Index />} />
- <Route path="*" element={<NotFound />} />
- </Routes>
- </BrowserRouter>
- </GameProgressProvider>
- </StudentProvider>
- </TooltipProvider>
- </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <StudentProvider>
+          <GameProgressProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </GameProgressProvider>
+        </StudentProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
