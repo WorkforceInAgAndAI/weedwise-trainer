@@ -20,6 +20,8 @@ If you want to work locally using your own IDE, you can clone this repo and push
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
+**Local environment variables:** Copy [`.env.example`](./.env.example) to `.env` and fill in values. You do not need `.env.local` unless you want overrides (see [Lovable vs local `.env`](./docs/lovable-and-local-env.md) if Lovable or Supabase keys stop working).
+
 Follow these steps:
 
 ```sh
