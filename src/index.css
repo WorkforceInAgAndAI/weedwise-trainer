@@ -161,3 +161,8 @@
   33% { opacity: 0; }
   100% { opacity: 0; }
 }
+
+/* Sonner portal must sit above app modals (z-50 / z-[60]) */
+[data-sonner-toaster] {
+  z-index: 200;
+}

@@ -26,7 +26,11 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Root render error caught by ErrorBoundary", error, errorInfo);
+    if (import.meta.env.DEV) {
+      console.error("[WeedNet] ErrorBoundary", error, errorInfo);
+    } else {
+      console.error("[WeedNet] UI render error");
+    }
     this.setState({ errorInfo });
   }
 

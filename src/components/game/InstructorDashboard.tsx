@@ -1,5 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { BADGES } from '@/data/badges';
 import { PHASES } from '@/data/phases';
 import { weeds } from '@/data/weeds';
@@ -39,14 +41,28 @@ function CreateClassModal({ instructorName, onCreated, onClose }: {
 
  // Generate a passkey on mount
  useEffect(() => {
- supabase.rpc('generate_join_code').then(({ data }) => {
- if (data) setGeneratedCode(data as string);
+ supabase.rpc('generate_join_code').then(({ data, error }) => {
+ if (error) {
+ setError("Couldn't generate a join code. Check your connection and try again.");
+ logger.devWarn('[CreateClass] generate_join_code', error.message);
+ } else if (data) {
+ setGeneratedCode(data as string);
+ setError('');
+ }
  });
  }, []);
 
  const regenerate = async () => {
- const { data } = await supabase.rpc('generate_join_code');
- if (data) setGeneratedCode(data as string);
+ const { data, error } = await supabase.rpc('generate_join_code');
+ if (error) {
+ setError("Couldn't generate a new code. Try again.");
+ logger.devWarn('[CreateClass] regenerate', error.message);
+ return;
+ }
+ if (data) {
+ setGeneratedCode(data as string);
+ setError('');
+ }
  };
 
  const handleSubmit = async (e: React.FormEvent) => {
@@ -62,7 +78,12 @@ function CreateClassModal({ instructorName, onCreated, onClose }: {
  instructor_name: instructorName,
  } as any).select().single();
  setSaving(false);
- if (dbErr) { setError(dbErr.message); return; }
+ if (dbErr) {
+ setError(dbErr.message || 'Could not create class.');
+ logger.devWarn('[CreateClass] insert', dbErr);
+ return;
+ }
+ toast.success('Class created.');
  onCreated(data as unknown as ClassInfo);
  };
 
@@ -428,7 +449,15 @@ export default function InstructorDashboard({ onClose }: Props) {
  supabase.from('classes').select('*')
  .eq('instructor_name', instructorName)
  .order('created_at', { ascending: false })
- .then(({ data }) => {
+ .then(({ data, error }) => {
+ if (error) {
+ toast.error("Couldn't load your classes. Check your connection and try again.");
+ logger.devWarn('[InstructorDashboard] load classes', error.message);
+ setClasses([]);
+ setSelectedClass(null);
+ setLoading(false);
+ return;
+ }
  setClasses((data as unknown as ClassInfo[]) || []);
  if (data && data.length > 0) setSelectedClass(data[0].id);
  setLoading(false);
@@ -436,24 +465,41 @@ export default function InstructorDashboard({ onClose }: Props) {
  }, [instructorName]);
 
  /* Load class data + auto-refresh every 30 seconds */
+ const loadClassDataSilentRef = useRef(false);
  useEffect(() => {
  if (!selectedClass) { setLoading(false); return; }
+ loadClassDataSilentRef.current = false;
  const load = async () => {
- const { data: studs } = await supabase.from('students').select('*').eq('class_id', selectedClass);
+ const silent = loadClassDataSilentRef.current;
+ const { data: studs, error: studsErr } = await supabase.from('students').select('*').eq('class_id', selectedClass);
+ if (studsErr) {
+ if (!silent) {
+ toast.error("Couldn't load students for this class. Try again.");
+ logger.devWarn('[InstructorDashboard] students', studsErr.message);
+ }
+ return;
+ }
  const list = (studs as StudentRow[]) || [];
  setStudents(list);
  if (list.length > 0) {
  const ids = list.map(s => s.id);
- const [{ data: sess }, { data: bdg }] = await Promise.all([
+ const [{ data: sess, error: sessErr }, { data: bdg, error: bdgErr }] = await Promise.all([
  supabase.from('game_sessions').select('*').in('student_id', ids),
  supabase.from('student_badges').select('*').in('student_id', ids),
  ]);
+ if (sessErr || bdgErr) {
+ if (!silent) {
+ toast.error("Couldn't load session or badge data. Try again.");
+ logger.devWarn('[InstructorDashboard] sessions/badges', sessErr || bdgErr);
+ }
+ return;
+ }
  setSessions((sess as SessionRow[]) || []);
  setBadges((bdg as BadgeRow[]) || []);
  } else { setSessions([]); setBadges([]); }
  };
- load();
- const interval = setInterval(load, 30000);
+ load().then(() => { loadClassDataSilentRef.current = true; });
+ const interval = setInterval(() => { loadClassDataSilentRef.current = true; load(); }, 30000);
  return () => clearInterval(interval);
  }, [selectedClass]);
 
@@ -563,12 +609,18 @@ export default function InstructorDashboard({ onClose }: Props) {
  const handleEndSession = async () => {
  if (!selectedClass) return;
  setEndingSession(true);
- await supabase.from('classes').delete().eq('id', selectedClass);
+ const { error } = await supabase.from('classes').delete().eq('id', selectedClass);
+ setEndingSession(false);
+ if (error) {
+ toast.error("Couldn't end the session. Try again or check your connection.");
+ logger.devWarn('[InstructorDashboard] end session', error.message);
+ return;
+ }
+ toast.success('Session ended. Class data was removed.');
  const remaining = classes.filter(c => c.id !== selectedClass);
  setClasses(remaining);
  setSelectedClass(remaining.length > 0 ? remaining[0].id : null);
  setStudents([]); setSessions([]); setBadges([]);
- setEndingSession(false);
  setShowEndConfirm(false);
  };
 
@@ -577,6 +629,26 @@ export default function InstructorDashboard({ onClose }: Props) {
   { key: 'students', label: 'Students' },
   { key: 'glossary', label: 'Glossary' },
  ];
+
+ const instructorPin = (import.meta.env.VITE_INSTRUCTOR_PIN ?? '').trim();
+ const pinRequired = instructorPin.length > 0;
+
+ /* Production builds must have VITE_INSTRUCTOR_PIN set on the host */
+ if (import.meta.env.PROD && !pinRequired) {
+ return (
+ <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center p-4">
+ <div className="bg-card border border-border rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 animate-scale-in text-center">
+ <h2 className="text-xl font-display font-bold text-foreground">Instructor access not configured</h2>
+ <p className="text-sm text-muted-foreground">
+ This deployment is missing <span className="font-mono text-xs">VITE_INSTRUCTOR_PIN</span>. Add it in your hosting provider environment variables (same place as your Supabase keys), then redeploy.
+ </p>
+ <button type="button" onClick={onClose} className="w-full px-4 py-2 rounded-lg border border-border hover:bg-secondary text-sm">
+ Close
+ </button>
+ </div>
+ </div>
+ );
+ }
 
  /* Name-entry gate */
  if (!instructorName) return (
@@ -591,7 +663,7 @@ export default function InstructorDashboard({ onClose }: Props) {
  e.preventDefault();
  const name = nameInput.trim();
  if (!name) return;
- if (pinInput !== import.meta.env.VITE_INSTRUCTOR_PIN) {
+ if (pinRequired && pinInput !== instructorPin) {
  setPinError(true);
  return;
  }
@@ -615,6 +687,13 @@ export default function InstructorDashboard({ onClose }: Props) {
  </button>
  )}
  </div>
+ {!pinRequired && import.meta.env.DEV && (
+ <p className="text-xs text-amber-700 dark:text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md px-3 py-2">
+ Development only: <span className="font-mono">VITE_INSTRUCTOR_PIN</span> is not set. The dashboard opens with your name only.
+ </p>
+ )}
+ {pinRequired && (
+ <>
  <input
  type="password"
  value={pinInput}
@@ -623,9 +702,11 @@ export default function InstructorDashboard({ onClose }: Props) {
  className={`w-full px-4 py-3 rounded-lg border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary ${pinError ? 'border-destructive' : 'border-border'}`}
  />
  {pinError && <p className="text-xs text-destructive">Incorrect PIN. Please check with your course coordinator.</p>}
+ </>
+ )}
  <button
  type="submit"
- disabled={!nameInput.trim() || !pinInput}
+ disabled={!nameInput.trim() || (pinRequired && !pinInput)}
  className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
  >
  Enter Dashboard

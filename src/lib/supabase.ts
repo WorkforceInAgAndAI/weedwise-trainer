@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { logger } from "@/lib/logger";
 
 type PublicEnv = ImportMetaEnv & {
   VITE_SUPABASE_ANON_KEY?: string;
@@ -20,7 +21,7 @@ const SUPABASE_URL = envUrl || (envProjectId ? `https://${envProjectId}.supabase
 const SUPABASE_PUBLISHABLE_KEY = envPublishableKey || FALLBACK_SUPABASE_PUBLISHABLE_KEY;
 
 if (!envUrl || !envPublishableKey) {
-  console.warn("Using embedded public backend config because Vite env vars are missing.", {
+  logger.devWarn("Using embedded public Supabase config (Vite env vars missing).", {
     hasSupabaseUrlEnv: Boolean(envUrl),
     hasSupabasePublishableKeyEnv: Boolean(envPublishableKey),
     hasSupabaseProjectIdEnv: Boolean(envProjectId),

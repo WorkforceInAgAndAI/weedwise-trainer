@@ -19,15 +19,17 @@ async function boot() {
   try {
     // These dynamic imports will trigger supabase client init.
     // If env vars are missing, createClient throws before React mounts.
-    const [{ createRoot }, { default: App }] = await Promise.all([
+    const [{ createRoot }, { default: App }, { logger }] = await Promise.all([
       import("react-dom/client"),
       import("./App.tsx"),
+      import("./lib/logger"),
     ]);
-    console.log("WeedNet app mounting...");
+    logger.devDebug("app mounting");
     createRoot(root).render(<App />);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error("Fatal boot error:", err);
+    const { logger } = await import("./lib/logger");
+    logger.error("fatal boot error", err);
 
     if (message.includes("supabaseUrl is required") || message.includes("supabaseKey is required")) {
       showFatalError(

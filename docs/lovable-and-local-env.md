@@ -26,6 +26,6 @@
 
 ## `VITE_INSTRUCTOR_PIN`
 
-- Required for the instructor dashboard gate in builds that include this feature.
-- Set the same value in Lovable (when you use this branch there) and in Amplify later.
-- If it’s missing, `import.meta.env.VITE_INSTRUCTOR_PIN` is `undefined` and PIN checks may behave unexpectedly — set it everywhere you deploy.
+- **Production builds:** If this variable is missing or empty, the instructor dashboard shows a clear “not configured” screen instead of a broken PIN form.
+- **Local development:** If unset, you can open the dashboard with your name only (a small dev-only notice is shown). Set it in `.env` to test the real PIN flow.
+- Set the same value in Lovable and in Amplify when you deploy.

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
@@ -115,7 +116,7 @@ export default function LeafArtist({ onBack }: { onBack: () => void }) {
  if (error) throw error;
  setAiGrade(data);
  } catch (err) {
- console.error('AI grading error:', err);
+ logger.devWarn('LeafArtist grade-drawing', err);
  setAiGrade({ score: 2, feedback: 'Nice work on your leaf drawing!' });
  } finally {
  setGrading(false);

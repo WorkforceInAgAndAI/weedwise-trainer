@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface StudentSession {
  studentId: string;
@@ -11,7 +12,10 @@ interface StudentSession {
 
 interface StudentContextType {
  session: StudentSession | null;
- joinClass: (joinCode: string, nickname: string) => Promise<{ success: boolean; error?: string }>;
+ joinClass: (
+ joinCode: string,
+ nickname: string
+ ) => Promise<{ success: boolean; error?: string; rejoined?: boolean }>;
  leaveClass: () => void;
 }
 
@@ -60,22 +64,39 @@ export function StudentProvider({ children }: { children: ReactNode }) {
  .eq('join_code', joinCode.toUpperCase().trim())
  .maybeSingle();
 
- if (classErr || !classData) {
+ if (classErr) {
+ logger.devWarn('[joinClass] class lookup', classErr.message);
+ return {
+ success: false,
+ error: "We couldn't look up that class. Check your connection and try again, or ask your instructor.",
+ };
+ }
+ if (!classData) {
  return { success: false, error: 'Invalid join code. Please check with your instructor.' };
  }
 
  // Check if nickname already exists in this class
- const { data: existing } = await supabase
+ const { data: existing, error: existingErr } = await supabase
  .from('students')
  .select('id')
  .eq('class_id', classData.id)
  .eq('nickname', nickname.trim())
  .maybeSingle();
 
+ if (existingErr) {
+ logger.devWarn('[joinClass] student lookup', existingErr.message);
+ return {
+ success: false,
+ error: "We couldn't verify your nickname. Check your connection and try again.",
+ };
+ }
+
  let studentId: string;
+ let rejoined = false;
 
  if (existing) {
  // Rejoin as existing student
+ rejoined = true;
  studentId = existing.id;
  } else {
  // Create new student
@@ -86,7 +107,19 @@ export function StudentProvider({ children }: { children: ReactNode }) {
  .single();
 
  if (insertErr || !newStudent) {
- return { success: false, error: 'Failed to join class. Please try again.' };
+ logger.devWarn('[joinClass] insert student', insertErr?.message);
+ const code = insertErr?.code;
+ const msg = insertErr?.message?.toLowerCase() ?? '';
+ if (code === '23505' || msg.includes('unique') || msg.includes('duplicate')) {
+ return {
+ success: false,
+ error: 'That nickname is already taken in this class. Pick a different nickname.',
+ };
+ }
+ return {
+ success: false,
+ error: "We couldn't join you to the class. Please try again or ask your instructor.",
+ };
  }
  studentId = newStudent.id;
  }
@@ -99,7 +132,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
  };
  setSession(sess);
  localStorage.setItem('weedid_student', JSON.stringify(sess));
- return { success: true };
+ return { success: true, rejoined };
  }, []);
 
  const leaveClass = useCallback(() => {
