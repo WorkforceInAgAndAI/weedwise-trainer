@@ -175,7 +175,7 @@ export default function PracticeHub({ onClose }: { onClose: () => void }) {
  {[
  { id: 'k5', label: 'Grades K-5', sub: 'Explorer', Icon: Leaf, count: 15, accent: 'grade-elementary' },
  { id: '68', label: 'Grades 6-8', sub: 'Investigator', Icon: Microscope, count: 17, accent: 'grade-middle' },
- { id: '912', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: 15, accent: 'grade-high' },
+ { id: '912', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: 14, accent: 'grade-high' },
  ].map(g => (
  <button
  key={g.id}
