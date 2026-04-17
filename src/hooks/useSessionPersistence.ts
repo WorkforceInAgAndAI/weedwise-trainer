@@ -67,5 +67,46 @@ export function useSessionPersistence(studentId: string | null) {
    .eq('id', sid);
  }, [studentId, ensureSession]);
 
- return { createSession, updateSession, sessionIdRef };
+ // Logs a completed Farm Mode season as its own game_sessions row.
+ // Separate from createSession/updateSession so it doesn't interfere with the
+ // live ID-game row tracked via sessionIdRef.
+ const logFarmSeason = useCallback(async (data: {
+  grade: GradeLevel;
+  yieldBuAcre: number;
+  costPerAcre: number;
+  hoursWorked: number;
+  weedsControlled: number;
+  totalWeeds: number;
+  eventsCorrect: number;
+  eventsAnswered: number;
+  seasonsCompleted: number;
+ }) => {
+  if (!studentId) return;
+  const totalCorrect = data.eventsCorrect;
+  const totalWrong = Math.max(0, data.eventsAnswered - data.eventsCorrect);
+  const totalXp = Math.max(
+   0,
+   Math.round(data.yieldBuAcre * 10 + data.weedsControlled * 5 + data.eventsCorrect * 20)
+  );
+  await supabase.from('game_sessions').insert({
+   student_id: studentId,
+   grade_level: data.grade,
+   total_xp: totalXp,
+   total_correct: totalCorrect,
+   total_wrong: totalWrong,
+   species_mastered: data.weedsControlled,
+   streak_best: 0,
+   phases_completed: data.seasonsCompleted,
+   session_data: {
+    mode: 'farm',
+    yield_bu_acre: data.yieldBuAcre,
+    cost_per_acre: data.costPerAcre,
+    hours_worked: data.hoursWorked,
+    weeds_controlled: data.weedsControlled,
+    total_weeds: data.totalWeeds,
+   } as any,
+  });
+ }, [studentId]);
+
+ return { createSession, updateSession, logFarmSeason, sessionIdRef };
 }

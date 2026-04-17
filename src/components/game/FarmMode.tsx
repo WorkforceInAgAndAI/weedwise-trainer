@@ -1,10 +1,12 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { weeds } from '@/data/weeds';
 import type { GradeLevel, Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler } from 'lucide-react';
 import HomeButton from './HomeButton';
 import fieldBgImage from '@/assets/images/field-background.jpg';
+import { useStudent } from '@/contexts/StudentContext';
+import { useSessionPersistence } from '@/hooks/useSessionPersistence';
 
 // Types 
 type GamePhase = 'setup' | 'playing' | 'scouting' | 'identifying' | 'managing' | 'event' | 'harvest' | 'results';
@@ -242,6 +244,12 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  const [mgmtFeedback, setMgmtFeedback] = useState<string | null>(null);
  const [driftWarning, setDriftWarning] = useState(false);
 
+ // Session logging: record a completed season to game_sessions so the
+ // instructor dashboard reflects Farm Mode activity.
+ const { session } = useStudent();
+ const { logFarmSeason } = useSessionPersistence(session?.studentId ?? null);
+ const loggedRef = useRef(false);
+
  const seasonIdx = SEASON_ORDER.indexOf(currentSeason);
  const seasonInfo = SEASONS[currentSeason];
 
@@ -461,6 +469,29 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  const scoutedCount = fieldWeeds.filter(w => w.scouted && w.alive).length;
  const identifiedCount = fieldWeeds.filter(w => w.identified && w.alive).length;
  const totalCount = fieldWeeds.length;
+
+ // Log one game_sessions row per completed season, the first time we reach
+ // results. Reset the guard when the player returns to setup so a fresh
+ // season can log again.
+ useEffect(() => {
+ if (phase === 'setup') {
+ loggedRef.current = false;
+ return;
+ }
+ if (phase !== 'results' || loggedRef.current || !grade) return;
+ loggedRef.current = true;
+ logFarmSeason({
+ grade,
+ yieldBuAcre: finalYield,
+ costPerAcre: totalCost,
+ hoursWorked: totalHours,
+ weedsControlled: weedsKilled,
+ totalWeeds: totalCount,
+ eventsCorrect,
+ eventsAnswered,
+ seasonsCompleted: SEASON_ORDER.length,
+ });
+ }, [phase, grade, finalYield, totalCost, totalHours, weedsKilled, totalCount, eventsCorrect, eventsAnswered, logFarmSeason]);
 
  // Setup Screen 
  if (phase === 'setup') {
