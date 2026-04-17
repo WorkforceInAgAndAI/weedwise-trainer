@@ -2,13 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
-import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2, Sprout, X } from 'lucide-react';
-
-const GRADE_OPTIONS: { id: GradeLevel; label: string; range: string; desc: string }[] = [
- { id: 'elementary', label: 'Elementary', range: 'K-5', desc: 'Common names and visual traits.' },
- { id: 'middle', label: 'Middle School', range: '6-8', desc: 'Plant families and life cycles.' },
- { id: 'high', label: 'High School', range: '9-12', desc: 'Scientific names and advanced biology.' },
-];
+import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
 
 const CAROUSEL_WEEDS = ['waterhemp', 'palmer-amaranth', 'giant-ragweed', 'lambsquarters', 'velvetleaf', 'marestail', 'kochia', 'morningglory'];
 
@@ -28,14 +22,12 @@ interface Props extends GameEngine {
 }
 
 export default function LandingPage({
- startGame,
  onOpenLearning, onOpenGlossary, onOpenClassJoin,
  onOpenDashboard, onOpenFarmMode, onOpenPracticeHub,
  onOpenStats, studentSession,
 }: Props) {
  const [carouselIdx, setCarouselIdx] = useState(0);
  const [fadeClass, setFadeClass] = useState('opacity-100');
- const [showGradePicker, setShowGradePicker] = useState(false);
 
  const nextSlide = useCallback(() => {
  setFadeClass('opacity-0');
@@ -92,10 +84,9 @@ export default function LandingPage({
 
  {/* Content Cards */}
  <section className="max-w-[1200px] mx-auto px-5 sm:px-10 py-16">
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+ <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
  {[
  { title: 'Learn', desc: 'Study weeds by topic with detailed guides, real photographs, and botanical information organized by grade level.', icon: BookOpen, action: onOpenLearning },
- { title: 'Identify', desc: 'Answer timed weed identification questions. Earn XP, build streaks, and track your mastery by species.', icon: Sprout, action: () => setShowGradePicker(true) },
  { title: 'Practice', desc: 'Sharpen your skills with interactive mini-games covering identification, taxonomy, ecology, and management.', icon: Target, action: onOpenPracticeHub },
  { title: 'Play', desc: 'Manage a soybean farm through a full growing season. Scout fields, make management decisions, and harvest.', icon: Gamepad2, action: onOpenFarmMode },
  ].map(card => (
@@ -116,50 +107,6 @@ export default function LandingPage({
  ))}
  </div>
  </section>
-
- {/* Grade picker modal for Identify */}
- {showGradePicker && (
- <div
-  className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-  onClick={() => setShowGradePicker(false)}
- >
- <div
-  className="bg-card border border-border rounded-xl shadow-card-hover max-w-lg w-full p-6 space-y-4 animate-scale-in"
-  onClick={e => e.stopPropagation()}
- >
- <div className="flex items-center justify-between">
- <div>
- <h2 className="font-display font-bold text-xl text-foreground">Choose Your Level</h2>
- <p className="text-sm text-muted-foreground mt-1">Pick a grade band to start identifying weeds.</p>
- </div>
- <button
-  onClick={() => setShowGradePicker(false)}
-  className="w-8 h-8 rounded-md border border-border text-muted-foreground hover:text-foreground flex items-center justify-center"
-  aria-label="Close"
- >
- <X className="w-4 h-4" />
- </button>
- </div>
- <div className="grid gap-3">
- {GRADE_OPTIONS.map(g => (
- <button
-  key={g.id}
-  onClick={() => { setShowGradePicker(false); startGame(g.id); }}
-  className="text-left p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-subtle transition-all"
- >
- <div className="flex items-center justify-between">
- <div>
- <p className="font-semibold text-foreground">{g.label} <span className="text-muted-foreground font-normal">({g.range})</span></p>
- <p className="text-sm text-muted-foreground mt-0.5">{g.desc}</p>
- </div>
- <ChevronRight className="w-4 h-4 text-muted-foreground" />
- </div>
- </button>
- ))}
- </div>
- </div>
- </div>
- )}
 
  {/* Student Session Banner */}
  {studentSession && (
