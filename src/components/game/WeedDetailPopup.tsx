@@ -19,7 +19,7 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  <div>
  <h2 className="text-xl font-display font-bold text-foreground">{weed.commonName}</h2>
  <p className="text-sm text-primary italic">{weed.scientificName}</p>
- <p className="text-xs text-muted-foreground mt-0.5">EPPO: {weed.eppoCode} · {weed.family}</p>
+ <p className="text-xs text-muted-foreground mt-0.5">{weed.family}</p>
  </div>
  <button onClick={onClose} className="w-8 h-8 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
  <X className="w-4 h-4" />

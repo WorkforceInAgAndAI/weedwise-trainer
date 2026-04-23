@@ -4,7 +4,6 @@ export interface Weed {
  id: string;
  commonName: string;
  scientificName: string;
- eppoCode: string;
  family: string;
  plantType: 'Dicot' | 'Monocot' | 'Non-flowering';
  lifeCycle: string;
