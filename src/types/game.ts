@@ -9,7 +9,7 @@ export interface Weed {
  plantType: 'Dicot' | 'Monocot' | 'Non-flowering';
  lifeCycle: string;
  origin: 'Native' | 'Introduced';
- emoji: string;
+ emoji?: string;
  image?: string;
  traits: string[];
  habitat: string;
