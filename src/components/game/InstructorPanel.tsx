@@ -188,7 +188,7 @@ export default function InstructorPanel(game: GameEngine) {
  </div>
  </div>
  <div className="text-xs space-y-1 text-muted-foreground">
- <p><span className="text-foreground">EPPO:</span> {w.eppoCode} | <span className="text-foreground">Family:</span> {w.family}</p>
+ <p><span className="text-foreground">Family:</span> {w.family}</p>
  <p><span className="text-foreground">Type:</span> {w.plantType} | <span className="text-foreground">Cycle:</span> {w.lifeCycle} | <span className="text-foreground">Origin:</span> {w.origin}</p>
  </div>
  <div className="text-xs space-y-1">

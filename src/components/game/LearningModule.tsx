@@ -572,7 +572,6 @@ function TopicContent({
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
                       <div className="text-xs text-primary italic mt-1">{w.scientificName}</div>
-                      <div className="text-[10px] text-muted-foreground">EPPO: {w.eppoCode}</div>
                     </div>
                   ))}
               </div>
@@ -678,7 +677,7 @@ function TopicContent({
               </div>
             )}
 
-            {/* All species with EPPO codes */}
+            {/* All species */}
             <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
             {topicWeeds.map((w) => (
               <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
@@ -688,7 +687,7 @@ function TopicContent({
                 <div className="space-y-1">
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
                   <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">EPPO: {w.eppoCode} | Family: {w.family}</div>
+                  <div className="text-xs text-muted-foreground">Family: {w.family}</div>
                   <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                     {w.traits.slice(0, 3).map((t, i) => (
                       <li key={i}>- {t}</li>
