@@ -170,7 +170,7 @@ lookAlike: {id: "Prickly_lettuce", species: "Prickly Lettuce", difference: "Pric
     plantType: "Monocot",
     lifeCycle: "Perennial",
     origin: "Introduced",
-    traits: ["White midrib", "Large open panicle", "Rhizomatous", "Tall growth to 8 ft" "red-purple mature panicles"],
+    traits: ["White midrib", "Large open panicle", "Rhizomatous", "Tall growth to 8 ft", "red-purple mature panicles"],
     habitat: "Crop fields, roadsides, ditches, disturbed areas",
     primaryHabitat: "Warm-Season / Full Sun",
     management: "Systemic grass herbicides; repeated mowing; prevent seed production",
