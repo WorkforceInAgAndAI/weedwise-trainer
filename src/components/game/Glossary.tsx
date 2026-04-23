@@ -109,8 +109,7 @@ export default function Glossary({ onClose }: Props) {
  result = result.filter(w =>
  w.commonName.toLowerCase().includes(q) ||
  w.scientificName.toLowerCase().includes(q) ||
- w.family.toLowerCase().includes(q) ||
- w.eppoCode.toLowerCase().includes(q)
+ w.family.toLowerCase().includes(q)
  );
  }
  return result;
@@ -146,7 +145,7 @@ export default function Glossary({ onClose }: Props) {
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
  <input
  type="text" value={search} onChange={e => setSearch(e.target.value)}
- placeholder="Search by name, scientific name, family, or EPPO code..."
+ placeholder="Search by name, scientific name, or family..."
  className="w-full pl-10 pr-4 py-2.5 rounded-md border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
  />
  </div>
