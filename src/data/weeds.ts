@@ -218,7 +218,7 @@ lookAlike: {id: "Prickly_lettuce", species: "Prickly Lettuce", difference: "Pric
     family: "Poaceae",
     plantType: "Monocot",
     lifeCycle: "Annual",
-    origin: "Introduced",    traits: ["Twisted bent awns", "Open panicle", "Hairy lemma", "No auricles" "Large papery ligule"],
+    origin: "Introduced",    traits: ["Twisted bent awns", "Open panicle", "Hairy lemma", "No auricles", "Large papery ligule"],
     habitat: "Small grain fields, roadsides, disturbed areas",
     primaryHabitat: "Cool-Season / Full Sun",
     management: "Pre-emergent and post-emergent grass herbicides; crop rotation",
