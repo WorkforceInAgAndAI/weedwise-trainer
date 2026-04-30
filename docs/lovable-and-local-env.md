@@ -24,8 +24,21 @@
 - **CI/CD** (lint + build on PR) can be added **after** the demo; it does not replace Lovable secrets.
 - When you move to **AWS Amplify** (or similar), add the **same** `VITE_*` variables in the host’s console; still keep `.env` out of Git.
 
-## `VITE_INSTRUCTOR_PIN`
+## Instructor PIN (per class)
 
-- **Production builds:** If this variable is missing or empty, the instructor dashboard shows a clear “not configured” screen instead of a broken PIN form.
-- **Local development:** If unset, you can open the dashboard with your name only (a small dev-only notice is shown). Set it in `.env` to test the real PIN flow.
-- Set the same value in Lovable and in Amplify when you deploy.
+The shared `VITE_INSTRUCTOR_PIN` env var has been removed. Each class now stores its own
+PIN (`classes.instructor_pin`) that the instructor sets when creating the class:
+
+- **Sign-in gate:** Instructors enter their **name + PIN**. The PIN must match at least one of
+  their existing classes; first-time instructors with no classes yet are allowed in and the
+  PIN they typed is saved to the first class they create.
+- **Per-class scope:** Different teachers (or sessions) can pick different PINs without any
+  shared deployment-level secret. Nothing PIN-related needs to be configured in Lovable or
+  Amplify.
+- **Legacy classes:** Classes created before this change were backfilled with `1234` so they
+  still open with the old shared PIN. Use **End Session** and recreate them under your own
+  PIN when convenient.
+
+
+Both Play and Practice hub updates dashboard
+Landing page has permanent navbar

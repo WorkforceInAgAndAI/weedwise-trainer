@@ -21,6 +21,7 @@ export type Database = {
           id: string
           instructor_id: string | null
           instructor_name: string
+          instructor_pin: string | null
           join_code: string
           name: string
           year: string | null
@@ -31,6 +32,7 @@ export type Database = {
           id?: string
           instructor_id?: string | null
           instructor_name: string
+          instructor_pin?: string | null
           join_code: string
           name: string
           year?: string | null
@@ -41,6 +43,7 @@ export type Database = {
           id?: string
           instructor_id?: string | null
           instructor_name?: string
+          instructor_pin?: string | null
           join_code?: string
           name?: string
           year?: string | null

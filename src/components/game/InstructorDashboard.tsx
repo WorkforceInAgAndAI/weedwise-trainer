@@ -14,6 +14,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } fro
 interface ClassInfo {
  id: string; name: string; join_code: string;
  instructor_name: string; instructor_id: string | null;
+ instructor_pin: string | null;
  created_at: string; year?: string | null; description?: string | null;
 }
 interface StudentRow { id: string; nickname: string; class_id: string; user_id?: string | null; }
@@ -28,8 +29,9 @@ interface Props { onClose: () => void; }
 type Tab = 'overview' | 'students' | 'glossary';
 
 /* Create-Class Modal */
-function CreateClassModal({ instructorName, onCreated, onClose }: {
+function CreateClassModal({ instructorName, instructorPin, onCreated, onClose }: {
  instructorName: string;
+ instructorPin: string;
  onCreated: (c: ClassInfo) => void; onClose: () => void;
 }) {
  const [name, setName] = useState('');
@@ -69,6 +71,7 @@ function CreateClassModal({ instructorName, onCreated, onClose }: {
  e.preventDefault();
  if (!name.trim()) { setError('Class name is required'); return; }
  if (!generatedCode) { setError('Passkey not ready yet'); return; }
+ if (instructorPin.length < 4) { setError('Instructor PIN missing — sign out and back in to set one.'); return; }
  setSaving(true); setError('');
  const { data, error: dbErr } = await supabase.from('classes').insert({
  name: name.trim(),
@@ -76,6 +79,7 @@ function CreateClassModal({ instructorName, onCreated, onClose }: {
  description: description.trim() || null,
  join_code: generatedCode,
  instructor_name: instructorName,
+ instructor_pin: instructorPin,
  } as any).select().single();
  setSaving(false);
  if (dbErr) {
@@ -119,6 +123,15 @@ function CreateClassModal({ instructorName, onCreated, onClose }: {
  placeholder="Optional: section notes, topics covered, grading period…"
  rows={3}
  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+ </div>
+
+ {/* Instructor PIN (read-only — set on the sign-in gate) */}
+ <div className="space-y-1">
+ <label className="text-sm font-medium text-foreground">Instructor PIN</label>
+ <div className="px-3 py-2 rounded-lg bg-muted border border-border font-mono tracking-widest text-sm text-muted-foreground">
+ {'•'.repeat(instructorPin.length)} <span className="ml-2 text-xs">({instructorPin.length} chars)</span>
+ </div>
+ <p className="text-xs text-muted-foreground">This class uses the PIN you signed in with. Re-enter it to access this class later. Students don't need it.</p>
  </div>
 
  {/* Passkey */}
@@ -425,9 +438,11 @@ const INSTRUCTOR_NAME_KEY = 'weedid_instructor_name';
 /* Main Dashboard */
 export default function InstructorDashboard({ onClose }: Props) {
  const [instructorName, setInstructorName] = useState<string>('');
+ const [instructorPin, setInstructorPin] = useState<string>('');
  const [nameInput, setNameInput] = useState(() => localStorage.getItem(INSTRUCTOR_NAME_KEY) ?? '');
  const [pinInput, setPinInput] = useState('');
- const [pinError, setPinError] = useState(false);
+ const [pinError, setPinError] = useState<string>('');
+ const [verifying, setVerifying] = useState(false);
  const [showCreateClass, setShowCreateClass] = useState(false);
  const [showGlossary, setShowGlossary] = useState(false);
  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
@@ -443,11 +458,13 @@ export default function InstructorDashboard({ onClose }: Props) {
  const [showEndConfirm, setShowEndConfirm] = useState(false);
  const [endingSession, setEndingSession] = useState(false);
 
- /* Load instructor's classes whenever they've identified themselves */
+ /* Load instructor's classes whenever they've identified themselves.
+  * Filters by name + PIN so each teacher only sees their own classes. */
  useEffect(() => {
  if (!instructorName) return;
  supabase.from('classes').select('*')
  .eq('instructor_name', instructorName)
+ .eq('instructor_pin', instructorPin)
  .order('created_at', { ascending: false })
  .then(({ data, error }) => {
  if (error) {
@@ -460,9 +477,10 @@ export default function InstructorDashboard({ onClose }: Props) {
  }
  setClasses((data as unknown as ClassInfo[]) || []);
  if (data && data.length > 0) setSelectedClass(data[0].id);
+ else setSelectedClass(null);
  setLoading(false);
  });
- }, [instructorName]);
+ }, [instructorName, instructorPin]);
 
  /* Load class data + auto-refresh every 30 seconds */
  const loadClassDataSilentRef = useRef(false);
@@ -630,52 +648,71 @@ export default function InstructorDashboard({ onClose }: Props) {
   { key: 'glossary', label: 'Glossary' },
  ];
 
- const instructorPin = (import.meta.env.VITE_INSTRUCTOR_PIN ?? '').trim();
- const pinRequired = instructorPin.length > 0;
+ /* Name + PIN gate. Each class carries its own PIN; the gate verifies that
+  * the entered (name, PIN) pair matches at least one existing class. A
+  * brand-new instructor (no classes under that name yet) is allowed in and
+  * their PIN is remembered for the first class they create. */
+ const handleGateSubmit = async (e: React.FormEvent) => {
+ e.preventDefault();
+ const name = nameInput.trim();
+ const pin = pinInput.trim();
+ if (!name || pin.length < 4) return;
+ setVerifying(true);
+ setPinError('');
 
- /* Production builds must have VITE_INSTRUCTOR_PIN set on the host */
- if (import.meta.env.PROD && !pinRequired) {
- return (
- <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center p-4">
- <div className="bg-card border border-border rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 animate-scale-in text-center">
- <h2 className="text-xl font-display font-bold text-foreground">Instructor access not configured</h2>
- <p className="text-sm text-muted-foreground">
- This deployment is missing <span className="font-mono text-xs">VITE_INSTRUCTOR_PIN</span>. Add it in your hosting provider environment variables (same place as your Supabase keys), then redeploy.
- </p>
- <button type="button" onClick={onClose} className="w-full px-4 py-2 rounded-lg border border-border hover:bg-secondary text-sm">
- Close
- </button>
- </div>
- </div>
- );
+ const { count, error } = await supabase
+ .from('classes')
+ .select('id', { count: 'exact', head: true })
+ .eq('instructor_name', name);
+ if (error) {
+ setVerifying(false);
+ setPinError("Couldn't reach the server. Check your connection and try again.");
+ logger.devWarn('[InstructorDashboard] gate name lookup', error.message);
+ return;
  }
 
- /* Name-entry gate */
+ if ((count ?? 0) === 0) {
+ setVerifying(false);
+ localStorage.setItem(INSTRUCTOR_NAME_KEY, name);
+ setInstructorName(name);
+ setInstructorPin(pin);
+ return;
+ }
+
+ const { count: matchCount, error: matchErr } = await supabase
+ .from('classes')
+ .select('id', { count: 'exact', head: true })
+ .eq('instructor_name', name)
+ .eq('instructor_pin', pin);
+ setVerifying(false);
+ if (matchErr) {
+ setPinError("Couldn't verify PIN. Try again.");
+ logger.devWarn('[InstructorDashboard] gate pin lookup', matchErr.message);
+ return;
+ }
+ if ((matchCount ?? 0) === 0) {
+ setPinError('Incorrect PIN for this instructor name.');
+ return;
+ }
+
+ localStorage.setItem(INSTRUCTOR_NAME_KEY, name);
+ setInstructorName(name);
+ setInstructorPin(pin);
+ };
+
  if (!instructorName) return (
  <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center p-4">
  <div className="bg-card border border-border rounded-xl shadow-lg max-w-sm w-full p-6 space-y-4 animate-scale-in">
  <div className="text-center space-y-1">
- <div className="text-4xl mb-2"></div>
  <h2 className="text-xl font-display font-bold text-foreground">Instructor Dashboard</h2>
- <p className="text-sm text-muted-foreground">Enter your name to start or continue a session.</p>
+ <p className="text-sm text-muted-foreground">Enter your name and instructor PIN.</p>
  </div>
- <form onSubmit={e => {
- e.preventDefault();
- const name = nameInput.trim();
- if (!name) return;
- if (pinRequired && pinInput !== instructorPin) {
- setPinError(true);
- return;
- }
- setPinError(false);
- localStorage.setItem(INSTRUCTOR_NAME_KEY, name);
- setInstructorName(name);
- }} className="space-y-3">
+ <form onSubmit={handleGateSubmit} className="space-y-3">
  <div className="space-y-1">
  <input
  type="text"
  value={nameInput}
- onChange={e => setNameInput(e.target.value)}
+ onChange={e => { setNameInput(e.target.value); setPinError(''); }}
  placeholder="Your name (e.g. Prof. Smith)"
  autoFocus
  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
@@ -687,29 +724,23 @@ export default function InstructorDashboard({ onClose }: Props) {
  </button>
  )}
  </div>
- {!pinRequired && import.meta.env.DEV && (
- <p className="text-xs text-amber-700 dark:text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-md px-3 py-2">
- Development only: <span className="font-mono">VITE_INSTRUCTOR_PIN</span> is not set. The dashboard opens with your name only.
- </p>
- )}
- {pinRequired && (
- <>
  <input
  type="password"
  value={pinInput}
- onChange={e => { setPinInput(e.target.value); setPinError(false); }}
+ onChange={e => { setPinInput(e.target.value); setPinError(''); }}
  placeholder="Instructor PIN"
  className={`w-full px-4 py-3 rounded-lg border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary ${pinError ? 'border-destructive' : 'border-border'}`}
  />
- {pinError && <p className="text-xs text-destructive">Incorrect PIN. Please check with your course coordinator.</p>}
- </>
- )}
+ {pinError && <p className="text-xs text-destructive">{pinError}</p>}
+ <p className="text-xs text-muted-foreground">
+ First time? Enter a PIN of 4+ characters and you'll set it on your first class. Returning? Use the PIN you chose when creating the class.
+ </p>
  <button
  type="submit"
- disabled={!nameInput.trim() || (pinRequired && !pinInput)}
+ disabled={!nameInput.trim() || pinInput.trim().length < 4 || verifying}
  className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
  >
- Enter Dashboard
+ {verifying ? 'Verifying…' : 'Enter Dashboard'}
  </button>
  <button type="button" onClick={onClose} className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors">
  Cancel
@@ -725,6 +756,7 @@ export default function InstructorDashboard({ onClose }: Props) {
  {showCreateClass && (
  <CreateClassModal
  instructorName={instructorName}
+ instructorPin={instructorPin}
  onCreated={(c) => {
  setClasses(prev => [c, ...prev]);
  setSelectedClass(c.id);
