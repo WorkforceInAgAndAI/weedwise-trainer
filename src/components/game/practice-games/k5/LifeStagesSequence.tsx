@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FarmerGuide from '@/components/game/FarmerGuide';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -65,6 +66,13 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
     { top: '100%', left: '50%', tx: '-50%', ty: '-100%' },
     { top: '50%', left: '0%', tx: '0', ty: '-50%' },
   ];
+  // Arrow midpoints between consecutive positions, rotated to point clockwise
+  const arrows = [
+    { top: '15%', left: '85%', rot: 45 },
+    { top: '85%', left: '85%', rot: 135 },
+    { top: '85%', left: '15%', rot: 225 },
+    { top: '15%', left: '15%', rot: 315 },
+  ];
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -78,6 +86,18 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 p-4 overflow-y-auto">
         {/* Main: circle layout */}
         <div className="flex flex-col items-center justify-center gap-6">
+          <FarmerGuide
+            gradeLabel={gradeLabel}
+            tone={checked ? (isCorrect ? 'correct' : 'wrong') : 'hint'}
+            message={
+              checked
+                ? isCorrect
+                  ? `Yee-haw! You walked the ${target.commonName} all the way around its cycle. That's how a real agronomist thinks!`
+                  : `Close, partner — every weed starts as a seed, sprouts into a seedling, grows tall (vegetative), then flowers (reproductive). Follow the arrows clockwise.`
+                : `Alright, let's trace the ${target.commonName} life cycle. Start at the top with the seed and follow the arrows clockwise. Use the ← → buttons to swap stages.`
+            }
+            className="max-w-xl w-full"
+          />
           <p className="text-foreground font-bold text-lg text-center">Put <span className="text-primary">{target.commonName}</span> in cycle order, starting at the top.</p>
 
           <div className="relative w-[360px] h-[360px] sm:w-[440px] sm:h-[440px]">
@@ -85,11 +105,26 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
             <div className="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-primary/5 border-2 border-dashed border-primary/30 flex items-center justify-center text-center">
               <span className="text-xs font-bold text-primary leading-tight px-2">Life Cycle<br/>(seed → seed)</span>
             </div>
-            {/* Stage slots */}
-            {order.map((stage, i) => {
+            {/* Arrows between stages — show clockwise cycle direction */}
+            {arrows.map((a, i) => (
+              <div
+                key={`arrow-${i}`}
+                className="absolute text-primary/70 text-2xl font-bold pointer-events-none select-none"
+                style={{ top: a.top, left: a.left, transform: `translate(-50%, -50%) rotate(${a.rot}deg)` }}
+              >
+                →
+              </div>
+            ))}
+            {/* Stage cards — keyed by stage so the image stays attached to its card while reordering */}
+            {STAGES.map((stage) => {
+              const i = order.indexOf(stage);
               const pos = positions[i];
               return (
-                <div key={i} className="absolute" style={{ top: pos.top, left: pos.left, transform: `translate(${pos.tx}, ${pos.ty})` }}>
+                <div
+                  key={stage}
+                  className="absolute transition-all duration-300"
+                  style={{ top: pos.top, left: pos.left, transform: `translate(${pos.tx}, ${pos.ty})` }}
+                >
                   <div className="flex flex-col items-center gap-1">
                     <div className="text-[10px] font-bold text-muted-foreground">#{i + 1}</div>
                     <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-3 ${
@@ -97,6 +132,7 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
                     }`}>
                       <WeedImage weedId={target.id} stage={stage} className="w-full h-full object-cover" />
                     </div>
+                    <div className="text-[10px] font-semibold text-foreground">{STAGE_LABELS[stage]}</div>
                     {!checked && (
                       <div className="flex gap-1">
                         <button onClick={() => swap(i, (i + order.length - 1) % order.length)} className="text-xs px-2 py-0.5 rounded bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground">←</button>
@@ -113,9 +149,6 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
             <button onClick={check} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Order</button>
           ) : (
             <div className="text-center">
-              <p className={`text-lg font-bold mb-2 ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
-                {isCorrect ? 'Perfect order!' : `Not quite — correct: ${STAGES.map(s => STAGE_LABELS[s]).join(' → ')}`}
-              </p>
               <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
             </div>
           )}
