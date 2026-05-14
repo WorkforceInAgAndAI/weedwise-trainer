@@ -792,9 +792,11 @@ function TopicContent({
               <p className="font-display font-bold text-primary text-base">Common Names</p>
               <p>
                 A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or
-                other plants for <strong>sunlight, water, and nutrients</strong>. While some plants are considered weeds
-                in one place, the same plant might be perfectly welcome somewhere else, making "weed" less about what
-                the plant is and more about <strong>where it is growing</strong>.
+                other plants for <strong>sunlight, water, and nutrients</strong>. Plants are usually grouped as either
+                <strong> pest plants</strong> (those that cause harm, reduce yields, or crowd out the plants we want)
+                or <strong>beneficial plants</strong> (those that provide food, habitat, or improve the soil). A weed is
+                a pest plant in the place it is currently growing, even if the same species could be useful somewhere
+                else.
               </p>
               <p>
                 Weeds are frequently known by <strong>multiple common names</strong> that vary by region, state, and
@@ -803,10 +805,8 @@ function TopicContent({
               </p>
               <p>
                 A single plant species may carry entirely different names depending on geographic location, local
-                tradition, or historical usage, and in some cases, the <strong>same common name</strong> may refer to
-                two completely different plant species in different parts of the country. This inconsistency in naming
-                makes accurate communication about weed identification and management more difficult across different
-                regions and disciplines.
+                tradition, or historical usage. This inconsistency in naming makes accurate communication about weed
+                identification and management more difficult across different regions and disciplines.
               </p>
             </div>
 
