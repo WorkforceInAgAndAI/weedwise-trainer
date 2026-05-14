@@ -1711,10 +1711,10 @@ function TopicContent({
                 is removed.
               </p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {perennials.slice(0, 8).map((w) => (
+                {perennials.map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1735,7 +1735,7 @@ function TopicContent({
                   {dualLifecycle.map((w) => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-2">
                       <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
