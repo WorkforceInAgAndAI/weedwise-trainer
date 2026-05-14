@@ -3125,7 +3125,7 @@ function TopicContent({
                     <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
                   </p>
                   <div className="space-y-2">
-                    {getMiddleSchoolMOAs().map(h => (
+                    {[...getMiddleSchoolMOAs()].sort((a, b) => a.group - b.group).map(h => (
                       <div key={h.id} className="bg-card border border-border rounded-lg p-3">
                         <p className="font-bold text-foreground text-xs">{h.moa} (Group {h.group})</p>
                         <p className="text-[10px] text-muted-foreground">
