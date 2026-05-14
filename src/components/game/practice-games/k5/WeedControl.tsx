@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
+import FarmerGuide from '@/components/game/FarmerGuide';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -147,6 +148,12 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     return shuffle([correct, ...wrongs]);
   }, [activeWeed, weedState]);
 
+  // Memoize control method options per active weed so they don't reshuffle on every render.
+  const methodOptions = useMemo(() => {
+    if (activeWeed === null) return [];
+    return methodOptionsFor(weedState[activeWeed].weed);
+  }, [activeWeed, weedState]);
+
   if (done) return <LevelComplete level={level} score={score} total={fieldWeeds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
   return (
@@ -158,9 +165,28 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <span className={`text-sm font-bold ${timer <= 10 ? 'text-destructive' : 'text-foreground'}`}>{timer}s</span>
         <span className="text-sm text-primary font-bold ml-2">{score} pts</span>
       </div>
+      <div className="flex-1 flex overflow-hidden">
       <div className="flex-1 relative">
         <img src={fieldBgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute top-3 left-3 right-3 z-20">
+          <FarmerGuide
+            gradeLabel="K-5"
+            tone={active ? (phase === 'idFeedback' && idChoice === active.weed.commonName ? 'correct' : phase === 'idFeedback' ? 'wrong' : phase === 'manageFeedback' && methodChoice === bestMethod(active.weed) ? 'correct' : phase === 'manageFeedback' ? 'wrong' : 'hint') : 'intro'}
+            compact
+            message={
+              !active
+                ? "Tap a weed in the field, then tell me what it is and how we should manage it!"
+                : phase === 'identify'
+                  ? `Look closely. Hint: ${active.weed.traits[0]}.`
+                  : phase === 'idFeedback'
+                    ? (idChoice === active.weed.commonName ? `Yes! That's ${active.weed.commonName}. Now pick a control method.` : `Not quite — that one is ${active.weed.commonName}. Try another weed!`)
+                    : phase === 'manage'
+                      ? `For ${active.weed.commonName}, think about its life cycle (${active.weed.lifeCycle}) and roots.`
+                      : (methodChoice === bestMethod(active.weed) ? `Great choice! ${bestMethodFor(active.weed).label} works best here.` : `Close! The best method is ${bestMethodFor(active.weed).label}.`)
+            }
+          />
+        </div>
         {weedState.map((fw, i) => (
           <button key={i} onClick={() => clickWeed(i)}
             className={`absolute w-14 h-14 rounded-full transition-all ${fw.managed ? 'opacity-30 scale-75' : 'hover:scale-110'}`}
@@ -233,7 +259,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {methodOptionsFor(active.weed).map(m => (
+                  {methodOptions.map(m => (
                     <button key={m.id} onClick={() => manageWeed(m.id)}
                       className="py-3 px-4 rounded-lg border border-border bg-secondary text-foreground text-sm font-medium hover:border-primary transition-colors text-left">
                       {m.label}
@@ -271,6 +297,33 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             )}
           </div>
         )}
+      </div>
+      {/* Side tracking panel */}
+      <aside className="hidden md:flex w-64 shrink-0 flex-col border-l border-border bg-card overflow-y-auto">
+        <div className="px-4 py-3 border-b border-border">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground font-bold">Field Log</p>
+          <p className="text-sm text-foreground mt-0.5">{weedState.filter(w => w.managed).length}/{weedState.length} managed</p>
+        </div>
+        <ul className="p-3 space-y-2">
+          {weedState.map((fw, i) => {
+            const chosen = fw.managed ? METHOD_LIBRARY[methodChoice && i === activeWeed ? methodChoice : '']?.label : null;
+            // Stored chosen method in fw isn't tracked — show generic outcome
+            return (
+              <li key={i} className={`flex items-start gap-2 p-2 rounded-lg border ${fw.managed ? (fw.correct ? 'border-green-500/40 bg-green-500/5' : 'border-destructive/40 bg-destructive/5') : 'border-border bg-secondary/40'}`}>
+                <div className="w-10 h-10 rounded-md overflow-hidden border border-border shrink-0">
+                  <WeedImage weedId={fw.weed.id} stage="plant" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-foreground truncate">{fw.identified || fw.managed ? fw.weed.commonName : `Weed #${i + 1}`}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {fw.managed ? (fw.correct ? `✓ ${bestMethodFor(fw.weed).label}` : `✗ Best: ${bestMethodFor(fw.weed).label}`) : (fw.identified ? 'Pick a control method' : 'Not yet identified')}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </aside>
       </div>
     </div>
   );
