@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
@@ -128,10 +128,34 @@ const highGames: GameDef[] = [
 
 type Screen = 'grades' | 'games' | 'info' | 'playing';
 
-export default function PracticeHub({ onClose }: { onClose: () => void }) {
+export default function PracticeHub({
+  onClose,
+  initialGrade,
+  initialGameId,
+}: {
+  onClose: () => void;
+  initialGrade?: string;
+  initialGameId?: string;
+}) {
  const [screen, setScreen] = useState<Screen>('grades');
  const [selectedGrade, setSelectedGrade] = useState<string>('');
  const [selectedGame, setSelectedGame] = useState<GameDef | null>(null);
+
+  useEffect(() => {
+    if (!initialGrade) return;
+    setSelectedGrade(initialGrade);
+    if (initialGameId) {
+      const list =
+        initialGrade === 'k5' ? k5Games : initialGrade === '68' ? middleGames : initialGrade === '912' ? highGames : [];
+      const found = list.find((g) => g.id === initialGameId);
+      if (found) {
+        setSelectedGame(found);
+        setScreen('info');
+        return;
+      }
+    }
+    setScreen('games');
+  }, [initialGrade, initialGameId]);
 
  const selectGrade = (g: string) => { setSelectedGrade(g); setScreen('games'); };
  const selectGame = (g: GameDef) => { setSelectedGame(g); setScreen('info'); };
