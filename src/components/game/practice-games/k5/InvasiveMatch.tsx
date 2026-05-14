@@ -1,20 +1,63 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
+import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const EFFECTS: Record<string, string> = {
-  'waterhemp': 'Overtakes crop fields and resists many herbicides',
-  'palmer-amaranth': 'Grows over 2 inches per day, blocking sunlight from crops',
-  'kochia': 'Spreads rapidly as a tumbleweed across dry farmland',
-  'johnsongrass': 'Takes over pastures and is toxic to livestock when stressed',
-  'canada-thistle': 'Spreads by underground roots across meadows and fields',
-  'giant-ragweed': 'Causes severe allergies and shades out crops completely',
-  'marestail': 'One of the first weeds to resist glyphosate herbicide',
-  'morningglory': 'Wraps around crops and pulls them down at harvest',
-  'barnyardgrass': 'Steals water and nutrients from rice and corn fields',
-  'large-crabgrass': 'Invades lawns and gardens, crowding out desired plants',
+// Each invasive weed has multiple verified negative effects; we rotate which one shows per round
+// so students see different impacts each time.
+const EFFECTS_BY_WEED: Record<string, string[]> = {
+  'waterhemp': [
+    'Overtakes soybean fields and resists 7 different herbicide groups',
+    'A single female plant produces over a million seeds in one season',
+    'Reduces soybean yields by up to 40% when uncontrolled',
+  ],
+  'palmer-amaranth': [
+    'Grows over 2 inches per day, blocking sunlight from crops',
+    'Stalks grow so thick they break combines at harvest',
+    'A single plant can cut corn yields by 50% in nearby rows',
+  ],
+  'kochia': [
+    'Spreads rapidly as a tumbleweed across dry farmland',
+    'Tolerates salty soils where most crops cannot grow',
+    'Resistant to glyphosate and several other herbicides',
+  ],
+  'johnsongrass': [
+    'Takes over pastures and is toxic to livestock when stressed',
+    'Spreads aggressively from underground rhizomes — hard to kill',
+    'Releases chemicals from roots that stunt nearby crops',
+  ],
+  'canada-thistle': [
+    'Spreads by underground roots across meadows and fields',
+    'Sharp spines injure livestock and make hay unpalatable',
+    'Even a small root piece left in soil can grow a new plant',
+  ],
+  'giant-ragweed': [
+    'Causes severe seasonal allergies in millions of people',
+    'Shades out soybeans and corn, slashing yields by up to 90%',
+    'Some populations resist both glyphosate and ALS herbicides',
+  ],
+  'marestail': [
+    'One of the first weeds to resist glyphosate herbicide',
+    'Tiny pappus seeds float for miles, spreading into new fields',
+    'A single plant produces up to 200,000 seeds',
+  ],
+  'morningglory': [
+    'Wraps around crops and pulls them down at harvest',
+    'Vines clog combines, slowing soybean and corn harvest',
+    'Hard seeds stay viable in the soil for over 20 years',
+  ],
+  'barnyardgrass': [
+    'Steals water and nutrients from rice and corn fields',
+    'Mimics rice seedlings, making it hard to spot and remove',
+    'A single plant can produce 40,000 seeds in one season',
+  ],
+  'large-crabgrass': [
+    'Invades lawns and gardens, crowding out desired plants',
+    'Grows flat to dodge mower blades and keep spreading',
+    'Thrives in hot, dry summer conditions when grass is stressed',
+  ],
 };
 
 const ITEMS_PER_ROUND = 5;
@@ -26,13 +69,18 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
   const [totalScore, setTotalScore] = useState(0);
 
   const allInvasive = useMemo(() => {
-    return weeds.filter(w => w.origin === 'Introduced' && EFFECTS[w.id]);
+    return weeds.filter(w => w.origin === 'Introduced' && EFFECTS_BY_WEED[w.id]);
   }, []);
 
   const items = useMemo(() => {
     const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * ITEMS_PER_ROUND;
     const rotated = [...allInvasive.slice(offset % allInvasive.length), ...allInvasive.slice(0, offset % allInvasive.length)];
-    return shuffle(rotated).slice(0, ITEMS_PER_ROUND).map(w => ({ weed: w, effect: EFFECTS[w.id] }));
+    return shuffle(rotated).slice(0, ITEMS_PER_ROUND).map(w => {
+      const effects = EFFECTS_BY_WEED[w.id];
+      // Rotate which effect is shown per (level, roundNum) so it varies each playthrough
+      const idx = (level + roundNum + w.id.length) % effects.length;
+      return { weed: w, effect: effects[idx] };
+    });
   }, [level, roundNum, allInvasive]);
 
   const shuffledEffects = useMemo(() => shuffle(items.map(i => ({ weedId: i.weed.id, effect: i.effect }))), [items]);
@@ -114,11 +162,14 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
             <p className="text-xs font-bold text-foreground text-center">Invasive Weeds</p>
             {items.map(i => (
               <button key={i.weed.id} onClick={() => !checked && setSelectedWeed(i.weed.id)}
-                className={`w-full py-2 px-3 rounded-lg border-2 text-sm font-medium text-left transition-all ${
+                className={`w-full p-2 rounded-lg border-2 text-sm font-medium text-left transition-all flex items-center gap-2 ${
                   selectedWeed === i.weed.id ? 'border-primary bg-primary/10 text-primary' :
                   matches[i.weed.id] ? 'border-primary/30 bg-primary/5 text-foreground' : 'border-border text-foreground hover:border-primary/50'
                 }`}>
-                {i.weed.commonName}
+                <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
+                  <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                </div>
+                <span className="text-xs leading-tight">{i.weed.commonName}</span>
               </button>
             ))}
           </div>

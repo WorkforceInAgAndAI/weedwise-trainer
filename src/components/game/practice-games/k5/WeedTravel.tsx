@@ -4,6 +4,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import FarmerGuide from '@/components/game/FarmerGuide';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -15,14 +16,23 @@ interface SeedCharacter {
 }
 
 const ALL_SEED_CANDIDATES: Omit<SeedCharacter, 'weedId'>[] = [
-  { name: 'Marestail Seed', traits: { wind: 3, water: 1, animal: 1, heat: 2, cold: 2 }, description: 'Tiny parachute seed — great at flying in the wind!' },
-  { name: 'Morningglory Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Hard round seed — tough and can survive heat!' },
-  { name: 'Giant Ragweed Seed', traits: { wind: 1, water: 3, animal: 1, heat: 1, cold: 3 }, description: 'Heavy seed that floats well in water and survives cold!' },
-  { name: 'Green Foxtail Seed', traits: { wind: 2, water: 1, animal: 3, heat: 2, cold: 2 }, description: 'Bristly seed that sticks to animal fur easily!' },
-  { name: 'Kochia Seed', traits: { wind: 3, water: 1, animal: 1, heat: 3, cold: 1 }, description: 'Tumbleweed seed — rolls and flies with the wind!' },
-  { name: 'Waterhemp Seed', traits: { wind: 2, water: 3, animal: 1, heat: 2, cold: 2 }, description: 'Smooth seed that loves wet areas and floods!' },
-  { name: 'Palmer Amaranth Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Fast-growing seed that thrives in hot conditions!' },
-  { name: 'Canada Thistle Seed', traits: { wind: 3, water: 2, animal: 1, heat: 1, cold: 3 }, description: 'Fluffy seed that drifts in the wind and survives frost!' },
+  // Trait values reflect verified dispersal mechanisms in published weed biology references.
+  // marestail (Conyza canadensis): tiny pappus seeds carried hundreds of km on wind.
+  { name: 'Marestail Seed', traits: { wind: 3, water: 1, animal: 1, heat: 2, cold: 2 }, description: 'Tiny pappus (parachute) seed — carried for miles on the wind.' },
+  // morningglory (Ipomoea spp.): hard, water-resistant seed coat; spread by water/animals/equipment.
+  { name: 'Morningglory Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Hard round seed coat — survives heat, water, and digestion.' },
+  // giant ragweed (Ambrosia trifida): large, heavy seeds float and overwinter; spread mainly by water and equipment.
+  { name: 'Giant Ragweed Seed', traits: { wind: 1, water: 3, animal: 1, heat: 1, cold: 3 }, description: 'Heavy seed that floats downstream and survives winter cold.' },
+  // green foxtail (Setaria viridis): bristly seedhead clings to fur and clothing.
+  { name: 'Green Foxtail Seed', traits: { wind: 2, water: 1, animal: 3, heat: 2, cold: 2 }, description: 'Bristly seedhead — hooks onto animal fur and pant legs.' },
+  // kochia (Bassia scoparia): whole plant breaks off as a tumbleweed, scattering seed.
+  { name: 'Kochia Seed', traits: { wind: 3, water: 1, animal: 1, heat: 3, cold: 1 }, description: 'Tumbleweed seed — the whole plant rolls and flings seed in wind.' },
+  // waterhemp (Amaranthus tuberculatus): tiny seeds float on floodwater into riverbanks and crop fields.
+  { name: 'Waterhemp Seed', traits: { wind: 2, water: 3, animal: 1, heat: 2, cold: 2 }, description: 'Tiny smooth seed that rides flood water into new fields.' },
+  // Palmer amaranth (Amaranthus palmeri): tiny seeds carried by equipment, manure, and water.
+  { name: 'Palmer Amaranth Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Tiny seed carried by equipment and animals; thrives in heat.' },
+  // Canada thistle (Cirsium arvense): fluffy pappus seed carried by wind; also spreads by roots.
+  { name: 'Canada Thistle Seed', traits: { wind: 3, water: 2, animal: 1, heat: 1, cold: 3 }, description: 'Fluffy pappus seed — drifts on wind and survives frost.' },
 ];
 
 const WEED_IDS_FOR_SEEDS = ['marestail', 'morningglory', 'giant-ragweed', 'green-foxtail', 'kochia', 'waterhemp', 'palmer-amaranth', 'canada-thistle'];
@@ -35,6 +45,14 @@ function buildSeedCharacters(count: number = 5): SeedCharacter[] {
     }
   });
   return shuffle(available).slice(0, count);
+}
+
+// Vary the "need" thresholds each level so the same need stars don't repeat
+function getThresholdForLevel(baseThreshold: number, level: number, nodeId: string, methodIdx: number): number {
+  // Pseudo-random seeded by level + node + option position. Thresholds 1, 2, or 3.
+  const seed = level * 31 + nodeId.length * 7 + methodIdx * 3;
+  const variation = (seed % 3) - 1; // -1, 0, +1
+  return Math.max(1, Math.min(3, baseThreshold + variation));
 }
 
 interface AdventureNode {
@@ -156,11 +174,18 @@ function getNode(id: string, obstacleSet: AdventureNode[]): AdventureNode {
   return obstacleSet.find(n => n.id === id) || FINISH_NODE;
 }
 
-export default function WeedTravel({ onBack }: { onBack: () => void }) {
+interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
+
+export default function WeedTravel({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const seedCharacters = useMemo(() => buildSeedCharacters(5), [level]);
-  const obstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
+  const baseObstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
+  // Apply per-level threshold variation so star requirements are not identical each round
+  const obstacleSet = useMemo<AdventureNode[]>(() => baseObstacleSet.map(node => ({
+    ...node,
+    options: node.options.map((opt, idx) => ({ ...opt, threshold: getThresholdForLevel(opt.threshold, level, node.id, idx) })),
+  })), [baseObstacleSet, level]);
 
   const [chosenSeed, setChosenSeed] = useState<SeedCharacter | null>(null);
   const [currentNodeId, setCurrentNodeId] = useState('start_hill');
@@ -219,6 +244,9 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <Sprout className="w-12 h-12 mx-auto mb-4 text-primary" />
           <h2 className="text-2xl font-display font-bold text-foreground mb-2">{reached ? 'You Made It!' : 'Journey Over!'}</h2>
+          {!reached && (
+            <p className="text-sm text-destructive mb-2">Your seed got blocked and didn't reach new soil. Pick a seed with traits matched to the obstacles next time!</p>
+          )}
           <p className="text-muted-foreground mb-1">Playing as: {chosenSeed.name}</p>
           <p className="text-muted-foreground mb-6">Obstacles conquered: {score}/{totalSteps}</p>
           <div className="flex gap-3 justify-center">
@@ -248,7 +276,12 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
   const handleContinue = () => {
     if (selectedOption === null) return;
     const opt = node.options[selectedOption];
-    const nextId = succeeded ? opt.nextOnSuccess : opt.nextOnFail;
+    if (!succeeded) {
+      // Falling = end the journey rather than continuing forward
+      setGameOver(true);
+      return;
+    }
+    const nextId = opt.nextOnSuccess;
     setCurrentNodeId(nextId);
     setSelectedOption(null);
     setAnswered(false);
@@ -268,6 +301,18 @@ export default function WeedTravel({ onBack }: { onBack: () => void }) {
         </div>
       </div>
       <div className="flex-1 flex flex-col p-4 gap-4">
+        <FarmerGuide
+          gradeLabel={gradeLabel}
+          tone={answered ? (succeeded ? 'correct' : 'wrong') : 'hint'}
+          message={
+            answered
+              ? succeeded
+                ? `Great pick! Your ${chosenSeed.name.toLowerCase()} had enough ${node.options[selectedOption!].traitKey} to make it past.`
+                : `Tough break — your seed didn't have enough ${node.options[selectedOption!].traitKey} for that. The journey ends here, partner.`
+              : `Look at your seed's gold stars vs. the amber stars needed. Pick the trait where your seed has enough!`
+          }
+          className="max-w-md mx-auto w-full"
+        />
         <div className="flex items-center gap-1 justify-center">
           {history.map((h, i) => (
             <div key={i} className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${h.success ? 'bg-green-500/20 text-green-600' : 'bg-destructive/20 text-destructive'}`}>

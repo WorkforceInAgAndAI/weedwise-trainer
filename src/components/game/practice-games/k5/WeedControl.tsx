@@ -6,22 +6,57 @@ import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const METHODS = [
-  { id: 'pull', label: 'Pull by hand', icon: '' },
-  { id: 'spray', label: 'Spray herbicide', icon: '' },
-  { id: 'mow', label: 'Mow it down', icon: '' },
-  { id: 'leave', label: 'Leave it alone', icon: '' },
-];
+// Diversified per-weed control methods. Each weed has its own best method drawn from
+// real-world IPM guidance. Wrong options are still real techniques but a poor fit.
+interface ControlMethod { id: string; label: string }
+const METHOD_LIBRARY: Record<string, ControlMethod> = {
+  'hand-pull': { id: 'hand-pull', label: 'Hand-pull young plants' },
+  'hoe': { id: 'hoe', label: 'Hoe at the soil line' },
+  'mow': { id: 'mow', label: 'Mow before flowering' },
+  'tillage': { id: 'tillage', label: 'Shallow tillage between rows' },
+  'pre-emergent': { id: 'pre-emergent', label: 'Spray pre-emergent herbicide' },
+  'post-emergent': { id: 'post-emergent', label: 'Spray post-emergent herbicide' },
+  'cover-crop': { id: 'cover-crop', label: 'Plant a cover crop to crowd it out' },
+  'rotation': { id: 'rotation', label: 'Rotate to a different crop next year' },
+  'spot-treat': { id: 'spot-treat', label: 'Spot-treat with herbicide' },
+  'mulch': { id: 'mulch', label: 'Mulch to block sunlight' },
+  'rhizome-dig': { id: 'rhizome-dig', label: 'Dig out roots and rhizomes' },
+  'leave': { id: 'leave', label: 'Leave it alone' },
+};
+
+function bestMethodFor(w: typeof weeds[0]): ControlMethod {
+  const m = w.management.toLowerCase();
+  const lc = w.lifeCycle.toLowerCase();
+  if (lc.includes('perennial') && (m.includes('rhizome') || m.includes('root'))) return METHOD_LIBRARY['rhizome-dig'];
+  if (m.includes('pre-emergent') || m.includes('pre emergent')) return METHOD_LIBRARY['pre-emergent'];
+  if (m.includes('post-emergent') || m.includes('post emergent')) return METHOD_LIBRARY['post-emergent'];
+  if (m.includes('hand') || m.includes('pull')) return METHOD_LIBRARY['hand-pull'];
+  if (m.includes('hoe')) return METHOD_LIBRARY['hoe'];
+  if (m.includes('mow')) return METHOD_LIBRARY['mow'];
+  if (m.includes('cover crop')) return METHOD_LIBRARY['cover-crop'];
+  if (m.includes('rotation') || m.includes('rotate')) return METHOD_LIBRARY['rotation'];
+  if (m.includes('mulch')) return METHOD_LIBRARY['mulch'];
+  if (m.includes('tillage') || m.includes('cultivation')) return METHOD_LIBRARY['tillage'];
+  if (m.includes('spot')) return METHOD_LIBRARY['spot-treat'];
+  if (m.includes('herbicide') || m.includes('chemical')) return METHOD_LIBRARY['post-emergent'];
+  // Hash-based fallback so each weed still gets a varied "best" method
+  const keys = Object.keys(METHOD_LIBRARY).filter(k => k !== 'leave');
+  const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return METHOD_LIBRARY[keys[hash % keys.length]];
+}
+
+function methodOptionsFor(w: typeof weeds[0]): ControlMethod[] {
+  const correct = bestMethodFor(w);
+  const distractors = Object.values(METHOD_LIBRARY).filter(m => m.id !== correct.id);
+  // Stable seed-based pick of 3 distractors per weed so options vary by species
+  const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const picked: ControlMethod[] = [];
+  for (let i = 0; i < 3; i++) picked.push(distractors[(hash + i * 5) % distractors.length]);
+  return shuffle([correct, ...picked]);
+}
 
 function bestMethod(w: typeof weeds[0]): string {
-  const m = w.management.toLowerCase();
-  if (m.includes('hand') || m.includes('pull') || m.includes('hoe')) return 'pull';
-  if (m.includes('mow') || m.includes('mechanical') || m.includes('tillage') || m.includes('cultivation')) return 'mow';
-  if (m.includes('cover crop') || m.includes('rotation') || m.includes('compete') || m.includes('cultural')) return 'leave';
-  if (m.includes('herbicide') || m.includes('pre') || m.includes('post') || m.includes('chemical')) return 'spray';
-  const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const fallbacks = ['pull', 'mow', 'leave', 'spray'];
-  return fallbacks[hash % fallbacks.length];
+  return bestMethodFor(w).id;
 }
 
 interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: boolean; managed: boolean; correct: boolean; }
@@ -142,8 +177,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               <div>
                 <p className="text-base font-bold text-foreground mb-3">What weed is this?</p>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-20 h-20 rounded-lg overflow-hidden border border-border bg-secondary">
-                    <WeedImage weedId={active.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  <div className="w-40 h-40 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
+                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
                   </div>
                   <p className="text-sm text-muted-foreground flex-1">{active.weed.traits[0]}</p>
                 </div>
@@ -160,12 +195,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             {phase === 'idFeedback' && (
               <div className="text-center">
                 <div className="flex items-center gap-4 justify-center mb-3">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-secondary">
-                    <WeedImage weedId={active.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  <div className="w-32 h-32 rounded-lg overflow-hidden border border-border bg-secondary">
+                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
                   </div>
                   <div className="text-left">
                     <p className="font-bold text-foreground">{active.weed.commonName}</p>
                     <p className="text-xs italic text-muted-foreground">{active.weed.scientificName}</p>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-[160px]">Look for: {active.weed.traits[0]}</p>
                   </div>
                 </div>
                 {idChoice === active.weed.commonName ? (
@@ -187,12 +223,20 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             )}
             {phase === 'manage' && (
               <div>
-                <p className="text-base font-bold text-foreground mb-3">How should you manage <span className="text-primary">{active.weed.commonName}</span>?</p>
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="w-32 h-32 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
+                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-foreground mb-1">Manage <span className="text-primary">{active.weed.commonName}</span></p>
+                    <p className="text-xs text-muted-foreground">{active.weed.lifeCycle} • {active.weed.plantType}</p>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {METHODS.map(m => (
+                  {methodOptionsFor(active.weed).map(m => (
                     <button key={m.id} onClick={() => manageWeed(m.id)}
-                      className="py-3 px-4 rounded-lg border border-border bg-secondary text-foreground text-base font-medium hover:border-primary transition-colors">
-                      {m.icon} {m.label}
+                      className="py-3 px-4 rounded-lg border border-border bg-secondary text-foreground text-sm font-medium hover:border-primary transition-colors text-left">
+                      {m.label}
                     </button>
                   ))}
                 </div>
@@ -200,20 +244,25 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             )}
             {phase === 'manageFeedback' && (
               <div className="text-center">
-                <p className="font-bold text-foreground mb-1">{active.weed.commonName}</p>
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <div className="w-24 h-24 rounded-lg overflow-hidden border border-border bg-secondary">
+                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  </div>
+                  <p className="font-bold text-foreground">{active.weed.commonName}</p>
+                </div>
                 {methodChoice === bestMethod(active.weed) ? (
                   <div>
                     <p className="text-green-500 font-bold text-lg mb-1">Correct!</p>
                     <p className="text-sm text-muted-foreground mb-3">
-                      {METHODS.find(m => m.id === methodChoice)?.label} is the best way to control {active.weed.commonName}!
+                      {METHOD_LIBRARY[methodChoice!]?.label} is the best way to control {active.weed.commonName}. {active.weed.management}
                     </p>
                   </div>
                 ) : (
                   <div>
                     <p className="text-destructive font-bold text-lg mb-1">Not the best choice</p>
-                    <p className="text-sm text-muted-foreground mb-1">You chose: {METHODS.find(m => m.id === methodChoice)?.label}</p>
+                    <p className="text-sm text-muted-foreground mb-1">You chose: {METHOD_LIBRARY[methodChoice!]?.label}</p>
                     <p className="text-sm text-muted-foreground mb-3">
-                      Best: <span className="font-bold text-foreground">{METHODS.find(m => m.id === bestMethod(active.weed))?.label}</span> — {active.weed.management}
+                      Best: <span className="font-bold text-foreground">{bestMethodFor(active.weed).label}</span> — {active.weed.management}
                     </p>
                   </div>
                 )}

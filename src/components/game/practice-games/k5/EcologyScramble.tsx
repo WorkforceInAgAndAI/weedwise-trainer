@@ -12,12 +12,29 @@ const ALL_NEEDS: NeedItem[] = [
   { id: 'standing-water', label: 'Standing water', category: 'aquatic' },
   { id: 'dissolved-nutrients', label: 'Dissolved nutrients', category: 'aquatic' },
   { id: 'underwater-light', label: 'Underwater sunlight', category: 'aquatic' },
+  { id: 'pond-surface', label: 'Pond or lake surface to float on', category: 'aquatic' },
+  { id: 'wet-mud', label: 'Wet muddy bottom', category: 'aquatic' },
+  { id: 'slow-current', label: 'Slow-moving water', category: 'aquatic' },
+  { id: 'algae-friends', label: 'Algae and pondweed neighbors', category: 'aquatic' },
+  { id: 'oxygen-water', label: 'Oxygen dissolved in water', category: 'aquatic' },
   { id: 'soil', label: 'Soil to root in', category: 'terrestrial' },
   { id: 'rain', label: 'Rainfall', category: 'terrestrial' },
   { id: 'air-space', label: 'Open air space', category: 'terrestrial' },
+  { id: 'sunlight-direct', label: 'Direct sunlight on leaves', category: 'terrestrial' },
+  { id: 'soil-nutrients', label: 'Nutrients in the soil', category: 'terrestrial' },
+  { id: 'pollinators', label: 'Bees and butterflies to pollinate', category: 'terrestrial' },
+  { id: 'wind-pollination', label: 'Wind to carry pollen', category: 'terrestrial' },
+  { id: 'roots-deep', label: 'Deep roots to find water', category: 'terrestrial' },
+  { id: 'co2-air', label: 'Carbon dioxide from the air', category: 'terrestrial' },
+  { id: 'topsoil', label: 'Loose topsoil to grow in', category: 'terrestrial' },
   { id: 'host-plant', label: 'Host plant to attach to', category: 'parasitic' },
   { id: 'steal-nutrients', label: 'Steal nutrients from host', category: 'parasitic' },
   { id: 'special-roots', label: 'Special attachment roots', category: 'parasitic' },
+  { id: 'haustoria', label: 'Haustoria to tap into stems', category: 'parasitic' },
+  { id: 'sugars-host', label: 'Sugars made by another plant', category: 'parasitic' },
+  { id: 'tree-branch', label: 'A tree branch to grow on', category: 'parasitic' },
+  { id: 'host-water', label: 'Water pulled from a host plant', category: 'parasitic' },
+  { id: 'no-photosynth', label: 'Little need for its own photosynthesis', category: 'parasitic' },
 ];
 
 const CATEGORIES = [
@@ -37,8 +54,21 @@ export default function EcologyScramble({ onBack, gradeLabel }: Props) {
 
   // Quick ID — show a need, user picks terrestrial/aquatic/parasitic in 10 seconds
   const quickIDRounds = useMemo(() => {
-    const pool = shuffle([...ALL_NEEDS]);
-    return pool.map(need => ({ need, correctCategory: need.category }));
+    // Pick a varied subset per level so students see new needs each round.
+    // Aim for balanced categories: 4 from each = 12 questions.
+    const byCat = { aquatic: [] as NeedItem[], terrestrial: [] as NeedItem[], parasitic: [] as NeedItem[] };
+    ALL_NEEDS.forEach(n => byCat[n.category as keyof typeof byCat].push(n));
+    const pickFrom = (arr: NeedItem[], n: number) => {
+      const offset = (level - 1) * 2;
+      const rotated = [...arr.slice(offset % arr.length), ...arr.slice(0, offset % arr.length)];
+      return shuffle(rotated).slice(0, n);
+    };
+    const pool = [
+      ...pickFrom(byCat.aquatic, 4),
+      ...pickFrom(byCat.terrestrial, 4),
+      ...pickFrom(byCat.parasitic, 4),
+    ];
+    return shuffle(pool).map(need => ({ need, correctCategory: need.category }));
   }, [level]);
 
   const [qIdx, setQIdx] = useState(0);

@@ -5,12 +5,68 @@ import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const REMOVAL_METHODS = [
+// Per-weed safe handling guidance, so the management answer differs by toxic plant.
+// Each entry has 4 options with the safe ones varying based on the actual hazard.
+interface RemovalOption { id: string; label: string; safe: boolean }
+const SAFE_HANDLING_BY_WEED: Record<string, RemovalOption[]> = {
+  'poison-hemlock': [
+    { id: 'mask-gloves', label: 'Wear gloves AND a mask while pulling — sap and fumes are toxic', safe: true },
+    { id: 'tell', label: 'Tell an adult — never touch it yourself', safe: true },
+    { id: 'burn', label: 'Burn it in a bonfire to get rid of it', safe: false },
+    { id: 'crush', label: 'Crush the leaves to smell what it is', safe: false },
+  ],
+  'poison-ivy': [
+    { id: 'long-sleeves', label: 'Wear long sleeves, gloves, and pants — never touch the leaves', safe: true },
+    { id: 'tell', label: 'Tell an adult to spot-treat with herbicide', safe: true },
+    { id: 'pull-bare', label: 'Pull it bare-handed quickly', safe: false },
+    { id: 'burn', label: 'Burn it — the smoke carries the rash-causing oils', safe: false },
+  ],
+  'horsenettle': [
+    { id: 'gloves', label: 'Wear thick gloves — the spines on stems sting', safe: true },
+    { id: 'tell', label: 'Tell an adult and stay away from the berries', safe: true },
+    { id: 'eat-berries', label: 'Try the yellow berries — they look like tomatoes', safe: false },
+    { id: 'bare', label: 'Pull bare-handed and toss them aside', safe: false },
+  ],
+  'jimsonweed': [
+    { id: 'gloves', label: 'Wear gloves and wash hands afterwards — every part is poisonous', safe: true },
+    { id: 'tell', label: 'Tell an adult — do not touch the seed pods', safe: true },
+    { id: 'taste', label: 'Taste a seed to see what it is', safe: false },
+    { id: 'rub-eyes', label: 'Touch the leaves then rub your eyes', safe: false },
+  ],
+  'common-burdock': [
+    { id: 'gloves', label: 'Wear gloves to pull burs off — they hook into skin', safe: true },
+    { id: 'tell', label: 'Tell an adult before touching the prickly burs', safe: true },
+    { id: 'throw', label: 'Throw burs at friends as a joke', safe: false },
+    { id: 'eat', label: 'Chew on the seed burs to see how they taste', safe: false },
+  ],
+  'canada-thistle': [
+    { id: 'gloves', label: 'Wear thick gloves — the spines along the leaves prick', safe: true },
+    { id: 'tell', label: 'Tell an adult before pulling — the spines hurt', safe: true },
+    { id: 'bare', label: 'Pull it with bare hands as fast as you can', safe: false },
+    { id: 'sit-on', label: 'Sit on it to flatten it', safe: false },
+  ],
+  'bull-thistle': [
+    { id: 'gloves', label: 'Wear thick leather gloves — every leaf has long spines', safe: true },
+    { id: 'tell', label: 'Tell an adult to mow or cut before flowering', safe: true },
+    { id: 'grab', label: 'Grab it bare-handed — it does not look that sharp', safe: false },
+    { id: 'eat-flower', label: 'Pick the purple flower like a normal flower', safe: false },
+  ],
+  'stinging-nettle': [
+    { id: 'gloves', label: 'Wear gloves and long sleeves — the hairs sting on contact', safe: true },
+    { id: 'tell', label: 'Tell an adult — do not brush against it', safe: true },
+    { id: 'pull-bare', label: 'Pull it with bare hands quickly', safe: false },
+    { id: 'rub', label: 'Rub the leaves on your arm to see what happens', safe: false },
+  ],
+};
+const DEFAULT_REMOVAL_METHODS: RemovalOption[] = [
   { id: 'gloves', label: 'Wear gloves and pull it out', safe: true },
-  { id: 'bare', label: 'Pull it out with bare hands', safe: false },
   { id: 'tell', label: 'Tell an adult and stay away', safe: true },
+  { id: 'bare', label: 'Pull it out with bare hands', safe: false },
   { id: 'eat', label: 'Touch it to see if it stings', safe: false },
 ];
+function getRemovalOptions(weedId: string): RemovalOption[] {
+  return SAFE_HANDLING_BY_WEED[weedId] || DEFAULT_REMOVAL_METHODS;
+}
 
 const QUESTIONS_PER_LEVEL = 5;
 
@@ -121,7 +177,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
           {foundCorrect && !removalChoice && (
             <div className="space-y-2 mt-4">
               <p className="text-sm font-bold text-foreground text-center">How should you handle this toxic weed?</p>
-              {REMOVAL_METHODS.map(m => (
+              {getRemovalOptions(r.toxicWeed.id).map(m => (
                 <button key={m.id} onClick={() => chooseRemoval(m.id)}
                   className="w-full py-2 px-3 rounded-lg border-2 border-border bg-card text-foreground text-sm font-medium text-left hover:border-primary transition-colors">
                   {m.label}
@@ -132,8 +188,8 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
           {(removalChoice || !foundCorrect) && (
             <div className="text-center mt-3">
               {removalChoice && (
-                <p className={`text-sm font-bold mb-2 ${REMOVAL_METHODS.find(m => m.id === removalChoice)?.safe ? 'text-green-500' : 'text-destructive'}`}>
-                  {REMOVAL_METHODS.find(m => m.id === removalChoice)?.safe ? 'Smart and safe choice!' : 'Not safe! Always tell an adult and wear protection.'}
+                <p className={`text-sm font-bold mb-2 ${getRemovalOptions(r.toxicWeed.id).find(m => m.id === removalChoice)?.safe ? 'text-green-500' : 'text-destructive'}`}>
+                  {getRemovalOptions(r.toxicWeed.id).find(m => m.id === removalChoice)?.safe ? 'Smart and safe choice!' : 'Not safe! Always tell an adult and wear protection.'}
                 </p>
               )}
               <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">

@@ -137,57 +137,100 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm font-bold text-primary ml-2">{roundScore} pts</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-3">
-        <div className="relative w-full max-w-lg aspect-[16/10] rounded-2xl border-2 border-border overflow-hidden">
-          <img src={midwestMap} alt="U.S. Midwest map" className="absolute inset-0 w-full h-full object-cover" />
-          {MIDWEST_STATES.map(s => {
-            const isCurrentDot = r && s.name === r.state.name;
-            return (
-              <button key={s.name}
-                onClick={() => isCurrentDot && !clickedDot && setClickedDot(true)}
-                className={`absolute w-5 h-5 rounded-full border-2 transition-all ${
-                  isCurrentDot
-                    ? clickedDot ? 'bg-primary border-primary scale-125' : 'bg-rose-500 border-rose-400 animate-pulse scale-110 cursor-pointer'
-                    : 'bg-muted-foreground/30 border-border/50'
-                }`}
-                style={{ left: `${s.x}%`, top: `${s.y}%`, transform: 'translate(-50%, -50%)' }}
-                title={s.name}
-              />
-            );
-          })}
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_240px] gap-4 p-4">
+        {/* Left: bigger map + interaction */}
+        <div className="flex flex-col items-center justify-center gap-3">
+          <div className="relative w-full max-w-3xl aspect-[16/10] rounded-2xl border-2 border-border overflow-hidden">
+            <img src={midwestMap} alt="U.S. Midwest map" className="absolute inset-0 w-full h-full object-cover" />
+            {MIDWEST_STATES.map(s => {
+              const isCurrentDot = r && s.name === r.state.name;
+              return (
+                <button key={s.name}
+                  onClick={() => isCurrentDot && !clickedDot && setClickedDot(true)}
+                  className={`absolute w-7 h-7 rounded-full border-2 transition-all ${
+                    isCurrentDot
+                      ? clickedDot ? 'bg-primary border-primary scale-125' : 'bg-rose-500 border-rose-400 animate-pulse scale-110 cursor-pointer'
+                      : 'bg-muted-foreground/30 border-border/50'
+                  }`}
+                  style={{ left: `${s.x}%`, top: `${s.y}%`, transform: 'translate(-50%, -50%)' }}
+                  title={s.name}
+                />
+              );
+            })}
+          </div>
+          {!clickedDot ? (
+            <p className="text-sm text-muted-foreground text-center animate-pulse">Tap the glowing dot to investigate!</p>
+          ) : (
+            <>
+              <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center">
+                <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border bg-secondary flex-shrink-0">
+                  <WeedImage weedId={r!.weed.id} stage="plant" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg font-bold text-foreground">{r!.weed.commonName}</h2>
+                  <p className="text-sm text-muted-foreground">Found in: <strong>{r!.state.name}</strong></p>
+                  <p className="text-sm text-muted-foreground">Originally from: <strong>{r!.originRegion}</strong></p>
+                </div>
+              </div>
+              {!answered ? (
+                <div className="flex gap-4">
+                  <button onClick={() => submit('native')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold">Native</button>
+                  <button onClick={() => submit('invasive')} className="px-8 py-4 rounded-xl bg-destructive/90 text-destructive-foreground text-lg font-bold">Invasive</button>
+                </div>
+              ) : (
+                <div className="text-center max-w-sm">
+                  <p className={`text-lg font-bold mb-2 ${correct ? 'text-green-500' : 'text-destructive'}`}>
+                    {correct ? 'Correct!' : `Not quite — this plant is ${isInvasive ? 'invasive' : 'native'}!`}
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {isInvasive ? `${r!.weed.commonName} was brought from ${r!.originRegion}.` : `${r!.weed.commonName} naturally grows in North America.`}
+                  </p>
+                  <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
+                </div>
+              )}
+            </>
+          )}
         </div>
-        {!clickedDot ? (
-          <p className="text-sm text-muted-foreground text-center animate-pulse">Tap the glowing dot to investigate!</p>
-        ) : (
-          <>
-            <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center">
-              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border bg-secondary flex-shrink-0">
-                <WeedImage weedId={r!.weed.id} stage="plant" className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg font-bold text-foreground">{r!.weed.commonName}</h2>
-                <p className="text-sm text-muted-foreground">Found in: <strong>{r!.state.name}</strong></p>
-                <p className="text-sm text-muted-foreground">Originally from: <strong>{r!.originRegion}</strong></p>
-              </div>
+
+        {/* Right: collected weeds split by Native vs Invasive */}
+        <div className="space-y-3">
+          <div className="rounded-xl border-2 border-destructive/40 bg-destructive/5 p-3">
+            <p className="text-xs font-bold uppercase text-destructive mb-2">Invasive ({rounds.slice(0, questionIdx + (answered ? 1 : 0)).filter(q => q.weed.origin === 'Introduced').length})</p>
+            <div className="flex flex-wrap gap-1.5">
+              {rounds.slice(0, questionIdx + (answered ? 1 : 0))
+                .filter(q => q.weed.origin === 'Introduced')
+                .map((q, i) => (
+                  <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border text-xs">
+                    <div className="w-7 h-7 rounded overflow-hidden bg-secondary">
+                      <WeedImage weedId={q.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-foreground">{q.weed.commonName}</span>
+                  </div>
+                ))}
+              {rounds.slice(0, questionIdx + (answered ? 1 : 0)).filter(q => q.weed.origin === 'Introduced').length === 0 && (
+                <span className="text-xs text-muted-foreground italic">None yet</span>
+              )}
             </div>
-            {!answered ? (
-              <div className="flex gap-4">
-                <button onClick={() => submit('native')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold">Native</button>
-                <button onClick={() => submit('invasive')} className="px-8 py-4 rounded-xl bg-destructive/90 text-destructive-foreground text-lg font-bold">Invasive</button>
-              </div>
-            ) : (
-              <div className="text-center max-w-sm">
-                <p className={`text-lg font-bold mb-2 ${correct ? 'text-green-500' : 'text-destructive'}`}>
-                  {correct ? 'Correct!' : `Not quite — this plant is ${isInvasive ? 'invasive' : 'native'}!`}
-                </p>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {isInvasive ? `${r!.weed.commonName} was brought from ${r!.originRegion}.` : `${r!.weed.commonName} naturally grows in North America.`}
-                </p>
-                <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
-              </div>
-            )}
-          </>
-        )}
+          </div>
+          <div className="rounded-xl border-2 border-green-500/40 bg-green-500/5 p-3">
+            <p className="text-xs font-bold uppercase text-green-600 mb-2">Native ({rounds.slice(0, questionIdx + (answered ? 1 : 0)).filter(q => q.weed.origin === 'Native').length})</p>
+            <div className="flex flex-wrap gap-1.5">
+              {rounds.slice(0, questionIdx + (answered ? 1 : 0))
+                .filter(q => q.weed.origin === 'Native')
+                .map((q, i) => (
+                  <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border text-xs">
+                    <div className="w-7 h-7 rounded overflow-hidden bg-secondary">
+                      <WeedImage weedId={q.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-foreground">{q.weed.commonName}</span>
+                  </div>
+                ))}
+              {rounds.slice(0, questionIdx + (answered ? 1 : 0)).filter(q => q.weed.origin === 'Native').length === 0 && (
+                <span className="text-xs text-muted-foreground italic">None yet</span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

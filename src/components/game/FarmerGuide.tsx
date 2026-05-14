@@ -1,4 +1,5 @@
-import { Tractor } from "lucide-react";
+import { Tractor, Lightbulb } from "lucide-react";
+import { useState } from "react";
 
 type GradeLevel = "K-5" | "6-8" | "9-12" | string;
 
@@ -48,4 +49,27 @@ export function getHintMode(gradeLabel?: string): "auto" | "request" | "off" {
   if (gradeLabel === "9-12") return "off";
   if (gradeLabel === "6-8") return "request";
   return "auto";
+}
+
+/**
+ * On-request hint button for 6-8 (and optionally K-5). Hidden in 9-12.
+ * Renders a small lightbulb button; on click reveals Farmer Joe's hint bubble.
+ */
+export function HintButton({ hint, gradeLabel, className = "" }: { hint: string; gradeLabel?: string; className?: string }) {
+  const [open, setOpen] = useState(false);
+  if (gradeLabel === "9-12") return null;
+  return (
+    <div className={`flex flex-col items-end gap-2 ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full border-2 border-amber-500 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-bold hover:bg-amber-200 transition-colors"
+        aria-label="Ask Farmer Joe for a hint"
+      >
+        <Lightbulb className="w-4 h-4" />
+        {open ? "Hide hint" : "Hint"}
+      </button>
+      {open && <FarmerGuide message={hint} gradeLabel={gradeLabel} tone="hint" compact className="w-full max-w-md" />}
+    </div>
+  );
 }
