@@ -69,6 +69,7 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [collected, setCollected] = useState<Array<{ weedId: string; commonName: string; continent: string }>>([]);
 
   const done = round >= rounds.length;
   const current = !done ? rounds[round] : null;
@@ -78,10 +79,11 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
     setSelected(cId);
     setAnswered(true);
     if (cId === current!.continent) setScore(s => s + 1);
+    setCollected(prev => [...prev, { weedId: current!.weed.id, commonName: current!.weed.commonName, continent: current!.continent }]);
   };
 
   const next = () => { setRound(r => r + 1); setSelected(null); setAnswered(false); };
-  const restart = () => { setRound(0); setScore(0); setSelected(null); setAnswered(false); };
+  const restart = () => { setRound(0); setScore(0); setSelected(null); setAnswered(false); setCollected([]); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
@@ -98,11 +100,11 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 max-w-5xl mx-auto">
-          {/* LEFT: smaller world map */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 max-w-6xl mx-auto">
+          {/* LEFT: larger world map */}
           <div>
             <p className="text-sm text-muted-foreground text-center mb-3">Where did this weed originate? Click a continent.</p>
-            <div className="relative w-full max-w-md mx-auto aspect-[2/1] rounded-xl border-2 border-border overflow-hidden">
+            <div className="relative w-full max-w-3xl mx-auto aspect-[2/1] rounded-xl border-2 border-border overflow-hidden">
               <img src={worldMap} alt="World map" className="absolute inset-0 w-full h-full object-cover" />
               {CONTINENTS.map(c => {
                 const isCorrect = c.id === current!.continent;
@@ -112,12 +114,35 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
                 return (
                   <button key={c.id} onClick={() => submit(c.id)}
                     style={{ left: `${c.x}%`, top: `${c.y}%` }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 rounded-md text-[10px] font-bold transition-all shadow-md ${bg}`}>
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-md ${bg}`}>
                     {c.label}
                   </button>
                 );
               })}
             </div>
+
+            {/* Collected — sorted by continent */}
+            {collected.length > 0 && (
+              <div className="mt-4 max-w-3xl mx-auto">
+                <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">Identified weeds by continent</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {CONTINENTS.map(c => {
+                    const list = collected.filter(x => x.continent === c.id);
+                    if (list.length === 0) return null;
+                    return (
+                      <div key={c.id} className="bg-card border border-border rounded-lg p-2">
+                        <p className="text-[11px] font-bold text-foreground mb-1">{c.label} <span className="text-muted-foreground font-normal">({list.length})</span></p>
+                        <div className="flex flex-wrap gap-1">
+                          {list.map(w => (
+                            <span key={w.weedId} className="text-[10px] bg-secondary text-foreground px-1.5 py-0.5 rounded">{w.commonName}</span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT: weed info + submit area */}
