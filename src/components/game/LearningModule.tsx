@@ -573,10 +573,15 @@ export default function LearningModule({ onClose, onOpenPractice }: Props) {
             </aside>
             {/* Topic content */}
             <div className="min-w-0">
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <h2 className="text-lg font-display font-bold text-foreground">
                   {TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
+                <PracticeButton
+                  topicId={selectedTopic}
+                  grade={selectedGrade}
+                  onOpenPractice={onOpenPractice}
+                />
               </div>
               <TopicContent
                 topicId={selectedTopic}
