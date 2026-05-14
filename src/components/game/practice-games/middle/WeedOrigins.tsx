@@ -136,7 +136,7 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
             <p className="text-xs text-muted-foreground line-clamp-3">{current!.weed.habitat}</p>
 
             {answered && (
-              <div className="rounded-xl border-2 p-3 ${selected === current!.continent ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}">
+              <div className={`rounded-xl border-2 p-3 ${selected === current!.continent ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
                 <p className={`font-bold mb-2 ${selected === current!.continent ? 'text-green-500' : 'text-destructive'}`}>
                   {selected === current!.continent ? 'Correct!' : `Originally from: ${CONTINENTS.find(c => c.id === current!.continent)?.label}`}
                 </p>
