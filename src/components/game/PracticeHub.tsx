@@ -142,6 +142,7 @@ export default function PracticeHub({
  const [screen, setScreen] = useState<Screen>('grades');
  const [selectedGrade, setSelectedGrade] = useState<string>('');
  const [selectedGame, setSelectedGame] = useState<GameDef | null>(null);
+ const { badges, totalBadges } = useGameProgress();
 
   useEffect(() => {
     if (!initialGrade) return;
@@ -193,7 +194,38 @@ export default function PracticeHub({
  </p>
  )}
  </div>
+ <div className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+   <Trophy className="w-4 h-4 text-primary" />
+   <span className="text-sm font-bold text-foreground">{totalBadges}</span>
+   <span className="text-xs text-muted-foreground">badges</span>
  </div>
+ </div>
+
+ {/* Earned badges showcase */}
+ {screen !== 'grades' && totalBadges > 0 && (
+   <div className="mb-6 p-4 rounded-lg border border-border bg-card">
+     <div className="flex items-center gap-2 mb-3">
+       <Medal className="w-4 h-4 text-primary" />
+       <h2 className="text-sm font-bold text-foreground">Your Badges</h2>
+     </div>
+     <div className="flex gap-2 flex-wrap">
+       {badges.slice(-12).reverse().map((b, i) => {
+         const pct = b.total > 0 ? b.score / b.total : 0;
+         const TierIcon = pct >= 0.85 ? Trophy : pct >= 0.7 ? Award : Star;
+         const cls = pct >= 0.85 ? 'text-yellow-600 bg-yellow-100 border-yellow-300'
+           : pct >= 0.7 ? 'text-slate-600 bg-slate-100 border-slate-300'
+           : 'text-amber-700 bg-amber-100 border-amber-300';
+         return (
+           <div key={i} title={`${b.gameName} — ${b.score}/${b.total}`}
+             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${cls}`}>
+             <TierIcon className="w-3 h-3" />
+             <span className="max-w-[140px] truncate">{b.gameName}</span>
+           </div>
+         );
+       })}
+     </div>
+   </div>
+ )}
 
  {/* Grade Selection */}
  {screen === 'grades' && (
