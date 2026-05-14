@@ -120,7 +120,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
                 className={`p-3 rounded-xl border-2 text-left transition-all ${cls}`}>
                 <p className="text-sm font-bold text-foreground">{g.moa} (Group {g.group})</p>
                 <p className="text-[10px] text-muted-foreground">
-                  {g.timing} -- {g.spectrum} -- e.g. {g.brands[0]}
+                  {g.timing} -- {g.spectrum} -- chemical: {g.brands[0]}
                 </p>
               </button>
             );
