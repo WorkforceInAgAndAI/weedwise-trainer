@@ -33,6 +33,29 @@ for (const [path, url] of Object.entries(cropModules)) {
  }
 }
 
+// Herbicide injury images: src/assets/Herbicide-injury-images/G{group}_{br|gr}.jpg
+const injuryModules = import.meta.glob<string>(
+ '/src/assets/Herbicide-injury-images/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG}',
+ { eager: true, query: '?url', import: 'default' }
+);
+const injuryMap: Record<string, string> = {};
+for (const [path, url] of Object.entries(injuryModules)) {
+ const m = path.match(/\/([^/]+)$/);
+ if (m) injuryMap[m[1].toLowerCase()] = url;
+}
+
+/**
+ * Resolve a herbicide injury image by WSSA group number and symptom type.
+ * type: 'br' = broadleaf injury, 'gr' = grass injury.
+ * Falls back to the other type if the requested one is missing.
+ */
+export function resolveInjuryImage(group: number, type: 'br' | 'gr'): string | null {
+ const primary = injuryMap[`g${group}_${type}.jpg`];
+ if (primary) return primary;
+ const other: 'br' | 'gr' = type === 'br' ? 'gr' : 'br';
+ return injuryMap[`g${group}_${other}.jpg`] || null;
+}
+
 export function resolveImageUrl(weedId: string, filename: string): string | null {
  const key = `${weedId}/${filename}`;
  return imageMap[key] || imageMapLower[key.toLowerCase()] || null;

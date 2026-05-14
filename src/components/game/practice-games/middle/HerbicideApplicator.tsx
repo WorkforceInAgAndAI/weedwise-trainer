@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import cornBg from '@/assets/images/corn_field_1.jpg';
+import soybeanBg from '@/assets/images/soybean_field_1.jpg';
 import { Droplets, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
@@ -197,7 +197,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
       </div>
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 relative overflow-hidden">
-          <img src={cornBg} alt="Corn Field" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={soybeanBg} alt="Soybean Field" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/20" />
           {items.map((item, i) => (
             <button key={i} onClick={() => setSelectedWeed(i)}

@@ -2,6 +2,17 @@ import { useState, useMemo } from 'react';
 import { Stethoscope } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import { resolveInjuryImage } from '@/lib/imageMap';
+
+/** Extract WSSA group number from a herbicide label like "2,4-D (Group 4)". */
+function extractGroup(label: string): number | null {
+ const m = label.match(/Group\s+(\d+)/i);
+ return m ? parseInt(m[1], 10) : null;
+}
+/** Soybean = broadleaf injury, Corn = grass-crop injury. */
+function injuryTypeForCrop(crop: string): 'br' | 'gr' {
+ return crop.toLowerCase().startsWith('soy') ? 'br' : 'gr';
+}
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -95,6 +106,17 @@ export default function CropDoctor({ onBack }: { onBack: () => void }) {
     <p className="text-xs text-muted-foreground text-center mb-2">Question {idx + 1} of {rounds.length}</p>
     <div className="bg-secondary/50 rounded-xl p-4 mb-4 text-center">
      <p className="text-lg font-bold text-foreground mb-2">{c.crop}</p>
+     {(() => {
+      const g = extractGroup(c.correct);
+      const url = g ? resolveInjuryImage(g, injuryTypeForCrop(c.crop)) : null;
+      return url ? (
+       <img
+        src={url}
+        alt={`${c.crop} injury symptom`}
+        className="w-full max-h-56 object-cover rounded-lg mb-3 border border-border"
+       />
+      ) : null;
+     })()}
      <p className="text-sm text-foreground font-medium">Symptom: {c.symptom}</p>
     </div>
     <p className="text-sm text-muted-foreground text-center mb-3">Which herbicide likely caused this injury?</p>

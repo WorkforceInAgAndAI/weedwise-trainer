@@ -1,15 +1,15 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import fieldBg1 from '@/assets/images/field-background.jpg';
-import fieldBg2 from '@/assets/images/field-background-2.jpg';
-import cornBg from '@/assets/images/corn_field_1.jpg';
+import soybeanBg1 from '@/assets/images/soybean_field_1.jpg';
+import soybeanBg2 from '@/assets/images/soybean_field_2.jpg';
+import soybeanBg3 from '@/assets/images/soybean_field_3.jpg';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const FIELDS_PER_LEVEL = 3;
-const FIELD_BGS = [fieldBg1, fieldBg2, cornBg];
+const FIELD_BGS = [soybeanBg1, soybeanBg2, soybeanBg3];
 
 const METHODS = [
  { id: 'cultivate', label: 'Cultivation' },
