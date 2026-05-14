@@ -1051,100 +1051,21 @@ function TopicContent({
       const dicots = topicWeeds.filter((w) => w.plantType === "Dicot");
 
       if (grade === "elementary") {
-        const LEAF_SHAPES = [
-          { name: "Ovate", desc: "Egg-shaped, wider at the base" },
-          { name: "Lanceolate", desc: "Long and narrow, like a lance" },
-          { name: "Cordate", desc: "Heart-shaped" },
-          { name: "Linear", desc: "Very long and thin, like grass" },
-          { name: "Palmate", desc: "Shaped like an open hand with fingers" },
-          { name: "Lobed", desc: "Has rounded sections cut into the leaf" },
-          { name: "Serrate", desc: "Has toothed or jagged edges" },
-          { name: "Entire", desc: "Smooth edges with no teeth" },
-        ];
-
         return (
           <div className="space-y-5">
-            {/* Leaf Morphology intro */}
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Leaf Morphology (Venation and Leaf Shape)</p>
-              <p>
-                Weeds look unique because of their <strong>color, leaf shape, leaf number, height</strong>, and other
-                features. Leaves can help us identify weeds.
-              </p>
-              <p>
-                Leaves can be <strong>broadleaves</strong> (on dicots) or <strong>grasses</strong> (on monocots).
-              </p>
-            </div>
-
-            {/* Venation patterns */}
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Venation Patterns</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
-                  <p className="font-bold text-foreground text-sm">Netted Venation (Dicots)</p>
-                  <p className="text-xs text-muted-foreground">
-                    Broadleaves have <strong>netted venation</strong>, meaning the veins in the leaves are in a net or
-                    web pattern.
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {dicots.slice(0, 2).map((w) => (
-                      <div key={w.id} className="text-center">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-accent/5 border border-accent/20 rounded-lg p-4 space-y-2">
-                  <p className="font-bold text-foreground text-sm">Parallel Venation (Monocots)</p>
-                  <p className="text-xs text-muted-foreground">
-                    Grasses have <strong>parallel venation</strong>, meaning the veins in the leaves are straight from
-                    the bottom to the top of the leaf. Veins in grasses do not touch each other. This is what it means
-                    to be parallel.
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {monocots.slice(0, 2).map((w) => (
-                      <div key={w.id} className="text-center">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Leaf shapes chart */}
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Leaf Shapes</p>
-              <p className="text-xs text-muted-foreground">
-                Some leaves are wide, others are thin. Broadleaves can also have lots of different-shaped edges. Here
-                are some different leaf shapes:
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {LEAF_SHAPES.map((ls) => (
-                  <div key={ls.name} className="bg-secondary/30 border border-border rounded-lg p-3 text-center">
-                    <p className="font-bold text-foreground text-sm">{ls.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">{ls.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Monocots vs Dicots comparison */}
+            {/* Intro */}
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">Monocots vs. Dicots</p>
               <p>
-                You may have noticed that some weeds look more different from each other than other weeds. Take a look
-                at the two groups of weeds below.
+                These two groups of weeds are called <strong>monocots</strong> (thin, straight leaves) and{" "}
+                <strong>dicots</strong> (broad, wide leaves). Even though all plants might look similar at first, monocots
+                and dicots are different in a few important ways: their <strong>roots</strong>, their{" "}
+                <strong>leaves</strong>, how they <strong>move water and nutrients through their stems</strong>, the way
+                their <strong>flowers are organized</strong>, and their <strong>seed structure</strong>.
               </p>
             </div>
 
-            {/* Side-by-side example images - 4 each */}
+            {/* Side-by-side example images */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <p className="font-display font-bold text-foreground text-sm text-center">Dicots (Broadleaves)</p>
@@ -1152,7 +1073,7 @@ function TopicContent({
                   {dicots.slice(0, 4).map((w) => (
                     <div key={w.id} className="text-center">
                       <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
@@ -1165,7 +1086,7 @@ function TopicContent({
                   {monocots.slice(0, 4).map((w) => (
                     <div key={w.id} className="text-center">
                       <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
@@ -1174,68 +1095,50 @@ function TopicContent({
               </div>
             </div>
 
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-bold text-foreground">What are some of the differences between the two groups?</p>
-              <p>
-                The weeds on the left have <strong>broad leaves</strong>; the weeds on the right have{" "}
-                <strong>thin, straight leaves</strong>. These two groups of weeds are called <strong>monocots</strong>{" "}
-                (thin, straight leaves) and <strong>dicots</strong> (broad, wide leaves). You can distinguish them based
-                on their physical characteristics or on what they look like as seedlings.
-              </p>
-            </div>
-
             {/* What the words mean */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">What do these words mean?</p>
-              <p>
-                Before we can understand the difference between monocots and dicots, we need to know what these words
-                mean. Scientists like to use words in Latin to help describe plants and plant parts.
-              </p>
               <div className="grid grid-cols-2 gap-4 mt-3">
-                <div className="bg-card border border-border rounded-lg p-4 text-center space-y-2">
+                <div className="bg-card border border-border rounded-lg p-4 text-center space-y-1">
                   <p className="font-bold text-foreground text-lg">"Mono" = One</p>
                   <p className="text-xs text-muted-foreground">"Cot" = Cotyledon</p>
-                  <div className="bg-secondary rounded-lg p-3 mt-2">
-                    <p className="text-xs text-foreground">
-                      A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.
-                    </p>
-                  </div>
                   <p className="text-xs font-bold text-foreground mt-2">Monocot = ONE cotyledon</p>
                 </div>
-                <div className="bg-card border border-border rounded-lg p-4 text-center space-y-2">
+                <div className="bg-card border border-border rounded-lg p-4 text-center space-y-1">
                   <p className="font-bold text-foreground text-lg">"Di" = Two</p>
                   <p className="text-xs text-muted-foreground">"Cot" = Cotyledon</p>
-                  <div className="bg-secondary rounded-lg p-3 mt-2">
-                    <p className="text-xs text-foreground">
-                      As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
-                      plant looks like.
-                    </p>
-                  </div>
                   <p className="text-xs font-bold text-foreground mt-2">Dicot = TWO cotyledons</p>
                 </div>
+              </div>
+              <div className="bg-secondary rounded-lg p-3 mt-3">
+                <p className="text-xs text-foreground">
+                  A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.
+                </p>
+              </div>
+              <div className="bg-secondary rounded-lg p-3">
+                <p className="text-xs text-foreground">
+                  As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
+                  plant looks like.
+                </p>
               </div>
             </div>
 
             {/* Detailed monocot section with scrollbar */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">
-                Monocots (Grasses) -- All {monocots.length} Species
+                Monocots (Grasses) — All {monocots.length} Species
               </p>
-              <p className="text-sm text-foreground">
-                Monocots are plants with <strong>thin, straight leaves</strong>. They are also called{" "}
-                <strong>grasses</strong>. As discussed above, monocots have <strong>one cotyledon</strong>.
-              </p>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>- One seed leaf (cotyledon)</li>
-                <li>- Parallel leaf veins</li>
-                <li>- Fibrous root system</li>
+              <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-5">
+                <li><strong>One seed leaf</strong> (cotyledon)</li>
+                <li><strong>Parallel</strong> leaf veins</li>
+                <li><strong>Fibrous</strong> root system</li>
               </ul>
               <div className="overflow-x-auto pb-2">
                 <div className="flex gap-3" style={{ minWidth: `${monocots.length * 7}rem` }}>
                   {monocots.map((w) => (
                     <div key={w.id} className="text-center shrink-0 w-24">
                       <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
@@ -1248,23 +1151,19 @@ function TopicContent({
             {/* Detailed dicot section with scrollbar */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">
-                Dicots (Broadleaves) -- All {dicots.length} Species
+                Dicots (Broadleaves) — All {dicots.length} Species
               </p>
-              <p className="text-sm text-foreground">
-                Dicots are plants with <strong>wide, broad leaves</strong>. They are also called{" "}
-                <strong>broadleaves</strong>. As discussed above, dicots have <strong>two cotyledons</strong>.
-              </p>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>- Two seed leaves (cotyledons)</li>
-                <li>- Branching (net) leaf veins</li>
-                <li>- Taproot system</li>
+              <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-5">
+                <li><strong>Two seed leaves</strong> (cotyledons)</li>
+                <li><strong>Branching (net)</strong> leaf veins</li>
+                <li><strong>Taproot</strong> system</li>
               </ul>
               <div className="overflow-x-auto pb-2">
                 <div className="flex gap-3" style={{ minWidth: `${dicots.length * 7}rem` }}>
                   {dicots.map((w) => (
                     <div key={w.id} className="text-center shrink-0 w-24">
                       <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
@@ -1272,39 +1171,6 @@ function TopicContent({
                 </div>
               </div>
               <p className="text-[10px] text-muted-foreground">← Scroll to see all dicots →</p>
-            </div>
-
-            {/* Seedling comparison */}
-            <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-3">
-              <p className="font-display font-bold text-accent text-sm">Seedling Comparison</p>
-              <p className="text-xs text-foreground">
-                You can also tell monocots and dicots apart when they are seedlings. Monocot seedlings have one seed
-                leaf; dicot seedlings have two.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-center text-foreground">Monocot Seedling</p>
-                  {monocots.slice(0, 2).map((w) => (
-                    <div key={w.id} className="flex gap-2 items-center">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
-                        <WeedImage weedId={w.id} stage="seedling" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                    </div>
-                  ))}
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-center text-foreground">Dicot Seedling</p>
-                  {dicots.slice(0, 2).map((w) => (
-                    <div key={w.id} className="flex gap-2 items-center">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
-                        <WeedImage weedId={w.id} stage="seedling" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         );
