@@ -521,7 +521,7 @@ export default function LearningModule({ onClose }: Props) {
               ))}
             </aside>
             {/* Topic content */}
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-display font-bold text-foreground">
                   {TOPICS.find((t) => t.id === selectedTopic)?.name}
