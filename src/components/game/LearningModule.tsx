@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { weeds } from "@/data/weeds";
 import type { GradeLevel, Weed } from "@/types/game";
 import { GRADE_NAMES, GRADE_RANGES } from "@/data/phases";
