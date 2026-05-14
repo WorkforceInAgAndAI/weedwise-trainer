@@ -591,7 +591,7 @@ function PracticeButton({
   if (!gameId) return null;
   return (
     <button
-      onClick={() => onOpenPractice(GRADE_TO_HUB[grade] as GradeLevel, gameId)}
+      onClick={() => onOpenPractice(GRADE_TO_HUB[grade], gameId)}
       className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
     >
       <Play className="w-4 h-4" />
