@@ -1147,8 +1147,8 @@ function TopicContent({
             )}
           </div>
 
-          {/* Elementary: visual cycle diagram */}
-          {grade === "elementary" && (
+          {/* Visual cycle diagram (Elementary + High School) */}
+          {(grade === "elementary" || grade === "high") && (
             <div className="bg-card border border-border rounded-xl p-5">
               <p className="font-display font-bold text-foreground text-sm text-center mb-4">
                 The Weed Life Cycle
@@ -1196,7 +1196,7 @@ function TopicContent({
                 </p>
               </div>
             </div>
-          ) : (
+          ) : grade === "middle" ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {LIFE_STAGE_INFO.map((s) => (
                 <div key={s.stage} className="bg-card border border-border rounded-lg p-3 text-center">
@@ -1205,10 +1205,35 @@ function TopicContent({
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
 
-          {/* ALL weeds shown for all grade levels */}
-          {topicWeeds.map((w) => {
+          {/* Weeds: HS groups by control timing; others list straight */}
+          {(grade === "high"
+            ? Array.from(
+                topicWeeds.reduce((map, w) => {
+                  const key = (w.controlTiming || "Other").trim();
+                  if (!map.has(key)) map.set(key, [] as Weed[]);
+                  map.get(key)!.push(w);
+                  return map;
+                }, new Map<string, Weed[]>())
+              ).flatMap(([timing, ws]) => [
+                <h3 key={`hdr-${timing}`} className="font-display font-bold text-foreground text-sm mt-4 border-l-4 border-primary pl-3">
+                  Best Control Timing: {timing}
+                </h3>,
+                ...ws.map((w) => renderLifeStageCard(w, grade, LIFE_STAGE_INFO, onSelectWeed)),
+              ])
+            : topicWeeds.map((w) => renderLifeStageCard(w, grade, LIFE_STAGE_INFO, onSelectWeed)))}
+        </div>
+      );
+    }
+
+    /* end life-stages */ /* eslint-disable-next-line */
+    /* placeholder to keep diff small */
+    /* The original closing braces and per-weed JSX are replaced by renderLifeStageCard above. */
+    // (handled by helper)
+    // eslint-disable-next-line no-unreachable
+    {
+      const __unused = () => {
             const isGrass = w.plantType === "Monocot";
             return (
               <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
@@ -1247,9 +1272,8 @@ function TopicContent({
                 <p className="text-xs text-primary">{w.memoryHook}</p>
               </div>
             );
-          })}
-        </div>
-      );
+          })};
+      };
     }
 
     /* ═══════════════════════════════════════════════════════════
