@@ -135,10 +135,12 @@ export default function PracticeHub({
   onClose,
   initialGrade,
   initialGameId,
+  onOpenLearning,
 }: {
   onClose: () => void;
   initialGrade?: string;
   initialGameId?: string;
+  onOpenLearning?: (topicId: string) => void;
 }) {
  const [screen, setScreen] = useState<Screen>('grades');
  const [selectedGrade, setSelectedGrade] = useState<string>('');
