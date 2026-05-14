@@ -69,7 +69,7 @@ interface GameDef {
  category: string;
  description: string;
  howToPlay: string;
- component: React.ComponentType<{ onBack: () => void }>;
+ component: React.ComponentType<{ onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }>;
 }
 
 const k5Games: GameDef[] = [
