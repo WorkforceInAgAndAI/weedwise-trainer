@@ -261,7 +261,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  setScoutAnimating(true);
  setTotalCost(prev => prev + sm.cost);
  setTotalHours(prev => prev + sm.timeHours);
- setActionLog(prev => [...prev, { season: currentSeason, action: `Scouted (${sm.label})`, detail: `Cost: $${sm.cost}, Time: ${sm.timeHours}h`, cost: sm.cost }]);
+ setActionLog(prev => [...prev, { season: currentSeason, action: `Scouted (${sm.label})`, detail: `Cost: $${sm.cost}, Time: ${sm.timeHours} hours`, cost: sm.cost }]);
 
  setTimeout(() => {
  setFieldWeeds(prev => prev.map(w => {
@@ -598,7 +598,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <p className="text-xs text-muted-foreground mb-2">{sm.gradeDesc[grade!]}</p>
  <div className="flex items-center gap-2 text-xs">
  <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">${sm.cost}</span>
- <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{sm.timeHours}h</span>
+ <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{sm.timeHours} hours</span>
  <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(sm.accuracy * 100)}%</span>
  </div>
  </button>
@@ -777,7 +777,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <button key={p.id} onClick={() => setHerbProduct(p.id)}
  className={`w-full text-left p-2 rounded-lg border text-xs transition-all ${herbProduct === p.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
  <p className="font-medium text-foreground">{p.label}</p>
- <p className="text-muted-foreground">${p.cost} · {Math.round(p.effectiveness * 100)}% · {p.broadleaf ? 'Broadleaf' : ''}{p.broadleaf && p.grass ? '+' : ''}{p.grass ? 'Grass' : ''}</p>
+ <p className="text-muted-foreground">${p.cost} · {Math.round(p.effectiveness * 100)}% control · {p.broadleaf ? 'Broadleaf' : ''}{p.broadleaf && p.grass ? '+' : ''}{p.grass ? 'Grass' : ''}</p>
  </button>
  ))}
  </div>
@@ -837,7 +837,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <p className="text-xs font-semibold text-primary uppercase tracking-wider">Decision Preview</p>
  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
  <span className="text-muted-foreground">Coverage:</span>
- <span className="font-medium text-foreground">{Math.round(herbPreview.effectiveCoverage * 100)}%</span>
+ <span className="font-medium text-foreground">{Math.round(herbPreview.effectiveCoverage * 100)}% coverage</span>
  <span className="text-muted-foreground">Drift Risk:</span>
  <span className={`font-medium ${herbPreview.driftRisk > 0.25 ? 'text-warning' : 'text-foreground'}`}>
  {Math.round(herbPreview.driftRisk * 100)}%{herbPreview.driftRisk > 0.25 ? ' ' : ''}
@@ -845,7 +845,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <span className="text-muted-foreground">Est. Weeds Killed:</span>
  <span className="font-medium text-foreground">~{herbPreview.estKill} of {herbPreview.targetable} targetable</span>
  <span className="text-muted-foreground">Time:</span>
- <span className="font-medium text-foreground">{herbPreview.timeHours.toFixed(1)}h</span>
+ <span className="font-medium text-foreground">{herbPreview.timeHours.toFixed(1)} hours</span>
  <span className="text-muted-foreground">Cost:</span>
  <span className="font-medium text-foreground">${herbPreview.product.cost}/acre</span>
  </div>
@@ -882,8 +882,8 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <p className="text-muted-foreground">{t.desc}</p>
  <div className="flex gap-2 mt-1">
  <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">${t.cost}</span>
- <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{t.timeHours}h</span>
- <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(t.effectiveness * 100)}%</span>
+ <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{t.timeHours} hours</span>
+ <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(t.effectiveness * 100)}% control</span>
  </div>
  </button>
  ))}
@@ -895,9 +895,9 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <span className="text-muted-foreground">Equipment:</span>
  <span className="font-medium text-foreground">{selectedTill.label}</span>
  <span className="text-muted-foreground">Effectiveness:</span>
- <span className="font-medium text-foreground">{Math.round(selectedTill.effectiveness * 100)}%</span>
+ <span className="font-medium text-foreground">{Math.round(selectedTill.effectiveness * 100)}% control</span>
  <span className="text-muted-foreground">Time:</span>
- <span className="font-medium text-foreground">{selectedTill.timeHours}h</span>
+ <span className="font-medium text-foreground">{selectedTill.timeHours} hours</span>
  <span className="text-muted-foreground">Cost:</span>
  <span className="font-medium text-foreground">${selectedTill.cost}/acre</span>
  </div>
