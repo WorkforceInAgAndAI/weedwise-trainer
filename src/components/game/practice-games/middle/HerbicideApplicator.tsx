@@ -5,6 +5,7 @@ import soybeanBg from '@/assets/images/soybean_field_1.jpg';
 import { Droplets, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import { resolveInjuryImage } from '@/lib/imageMap';
 import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
@@ -55,7 +56,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const [selectedWeed, setSelectedWeed] = useState<number | null>(null);
   const [selectedHerb, setSelectedHerb] = useState<string | null>(null);
   const [selectedRate, setSelectedRate] = useState<string | null>(null);
-  const [roundResults, setRoundResults] = useState<{ weedName: string; killed: boolean; resistanceGain: number; moaLabel: string }[]>([]);
+  const [roundResults, setRoundResults] = useState<{ weedName: string; killed: boolean; resistanceGain: number; moaLabel: string; group: number; plantType: string }[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [totalScore, setTotalScore] = useState(0);
 
@@ -89,6 +90,8 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
       killed,
       resistanceGain,
       moaLabel: `${herb.moa} (Group ${herb.group}) — e.g. ${herb.brands[0]}`,
+      group: herb.group,
+      plantType: weed.weed.plantType,
     }]);
     if (killed) setTotalScore(s => s + 1);
 
@@ -151,11 +154,22 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
         <div className="w-full max-w-md space-y-2 mb-4">
           {roundResults.map((r, i) => (
             <div key={i} className={`p-3 rounded-lg border-2 ${r.killed ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">{r.weedName}</span>
-                <span className={`text-xs font-bold ${r.killed ? 'text-green-600' : 'text-destructive'}`}>{r.killed ? 'Controlled' : 'Survived'}</span>
+              <div className="flex gap-3">
+                {(() => {
+                  const type: 'br' | 'gr' = r.plantType === 'Monocot' ? 'gr' : 'br';
+                  const url = resolveInjuryImage(r.group, type);
+                  return url ? (
+                    <img src={url} alt={`Group ${r.group} injury`} className="w-16 h-16 object-cover rounded-md border border-border flex-shrink-0" />
+                  ) : null;
+                })()}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">{r.weedName}</span>
+                    <span className={`text-xs font-bold ${r.killed ? 'text-green-600' : 'text-destructive'}`}>{r.killed ? 'Controlled' : 'Survived'}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{r.moaLabel}</p>
+                </div>
               </div>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{r.moaLabel}</p>
               {r.resistanceGain > 0.1 && (
                 <div className="flex items-center gap-1 mt-1">
                   <AlertTriangle className="w-3 h-3 text-amber-500" />
