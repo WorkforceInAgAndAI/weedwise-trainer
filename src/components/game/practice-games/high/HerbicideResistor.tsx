@@ -5,8 +5,8 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import soyBg from '@/assets/images/soybean_field_1.jpg';
-import cornBg from '@/assets/images/soybean_field_2.JPG';
-import wheatBg from '@/assets/images/soybean_field_3.JPG';
+import cornBg from '@/assets/images/soybean_field_2.jpg';
+import wheatBg from '@/assets/images/soybean_field_3.jpg';
 import { HERBICIDE_MOA, type HerbicideMOA } from '@/data/herbicides';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
