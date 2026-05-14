@@ -18,7 +18,6 @@ function buildPyramid(target: typeof weeds[0]): PyramidLevel[] {
   return [
     { question: 'Is this organism a plant or animal?', options: ['Plant', 'Animal'], correctIdx: 0 },
     { question: 'What type of leaf veins does it have?', options: ['Parallel veins (Monocot)', 'Branching veins (Dicot)'], correctIdx: isMonocot ? 0 : 1 },
-    { question: 'Does this plant produce flowers?', options: ['Yes — Flowering', 'No — Non-flowering'], correctIdx: 0 },
     { question: 'Which plant family does it belong to?', options: [target.family, shuffle(weeds.filter(w => w.family !== target.family))[0]?.family || 'Poaceae'], correctIdx: 0 },
     { question: 'Identify this weed!', options: nameOptions, correctIdx: nameCorrect },
   ];
@@ -32,7 +31,9 @@ function getTargetsForLevel(level: number): typeof weeds {
   return shuffle(rotated).slice(0, ROUNDS_PER_LEVEL);
 }
 
-export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
+interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }
+
+export default function TaxonomyTower({ onBack }: Props) {
   const [level, setLevel] = useState(1);
   const targets = useMemo(() => getTargetsForLevel(level), [level]);
   const [targetIdx, setTargetIdx] = useState(0);
@@ -40,6 +41,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
   const [wrong, setWrong] = useState(false);
   const [found, setFound] = useState(false);
   const [score, setScore] = useState(0);
+  const [history, setHistory] = useState<{ weed: typeof weeds[0] }[]>([]);
 
   const target = targets[targetIdx];
   const pyramid = useMemo(() => buildPyramid(target), [target]);
@@ -51,6 +53,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
       if (pyramidLevel + 1 >= pyramid.length) {
         setFound(true);
         setScore(s => s + 1);
+        setHistory(h => [...h, { weed: target }]);
       } else {
         setPyramidLevel(l => l + 1);
       }
@@ -65,7 +68,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
     setPyramidLevel(0); setFound(false); setWrong(false);
   };
 
-  const restart = () => { setTargetIdx(0); setPyramidLevel(0); setFound(false); setWrong(false); setScore(0); };
+  const restart = () => { setTargetIdx(0); setPyramidLevel(0); setFound(false); setWrong(false); setScore(0); setHistory([]); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
@@ -79,15 +82,16 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">{targetIdx + 1}/{targets.length}</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
-        <div className="bg-secondary/50 rounded-xl p-3 text-center">
-          <p className="text-sm text-muted-foreground">Classify this weed:</p>
-        </div>
-        <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-primary/30">
-          <WeedImage weedId={target.id} stage="vegetative" className="w-full h-full object-cover" />
-        </div>
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_220px] gap-4 p-4">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="bg-secondary/50 rounded-xl p-3 text-center">
+            <p className="text-sm text-muted-foreground">Classify this weed:</p>
+          </div>
+          <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-primary/30">
+            <WeedImage weedId={target.id} stage="vegetative" className="w-full h-full object-cover" />
+          </div>
 
-        <div className="w-full max-w-md flex flex-col items-center gap-2">
+          <div className="w-full max-w-md flex flex-col items-center gap-2">
           {pyramid.map((_, i) => {
             const displayIdx = pyramid.length - 1 - i;
             const actualLevel = pyramid[displayIdx];
@@ -124,15 +128,35 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
               </div>
             );
           })}
+          </div>
+
+          {found && (
+            <div className="text-center mt-2">
+              <p className="text-lg font-bold text-green-500 mb-3">You found {target.commonName}!</p>
+              <button onClick={nextTarget} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Weed</button>
+            </div>
+          )}
+          {wrong && <p className="text-destructive font-bold animate-pulse">Try again!</p>}
         </div>
 
-        {found && (
-          <div className="text-center mt-2">
-            <p className="text-lg font-bold text-green-500 mb-3">You found {target.commonName}!</p>
-            <button onClick={nextTarget} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Weed</button>
+        {/* Side collection of classified weeds */}
+        <div className="rounded-xl border-2 border-border bg-card p-3 h-fit md:sticky md:top-4">
+          <p className="text-xs font-bold uppercase text-foreground mb-3">Classified ({history.length})</p>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {history.length === 0 && <p className="text-xs text-muted-foreground italic">Climbed weeds collect here.</p>}
+            {history.map((h, i) => (
+              <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg border border-green-500/40 bg-green-500/5">
+                <div className="w-10 h-10 rounded overflow-hidden bg-secondary shrink-0">
+                  <WeedImage weedId={h.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-foreground truncate">{h.weed.commonName}</p>
+                  <p className="text-[10px] text-muted-foreground italic truncate">{h.weed.plantType}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-        {wrong && <p className="text-destructive font-bold animate-pulse">Try again!</p>}
+        </div>
       </div>
     </div>
   );
