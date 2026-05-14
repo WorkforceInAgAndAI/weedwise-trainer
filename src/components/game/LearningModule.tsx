@@ -1553,7 +1553,7 @@ function TopicContent({
                 {(summerAnnuals.length > 0 ? summerAnnuals : annuals).slice(0, 8).map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1582,7 +1582,7 @@ function TopicContent({
                 {biennials.slice(0, 8).map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1602,7 +1602,7 @@ function TopicContent({
                 {perennials.slice(0, 8).map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1794,7 +1794,7 @@ function TopicContent({
                   {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).slice(0, 6).map((w) => (
                     <div key={w.id} className="text-center">
                       <div className="aspect-square rounded overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                     </div>
@@ -1808,7 +1808,7 @@ function TopicContent({
                   {winterAnnuals.slice(0, 6).map((w) => (
                     <div key={w.id} className="text-center">
                       <div className="aspect-square rounded overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                     </div>
@@ -1830,7 +1830,7 @@ function TopicContent({
               {biennials.slice(0, 8).map((w) => (
                 <div key={w.id} className="text-center">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                   </div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                 </div>
@@ -1854,7 +1854,7 @@ function TopicContent({
               {perennials.slice(0, 8).map((w) => (
                 <div key={w.id} className="text-center">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                   </div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                 </div>
