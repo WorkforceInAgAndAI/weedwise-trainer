@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton';
+import { useGameProgress } from '@/contexts/GameProgressContext';
+import { Medal, Trophy, Award, Star } from 'lucide-react';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
@@ -164,7 +166,8 @@ export default function PracticeHub({
 
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
- return <GameComp onBack={backToGames} />;
+ const gradeLabel = selectedGrade === 'k5' ? 'K-5' : selectedGrade === '68' ? '6-8' : '9-12';
+ return <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />;
  }
 
  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : selectedGrade === '912' ? highGames : [];
