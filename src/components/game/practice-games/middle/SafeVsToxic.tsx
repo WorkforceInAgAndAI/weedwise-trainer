@@ -111,10 +111,10 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
               {current!.options.map(w => (
                 <button key={w.id} onClick={() => identify(w.id)}
                   className="flex flex-col items-center p-3 rounded-xl border-2 border-border bg-card hover:border-primary transition-all">
-                  <div className="w-24 h-24 rounded-lg overflow-hidden bg-secondary mb-2">
+                  <div className="w-40 h-40 rounded-lg overflow-hidden bg-secondary mb-2">
                     <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-xs font-medium text-foreground">{w.commonName}</span>
+                  <span className="text-sm font-medium text-foreground">{w.commonName}</span>
                 </button>
               ))}
             </div>
@@ -123,7 +123,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
 
         {phase === 'review' && (
           <div className="text-center flex flex-col items-center">
-            <div className="w-32 h-32 rounded-xl overflow-hidden bg-secondary mb-3">
+            <div className="w-56 h-56 rounded-xl overflow-hidden bg-secondary mb-3">
               <WeedImage weedId={current!.toxic.id} stage="vegetative" className="w-full h-full object-cover" />
             </div>
             {selected === current!.toxic.id ? (
