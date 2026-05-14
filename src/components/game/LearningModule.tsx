@@ -584,6 +584,7 @@ export default function LearningModule({ onClose, onOpenPractice }: Props) {
                 topicWeeds={getTopicWeeds(selectedTopic)}
                 onSelectWeed={setSelectedWeed}
                 viewMode={viewMode}
+                onOpenPractice={onOpenPractice}
               />
             </div>
           </div>
