@@ -1463,7 +1463,7 @@ function TopicContent({
 
       const lcGroups = [
         { key: "Annual", icon: "", desc: "Completes its life cycle in one growing season." },
-        { key: "Biennial", icon: "", desc: "Takes two years -- rosette in year 1, flowers and seeds in year 2." },
+        { key: "Biennial", icon: "", desc: "Takes two years — rosette in year 1, flowers and seeds in year 2." },
         { key: "Perennial", icon: "", desc: "Lives for multiple years, regrowing from roots, rhizomes, or tubers." },
       ];
 
@@ -1549,7 +1549,7 @@ function TopicContent({
               <p className="text-sm text-foreground">
                 <strong>Biennial</strong> weeds complete their life cycle in <strong>two years</strong>. During the
                 first year, weeds grow vegetatively and develop deep root systems to help gather nutrients. Biennial
-                weeds form a <strong>rosette</strong> during their first year -- a flat circle of leaves close to the
+                weeds form a <strong>rosette</strong> during their first year — a flat circle of leaves close to the
                 ground. During their second year of life, they grow a stalk, flowers, and seeds. After spreading its
                 seeds, the weed dies.
               </p>
@@ -1634,7 +1634,7 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Annual Weeds</p>
               <p className="text-sm text-foreground">
-                Annual weeds complete their entire life cycle -- from seed germination to seed production and death --
+                Annual weeds complete their entire life cycle — from seed germination to seed production and death --
                 within a <strong>single growing season</strong>. They rely entirely on prolific seed production for
                 survival.
               </p>
@@ -1968,7 +1968,7 @@ function TopicContent({
             <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
               <p className="font-bold text-accent">How Invasive Weeds Travel</p>
               <p>
-                Invasive weeds are like uninvited guests that show up, take over, and refuse to leave -- and they
+                Invasive weeds are like uninvited guests that show up, take over, and refuse to leave — and they
                 usually arrive because of human activity, even when it's completely accidental. Seeds can hitchhike
                 on the muddy tires of a tractor, hide inside a bag of crop seed, cling to an animal's fur, or float
                 down a river to a new location.
@@ -2421,7 +2421,7 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
             <p>
-              Not all weeds grow the same way or in the same places -- some grow on land, some grow in water, and some
+              Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
               actually steal nutrients from other plants!
             </p>
             <p>
@@ -2685,7 +2685,7 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Some weeds are master disguisers -- they look almost identical to crop plants or harmless native
+                  Some weeds are master disguisers — they look almost identical to crop plants or harmless native
                   plants, which can trick even experienced farmers. Misidentification can result in missed treatment
                   opportunities, unnecessary herbicide applications, crop damage from incorrectly targeted spraying, or
                   failure to detect a problematic species before it becomes well established.
@@ -2949,7 +2949,7 @@ function TopicContent({
         {
           key: "pre-emergent",
           label: "General Pre-Emergent Herbicide",
-          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical -- applying too early or too late reduces efficacy significantly.",
+          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical — applying too early or too late reduces efficacy significantly.",
           example:
             "Applying pendimethalin or S-metolachlor to corn fields before planting to prevent annual grass and small-seeded broadleaf emergence.",
         },
@@ -3023,7 +3023,7 @@ function TopicContent({
             ) : (
               <>
                 <p>
-                  Controlling weeds isn't just about spraying chemicals -- there's actually a whole toolbox of strategies
+                  Controlling weeds isn't just about spraying chemicals — there's actually a whole toolbox of strategies
                   that farmers can use including <strong>cultural, mechanical, biological, and chemical</strong> methods.
                 </p>
               </>
@@ -3091,7 +3091,7 @@ function TopicContent({
                 <>
                   <p className="text-xs text-muted-foreground">
                     Herbicides work in different ways to kill weeds. Scientists group them by their
-                    <strong> mode of action (MOA)</strong> -- the specific way the chemical disrupts the weed's biology.
+                    <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
                   </p>
                   <div className="space-y-2">
                     {getMiddleSchoolMOAs().map(h => (
@@ -3237,7 +3237,7 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Weeds aren't just competing with crops -- they're also fighting each other for space, sunlight, water,
+                  Weeds aren't just competing with crops — they're also fighting each other for space, sunlight, water,
                   and nutrients in a fierce natural battle.
                 </p>
                 <p>
@@ -3311,8 +3311,8 @@ function TopicContent({
                   the damage it causes to a crop is worth more than what it would cost to control it.
                 </p>
                 <p>
-                  Below this threshold, the expense of treatment -- including the cost of herbicides, equipment, fuel,
-                  and labor -- exceeds the value of the yield that would be lost to weed competition, making treatment
+                  Below this threshold, the expense of treatment — including the cost of herbicides, equipment, fuel,
+                  and labor — exceeds the value of the yield that would be lost to weed competition, making treatment
                   economically counterproductive.
                 </p>
                 <p>
@@ -3334,7 +3334,7 @@ function TopicContent({
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                 <p className="font-bold text-foreground text-sm">Below Threshold</p>
                 <p className="text-xs text-muted-foreground">
-                  Cost of treatment is greater than the value of crop loss. No action needed -- save your money.
+                  Cost of treatment is greater than the value of crop loss. No action needed — save your money.
                 </p>
               </div>
               <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
@@ -3398,7 +3398,7 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Taxonomy is the system scientists use to organize and name every living thing on Earth -- like a giant
+                  Taxonomy is the system scientists use to organize and name every living thing on Earth — like a giant
                   filing system for nature.
                 </p>
                 <p>
@@ -3406,7 +3406,7 @@ function TopicContent({
                   into a structured hierarchy based on shared characteristics and evolutionary relationships. In plant
                   science, this hierarchy runs from broad categories like <strong>Kingdom</strong> and{" "}
                   <strong>Division</strong> down through <strong>Family</strong>, <strong>Genus</strong>, and{" "}
-                  <strong>Species</strong> -- with each level becoming more specific.
+                  <strong>Species</strong> — with each level becoming more specific.
                 </p>
                 <p>
                   Every weed species is assigned a two-part scientific name, known as a <strong>binomial</strong>,
@@ -3763,7 +3763,7 @@ function TopicContent({
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Diagnosis Tip</p>
-            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> -- whether it appears first on leaves, stems, or roots -- agronomists can often determine which herbicide group caused the injury.</p>
+            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> — whether it appears first on leaves, stems, or roots — agronomists can often determine which herbicide group caused the injury.</p>
           </div>
         </div>
       );
@@ -3775,7 +3775,7 @@ function TopicContent({
     case "life-stage-control": {
       const STAGE_CONTROL = [
         { stage: "Seed (Seed Bank)", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
-        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal -- most cost-effective window" },
+        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
         { stage: "Vegetative", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
         { stage: "Reproductive", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
         { stage: "Mature / Dispersal", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },
