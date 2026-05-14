@@ -388,7 +388,7 @@ function SubheadingBox({
 
 interface Props {
   onClose: () => void;
-  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }
 
 /**
@@ -584,14 +584,14 @@ function PracticeButton({
 }: {
   topicId: TopicId;
   grade: GradeLevel;
-  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }) {
   if (!onOpenPractice) return null;
   const gameId = PRACTICE_GAME_MAP[topicId]?.[grade];
   if (!gameId) return null;
   return (
     <button
-      onClick={() => onOpenPractice(grade, gameId)}
+      onClick={() => onOpenPractice(GRADE_TO_HUB[grade], gameId)}
       className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
     >
       <Play className="w-4 h-4" />
@@ -774,7 +774,7 @@ function TopicContent({
   topicWeeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   viewMode: "list" | "box";
-  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }) {
   switch (topicId) {
     /* ═══════════════════════════════════════════════════════════
