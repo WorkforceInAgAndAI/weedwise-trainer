@@ -5,7 +5,6 @@ import { FlaskConical } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import {
-import FloatingCoach from '@/components/game/FloatingCoach';
   HERBICIDE_MOA,
   SYMPTOM_TYPES,
   getMiddleSchoolMOAs,
@@ -13,6 +12,7 @@ import FloatingCoach from '@/components/game/FloatingCoach';
   getBestTimingForWeed,
   pickDistinctDistractors,
 } from '@/data/herbicides';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 

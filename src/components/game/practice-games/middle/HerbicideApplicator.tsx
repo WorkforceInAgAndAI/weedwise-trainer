@@ -7,13 +7,13 @@ import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import { resolveInjuryImage } from '@/lib/imageMap';
 import {
-import FloatingCoach from '@/components/game/FloatingCoach';
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
   pickDistinctDistractors,
   getBestMOAForWeed,
   type HerbicideMOA,
 } from '@/data/herbicides';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
