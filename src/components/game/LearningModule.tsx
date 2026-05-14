@@ -1208,72 +1208,67 @@ function TopicContent({
           ) : null}
 
           {/* Weeds: HS groups by control timing; others list straight */}
-          {(grade === "high"
-            ? Array.from(
-                topicWeeds.reduce((map, w) => {
-                  const key = (w.controlTiming || "Other").trim();
-                  if (!map.has(key)) map.set(key, [] as Weed[]);
-                  map.get(key)!.push(w);
-                  return map;
-                }, new Map<string, Weed[]>())
-              ).flatMap(([timing, ws]) => [
-                <h3 key={`hdr-${timing}`} className="font-display font-bold text-foreground text-sm mt-4 border-l-4 border-primary pl-3">
-                  Best Control Timing: {timing}
-                </h3>,
-                ...ws.map((w) => renderLifeStageCard(w, grade, LIFE_STAGE_INFO, onSelectWeed)),
-              ])
-            : topicWeeds.map((w) => renderLifeStageCard(w, grade, LIFE_STAGE_INFO, onSelectWeed)))}
+          {(() => {
+            const renderCard = (w: Weed) => {
+              const isGrass = w.plantType === "Monocot";
+              return (
+                <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold" />
+                    {grade !== "elementary" && <span className="text-xs text-primary italic">{w.scientificName}</span>}
+                    {grade === "middle" && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                        {w.family}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
+                    {LIFE_STAGE_INFO.map((s) => (
+                      <div key={s.stage} className="space-y-1">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                          <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                        </div>
+                      </div>
+                    ))}
+                    {isGrass && (
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">Ligule</div>
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                          <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {grade === "middle" && (
+                    <div className="text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">Best control timing:</span> {w.controlTiming}
+                    </div>
+                  )}
+                  <p className="text-xs text-primary">{w.memoryHook}</p>
+                </div>
+              );
+            };
+            if (grade === "high") {
+              const groups = new Map<string, Weed[]>();
+              for (const w of topicWeeds) {
+                const key = (w.controlTiming || "Other").trim();
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key)!.push(w);
+              }
+              return Array.from(groups.entries()).map(([timing, ws]) => (
+                <div key={`grp-${timing}`} className="space-y-3">
+                  <h3 className="font-display font-bold text-foreground text-sm mt-4 border-l-4 border-primary pl-3">
+                    Best Control Timing: {timing}
+                  </h3>
+                  {ws.map(renderCard)}
+                </div>
+              ));
+            }
+            return topicWeeds.map(renderCard);
+          })()}
         </div>
       );
-    }
-
-    /* end life-stages */ /* eslint-disable-next-line */
-    /* placeholder to keep diff small */
-    /* The original closing braces and per-weed JSX are replaced by renderLifeStageCard above. */
-    // (handled by helper)
-    // eslint-disable-next-line no-unreachable
-    {
-      const __unused = () => {
-            const isGrass = w.plantType === "Monocot";
-            return (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold" />
-                  {grade !== "elementary" && <span className="text-xs text-primary italic">{w.scientificName}</span>}
-                  {grade !== "elementary" && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
-                      {w.family}
-                    </span>
-                  )}
-                </div>
-                <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
-                  {LIFE_STAGE_INFO.map((s) => (
-                    <div key={s.stage} className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
-                      <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
-                      </div>
-                    </div>
-                  ))}
-                  {isGrass && (
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">Ligule</div>
-                      <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {grade !== "elementary" && (
-                  <div className="text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">Best control timing:</span> {w.controlTiming}
-                  </div>
-                )}
-                <p className="text-xs text-primary">{w.memoryHook}</p>
-              </div>
-            );
-          })};
-      };
     }
 
     /* ═══════════════════════════════════════════════════════════
