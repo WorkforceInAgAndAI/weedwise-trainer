@@ -49,13 +49,13 @@ interface SeasonData {
 
 // Constants 
 const SEASONS: Record<Season, SeasonData> = {
- 'spring': { label: 'Spring Pre-Plant', cropStage: 'Pre-Plant', description: 'Prepare the seedbed and make early decisions before soybeans emerge.' },
- 'early-summer': { label: 'Early Summer', cropStage: 'V2-V4 Soybeans', description: 'First weed flush. Critical POST herbicide application window.' },
- 'mid-summer': { label: 'Mid-Summer', cropStage: 'V5-V8 Soybeans', description: 'Second weed flush. Rain events may bring new challenges.' },
- 'late-summer': { label: 'Late Summer', cropStage: 'V9+ Soybeans', description: 'Weeds approaching maturity. Last chance for intervention.' },
- 'fall': { label: 'Fall Harvest', cropStage: 'R6-R8 Soybeans', description: 'Harvest time. Assess the season and calculate yield.' },
+ 'spring':       { label: 'Year 1 — Establishment',  cropStage: 'First Soybean Crop',     description: 'Year 1 of your soybean rotation. Build the seed bank picture, choose early controls.' },
+ 'early-summer': { label: 'Early Summer',            cropStage: 'V2-V4 Soybeans',         description: 'First weed flush. Critical POST herbicide application window.' },
+ 'mid-summer':   { label: 'Year 2 — Building',       cropStage: 'Second Soybean Crop',    description: 'Year 2. Carry-over weeds returning. Decisions made last year matter now.' },
+ 'late-summer':  { label: 'Late Summer',             cropStage: 'V9+ Soybeans',           description: 'Weeds approaching maturity. Last chance for intervention.' },
+ 'fall':         { label: 'Year 3 — Harvest',        cropStage: 'Third Soybean Crop',     description: 'Year 3. Final crop — your three-year management strategy is judged here.' },
 };
-const SEASON_ORDER: Season[] = ['spring', 'early-summer', 'mid-summer', 'late-summer', 'fall'];
+const SEASON_ORDER: Season[] = ['spring', 'mid-summer', 'fall'];
 const WEED_STAGE_BY_SEASON: Record<Season, FieldWeed['stage']> = {
  'spring': 'seedling', 'early-summer': 'seedling', 'mid-summer': 'vegetative', 'late-summer': 'reproductive', 'fall': 'mature',
 };
