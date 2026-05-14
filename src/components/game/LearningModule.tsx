@@ -7,7 +7,7 @@ import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { ArrowLeft, X } from "lucide-react";
-import { hasImage, resolveCropImageUrl } from "@/lib/imageMap";
+import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 
 type TopicId =
@@ -3510,6 +3510,28 @@ function TopicContent({
               <div key={p.group} className="bg-card border border-border rounded-lg p-4">
                 <p className="font-bold text-foreground">Group {p.group}: {p.name}</p>
                 <p className="text-sm text-muted-foreground mt-1">{p.symptoms}</p>
+                {(() => {
+                  const g = parseInt(p.group, 10);
+                  const br = resolveInjuryImage(g, "br");
+                  const gr = resolveInjuryImage(g, "gr");
+                  if (!br && !gr) return null;
+                  return (
+                    <div className="grid grid-cols-2 gap-2 mt-3">
+                      {br && (
+                        <figure>
+                          <img src={br} alt={`Group ${p.group} broadleaf injury`} className="w-full h-32 object-cover rounded-md border border-border" />
+                          <figcaption className="text-[10px] text-muted-foreground text-center mt-1">Broadleaf injury</figcaption>
+                        </figure>
+                      )}
+                      {gr && (
+                        <figure>
+                          <img src={gr} alt={`Group ${p.group} grass injury`} className="w-full h-32 object-cover rounded-md border border-border" />
+                          <figcaption className="text-[10px] text-muted-foreground text-center mt-1">Grass injury</figcaption>
+                        </figure>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             ))}
           </div>
