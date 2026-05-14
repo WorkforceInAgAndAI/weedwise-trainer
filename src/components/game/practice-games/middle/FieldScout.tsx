@@ -1,14 +1,10 @@
 import { useState, useMemo } from 'react';
-import { DollarSign, Briefcase } from 'lucide-react';
+import { DollarSign, Briefcase, Search, Target } from 'lucide-react';
 import WeedImage from '@/components/game/WeedImage';
 import { weeds } from '@/data/weeds';
-import soybeanField1 from '@/assets/images/soybean_field_1.jpg';
-import soybeanField2 from '@/assets/images/soybean_field_2.jpg';
-import soybeanField3 from '@/assets/images/soybean_field_3.jpg';
-const cornField1 = soybeanField1;
-const cornField2 = soybeanField2;
-const pastureField1 = soybeanField3;
-const pastureField2 = soybeanField1;
+import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
+import aerialSoybean from '@/assets/images/aerial_soybean_field.jpg';
+import aerialPasture from '@/assets/images/aerial_pasture_field.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 
@@ -100,9 +96,9 @@ const FIELDS: FieldDef[] = [
 ];
 
 const CROP_IMAGES: Record<string, string[]> = {
-  corn: [cornField1, cornField2],
-  soybean: [soybeanField1],
-  pasture: [pastureField1, pastureField2],
+  corn: [aerialCorn],
+  soybean: [aerialSoybean],
+  pasture: [aerialPasture],
 };
 
 const TOTAL_ROUNDS = 10;
@@ -163,6 +159,15 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
     }, 2000);
   };
 
+  // Simulate weeds found by chosen pattern: best pattern finds ~all, others find a fraction
+  const weedsFound = useMemo(() => {
+    if (!done || !chosen) return 0;
+    if (chosen === field.bestPattern) return field.weedCount;
+    // Less effective patterns find roughly 35-60% of weeds
+    const ratios: Record<string, number> = { w: 0.5, z: 0.45, x: 0.4, edge: 0.35 };
+    return Math.max(1, Math.round(field.weedCount * (ratios[chosen] ?? 0.4)));
+  }, [done, chosen, field]);
+
   const next = () => { setRound(r => r + 1); setChosen(null); setDone(false); };
   const restart = () => { setRound(0); setChosen(null); setDone(false); setScore(0); setMoney(0); setShowIntro(true); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
@@ -217,57 +222,87 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
         </div>
         <span className="text-sm text-muted-foreground ml-2">Field {round + 1}/{TOTAL_ROUNDS}</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="relative w-full aspect-[3/2] rounded-xl border-2 border-border mb-4 overflow-hidden">
-          <img src={cropImg} alt="Aerial field view" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/10" />
-          {weedSpots.map((spot, i) => (
-            <div key={i} className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-md overflow-hidden" style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%,-50%)' }}>
-              <WeedImage weedId={spot.weedId} stage="vegetative" className="w-full h-full object-cover" />
+      <div className="flex-1 overflow-hidden p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 h-full">
+          {/* LEFT: field image */}
+          <div className="relative rounded-xl border-2 border-border overflow-hidden min-h-[300px]">
+            <img src={cropImg} alt="Aerial field view" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/10" />
+            {weedSpots.map((spot, i) => (
+              <div key={i} className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-md overflow-hidden" style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%,-50%)' }}>
+                <WeedImage weedId={spot.weedId} stage="vegetative" className="w-full h-full object-cover" />
+              </div>
+            ))}
+            {(scouting || done) && chosen && (
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 200" preserveAspectRatio="none">
+                {chosen === 'w' && <polyline points="20,180 75,40 150,160 225,40 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className={scouting ? 'animate-pulse' : ''} />}
+                {chosen === 'z' && <polyline points="20,40 280,40 20,180 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className={scouting ? 'animate-pulse' : ''} />}
+                {chosen === 'x' && <><line x1="20" y1="20" x2="280" y2="180" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className={scouting ? 'animate-pulse' : ''} /><line x1="280" y1="20" x2="20" y2="180" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className={scouting ? 'animate-pulse' : ''} /></>}
+                {chosen === 'edge' && <rect x="20" y="20" width="260" height="160" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className={scouting ? 'animate-pulse' : ''} />}
+              </svg>
+            )}
+          </div>
+
+          {/* RIGHT: side panel — description, methods, results */}
+          <div className="overflow-y-auto pr-1 space-y-3">
+            <div className="rounded-xl border-2 border-border bg-card p-3">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Field Description</p>
+              <p className="text-sm text-foreground font-medium">{field.label}</p>
+              <p className="text-xs text-muted-foreground mt-1">Crop: <span className="font-semibold capitalize">{field.crop}</span></p>
             </div>
-          ))}
-          {scouting && chosen && (
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 200">
-              {chosen === 'w' && <polyline points="20,180 75,40 150,160 225,40 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" />}
-              {chosen === 'z' && <polyline points="20,40 280,40 20,180 280,180" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" />}
-              {chosen === 'x' && <><line x1="20" y1="20" x2="280" y2="180" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" /><line x1="280" y1="20" x2="20" y2="180" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" /></>}
-              {chosen === 'edge' && <rect x="20" y="20" width="260" height="160" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray="8" className="animate-pulse" />}
-            </svg>
-          )}
-          <div className="absolute bottom-2 left-2 right-2 bg-background/80 rounded-lg p-2">
-            <p className="text-xs text-foreground font-medium">{field.label}</p>
+
+            <div>
+              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2">Pick a scouting pattern</p>
+              <div className="space-y-2">
+                {PATTERNS.map(p => (
+                  <button key={p.id} onClick={() => select(p.id)} disabled={done || scouting}
+                    className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                      done ? (p.id === field.bestPattern ? 'border-green-500 bg-green-500/10' : p.id === chosen ? 'border-destructive bg-destructive/10' : 'border-border bg-card opacity-60')
+                      : chosen === p.id ? 'border-primary bg-primary/10 ring-2 ring-primary/30' : 'border-border bg-card hover:border-primary/50'
+                    }`}>
+                    <span className="font-bold text-sm text-foreground">{p.name}</span>
+                    <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {!done && chosen && !scouting && (
+              <button onClick={scout} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Scout the Field</button>
+            )}
+            {scouting && <p className="text-center text-primary font-bold animate-pulse">Scouting in progress...</p>}
+
+            {done && (
+              <div className={`rounded-xl border-2 p-4 ${isCorrect ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
+                {/* Money — large and prominent */}
+                <div className="flex items-baseline justify-between mb-2">
+                  <span className="text-xs uppercase tracking-wider font-bold text-muted-foreground">You earned</span>
+                  <span className={`text-3xl font-extrabold ${isCorrect ? 'text-green-600' : 'text-amber-600'}`}>+${isCorrect ? CORRECT_PAY : WRONG_PAY}</span>
+                </div>
+
+                {/* Weeds found vs optimal */}
+                <div className="bg-background/60 rounded-lg p-2 mb-2">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="flex items-center gap-1 text-foreground"><Search className="w-3 h-3" /> Weeds you found</span>
+                    <span className="font-bold text-foreground">{weedsFound}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground"><Target className="w-3 h-3" /> Optimal pattern would find</span>
+                    <span className="font-bold text-green-600">{field.weedCount}</span>
+                  </div>
+                  {!isCorrect && (
+                    <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-2 font-semibold">
+                      You missed {field.weedCount - weedsFound} weeds! Best pattern: {PATTERNS.find(p => p.id === field.bestPattern)?.name}
+                    </p>
+                  )}
+                </div>
+
+                <p className="text-xs text-muted-foreground mb-3">{field.note}</p>
+                <button onClick={next} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">Next Field →</button>
+              </div>
+            )}
           </div>
         </div>
-
-        <p className="text-sm text-muted-foreground mb-3 text-center">Choose the best scouting pattern for this field</p>
-
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {PATTERNS.map(p => (
-            <button key={p.id} onClick={() => select(p.id)}
-              className={`p-3 rounded-lg border-2 text-left transition-all ${
-                done ? (p.id === field.bestPattern ? 'border-green-500 bg-green-500/10' : p.id === chosen ? 'border-destructive bg-destructive/10' : 'border-border bg-card')
-                : chosen === p.id ? 'border-primary bg-primary/10' : 'border-border bg-card hover:border-primary/50'
-              }`}>
-              <span className="font-bold text-sm text-foreground">{p.name}</span>
-              <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
-            </button>
-          ))}
-        </div>
-
-        {!done && chosen && !scouting && (
-          <button onClick={scout} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Scout the Field</button>
-        )}
-        {scouting && <p className="text-center text-primary font-bold animate-pulse">Scouting in progress...</p>}
-        {done && (
-          <div className="text-center">
-            <p className={`font-bold mb-1 ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
-              {isCorrect ? `Great choice! +$${CORRECT_PAY}` : `The best pattern was: ${PATTERNS.find(p => p.id === field.bestPattern)?.name} (+$${WRONG_PAY})`}
-            </p>
-            <p className="text-sm text-muted-foreground mb-1">Weeds spotted: {field.weedCount}</p>
-            <p className="text-sm text-muted-foreground mb-4">{field.note}</p>
-            <button onClick={next} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Field</button>
-          </div>
-        )}
       </div>
           <FloatingCoach grade="6-8" tip={`Scout systematically — note density, growth stage, and patterns before recommending action.`} />
 </div>
