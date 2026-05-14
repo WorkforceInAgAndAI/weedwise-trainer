@@ -257,12 +257,23 @@ export default function PracticeHub({
  {/* Game Grid */}
  {screen === 'games' && (
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
- {games.map(g => (
+ {games.map(g => {
+ const earned = badges.filter(b => b.gameId.startsWith(`${g.id}-lv`));
+ const best = earned.reduce((acc, b) => Math.max(acc, b.total > 0 ? b.score / b.total : 0), 0);
+ const TierIcon = best >= 0.85 ? Trophy : best >= 0.7 ? Award : best > 0 ? Star : null;
+ const tierCls = best >= 0.85 ? 'text-yellow-600' : best >= 0.7 ? 'text-slate-500' : 'text-amber-700';
+ return (
  <button
  key={g.id}
  onClick={() => selectGame(g)}
- className="group flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-card shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
+ className="group relative flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-card shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
  >
+ {TierIcon && (
+   <div className={`absolute top-2 right-2 flex items-center gap-1 ${tierCls}`}>
+     <TierIcon className="w-3.5 h-3.5" />
+     <span className="text-[10px] font-bold">{earned.length}</span>
+   </div>
+ )}
  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-primary/8 flex items-center justify-center group-hover:bg-primary/12 transition-colors">
  <g.Icon className="w-7 h-7 text-primary" />
  </div>
@@ -271,7 +282,7 @@ export default function PracticeHub({
  <span className="text-[10px] text-muted-foreground mt-0.5 block">{g.category}</span>
  </div>
  </button>
- ))}
+ );})}
  </div>
  )}
 
