@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getCropImages } from '@/lib/imageMap';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const CROP_FOLDERS = ['Alfalfa', 'Barley', 'Canola', 'Corn', 'Cotton', 'Field Peas', 'Millet', 'Mungbean', 'Oats', 'Potatoes', 'Pumpkin', 'Rice', 'Sorghum', 'Soybean', 'Sugarcane', 'Wheat'];
 
@@ -137,6 +138,7 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
         ))}
       </div>
       </div>
-    </div>
+          <FloatingCoach grade="K-5" tip={`Crops are planted on purpose. Weeds show up where we don't want them. Look at the leaves!`} />
+</div>
   );
 }

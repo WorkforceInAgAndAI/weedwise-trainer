@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -199,6 +200,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="K-5" tip={`Each invasive weed causes its own kind of trouble. Match it to what it does to the field!`} />
+</div>
   );
 }

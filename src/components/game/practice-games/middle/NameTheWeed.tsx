@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -157,6 +158,7 @@ export default function NameTheWeed({ onBack }: Props) {
           </div>
         </div>
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Use 2–3 traits at once: leaf shape, venation, stem features, and growth habit.`} />
+</div>
   );
 }

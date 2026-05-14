@@ -5,6 +5,7 @@ import { FlaskConical } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import {
+import FloatingCoach from '@/components/game/FloatingCoach';
   HERBICIDE_MOA,
   SYMPTOM_TYPES,
   getMiddleSchoolMOAs,
@@ -167,6 +168,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
           </div>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Match each control method to its mode of action — chemical, mechanical, cultural, or biological.`} />
+</div>
   );
 }

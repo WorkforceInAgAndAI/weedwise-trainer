@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -154,6 +155,7 @@ export default function TaxonomyTower({ onBack, gameId, gameName, gradeLabel }: 
           )}
         </div>
       </div>
-    </div>
+          <FloatingCoach grade="K-5" tip={`Monocots have one seed leaf and parallel veins. Dicots have two seed leaves and netted veins!`} />
+</div>
   );
 }

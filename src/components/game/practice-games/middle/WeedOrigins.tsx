@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import worldMap from '@/assets/images/world-map.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -135,6 +136,7 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Origin shapes management — introduced species often lack natural predators here.`} />
+</div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -155,6 +156,7 @@ export default function NameTheWeed({ onBack, gameId, gameName, gradeLabel }: Pr
         </div>
       </div>
       </div>
-    </div>
+          <FloatingCoach grade="K-5" tip={`Look at the flowers, leaves, and stems. Each weed has its own special look!`} />
+</div>
   );
 }

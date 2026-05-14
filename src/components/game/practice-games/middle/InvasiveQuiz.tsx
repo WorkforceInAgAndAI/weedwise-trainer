@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { Ship, Package, Bug } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -233,6 +234,7 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Invasive ≠ native. Think origin, spread rate, and impact on the local ecosystem.`} />
+</div>
   );
 }

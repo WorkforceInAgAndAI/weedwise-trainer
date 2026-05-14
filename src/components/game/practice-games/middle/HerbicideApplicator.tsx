@@ -7,6 +7,7 @@ import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import { resolveInjuryImage } from '@/lib/imageMap';
 import {
+import FloatingCoach from '@/components/game/FloatingCoach';
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
   pickDistinctDistractors,
@@ -264,6 +265,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
           )}
         </div>
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Pick a herbicide whose mode of action matches the weed's life cycle and growth stage.`} />
+</div>
   );
 }

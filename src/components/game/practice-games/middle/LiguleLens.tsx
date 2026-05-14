@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -85,6 +86,7 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
      <button onClick={next} className="mt-4 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
     )}
    </div>
-  </div>
+        <FloatingCoach grade="6-8" tip={`Grass ID lives in the ligule, auricles, and collar. Look closely at the leaf base.`} />
+</div>
  );
 }
