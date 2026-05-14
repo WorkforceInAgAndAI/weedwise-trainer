@@ -151,6 +151,7 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
   const [selected, setSelected] = useState<ArrivalMethod | null>(null);
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [history, setHistory] = useState<{ weedId: string; name: string; method: ArrivalMethod; correct: boolean }[]>([]);
 
   const done = round >= rounds.length;
   const current = !done ? rounds[round] : null;
@@ -159,7 +160,9 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
     if (answered) return;
     setSelected(method);
     setAnswered(true);
-    if (method === current!.method) setScore(s => s + 1);
+    const isCorrect = method === current!.method;
+    if (isCorrect) setScore(s => s + 1);
+    setHistory(h => [...h, { weedId: current!.weed.id, name: current!.weed.commonName, method: current!.method, correct: isCorrect }]);
   };
 
   const next = () => { setRound(r => r + 1); setSelected(null); setAnswered(false); };
@@ -187,52 +190,95 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
-        <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center mb-4">
-          <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary flex-shrink-0">
-            <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr_280px] gap-4 max-w-6xl mx-auto">
+          {/* LEFT: large weed image */}
+          <div className="space-y-3">
+            <div className="rounded-xl overflow-hidden border-2 border-border bg-secondary aspect-square">
+              <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+            </div>
+            <div className="bg-card border border-border rounded-xl p-3">
+              <p className="font-bold text-foreground text-lg">{current!.weed.commonName}</p>
+              <p className="text-xs text-muted-foreground italic">{current!.weed.scientificName}</p>
+              <p className="text-xs text-muted-foreground mt-1">Family: {current!.weed.family}</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-foreground text-lg">{current!.weed.commonName}</p>
-            <p className="text-xs text-muted-foreground italic">{current!.weed.scientificName}</p>
-            <p className="text-xs text-muted-foreground mt-1">Family: {current!.weed.family}</p>
-          </div>
-        </div>
 
-        <p className="font-bold text-foreground text-center mb-4">How did this weed most likely arrive in North America?</p>
+          {/* CENTER: arrival options with dashed loop animation when selected */}
+          <div>
+            <p className="font-bold text-foreground text-center mb-3 text-sm">How did this weed arrive in North America?</p>
+            <div className="relative flex flex-col gap-3">
+              {(Object.keys(ARRIVAL_LABELS) as ArrivalMethod[]).map(method => {
+                const isCorrect = method === current!.method;
+                const { label, Icon } = ARRIVAL_LABELS[method];
+                const isSel = method === selected;
+                const bg = !answered ? 'border-border bg-card hover:border-primary' :
+                  isSel ? (isCorrect ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
+                  isCorrect ? 'border-green-500 bg-green-500/20' : 'border-border bg-card';
+                return (
+                  <button key={method} onClick={() => submit(method)}
+                    className={`relative p-3 rounded-lg border-2 text-left transition-all flex items-start gap-2 ${bg}`}>
+                    <Icon className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-bold text-sm text-foreground">{label}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">{ARRIVAL_DESCRIPTIONS[method]}</p>
+                    </div>
+                    {isSel && (
+                      // Dashed loop SVG to the left edge
+                      <svg className="absolute pointer-events-none -left-12 top-1/2 -translate-y-1/2 hidden lg:block" width="48" height="60" viewBox="0 0 48 60" fill="none">
+                        <path d="M 0 30 Q -8 15 8 12 Q 24 9 18 30 Q 12 48 30 38 Q 46 30 48 30"
+                          stroke="hsl(var(--primary))" strokeWidth="2" strokeDasharray="4 3" fill="none"
+                          className="animate-pulse" />
+                        <circle cx="46" cy="30" r="3" fill="hsl(var(--primary))" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-        <div className="flex flex-col gap-3 w-full max-w-md">
-          {(Object.keys(ARRIVAL_LABELS) as ArrivalMethod[]).map(method => {
-            const isCorrect = method === current!.method;
-            const { label, Icon } = ARRIVAL_LABELS[method];
-            const bg = !answered ? 'border-border bg-card hover:border-primary' :
-              method === selected ? (isCorrect ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
-              isCorrect ? 'border-green-500 bg-green-500/20' : 'border-border bg-card';
-            return (
-              <button key={method} onClick={() => submit(method)}
-                className={`p-4 rounded-lg border-2 text-left transition-all flex items-start gap-3 ${bg}`}>
-                <Icon className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-sm text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{ARRIVAL_DESCRIPTIONS[method]}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {answered && (
-          <div className="mt-4 bg-card border border-border rounded-xl p-4 max-w-md w-full">
-            <p className={`font-bold mb-2 ${selected === current!.method ? 'text-green-500' : 'text-destructive'}`}>
-              {selected === current!.method ? 'Correct!' : 'Not quite!'}
-            </p>
-            <p className="text-sm text-foreground leading-relaxed">{current!.story}</p>
-            {current!.weed.memoryHook && (
-              <p className="text-xs text-muted-foreground mt-2 italic">Tip: {current!.weed.memoryHook}</p>
+            {answered && (
+              <div className="mt-4 bg-card border border-border rounded-xl p-3">
+                <p className={`font-bold mb-2 text-sm ${selected === current!.method ? 'text-green-500' : 'text-destructive'}`}>
+                  {selected === current!.method ? 'Correct!' : 'Not quite!'}
+                </p>
+                <p className="text-xs text-foreground leading-relaxed">{current!.story}</p>
+                {current!.weed.memoryHook && (
+                  <p className="text-[11px] text-muted-foreground mt-2 italic">Tip: {current!.weed.memoryHook}</p>
+                )}
+                <button onClick={next} className="mt-3 w-full py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm">Next →</button>
+              </div>
             )}
-            <button onClick={next} className="mt-3 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold w-full">Next</button>
           </div>
-        )}
+
+          {/* RIGHT: collection panel grouped by arrival method */}
+          <div className="rounded-xl border-2 border-border bg-card p-3 h-fit lg:sticky lg:top-4">
+            <p className="text-xs font-bold uppercase text-foreground mb-3">Your Field Notes ({history.length})</p>
+            <div className="space-y-3">
+              {(Object.keys(ARRIVAL_LABELS) as ArrivalMethod[]).map(m => {
+                const items = history.filter(h => h.method === m);
+                if (items.length === 0) return null;
+                const { label, Icon } = ARRIVAL_LABELS[m];
+                return (
+                  <div key={m}>
+                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase text-muted-foreground mb-1">
+                      <Icon className="w-3 h-3" /> {label}
+                    </div>
+                    <div className="space-y-1">
+                      {items.map((h, idx) => (
+                        <div key={idx} className={`flex items-center gap-1 text-[11px] px-2 py-1 rounded ${h.correct ? 'bg-green-500/10 text-foreground' : 'bg-destructive/10 text-foreground'}`}>
+                          <span className={h.correct ? 'text-green-600' : 'text-destructive'}>{h.correct ? '✓' : '✗'}</span>
+                          <span className="truncate">{h.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              {history.length === 0 && <p className="text-[11px] text-muted-foreground italic">Your guesses will collect here.</p>}
+            </div>
+          </div>
+        </div>
       </div>
           <FloatingCoach grade="6-8" tip={`Invasive ≠ native. Think origin, spread rate, and impact on the local ecosystem.`} />
 </div>
