@@ -885,8 +885,8 @@ function TopicContent({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">What is Binomial Nomenclature?</p>
               <p>
-                Binomial nomenclature is the formal, two-term scientific system for naming organisms, which uses terms
-                in Latin to state the <strong>genus</strong> and <strong>specific epithet</strong>. It was developed by
+                Binomial nomenclature is the formal, two-term scientific system for naming plants, which uses terms
+                in Latin to state the <strong>genus</strong> and <strong>species</strong>. It was developed by
                 <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
                 worldwide.
               </p>
@@ -896,7 +896,7 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
               <div className="flex gap-4 items-start">
-                <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border-2 border-border">
+                <div className="w-40 h-40 rounded-xl overflow-hidden shrink-0 border-2 border-border">
                   <WeedImage weedId={waterhemp.id} stage="whole" className="w-full h-full" />
                 </div>
                 <div className="space-y-2">
@@ -924,13 +924,13 @@ function TopicContent({
               <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 space-y-3">
                 <p className="font-display font-bold text-foreground text-base">Genus Relationships: Foxtails</p>
                 <p className="text-sm text-foreground">
-                  Organisms with scientific names closer in form can be more closely related. These foxtails all share
-                  the genus <strong className="italic">Setaria</strong>, showing their common heritage and characteristics.
+                  Plants with scientific names closer in form can be more closely related. These foxtails all share
+                  the genus <strong className="italic">Setaria</strong>, showing their common lineage and characteristics.
                 </p>
                 <div className="grid grid-cols-3 gap-3">
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                      <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden mb-2">
+                      <div className="w-28 h-28 mx-auto rounded-lg overflow-hidden mb-2">
                         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
@@ -945,13 +945,12 @@ function TopicContent({
             <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
             {topicWeeds.map((w) => (
               <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+                <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0">
                   <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
                 </div>
                 <div className="space-y-1">
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
                   <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">Family: {w.family}</div>
                   <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                     {w.traits.slice(0, 3).map((t, i) => (
                       <li key={i}>- {t}</li>
