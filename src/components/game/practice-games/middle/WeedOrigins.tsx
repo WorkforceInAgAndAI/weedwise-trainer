@@ -154,7 +154,7 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
           <div className="space-y-3">
             <div className="flex items-start gap-3 bg-card rounded-xl border border-border p-3">
               <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary shrink-0">
-                <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={current!.weed.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-foreground">{current!.weed.commonName}</p>

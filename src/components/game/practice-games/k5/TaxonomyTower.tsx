@@ -100,7 +100,7 @@ export default function TaxonomyTower({ onBack, gameId, gameName, gradeLabel }: 
                       <div className={`aspect-square rounded-md overflow-hidden border-2 ${
                         phase === 'sort' ? 'border-border' : (placements[w.id] === w.plantType ? 'border-green-500' : 'border-destructive')
                       }`}>
-                        <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
                       </div>
                       <p className="text-[10px] mt-1 text-foreground">{w.commonName}</p>
                     </div>
@@ -119,7 +119,7 @@ export default function TaxonomyTower({ onBack, gameId, gameName, gradeLabel }: 
                   <button key={w.id} onClick={() => setSelectedId(selectedId === w.id ? null : w.id)}
                     className={`p-2 rounded-lg border-2 text-center transition-all ${selectedId === w.id ? 'border-primary bg-primary/10 scale-105' : 'border-border bg-card hover:border-primary/50'}`}>
                     <div className="aspect-square rounded-md overflow-hidden bg-secondary mb-1">
-                      <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
                     </div>
                     <p className="text-[10px] font-semibold text-foreground">{w.commonName}</p>
                   </button>

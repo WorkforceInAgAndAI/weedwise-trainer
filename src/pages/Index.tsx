@@ -39,10 +39,17 @@ const Index = () => {
   const [showReferences, setShowReferences] = useState(false);
   const [globalGrade, setGlobalGrade] = useState<GradeLevel>("elementary");
   const [practiceInitial, setPracticeInitial] = useState<{ grade?: string; gameId?: string } | null>(null);
+  const [learningInitialTopic, setLearningInitialTopic] = useState<string | null>(null);
 
   const openPractice = (grade?: string, gameId?: string) => {
     setPracticeInitial({ grade, gameId });
     setShowPracticeHub(true);
+  };
+
+  const openLearningTopic = (topicId: string) => {
+    setLearningInitialTopic(topicId);
+    setShowPracticeHub(false);
+    setShowLearning(true);
   };
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
@@ -132,9 +139,11 @@ const Index = () => {
       )}
       {showLearning && (
         <LearningModule
-          onClose={() => setShowLearning(false)}
+          onClose={() => { setShowLearning(false); setLearningInitialTopic(null); }}
+          initialTopicId={learningInitialTopic ?? undefined}
           onOpenPractice={(grade, gameId) => {
             setShowLearning(false);
+            setLearningInitialTopic(null);
             openPractice(grade, gameId);
           }}
         />
@@ -152,6 +161,7 @@ const Index = () => {
           }}
           initialGrade={practiceInitial?.grade}
           initialGameId={practiceInitial?.gameId}
+          onOpenLearning={openLearningTopic}
         />
       )}
       {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}

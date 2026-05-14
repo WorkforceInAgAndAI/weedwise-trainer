@@ -75,7 +75,7 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
     <h2 className="font-bold text-lg text-foreground mb-4">Review: {reviewIdx + 1}/{wrongItems.length}</h2>
     <div className="w-32 h-32 rounded-xl overflow-hidden bg-secondary mb-3">
-     <WeedImage weedId={item.weed.id} stage="plant" className="w-full h-full object-cover" />
+     <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
     </div>
     <p className="font-bold text-foreground text-lg mb-1">{item.weed.commonName}</p>
     <p className="text-xs text-muted-foreground italic mb-2">{item.weed.scientificName}</p>
@@ -139,7 +139,7 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
      {items.filter(it => !placements[it.weed.id]).map(it => (
       <button key={it.weed.id} onClick={() => setSelected(selected === it.weed.id ? null : it.weed.id)}
        className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 ${selected === it.weed.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-       <div className="w-8 h-8 rounded-lg overflow-hidden"><WeedImage weedId={it.weed.id} stage="plant" className="w-full h-full object-cover" /></div>
+       <div className="w-8 h-8 rounded-lg overflow-hidden"><WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" /></div>
        <span className="text-xs font-medium text-foreground">{it.weed.commonName}</span>
       </button>
      ))}

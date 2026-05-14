@@ -129,7 +129,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                 <div className={`w-12 h-12 rounded-full overflow-hidden border-[3px] shadow-lg ${
                   it.killed ? 'border-destructive' : isSelected ? 'border-primary ring-2 ring-primary/40 scale-110' : 'border-white/80'
                 }`}>
-                  <WeedImage weedId={it.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  <WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
               </button>
             );
@@ -152,7 +152,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                     return (
                       <div key={id} className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded overflow-hidden bg-secondary flex-shrink-0">
-                          <WeedImage weedId={it.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                          <WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" />
                         </div>
                         <span className="text-[11px] text-foreground flex-1 truncate">{it.weed.commonName}</span>
                       </div>

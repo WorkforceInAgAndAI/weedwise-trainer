@@ -228,7 +228,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
             <div className="absolute inset-0 bg-black/10" />
             {weedSpots.map((spot, i) => (
               <div key={i} className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-md overflow-hidden" style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%,-50%)' }}>
-                <WeedImage weedId={spot.weedId} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={spot.weedId} stage="flower" className="w-full h-full object-cover" />
               </div>
             ))}
             {(scouting || done) && chosen && (

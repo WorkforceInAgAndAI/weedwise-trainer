@@ -150,7 +150,7 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
             {fieldWeeds.slice(0, 3).map((w, i) => (
               <div key={i} className="flex flex-col items-center">
                 <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${compatible ? 'border-green-500 opacity-40' : 'border-destructive'}`}>
-                  <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
+                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <span className="text-[9px] text-muted-foreground mt-0.5">{compatible ? 'Suppressed' : 'Thriving'}</span>
               </div>

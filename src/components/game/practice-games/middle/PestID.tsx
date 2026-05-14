@@ -184,7 +184,7 @@ export default function PestID({ onBack }: { onBack: () => void }) {
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
         <div className="w-44 h-44 rounded-xl overflow-hidden bg-secondary mb-3">
-          <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+          <WeedImage weedId={current!.weed.id} stage="flower" className="w-full h-full object-cover" />
         </div>
         <p className="font-bold text-foreground mb-1">{current!.weed.commonName}</p>
         <p className="text-xs text-muted-foreground mb-4 text-center max-w-sm">{current!.weed.habitat}</p>

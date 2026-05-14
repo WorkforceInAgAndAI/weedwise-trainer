@@ -92,7 +92,7 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
       <button key={w.id} onClick={() => setPlayerWeed(w)}
        className={`p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${playerWeed.id === w.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-border">
-        <WeedImage weedId={w.id} stage="plant" className="w-full h-full object-cover" />
+        <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
        </div>
        <p className="text-xs font-bold text-foreground">{w.name}</p>
       </button>
@@ -110,7 +110,7 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
   return (
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
     <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary mb-4">
-     <WeedImage weedId={playerWeed.id} stage="plant" className="w-full h-full object-cover" />
+     <WeedImage weedId={playerWeed.id} stage="flower" className="w-full h-full object-cover" />
     </div>
     <h2 className="font-display font-bold text-xl text-foreground mb-2">{playerWeed.name}</h2>
     <p className="text-sm text-muted-foreground max-w-md mb-6">{playerWeed.bio}</p>
@@ -144,14 +144,14 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
     <div className="flex items-center justify-center gap-4 mb-4">
      <div className="flex flex-col items-center">
       <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary">
-       <WeedImage weedId={playerWeed.id} stage="plant" className="w-full h-full object-cover" />
+       <WeedImage weedId={playerWeed.id} stage="flower" className="w-full h-full object-cover" />
       </div>
       <p className="text-xs font-bold text-primary mt-1">You ({playerWeed.name})</p>
      </div>
      <Swords className="w-6 h-6 text-muted-foreground" />
      <div className="flex flex-col items-center">
       <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-destructive">
-       <WeedImage weedId={s.enemy} stage="plant" className="w-full h-full object-cover" />
+       <WeedImage weedId={s.enemy} stage="flower" className="w-full h-full object-cover" />
       </div>
       <p className="text-xs font-bold text-destructive mt-1">{s.enemyName}</p>
      </div>

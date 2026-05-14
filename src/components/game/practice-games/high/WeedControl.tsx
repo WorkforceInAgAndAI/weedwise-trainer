@@ -137,7 +137,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
        {wrongResults.map((r, i) => (
         <div key={i} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
          <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-          <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+          <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
          </div>
          <div className="flex-1">
           <p className="font-bold text-foreground text-sm">{r.weed.commonName}</p>
@@ -175,7 +175,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
       className={`absolute w-14 h-14 rounded-full transition-all ${active === i ? 'scale-125 z-10' : 'animate-pulse'}`}
       style={{ left: `${w.x}%`, top: `${w.y}%` }}>
       <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
-       <WeedImage weedId={w.weed.id} stage="plant" className="w-full h-full object-cover" />
+       <WeedImage weedId={w.weed.id} stage="flower" className="w-full h-full object-cover" />
       </div>
      </button>
     ))}
@@ -184,7 +184,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     <div className="bg-card border-t-2 border-border p-4">
      <div className="flex items-start gap-3 mb-3">
       <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary flex-shrink-0">
-       <WeedImage weedId={items[active].weed.id} stage="plant" className="w-full h-full object-cover" />
+       <WeedImage weedId={items[active].weed.id} stage="flower" className="w-full h-full object-cover" />
       </div>
       <div className="flex-1">
        <p className="font-bold text-foreground text-lg">{items[active].weed.commonName}</p>

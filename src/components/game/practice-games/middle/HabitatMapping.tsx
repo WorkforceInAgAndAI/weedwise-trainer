@@ -132,7 +132,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
               return (
                 <div key={i.weed.id} className="flex gap-3 items-start p-3 rounded-xl border-2 border-border bg-card">
                   <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
-                    <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-foreground text-sm">{i.weed.commonName} <span className="text-xs text-primary">— {zoneLabel}</span></p>
@@ -194,7 +194,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
                             'border-border bg-secondary'
                           }`}>
                           <div className="w-14 h-14 rounded overflow-hidden bg-muted">
-                            <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                            <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                           </div>
                           <span className="text-[10px] font-medium text-foreground max-w-[60px] text-center leading-tight">{i.weed.commonName}</span>
                           {!checked && (
@@ -223,7 +223,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
                     selected === i.weed.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-background text-foreground hover:border-primary/50'
                   }`}>
                   <div className="w-12 h-12 rounded overflow-hidden bg-muted shrink-0">
-                    <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <span className="text-left text-xs leading-tight">{i.weed.commonName}</span>
                 </button>

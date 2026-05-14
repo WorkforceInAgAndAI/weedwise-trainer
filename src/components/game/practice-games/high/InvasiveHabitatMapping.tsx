@@ -172,7 +172,7 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
 
     <div className="flex justify-center mb-4">
      <div className="w-40 h-40 rounded-xl overflow-hidden bg-secondary border-2 border-border">
-      <WeedImage weedId={current.id} stage="plant" className="w-full h-full object-cover" />
+      <WeedImage weedId={current.id} stage="flower" className="w-full h-full object-cover" />
      </div>
     </div>
 

@@ -192,7 +192,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             className={`absolute w-14 h-14 rounded-full transition-all ${fw.managed ? 'opacity-30 scale-75' : 'hover:scale-110'}`}
             style={{ left: `${fw.x}%`, top: `${fw.y}%` }}>
             <div className="w-full h-full rounded-full overflow-hidden border-2 border-border bg-secondary shadow-lg">
-              <WeedImage weedId={fw.weed.id} stage="plant" className="w-full h-full object-cover" />
+              <WeedImage weedId={fw.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
             {fw.managed && <span className="absolute -top-1 -right-1 text-sm">{fw.correct ? '✓' : '✗'}</span>}
           </button>
@@ -204,7 +204,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 <p className="text-base font-bold text-foreground mb-3">What weed is this?</p>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-40 h-40 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
-                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={active.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <p className="text-sm text-muted-foreground flex-1">{active.weed.traits[0]}</p>
                 </div>
@@ -222,7 +222,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               <div className="text-center">
                 <div className="flex items-center gap-4 justify-center mb-3">
                   <div className="w-32 h-32 rounded-lg overflow-hidden border border-border bg-secondary">
-                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={active.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div className="text-left">
                     <p className="font-bold text-foreground">{active.weed.commonName}</p>
@@ -251,7 +251,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               <div>
                 <div className="flex items-start gap-4 mb-3">
                   <div className="w-32 h-32 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
-                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={active.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <p className="text-base font-bold text-foreground mb-1">Manage <span className="text-primary">{active.weed.commonName}</span></p>
@@ -272,7 +272,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               <div className="text-center">
                 <div className="flex items-center justify-center gap-3 mb-2">
                   <div className="w-24 h-24 rounded-lg overflow-hidden border border-border bg-secondary">
-                    <WeedImage weedId={active.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={active.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <p className="font-bold text-foreground">{active.weed.commonName}</p>
                 </div>
@@ -310,7 +310,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             return (
               <li key={i} className={`flex items-start gap-2 p-2 rounded-lg border ${fw.managed ? (fw.correct ? 'border-green-500/40 bg-green-500/5' : 'border-destructive/40 bg-destructive/5') : 'border-border bg-secondary/40'}`}>
                 <div className="w-10 h-10 rounded-md overflow-hidden border border-border shrink-0">
-                  <WeedImage weedId={fw.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  <WeedImage weedId={fw.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground truncate">{fw.identified || fw.managed ? fw.weed.commonName : `Weed #${i + 1}`}</p>

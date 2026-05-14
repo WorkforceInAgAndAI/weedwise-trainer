@@ -389,6 +389,7 @@ function SubheadingBox({
 interface Props {
   onClose: () => void;
   onOpenPractice?: (gradeHub: string, gameId?: string) => void;
+  initialTopicId?: string;
 }
 
 /**
@@ -600,9 +601,11 @@ function PracticeButton({
   );
 }
 
-export default function LearningModule({ onClose, onOpenPractice }: Props) {
+export default function LearningModule({ onClose, onOpenPractice, initialTopicId }: Props) {
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel>("elementary");
-  const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
+    (initialTopicId as TopicId) ?? null,
+  );
   const [selectedWeed, setSelectedWeed] = useState<Weed | null>(null);
   const viewMode: "list" | "box" = "list";
 

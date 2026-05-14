@@ -168,7 +168,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
                   matches[i.weed.id] ? 'border-primary/30 bg-primary/5 text-foreground' : 'border-border text-foreground hover:border-primary/50'
                 }`}>
                 <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
-                  <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <span className="text-xs leading-tight">{i.weed.commonName}</span>
               </button>

@@ -262,7 +262,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
                 <button key={w.id} onClick={() => identify(w.id)}
                   className="flex flex-col items-center p-3 rounded-xl border-2 border-border bg-card hover:border-primary transition-all">
                   <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-lg overflow-hidden bg-secondary mb-2">
-                    <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <span className="text-base font-medium text-foreground">{w.commonName}</span>
                 </button>
@@ -275,7 +275,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
           <div className="max-w-3xl mx-auto">
             <div className="flex flex-col items-center mb-3">
               <div className="w-64 h-64 rounded-xl overflow-hidden bg-secondary mb-3 border-2 border-destructive">
-                <WeedImage weedId={current!.toxic.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={current!.toxic.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               {selected === current!.toxic.id ? (
                 <p className="text-green-500 font-bold text-lg">Correct! You identified the toxic weed.</p>

@@ -83,7 +83,7 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
                 selected === w.id ? 'border-primary scale-105 shadow-lg' : 'border-border'
               } ${submitted && w.id === target?.id ? 'ring-2 ring-green-500' : ''} ${submitted && selected === w.id && w.id !== target?.id ? 'ring-2 ring-destructive' : ''}`}>
               <div className="aspect-square bg-secondary">
-                <WeedImage weedId={w.id} stage="plant" className="w-full h-full object-cover" />
+                <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               {submitted && (
                 <p className={`text-xs font-medium p-2 text-center ${w.id === target?.id ? 'text-green-500 font-bold' : 'text-foreground'}`}>{w.commonName}</p>
@@ -113,10 +113,10 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
               <p className="text-[10px] font-bold text-foreground mb-1 truncate">{h.targetName}</p>
               <div className="grid grid-cols-2 gap-1">
                 <div className="aspect-square rounded overflow-hidden">
-                  <WeedImage weedId={h.weedId} stage="plant" className="w-full h-full object-cover" />
+                  <WeedImage weedId={h.weedId} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <div className="aspect-square rounded overflow-hidden">
-                  <WeedImage weedId={h.alikeId} stage="plant" className="w-full h-full object-cover" />
+                  <WeedImage weedId={h.alikeId} stage="flower" className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
