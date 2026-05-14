@@ -131,7 +131,7 @@ export default function FamilyFlipMatch({ onComplete, onNext }: Props) {
  {selectedWeeds.map(weed => (
  <div key={weed.id} className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border">
  <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
- <WeedImage weedId={weed.id} stage="whole" className="w-full h-full" />
+ <WeedImage weedId={weed.id} stage="flower" className="w-full h-full" />
  </div>
  <div className="flex-1 min-w-0">
  <h3 className="font-semibold text-primary italic">{weed.scientificName}</h3>

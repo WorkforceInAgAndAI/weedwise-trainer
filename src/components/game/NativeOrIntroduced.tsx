@@ -151,7 +151,7 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  }`}
  >
  <div className="w-full h-14 mb-1 overflow-hidden rounded">
- <WeedImage weedId={item.weedId} stage="whole" className="w-full h-full" />
+ <WeedImage weedId={item.weedId} stage="flower" className="w-full h-full" />
  </div>
  <span className="text-[10px] font-semibold text-foreground leading-tight block">{item.name}</span>
  </button>
