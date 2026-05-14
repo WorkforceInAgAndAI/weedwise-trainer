@@ -390,6 +390,7 @@ interface Props {
   onClose: () => void;
   onOpenPractice?: (gradeHub: string, gameId?: string) => void;
   initialTopicId?: string;
+  onBackToPractice?: () => void;
 }
 
 /**
@@ -601,8 +602,17 @@ function PracticeButton({
   );
 }
 
-export default function LearningModule({ onClose, onOpenPractice, initialTopicId }: Props) {
-  const [selectedGrade, setSelectedGrade] = useState<GradeLevel>("elementary");
+export default function LearningModule({ onClose, onOpenPractice, initialTopicId, onBackToPractice }: Props) {
+  // Infer grade from the initial topic so the topic actually appears in the grade's list.
+  const initialGrade: GradeLevel = (() => {
+    if (!initialTopicId) return "elementary";
+    const t = TOPICS.find((x) => x.id === (initialTopicId as TopicId));
+    if (!t) return "elementary";
+    if (t.grades.includes("middle")) return "middle";
+    if (t.grades.includes("high")) return "high";
+    return "elementary";
+  })();
+  const [selectedGrade, setSelectedGrade] = useState<GradeLevel>(initialGrade);
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
@@ -643,12 +653,22 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
             )}
             <h1 className="text-xl font-display font-bold text-foreground">Learning Module</h1>
           </div>
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onBackToPractice && (
+              <button
+                onClick={onBackToPractice}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-success/40 bg-success/10 text-success text-sm font-semibold hover:bg-success/20 transition-colors"
+              >
+                <Play className="w-4 h-4" /> Back to Practice
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2 mb-6">
@@ -3091,12 +3111,12 @@ function TopicContent({
                           <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {HERBICIDE_MOA.map(h => (
+                       <tbody>
+                         {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
                           <tr key={h.id} className="even:bg-muted/20">
                             <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
@@ -3125,7 +3145,7 @@ function TopicContent({
                     <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
                   </p>
                   <div className="space-y-2">
-                    {getMiddleSchoolMOAs().map(h => (
+                    {[...getMiddleSchoolMOAs()].sort((a, b) => a.group - b.group).map(h => (
                       <div key={h.id} className="bg-card border border-border rounded-lg p-3">
                         <p className="font-bold text-foreground text-xs">{h.moa} (Group {h.group})</p>
                         <p className="text-[10px] text-muted-foreground">
@@ -3134,9 +3154,9 @@ function TopicContent({
                         <p className="text-[10px] text-muted-foreground">
                           <span className="font-medium">Targets:</span> {h.spectrum === 'Both' ? 'Grasses and broadleaves' : h.spectrum === 'Grass' ? 'Grasses (monocots)' : 'Broadleaves (dicots)'}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          <span className="font-medium">Brand example:</span> {h.brands[0]}
-                        </p>
+                         <p className="text-[10px] text-muted-foreground">
+                           <span className="font-medium">Chemical:</span> {h.brands[0]}
+                         </p>
                         <p className="text-[10px] text-muted-foreground">
                           <span className="font-medium">What it looks like:</span> {SYMPTOM_TYPES[h.symptomType]?.label}
                         </p>
@@ -3709,12 +3729,12 @@ function TopicContent({
                     <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
                     <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                     <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
-                    <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
                     <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {HERBICIDE_MOA.map(h => (
+                  {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
                     <tr key={h.id} className="even:bg-muted/20">
                       <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
                       <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>

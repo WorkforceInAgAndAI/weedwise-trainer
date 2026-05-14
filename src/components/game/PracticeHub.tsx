@@ -167,7 +167,7 @@ export default function PracticeHub({
   onClose: () => void;
   initialGrade?: string;
   initialGameId?: string;
-  onOpenLearning?: (topicId: string) => void;
+  onOpenLearning?: (topicId: string, gradeHub?: string, gameId?: string) => void;
 }) {
  const [screen, setScreen] = useState<Screen>('grades');
  const [selectedGrade, setSelectedGrade] = useState<string>('');
@@ -198,7 +198,21 @@ export default function PracticeHub({
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
  const gradeLabel = selectedGrade === 'k5' ? 'K-5' : selectedGrade === '68' ? '6-8' : '9-12';
- return <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />;
+ const topicId = GAME_TO_TOPIC[selectedGame.id];
+ return (
+   <>
+     <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
+     {onOpenLearning && topicId && (
+       <button
+         onClick={() => onOpenLearning(topicId, selectedGrade, selectedGame.id)}
+         className="fixed bottom-4 right-4 z-[60] inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-primary/40 bg-card text-primary text-sm font-semibold shadow-card hover:bg-primary/10 transition-colors"
+         title="Open the related learning module"
+       >
+         <Leaf className="w-4 h-4" /> Learn more
+       </button>
+     )}
+   </>
+ );
  }
 
  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : selectedGrade === '912' ? highGames : [];
@@ -331,7 +345,7 @@ export default function PracticeHub({
  </div>
  {onOpenLearning && GAME_TO_TOPIC[selectedGame.id] && (
    <button
-     onClick={() => onOpenLearning(GAME_TO_TOPIC[selectedGame.id])}
+      onClick={() => onOpenLearning(GAME_TO_TOPIC[selectedGame.id], selectedGrade, selectedGame.id)}
      className="w-full mb-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
    >
      <Leaf className="w-4 h-4" /> Learn more about this topic

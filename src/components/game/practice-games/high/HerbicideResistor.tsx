@@ -22,7 +22,7 @@ const HERBICIDES: { id: string; moa: HerbicideMOA; risk: string }[] = [
 
 function herbLabel(h: typeof HERBICIDES[0], isMulti: boolean): string {
   if (isMulti) return `Tank Mix (Multiple MOA)`;
-  return `${h.moa.moa} (Group ${h.moa.group}) — e.g. ${h.moa.brands[0]}`;
+  return `${h.moa.moa} (Group ${h.moa.group}) — chemical: ${h.moa.brands[0]}`;
 }
 
 const CROP_LEVELS = [

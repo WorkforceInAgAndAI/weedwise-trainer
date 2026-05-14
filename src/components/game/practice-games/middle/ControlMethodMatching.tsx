@@ -107,7 +107,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
                     <button key={g.id} onClick={() => submitMOA(g.id)}
                       className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-left text-sm">
                       <span className="font-bold text-foreground">{g.moa} (Group {g.group})</span>
-                      <span className="text-[10px] text-muted-foreground block mt-0.5">e.g. {g.brands[0]}</span>
+                      <span className="text-[10px] text-muted-foreground block mt-0.5">Chemical: {g.brands[0]}</span>
                     </button>
                   ))}
                 </div>
@@ -123,7 +123,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
                   <span className="font-semibold">Best MOA:</span> {current!.bestMOA.moa} (Group {current!.bestMOA.group})
                 </p>
                 <p className="text-xs text-muted-foreground mb-1">
-                  <span className="font-semibold">Brand example:</span> {current!.bestMOA.brands[0]}
+                  <span className="font-semibold">Chemical:</span> {current!.bestMOA.brands[0]}
                 </p>
                 {symptomInfo && (
                   <p className="text-xs text-muted-foreground mb-1">

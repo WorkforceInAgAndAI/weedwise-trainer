@@ -176,7 +176,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                   <button key={m.id} onClick={() => apply(m.id)}
                     className="w-full p-2.5 rounded-lg border-2 border-border bg-background hover:border-primary text-left">
                     <span className="text-xs font-bold text-foreground">{m.moa} (Group {m.group})</span>
-                    <span className="text-[10px] text-muted-foreground block">e.g. {m.brands[0]}</span>
+                    <span className="text-[10px] text-muted-foreground block">Chemical: {m.brands[0]}</span>
                   </button>
                 ))}
               </div>
