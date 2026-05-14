@@ -1622,28 +1622,12 @@ function TopicContent({
               <p>
                 Plants have unique systems to best enable them to reproduce and survive in varying conditions. One such
                 system is how quickly or slowly plants complete a <strong>life cycle</strong>. A complete life cycle
-                includes going through 6 stages:{" "}
-                <strong>
-                  seed, germination, seedling growth, maturity (flowering), pollination/fertilization, and seed
-                  dispersal
-                </strong>
-                .
+                moves through five stages:{" "}
+                <strong>seed, seedling, vegetative, reproductive, and mature</strong>. The
+                <strong> reproductive</strong> stage groups flowering, pollination, and fertilization together, since
+                they all happen as the plant prepares to set seed. Refer to the Life Stages topic for the visual cycle
+                diagram.
               </p>
-            </div>
-
-            {/* Life cycle flow chart */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Flow</p>
-              <div className="flex items-center justify-center gap-2 flex-wrap">
-                {["Seed", "Germination", "Seedling", "Maturity", "Pollination", "Seed Dispersal"].map((stage, i) => (
-                  <div key={stage} className="flex items-center gap-2">
-                    <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">
-                      {stage}
-                    </div>
-                    {i < 5 && <span className="text-muted-foreground font-bold">→</span>}
-                  </div>
-                ))}
-              </div>
             </div>
 
             <p className="text-sm text-foreground">Common weeds have three general life cycle lengths.</p>
@@ -1652,7 +1636,7 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Annual Weeds</p>
               <p className="text-sm text-foreground">
-                Annual weeds complete their entire life cycle — from seed germination to seed production and death --
+                Annual weeds complete their entire life cycle — from seed germination to seed production and death —
                 within a <strong>single growing season</strong>. They rely entirely on prolific seed production for
                 survival.
               </p>
@@ -1661,10 +1645,10 @@ function TopicContent({
                   <p className="font-bold text-foreground text-sm">Summer Annuals</p>
                   <p className="text-xs text-muted-foreground">Germinate in spring and die after frost.</p>
                   <div className="grid grid-cols-3 gap-1">
-                    {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).slice(0, 6).map((w) => (
+                    {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).map((w) => (
                       <div key={w.id} className="text-center">
                         <div className="aspect-square rounded overflow-hidden bg-muted">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                         </div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                       </div>
@@ -1677,10 +1661,10 @@ function TopicContent({
                     Germinate in fall, overwinter, and produce seed in spring.
                   </p>
                   <div className="grid grid-cols-3 gap-1">
-                    {winterAnnuals.slice(0, 6).map((w) => (
+                    {winterAnnuals.map((w) => (
                       <div key={w.id} className="text-center">
                         <div className="aspect-square rounded overflow-hidden bg-muted">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                         </div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                       </div>
@@ -1703,10 +1687,10 @@ function TopicContent({
                 Control is most effective during the <strong>rosette stage</strong>.
               </p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {biennials.slice(0, 8).map((w) => (
+                {biennials.map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
