@@ -3023,7 +3023,7 @@ function TopicContent({
             ) : isHighSchool ? (
               <>
                 <p>
-                  Effective weed management requires an <strong>Integrated Pest Management (IPM)</strong> approach --
+                  Effective weed management requires an <strong>Integrated Pest Management (IPM)</strong> approach —
                   combining multiple control tactics to reduce weed pressure, prevent resistance, and protect crop yield.
                 </p>
                 <p className="text-muted-foreground">
