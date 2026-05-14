@@ -394,9 +394,16 @@ export default function LearningModule({ onClose }: Props) {
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel>("elementary");
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(null);
   const [selectedWeed, setSelectedWeed] = useState<Weed | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "box">("list");
+  const viewMode: "list" | "box" = "list";
 
   const availableTopics = useMemo(() => TOPICS.filter((t) => t.grades.includes(selectedGrade)), [selectedGrade]);
+
+  const topicsByCategory = useMemo(() => {
+    const order: CategoryId[] = ["identification", "lifecycle", "control"];
+    return order
+      .map((cat) => ({ category: CATEGORIES[cat], topics: availableTopics.filter((t) => t.category === cat) }))
+      .filter((g) => g.topics.length > 0);
+  }, [availableTopics]);
 
   const gradeCards: { grade: GradeLevel; label: string; color: string }[] = [
     { grade: "elementary", label: "K-5", color: "border-grade-elementary" },
@@ -404,12 +411,9 @@ export default function LearningModule({ onClose }: Props) {
     { grade: "high", label: "9-12", color: "border-grade-high" },
   ];
 
-  const topicNeedsViewToggle =
-    selectedTopic === "families" || selectedTopic === "habitats" || selectedTopic === "life-cycles";
-
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 py-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <HomeButton onClose={onClose} />
@@ -418,7 +422,6 @@ export default function LearningModule({ onClose }: Props) {
               <button
                 onClick={() => {
                   setSelectedTopic(null);
-                  setViewMode("list");
                 }}
                 className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               >
@@ -455,47 +458,74 @@ export default function LearningModule({ onClose }: Props) {
         </div>
 
         {!selectedTopic ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {availableTopics.map((topic) => (
-              <button
-                key={topic.id}
-                onClick={() => setSelectedTopic(topic.id)}
-                className="bg-card border border-border rounded-lg p-6 text-left shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
-              >
-                <div className="font-display font-bold text-foreground mb-1">{topic.name}</div>
-                <div className="text-sm text-muted-foreground leading-relaxed">{topic.description}</div>
-                <div className="text-xs text-primary mt-3 font-medium">{getTopicWeeds(topic.id).length} species →</div>
-              </button>
+          <div className="space-y-6">
+            {topicsByCategory.map(({ category, topics }) => (
+              <section key={category.id}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full ${category.dotClass}`} />
+                  <h2 className={`text-sm font-display font-bold uppercase tracking-wide ${category.headerClass}`}>
+                    {category.label}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {topics.map((topic) => (
+                    <button
+                      key={topic.id}
+                      onClick={() => setSelectedTopic(topic.id)}
+                      className={`rounded-lg p-4 text-left border shadow-sm transition-all duration-200 ${category.cardClass}`}
+                    >
+                      <div className="font-display font-bold text-foreground text-sm mb-1.5 leading-snug">
+                        {topic.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground leading-relaxed">{topic.description}</div>
+                      <div className="text-[11px] text-foreground/70 mt-2 font-medium">
+                        {getTopicWeeds(topic.id).length} species →
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         ) : (
-          <div>
-            {/* Topic bubbles at top */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {availableTopics.map((topic) => (
-                <button
-                  key={topic.id}
-                  onClick={() => {
-                    setSelectedTopic(topic.id);
-                    setViewMode("list");
-                  }}
-                  className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap ${
-                    selectedTopic === topic.id
-                      ? "bg-primary text-primary-foreground shadow-subtle"
-                      : "bg-card border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  }`}
-                >
-                  {topic.name}
-                </button>
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+            {/* Left sidebar: topic list grouped by category */}
+            <aside className="space-y-5 lg:sticky lg:top-6 self-start">
+              {topicsByCategory.map(({ category, topics }) => (
+                <div key={category.id}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`inline-block w-2 h-2 rounded-full ${category.dotClass}`} />
+                    <h3 className={`text-[11px] font-display font-bold uppercase tracking-wide ${category.headerClass}`}>
+                      {category.label}
+                    </h3>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {topics.map((topic) => {
+                      const isActive = selectedTopic === topic.id;
+                      return (
+                        <button
+                          key={topic.id}
+                          onClick={() => setSelectedTopic(topic.id)}
+                          className={`px-3 py-2 rounded-md text-xs font-medium text-left transition-all duration-200 border ${
+                            isActive
+                              ? category.activeClass
+                              : `${category.cardClass} text-foreground/80`
+                          }`}
+                        >
+                          {topic.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               ))}
-            </div>
+            </aside>
             {/* Topic content */}
             <div>
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-display font-bold text-foreground">
                   {TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
-                {topicNeedsViewToggle && <ViewToggle view={viewMode} onChange={setViewMode} />}
               </div>
               <TopicContent
                 topicId={selectedTopic}
