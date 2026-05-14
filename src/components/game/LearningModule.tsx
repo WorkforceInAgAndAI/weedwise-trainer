@@ -391,6 +391,165 @@ interface Props {
   onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
 }
 
+/**
+ * Elementary "Weed Names & ID" flashcard deck.
+ * One weed per card with large image, sorted into "Confident" and "Review" buckets.
+ */
+function ElementaryNamesFlashcards({
+  weeds: deck,
+  onSelectWeed,
+}: {
+  weeds: Weed[];
+  onSelectWeed: (w: Weed) => void;
+}) {
+  const [index, setIndex] = useState(0);
+  const [confident, setConfident] = useState<string[]>([]);
+  const [review, setReview] = useState<string[]>([]);
+
+  const total = deck.length;
+  const done = index >= total;
+  const current = !done ? deck[index] : null;
+
+  const reset = () => {
+    setIndex(0);
+    setConfident([]);
+    setReview([]);
+  };
+
+  const sortCard = (bucket: "confident" | "review") => {
+    if (!current) return;
+    if (bucket === "confident") setConfident((p) => [...p, current.id]);
+    else setReview((p) => [...p, current.id]);
+    setIndex((i) => i + 1);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
+        <p>
+          A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
+          a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
+          plants we want to keep, like crops in a farmer's field.
+        </p>
+        <p>
+          Each weed has a <strong>common name</strong> we use every day. Knowing weed names helps us
+          <strong> identify, manage, and stay safe</strong> around them.
+        </p>
+      </div>
+
+      {!done && current ? (
+        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-4">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Card {index + 1} of {total}
+            </span>
+            <span>
+              <span className="text-success font-semibold">Confident: {confident.length}</span>
+              {" · "}
+              <span className="text-terracotta font-semibold">Review: {review.length}</span>
+            </span>
+          </div>
+
+          <div className="w-full aspect-[4/3] max-h-80 mx-auto rounded-xl overflow-hidden bg-muted">
+            <WeedImage weedId={current.id} stage="whole" className="w-full h-full" />
+          </div>
+
+          <div className="text-center space-y-1">
+            <ClickableWeedName
+              weed={current}
+              onSelect={onSelectWeed}
+              className="font-display text-2xl"
+            />
+            <p className="text-xs text-muted-foreground">
+              {current.plantType} • {current.lifeCycle}
+            </p>
+          </div>
+
+          <div className="bg-primary/10 rounded-lg px-3 py-2 text-center">
+            <p className="text-sm text-primary">
+              <span className="font-bold">Memory trick:</span> {current.memoryHook}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <button
+              onClick={() => sortCard("review")}
+              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-terracotta/40 bg-terracotta/5 text-terracotta font-semibold hover:bg-terracotta/15 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Want to review more
+            </button>
+            <button
+              onClick={() => sortCard("confident")}
+              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-success/40 bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
+            >
+              <ThumbsUp className="w-4 h-4" />
+              I'm confident
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-5">
+          <div className="text-center">
+            <h3 className="font-display font-bold text-foreground text-xl">Great work!</h3>
+            <p className="text-sm text-muted-foreground">You sorted all {total} weeds.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-success/40 bg-success/5 p-4">
+              <p className="font-display font-bold text-success text-sm mb-2">
+                Confident ({confident.length})
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {confident.map((id) => {
+                  const w = deck.find((d) => d.id === id);
+                  if (!w) return null;
+                  return (
+                    <div key={id} className="text-center">
+                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      </div>
+                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="rounded-lg border border-terracotta/40 bg-terracotta/5 p-4">
+              <p className="font-display font-bold text-terracotta text-sm mb-2">
+                Want to review more ({review.length})
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {review.map((id) => {
+                  const w = deck.find((d) => d.id === id);
+                  if (!w) return null;
+                  return (
+                    <div key={id} className="text-center">
+                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      </div>
+                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              onClick={reset}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Start over
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Maps a topic + grade to a Practice Hub game id. */
 const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, string>>>> = {
   names: { elementary: "name-the-weed", middle: "ms-name-weed", high: "hs-name-weed" },
