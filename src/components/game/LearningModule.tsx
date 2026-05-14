@@ -1257,25 +1257,27 @@ function TopicContent({
                     {s.label} Stage
                   </h3>
                   <p className="text-xs text-muted-foreground pl-3">{s.desc}</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {topicWeeds.map((w) => (
-                      <div
-                        key={`${s.stage}-${w.id}`}
-                        className="bg-card border border-border rounded-lg p-2 space-y-2"
-                      >
-                        <div className="aspect-square rounded-md overflow-hidden bg-muted">
-                          <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                  <div className="overflow-x-auto -mx-3 px-3 pb-3 scrollbar-thin">
+                    <div className="flex gap-3 w-max">
+                      {topicWeeds.map((w) => (
+                        <div
+                          key={`${s.stage}-${w.id}`}
+                          className="bg-card border border-border rounded-lg p-2 space-y-2 w-40 shrink-0"
+                        >
+                          <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                            <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                          </div>
+                          <ClickableWeedName
+                            weed={w}
+                            onSelect={onSelectWeed}
+                            className="text-xs font-bold block text-center"
+                          />
+                          <p className="text-[10px] text-primary italic text-center">
+                            {w.scientificName}
+                          </p>
                         </div>
-                        <ClickableWeedName
-                          weed={w}
-                          onSelect={onSelectWeed}
-                          className="text-xs font-bold block text-center"
-                        />
-                        <p className="text-[10px] text-primary italic text-center">
-                          {w.scientificName}
-                        </p>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               ));
