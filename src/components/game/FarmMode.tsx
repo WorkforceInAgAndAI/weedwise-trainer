@@ -1110,7 +1110,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <div className="p-4 border-t border-border">
  <button onClick={advanceSeason}
  className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90 flex items-center justify-center gap-2">
- {currentSeason === 'late-summer' ? 'Harvest' : 'Next Season'} <ChevronRight className="w-4 h-4" />
+ {currentSeason === 'fall' ? 'Harvest' : 'Next Season'} <ChevronRight className="w-4 h-4" />
  </button>
  </div>
  </div>
@@ -1280,7 +1280,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
       </button>
       <button onClick={advanceSeason}
         className="shrink-0 px-4 py-2 rounded-md bg-success text-success-foreground text-xs font-bold">
-        {currentSeason === 'late-summer' ? 'Harvest' : 'Next'} <ChevronRight className="w-3 h-3 inline" />
+        {currentSeason === 'fall' ? 'Harvest' : 'Next'} <ChevronRight className="w-3 h-3 inline" />
       </button>
     </div>
   </div>
