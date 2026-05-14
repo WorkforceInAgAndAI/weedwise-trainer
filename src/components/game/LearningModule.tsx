@@ -1115,13 +1115,9 @@ function TopicContent({
               <>
                 <p className="font-semibold text-primary">Life Stages</p>
                 <p>
-                  Just like people, weeds go through different stages of development. Weeds start as seedlings and grow
-                  into mature plants through five stages: <strong>seed, seedling, vegetative, reproductive, and
-                  maturity</strong>.
-                </p>
-                <p>
-                  Weeds look different in each stage of life. Knowing what weeds look like in different life stages can
-                  help us <strong>identify and manage them</strong>.
+                  Just like people, weeds grow up. They go through five stages:
+                  <strong> seed, seedling, vegetative, reproductive, and mature</strong>. Knowing what a
+                  weed looks like at each stage helps us spot it and stop it.
                 </p>
               </>
             ) : (
@@ -1139,6 +1135,38 @@ function TopicContent({
             )}
           </div>
 
+          {/* Elementary: visual cycle diagram */}
+          {grade === "elementary" && (
+            <div className="bg-card border border-border rounded-xl p-5">
+              <p className="font-display font-bold text-foreground text-sm text-center mb-4">
+                The Weed Life Cycle
+              </p>
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                {[
+                  { label: "Seed", color: "bg-amber-100 text-amber-900 border-amber-300" },
+                  { label: "Seedling", color: "bg-lime-100 text-lime-900 border-lime-300" },
+                  { label: "Vegetative", color: "bg-success/15 text-success border-success/40" },
+                  { label: "Reproductive", color: "bg-pink-100 text-pink-900 border-pink-300" },
+                  { label: "Mature", color: "bg-primary/10 text-primary border-primary/40" },
+                ].map((s, i, arr) => (
+                  <div key={s.label} className="flex items-center gap-2">
+                    <div
+                      className={`w-20 h-20 rounded-full border-2 ${s.color} flex items-center justify-center text-center text-xs font-bold leading-tight px-1`}
+                    >
+                      {s.label}
+                    </div>
+                    <span className="text-muted-foreground text-2xl font-bold">→</span>
+                    {i === arr.length - 1 && (
+                      <div className="text-xs text-muted-foreground italic ml-1">
+                        and back to <strong>seeds</strong>!
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Stage description cards */}
           {grade === "elementary" ? (
             <div className="space-y-3">
@@ -1151,9 +1179,8 @@ function TopicContent({
               <div className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <div className="font-bold text-foreground text-sm">Maturity</div>
                 <p className="text-xs text-muted-foreground">
-                  A weed reaches maturity after it has gone through all the life stages and spread its seeds to begin
-                  new weeds. Mature weeds usually have more leaves, flowers, and other parts than younger weeds. At the
-                  end of a growing season, a mature weed may die on its own.
+                  A grown-up weed that has spread its seeds. At the end of the season it may die, but its seeds
+                  start the cycle all over again.
                 </p>
               </div>
             </div>
@@ -1176,9 +1203,11 @@ function TopicContent({
                 <div className="flex items-center gap-3">
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold" />
                   {grade !== "elementary" && <span className="text-xs text-primary italic">{w.scientificName}</span>}
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
-                    {w.family}
-                  </span>
+                  {grade !== "elementary" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                      {w.family}
+                    </span>
+                  )}
                 </div>
                 <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
                   {LIFE_STAGE_INFO.map((s) => (
