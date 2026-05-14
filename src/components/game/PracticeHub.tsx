@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import FarmerGuide from './FarmerGuide';
 import { Medal, Trophy, Award, Star } from 'lucide-react';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
@@ -299,6 +300,19 @@ export default function PracticeHub({
  <h3 className="font-semibold text-sm text-foreground mb-2">How to Play</h3>
  <p className="text-sm text-muted-foreground leading-relaxed">{selectedGame.howToPlay}</p>
  </div>
+  {selectedGrade !== '912' && (
+    <div className="mb-6 text-left">
+      <FarmerGuide
+        gradeLabel={selectedGrade === 'k5' ? 'K-5' : '6-8'}
+        tone="intro"
+        message={
+          selectedGrade === 'k5'
+            ? `Howdy partner! I'm Farmer Joe and I'll be your buddy through ${selectedGame.name}. Don't worry — I'll cheer you on and help if you get stuck. Ready? Let's go grow some smart weed scientists!`
+            : `Welcome, scout. I'm Farmer Joe. I'll set the scene for ${selectedGame.name}, but you'll do the thinking. If you ever feel stuck, ask for a hint — otherwise, trust your training.`
+        }
+      />
+    </div>
+  )}
  <button
  onClick={() => setScreen('playing')}
  className="inline-flex items-center gap-2 px-10 py-3.5 rounded-md bg-success text-success-foreground font-bold text-base hover:opacity-90 transition-opacity shadow-card"
