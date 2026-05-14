@@ -623,57 +623,7 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "names":
       if (grade === "elementary") {
-        return (
-          <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Common Names and Descriptions</p>
-              <p>
-                There are lots of plants that can be weeds. Each weed is different in how it looks. Weeds can also look
-                similar to one another.
-              </p>
-              <p>
-                We use words called <strong>adjectives</strong> to describe weeds based on their <strong>color, leaf
-                shape, leaf number, height</strong>, and other features.
-              </p>
-              <p>
-                Knowing the description of weeds and their common names helps us <strong>identify weeds, manage
-                them</strong>, and <strong>keep humans and animals safe</strong>.
-              </p>
-            </div>
-
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Memory Tricks</p>
-              <p>
-                We can use "memory tricks" to help us remember weed names and appearances. A memory trick connects
-                something about the weed -- like its shape, color, or name -- to something you already know.
-              </p>
-            </div>
-
-            {/* Weed examples with descriptions and memory hooks */}
-            <h3 className="font-display font-bold text-foreground text-sm">
-              Weed Examples ({topicWeeds.length} species)
-            </h3>
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div className="space-y-1">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <p className="text-xs text-muted-foreground">{w.plantType} • {w.lifeCycle}</p>
-                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                    {w.traits.slice(0, 2).map((t, i) => (
-                      <li key={i}>- {t}</li>
-                    ))}
-                  </ul>
-                  <div className="bg-primary/10 rounded px-2 py-1 mt-1">
-                    <p className="text-xs text-primary"><span className="font-bold">Memory trick:</span> {w.memoryHook}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
+        return <ElementaryNamesFlashcards weeds={topicWeeds} onSelectWeed={onSelectWeed} />;
       }
 
       if (grade === "middle") {
