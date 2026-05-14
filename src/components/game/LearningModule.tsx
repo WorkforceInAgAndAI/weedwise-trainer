@@ -653,12 +653,22 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
             )}
             <h1 className="text-xl font-display font-bold text-foreground">Learning Module</h1>
           </div>
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onBackToPractice && (
+              <button
+                onClick={onBackToPractice}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-success/40 bg-success/10 text-success text-sm font-semibold hover:bg-success/20 transition-colors"
+              >
+                <Play className="w-4 h-4" /> Back to Practice
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-md border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2 mb-6">
