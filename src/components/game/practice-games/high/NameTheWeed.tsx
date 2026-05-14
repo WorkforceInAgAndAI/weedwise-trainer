@@ -50,7 +50,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
     </div>
     <div className="flex justify-center mb-4">
      <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-border bg-secondary">
-      <WeedImage weedId={current.weed.id} stage="plant" className="w-full h-full object-cover" />
+      <WeedImage weedId={current.weed.id} stage="flower" className="w-full h-full object-cover" />
      </div>
     </div>
     <p className="text-sm text-muted-foreground text-center mb-1 italic">{current.weed.traits[0]}</p>

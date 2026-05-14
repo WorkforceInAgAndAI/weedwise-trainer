@@ -165,7 +165,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
             <>
               <div className="bg-card border border-border rounded-xl p-4 max-w-md w-full flex gap-4 items-center">
                 <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border bg-secondary flex-shrink-0">
-                  <WeedImage weedId={r!.weed.id} stage="plant" className="w-full h-full object-cover" />
+                  <WeedImage weedId={r!.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-bold text-foreground">{r!.weed.commonName}</h2>
@@ -203,7 +203,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
                 .map((q, i) => (
                   <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border text-xs">
                     <div className="w-7 h-7 rounded overflow-hidden bg-secondary">
-                      <WeedImage weedId={q.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                      <WeedImage weedId={q.weed.id} stage="flower" className="w-full h-full object-cover" />
                     </div>
                     <span className="text-foreground">{q.weed.commonName}</span>
                   </div>
@@ -221,7 +221,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
                 .map((q, i) => (
                   <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border text-xs">
                     <div className="w-7 h-7 rounded overflow-hidden bg-secondary">
-                      <WeedImage weedId={q.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                      <WeedImage weedId={q.weed.id} stage="flower" className="w-full h-full object-cover" />
                     </div>
                     <span className="text-foreground">{q.weed.commonName}</span>
                   </div>

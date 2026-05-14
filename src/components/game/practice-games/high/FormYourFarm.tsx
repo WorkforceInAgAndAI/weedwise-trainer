@@ -166,7 +166,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
        <div key={aw.weed.id} className="bg-card border border-border rounded-xl p-3">
         <div className="flex items-center gap-3 mb-2">
          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-          <WeedImage weedId={aw.weed.id} stage="plant" className="w-full h-full object-cover" />
+          <WeedImage weedId={aw.weed.id} stage="flower" className="w-full h-full object-cover" />
          </div>
          <div>
           <p className="text-sm font-bold text-foreground">{aw.weed.commonName}</p>
@@ -217,7 +217,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
         <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.manageCorrect ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
          <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-           <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+           <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
           </div>
           <div className="flex-1">
            <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
@@ -274,7 +274,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
           <div key={`dec-${r.weed.id}`} className="p-3 rounded-xl border-2 border-destructive bg-destructive/5">
            <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-             <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+             <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
              <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
@@ -299,7 +299,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
           <div key={`mgmt-${r.weed.id}`} className="p-3 rounded-xl border-2 border-destructive bg-destructive/5">
            <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-             <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+             <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
              <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
@@ -320,7 +320,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
         <div key={r.weed.id} className={`p-3 rounded-xl border-2 ${r.correct && (!r.managePick || r.manageCorrect) ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
          <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-           <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+           <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
            <p className="text-sm font-bold text-foreground">{r.weed.commonName}</p>
@@ -359,7 +359,7 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
      {attackWeeds.map(aw => (
       <div key={aw.weed.id} className="flex items-center gap-3 p-3 rounded-xl border-2 border-border bg-card">
        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-        <WeedImage weedId={aw.weed.id} stage="plant" className="w-full h-full object-cover" />
+        <WeedImage weedId={aw.weed.id} stage="flower" className="w-full h-full object-cover" />
        </div>
        <div className="flex-1">
         <p className="text-xs font-bold text-foreground">{aw.weed.commonName}</p>

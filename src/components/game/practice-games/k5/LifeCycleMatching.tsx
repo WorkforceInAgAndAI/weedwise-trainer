@@ -174,7 +174,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                           }`}
                         >
                           <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted">
-                            <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                            <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                           </div>
                           <span className="text-xs font-medium text-foreground max-w-[80px] text-center leading-tight">{i.weed.commonName}</span>
                           {!checked && (
@@ -217,7 +217,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                   }`}
                 >
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
-                    <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <span className="text-left text-xs leading-tight">{i.weed.commonName}</span>
                 </button>

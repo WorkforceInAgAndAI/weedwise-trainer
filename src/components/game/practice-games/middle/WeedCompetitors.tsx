@@ -161,7 +161,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           <div className="flex items-center gap-6">
             <div className="text-center">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border mb-2">
-                <WeedImage weedId={match.you.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={match.you.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-bold text-foreground">{match.you.commonName}</p>
               <p className="text-lg font-bold text-foreground">{points}</p>
@@ -169,7 +169,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
             <span className="text-2xl font-black text-muted-foreground">-</span>
             <div className="text-center">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border mb-2">
-                <WeedImage weedId={match.opponent.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={match.opponent.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-bold text-foreground">{match.opponent.commonName}</p>
               <p className="text-lg font-bold text-foreground">{rounds.length - points}</p>
@@ -204,7 +204,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           <div className="w-full border border-border rounded-xl p-4 bg-card">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
-                <WeedImage weedId={match.you.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={match.you.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="font-bold text-foreground text-sm">{match.you.commonName} <span className="text-xs text-muted-foreground">(You)</span></p>
@@ -217,7 +217,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           <div className="w-full border border-border rounded-xl p-4 bg-card">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
-                <WeedImage weedId={match.opponent.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={match.opponent.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="font-bold text-foreground text-sm">{match.opponent.commonName} <span className="text-xs text-muted-foreground">(Rival)</span></p>
@@ -249,7 +249,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
               <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
-                <WeedImage weedId={match!.you.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={match!.you.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-bold text-foreground">{match!.you.commonName}</p>
               <p className="text-[10px] text-muted-foreground font-bold uppercase">You</p>
@@ -265,7 +265,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
             </div>
             <div className="text-center flex-1">
               <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
-                <WeedImage weedId={match!.opponent.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={match!.opponent.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-bold text-foreground">{match!.opponent.commonName}</p>
               <p className="text-[10px] text-muted-foreground font-bold uppercase">Rival</p>

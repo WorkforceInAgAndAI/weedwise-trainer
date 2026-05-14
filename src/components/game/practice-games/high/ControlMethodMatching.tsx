@@ -69,7 +69,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
                 return (
                   <div key={i} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-                      <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+                      <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
                       <p className="font-bold text-foreground text-sm">{r.weed.commonName}</p>
@@ -104,7 +104,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
         </div>
         <div className="flex justify-center mb-3">
           <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-border">
-            <WeedImage weedId={cur.weed.id} stage="plant" className="w-full h-full object-cover" />
+            <WeedImage weedId={cur.weed.id} stage="flower" className="w-full h-full object-cover" />
           </div>
         </div>
         <p className="text-center font-bold text-foreground mb-1">{cur.weed.commonName}</p>

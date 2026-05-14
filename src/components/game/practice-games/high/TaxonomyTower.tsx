@@ -80,7 +80,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
     </div>
     <div className="flex justify-center mb-4">
      <div className="w-36 h-36 rounded-2xl overflow-hidden border-2 border-border">
-      <WeedImage weedId={t.id} stage="plant" className="w-full h-full object-cover" />
+      <WeedImage weedId={t.id} stage="flower" className="w-full h-full object-cover" />
      </div>
     </div>
     <p className="text-center text-sm text-muted-foreground mb-4">Identify: <strong className="text-foreground">{t.commonName}</strong></p>

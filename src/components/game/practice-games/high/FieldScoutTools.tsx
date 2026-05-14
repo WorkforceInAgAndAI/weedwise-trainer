@@ -185,7 +185,7 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
           {weedSpots.map((spot, i) => (
             <div key={i} className="absolute w-7 h-7 sm:w-9 sm:h-9 rounded-full border-2 border-white shadow-md overflow-hidden"
               style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%,-50%)' }}>
-              <WeedImage weedId={spot.weedId} stage="vegetative" className="w-full h-full object-cover" />
+              <WeedImage weedId={spot.weedId} stage="flower" className="w-full h-full object-cover" />
             </div>
           ))}
           {/* Tool animation overlay */}

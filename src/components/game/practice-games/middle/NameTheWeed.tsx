@@ -85,7 +85,7 @@ export default function NameTheWeed({ onBack }: Props) {
         </div>
         <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center p-6 gap-4 max-w-md mx-auto">
           <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-border bg-secondary">
-            <WeedImage weedId={r.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+            <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
           </div>
           <p className={`text-xl font-bold ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
             {isCorrect ? 'Correct!' : 'Not quite!'}
@@ -122,7 +122,7 @@ export default function NameTheWeed({ onBack }: Props) {
       <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_240px] gap-4 p-4">
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-border bg-secondary">
-            <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+            <WeedImage weedId={r!.weed.id} stage="flower" className="w-full h-full object-cover" />
           </div>
           <p className="text-sm text-muted-foreground text-center max-w-xs">{r!.weed.traits[0]}</p>
           <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
@@ -147,7 +147,7 @@ export default function NameTheWeed({ onBack }: Props) {
             {history.map((h, i) => (
               <div key={i} className={`flex items-center gap-2 p-1.5 rounded-lg border ${h.correct ? 'border-green-500/40 bg-green-500/5' : 'border-destructive/40 bg-destructive/5'}`}>
                 <div className="w-10 h-10 rounded overflow-hidden bg-secondary shrink-0">
-                  <WeedImage weedId={h.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  <WeedImage weedId={h.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground truncate">{h.weed.commonName}</p>

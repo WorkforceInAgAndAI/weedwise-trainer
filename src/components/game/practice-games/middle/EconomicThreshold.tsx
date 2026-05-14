@@ -154,7 +154,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
               <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${fw.x}%`, top: `${fw.y}%` }}>
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 shadow-lg">
-                  <WeedImage weedId={fw.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  <WeedImage weedId={fw.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
               </div>
             ))}
@@ -171,7 +171,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                   {speciesList.map(s => (
                     <div key={s.weed.id} className="flex items-center gap-2 p-2 rounded border border-border bg-background">
                       <div className="w-10 h-10 rounded overflow-hidden bg-secondary flex-shrink-0">
-                        <WeedImage weedId={s.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                        <WeedImage weedId={s.weed.id} stage="flower" className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-foreground truncate">{s.weed.commonName}</p>
@@ -194,7 +194,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                     <div key={s.weed.id} className="p-2 rounded-lg border border-border bg-background">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-9 h-9 rounded overflow-hidden bg-secondary flex-shrink-0">
-                          <WeedImage weedId={s.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                          <WeedImage weedId={s.weed.id} stage="flower" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-foreground truncate">{s.weed.commonName}</p>
@@ -233,7 +233,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                       <div key={s.weed.id} className={`p-2 rounded border-2 ${correct ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
                         <div className="flex items-center gap-2">
                           <div className="w-9 h-9 rounded overflow-hidden bg-secondary flex-shrink-0">
-                            <WeedImage weedId={s.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                            <WeedImage weedId={s.weed.id} stage="flower" className="w-full h-full object-cover" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-bold text-foreground truncate">{s.weed.commonName}</p>

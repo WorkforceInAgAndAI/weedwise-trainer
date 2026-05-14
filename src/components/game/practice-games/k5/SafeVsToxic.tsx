@@ -237,7 +237,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
           />
           <div className="flex justify-center mb-3">
             <div className="w-40 h-40 rounded-xl overflow-hidden border-2 border-destructive bg-secondary">
-              <WeedImage weedId={r.toxicWeed.id} stage="plant" className="w-full h-full object-cover" />
+              <WeedImage weedId={r.toxicWeed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
           </div>
           <h3 className="text-center font-bold text-foreground text-lg mb-2">{r.toxicWeed.commonName}</h3>
@@ -324,7 +324,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
                 selected === w.id ? 'border-primary scale-105' : 'border-border hover:border-primary/50'
               }`}>
               <div className="aspect-square bg-secondary">
-                <WeedImage weedId={w.id} stage="plant" className="w-full h-full object-cover" />
+                <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-medium text-foreground p-1.5 text-center">{w.commonName}</p>
             </button>

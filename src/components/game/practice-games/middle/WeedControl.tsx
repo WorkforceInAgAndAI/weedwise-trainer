@@ -193,7 +193,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               {wrong.map((r, i) => (
                 <div key={i} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-                    <WeedImage weedId={r.weedId.split('-')[0]} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={r.weedId.split('-')[0]} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-foreground text-sm">{r.weedName}</p>
@@ -233,7 +233,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               style={{ left: `${f.x}%`, top: `${f.y}%` }}
               className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${done.includes(f.id) ? 'opacity-30 pointer-events-none' : 'animate-pulse'}`}>
               <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
-                <WeedImage weedId={f.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
               </div>
             </button>
           ))}
@@ -298,7 +298,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               {history.map((h, i) => (
                 <div key={i} className={`flex items-center gap-2 p-2 rounded border ${h.correct ? 'border-green-500/40 bg-green-500/10' : 'border-destructive/40 bg-destructive/10'}`}>
                   <div className="w-9 h-9 rounded overflow-hidden bg-secondary flex-shrink-0">
-                    <WeedImage weedId={h.weedId.split('-')[0]} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={h.weedId.split('-')[0]} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold text-foreground truncate">{h.weedName}</p>

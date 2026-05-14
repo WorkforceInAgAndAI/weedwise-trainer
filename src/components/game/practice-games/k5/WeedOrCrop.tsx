@@ -93,7 +93,7 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
         </div>
         <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-border">
           {item.weedId ? (
-            <WeedImage weedId={item.weedId} stage="plant" className="w-full h-full object-cover" />
+            <WeedImage weedId={item.weedId} stage="flower" className="w-full h-full object-cover" />
           ) : item.cropImage ? (
             <img src={item.cropImage} alt={item.name} className="w-full h-full object-cover" />
           ) : (
@@ -127,7 +127,7 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
               {b.items.map((c, i) => (
                 <div key={i} className="text-center">
                   <div className={`aspect-square rounded-md overflow-hidden border-2 ${c.correct ? 'border-green-500' : 'border-destructive'}`}>
-                    {c.weedId ? <WeedImage weedId={c.weedId} stage="plant" className="w-full h-full object-cover" /> :
+                    {c.weedId ? <WeedImage weedId={c.weedId} stage="flower" className="w-full h-full object-cover" /> :
                       c.cropImage ? <img src={c.cropImage} alt={c.name} className="w-full h-full object-cover" /> : null}
                   </div>
                   <p className="text-[9px] mt-1 text-foreground truncate">{c.name}</p>

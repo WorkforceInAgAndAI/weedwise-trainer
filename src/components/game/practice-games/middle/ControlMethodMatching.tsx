@@ -94,7 +94,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 h-full max-w-5xl mx-auto">
           <div className="overflow-y-auto flex flex-col items-center">
             <div className="w-44 h-44 rounded-xl overflow-hidden bg-secondary mb-3">
-              <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+              <WeedImage weedId={current!.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
             <p className="font-bold text-foreground mb-1">{current!.weed.commonName}</p>
             <p className="text-xs text-muted-foreground mb-3">Type: {current!.weed.plantType} ({current!.weed.plantType === 'Monocot' ? 'grass' : 'broadleaf'})</p>
@@ -146,7 +146,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
               {history.map((h, i) => (
                 <div key={i} className={`flex items-center gap-2 p-2 rounded border ${h.correct ? 'border-green-500/40 bg-green-500/10' : 'border-destructive/40 bg-destructive/10'}`}>
                   <div className="w-10 h-10 rounded overflow-hidden bg-secondary flex-shrink-0">
-                    <WeedImage weedId={h.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                    <WeedImage weedId={h.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold text-foreground truncate">{h.weed.commonName}</p>

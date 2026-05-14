@@ -195,7 +195,7 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
           {/* LEFT: large weed image */}
           <div className="space-y-3">
             <div className="rounded-xl overflow-hidden border-2 border-border bg-secondary aspect-square">
-              <WeedImage weedId={current!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+              <WeedImage weedId={current!.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
             <div className="bg-card border border-border rounded-xl p-3">
               <p className="font-bold text-foreground text-lg">{current!.weed.commonName}</p>

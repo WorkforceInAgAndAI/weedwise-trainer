@@ -89,7 +89,7 @@ export default function TaxonomyTower({ onBack }: Props) {
             <p className="text-sm text-muted-foreground">Classify this weed:</p>
           </div>
           <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-primary/30">
-            <WeedImage weedId={target.id} stage="vegetative" className="w-full h-full object-cover" />
+            <WeedImage weedId={target.id} stage="flower" className="w-full h-full object-cover" />
           </div>
 
           <div className="w-full max-w-md flex flex-col items-center gap-2">
@@ -148,7 +148,7 @@ export default function TaxonomyTower({ onBack }: Props) {
             {history.map((h, i) => (
               <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg border border-green-500/40 bg-green-500/5">
                 <div className="w-10 h-10 rounded overflow-hidden bg-secondary shrink-0">
-                  <WeedImage weedId={h.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                  <WeedImage weedId={h.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground truncate">{h.weed.commonName}</p>

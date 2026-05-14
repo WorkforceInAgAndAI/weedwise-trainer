@@ -114,7 +114,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
        <div key={i.weed.id} className="bg-card border border-border rounded-xl p-4">
         <div className="flex items-center gap-3 mb-2">
          <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-          <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+          <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
          </div>
          <div>
           <p className="font-bold text-foreground">{i.weed.commonName}</p>
@@ -180,7 +180,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
            checked ? (i.correct === cycle ? 'bg-green-500/20 border border-green-500' : 'bg-destructive/20 border border-destructive') : 'bg-secondary'
           }`}>
            <div className="w-8 h-8 rounded overflow-hidden bg-secondary flex-shrink-0">
-            <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+            <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
            </div>
            <span className="text-[10px] font-medium text-foreground flex-1 truncate">{i.weed.commonName}</span>
            {!checked && (
@@ -202,7 +202,7 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
          selected === i.weed.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:border-primary/50'
         }`}>
         <div className="w-8 h-8 rounded overflow-hidden bg-secondary">
-         <WeedImage weedId={i.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+         <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
         </div>
         {i.weed.commonName}
        </button>
