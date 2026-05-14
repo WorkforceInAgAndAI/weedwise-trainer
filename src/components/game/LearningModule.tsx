@@ -388,7 +388,7 @@ function SubheadingBox({
 
 interface Props {
   onClose: () => void;
-  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }
 
 /**
@@ -584,7 +584,7 @@ function PracticeButton({
 }: {
   topicId: TopicId;
   grade: GradeLevel;
-  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }) {
   if (!onOpenPractice) return null;
   const gameId = PRACTICE_GAME_MAP[topicId]?.[grade];
@@ -774,7 +774,7 @@ function TopicContent({
   topicWeeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   viewMode: "list" | "box";
-  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }) {
   switch (topicId) {
     /* ═══════════════════════════════════════════════════════════
