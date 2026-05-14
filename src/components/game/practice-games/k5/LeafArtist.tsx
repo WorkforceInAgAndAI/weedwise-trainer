@@ -1,223 +1,113 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import { supabase } from '@/integrations/supabase/client';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const venationTypes = [
- { type: 'Parallel', plantType: 'Monocot', description: 'Lines run side by side from base to tip (like grass)', shape: 'Long and narrow (linear)' },
- { type: 'Netted', plantType: 'Dicot', description: 'Veins branch out like a net from a central line', shape: 'Wide and rounded (ovate or heart-shaped)' },
-];
+interface Round { weed: typeof weeds[0]; correct: 'Parallel' | 'Netted' }
 
-const STUDY_TIME = 8; // seconds to view the image
+interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
-export default function LeafArtist({ onBack }: { onBack: () => void }) {
+export default function LeafArtist({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
- const canvasRef = useRef<HTMLCanvasElement>(null);
- const [drawing, setDrawing] = useState(false);
- const [submitted, setSubmitted] = useState(false);
- const [grading, setGrading] = useState(false);
- const [aiGrade, setAiGrade] = useState<{ score: number; feedback: string } | null>(null);
- const [roundIdx, setRoundIdx] = useState(0);
- const [studyTimer, setStudyTimer] = useState(STUDY_TIME);
- const [studyDone, setStudyDone] = useState(false);
 
- const rounds = useMemo(() => {
- const monocots = shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, 2);
- const dicots = shuffle(weeds.filter(w => w.plantType === 'Dicot')).slice(0, 2);
- return shuffle([...monocots, ...dicots]).map(w => ({
- weed: w,
- venation: venationTypes.find(v => v.plantType === w.plantType)!,
- }));
- }, []);
+  const rounds = useMemo<Round[]>(() => {
+    const monocots = shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, 3);
+    const dicots = shuffle(weeds.filter(w => w.plantType === 'Dicot')).slice(0, 3);
+    return shuffle([
+      ...monocots.map(w => ({ weed: w, correct: 'Parallel' as const })),
+      ...dicots.map(w => ({ weed: w, correct: 'Netted' as const })),
+    ]);
+  }, [level]);
 
- const round = rounds[roundIdx];
- const done = roundIdx >= rounds.length;
+  const [idx, setIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [picked, setPicked] = useState<'Parallel' | 'Netted' | null>(null);
+  const [classified, setClassified] = useState<{ weed: typeof weeds[0]; correct: boolean; venation: string }[]>([]);
 
- // Study timer countdown
- useEffect(() => {
- if (studyDone || done) return;
- if (studyTimer <= 0) { setStudyDone(true); return; }
- const t = setTimeout(() => setStudyTimer(s => s - 1), 1000);
- return () => clearTimeout(t);
- }, [studyTimer, studyDone, done]);
+  const done = idx >= rounds.length;
+  const r = !done ? rounds[idx] : null;
 
- // Init canvas
- useEffect(() => {
- const c = canvasRef.current;
- if (!c) return;
- const ctx = c.getContext('2d');
- if (!ctx) return;
- ctx.fillStyle = '#f5f3ef';
- ctx.fillRect(0, 0, c.width, c.height);
- }, [roundIdx, studyDone]);
-
- const getPos = (e: React.MouseEvent | React.TouchEvent) => {
- const c = canvasRef.current!;
- const rect = c.getBoundingClientRect();
- if ('touches' in e) {
- return { x: (e.touches[0].clientX - rect.left) * (c.width / rect.width), y: (e.touches[0].clientY - rect.top) * (c.height / rect.height) };
- }
- const me = e as React.MouseEvent;
- return { x: (me.clientX - rect.left) * (c.width / rect.width), y: (me.clientY - rect.top) * (c.height / rect.height) };
- };
-
- const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
- if (submitted || !studyDone) return;
- setDrawing(true);
- const ctx = canvasRef.current?.getContext('2d');
- if (!ctx) return;
- const { x, y } = getPos(e);
- ctx.beginPath();
- ctx.moveTo(x, y);
- ctx.lineWidth = 3;
- ctx.strokeStyle = '#2d5016';
- ctx.lineCap = 'round';
- };
-
- const draw = (e: React.MouseEvent | React.TouchEvent) => {
- if (!drawing || submitted) return;
- const ctx = canvasRef.current?.getContext('2d');
- if (!ctx) return;
- const { x, y } = getPos(e);
- ctx.lineTo(x, y);
- ctx.stroke();
- };
-
- const endDraw = () => setDrawing(false);
-
- const clearCanvas = () => {
- const c = canvasRef.current;
- if (!c) return;
- const ctx = c.getContext('2d');
- if (!ctx) return;
- ctx.fillStyle = '#f5f3ef';
- ctx.fillRect(0, 0, c.width, c.height);
- };
-
- const submitDrawing = async () => {
- setSubmitted(true);
- setGrading(true);
-
- const c = canvasRef.current;
- if (!c) { setGrading(false); return; }
-
- try {
- const dataUrl = c.toDataURL('image/png');
- const base64 = dataUrl.split(',')[1];
-
- const { data, error } = await supabase.functions.invoke('grade-drawing', {
- body: { imageBase64: base64, venationType: round.venation.type, weedName: round.weed.commonName },
- });
-
- if (error) throw error;
- setAiGrade(data);
- } catch (err) {
- console.error('AI grading error:', err);
- setAiGrade({ score: 2, feedback: 'Nice work on your leaf drawing!' });
- } finally {
- setGrading(false);
- }
- };
-
- const nextRound = () => {
- setRoundIdx(i => i + 1);
- setSubmitted(false);
- setAiGrade(null);
- setStudyTimer(STUDY_TIME);
- setStudyDone(false);
- };
-
- const restart = () => {
- setRoundIdx(0);
- setSubmitted(false);
- setAiGrade(null);
- setStudyTimer(STUDY_TIME);
- setStudyDone(false);
- };
+  const restart = () => { setIdx(0); setScore(0); setPicked(null); setClassified([]); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
- const gradeLabels = ['', 'Keep Practicing', 'Good Try', 'Great Job'];
- const gradeColors = ['', 'text-warning', 'text-primary', 'text-success'];
+  const pick = (choice: 'Parallel' | 'Netted') => {
+    if (picked || !r) return;
+    setPicked(choice);
+    const ok = choice === r.correct;
+    if (ok) setScore(s => s + 1);
+    setClassified(prev => [...prev, { weed: r.weed, correct: ok, venation: r.correct }]);
+  };
 
- if (done) return <LevelComplete level={level} score={0} total={1} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  const next = () => { setPicked(null); setIdx(i => i + 1); };
 
- return (
- <div className="fixed inset-0 bg-background z-50 flex flex-col">
- <div className="flex items-center gap-3 p-4 border-b border-border">
- <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
- <h1 className="font-display font-bold text-foreground text-lg flex-1">Leaf Artist</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
- <span className="text-sm text-muted-foreground">Round {roundIdx + 1}/{rounds.length}</span>
- </div>
- <div className="flex-1 overflow-y-auto p-4">
- <div className="max-w-lg mx-auto space-y-4">
- {/* Instructions */}
- <div className="bg-secondary/50 rounded-xl p-4">
- <p className="text-sm font-bold text-foreground mb-1">
- Draw a leaf with <span className="text-primary">{round.venation.type} venation</span>
- </p>
- <p className="text-xs text-muted-foreground">{round.venation.description}</p>
- <p className="text-xs text-muted-foreground mt-1">Leaf shape: {round.venation.shape}</p>
- </div>
+  if (done) return <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
- {/* Study phase: show image */}
- {!studyDone && (
- <div className="text-center space-y-3">
- <p className="text-sm font-medium text-foreground">Study this leaf — {studyTimer}s remaining</p>
- <div className="w-full max-w-xs mx-auto aspect-square rounded-xl overflow-hidden border-2 border-primary/30 bg-secondary">
- <WeedImage weedId={round.weed.id} stage="plant" className="w-full h-full object-cover" />
- </div>
- <p className="text-xs text-muted-foreground">{round.weed.commonName}</p>
- <button onClick={() => { setStudyTimer(0); setStudyDone(true); }}
- className="text-xs text-primary hover:underline">I'm ready to draw</button>
- </div>
- )}
+  return (
+    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b border-border">
+        <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+        <h1 className="font-display font-bold text-foreground text-lg flex-1">Leaf Detective</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm text-muted-foreground">{idx + 1}/{rounds.length}</span>
+        <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
+      </div>
 
- {/* Drawing phase: full-width canvas */}
- {studyDone && (
- <>
- <div>
- <div className="flex justify-between items-center mb-2">
- <p className="text-sm font-medium text-foreground">Now draw from memory!</p>
- {!submitted && <button onClick={clearCanvas} className="text-xs text-destructive hover:underline">Clear</button>}
- </div>
- <canvas
- ref={canvasRef}
- width={500} height={500}
- className="w-full aspect-square rounded-xl border-2 border-border cursor-crosshair touch-none bg-background"
- onMouseDown={startDraw} onMouseMove={draw} onMouseUp={endDraw} onMouseLeave={endDraw}
- onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={endDraw}
- />
- </div>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 p-4 overflow-y-auto">
+        {/* Main game */}
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="bg-secondary/50 rounded-xl p-3 max-w-md text-center">
+            <p className="text-sm font-bold text-foreground">Look at the leaf veins.</p>
+            <p className="text-xs text-muted-foreground">Are they <span className="font-bold text-primary">Parallel</span> (running side-by-side like grass) or <span className="font-bold text-primary">Netted</span> (branching like a net)?</p>
+          </div>
 
- {!submitted ? (
- <button onClick={submitDrawing} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
- Submit Drawing
- </button>
- ) : grading ? (
- <div className="text-center py-6">
- <div className="w-10 h-10 mx-auto mb-3 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
- <p className="text-sm text-muted-foreground">AI is grading your drawing...</p>
- </div>
- ) : aiGrade ? (
- <div className="bg-card border border-border rounded-xl p-6 text-center space-y-3">
- <p className={`text-xl font-display font-bold ${gradeColors[aiGrade.score]}`}>
- {gradeLabels[aiGrade.score]}
- </p>
- <p className="text-sm text-muted-foreground">{aiGrade.feedback}</p>
- <button onClick={nextRound} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
- Next Leaf →
- </button>
- </div>
- ) : null}
- </>
- )}
- </div>
- </div>
- </div>
- );
+          <div className="w-72 h-72 sm:w-96 sm:h-96 rounded-xl overflow-hidden border-2 border-border bg-secondary">
+            <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+          </div>
+          <p className="text-base font-bold text-foreground">{r!.weed.commonName}</p>
+
+          {!picked ? (
+            <div className="flex gap-4">
+              <button onClick={() => pick('Parallel')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold hover:opacity-90">Parallel</button>
+              <button onClick={() => pick('Netted')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold hover:opacity-90">Netted</button>
+            </div>
+          ) : (
+            <div className="text-center max-w-md">
+              <p className={`text-xl font-bold mb-2 ${picked === r!.correct ? 'text-green-500' : 'text-destructive'}`}>
+                {picked === r!.correct ? 'Correct!' : `Not quite — it's ${r!.correct}.`}
+              </p>
+              <p className="text-xs text-muted-foreground mb-3">
+                {r!.correct === 'Parallel' ? `${r!.weed.commonName} is a monocot (grass-like). Its veins run in parallel lines.` : `${r!.weed.commonName} is a dicot (broadleaf). Its veins branch out in a net pattern.`}
+              </p>
+              <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
+            </div>
+          )}
+        </div>
+
+        {/* Side panel */}
+        <div className="grid grid-rows-2 gap-3">
+          {(['Parallel', 'Netted'] as const).map(v => {
+            const items = classified.filter(c => c.venation === v);
+            return (
+              <div key={v} className="rounded-xl border-2 border-border bg-card p-3 overflow-y-auto">
+                <p className="text-xs font-bold uppercase text-foreground mb-2">{v} ({items.length})</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {items.map((c, i) => (
+                    <div key={i} className="text-center">
+                      <div className={`aspect-square rounded-md overflow-hidden border-2 ${c.correct ? 'border-green-500' : 'border-destructive'}`}>
+                        <WeedImage weedId={c.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[9px] mt-1 text-foreground truncate">{c.weed.commonName}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }

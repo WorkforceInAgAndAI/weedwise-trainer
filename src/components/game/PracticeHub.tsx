@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton';
+import { useGameProgress } from '@/contexts/GameProgressContext';
+import { Medal, Trophy, Award, Star } from 'lucide-react';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
@@ -67,12 +69,12 @@ interface GameDef {
  category: string;
  description: string;
  howToPlay: string;
- component: React.ComponentType<{ onBack: () => void }>;
+ component: React.ComponentType<{ onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }>;
 }
 
 const k5Games: GameDef[] = [
  { id: 'weed-or-crop', name: 'Weed or Crop', Icon: Sprout, category: 'Identification', description: 'A plant image appears — is it a weed or a crop? Think fast!', howToPlay: 'You have 10 seconds per round to decide if the plant shown is a weed or a crop. Tap your answer before time runs out!', component: WeedOrCrop },
- { id: 'leaf-artist', name: 'Leaf Artist', Icon: Palette, category: 'Leaf Morphology', description: 'Draw leaves with the correct venation pattern.', howToPlay: 'Study the example leaf, then draw your own on the canvas. Focus on getting the venation and leaf shape correct.', component: LeafArtist },
+ { id: 'leaf-artist', name: 'Leaf Detective', Icon: Palette, category: 'Leaf Morphology', description: 'Identify leaf venation: parallel or netted?', howToPlay: 'Look closely at each leaf. Decide if its veins are parallel (running side by side, like grass) or netted (branching like a net). Track your finds in the side panel.', component: LeafArtist },
  { id: 'taxonomy-tower', name: 'Monocot or Dicot?', Icon: Layers, category: 'Taxonomy', description: 'Look at two weeds and identify which is a monocot and which is a dicot.', howToPlay: 'Two weeds are shown side by side. Identify which is the monocot and which is the dicot, then answer a follow-up question about monocot and dicot traits.', component: TaxonomyTower },
  { id: 'look-alike', name: 'Look-Alike Challenge', Icon: Eye, category: 'Look-Alikes', description: 'Can you tell similar-looking plants apart?', howToPlay: 'Two similar weeds are shown side by side. Read the clue and pick which one matches the description.', component: K5LookAlike },
  { id: 'name-the-weed', name: 'Name the Weed', Icon: Tag, category: 'Names', description: 'Identify weeds by their image and description.', howToPlay: 'Look at the weed image and read the clue. Choose the correct common name from four options.', component: NameTheWeed },
@@ -140,6 +142,7 @@ export default function PracticeHub({
  const [screen, setScreen] = useState<Screen>('grades');
  const [selectedGrade, setSelectedGrade] = useState<string>('');
  const [selectedGame, setSelectedGame] = useState<GameDef | null>(null);
+ const { badges, totalBadges } = useGameProgress();
 
   useEffect(() => {
     if (!initialGrade) return;
@@ -164,7 +167,8 @@ export default function PracticeHub({
 
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
- return <GameComp onBack={backToGames} />;
+ const gradeLabel = selectedGrade === 'k5' ? 'K-5' : selectedGrade === '68' ? '6-8' : '9-12';
+ return <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />;
  }
 
  const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : selectedGrade === '912' ? highGames : [];
@@ -190,7 +194,38 @@ export default function PracticeHub({
  </p>
  )}
  </div>
+ <div className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+   <Trophy className="w-4 h-4 text-primary" />
+   <span className="text-sm font-bold text-foreground">{totalBadges}</span>
+   <span className="text-xs text-muted-foreground">badges</span>
  </div>
+ </div>
+
+ {/* Earned badges showcase */}
+ {screen !== 'grades' && totalBadges > 0 && (
+   <div className="mb-6 p-4 rounded-lg border border-border bg-card">
+     <div className="flex items-center gap-2 mb-3">
+       <Medal className="w-4 h-4 text-primary" />
+       <h2 className="text-sm font-bold text-foreground">Your Badges</h2>
+     </div>
+     <div className="flex gap-2 flex-wrap">
+       {badges.slice(-12).reverse().map((b, i) => {
+         const pct = b.total > 0 ? b.score / b.total : 0;
+         const TierIcon = pct >= 0.85 ? Trophy : pct >= 0.7 ? Award : Star;
+         const cls = pct >= 0.85 ? 'text-yellow-600 bg-yellow-100 border-yellow-300'
+           : pct >= 0.7 ? 'text-slate-600 bg-slate-100 border-slate-300'
+           : 'text-amber-700 bg-amber-100 border-amber-300';
+         return (
+           <div key={i} title={`${b.gameName} — ${b.score}/${b.total}`}
+             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${cls}`}>
+             <TierIcon className="w-3 h-3" />
+             <span className="max-w-[140px] truncate">{b.gameName}</span>
+           </div>
+         );
+       })}
+     </div>
+   </div>
+ )}
 
  {/* Grade Selection */}
  {screen === 'grades' && (
@@ -222,12 +257,23 @@ export default function PracticeHub({
  {/* Game Grid */}
  {screen === 'games' && (
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
- {games.map(g => (
+ {games.map(g => {
+ const earned = badges.filter(b => b.gameId.startsWith(`${g.id}-lv`));
+ const best = earned.reduce((acc, b) => Math.max(acc, b.total > 0 ? b.score / b.total : 0), 0);
+ const TierIcon = best >= 0.85 ? Trophy : best >= 0.7 ? Award : best > 0 ? Star : null;
+ const tierCls = best >= 0.85 ? 'text-yellow-600' : best >= 0.7 ? 'text-slate-500' : 'text-amber-700';
+ return (
  <button
  key={g.id}
  onClick={() => selectGame(g)}
- className="group flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-card shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
+ className="group relative flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-card shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
  >
+ {TierIcon && (
+   <div className={`absolute top-2 right-2 flex items-center gap-1 ${tierCls}`}>
+     <TierIcon className="w-3.5 h-3.5" />
+     <span className="text-[10px] font-bold">{earned.length}</span>
+   </div>
+ )}
  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-primary/8 flex items-center justify-center group-hover:bg-primary/12 transition-colors">
  <g.Icon className="w-7 h-7 text-primary" />
  </div>
@@ -236,7 +282,7 @@ export default function PracticeHub({
  <span className="text-[10px] text-muted-foreground mt-0.5 block">{g.category}</span>
  </div>
  </button>
- ))}
+ );})}
  </div>
  )}
 

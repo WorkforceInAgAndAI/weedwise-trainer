@@ -10,8 +10,10 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 interface RoundItem { type: 'weed' | 'crop'; name: string; weedId?: string; cropImage?: string; }
 
-export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
+interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
+export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const [classified, setClassified] = useState<{ name: string; type: 'weed' | 'crop'; correct: boolean; weedId?: string; cropImage?: string }[]>([]);
   const rounds = useMemo(() => {
     const weedPool = shuffle([...weeds]);
     const selectedWeeds = weedPool.slice(0, 5);
@@ -41,8 +43,8 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
   const [done, setDone] = useState(false);
 
   const restart = () => { setRound(0); setScore(0); setTimer(10); setAnswered(false); setCorrect(null); setDone(false); };
-  const nextLevel = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); restart(); };
+  const nextLevel = () => { setLevel(l => l + 1); restart(); setClassified([]); };
+  const startOver = () => { setLevel(1); restart(); setClassified([]); };
 
   useEffect(() => {
     if (answered || done) return;
@@ -54,9 +56,11 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
   const handleAnswer = (choice: 'weed' | 'crop') => {
     if (answered) return;
     setAnswered(true);
-    const ok = choice === rounds[round].type;
+    const item = rounds[round];
+    const ok = choice === item.type;
     setCorrect(ok);
     if (ok) setScore(s => s + 1);
+    setClassified(prev => [...prev, { name: item.name, type: item.type, correct: ok, weedId: item.weedId, cropImage: item.cropImage }]);
   };
 
   const next = () => {
@@ -64,9 +68,11 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
     setRound(r => r + 1); setTimer(10); setAnswered(false); setCorrect(null);
   };
 
-  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
   const item = rounds[round];
+  const weedBucket = classified.filter(c => c.type === 'weed');
+  const cropBucket = classified.filter(c => c.type === 'crop');
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
@@ -76,14 +82,15 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">Round {round + 1}/{rounds.length}</span>
         <span className="text-sm font-bold text-primary ml-2">Score: {score}</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-5">
-        <div className="w-full max-w-xs">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 p-4 overflow-y-auto">
+      <div className="flex flex-col items-center justify-center gap-5">
+        <div className="w-full max-w-md">
           <div className="h-3 bg-secondary rounded-full overflow-hidden">
             <div className={`h-full transition-all duration-1000 rounded-full ${timer <= 3 ? 'bg-destructive' : 'bg-primary'}`} style={{ width: `${(timer / 10) * 100}%` }} />
           </div>
           <p className="text-center text-sm text-muted-foreground mt-1">{timer}s</p>
         </div>
-        <div className="w-44 h-44 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-border">
+        <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-border">
           {item.weedId ? (
             <WeedImage weedId={item.weedId} stage="plant" className="w-full h-full object-cover" />
           ) : item.cropImage ? (
@@ -106,6 +113,29 @@ export default function WeedOrCrop({ onBack }: { onBack: () => void }) {
             <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
           </div>
         )}
+      </div>
+      {/* Classification side panel */}
+      <div className="grid grid-rows-2 gap-3">
+        {([
+          { label: 'Weeds', items: weedBucket, color: 'border-destructive/40 bg-destructive/5' },
+          { label: 'Crops', items: cropBucket, color: 'border-primary/40 bg-primary/5' },
+        ]).map(b => (
+          <div key={b.label} className={`rounded-xl border-2 p-3 overflow-y-auto ${b.color}`}>
+            <p className="text-xs font-bold uppercase text-foreground mb-2">{b.label} ({b.items.length})</p>
+            <div className="grid grid-cols-3 gap-2">
+              {b.items.map((c, i) => (
+                <div key={i} className="text-center">
+                  <div className={`aspect-square rounded-md overflow-hidden border-2 ${c.correct ? 'border-green-500' : 'border-destructive'}`}>
+                    {c.weedId ? <WeedImage weedId={c.weedId} stage="plant" className="w-full h-full object-cover" /> :
+                      c.cropImage ? <img src={c.cropImage} alt={c.name} className="w-full h-full object-cover" /> : null}
+                  </div>
+                  <p className="text-[9px] mt-1 text-foreground truncate">{c.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
       </div>
     </div>
   );
