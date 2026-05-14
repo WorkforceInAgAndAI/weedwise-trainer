@@ -603,12 +603,14 @@ function TopicContent({
   topicWeeds,
   onSelectWeed,
   viewMode,
+  onOpenPractice,
 }: {
   topicId: TopicId;
   grade: GradeLevel;
   topicWeeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   viewMode: "list" | "box";
+  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
 }) {
   switch (topicId) {
     /* ═══════════════════════════════════════════════════════════
