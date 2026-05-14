@@ -7,6 +7,29 @@ import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+// Ligule-only descriptions per grass weed. Focused strictly on the ligule
+// (and adjacent collar/auricle landmarks where relevant). No flower or seed info.
+const LIGULE_DESC: Record<string, string> = {
+  giant_foxtail: 'Ligule is a fringe of long hairs (~2 mm) — no membrane.',
+  yellow_foxtail: 'Ligule is a dense ring of stiff hairs (~1 mm) at the leaf base.',
+  green_foxtail: 'Ligule is a short fringe of hairs — finer than yellow foxtail.',
+  barnyardgrass: 'No ligule present — the leaf collar is bare. A key ID feature.',
+  large_crabgrass: 'Membranous ligule that is jagged/toothed at the top, ~1-2 mm tall.',
+  smooth_crabgrass: 'Membranous ligule that is short, smooth, and rounded.',
+  fall_panicum: 'Membranous ligule fringed with fine hairs along the upper edge.',
+  woolly_cupgrass: 'Ligule is a short membrane topped with a fringe of hairs.',
+  shattercane: 'Membranous ligule, short and rounded with no hair fringe.',
+  johnsongrass: 'Membranous ligule, tall (~2-5 mm) with a finely-toothed margin.',
+  quackgrass: 'Short membranous ligule with clasping auricles at the collar.',
+  wirestem_muhly: 'Short membranous ligule, less than 1 mm tall.',
+  yellow_nutsedge: 'No true ligule — sedge has a triangular stem (sedges have edges).',
+  purple_nutsedge: 'No true ligule — sedge with triangular stem (not a true grass).',
+};
+
+function getLiguleText(weed: { id: string; traits?: string[] }) {
+  return LIGULE_DESC[weed.id] || 'Examine the ligule shape (membrane vs. fringe of hairs) at the leaf base.';
+}
+
 export default function LiguleLens({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
@@ -63,11 +86,11 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
    </div>
    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
     <p className="text-sm text-muted-foreground mb-2">Zoom in on the ligule — identify the grass!</p>
-     <div className="relative w-48 h-48 rounded-full overflow-hidden bg-secondary mb-4 border-4 border-primary">
-      <WeedImage weedId={current!.weed.id} stage="ligule" className="w-full h-full object-cover scale-150" />
+     <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden bg-secondary mb-4 border-4 border-primary">
+      <WeedImage weedId={current!.weed.id} stage="ligule" className="w-full h-full object-cover scale-[1.75]" />
       <div className="absolute inset-0 rounded-full border-4 border-primary/30" />
      </div>
-    <p className="text-xs text-muted-foreground mb-4">{current!.weed.traits.find(t => t.toLowerCase().includes('ligule')) || current!.weed.traits[0]}</p>
+    <p className="text-xs text-muted-foreground mb-4 max-w-md text-center"><span className="font-semibold text-foreground">Ligule:</span> {getLiguleText(current!.weed)}</p>
     <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
      {current!.options.map(opt => {
       const isCorrect = opt === current!.weed.commonName;
