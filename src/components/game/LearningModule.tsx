@@ -2899,16 +2899,22 @@ function TopicContent({
           example: "Walking through a garden and pulling out dandelions before they form their white seed heads.",
         },
         {
-          key: "mulch-cover",
-          label: "Mulch and Cover Crops",
-          desc: "Covering the soil with mulch (straw, wood chips) or planting cover crops (like clover or rye) to block sunlight and prevent weed seeds from germinating. This is a natural, chemical-free approach.",
-          example: "Putting wood chips around your garden plants to stop weeds from growing between them.",
+          key: "cover-crops",
+          label: "Cover Crops",
+          desc: "Planting helper crops (like cereal rye or clover) between cash crops to shade the soil, take up space, and stop weed seeds from germinating. This is a natural, chemical-free approach.",
+          example: "Planting cereal rye after the soybean harvest so the field is not bare during the winter.",
         },
         {
-          key: "mowing",
-          label: "Mowing",
-          desc: "Cutting weeds down before they can spread their seeds. This helps stop weeds from making new weeds, but they may grow back from their roots.",
-          example: "Mowing a field of tall weeds before they flower and drop seeds.",
+          key: "tillage",
+          label: "Tillage",
+          desc: "Using equipment to turn or stir the soil so that small weeds are uprooted and buried. There are different kinds of tillage: deep tillage (like a moldboard plow) flips the soil over, conservation tillage (like a chisel plow or disk) only stirs the top, and row cultivation pulls weeds from between crop rows.",
+          example: "A farmer uses a row cultivator to remove weeds growing between rows of soybeans.",
+        },
+        {
+          key: "chemical",
+          label: "Chemical Methods (Herbicides)",
+          desc: "Herbicides are special chemicals that farmers spray on fields to stop weeds. Pre-emergent herbicides are sprayed before weed seeds sprout. Post-emergent herbicides are sprayed on weeds that are already growing. Farmers wear safety gear and follow the label exactly to keep people, animals, and crops safe.",
+          example: "A farmer sprays a pre-emergent herbicide on a soybean field in early spring to stop weeds before they sprout.",
         },
       ];
 
