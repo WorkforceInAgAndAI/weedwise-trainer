@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
@@ -42,6 +42,17 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
  const [checked, setChecked] = useState(false);
  const [reviewing, setReviewing] = useState(false);
  const [totalScore, setTotalScore] = useState(0);
+ const [bouncedIds, setBouncedIds] = useState<string[]>([]);
+
+ useEffect(() => {
+ if (bouncedIds.length === 0) return;
+ const t = setTimeout(() => {
+ setPlacements(p => { const n = { ...p }; bouncedIds.forEach(id => delete n[id]); return n; });
+ setChecked(false);
+ setBouncedIds([]);
+ }, 700);
+ return () => clearTimeout(t);
+ }, [bouncedIds]);
 
  const unplaced = items.filter(i => !placements[i.weed.id]);
  const allPlaced = Object.keys(placements).length === items.length;
@@ -65,9 +76,12 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
  const handleCheck = () => {
   setChecked(true);
   const cc = items.filter(i => placements[i.weed.id] === i.correct).length;
-  setTotalScore(s => s + cc);
-  if (items.filter(i => placements[i.weed.id] !== i.correct).length > 0) {
-   setReviewing(true);
+  const wrong = items.filter(i => placements[i.weed.id] !== i.correct).map(i => i.weed.id);
+  if (wrong.length === 0) {
+   setTotalScore(s => s + cc);
+  } else {
+   // bounce wrong ones back so user retries them
+   setBouncedIds(wrong);
   }
  };
 
@@ -161,7 +175,8 @@ export default function LifeCycleMatching({ onBack }: { onBack: () => void }) {
         <p className="text-sm font-bold text-foreground text-center mb-2">{cycle}</p>
         <div className="space-y-2">
          {placed.map(i => (
-          <div key={i.weed.id} className={`flex items-center gap-1 p-1.5 rounded-lg ${
+          <div key={i.weed.id} className={`flex items-center gap-1 p-1.5 rounded-lg transition-all duration-500 ${
+           bouncedIds.includes(i.weed.id) ? 'opacity-0 -translate-y-8 scale-50' :
            checked ? (i.correct === cycle ? 'bg-green-500/20 border border-green-500' : 'bg-destructive/20 border border-destructive') : 'bg-secondary'
           }`}>
            <div className="w-8 h-8 rounded overflow-hidden bg-secondary flex-shrink-0">
