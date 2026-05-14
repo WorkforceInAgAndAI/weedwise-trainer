@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -108,6 +109,7 @@ export default function LeafArtist({ onBack, gameId, gameName, gradeLabel }: Pro
           })}
         </div>
       </div>
-    </div>
+          <FloatingCoach grade="K-5" tip={`Look at the lines on the leaf. Parallel lines run side by side. Netted lines branch out like a spider web.`} />
+</div>
   );
 }

@@ -62,7 +62,7 @@ export default function LandingPage({
  Weed Science<br />for Every Age
  </h1>
  <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8 max-w-md">
- Learn, practice, and play in our interactive agricultural simulation. Explore the intricate world of botany through a researcher's lens.
+ Explore the intricate world of weed science. Learn, practice, and play through an interactive agricultural simulation built for K-12 classrooms.
  </p>
  <button
  onClick={onOpenLearning}

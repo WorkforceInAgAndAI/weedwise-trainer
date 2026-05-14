@@ -6,6 +6,7 @@ import soybeanBg2 from '@/assets/images/soybean_field_2.jpg';
 import soybeanBg3 from '@/assets/images/soybean_field_3.jpg';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const FIELDS_PER_LEVEL = 3;
@@ -275,6 +276,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
      )}
     </div>
    )}
-  </div>
+        <FloatingCoach grade="6-8" tip={`Compare control cost to expected yield loss. Treat only when damage exceeds the threshold.`} />
+</div>
  );
 }

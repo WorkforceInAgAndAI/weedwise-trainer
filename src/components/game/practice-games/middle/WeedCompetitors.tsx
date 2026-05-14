@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -304,6 +305,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           </button>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Weeds compete for light, water, nutrients, and space. Some are more aggressive than others.`} />
+</div>
   );
 }

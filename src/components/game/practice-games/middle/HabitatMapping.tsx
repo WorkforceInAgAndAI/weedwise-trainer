@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Sun, Thermometer, Droplets, Wind, X } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -204,6 +205,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Match each weed to the habitat where its life cycle and seed dispersal succeed best.`} />
+</div>
   );
 }

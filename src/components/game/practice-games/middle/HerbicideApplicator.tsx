@@ -13,6 +13,7 @@ import {
   getBestMOAForWeed,
   type HerbicideMOA,
 } from '@/data/herbicides';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -264,6 +265,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
           )}
         </div>
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Pick a herbicide whose mode of action matches the weed's life cycle and growth stage.`} />
+</div>
   );
 }

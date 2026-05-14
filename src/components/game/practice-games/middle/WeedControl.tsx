@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const ROUNDS_PER_LEVEL = 3;
@@ -237,6 +238,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
      )}
     </div>
    )}
-  </div>
+        <FloatingCoach grade="6-8" tip={`IPM combines cultural, mechanical, biological, and chemical methods for the best result.`} />
+</div>
  );
 }

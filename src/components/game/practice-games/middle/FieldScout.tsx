@@ -10,6 +10,7 @@ const cornField2 = soybeanField2;
 const pastureField1 = soybeanField3;
 const pastureField2 = soybeanField1;
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -268,6 +269,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-    </div>
+          <FloatingCoach grade="6-8" tip={`Scout systematically — note density, growth stage, and patterns before recommending action.`} />
+</div>
   );
 }

@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import midwestMap from '@/assets/images/midwest-map.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
+import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -232,6 +233,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       </div>
-    </div>
+          <FloatingCoach grade="K-5" tip={`Invasive species don't belong here naturally — they crowd out native plants. Look for the ones that came from far away!`} />
+</div>
   );
 }
