@@ -390,6 +390,7 @@ interface Props {
   onClose: () => void;
   onOpenPractice?: (gradeHub: string, gameId?: string) => void;
   initialTopicId?: string;
+  onBackToPractice?: () => void;
 }
 
 /**
@@ -601,8 +602,17 @@ function PracticeButton({
   );
 }
 
-export default function LearningModule({ onClose, onOpenPractice, initialTopicId }: Props) {
-  const [selectedGrade, setSelectedGrade] = useState<GradeLevel>("elementary");
+export default function LearningModule({ onClose, onOpenPractice, initialTopicId, onBackToPractice }: Props) {
+  // Infer grade from the initial topic so the topic actually appears in the grade's list.
+  const initialGrade: GradeLevel = (() => {
+    if (!initialTopicId) return "elementary";
+    const t = TOPICS.find((x) => x.id === (initialTopicId as TopicId));
+    if (!t) return "elementary";
+    if (t.grades.includes("middle")) return "middle";
+    if (t.grades.includes("high")) return "high";
+    return "elementary";
+  })();
+  const [selectedGrade, setSelectedGrade] = useState<GradeLevel>(initialGrade);
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
