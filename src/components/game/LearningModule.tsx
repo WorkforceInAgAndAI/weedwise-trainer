@@ -34,168 +34,234 @@ type TopicId =
   | "crop-injury"
   | "life-stage-control";
 
+type CategoryId = "identification" | "lifecycle" | "control";
+
+interface CategoryStyle {
+  id: CategoryId;
+  label: string;
+  cardClass: string;
+  activeClass: string;
+  dotClass: string;
+  headerClass: string;
+}
+
+const CATEGORIES: Record<CategoryId, CategoryStyle> = {
+  identification: {
+    id: "identification",
+    label: "Identification & Morphology",
+    cardClass: "bg-info/5 border-info/40 hover:bg-info/10 hover:border-info/60",
+    activeClass: "bg-info text-info-foreground border-info",
+    dotClass: "bg-info",
+    headerClass: "text-info",
+  },
+  lifecycle: {
+    id: "lifecycle",
+    label: "Life Stages, Cycles, Seeds & Habitat",
+    cardClass: "bg-success/5 border-success/40 hover:bg-success/10 hover:border-success/60",
+    activeClass: "bg-success text-success-foreground border-success",
+    dotClass: "bg-success",
+    headerClass: "text-success",
+  },
+  control: {
+    id: "control",
+    label: "Control, Safety & Field Management",
+    cardClass: "bg-terracotta/5 border-terracotta/40 hover:bg-terracotta/10 hover:border-terracotta/60",
+    activeClass: "bg-terracotta text-primary-foreground border-terracotta",
+    dotClass: "bg-terracotta",
+    headerClass: "text-terracotta",
+  },
+};
+
 interface Topic {
   id: TopicId;
   name: string;
   icon: string;
   description: string;
   grades: GradeLevel[];
+  category: CategoryId;
 }
 
 const TOPICS: Topic[] = [
+  // Identification & Morphology
   {
     id: "names",
     name: "Weed Names & ID",
     icon: "names",
-    description: "Learn common names, scientific names, and key traits",
+    description: "Recall common and scientific names while analyzing the key traits used to identify each species in the field.",
     grades: ["elementary", "middle", "high"],
-  },
-  {
-    id: "seeds",
-    name: "Seeds & Seed Banks",
-    icon: "seeds",
-    description: "Learn about weed seeds, how they look, spread, and persist in the soil",
-    grades: ["elementary", "middle", "high"],
+    category: "identification",
   },
   {
     id: "monocot-dicot",
     name: "Monocot vs Dicot",
     icon: "monocot",
-    description: "Understand the difference between monocots and dicots",
+    description: "Distinguish monocots from dicots by comparing leaf venation, seed structure, and overall growth habit.",
     grades: ["elementary", "middle", "high"],
-  },
-  {
-    id: "life-stages",
-    name: "Life Stages",
-    icon: "stages",
-    description: "Learn to identify weeds at seed, seedling, vegetative, and reproductive stages",
-    grades: ["elementary", "middle", "high"],
-  },
-  {
-    id: "life-cycles",
-    name: "Life Cycles",
-    icon: "cycles",
-    description: "Annual, biennial, and perennial growth patterns",
-    grades: ["elementary", "middle", "high"],
-  },
-  {
-    id: "habitats",
-    name: "Habitats & Climate",
-    icon: "habitats",
-    description: "Where each weed thrives -- warm, cool, wet, or dry",
-    grades: ["elementary", "middle", "high"],
-  },
-  {
-    id: "ecology",
-    name: "Ecology & Growth Types",
-    icon: "ecology",
-    description: "Terrestrial, aquatic, and parasitic weeds and their unique needs",
-    grades: ["elementary", "middle"],
-  },
-  {
-    id: "native-introduced",
-    name: "Native vs Introduced",
-    icon: "origin",
-    description: "Which species are native and which were introduced",
-    grades: ["elementary", "middle", "high"],
+    category: "identification",
   },
   {
     id: "look-alikes",
     name: "Look-Alike Species",
     icon: "lookalike",
-    description: "Compare easily confused species pairs",
+    description: "Compare easily confused weed pairs and evaluate the subtle features that separate one species from another.",
     grades: ["elementary", "middle", "high"],
+    category: "identification",
   },
   {
-    id: "safety",
-    name: "Safety & Control",
-    icon: "safety",
-    description: "Identify dangerous species and learn basic control methods",
+    id: "native-introduced",
+    name: "Native vs Introduced",
+    icon: "origin",
+    description: "Differentiate native species from introduced ones and assess their ecological impact on Midwest cropland.",
     grades: ["elementary", "middle", "high"],
+    category: "identification",
   },
   {
-    id: "control-methods",
-    name: "Control Methods",
-    icon: "control",
-    description: "Learn about different ways to manage weeds -- from hand weeding to herbicides",
-    grades: ["elementary", "middle", "high"],
-  },
-  {
-    id: "field-scouting",
-    name: "Field Scouting",
-    icon: "scouting",
-    description: "Learn systematic field walking methods and scouting patterns",
-    grades: ["middle", "high"],
-  },
-  {
-    id: "weed-competitors",
-    name: "Weed Competition",
-    icon: "competition",
-    description: "How weeds compete with each other and with crops for resources",
-    grades: ["middle", "high"],
-  },
-  {
-    id: "economic-threshold",
-    name: "Economic Threshold",
-    icon: "threshold",
-    description: "When is it worth treating weeds? Understanding cost vs. benefit",
-    grades: ["middle", "high"],
-  },
-   {
     id: "taxonomy",
     name: "Taxonomy",
     icon: "taxonomy",
-    description: "The scientific system for classifying and naming every living organism",
+    description: "Understand the scientific hierarchy used to classify and name every living organism from kingdom to species.",
     grades: ["middle", "high"],
+    category: "identification",
   },
   {
     id: "families",
     name: "Plant Families",
     icon: "families",
-    description: "Group weeds by their botanical families",
+    description: "Classify weeds into botanical families and explain the shared traits that group them together.",
     grades: ["high"],
+    category: "identification",
   },
   {
     id: "dioecious",
     name: "Dioecious Weeds",
     icon: "dioecious",
-    description: "Learn about weeds with separate male and female plants",
+    description: "Examine weeds that produce separate male and female plants and explain how this affects reproduction and control.",
     grades: ["high"],
+    category: "identification",
+  },
+
+  // Life Stages, Cycles, Seeds & Habitat
+  {
+    id: "life-stages",
+    name: "Life Stages",
+    icon: "stages",
+    description: "Identify weeds across seed, seedling, vegetative, and reproductive stages to support timely management decisions.",
+    grades: ["elementary", "middle", "high"],
+    category: "lifecycle",
+  },
+  {
+    id: "life-cycles",
+    name: "Life Cycles",
+    icon: "cycles",
+    description: "Compare annual, biennial, and perennial growth patterns and predict how each cycle influences control timing.",
+    grades: ["elementary", "middle", "high"],
+    category: "lifecycle",
+  },
+  {
+    id: "seeds",
+    name: "Seeds & Seed Banks",
+    icon: "seeds",
+    description: "Describe how weed seeds look, spread, and persist in the soil seed bank from one season to the next.",
+    grades: ["elementary", "middle", "high"],
+    category: "lifecycle",
   },
   {
     id: "seed-dormancy",
     name: "Seed Dormancy",
     icon: "dormancy",
-    description: "How seeds survive unfavorable conditions through physical, physiological, chemical, and morphological dormancy",
+    description: "Analyze how physical, physiological, chemical, and morphological dormancy allow seeds to survive harsh conditions.",
     grades: ["high"],
+    category: "lifecycle",
+  },
+  {
+    id: "habitats",
+    name: "Habitats & Climate",
+    icon: "habitats",
+    description: "Predict where each weed thrives across warm, cool, wet, and dry habitats based on its biology.",
+    grades: ["elementary", "middle", "high"],
+    category: "lifecycle",
+  },
+  {
+    id: "ecology",
+    name: "Ecology & Growth Types",
+    icon: "ecology",
+    description: "Investigate terrestrial, aquatic, and parasitic weeds and explain the unique resources each growth type requires.",
+    grades: ["elementary", "middle"],
+    category: "lifecycle",
+  },
+
+  // Control, Safety & Field Management
+  {
+    id: "safety",
+    name: "Safety & Control",
+    icon: "safety",
+    description: "Recognize dangerous and toxic species and apply basic safety practices when handling them in the field.",
+    grades: ["elementary", "middle", "high"],
+    category: "control",
+  },
+  {
+    id: "control-methods",
+    name: "Control Methods",
+    icon: "control",
+    description: "Compare cultural, mechanical, biological, and chemical control methods and choose the right tool for each situation.",
+    grades: ["elementary", "middle", "high"],
+    category: "control",
+  },
+  {
+    id: "field-scouting",
+    name: "Field Scouting",
+    icon: "scouting",
+    description: "Apply systematic walking patterns to scout fields and accurately estimate weed pressure across the season.",
+    grades: ["middle", "high"],
+    category: "control",
+  },
+  {
+    id: "weed-competitors",
+    name: "Weed Competition",
+    icon: "competition",
+    description: "Analyze how weeds compete with crops and one another for light, water, and soil nutrients.",
+    grades: ["middle", "high"],
+    category: "control",
+  },
+  {
+    id: "economic-threshold",
+    name: "Economic Threshold",
+    icon: "threshold",
+    description: "Evaluate when treatment is justified by weighing control costs against the expected yield loss.",
+    grades: ["middle", "high"],
+    category: "control",
   },
   {
     id: "allelopathy",
     name: "Allelopathy",
     icon: "allelopathy",
-    description: "How weeds release chemicals to inhibit other plants' growth",
+    description: "Explain how certain weeds release chemicals that suppress the growth of neighboring plants.",
     grades: ["high"],
+    category: "control",
   },
   {
     id: "herbicide-moa",
     name: "Herbicide MOA",
     icon: "herbicide",
-    description: "Herbicide groups, modes of action, and how they affect weeds",
+    description: "Classify herbicides by WSSA group and explain how each mode of action disrupts plant function.",
     grades: ["high"],
+    category: "control",
   },
   {
     id: "crop-injury",
     name: "Crop Injury Symptoms",
     icon: "injury",
-    description: "Recognize herbicide injury patterns by MOA group",
+    description: "Diagnose herbicide injury patterns on crops and trace symptoms back to the responsible MOA group.",
     grades: ["high"],
+    category: "control",
   },
   {
     id: "life-stage-control",
     name: "Life Stage Control",
     icon: "stagecontrol",
-    description: "Target weeds at their most vulnerable growth stage for effective management",
+    description: "Choose the most vulnerable growth stage to target weeds for the most effective control outcome.",
     grades: ["high"],
+    category: "control",
   },
 ];
 
