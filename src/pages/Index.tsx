@@ -40,14 +40,16 @@ const Index = () => {
   const [globalGrade, setGlobalGrade] = useState<GradeLevel>("elementary");
   const [practiceInitial, setPracticeInitial] = useState<{ grade?: string; gameId?: string } | null>(null);
   const [learningInitialTopic, setLearningInitialTopic] = useState<string | null>(null);
+  const [learningReturnContext, setLearningReturnContext] = useState<{ grade?: string; gameId?: string } | null>(null);
 
   const openPractice = (grade?: string, gameId?: string) => {
     setPracticeInitial({ grade, gameId });
     setShowPracticeHub(true);
   };
 
-  const openLearningTopic = (topicId: string) => {
+  const openLearningTopic = (topicId: string, grade?: string, gameId?: string) => {
     setLearningInitialTopic(topicId);
+    if (grade || gameId) setLearningReturnContext({ grade, gameId });
     setShowPracticeHub(false);
     setShowLearning(true);
   };
@@ -139,11 +141,27 @@ const Index = () => {
       )}
       {showLearning && (
         <LearningModule
-          onClose={() => { setShowLearning(false); setLearningInitialTopic(null); }}
+          onClose={() => {
+            setShowLearning(false);
+            setLearningInitialTopic(null);
+            setLearningReturnContext(null);
+          }}
           initialTopicId={learningInitialTopic ?? undefined}
+          onBackToPractice={
+            learningReturnContext
+              ? () => {
+                  const ctx = learningReturnContext;
+                  setShowLearning(false);
+                  setLearningInitialTopic(null);
+                  setLearningReturnContext(null);
+                  openPractice(ctx.grade, ctx.gameId);
+                }
+              : undefined
+          }
           onOpenPractice={(grade, gameId) => {
             setShowLearning(false);
             setLearningInitialTopic(null);
+            setLearningReturnContext(null);
             openPractice(grade, gameId);
           }}
         />
