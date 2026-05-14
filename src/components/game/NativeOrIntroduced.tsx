@@ -7,14 +7,35 @@ interface Props {
  onNext: () => void;
 }
 
+type Region = 'Native' | 'Europe' | 'Asia' | 'Africa' | 'Other Introduced';
+
+const REGIONS: { id: Region; label: string; sub: string; tone: string }[] = [
+  { id: 'Native',           label: 'Native',           sub: 'North America',     tone: 'bg-green-900/15 border-green-600/50' },
+  { id: 'Europe',           label: 'Europe',           sub: 'Introduced',        tone: 'bg-amber-900/15 border-amber-600/50' },
+  { id: 'Asia',             label: 'Asia',             sub: 'Introduced',        tone: 'bg-rose-900/15 border-rose-600/50' },
+  { id: 'Africa',           label: 'Africa',           sub: 'Introduced',        tone: 'bg-orange-900/15 border-orange-600/50' },
+  { id: 'Other Introduced', label: 'Other',            sub: 'S. America / Aus.', tone: 'bg-sky-900/15 border-sky-600/50' },
+];
+
+function getRegion(w: typeof weeds[0]): Region {
+  if (w.origin === 'Native') return 'Native';
+  const t = `${w.habitat} ${w.commonName} ${w.scientificName}`.toLowerCase();
+  if (/europ|mediter/.test(t)) return 'Europe';
+  if (/asia|china|japan|india|siberia/.test(t)) return 'Asia';
+  if (/africa/.test(t)) return 'Africa';
+  if (/south america|brazil|austral/.test(t)) return 'Other Introduced';
+  // Fallback for introduced with no continent hint — Europe is the most common origin
+  return 'Europe';
+}
+
 export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  const queue = useMemo(() => {
  return [...weeds].sort(() => Math.random() - 0.5).slice(0, 12).map(w => ({
- weedId: w.id, name: w.commonName, correct: w.origin,
+   weedId: w.id, name: w.commonName, correct: getRegion(w),
  }));
  }, []);
 
- const [placements, setPlacements] = useState<Record<string, 'Native' | 'Introduced'>>({});
+ const [placements, setPlacements] = useState<Record<string, Region>>({});
  const [selected, setSelected] = useState<string | null>(null);
  const [checked, setChecked] = useState(false);
  const [bouncedIds, setBouncedIds] = useState<string[]>([]);
@@ -23,7 +44,7 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  const unplaced = queue.filter(q => !placements[q.weedId]);
  const allPlaced = unplaced.length === 0;
 
- const handleZoneDrop = (zone: 'Native' | 'Introduced') => {
+ const handleZoneDrop = (zone: Region) => {
  if (checked || !selected) return;
  setPlacements(prev => ({ ...prev, [selected]: zone }));
  setSelected(null);
@@ -66,86 +87,50 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  }, [bouncedIds]);
 
  const correctCount = checked ? queue.filter(q => placements[q.weedId] === q.correct).length : 0;
- const nativeWeeds = queue.filter(q => placements[q.weedId] === 'Native');
- const introducedWeeds = queue.filter(q => placements[q.weedId] === 'Introduced');
 
  return (
  <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
  <div>
- <h2 className="font-display font-bold text-lg text-foreground"> Native or Introduced?</h2>
- <p className="text-sm text-muted-foreground">Tap a weed, then drop it into the correct origin zone.</p>
+  <h2 className="font-display font-bold text-lg text-foreground"> Where did this weed come from?</h2>
+  <p className="text-sm text-muted-foreground">Tap a weed, then drop it into the correct region of origin.</p>
  </div>
 
- {/* Two drop zones side by side */}
- <div className="grid grid-cols-2 gap-3">
- {/* Native zone */}
- <button
- onClick={() => handleZoneDrop('Native')}
- className={`p-3 rounded-xl border-2 text-left transition-all min-h-[140px] bg-green-900/15 border-green-600/50 ${
- selected && !checked ? 'cursor-pointer ring-1 ring-green-500/40 hover:bg-green-900/25' : 'cursor-default'
- }`}
- >
- <div className="flex items-center gap-2 mb-1">
- <span className="text-2xl"></span>
- <div>
- <span className="text-sm font-bold text-foreground block">Native</span>
- <span className="text-[10px] text-muted-foreground">Originally from N. America</span>
- </div>
- </div>
- <div className="flex flex-wrap gap-1 mt-2">
-       {nativeWeeds.map(w => {
- const bouncing = bouncedIds.includes(w.weedId);
- return (
- <span
- key={w.weedId}
- onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
-        className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 transition-all duration-500 ${bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''} ${
- checked
- ? w.correct === 'Native' ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
- : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
- }`}
- >
- {w.name} {!checked && ''}
- </span>
- );
- })}
- </div>
- </button>
-
- {/* Introduced zone */}
- <button
- onClick={() => handleZoneDrop('Introduced')}
- className={`p-3 rounded-xl border-2 text-left transition-all min-h-[140px] bg-amber-900/15 border-amber-600/50 ${
- selected && !checked ? 'cursor-pointer ring-1 ring-amber-500/40 hover:bg-amber-900/25' : 'cursor-default'
- }`}
- >
- <div className="flex items-center gap-2 mb-1">
- <span className="text-2xl"></span>
- <div>
- <span className="text-sm font-bold text-foreground block">Introduced</span>
- <span className="text-[10px] text-muted-foreground">Brought from elsewhere</span>
- </div>
- </div>
- <div className="flex flex-wrap gap-1 mt-2">
-       {introducedWeeds.map(w => {
- const bouncing = bouncedIds.includes(w.weedId);
- return (
- <span
- key={w.weedId}
- onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
-        className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 transition-all duration-500 ${bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''} ${
- checked
- ? w.correct === 'Introduced' ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
- : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
- }`}
- >
- {w.name} {!checked && ''}
- </span>
- );
- })}
- </div>
- </button>
- </div>
+  {/* Region drop zones */}
+  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+    {REGIONS.map(region => {
+      const inZone = queue.filter(q => placements[q.weedId] === region.id);
+      return (
+        <button
+          key={region.id}
+          onClick={() => handleZoneDrop(region.id)}
+          className={`p-2 rounded-xl border-2 text-left transition-all min-h-[130px] ${region.tone} ${
+            selected && !checked ? 'cursor-pointer ring-1 ring-primary/40' : 'cursor-default'
+          }`}
+        >
+          <span className="text-xs font-bold text-foreground block">{region.label}</span>
+          <span className="text-[9px] text-muted-foreground">{region.sub}</span>
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {inZone.map(w => {
+              const bouncing = bouncedIds.includes(w.weedId);
+              return (
+                <span
+                  key={w.weedId}
+                  onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
+                  className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer transition-all duration-500 ${bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''} ${
+                    checked
+                      ? w.correct === region.id ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
+                      : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
+                  }`}
+                >
+                  {w.name}
+                </span>
+              );
+            })}
+          </div>
+        </button>
+      );
+    })}
+  </div>
 
  {/* Weed cards to drag */}
  {unplaced.length > 0 && (
