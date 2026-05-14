@@ -388,9 +388,60 @@ function SubheadingBox({
 
 interface Props {
   onClose: () => void;
+  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
 }
 
-export default function LearningModule({ onClose }: Props) {
+/** Maps a topic + grade to a Practice Hub game id. */
+const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, string>>>> = {
+  names: { elementary: "name-the-weed", middle: "ms-name-weed", high: "hs-name-weed" },
+  "monocot-dicot": { elementary: "taxonomy-tower", middle: "ms-taxonomy" },
+  "look-alikes": { elementary: "look-alike", middle: "native-lookalike", high: "spot-differences" },
+  "native-introduced": { elementary: "invasive-id", middle: "weed-origins", high: "invasive-habitat" },
+  taxonomy: { middle: "ms-taxonomy", high: "hs-taxonomy" },
+  dioecious: { high: "spot-differences" },
+  "life-stages": { elementary: "life-stages", middle: "life-stage-control", high: "life-stage-maze" },
+  "life-cycles": { elementary: "life-cycle-match", middle: "ms-lifecycle", high: "hs-lifecycle" },
+  seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
+  "seed-dormancy": { high: "sleepy-seeds" },
+  habitats: { elementary: "habitat-mapping", middle: "ms-habitat", high: "hs-habitat" },
+  ecology: { elementary: "ecology-scramble", middle: "pest-id" },
+  safety: { elementary: "safe-vs-toxic", middle: "ms-safe-toxic" },
+  "control-methods": { elementary: "weed-control", middle: "ms-weed-control", high: "hs-weed-control" },
+  "field-scouting": { middle: "field-scout", high: "hs-field-scout" },
+  "weed-competitors": { middle: "weed-competitors" },
+  "economic-threshold": { middle: "economic-threshold", high: "form-farm" },
+  allelopathy: { high: "allelopathy" },
+  "herbicide-moa": { middle: "control-matching", high: "hs-control-match" },
+  "crop-injury": { high: "crop-doctor" },
+  "life-stage-control": { high: "life-stage-maze" },
+};
+
+const GRADE_TO_HUB: Record<GradeLevel, string> = { elementary: "k5", middle: "68", high: "912" };
+
+function PracticeButton({
+  topicId,
+  grade,
+  onOpenPractice,
+}: {
+  topicId: TopicId;
+  grade: GradeLevel;
+  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+}) {
+  if (!onOpenPractice) return null;
+  const gameId = PRACTICE_GAME_MAP[topicId]?.[grade];
+  if (!gameId) return null;
+  return (
+    <button
+      onClick={() => onOpenPractice(grade, gameId)}
+      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
+    >
+      <Play className="w-4 h-4" />
+      Try this in a Practice Game
+    </button>
+  );
+}
+
+export default function LearningModule({ onClose, onOpenPractice }: Props) {
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel>("elementary");
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(null);
   const [selectedWeed, setSelectedWeed] = useState<Weed | null>(null);
