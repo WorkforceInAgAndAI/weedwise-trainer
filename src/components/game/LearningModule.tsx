@@ -3091,12 +3091,12 @@ function TopicContent({
                           <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {HERBICIDE_MOA.map(h => (
+                       <tbody>
+                         {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
                           <tr key={h.id} className="even:bg-muted/20">
                             <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
@@ -3134,9 +3134,9 @@ function TopicContent({
                         <p className="text-[10px] text-muted-foreground">
                           <span className="font-medium">Targets:</span> {h.spectrum === 'Both' ? 'Grasses and broadleaves' : h.spectrum === 'Grass' ? 'Grasses (monocots)' : 'Broadleaves (dicots)'}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          <span className="font-medium">Brand example:</span> {h.brands[0]}
-                        </p>
+                         <p className="text-[10px] text-muted-foreground">
+                           <span className="font-medium">Chemical:</span> {h.brands[0]}
+                         </p>
                         <p className="text-[10px] text-muted-foreground">
                           <span className="font-medium">What it looks like:</span> {SYMPTOM_TYPES[h.symptomType]?.label}
                         </p>
@@ -3709,12 +3709,12 @@ function TopicContent({
                     <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
                     <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                     <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
-                    <th className="p-2 text-left font-bold text-foreground border border-border">Brand Example</th>
+                    <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
                     <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {HERBICIDE_MOA.map(h => (
+                  {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
                     <tr key={h.id} className="even:bg-muted/20">
                       <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
                       <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
