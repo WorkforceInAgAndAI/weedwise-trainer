@@ -2338,48 +2338,55 @@ function TopicContent({
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
               <p>
-                You learned that weeds grow in different areas based on their preferences and adaptations. Weeds living
-                in different areas have different needs. We can group weeds into three categories based on what kind of
-                needs they have in their environment.
+                Different weeds need different things to live. We sort weeds into three groups based on how and
+                where they get what they need: <strong>terrestrial</strong> (on land), <strong>aquatic</strong>
+                (in water), and <strong>parasitic</strong> (taking food from other plants).
               </p>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Terrestrial Weeds</p>
-              <p className="text-sm text-foreground">
-                <strong>Terrestrial weeds</strong> are weeds that grow on land. Terrestrial weeds need <strong>soil to
-                root into, rainfall, and open air space</strong> to keep them alive.
+              <p className="font-display font-bold text-foreground text-base">
+                Terrestrial Weeds <span className="text-xs text-muted-foreground font-normal">({terrestrial.length})</span>
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {terrestrial.slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Aquatic Weeds</p>
               <p className="text-sm text-foreground">
-                <strong>Aquatic weeds</strong> grow near water or in water. They can be underwater or sticking out of
-                the water. Aquatic weeds have different needs than terrestrial weeds. Aquatic weeds need{" "}
-                <strong>water to grow in, underwater sunlight, and nutrients dissolved in the water</strong>. These
-                special adaptations help aquatic weeds survive in wet areas.
+                <strong>Terrestrial weeds</strong> grow on land. They need <strong>soil, rain, and air</strong> to
+                live, just like the plants in your yard.
               </p>
-              {aquatic.length > 0 && (
-                <div className="grid grid-cols-3 gap-2">
-                  {aquatic.map((w) => (
-                    <div key={w.id} className="text-center">
-                      <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+              <div className="overflow-x-auto pb-2">
+                <div className="flex gap-3" style={{ minWidth: `${Math.max(terrestrial.length, 1) * 7}rem` }}>
+                  {terrestrial.map((w) => (
+                    <div key={w.id} className="text-center shrink-0 w-24">
+                      <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
                         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
                   ))}
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground">← Scroll to see all {terrestrial.length} →</p>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">
+                Aquatic Weeds <span className="text-xs text-muted-foreground font-normal">({aquatic.length})</span>
+              </p>
+              <p className="text-sm text-foreground">
+                <strong>Aquatic weeds</strong> live in or right next to water. They need <strong>water, sunlight,
+                and nutrients in the water</strong> to grow.
+              </p>
+              {aquatic.length > 0 && (
+                <div className="overflow-x-auto pb-2">
+                  <div className="flex gap-3" style={{ minWidth: `${Math.max(aquatic.length, 1) * 7}rem` }}>
+                    {aquatic.map((w) => (
+                      <div key={w.id} className="text-center shrink-0 w-24">
+                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        </div>
+                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -2387,9 +2394,8 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Parasitic Weeds</p>
               <p className="text-sm text-foreground">
-                <strong>Parasitic weeds</strong> do not make their own food. Instead, they steal food and energy from
-                other plants called <strong>hosts</strong>. To steal nutrients from a host, they need special roots to
-                attach themselves to the host plant.
+                <strong>Parasitic weeds</strong> can't make their own food. They use special roots to grab food
+                and water from another plant, called the <strong>host</strong>.
               </p>
             </div>
           </div>
