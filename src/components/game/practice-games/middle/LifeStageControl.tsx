@@ -52,6 +52,7 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [weedAnswer, setWeedAnswer] = useState<string | null>(null);
   const [controlAnswer, setControlAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
+  const [money, setMoney] = useState(0);
 
   const done = idx >= items.length;
   const current = !done ? items[idx] : null;
@@ -88,7 +89,14 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
 
   const handleControl = (cId: string) => {
     setControlAnswer(cId);
-    if (validControlIds.includes(cId)) setScore(sc => sc + 1);
+    const stageOk = stageAnswer === current!.stage;
+    const weedOk = weedAnswer === current!.weed.id;
+    const controlOk = validControlIds.includes(cId);
+    if (controlOk) setScore(sc => sc + 1);
+    // Money rewards mastery of all THREE — only full payout when all correct.
+    if (stageOk && weedOk && controlOk) setMoney(m => m + 100);
+    else if ([stageOk, weedOk, controlOk].filter(Boolean).length === 2) setMoney(m => m + 25);
+    else setMoney(m => m + 5);
     setStep('feedback');
   };
 
@@ -128,6 +136,7 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Life Stage Control</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm font-bold text-green-600">${money}</span>
         <span className="text-sm text-muted-foreground">{idx + 1}/{items.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
@@ -143,9 +152,15 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
             const currentIdx = stepNames.indexOf(step);
             const isComplete = currentIdx > i;
             const isCurrent = currentIdx === i;
+            // Determine correctness per step (only known after answered)
+            let stepCorrect: boolean | null = null;
+            if (i === 0 && stageAnswer) stepCorrect = stageAnswer === current!.stage;
+            else if (i === 1 && weedAnswer) stepCorrect = weedAnswer === current!.weed.id;
+            else if (i === 2 && controlAnswer) stepCorrect = validControlIds.includes(controlAnswer);
             return (
               <span key={label} className={`px-3 py-1 rounded-full text-xs font-bold ${
-                isComplete ? 'bg-green-500/20 text-green-500' :
+                isComplete && stepCorrect === true ? 'bg-green-500/20 text-green-500' :
+                isComplete && stepCorrect === false ? 'bg-destructive/20 text-destructive' :
                 isCurrent ? 'bg-primary text-primary-foreground' :
                 'bg-secondary text-muted-foreground'
               }`}>{i + 1}. {label}</span>
@@ -212,6 +227,13 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
             <div className="bg-card border border-border rounded-xl p-4 mb-4">
               <p className="font-bold text-foreground mb-2">{current!.weed.commonName}</p>
               <p className="text-xs text-muted-foreground italic mb-2">{current!.weed.scientificName}</p>
+              {stageCorrect && weedCorrect && controlCorrect ? (
+                <p className="text-sm font-bold text-green-600 mb-2">+$100 — Perfect! All three matter to control this weed.</p>
+              ) : (
+                <p className="text-xs text-amber-600 mb-2 font-semibold">
+                  Knowing the stage, the species, AND the right control all together unlocks the full $100 reward — partial knowledge still leaves money on the table.
+                </p>
+              )}
 
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from './WeedImage';
 
@@ -9,7 +9,7 @@ interface Props {
 
 export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  const queue = useMemo(() => {
- return [...weeds].sort(() => Math.random() - 0.5).slice(0, 8).map(w => ({
+ return [...weeds].sort(() => Math.random() - 0.5).slice(0, 12).map(w => ({
  weedId: w.id, name: w.commonName, correct: w.origin,
  }));
  }, []);
@@ -17,6 +17,8 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  const [placements, setPlacements] = useState<Record<string, 'Native' | 'Introduced'>>({});
  const [selected, setSelected] = useState<string | null>(null);
  const [checked, setChecked] = useState(false);
+ const [bouncedIds, setBouncedIds] = useState<string[]>([]);
+ const [retriedOnce, setRetriedOnce] = useState(false);
 
  const unplaced = queue.filter(q => !placements[q.weedId]);
  const allPlaced = unplaced.length === 0;
@@ -37,12 +39,31 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  };
 
  const handleCheck = () => {
+ const wrong = queue.filter(q => placements[q.weedId] !== q.correct).map(q => q.weedId);
  setChecked(true);
+ if (wrong.length > 0 && !retriedOnce) {
+ // Bounce wrong ones back for retry — do not finalize yet
+ setBouncedIds(wrong);
+ } else {
+ // Finalize on second pass (or first if all correct)
  onComplete(queue.map(q => ({
  weedId: q.weedId,
  correct: placements[q.weedId] === q.correct,
  })));
+ }
  };
+
+ // After bounce animation, remove wrong placements so user can re-do them
+ useEffect(() => {
+ if (bouncedIds.length === 0) return;
+ const t = setTimeout(() => {
+ setPlacements(p => { const n = { ...p }; bouncedIds.forEach(id => delete n[id]); return n; });
+ setChecked(false);
+ setRetriedOnce(true);
+ setBouncedIds([]);
+ }, 800);
+ return () => clearTimeout(t);
+ }, [bouncedIds]);
 
  const correctCount = checked ? queue.filter(q => placements[q.weedId] === q.correct).length : 0;
  const nativeWeeds = queue.filter(q => placements[q.weedId] === 'Native');
@@ -72,11 +93,13 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  </div>
  </div>
  <div className="flex flex-wrap gap-1 mt-2">
- {nativeWeeds.map(w => (
+       {nativeWeeds.map(w => {
+ const bouncing = bouncedIds.includes(w.weedId);
+ return (
  <span
  key={w.weedId}
  onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
- className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 ${
+        className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 transition-all duration-500 ${bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''} ${
  checked
  ? w.correct === 'Native' ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
  : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
@@ -84,7 +107,8 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  >
  {w.name} {!checked && ''}
  </span>
- ))}
+ );
+ })}
  </div>
  </button>
 
@@ -103,11 +127,13 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  </div>
  </div>
  <div className="flex flex-wrap gap-1 mt-2">
- {introducedWeeds.map(w => (
+       {introducedWeeds.map(w => {
+ const bouncing = bouncedIds.includes(w.weedId);
+ return (
  <span
  key={w.weedId}
  onClick={e => { e.stopPropagation(); handleRemove(w.weedId); }}
- className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 ${
+        className={`text-[10px] px-1.5 py-0.5 rounded cursor-pointer flex items-center gap-1 transition-all duration-500 ${bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''} ${
  checked
  ? w.correct === 'Introduced' ? 'bg-accent/30 text-accent' : 'bg-destructive/30 text-destructive line-through'
  : 'bg-foreground/10 text-foreground hover:bg-destructive/20'
@@ -115,7 +141,8 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  >
  {w.name} {!checked && ''}
  </span>
- ))}
+ );
+ })}
  </div>
  </button>
  </div>
@@ -123,6 +150,11 @@ export default function NativeOrIntroduced({ onComplete, onNext }: Props) {
  {/* Weed cards to drag */}
  {unplaced.length > 0 && (
  <div className="grid grid-cols-4 gap-2">
+ {retriedOnce && (
+ <p className="col-span-4 text-xs text-amber-600 font-semibold text-center">
+ Try again — re-place the {unplaced.length} weed{unplaced.length === 1 ? '' : 's'} you missed.
+ </p>
+ )}
  {unplaced.map(item => (
  <button
  key={item.weedId}
