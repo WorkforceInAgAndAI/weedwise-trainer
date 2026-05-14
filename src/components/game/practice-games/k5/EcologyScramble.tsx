@@ -26,12 +26,6 @@ const CATEGORIES = [
   { id: 'parasitic', label: 'Parasitic Plants', Icon: Link, borderColor: 'border-accent/50' },
 ];
 
-// All weeds are terrestrial except water smartweed which is aquatic
-function getWeedCategory(w: typeof weeds[0]): string {
-  if (w.id === 'water-smartweed' || w.commonName.toLowerCase() === 'water smartweed') return 'aquatic';
-  return 'terrestrial';
-}
-
 const TIMER_SECONDS = 10;
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
