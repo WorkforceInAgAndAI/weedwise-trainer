@@ -329,6 +329,14 @@ export default function PracticeHub({
  <h3 className="font-semibold text-sm text-foreground mb-2">How to Play</h3>
  <p className="text-sm text-muted-foreground leading-relaxed">{selectedGame.howToPlay}</p>
  </div>
+ {onOpenLearning && GAME_TO_TOPIC[selectedGame.id] && (
+   <button
+     onClick={() => onOpenLearning(GAME_TO_TOPIC[selectedGame.id])}
+     className="w-full mb-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
+   >
+     <Leaf className="w-4 h-4" /> Learn more about this topic
+   </button>
+ )}
   {selectedGrade !== '912' && (
     <div className="mb-6 text-left">
       <FarmerGuide
