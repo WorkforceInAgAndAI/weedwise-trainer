@@ -2101,22 +2101,30 @@ function TopicContent({
           {
             key: "Warm-Season / Full Sun",
             label: "Warm-Season Weeds",
-            desc: "Warm-season weeds thrive in hot summer conditions with full sun exposure. They germinate when soil temperatures rise in late spring and grow most vigorously during the hottest months. Warm-season weeds are common in corn, soybean, and sorghum fields across the Midwest.",
+            desc: "These weeds love hot, sunny weather. They wake up in late spring and grow the most when summer is hottest, like in corn and soybean fields.",
+            color: "bg-amber-500/70",
+            region: "Southern & central US (warm summers)",
           },
           {
             key: "Cool-Season / Early Spring",
             label: "Cool-Season Weeds",
-            desc: "Cool-season weeds germinate in fall or early spring when temperatures are lower. They grow rapidly before warm-season crops are planted and can compete early in the growing season. Many are winter annuals that overwinter as rosettes.",
+            desc: "These weeds like cool weather. They sprout in fall or early spring, before it gets too hot.",
+            color: "bg-sky-500/70",
+            region: "Northern US (cool springs and falls)",
           },
           {
             key: "Wet / Poorly Drained",
             label: "Wet-Habitat Weeds",
-            desc: "Wet-habitat weeds are adapted to poorly drained soils, field edges near waterways, and areas with high water tables. They often have specialized tissues for waterlogged conditions and can indicate drainage problems in fields.",
+            desc: "These weeds love soggy, wet soil. You'll find them near ponds, ditches, and wet field edges.",
+            color: "bg-blue-700/70",
+            region: "Wet areas, river valleys, the Great Lakes region",
           },
           {
             key: "Dry / Disturbed",
             label: "Dry-Habitat Weeds",
-            desc: "Dry-habitat weeds are adapted to well-drained, often sandy soils and disturbed areas like roadsides, construction sites, and field margins. They are typically drought-tolerant with deep root systems or water-conserving leaf structures.",
+            desc: "These weeds can live with very little water. They pop up on roadsides, sandy spots, and dry, dug-up land.",
+            color: "bg-orange-600/70",
+            region: "Western & southwestern US (dry plains)",
           },
         ];
 
@@ -2125,33 +2133,73 @@ function TopicContent({
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">Habitats</p>
               <p>
-                Some people like to live in warm areas with lots of sun. Others like to live in cooler regions with lots
-                of rain. Weeds are just the same! Weeds live in different areas based on their preferences and{" "}
-                <strong>adaptations</strong> to survive.
+                A <strong>habitat</strong> is the kind of place where a plant likes to live. Some weeds love hot
+                sunny spots, others like cool or wet places. Knowing where a weed likes to grow helps us guess where
+                we will find it.
               </p>
-              <p>
-                An <strong>adaptation</strong> is a new trait that is developed to help a weed survive in a specific
-                area. Knowing what habitats weeds like to grow in can help us <strong>predict where weeds will
-                grow</strong>.
+            </div>
+
+            {/* Climate map */}
+            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-sm text-center">
+                Where These Habitats Live in the U.S.
               </p>
+              <div className="relative w-full max-w-md mx-auto">
+                <svg viewBox="0 0 300 180" className="w-full h-auto">
+                  {/* Simplified continental US outline */}
+                  <path
+                    d="M30,60 L60,40 L120,30 L180,30 L230,40 L270,55 L275,90 L260,130 L220,150 L160,155 L100,150 L60,140 L35,110 Z"
+                    fill="hsl(var(--muted))"
+                    stroke="hsl(var(--border))"
+                    strokeWidth="1.5"
+                  />
+                  {/* Cool-Season: Northern US */}
+                  <path d="M60,40 L120,30 L180,30 L230,40 L235,70 L180,75 L120,72 L65,72 Z" fill="rgb(56 189 248 / 0.65)" />
+                  {/* Warm-Season: Southern central US */}
+                  <path d="M65,72 L235,70 L240,110 L200,130 L120,128 L65,115 Z" fill="rgb(245 158 11 / 0.6)" />
+                  {/* Dry: Southwest */}
+                  <path d="M30,60 L65,72 L65,115 L60,140 L35,110 Z" fill="rgb(234 88 12 / 0.6)" />
+                  {/* Wet: Southeast & Great Lakes */}
+                  <path d="M200,130 L240,110 L260,130 L220,150 L160,155 L120,128 Z" fill="rgb(29 78 216 / 0.55)" />
+                </svg>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {elemHabitats.map((h) => (
+                  <div key={h.key} className="flex items-center gap-2">
+                    <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
+                    <span className="text-foreground">
+                      <strong>{h.label}</strong>
+                      <span className="text-muted-foreground"> — {h.region}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {elemHabitats.map((h) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
               return (
                 <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                  <p className="font-display font-bold text-foreground text-base">{h.label}</p>
-                  <p className="text-sm text-foreground">{h.desc}</p>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {grouped.slice(0, 8).map((w) => (
-                      <div key={w.id} className="text-center">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
+                    <p className="font-display font-bold text-foreground text-base">
+                      {h.label} <span className="text-xs text-muted-foreground font-normal">({grouped.length} species)</span>
+                    </p>
                   </div>
+                  <p className="text-sm text-foreground">{h.desc}</p>
+                  <div className="overflow-x-auto pb-2">
+                    <div className="flex gap-3" style={{ minWidth: `${Math.max(grouped.length, 1) * 7}rem` }}>
+                      {grouped.map((w) => (
+                        <div key={w.id} className="text-center shrink-0 w-24">
+                          <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+                            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          </div>
+                          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">← Scroll to see all {grouped.length} →</p>
                 </div>
               );
             })}
