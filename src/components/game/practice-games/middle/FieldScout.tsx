@@ -4,7 +4,6 @@ import WeedImage from '@/components/game/WeedImage';
 import { weeds } from '@/data/weeds';
 import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
 import aerialSoybean from '@/assets/images/aerial_soybean_field.jpg';
-import aerialPasture from '@/assets/images/aerial_pasture_field.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 
@@ -74,7 +73,7 @@ type WeedLayout = 'mixed' | 'rows' | 'center' | 'edges' | 'clumped' | 'diagonal'
 
 interface FieldDef {
   id: number;
-  crop: 'corn' | 'soybean' | 'pasture';
+  crop: 'corn' | 'soybean';
   weedLayout: WeedLayout;
   label: string;
   bestPattern: string;
@@ -85,12 +84,12 @@ interface FieldDef {
 const FIELDS: FieldDef[] = [
   { id: 1, crop: 'corn', weedLayout: 'mixed', label: 'Square corn field with mixed weed patches throughout', bestPattern: 'w', weedCount: 14, note: 'W-pattern crosses the most ground for mixed distributions.' },
   { id: 2, crop: 'soybean', weedLayout: 'rows', label: 'Long narrow soybean field with weeds along rows', bestPattern: 'z', weedCount: 9, note: 'Z-pattern works best for long fields by crossing each row.' },
-  { id: 3, crop: 'pasture', weedLayout: 'center', label: 'Square pasture with weeds concentrated in the center', bestPattern: 'x', weedCount: 18, note: 'X-pattern hits the center where the weeds are concentrated.' },
-  { id: 4, crop: 'pasture', weedLayout: 'edges', label: 'Irregularly shaped field with weed pressure on edges', bestPattern: 'edge', weedCount: 7, note: 'Edge walks catch boundary weeds that other patterns miss.' },
+  { id: 3, crop: 'soybean', weedLayout: 'center', label: 'Soybean field with weeds concentrated in the center', bestPattern: 'x', weedCount: 18, note: 'X-pattern hits the center where the weeds are concentrated.' },
+  { id: 4, crop: 'soybean', weedLayout: 'edges', label: 'Soybean field with weed pressure on the edges', bestPattern: 'edge', weedCount: 7, note: 'Edge walks catch boundary weeds that other patterns miss.' },
   { id: 5, crop: 'corn', weedLayout: 'clumped', label: 'Corn field with clustered weed patches in 2-3 spots', bestPattern: 'x', weedCount: 12, note: 'X-pattern finds clumped patches by crossing through them.' },
   { id: 6, crop: 'soybean', weedLayout: 'diagonal', label: 'Soybean field with weeds spreading diagonally from a corner', bestPattern: 'z', weedCount: 10, note: 'Z-pattern catches diagonal spreads across the field.' },
   { id: 7, crop: 'corn', weedLayout: 'scattered', label: 'Large corn field with randomly scattered weeds', bestPattern: 'w', weedCount: 16, note: 'W-pattern is most efficient for randomly scattered weeds.' },
-  { id: 8, crop: 'pasture', weedLayout: 'edges', label: 'Pasture with heavy weed pressure along fence lines', bestPattern: 'edge', weedCount: 11, note: 'Fence-line weeds are best found with an edge walk.' },
+  { id: 8, crop: 'soybean', weedLayout: 'edges', label: 'Soybean field with heavy weed pressure along the field margins', bestPattern: 'edge', weedCount: 11, note: 'Margin weeds are best found with an edge walk.' },
   { id: 9, crop: 'soybean', weedLayout: 'center', label: 'Soybean field with a dense weed patch in the middle', bestPattern: 'x', weedCount: 15, note: 'The X-pattern crosses through the center where weeds are densest.' },
   { id: 10, crop: 'corn', weedLayout: 'rows', label: 'Corn field with weeds emerging between crop rows', bestPattern: 'z', weedCount: 13, note: 'Z-pattern effectively crosses between rows to find emerging weeds.' },
 ];
@@ -98,7 +97,6 @@ const FIELDS: FieldDef[] = [
 const CROP_IMAGES: Record<string, string[]> = {
   corn: [aerialCorn],
   soybean: [aerialSoybean],
-  pasture: [aerialPasture],
 };
 
 const TOTAL_ROUNDS = 10;
