@@ -29,7 +29,8 @@ function getWeedsForLevel(level: number): typeof weeds {
   return shuffle(shifted).slice(0, 10);
 }
 
-export default function NameTheWeed({ onBack }: { onBack: () => void }) {
+interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
+export default function NameTheWeed({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const rounds = useMemo(() => {
     const levelWeeds = getWeedsForLevel(level);
@@ -44,6 +45,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
+  const [history, setHistory] = useState<{ weedId: string; name: string; correct: boolean }[]>([]);
 
   const done = round >= rounds.length;
   const r = !done ? rounds[round] : null;
@@ -51,7 +53,9 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
   const submit = (opt: string) => {
     setSelected(opt);
     setSubmitted(true);
-    if (opt === r?.weed.commonName) setScore(s => s + 1);
+    const ok = opt === r?.weed.commonName;
+    if (ok) setScore(s => s + 1);
+    if (r) setHistory(h => [...h, { weedId: r.weed.id, name: r.weed.commonName, correct: !!ok }]);
   };
 
   const showAnswer = () => setShowFeedback(true);
@@ -63,11 +67,11 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
     setShowFeedback(false);
   };
 
-  const restart = () => { setRound(0); setSelected(null); setSubmitted(false); setShowFeedback(false); setScore(0); };
+  const restart = () => { setRound(0); setSelected(null); setSubmitted(false); setShowFeedback(false); setScore(0); setHistory([]); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
   // Answer response screen with facts and memory hook
   if (showFeedback && r) {
@@ -82,7 +86,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4 max-w-md mx-auto">
           <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-xl overflow-hidden border-2 border-border bg-secondary">
-            <WeedImage weedId={r.weed.id} stage="plant" className="w-full h-full object-cover" />
+            <WeedImage weedId={r.weed.id} stage="flower" className="w-full h-full object-cover" />
           </div>
           <p className={`text-xl font-bold ${isCorrect ? 'text-green-500' : 'text-destructive'}`}>
             {isCorrect ? 'Correct!' : 'Not quite!'}
@@ -116,9 +120,10 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm font-bold text-primary ml-2">{score} pts</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 p-4 overflow-y-auto">
+      <div className="flex flex-col items-center justify-center gap-4">
         <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-border bg-secondary">
-          <WeedImage weedId={r!.weed.id} stage="plant" className="w-full h-full object-cover" />
+          <WeedImage weedId={r!.weed.id} stage="flower" className="w-full h-full object-cover" />
         </div>
         <p className="text-sm text-muted-foreground text-center max-w-xs">{r!.weed.traits[0]}</p>
         <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
@@ -134,6 +139,21 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
         {submitted && (
           <button onClick={showAnswer} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">See Details →</button>
         )}
+      </div>
+      {/* History side panel */}
+      <div className="rounded-xl border-2 border-border bg-card p-3 overflow-y-auto">
+        <p className="text-xs font-bold uppercase text-foreground mb-2">Identified ({history.length})</p>
+        <div className="grid grid-cols-2 gap-2">
+          {history.map((h, i) => (
+            <div key={i} className="text-center">
+              <div className={`aspect-square rounded-md overflow-hidden border-2 ${h.correct ? 'border-green-500' : 'border-destructive'}`}>
+                <WeedImage weedId={h.weedId} stage="flower" className="w-full h-full object-cover" />
+              </div>
+              <p className="text-[10px] mt-1 text-foreground truncate">{h.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
       </div>
     </div>
   );
