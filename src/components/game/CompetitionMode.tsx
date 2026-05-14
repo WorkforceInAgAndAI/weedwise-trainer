@@ -723,7 +723,7 @@ export default function CompetitionMode({ onClose }: Props) {
  <div className="bg-card border border-border rounded-xl p-6 space-y-4 animate-scale-in">
  <div className="flex items-center gap-4">
  <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
- <WeedImage weedId={q.weedId} stage="whole" className="w-full h-full" />
+ <WeedImage weedId={q.weedId} stage="flower" className="w-full h-full" />
  </div>
  <div>
  <p className="font-display font-bold text-lg text-foreground">Which weed is this?</p>

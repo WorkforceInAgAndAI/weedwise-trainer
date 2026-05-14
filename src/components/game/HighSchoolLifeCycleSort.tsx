@@ -113,7 +113,7 @@ export default function HighSchoolLifeCycleSort({ onComplete, onNext }: Props) {
  <button key={item.weedId} onClick={() => setSelected(selected === item.weedId ? null : item.weedId)}
  className={`p-2 rounded-lg border-2 transition-all text-center ${selected === item.weedId ? 'border-primary bg-primary/10 scale-105' : 'border-border bg-secondary/50 hover:border-primary/50'}`}>
  <div className="w-full h-16 mb-1 overflow-hidden rounded">
- <WeedImage weedId={item.weedId} stage="whole" className="w-full h-full" />
+ <WeedImage weedId={item.weedId} stage="flower" className="w-full h-full" />
  </div>
  <span className="text-[10px] font-semibold text-foreground leading-tight block">{item.name}</span>
  <span className="text-[8px] text-primary italic leading-tight block">{item.scientificName}</span>

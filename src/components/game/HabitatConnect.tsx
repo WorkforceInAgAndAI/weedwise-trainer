@@ -125,7 +125,7 @@ export default function HabitatConnect({ onComplete, onNext }: Props) {
  <div className="flex items-center gap-3">
  {isConnected && <span className={`w-4 h-4 rounded-full ${PAIR_COLORS[connIdx % PAIR_COLORS.length]} shrink-0`} />}
  <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
- <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+ <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
  </div>
  <span className="text-sm font-semibold text-foreground">{w.commonName}</span>
  </div>
@@ -185,7 +185,7 @@ export default function HabitatConnect({ onComplete, onNext }: Props) {
  <div key={w.id} className={`flex items-center gap-3 p-2 rounded-lg ${isCorrect ? 'bg-accent/10' : 'bg-destructive/10'}`}>
  <span className="text-sm">{isCorrect ? '' : ''}</span>
  <div className="w-8 h-8 rounded overflow-hidden shrink-0">
- <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+ <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
  </div>
  <div className="flex-1 min-w-0">
  <span className="text-sm font-semibold text-foreground">{w.commonName}</span>

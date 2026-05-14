@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
@@ -6,170 +6,156 @@ import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-type Pair = { native: typeof weeds[0]; introduced: typeof weeds[0] };
+const GROUP_SIZE = 6;
 
-function buildPairPool(): Pair[] {
-  const result: Pair[] = [];
-  const usedIds = new Set<string>();
-  const natives = shuffle(weeds.filter(w => w.origin === 'Native' && w.lookAlike));
-  for (const n of natives) {
-    const match = weeds.find(w => w.id === n.lookAlike.id && w.origin === 'Introduced');
-    if (match && !usedIds.has(n.id) && !usedIds.has(match.id)) {
-      result.push({ native: n, introduced: match });
-      usedIds.add(n.id);
-      usedIds.add(match.id);
-    }
-  }
-  const families = shuffle([...new Set(weeds.map(w => w.family))]);
-  for (const fam of families) {
-    const nats = weeds.filter(w => w.family === fam && w.origin === 'Native' && !usedIds.has(w.id));
-    const intros = weeds.filter(w => w.family === fam && w.origin === 'Introduced' && !usedIds.has(w.id));
-    for (let i = 0; i < Math.min(nats.length, intros.length); i++) {
-      result.push({ native: nats[i], introduced: intros[i] });
-      usedIds.add(nats[i].id);
-      usedIds.add(intros[i].id);
-    }
-  }
-  return result;
-}
-
-const QUESTIONS_PER_LEVEL = 5;
-
-function getPairsForLevel(level: number, allPairs: Pair[]): Pair[] {
-  const offset = (level - 1) * QUESTIONS_PER_LEVEL;
-  const rotated = [...allPairs.slice(offset % allPairs.length), ...allPairs.slice(0, offset % allPairs.length)];
-  return shuffle(rotated).slice(0, QUESTIONS_PER_LEVEL);
+function buildGroup(level: number): typeof weeds {
+  const natives = shuffle(weeds.filter(w => w.origin === 'Native'));
+  const intros = shuffle(weeds.filter(w => w.origin === 'Introduced'));
+  // Aim for a balanced mix: 3 native + 3 introduced when possible
+  const nCount = Math.min(3, natives.length);
+  const iCount = Math.min(GROUP_SIZE - nCount, intros.length);
+  const offsetN = ((level - 1) * 3) % Math.max(1, natives.length);
+  const offsetI = ((level - 1) * 3) % Math.max(1, intros.length);
+  const pickN = [...natives.slice(offsetN), ...natives.slice(0, offsetN)].slice(0, nCount);
+  const pickI = [...intros.slice(offsetI), ...intros.slice(0, offsetI)].slice(0, iCount);
+  return shuffle([...pickN, ...pickI]);
 }
 
 export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const allPairs = useMemo(() => shuffle(buildPairPool()), []);
-  const levelPairs = useMemo(() => getPairsForLevel(level, allPairs), [level, allPairs]);
-
-  const [round, setRound] = useState(0);
-  const [checked, setChecked] = useState(false);
-  const [score, setScore] = useState(0);
+  const group = useMemo(() => buildGroup(level), [level]);
   const [placements, setPlacements] = useState<Record<string, 'native' | 'introduced'>>({});
   const [selectedWeed, setSelectedWeed] = useState<string | null>(null);
+  const [checked, setChecked] = useState(false);
+  const [bouncedIds, setBouncedIds] = useState<string[]>([]);
+  const [retriedOnce, setRetriedOnce] = useState(false);
+  const [done, setDone] = useState(false);
+  const [score, setScore] = useState(0);
 
-  const done = round >= levelPairs.length;
-  const currentPair = !done ? levelPairs[round] : null;
-  const pairWeeds = useMemo(() =>
-    currentPair ? shuffle([currentPair.native, currentPair.introduced]) : [],
-    [round, done]
-  );
-  const totalInRound = 2;
-  const allPlaced = Object.keys(placements).length === totalInRound;
+  const unplaced = group.filter(w => !placements[w.id]);
+  const allPlaced = unplaced.length === 0;
+  const isCorrectZone = (w: typeof weeds[0], z: 'native' | 'introduced') =>
+    z === 'native' ? w.origin === 'Native' : w.origin === 'Introduced';
 
   const handleDrop = (zone: 'native' | 'introduced') => {
     if (!selectedWeed || checked) return;
     setPlacements(p => ({ ...p, [selectedWeed]: zone }));
     setSelectedWeed(null);
   };
-
   const handleRemove = (weedId: string) => {
     if (checked) return;
     setPlacements(p => { const n = { ...p }; delete n[weedId]; return n; });
   };
 
   const checkAnswers = () => {
+    const wrong = group.filter(w => !isCorrectZone(w, placements[w.id])).map(w => w.id);
     setChecked(true);
-    if (currentPair && placements[currentPair.native.id] === 'native' && placements[currentPair.introduced.id] === 'introduced') {
-      setScore(s => s + 1);
+    if (wrong.length > 0 && !retriedOnce) {
+      setBouncedIds(wrong);
+    } else {
+      const correct = group.filter(w => isCorrectZone(w, placements[w.id])).length;
+      setScore(correct);
+      setDone(true);
     }
   };
 
-  const next = () => {
-    setRound(r => r + 1);
-    setChecked(false);
-    setPlacements({});
-    setSelectedWeed(null);
-  };
+  useEffect(() => {
+    if (bouncedIds.length === 0) return;
+    const t = setTimeout(() => {
+      setPlacements(p => { const n = { ...p }; bouncedIds.forEach(id => delete n[id]); return n; });
+      setChecked(false);
+      setRetriedOnce(true);
+      setBouncedIds([]);
+    }, 800);
+    return () => clearTimeout(t);
+  }, [bouncedIds]);
 
-  const restart = () => { setRound(0); setScore(0); setChecked(false); setPlacements({}); setSelectedWeed(null); };
+  const restart = () => {
+    setPlacements({}); setSelectedWeed(null); setChecked(false);
+    setBouncedIds([]); setRetriedOnce(false); setDone(false); setScore(0);
+  };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    return <LevelComplete level={level} score={score} total={QUESTIONS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title={`Native or Introduced? Lv.${level}`} />;
+    return <LevelComplete level={level} score={score} total={GROUP_SIZE} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title={`Native or Introduced? Lv.${level}`} />;
   }
-
-  const isCorrectZone = (weed: typeof weeds[0], zone: 'native' | 'introduced') =>
-    zone === 'native' ? weed.origin === 'Native' : weed.origin === 'Introduced';
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Native or Introduced?</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">{round + 1}/{levelPairs.length}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+        <span className="text-sm text-muted-foreground">{Object.keys(placements).length}/{GROUP_SIZE}</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground text-center">Sort this pair into Native or Introduced</p>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <p className="text-sm text-muted-foreground text-center">Tap a weed, then drop it into Native or Introduced.</p>
 
-        {currentPair && (
-          <div className="border border-border rounded-xl p-3">
-            <p className="text-xs text-muted-foreground mb-2 font-medium">{currentPair.native.family} family</p>
-            <div className="flex gap-3">
-              <div className="flex flex-col gap-2 flex-shrink-0">
-                {pairWeeds.filter(w => !placements[w.id]).map(w => (
-                  <button key={w.id} onClick={() => setSelectedWeed(selectedWeed === w.id ? null : w.id)}
-                    className={`flex items-center gap-2 p-2 rounded-lg border-2 transition-all ${
-                      selectedWeed === w.id ? 'border-primary bg-primary/10' : 'border-border bg-card hover:border-primary/50'
-                    }`}>
-                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-                      <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
-                    </div>
-                    <span className="text-xs font-medium text-foreground">{w.commonName}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-2 flex-1">
-                {(['native', 'introduced'] as const).map(zone => {
-                  const placed = pairWeeds.filter(w => placements[w.id] === zone);
-                  return (
-                    <button key={zone} onClick={() => handleDrop(zone)}
-                      className={`flex-1 rounded-lg border-2 p-2 min-h-[60px] transition-all ${
-                        selectedWeed ? 'border-primary bg-primary/5 cursor-pointer' : 'border-border bg-card'
-                      }`}>
-                      <p className="text-xs font-bold text-foreground text-center mb-1 capitalize">{zone}</p>
-                      {placed.map(w => (
-                        <div key={w.id} className={`flex items-center gap-1 p-1 rounded ${
-                          checked ? (isCorrectZone(w, zone) ? 'bg-green-500/20' : 'bg-destructive/20') : 'bg-secondary'
-                        }`}>
-                          <div className="w-8 h-8 rounded overflow-hidden bg-secondary flex-shrink-0">
-                            <WeedImage weedId={w.id} stage="vegetative" className="w-full h-full object-cover" />
-                          </div>
-                          <span className="text-[10px] font-medium text-foreground flex-1 truncate">{w.commonName}</span>
-                          {!checked && (
-                            <button onClick={e => { e.stopPropagation(); handleRemove(w.id); }} className="text-muted-foreground text-xs">x</button>
-                          )}
+        {/* Drop zones */}
+        <div className="grid grid-cols-2 gap-3 max-w-4xl mx-auto">
+          {(['native', 'introduced'] as const).map(zone => {
+            const placed = group.filter(w => placements[w.id] === zone);
+            return (
+              <button key={zone} onClick={() => handleDrop(zone)}
+                className={`rounded-xl border-2 p-3 min-h-[200px] transition-all text-left ${
+                  zone === 'native' ? 'bg-green-900/15 border-green-600/50' : 'bg-amber-900/15 border-amber-600/50'
+                } ${selectedWeed && !checked ? 'ring-2 ring-primary cursor-pointer' : ''}`}>
+                <p className="text-sm font-bold text-foreground text-center mb-2 capitalize">{zone}</p>
+                <div className="flex flex-wrap gap-2">
+                  {placed.map(w => {
+                    const bouncing = bouncedIds.includes(w.id);
+                    const right = checked && isCorrectZone(w, zone);
+                    const wrong = checked && !isCorrectZone(w, zone);
+                    return (
+                      <div key={w.id} onClick={e => { e.stopPropagation(); handleRemove(w.id); }}
+                        className={`flex items-center gap-1.5 p-1.5 pr-2 rounded-lg cursor-pointer transition-all duration-500 ${
+                          bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''
+                        } ${right ? 'bg-green-500/30' : wrong ? 'bg-destructive/30' : 'bg-secondary hover:bg-destructive/20'}`}>
+                        <div className="w-10 h-10 rounded overflow-hidden bg-background flex-shrink-0">
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
                         </div>
-                      ))}
-                    </button>
-                  );
-                })}
-              </div>
+                        <span className="text-[11px] font-medium text-foreground">{w.commonName}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Unplaced weed cards */}
+        {unplaced.length > 0 && (
+          <div className="max-w-4xl mx-auto">
+            {retriedOnce && (
+              <p className="text-xs text-amber-600 font-semibold text-center mb-2">
+                Try again — re-place the {unplaced.length} weed{unplaced.length === 1 ? '' : 's'} you missed.
+              </p>
+            )}
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {unplaced.map(w => (
+                <button key={w.id} onClick={() => setSelectedWeed(selectedWeed === w.id ? null : w.id)}
+                  className={`p-2 rounded-lg border-2 transition-all text-center ${
+                    selectedWeed === w.id ? 'border-primary bg-primary/10 scale-105' : 'border-border bg-card hover:border-primary/50'
+                  }`}>
+                  <div className="w-full aspect-square mb-1 overflow-hidden rounded bg-secondary">
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="text-[10px] font-semibold text-foreground leading-tight block">{w.commonName}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}
 
-        {allPlaced && !checked && (
-          <button onClick={checkAnswers} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold mx-auto">Check Answers</button>
-        )}
-
-        {checked && currentPair && (
+        {!checked && allPlaced && (
           <div className="text-center">
-            <p className={`text-sm mb-3 ${placements[currentPair.native.id] === 'native' && placements[currentPair.introduced.id] === 'introduced' ? 'text-green-500 font-bold' : 'text-destructive font-bold'}`}>
-              {placements[currentPair.native.id] === 'native' && placements[currentPair.introduced.id] === 'introduced'
-                ? 'Correct!' : `${currentPair.native.commonName} is Native, ${currentPair.introduced.commonName} is Introduced`}
-            </p>
-            <button onClick={next} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
+            <button onClick={checkAnswers} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
           </div>
         )}
       </div>
-          <FloatingCoach grade="6-8" tip={`Native and invasive look-alikes share family traits. Look for subtle differences in leaves and flowers.`} />
-</div>
+      <FloatingCoach grade="6-8" tip="Native species evolved here. Introduced ones arrived from other continents — often without natural predators." />
+    </div>
   );
 }

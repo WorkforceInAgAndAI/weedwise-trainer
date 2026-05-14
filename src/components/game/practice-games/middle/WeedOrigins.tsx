@@ -132,9 +132,14 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
                     return (
                       <div key={c.id} className="bg-card border border-border rounded-lg p-2">
                         <p className="text-[11px] font-bold text-foreground mb-1">{c.label} <span className="text-muted-foreground font-normal">({list.length})</span></p>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1.5">
                           {list.map(w => (
-                            <span key={w.weedId} className="text-[10px] bg-secondary text-foreground px-1.5 py-0.5 rounded">{w.commonName}</span>
+                            <div key={w.weedId} className="flex items-center gap-1 bg-secondary rounded pr-1.5">
+                              <div className="w-7 h-7 rounded overflow-hidden bg-background flex-shrink-0">
+                                <WeedImage weedId={w.weedId} stage="flower" className="w-full h-full object-cover" />
+                              </div>
+                              <span className="text-[10px] text-foreground">{w.commonName}</span>
+                            </div>
                           ))}
                         </div>
                       </div>

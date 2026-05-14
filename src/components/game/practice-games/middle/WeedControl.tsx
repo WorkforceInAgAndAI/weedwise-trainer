@@ -239,12 +239,12 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
           ))}
 
           {current && fw && (
-            <div className="absolute bottom-0 left-0 right-0 bg-card/95 border-t-2 border-border p-3 backdrop-blur">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-14 h-14 rounded-lg overflow-hidden bg-secondary">
-                  <WeedImage weedId={fw.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+            <div className="absolute bottom-0 left-0 right-0 bg-card/95 border-t-2 border-border p-4 backdrop-blur">
+              <div className="flex items-start gap-4 mb-3">
+                <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-lg overflow-hidden bg-secondary border-2 border-border flex-shrink-0">
+                  <WeedImage weedId={fw.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   {!identified ? (
                     <p className="text-sm font-bold text-foreground">Identify this weed:</p>
                   ) : (

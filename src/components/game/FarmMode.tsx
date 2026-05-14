@@ -49,13 +49,13 @@ interface SeasonData {
 
 // Constants 
 const SEASONS: Record<Season, SeasonData> = {
- 'spring': { label: 'Spring Pre-Plant', cropStage: 'Pre-Plant', description: 'Prepare the seedbed and make early decisions before soybeans emerge.' },
- 'early-summer': { label: 'Early Summer', cropStage: 'V2-V4 Soybeans', description: 'First weed flush. Critical POST herbicide application window.' },
- 'mid-summer': { label: 'Mid-Summer', cropStage: 'V5-V8 Soybeans', description: 'Second weed flush. Rain events may bring new challenges.' },
- 'late-summer': { label: 'Late Summer', cropStage: 'V9+ Soybeans', description: 'Weeds approaching maturity. Last chance for intervention.' },
- 'fall': { label: 'Fall Harvest', cropStage: 'R6-R8 Soybeans', description: 'Harvest time. Assess the season and calculate yield.' },
+ 'spring':       { label: 'Year 1 — Establishment',  cropStage: 'First Soybean Crop',     description: 'Year 1 of your soybean rotation. Build the seed bank picture, choose early controls.' },
+ 'early-summer': { label: 'Early Summer',            cropStage: 'V2-V4 Soybeans',         description: 'First weed flush. Critical POST herbicide application window.' },
+ 'mid-summer':   { label: 'Year 2 — Building',       cropStage: 'Second Soybean Crop',    description: 'Year 2. Carry-over weeds returning. Decisions made last year matter now.' },
+ 'late-summer':  { label: 'Late Summer',             cropStage: 'V9+ Soybeans',           description: 'Weeds approaching maturity. Last chance for intervention.' },
+ 'fall':         { label: 'Year 3 — Harvest',        cropStage: 'Third Soybean Crop',     description: 'Year 3. Final crop — your three-year management strategy is judged here.' },
 };
-const SEASON_ORDER: Season[] = ['spring', 'early-summer', 'mid-summer', 'late-summer', 'fall'];
+const SEASON_ORDER: Season[] = ['spring', 'mid-summer', 'fall'];
 const WEED_STAGE_BY_SEASON: Record<Season, FieldWeed['stage']> = {
  'spring': 'seedling', 'early-summer': 'seedling', 'mid-summer': 'vegetative', 'late-summer': 'reproductive', 'fall': 'mature',
 };
@@ -261,7 +261,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  setScoutAnimating(true);
  setTotalCost(prev => prev + sm.cost);
  setTotalHours(prev => prev + sm.timeHours);
- setActionLog(prev => [...prev, { season: currentSeason, action: `Scouted (${sm.label})`, detail: `Cost: $${sm.cost}, Time: ${sm.timeHours}h`, cost: sm.cost }]);
+ setActionLog(prev => [...prev, { season: currentSeason, action: `Scouted (${sm.label})`, detail: `Cost: $${sm.cost}, Time: ${sm.timeHours} hours`, cost: sm.cost }]);
 
  setTimeout(() => {
  setFieldWeeds(prev => prev.map(w => {
@@ -598,7 +598,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <p className="text-xs text-muted-foreground mb-2">{sm.gradeDesc[grade!]}</p>
  <div className="flex items-center gap-2 text-xs">
  <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">${sm.cost}</span>
- <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{sm.timeHours}h</span>
+ <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{sm.timeHours} hours</span>
  <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(sm.accuracy * 100)}%</span>
  </div>
  </button>
@@ -777,7 +777,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <button key={p.id} onClick={() => setHerbProduct(p.id)}
  className={`w-full text-left p-2 rounded-lg border text-xs transition-all ${herbProduct === p.id ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/30'}`}>
  <p className="font-medium text-foreground">{p.label}</p>
- <p className="text-muted-foreground">${p.cost} · {Math.round(p.effectiveness * 100)}% · {p.broadleaf ? 'Broadleaf' : ''}{p.broadleaf && p.grass ? '+' : ''}{p.grass ? 'Grass' : ''}</p>
+ <p className="text-muted-foreground">${p.cost} · {Math.round(p.effectiveness * 100)}% control · {p.broadleaf ? 'Broadleaf' : ''}{p.broadleaf && p.grass ? '+' : ''}{p.grass ? 'Grass' : ''}</p>
  </button>
  ))}
  </div>
@@ -837,7 +837,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <p className="text-xs font-semibold text-primary uppercase tracking-wider">Decision Preview</p>
  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
  <span className="text-muted-foreground">Coverage:</span>
- <span className="font-medium text-foreground">{Math.round(herbPreview.effectiveCoverage * 100)}%</span>
+ <span className="font-medium text-foreground">{Math.round(herbPreview.effectiveCoverage * 100)}% coverage</span>
  <span className="text-muted-foreground">Drift Risk:</span>
  <span className={`font-medium ${herbPreview.driftRisk > 0.25 ? 'text-warning' : 'text-foreground'}`}>
  {Math.round(herbPreview.driftRisk * 100)}%{herbPreview.driftRisk > 0.25 ? ' ' : ''}
@@ -845,7 +845,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <span className="text-muted-foreground">Est. Weeds Killed:</span>
  <span className="font-medium text-foreground">~{herbPreview.estKill} of {herbPreview.targetable} targetable</span>
  <span className="text-muted-foreground">Time:</span>
- <span className="font-medium text-foreground">{herbPreview.timeHours.toFixed(1)}h</span>
+ <span className="font-medium text-foreground">{herbPreview.timeHours.toFixed(1)} hours</span>
  <span className="text-muted-foreground">Cost:</span>
  <span className="font-medium text-foreground">${herbPreview.product.cost}/acre</span>
  </div>
@@ -882,8 +882,8 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <p className="text-muted-foreground">{t.desc}</p>
  <div className="flex gap-2 mt-1">
  <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">${t.cost}</span>
- <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{t.timeHours}h</span>
- <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(t.effectiveness * 100)}%</span>
+ <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{t.timeHours} hours</span>
+ <span className="px-1.5 py-0.5 rounded bg-secondary text-foreground">{Math.round(t.effectiveness * 100)}% control</span>
  </div>
  </button>
  ))}
@@ -895,9 +895,9 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <span className="text-muted-foreground">Equipment:</span>
  <span className="font-medium text-foreground">{selectedTill.label}</span>
  <span className="text-muted-foreground">Effectiveness:</span>
- <span className="font-medium text-foreground">{Math.round(selectedTill.effectiveness * 100)}%</span>
+ <span className="font-medium text-foreground">{Math.round(selectedTill.effectiveness * 100)}% control</span>
  <span className="text-muted-foreground">Time:</span>
- <span className="font-medium text-foreground">{selectedTill.timeHours}h</span>
+ <span className="font-medium text-foreground">{selectedTill.timeHours} hours</span>
  <span className="text-muted-foreground">Cost:</span>
  <span className="font-medium text-foreground">${selectedTill.cost}/acre</span>
  </div>
@@ -1110,7 +1110,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <div className="p-4 border-t border-border">
  <button onClick={advanceSeason}
  className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90 flex items-center justify-center gap-2">
- {currentSeason === 'late-summer' ? 'Harvest' : 'Next Season'} <ChevronRight className="w-4 h-4" />
+ {currentSeason === 'fall' ? 'Harvest Year 3' : 'Next Year'} <ChevronRight className="w-4 h-4" />
  </button>
  </div>
  </div>
@@ -1150,12 +1150,18 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
   <div className="flex-1 flex overflow-hidden">
   {/* Left: Status Panel */}
   <div className="flex-[2] border-r border-border bg-card overflow-y-auto hidden sm:flex flex-col p-3 space-y-3">
-  <div>
-  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Budget</p>
-  <div className="space-y-1 text-xs">
-  <div className="flex justify-between"><span className="text-muted-foreground">Money Spent:</span><span className="font-bold text-foreground">${totalCost}/acre</span></div>
-  <div className="flex justify-between"><span className="text-muted-foreground">Time Spent:</span><span className="font-bold text-foreground">{totalHours.toFixed(1)}h</span></div>
-  </div>
+  <div className="bg-primary/10 border-2 border-primary/50 rounded-lg p-3">
+    <p className="text-[10px] text-primary uppercase tracking-wider font-bold mb-2">Resources Used</p>
+    <div className="space-y-2">
+      <div>
+        <p className="text-[10px] text-muted-foreground uppercase">Money Spent</p>
+        <p className="font-display font-bold text-2xl text-foreground leading-none">${totalCost}<span className="text-xs text-muted-foreground font-normal">/acre</span></p>
+      </div>
+      <div>
+        <p className="text-[10px] text-muted-foreground uppercase">Time Spent</p>
+        <p className="font-display font-bold text-2xl text-foreground leading-none">{totalHours.toFixed(1)}<span className="text-xs text-muted-foreground font-normal"> hours</span></p>
+      </div>
+    </div>
   </div>
   <div className="border-t border-border pt-3">
   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Weed Status</p>
@@ -1280,7 +1286,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
       </button>
       <button onClick={advanceSeason}
         className="shrink-0 px-4 py-2 rounded-md bg-success text-success-foreground text-xs font-bold">
-        {currentSeason === 'late-summer' ? 'Harvest' : 'Next'} <ChevronRight className="w-3 h-3 inline" />
+        {currentSeason === 'fall' ? 'Harvest' : 'Next Year'} <ChevronRight className="w-3 h-3 inline" />
       </button>
     </div>
   </div>
