@@ -59,17 +59,6 @@ function bestMethod(w: typeof weeds[0]): string {
   return bestMethodFor(w).id;
 }
 
-function bestMethod(w: typeof weeds[0]): string {
-  const m = w.management.toLowerCase();
-  if (m.includes('hand') || m.includes('pull') || m.includes('hoe')) return 'pull';
-  if (m.includes('mow') || m.includes('mechanical') || m.includes('tillage') || m.includes('cultivation')) return 'mow';
-  if (m.includes('cover crop') || m.includes('rotation') || m.includes('compete') || m.includes('cultural')) return 'leave';
-  if (m.includes('herbicide') || m.includes('pre') || m.includes('post') || m.includes('chemical')) return 'spray';
-  const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const fallbacks = ['pull', 'mow', 'leave', 'spray'];
-  return fallbacks[hash % fallbacks.length];
-}
-
 interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: boolean; managed: boolean; correct: boolean; }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
