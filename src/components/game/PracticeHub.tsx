@@ -73,6 +73,33 @@ interface GameDef {
  component: React.ComponentType<{ onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }>;
 }
 
+// Maps a Practice game id to the related Learning Module topic id.
+const GAME_TO_TOPIC: Record<string, string> = {
+  // K-5
+  'weed-or-crop': 'names', 'name-the-weed': 'names', 'leaf-artist': 'monocot-dicot',
+  'taxonomy-tower': 'monocot-dicot', 'look-alike': 'look-alikes', 'life-stages': 'life-stages',
+  'life-cycle-match': 'life-cycles', 'ecology-scramble': 'ecology', 'habitat-mapping': 'habitats',
+  'seed-banks': 'seeds', 'weed-travel': 'seeds', 'invasive-match': 'native-introduced',
+  'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety', 'weed-control': 'control-methods',
+  // 6-8
+  'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
+  'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
+  'native-lookalike': 'look-alikes', 'weed-competitors': 'weed-competitors',
+  'invasive-quiz': 'native-introduced', 'ms-safe-toxic': 'safety',
+  'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
+  'economic-threshold': 'economic-threshold', 'ms-weed-control': 'control-methods',
+  'control-matching': 'herbicide-moa', 'herbicide-applicator': 'herbicide-moa',
+  'ligule-lens': 'monocot-dicot',
+  // 9-12
+  'hs-name-weed': 'names', 'hs-taxonomy': 'taxonomy', 'spot-differences': 'dioecious',
+  'hs-habitat': 'habitats', 'invasive-habitat': 'native-introduced',
+  'hs-field-scout': 'field-scouting', 'hs-lifecycle': 'life-cycles',
+  'sleepy-seeds': 'seed-dormancy', 'allelopathy': 'allelopathy',
+  'form-farm': 'economic-threshold', 'hs-weed-control': 'control-methods',
+  'hs-control-match': 'herbicide-moa', 'crop-doctor': 'crop-injury',
+  'life-stage-maze': 'life-stage-control',
+};
+
 const k5Games: GameDef[] = [
  { id: 'weed-or-crop', name: 'Weed or Crop', Icon: Sprout, category: 'Identification', description: 'A plant image appears — is it a weed or a crop? Think fast!', howToPlay: 'You have 10 seconds per round to decide if the plant shown is a weed or a crop. Tap your answer before time runs out!', component: WeedOrCrop },
  { id: 'leaf-artist', name: 'Leaf Detective', Icon: Palette, category: 'Leaf Morphology', description: 'Identify leaf venation: parallel or netted?', howToPlay: 'Look closely at each leaf. Decide if its veins are parallel (running side by side, like grass) or netted (branching like a net). Track your finds in the side panel.', component: LeafArtist },
