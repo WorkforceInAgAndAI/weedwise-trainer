@@ -1013,13 +1013,26 @@ function TopicContent({
             {grade === "high" && (
               <>
                 <p>
-                  Seed biology is fundamental to weed management strategy. Key concepts include{" "}
-                  <strong>seed rain</strong> (annual seed input), <strong>seed bank dynamics</strong> (persistence and
-                  decay rates), and <strong>dormancy mechanisms</strong> (physical, physiological, and chemical).
+                  Seed biology drives nearly every weed management decision a grower makes. Each year a mature weed
+                  releases new seeds into the field, called <strong>seed rain</strong>. Those seeds join the
+                  <strong> soil seed bank</strong>, the underground reservoir of viable seeds that can germinate now
+                  or wait dormant for years. A single field can hold millions of weed seeds per acre.
                 </p>
                 <p>
-                  Understanding seed dispersal vectors -- wind (anemochory), water (hydrochory), animals (zoochory), and
-                  machinery (anthropochory) -- is critical for predicting weed spread and designing management plans.
+                  The seed bank shifts over time through <strong>seed bank dynamics</strong>: new inputs from seed
+                  rain, losses from germination, predation by insects and rodents, microbial decay, and burial too
+                  deep for emergence. Seeds also use <strong>dormancy mechanisms</strong> (physical, physiological,
+                  or chemical) to delay germination until soil temperature, moisture, and light are right, which is
+                  why one wet spring can pull years of buried seeds out of the bank at once.
+                </p>
+                <p>
+                  Weed seeds spread through four main <strong>dispersal vectors</strong>. <strong>Wind
+                  (anemochory)</strong> carries lightweight seeds with wings or tufts, like dandelion and marestail.
+                  <strong> Water (hydrochory)</strong> floats seeds along ditches, streams, and irrigation lines.
+                  <strong> Animals (zoochory)</strong> move seeds by eating fruit and depositing them, or by
+                  carrying burrs and barbs on fur and feathers. <strong>Humans and machinery (anthropochory)</strong>
+                  spread seeds farther and faster than any other vector through combines, tillage equipment,
+                  vehicles, manure, and contaminated crop seed.
                 </p>
                 <p>
                   The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
