@@ -1110,7 +1110,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <div className="p-4 border-t border-border">
  <button onClick={advanceSeason}
  className="w-full py-3 rounded-md bg-success text-success-foreground font-semibold text-sm hover:opacity-90 flex items-center justify-center gap-2">
- {currentSeason === 'fall' ? 'Harvest' : 'Next Season'} <ChevronRight className="w-4 h-4" />
+ {currentSeason === 'fall' ? 'Harvest Year 3' : 'Next Year'} <ChevronRight className="w-4 h-4" />
  </button>
  </div>
  </div>
@@ -1150,12 +1150,18 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
   <div className="flex-1 flex overflow-hidden">
   {/* Left: Status Panel */}
   <div className="flex-[2] border-r border-border bg-card overflow-y-auto hidden sm:flex flex-col p-3 space-y-3">
-  <div>
-  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Budget</p>
-  <div className="space-y-1 text-xs">
-  <div className="flex justify-between"><span className="text-muted-foreground">Money Spent:</span><span className="font-bold text-foreground">${totalCost}/acre</span></div>
-  <div className="flex justify-between"><span className="text-muted-foreground">Time Spent:</span><span className="font-bold text-foreground">{totalHours.toFixed(1)}h</span></div>
-  </div>
+  <div className="bg-primary/10 border-2 border-primary/50 rounded-lg p-3">
+    <p className="text-[10px] text-primary uppercase tracking-wider font-bold mb-2">Resources Used</p>
+    <div className="space-y-2">
+      <div>
+        <p className="text-[10px] text-muted-foreground uppercase">Money Spent</p>
+        <p className="font-display font-bold text-2xl text-foreground leading-none">${totalCost}<span className="text-xs text-muted-foreground font-normal">/acre</span></p>
+      </div>
+      <div>
+        <p className="text-[10px] text-muted-foreground uppercase">Time Spent</p>
+        <p className="font-display font-bold text-2xl text-foreground leading-none">{totalHours.toFixed(1)}<span className="text-xs text-muted-foreground font-normal"> hours</span></p>
+      </div>
+    </div>
   </div>
   <div className="border-t border-border pt-3">
   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-2">Weed Status</p>
@@ -1280,7 +1286,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
       </button>
       <button onClick={advanceSeason}
         className="shrink-0 px-4 py-2 rounded-md bg-success text-success-foreground text-xs font-bold">
-        {currentSeason === 'fall' ? 'Harvest' : 'Next'} <ChevronRight className="w-3 h-3 inline" />
+        {currentSeason === 'fall' ? 'Harvest' : 'Next Year'} <ChevronRight className="w-3 h-3 inline" />
       </button>
     </div>
   </div>
