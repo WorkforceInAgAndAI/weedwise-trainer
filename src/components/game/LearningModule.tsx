@@ -6,7 +6,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Play, ThumbsUp, RotateCcw } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 
@@ -96,7 +96,7 @@ const TOPICS: Topic[] = [
     name: "Monocot vs Dicot",
     icon: "monocot",
     description: "Distinguish monocots from dicots by comparing leaf venation, seed structure, and overall growth habit.",
-    grades: ["elementary", "middle", "high"],
+    grades: ["elementary", "middle"],
     category: "identification",
   },
   {
@@ -388,9 +388,219 @@ function SubheadingBox({
 
 interface Props {
   onClose: () => void;
+  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
 }
 
-export default function LearningModule({ onClose }: Props) {
+/**
+ * Elementary "Weed Names & ID" flashcard deck.
+ * One weed per card with large image, sorted into "Confident" and "Review" buckets.
+ */
+function ElementaryNamesFlashcards({
+  weeds: deck,
+  onSelectWeed,
+}: {
+  weeds: Weed[];
+  onSelectWeed: (w: Weed) => void;
+}) {
+  const [index, setIndex] = useState(0);
+  const [confident, setConfident] = useState<string[]>([]);
+  const [review, setReview] = useState<string[]>([]);
+
+  const total = deck.length;
+  const done = index >= total;
+  const current = !done ? deck[index] : null;
+
+  const reset = () => {
+    setIndex(0);
+    setConfident([]);
+    setReview([]);
+  };
+
+  const sortCard = (bucket: "confident" | "review") => {
+    if (!current) return;
+    if (bucket === "confident") setConfident((p) => [...p, current.id]);
+    else setReview((p) => [...p, current.id]);
+    setIndex((i) => i + 1);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
+        <p>
+          A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
+          a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
+          plants we want to keep, like crops in a farmer's field.
+        </p>
+        <p>
+          Each weed has a <strong>common name</strong> we use every day. Knowing weed names helps us
+          <strong> identify, manage, and stay safe</strong> around them.
+        </p>
+      </div>
+
+      {!done && current ? (
+        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-4">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Card {index + 1} of {total}
+            </span>
+            <span>
+              <span className="text-success font-semibold">Confident: {confident.length}</span>
+              {" · "}
+              <span className="text-terracotta font-semibold">Review: {review.length}</span>
+            </span>
+          </div>
+
+          <div className="w-full aspect-[4/3] max-h-80 mx-auto rounded-xl overflow-hidden bg-muted">
+            <WeedImage weedId={current.id} stage="whole" className="w-full h-full" />
+          </div>
+
+          <div className="text-center space-y-1">
+            <ClickableWeedName
+              weed={current}
+              onSelect={onSelectWeed}
+              className="font-display text-2xl"
+            />
+            <p className="text-xs text-muted-foreground">
+              {current.plantType} • {current.lifeCycle}
+            </p>
+          </div>
+
+          <div className="bg-primary/10 rounded-lg px-3 py-2 text-center">
+            <p className="text-sm text-primary">
+              <span className="font-bold">Memory trick:</span> {current.memoryHook}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <button
+              onClick={() => sortCard("review")}
+              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-terracotta/40 bg-terracotta/5 text-terracotta font-semibold hover:bg-terracotta/15 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Want to review more
+            </button>
+            <button
+              onClick={() => sortCard("confident")}
+              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-success/40 bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
+            >
+              <ThumbsUp className="w-4 h-4" />
+              I'm confident
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-5">
+          <div className="text-center">
+            <h3 className="font-display font-bold text-foreground text-xl">Great work!</h3>
+            <p className="text-sm text-muted-foreground">You sorted all {total} weeds.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-success/40 bg-success/5 p-4">
+              <p className="font-display font-bold text-success text-sm mb-2">
+                Confident ({confident.length})
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {confident.map((id) => {
+                  const w = deck.find((d) => d.id === id);
+                  if (!w) return null;
+                  return (
+                    <div key={id} className="text-center">
+                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      </div>
+                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="rounded-lg border border-terracotta/40 bg-terracotta/5 p-4">
+              <p className="font-display font-bold text-terracotta text-sm mb-2">
+                Want to review more ({review.length})
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {review.map((id) => {
+                  const w = deck.find((d) => d.id === id);
+                  if (!w) return null;
+                  return (
+                    <div key={id} className="text-center">
+                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      </div>
+                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              onClick={reset}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Start over
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Maps a topic + grade to a Practice Hub game id. */
+const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, string>>>> = {
+  names: { elementary: "name-the-weed", middle: "ms-name-weed", high: "hs-name-weed" },
+  "monocot-dicot": { elementary: "taxonomy-tower", middle: "ms-taxonomy" },
+  "look-alikes": { elementary: "look-alike", middle: "native-lookalike", high: "spot-differences" },
+  "native-introduced": { elementary: "invasive-id", middle: "weed-origins", high: "invasive-habitat" },
+  taxonomy: { middle: "ms-taxonomy", high: "hs-taxonomy" },
+  dioecious: { high: "spot-differences" },
+  "life-stages": { elementary: "life-stages", middle: "life-stage-control", high: "life-stage-maze" },
+  "life-cycles": { elementary: "life-cycle-match", middle: "ms-lifecycle", high: "hs-lifecycle" },
+  seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
+  "seed-dormancy": { high: "sleepy-seeds" },
+  habitats: { elementary: "habitat-mapping", middle: "ms-habitat", high: "hs-habitat" },
+  ecology: { elementary: "ecology-scramble", middle: "pest-id" },
+  safety: { elementary: "safe-vs-toxic", middle: "ms-safe-toxic" },
+  "control-methods": { elementary: "weed-control", middle: "ms-weed-control", high: "hs-weed-control" },
+  "field-scouting": { middle: "field-scout", high: "hs-field-scout" },
+  "weed-competitors": { middle: "weed-competitors" },
+  "economic-threshold": { middle: "economic-threshold", high: "form-farm" },
+  allelopathy: { high: "allelopathy" },
+  "herbicide-moa": { middle: "control-matching", high: "hs-control-match" },
+  "crop-injury": { high: "crop-doctor" },
+  "life-stage-control": { high: "life-stage-maze" },
+};
+
+const GRADE_TO_HUB: Record<GradeLevel, string> = { elementary: "k5", middle: "68", high: "912" };
+
+function PracticeButton({
+  topicId,
+  grade,
+  onOpenPractice,
+}: {
+  topicId: TopicId;
+  grade: GradeLevel;
+  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
+}) {
+  if (!onOpenPractice) return null;
+  const gameId = PRACTICE_GAME_MAP[topicId]?.[grade];
+  if (!gameId) return null;
+  return (
+    <button
+      onClick={() => onOpenPractice(grade, gameId)}
+      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
+    >
+      <Play className="w-4 h-4" />
+      Try this in a Practice Game
+    </button>
+  );
+}
+
+export default function LearningModule({ onClose, onOpenPractice }: Props) {
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel>("elementary");
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(null);
   const [selectedWeed, setSelectedWeed] = useState<Weed | null>(null);
@@ -522,10 +732,15 @@ export default function LearningModule({ onClose }: Props) {
             </aside>
             {/* Topic content */}
             <div className="min-w-0">
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <h2 className="text-lg font-display font-bold text-foreground">
                   {TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
+                <PracticeButton
+                  topicId={selectedTopic}
+                  grade={selectedGrade}
+                  onOpenPractice={onOpenPractice}
+                />
               </div>
               <TopicContent
                 topicId={selectedTopic}
@@ -533,6 +748,7 @@ export default function LearningModule({ onClose }: Props) {
                 topicWeeds={getTopicWeeds(selectedTopic)}
                 onSelectWeed={setSelectedWeed}
                 viewMode={viewMode}
+                onOpenPractice={onOpenPractice}
               />
             </div>
           </div>
@@ -551,12 +767,14 @@ function TopicContent({
   topicWeeds,
   onSelectWeed,
   viewMode,
+  onOpenPractice,
 }: {
   topicId: TopicId;
   grade: GradeLevel;
   topicWeeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   viewMode: "list" | "box";
+  onOpenPractice?: (grade: GradeLevel, gameId?: string) => void;
 }) {
   switch (topicId) {
     /* ═══════════════════════════════════════════════════════════
@@ -564,57 +782,7 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "names":
       if (grade === "elementary") {
-        return (
-          <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Common Names and Descriptions</p>
-              <p>
-                There are lots of plants that can be weeds. Each weed is different in how it looks. Weeds can also look
-                similar to one another.
-              </p>
-              <p>
-                We use words called <strong>adjectives</strong> to describe weeds based on their <strong>color, leaf
-                shape, leaf number, height</strong>, and other features.
-              </p>
-              <p>
-                Knowing the description of weeds and their common names helps us <strong>identify weeds, manage
-                them</strong>, and <strong>keep humans and animals safe</strong>.
-              </p>
-            </div>
-
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Memory Tricks</p>
-              <p>
-                We can use "memory tricks" to help us remember weed names and appearances. A memory trick connects
-                something about the weed -- like its shape, color, or name -- to something you already know.
-              </p>
-            </div>
-
-            {/* Weed examples with descriptions and memory hooks */}
-            <h3 className="font-display font-bold text-foreground text-sm">
-              Weed Examples ({topicWeeds.length} species)
-            </h3>
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div className="space-y-1">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <p className="text-xs text-muted-foreground">{w.plantType} • {w.lifeCycle}</p>
-                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                    {w.traits.slice(0, 2).map((t, i) => (
-                      <li key={i}>- {t}</li>
-                    ))}
-                  </ul>
-                  <div className="bg-primary/10 rounded px-2 py-1 mt-1">
-                    <p className="text-xs text-primary"><span className="font-bold">Memory trick:</span> {w.memoryHook}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
+        return <ElementaryNamesFlashcards weeds={topicWeeds} onSelectWeed={onSelectWeed} />;
       }
 
       if (grade === "middle") {
@@ -845,13 +1013,26 @@ function TopicContent({
             {grade === "high" && (
               <>
                 <p>
-                  Seed biology is fundamental to weed management strategy. Key concepts include{" "}
-                  <strong>seed rain</strong> (annual seed input), <strong>seed bank dynamics</strong> (persistence and
-                  decay rates), and <strong>dormancy mechanisms</strong> (physical, physiological, and chemical).
+                  Seed biology drives nearly every weed management decision a grower makes. Each year a mature weed
+                  releases new seeds into the field, called <strong>seed rain</strong>. Those seeds join the
+                  <strong> soil seed bank</strong>, the underground reservoir of viable seeds that can germinate now
+                  or wait dormant for years. A single field can hold millions of weed seeds per acre.
                 </p>
                 <p>
-                  Understanding seed dispersal vectors -- wind (anemochory), water (hydrochory), animals (zoochory), and
-                  machinery (anthropochory) -- is critical for predicting weed spread and designing management plans.
+                  The seed bank shifts over time through <strong>seed bank dynamics</strong>: new inputs from seed
+                  rain, losses from germination, predation by insects and rodents, microbial decay, and burial too
+                  deep for emergence. Seeds also use <strong>dormancy mechanisms</strong> (physical, physiological,
+                  or chemical) to delay germination until soil temperature, moisture, and light are right, which is
+                  why one wet spring can pull years of buried seeds out of the bank at once.
+                </p>
+                <p>
+                  Weed seeds spread through four main <strong>dispersal vectors</strong>. <strong>Wind
+                  (anemochory)</strong> carries lightweight seeds with wings or tufts, like dandelion and marestail.
+                  <strong> Water (hydrochory)</strong> floats seeds along ditches, streams, and irrigation lines.
+                  <strong> Animals (zoochory)</strong> move seeds by eating fruit and depositing them, or by
+                  carrying burrs and barbs on fur and feathers. <strong>Humans and machinery (anthropochory)</strong>
+                  spread seeds farther and faster than any other vector through combines, tillage equipment,
+                  vehicles, manure, and contaminated crop seed.
                 </p>
                 <p>
                   The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
@@ -896,22 +1077,22 @@ function TopicContent({
         {
           stage: "seed",
           label: "Seed",
-          desc: "A seed is a small, protective package containing a baby plant and food, designed to grow into a new plant like a flower or tree when given water, warmth, and soil. They are the start of a plant's life cycle and come in many shapes, sizes, and colors, often found inside fruits or produced by flowers. Part of each seed is the cotyledon, a place where a seed stores its food to give it energy to grow. Seeds can have different shapes and characteristics to help protect and move them in and around the environment.",
+          desc: "A tiny package that holds a baby plant and the food it needs to start growing.",
         },
         {
           stage: "seedling",
           label: "Seedling",
-          desc: "A seedling is a weed just beginning to take root. Seedlings are the first stage of life a weed goes through after it emerges from the seed. Weeds can be in the seedling stage until they grow more than two leaves. Then, they move on to the vegetative stage. Seedlings can look just as different as the plants they come from.",
+          desc: "A baby weed that has just sprouted out of the seed with its first little leaves.",
         },
         {
           stage: "vegetative",
           label: "Vegetative",
-          desc: "Think of a weed in a vegetative stage as a growing teenager. The weed is getting larger and taller, and it is growing more leaves. Weeds in the vegetative stage do not have flowers or seed pods yet.",
+          desc: "A growing weed, getting taller and adding more leaves. No flowers yet.",
         },
         {
           stage: "flower",
           label: "Reproductive",
-          desc: "Weeds in the reproductive stage are getting ready to release seeds, grow flowers, and attract pollinators to aid reproduction. Each weed looks different at this stage, but they may share some common features. Weeds in the reproductive stage may have flower buds, flowers, seed pods, or seed heads.",
+          desc: "A grown-up weed making flowers and brand new seeds.",
         },
       ];
 
@@ -947,13 +1128,9 @@ function TopicContent({
               <>
                 <p className="font-semibold text-primary">Life Stages</p>
                 <p>
-                  Just like people, weeds go through different stages of development. Weeds start as seedlings and grow
-                  into mature plants through five stages: <strong>seed, seedling, vegetative, reproductive, and
-                  maturity</strong>.
-                </p>
-                <p>
-                  Weeds look different in each stage of life. Knowing what weeds look like in different life stages can
-                  help us <strong>identify and manage them</strong>.
+                  Just like people, weeds grow up. They go through five stages:
+                  <strong> seed, seedling, vegetative, reproductive, and mature</strong>. Knowing what a
+                  weed looks like at each stage helps us spot it and stop it.
                 </p>
               </>
             ) : (
@@ -971,6 +1148,38 @@ function TopicContent({
             )}
           </div>
 
+          {/* Elementary: visual cycle diagram */}
+          {grade === "elementary" && (
+            <div className="bg-card border border-border rounded-xl p-5">
+              <p className="font-display font-bold text-foreground text-sm text-center mb-4">
+                The Weed Life Cycle
+              </p>
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                {[
+                  { label: "Seed", color: "bg-amber-100 text-amber-900 border-amber-300" },
+                  { label: "Seedling", color: "bg-lime-100 text-lime-900 border-lime-300" },
+                  { label: "Vegetative", color: "bg-success/15 text-success border-success/40" },
+                  { label: "Reproductive", color: "bg-pink-100 text-pink-900 border-pink-300" },
+                  { label: "Mature", color: "bg-primary/10 text-primary border-primary/40" },
+                ].map((s, i, arr) => (
+                  <div key={s.label} className="flex items-center gap-2">
+                    <div
+                      className={`w-20 h-20 rounded-full border-2 ${s.color} flex items-center justify-center text-center text-xs font-bold leading-tight px-1`}
+                    >
+                      {s.label}
+                    </div>
+                    <span className="text-muted-foreground text-2xl font-bold">→</span>
+                    {i === arr.length - 1 && (
+                      <div className="text-xs text-muted-foreground italic ml-1">
+                        and back to <strong>seeds</strong>!
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Stage description cards */}
           {grade === "elementary" ? (
             <div className="space-y-3">
@@ -983,9 +1192,8 @@ function TopicContent({
               <div className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <div className="font-bold text-foreground text-sm">Maturity</div>
                 <p className="text-xs text-muted-foreground">
-                  A weed reaches maturity after it has gone through all the life stages and spread its seeds to begin
-                  new weeds. Mature weeds usually have more leaves, flowers, and other parts than younger weeds. At the
-                  end of a growing season, a mature weed may die on its own.
+                  A grown-up weed that has spread its seeds. At the end of the season it may die, but its seeds
+                  start the cycle all over again.
                 </p>
               </div>
             </div>
@@ -1008,9 +1216,11 @@ function TopicContent({
                 <div className="flex items-center gap-3">
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold" />
                   {grade !== "elementary" && <span className="text-xs text-primary italic">{w.scientificName}</span>}
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
-                    {w.family}
-                  </span>
+                  {grade !== "elementary" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                      {w.family}
+                    </span>
+                  )}
                 </div>
                 <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
                   {LIFE_STAGE_INFO.map((s) => (
@@ -1253,7 +1463,7 @@ function TopicContent({
 
       const lcGroups = [
         { key: "Annual", icon: "", desc: "Completes its life cycle in one growing season." },
-        { key: "Biennial", icon: "", desc: "Takes two years -- rosette in year 1, flowers and seeds in year 2." },
+        { key: "Biennial", icon: "", desc: "Takes two years — rosette in year 1, flowers and seeds in year 2." },
         { key: "Perennial", icon: "", desc: "Lives for multiple years, regrowing from roots, rhizomes, or tubers." },
       ];
 
@@ -1339,7 +1549,7 @@ function TopicContent({
               <p className="text-sm text-foreground">
                 <strong>Biennial</strong> weeds complete their life cycle in <strong>two years</strong>. During the
                 first year, weeds grow vegetatively and develop deep root systems to help gather nutrients. Biennial
-                weeds form a <strong>rosette</strong> during their first year -- a flat circle of leaves close to the
+                weeds form a <strong>rosette</strong> during their first year — a flat circle of leaves close to the
                 ground. During their second year of life, they grow a stalk, flowers, and seeds. After spreading its
                 seeds, the weed dies.
               </p>
@@ -1424,7 +1634,7 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Annual Weeds</p>
               <p className="text-sm text-foreground">
-                Annual weeds complete their entire life cycle -- from seed germination to seed production and death --
+                Annual weeds complete their entire life cycle — from seed germination to seed production and death --
                 within a <strong>single growing season</strong>. They rely entirely on prolific seed production for
                 survival.
               </p>
@@ -1758,7 +1968,7 @@ function TopicContent({
             <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
               <p className="font-bold text-accent">How Invasive Weeds Travel</p>
               <p>
-                Invasive weeds are like uninvited guests that show up, take over, and refuse to leave -- and they
+                Invasive weeds are like uninvited guests that show up, take over, and refuse to leave — and they
                 usually arrive because of human activity, even when it's completely accidental. Seeds can hitchhike
                 on the muddy tires of a tractor, hide inside a bag of crop seed, cling to an animal's fur, or float
                 down a river to a new location.
@@ -1904,22 +2114,30 @@ function TopicContent({
           {
             key: "Warm-Season / Full Sun",
             label: "Warm-Season Weeds",
-            desc: "Warm-season weeds thrive in hot summer conditions with full sun exposure. They germinate when soil temperatures rise in late spring and grow most vigorously during the hottest months. Warm-season weeds are common in corn, soybean, and sorghum fields across the Midwest.",
+            desc: "These weeds love hot, sunny weather. They wake up in late spring and grow the most when summer is hottest, like in corn and soybean fields.",
+            color: "bg-amber-500/70",
+            region: "Southern & central US (warm summers)",
           },
           {
             key: "Cool-Season / Early Spring",
             label: "Cool-Season Weeds",
-            desc: "Cool-season weeds germinate in fall or early spring when temperatures are lower. They grow rapidly before warm-season crops are planted and can compete early in the growing season. Many are winter annuals that overwinter as rosettes.",
+            desc: "These weeds like cool weather. They sprout in fall or early spring, before it gets too hot.",
+            color: "bg-sky-500/70",
+            region: "Northern US (cool springs and falls)",
           },
           {
             key: "Wet / Poorly Drained",
             label: "Wet-Habitat Weeds",
-            desc: "Wet-habitat weeds are adapted to poorly drained soils, field edges near waterways, and areas with high water tables. They often have specialized tissues for waterlogged conditions and can indicate drainage problems in fields.",
+            desc: "These weeds love soggy, wet soil. You'll find them near ponds, ditches, and wet field edges.",
+            color: "bg-blue-700/70",
+            region: "Wet areas, river valleys, the Great Lakes region",
           },
           {
             key: "Dry / Disturbed",
             label: "Dry-Habitat Weeds",
-            desc: "Dry-habitat weeds are adapted to well-drained, often sandy soils and disturbed areas like roadsides, construction sites, and field margins. They are typically drought-tolerant with deep root systems or water-conserving leaf structures.",
+            desc: "These weeds can live with very little water. They pop up on roadsides, sandy spots, and dry, dug-up land.",
+            color: "bg-orange-600/70",
+            region: "Western & southwestern US (dry plains)",
           },
         ];
 
@@ -1928,33 +2146,73 @@ function TopicContent({
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">Habitats</p>
               <p>
-                Some people like to live in warm areas with lots of sun. Others like to live in cooler regions with lots
-                of rain. Weeds are just the same! Weeds live in different areas based on their preferences and{" "}
-                <strong>adaptations</strong> to survive.
+                A <strong>habitat</strong> is the kind of place where a plant likes to live. Some weeds love hot
+                sunny spots, others like cool or wet places. Knowing where a weed likes to grow helps us guess where
+                we will find it.
               </p>
-              <p>
-                An <strong>adaptation</strong> is a new trait that is developed to help a weed survive in a specific
-                area. Knowing what habitats weeds like to grow in can help us <strong>predict where weeds will
-                grow</strong>.
+            </div>
+
+            {/* Climate map */}
+            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-sm text-center">
+                Where These Habitats Live in the U.S.
               </p>
+              <div className="relative w-full max-w-md mx-auto">
+                <svg viewBox="0 0 300 180" className="w-full h-auto">
+                  {/* Simplified continental US outline */}
+                  <path
+                    d="M30,60 L60,40 L120,30 L180,30 L230,40 L270,55 L275,90 L260,130 L220,150 L160,155 L100,150 L60,140 L35,110 Z"
+                    fill="hsl(var(--muted))"
+                    stroke="hsl(var(--border))"
+                    strokeWidth="1.5"
+                  />
+                  {/* Cool-Season: Northern US */}
+                  <path d="M60,40 L120,30 L180,30 L230,40 L235,70 L180,75 L120,72 L65,72 Z" fill="rgb(56 189 248 / 0.65)" />
+                  {/* Warm-Season: Southern central US */}
+                  <path d="M65,72 L235,70 L240,110 L200,130 L120,128 L65,115 Z" fill="rgb(245 158 11 / 0.6)" />
+                  {/* Dry: Southwest */}
+                  <path d="M30,60 L65,72 L65,115 L60,140 L35,110 Z" fill="rgb(234 88 12 / 0.6)" />
+                  {/* Wet: Southeast & Great Lakes */}
+                  <path d="M200,130 L240,110 L260,130 L220,150 L160,155 L120,128 Z" fill="rgb(29 78 216 / 0.55)" />
+                </svg>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {elemHabitats.map((h) => (
+                  <div key={h.key} className="flex items-center gap-2">
+                    <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
+                    <span className="text-foreground">
+                      <strong>{h.label}</strong>
+                      <span className="text-muted-foreground"> — {h.region}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {elemHabitats.map((h) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
               return (
                 <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                  <p className="font-display font-bold text-foreground text-base">{h.label}</p>
-                  <p className="text-sm text-foreground">{h.desc}</p>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {grouped.slice(0, 8).map((w) => (
-                      <div key={w.id} className="text-center">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
+                    <p className="font-display font-bold text-foreground text-base">
+                      {h.label} <span className="text-xs text-muted-foreground font-normal">({grouped.length} species)</span>
+                    </p>
                   </div>
+                  <p className="text-sm text-foreground">{h.desc}</p>
+                  <div className="overflow-x-auto pb-2">
+                    <div className="flex gap-3" style={{ minWidth: `${Math.max(grouped.length, 1) * 7}rem` }}>
+                      {grouped.map((w) => (
+                        <div key={w.id} className="text-center shrink-0 w-24">
+                          <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+                            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          </div>
+                          <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">← Scroll to see all {grouped.length} →</p>
                 </div>
               );
             })}
@@ -2093,48 +2351,55 @@ function TopicContent({
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
               <p>
-                You learned that weeds grow in different areas based on their preferences and adaptations. Weeds living
-                in different areas have different needs. We can group weeds into three categories based on what kind of
-                needs they have in their environment.
+                Different weeds need different things to live. We sort weeds into three groups based on how and
+                where they get what they need: <strong>terrestrial</strong> (on land), <strong>aquatic</strong>
+                (in water), and <strong>parasitic</strong> (taking food from other plants).
               </p>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Terrestrial Weeds</p>
-              <p className="text-sm text-foreground">
-                <strong>Terrestrial weeds</strong> are weeds that grow on land. Terrestrial weeds need <strong>soil to
-                root into, rainfall, and open air space</strong> to keep them alive.
+              <p className="font-display font-bold text-foreground text-base">
+                Terrestrial Weeds <span className="text-xs text-muted-foreground font-normal">({terrestrial.length})</span>
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {terrestrial.slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Aquatic Weeds</p>
               <p className="text-sm text-foreground">
-                <strong>Aquatic weeds</strong> grow near water or in water. They can be underwater or sticking out of
-                the water. Aquatic weeds have different needs than terrestrial weeds. Aquatic weeds need{" "}
-                <strong>water to grow in, underwater sunlight, and nutrients dissolved in the water</strong>. These
-                special adaptations help aquatic weeds survive in wet areas.
+                <strong>Terrestrial weeds</strong> grow on land. They need <strong>soil, rain, and air</strong> to
+                live, just like the plants in your yard.
               </p>
-              {aquatic.length > 0 && (
-                <div className="grid grid-cols-3 gap-2">
-                  {aquatic.map((w) => (
-                    <div key={w.id} className="text-center">
-                      <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+              <div className="overflow-x-auto pb-2">
+                <div className="flex gap-3" style={{ minWidth: `${Math.max(terrestrial.length, 1) * 7}rem` }}>
+                  {terrestrial.map((w) => (
+                    <div key={w.id} className="text-center shrink-0 w-24">
+                      <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
                         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
                   ))}
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground">← Scroll to see all {terrestrial.length} →</p>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">
+                Aquatic Weeds <span className="text-xs text-muted-foreground font-normal">({aquatic.length})</span>
+              </p>
+              <p className="text-sm text-foreground">
+                <strong>Aquatic weeds</strong> live in or right next to water. They need <strong>water, sunlight,
+                and nutrients in the water</strong> to grow.
+              </p>
+              {aquatic.length > 0 && (
+                <div className="overflow-x-auto pb-2">
+                  <div className="flex gap-3" style={{ minWidth: `${Math.max(aquatic.length, 1) * 7}rem` }}>
+                    {aquatic.map((w) => (
+                      <div key={w.id} className="text-center shrink-0 w-24">
+                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
+                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        </div>
+                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -2142,9 +2407,8 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Parasitic Weeds</p>
               <p className="text-sm text-foreground">
-                <strong>Parasitic weeds</strong> do not make their own food. Instead, they steal food and energy from
-                other plants called <strong>hosts</strong>. To steal nutrients from a host, they need special roots to
-                attach themselves to the host plant.
+                <strong>Parasitic weeds</strong> can't make their own food. They use special roots to grab food
+                and water from another plant, called the <strong>host</strong>.
               </p>
             </div>
           </div>
@@ -2157,7 +2421,7 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
             <p>
-              Not all weeds grow the same way or in the same places -- some grow on land, some grow in water, and some
+              Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
               actually steal nutrients from other plants!
             </p>
             <p>
@@ -2421,7 +2685,7 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Some weeds are master disguisers -- they look almost identical to crop plants or harmless native
+                  Some weeds are master disguisers — they look almost identical to crop plants or harmless native
                   plants, which can trick even experienced farmers. Misidentification can result in missed treatment
                   opportunities, unnecessary herbicide applications, crop damage from incorrectly targeted spraying, or
                   failure to detect a problematic species before it becomes well established.
@@ -2685,7 +2949,7 @@ function TopicContent({
         {
           key: "pre-emergent",
           label: "General Pre-Emergent Herbicide",
-          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical -- applying too early or too late reduces efficacy significantly.",
+          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical — applying too early or too late reduces efficacy significantly.",
           example:
             "Applying pendimethalin or S-metolachlor to corn fields before planting to prevent annual grass and small-seeded broadleaf emergence.",
         },
@@ -2759,7 +3023,7 @@ function TopicContent({
             ) : (
               <>
                 <p>
-                  Controlling weeds isn't just about spraying chemicals -- there's actually a whole toolbox of strategies
+                  Controlling weeds isn't just about spraying chemicals — there's actually a whole toolbox of strategies
                   that farmers can use including <strong>cultural, mechanical, biological, and chemical</strong> methods.
                 </p>
               </>
@@ -2827,7 +3091,7 @@ function TopicContent({
                 <>
                   <p className="text-xs text-muted-foreground">
                     Herbicides work in different ways to kill weeds. Scientists group them by their
-                    <strong> mode of action (MOA)</strong> -- the specific way the chemical disrupts the weed's biology.
+                    <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
                   </p>
                   <div className="space-y-2">
                     {getMiddleSchoolMOAs().map(h => (
@@ -2973,7 +3237,7 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Weeds aren't just competing with crops -- they're also fighting each other for space, sunlight, water,
+                  Weeds aren't just competing with crops — they're also fighting each other for space, sunlight, water,
                   and nutrients in a fierce natural battle.
                 </p>
                 <p>
@@ -3047,8 +3311,8 @@ function TopicContent({
                   the damage it causes to a crop is worth more than what it would cost to control it.
                 </p>
                 <p>
-                  Below this threshold, the expense of treatment -- including the cost of herbicides, equipment, fuel,
-                  and labor -- exceeds the value of the yield that would be lost to weed competition, making treatment
+                  Below this threshold, the expense of treatment — including the cost of herbicides, equipment, fuel,
+                  and labor — exceeds the value of the yield that would be lost to weed competition, making treatment
                   economically counterproductive.
                 </p>
                 <p>
@@ -3070,7 +3334,7 @@ function TopicContent({
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                 <p className="font-bold text-foreground text-sm">Below Threshold</p>
                 <p className="text-xs text-muted-foreground">
-                  Cost of treatment is greater than the value of crop loss. No action needed -- save your money.
+                  Cost of treatment is greater than the value of crop loss. No action needed — save your money.
                 </p>
               </div>
               <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
@@ -3134,7 +3398,7 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Taxonomy is the system scientists use to organize and name every living thing on Earth -- like a giant
+                  Taxonomy is the system scientists use to organize and name every living thing on Earth — like a giant
                   filing system for nature.
                 </p>
                 <p>
@@ -3142,7 +3406,7 @@ function TopicContent({
                   into a structured hierarchy based on shared characteristics and evolutionary relationships. In plant
                   science, this hierarchy runs from broad categories like <strong>Kingdom</strong> and{" "}
                   <strong>Division</strong> down through <strong>Family</strong>, <strong>Genus</strong>, and{" "}
-                  <strong>Species</strong> -- with each level becoming more specific.
+                  <strong>Species</strong> — with each level becoming more specific.
                 </p>
                 <p>
                   Every weed species is assigned a two-part scientific name, known as a <strong>binomial</strong>,
@@ -3499,7 +3763,7 @@ function TopicContent({
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Diagnosis Tip</p>
-            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> -- whether it appears first on leaves, stems, or roots -- agronomists can often determine which herbicide group caused the injury.</p>
+            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> — whether it appears first on leaves, stems, or roots — agronomists can often determine which herbicide group caused the injury.</p>
           </div>
         </div>
       );
@@ -3511,7 +3775,7 @@ function TopicContent({
     case "life-stage-control": {
       const STAGE_CONTROL = [
         { stage: "Seed (Seed Bank)", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
-        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal -- most cost-effective window" },
+        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
         { stage: "Vegetative", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
         { stage: "Reproductive", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
         { stage: "Mature / Dispersal", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },

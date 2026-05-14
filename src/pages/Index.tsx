@@ -38,6 +38,12 @@ const Index = () => {
   const [showStats, setShowStats] = useState(false);
   const [showReferences, setShowReferences] = useState(false);
   const [globalGrade, setGlobalGrade] = useState<GradeLevel>("elementary");
+  const [practiceInitial, setPracticeInitial] = useState<{ grade?: string; gameId?: string } | null>(null);
+
+  const openPractice = (grade?: string, gameId?: string) => {
+    setPracticeInitial({ grade, gameId });
+    setShowPracticeHub(true);
+  };
 
   const { checkBadges, loadEarned } = useBadgeChecker(session?.studentId ?? null);
   const { createSession, updateSession } = useSessionPersistence(session?.studentId ?? null);
@@ -124,13 +130,30 @@ const Index = () => {
           }}
         />
       )}
-      {showLearning && <LearningModule onClose={() => setShowLearning(false)} />}
+      {showLearning && (
+        <LearningModule
+          onClose={() => setShowLearning(false)}
+          onOpenPractice={(grade, gameId) => {
+            setShowLearning(false);
+            openPractice(grade, gameId);
+          }}
+        />
+      )}
       {showClassJoin && <ClassJoinFlow onClose={() => setShowClassJoin(false)} />}
       {showDashboard && <InstructorDashboard onClose={() => setShowDashboard(false)} />}
       {showLeaderboard && <StudentLeaderboard onClose={() => setShowLeaderboard(false)} />}
       {showCompetition && <CompetitionMode onClose={() => setShowCompetition(false)} />}
       {showFarmMode && <FarmMode onClose={() => setShowFarmMode(false)} />}
-      {showPracticeHub && <PracticeHub onClose={() => setShowPracticeHub(false)} />}
+      {showPracticeHub && (
+        <PracticeHub
+          onClose={() => {
+            setShowPracticeHub(false);
+            setPracticeInitial(null);
+          }}
+          initialGrade={practiceInitial?.grade}
+          initialGameId={practiceInitial?.gameId}
+        />
+      )}
       {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}
       {showReferences && <ReferencesPage onClose={() => setShowReferences(false)} />}
     </div>
