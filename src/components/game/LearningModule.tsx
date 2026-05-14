@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { weeds } from "@/data/weeds";
 import type { GradeLevel, Weed } from "@/types/game";
 import { GRADE_NAMES, GRADE_RANGES } from "@/data/phases";
@@ -6,7 +6,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Play, ThumbsUp, RotateCcw } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 
@@ -96,7 +96,7 @@ const TOPICS: Topic[] = [
     name: "Monocot vs Dicot",
     icon: "monocot",
     description: "Distinguish monocots from dicots by comparing leaf venation, seed structure, and overall growth habit.",
-    grades: ["elementary", "middle", "high"],
+    grades: ["elementary", "middle"],
     category: "identification",
   },
   {
