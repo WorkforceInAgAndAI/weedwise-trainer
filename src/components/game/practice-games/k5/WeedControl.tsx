@@ -60,7 +60,7 @@ function bestMethod(w: typeof weeds[0]): string {
   return bestMethodFor(w).id;
 }
 
-interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: boolean; managed: boolean; correct: boolean; }
+interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: boolean; managed: boolean; correct: boolean; chosenMethodId?: string; }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
@@ -127,7 +127,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     const w = weedState[activeWeed];
     const correct = methodId === bestMethod(w.weed);
     setMethodChoice(methodId);
-    setWeedState(prev => prev.map((fw, i) => i === activeWeed ? { ...fw, managed: true, correct } : fw));
+    setWeedState(prev => prev.map((fw, i) => i === activeWeed ? { ...fw, managed: true, correct, chosenMethodId: methodId } : fw));
     setPhase('manageFeedback');
     if (weedState.filter(w => w.managed).length + 1 >= weedState.length) {
       setTimeout(() => setDone(true), 2000);
@@ -306,8 +306,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         </div>
         <ul className="p-3 space-y-2">
           {weedState.map((fw, i) => {
-            const chosen = fw.managed ? METHOD_LIBRARY[methodChoice && i === activeWeed ? methodChoice : '']?.label : null;
-            // Stored chosen method in fw isn't tracked — show generic outcome
+            const chosenLabel = fw.chosenMethodId ? METHOD_LIBRARY[fw.chosenMethodId]?.label : null;
             return (
               <li key={i} className={`flex items-start gap-2 p-2 rounded-lg border ${fw.managed ? (fw.correct ? 'border-green-500/40 bg-green-500/5' : 'border-destructive/40 bg-destructive/5') : 'border-border bg-secondary/40'}`}>
                 <div className="w-10 h-10 rounded-md overflow-hidden border border-border shrink-0">
@@ -315,9 +314,16 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground truncate">{fw.identified || fw.managed ? fw.weed.commonName : `Weed #${i + 1}`}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {fw.managed ? (fw.correct ? `✓ ${bestMethodFor(fw.weed).label}` : `✗ Best: ${bestMethodFor(fw.weed).label}`) : (fw.identified ? 'Pick a control method' : 'Not yet identified')}
-                  </p>
+                  {fw.managed ? (
+                    <>
+                      <p className={`text-[10px] font-semibold ${fw.correct ? 'text-green-600' : 'text-destructive'}`}>
+                        {fw.correct ? '✓' : '✗'} You chose: {chosenLabel}
+                      </p>
+                      {!fw.correct && <p className="text-[10px] text-muted-foreground">Best: {bestMethodFor(fw.weed).label}</p>}
+                    </>
+                  ) : (
+                    <p className="text-[10px] text-muted-foreground">{fw.identified ? 'Pick a control method' : 'Not yet identified'}</p>
+                  )}
                 </div>
               </li>
             );
