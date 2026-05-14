@@ -3,11 +3,13 @@ import { Scan, Radio, Footprints, Satellite } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import WeedImage from '@/components/game/WeedImage';
 import { weeds } from '@/data/weeds';
-import cornField1 from '@/assets/images/corn_field_1.jpg';
-import cornField2 from '@/assets/images/corn_field_2.jpg';
 import soybeanField1 from '@/assets/images/soybean_field_1.jpg';
-import pastureField1 from '@/assets/images/pasture_field_1.jpg';
-import pastureField2 from '@/assets/images/pasture_field_2.jpg';
+import soybeanField2 from '@/assets/images/soybean_field_2.JPG';
+import soybeanField3 from '@/assets/images/soybean_field_3.JPG';
+const cornField1 = soybeanField1;
+const cornField2 = soybeanField2;
+const pastureField1 = soybeanField3;
+const pastureField2 = soybeanField1;
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
