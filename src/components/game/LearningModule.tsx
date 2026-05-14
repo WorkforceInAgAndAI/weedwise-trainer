@@ -1766,15 +1766,18 @@ function TopicContent({
           <div className="bg-card border border-border rounded-lg p-4">
             <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Stages</p>
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              {["Seed", "Germination", "Seedling", "Maturity", "Pollination", "Seed Dispersal"].map((stage, i) => (
+              {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((stage, i, arr) => (
                 <div key={stage} className="flex items-center gap-2">
                   <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">
                     {stage}
                   </div>
-                  {i < 5 && <span className="text-muted-foreground font-bold">→</span>}
+                  {i < arr.length - 1 && <span className="text-muted-foreground font-bold">→</span>}
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">
+              The reproductive stage groups flowering, pollination, and fertilization together.
+            </p>
           </div>
 
           {/* Annual */}
