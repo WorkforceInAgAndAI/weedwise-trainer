@@ -1064,22 +1064,22 @@ function TopicContent({
         {
           stage: "seed",
           label: "Seed",
-          desc: "A seed is a small, protective package containing a baby plant and food, designed to grow into a new plant like a flower or tree when given water, warmth, and soil. They are the start of a plant's life cycle and come in many shapes, sizes, and colors, often found inside fruits or produced by flowers. Part of each seed is the cotyledon, a place where a seed stores its food to give it energy to grow. Seeds can have different shapes and characteristics to help protect and move them in and around the environment.",
+          desc: "A tiny package that holds a baby plant and the food it needs to start growing.",
         },
         {
           stage: "seedling",
           label: "Seedling",
-          desc: "A seedling is a weed just beginning to take root. Seedlings are the first stage of life a weed goes through after it emerges from the seed. Weeds can be in the seedling stage until they grow more than two leaves. Then, they move on to the vegetative stage. Seedlings can look just as different as the plants they come from.",
+          desc: "A baby weed that has just sprouted out of the seed with its first little leaves.",
         },
         {
           stage: "vegetative",
           label: "Vegetative",
-          desc: "Think of a weed in a vegetative stage as a growing teenager. The weed is getting larger and taller, and it is growing more leaves. Weeds in the vegetative stage do not have flowers or seed pods yet.",
+          desc: "A growing weed, getting taller and adding more leaves. No flowers yet.",
         },
         {
           stage: "flower",
           label: "Reproductive",
-          desc: "Weeds in the reproductive stage are getting ready to release seeds, grow flowers, and attract pollinators to aid reproduction. Each weed looks different at this stage, but they may share some common features. Weeds in the reproductive stage may have flower buds, flowers, seed pods, or seed heads.",
+          desc: "A grown-up weed making flowers and brand new seeds.",
         },
       ];
 
