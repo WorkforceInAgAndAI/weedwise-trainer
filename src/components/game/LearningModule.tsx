@@ -792,9 +792,11 @@ function TopicContent({
               <p className="font-display font-bold text-primary text-base">Common Names</p>
               <p>
                 A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or
-                other plants for <strong>sunlight, water, and nutrients</strong>. While some plants are considered weeds
-                in one place, the same plant might be perfectly welcome somewhere else, making "weed" less about what
-                the plant is and more about <strong>where it is growing</strong>.
+                other plants for <strong>sunlight, water, and nutrients</strong>. Plants are usually grouped as either
+                <strong> pest plants</strong> (those that cause harm, reduce yields, or crowd out the plants we want)
+                or <strong>beneficial plants</strong> (those that provide food, habitat, or improve the soil). A weed is
+                a pest plant in the place it is currently growing, even if the same species could be useful somewhere
+                else.
               </p>
               <p>
                 Weeds are frequently known by <strong>multiple common names</strong> that vary by region, state, and
@@ -803,10 +805,8 @@ function TopicContent({
               </p>
               <p>
                 A single plant species may carry entirely different names depending on geographic location, local
-                tradition, or historical usage, and in some cases, the <strong>same common name</strong> may refer to
-                two completely different plant species in different parts of the country. This inconsistency in naming
-                makes accurate communication about weed identification and management more difficult across different
-                regions and disciplines.
+                tradition, or historical usage. This inconsistency in naming makes accurate communication about weed
+                identification and management more difficult across different regions and disciplines.
               </p>
             </div>
 
@@ -885,8 +885,8 @@ function TopicContent({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">What is Binomial Nomenclature?</p>
               <p>
-                Binomial nomenclature is the formal, two-term scientific system for naming organisms, which uses terms
-                in Latin to state the <strong>genus</strong> and <strong>specific epithet</strong>. It was developed by
+                Binomial nomenclature is the formal, two-term scientific system for naming plants, which uses terms
+                in Latin to state the <strong>genus</strong> and <strong>species</strong>. It was developed by
                 <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
                 worldwide.
               </p>
@@ -896,7 +896,7 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
               <div className="flex gap-4 items-start">
-                <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border-2 border-border">
+                <div className="w-40 h-40 rounded-xl overflow-hidden shrink-0 border-2 border-border">
                   <WeedImage weedId={waterhemp.id} stage="whole" className="w-full h-full" />
                 </div>
                 <div className="space-y-2">
@@ -924,13 +924,13 @@ function TopicContent({
               <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 space-y-3">
                 <p className="font-display font-bold text-foreground text-base">Genus Relationships: Foxtails</p>
                 <p className="text-sm text-foreground">
-                  Organisms with scientific names closer in form can be more closely related. These foxtails all share
-                  the genus <strong className="italic">Setaria</strong>, showing their common heritage and characteristics.
+                  Plants with scientific names closer in form can be more closely related. These foxtails all share
+                  the genus <strong className="italic">Setaria</strong>, showing their common lineage and characteristics.
                 </p>
                 <div className="grid grid-cols-3 gap-3">
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                      <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden mb-2">
+                      <div className="w-28 h-28 mx-auto rounded-lg overflow-hidden mb-2">
                         <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
@@ -945,13 +945,12 @@ function TopicContent({
             <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
             {topicWeeds.map((w) => (
               <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+                <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0">
                   <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
                 </div>
                 <div className="space-y-1">
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
                   <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">Family: {w.family}</div>
                   <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
                     {w.traits.slice(0, 3).map((t, i) => (
                       <li key={i}>- {t}</li>
@@ -1148,8 +1147,8 @@ function TopicContent({
             )}
           </div>
 
-          {/* Elementary: visual cycle diagram */}
-          {grade === "elementary" && (
+          {/* Visual cycle diagram (Elementary + High School) */}
+          {(grade === "elementary" || grade === "high") && (
             <div className="bg-card border border-border rounded-xl p-5">
               <p className="font-display font-bold text-foreground text-sm text-center mb-4">
                 The Weed Life Cycle
@@ -1197,7 +1196,7 @@ function TopicContent({
                 </p>
               </div>
             </div>
-          ) : (
+          ) : grade === "middle" ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {LIFE_STAGE_INFO.map((s) => (
                 <div key={s.stage} className="bg-card border border-border rounded-lg p-3 text-center">
@@ -1206,49 +1205,68 @@ function TopicContent({
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
 
-          {/* ALL weeds shown for all grade levels */}
-          {topicWeeds.map((w) => {
-            const isGrass = w.plantType === "Monocot";
-            return (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold" />
-                  {grade !== "elementary" && <span className="text-xs text-primary italic">{w.scientificName}</span>}
-                  {grade !== "elementary" && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
-                      {w.family}
-                    </span>
-                  )}
-                </div>
-                <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
-                  {LIFE_STAGE_INFO.map((s) => (
-                    <div key={s.stage} className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
-                      <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
-                      </div>
-                    </div>
-                  ))}
-                  {isGrass && (
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">Ligule</div>
-                      <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {grade !== "elementary" && (
-                  <div className="text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">Best control timing:</span> {w.controlTiming}
+          {/* Weeds: HS groups by control timing; others list straight */}
+          {(() => {
+            const renderCard = (w: Weed) => {
+              const isGrass = w.plantType === "Monocot";
+              return (
+                <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold" />
+                    {grade !== "elementary" && <span className="text-xs text-primary italic">{w.scientificName}</span>}
+                    {grade === "middle" && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                        {w.family}
+                      </span>
+                    )}
                   </div>
-                )}
-                <p className="text-xs text-primary">{w.memoryHook}</p>
-              </div>
-            );
-          })}
+                  <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
+                    {LIFE_STAGE_INFO.map((s) => (
+                      <div key={s.stage} className="space-y-1">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                          <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                        </div>
+                      </div>
+                    ))}
+                    {isGrass && (
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">Ligule</div>
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                          <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {grade === "middle" && (
+                    <div className="text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">Best control timing:</span> {w.controlTiming}
+                    </div>
+                  )}
+                  <p className="text-xs text-primary">{w.memoryHook}</p>
+                </div>
+              );
+            };
+            if (grade === "high") {
+              const groups = new Map<string, Weed[]>();
+              for (const w of topicWeeds) {
+                const key = (w.controlTiming || "Other").trim();
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key)!.push(w);
+              }
+              return Array.from(groups.entries()).map(([timing, ws]) => (
+                <div key={`grp-${timing}`} className="space-y-3">
+                  <h3 className="font-display font-bold text-foreground text-sm mt-4 border-l-4 border-primary pl-3">
+                    Best Control Timing: {timing}
+                  </h3>
+                  {ws.map(renderCard)}
+                </div>
+              ));
+            }
+            return topicWeeds.map(renderCard);
+          })()}
         </div>
       );
     }
@@ -1535,7 +1553,7 @@ function TopicContent({
                 {(summerAnnuals.length > 0 ? summerAnnuals : annuals).slice(0, 8).map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1564,7 +1582,7 @@ function TopicContent({
                 {biennials.slice(0, 8).map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1584,7 +1602,7 @@ function TopicContent({
                 {perennials.slice(0, 8).map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1604,28 +1622,12 @@ function TopicContent({
               <p>
                 Plants have unique systems to best enable them to reproduce and survive in varying conditions. One such
                 system is how quickly or slowly plants complete a <strong>life cycle</strong>. A complete life cycle
-                includes going through 6 stages:{" "}
-                <strong>
-                  seed, germination, seedling growth, maturity (flowering), pollination/fertilization, and seed
-                  dispersal
-                </strong>
-                .
+                moves through five stages:{" "}
+                <strong>seed, seedling, vegetative, reproductive, and mature</strong>. The
+                <strong> reproductive</strong> stage groups flowering, pollination, and fertilization together, since
+                they all happen as the plant prepares to set seed. Refer to the Life Stages topic for the visual cycle
+                diagram.
               </p>
-            </div>
-
-            {/* Life cycle flow chart */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Flow</p>
-              <div className="flex items-center justify-center gap-2 flex-wrap">
-                {["Seed", "Germination", "Seedling", "Maturity", "Pollination", "Seed Dispersal"].map((stage, i) => (
-                  <div key={stage} className="flex items-center gap-2">
-                    <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">
-                      {stage}
-                    </div>
-                    {i < 5 && <span className="text-muted-foreground font-bold">→</span>}
-                  </div>
-                ))}
-              </div>
             </div>
 
             <p className="text-sm text-foreground">Common weeds have three general life cycle lengths.</p>
@@ -1634,7 +1636,7 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Annual Weeds</p>
               <p className="text-sm text-foreground">
-                Annual weeds complete their entire life cycle — from seed germination to seed production and death --
+                Annual weeds complete their entire life cycle — from seed germination to seed production and death —
                 within a <strong>single growing season</strong>. They rely entirely on prolific seed production for
                 survival.
               </p>
@@ -1643,10 +1645,10 @@ function TopicContent({
                   <p className="font-bold text-foreground text-sm">Summer Annuals</p>
                   <p className="text-xs text-muted-foreground">Germinate in spring and die after frost.</p>
                   <div className="grid grid-cols-3 gap-1">
-                    {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).slice(0, 6).map((w) => (
+                    {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).map((w) => (
                       <div key={w.id} className="text-center">
                         <div className="aspect-square rounded overflow-hidden bg-muted">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                         </div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                       </div>
@@ -1659,10 +1661,10 @@ function TopicContent({
                     Germinate in fall, overwinter, and produce seed in spring.
                   </p>
                   <div className="grid grid-cols-3 gap-1">
-                    {winterAnnuals.slice(0, 6).map((w) => (
+                    {winterAnnuals.map((w) => (
                       <div key={w.id} className="text-center">
                         <div className="aspect-square rounded overflow-hidden bg-muted">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                         </div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                       </div>
@@ -1685,10 +1687,10 @@ function TopicContent({
                 Control is most effective during the <strong>rosette stage</strong>.
               </p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {biennials.slice(0, 8).map((w) => (
+                {biennials.map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1709,10 +1711,10 @@ function TopicContent({
                 is removed.
               </p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {perennials.slice(0, 8).map((w) => (
+                {perennials.map((w) => (
                   <div key={w.id} className="text-center">
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                     </div>
                     <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                   </div>
@@ -1733,7 +1735,7 @@ function TopicContent({
                   {dualLifecycle.map((w) => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-2">
                       <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
@@ -1764,15 +1766,18 @@ function TopicContent({
           <div className="bg-card border border-border rounded-lg p-4">
             <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Stages</p>
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              {["Seed", "Germination", "Seedling", "Maturity", "Pollination", "Seed Dispersal"].map((stage, i) => (
+              {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((stage, i, arr) => (
                 <div key={stage} className="flex items-center gap-2">
                   <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">
                     {stage}
                   </div>
-                  {i < 5 && <span className="text-muted-foreground font-bold">→</span>}
+                  {i < arr.length - 1 && <span className="text-muted-foreground font-bold">→</span>}
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">
+              The reproductive stage groups flowering, pollination, and fertilization together.
+            </p>
           </div>
 
           {/* Annual */}
@@ -1792,7 +1797,7 @@ function TopicContent({
                   {(summerAnnuals.length > 0 ? summerAnnuals : otherAnnuals).slice(0, 6).map((w) => (
                     <div key={w.id} className="text-center">
                       <div className="aspect-square rounded overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                     </div>
@@ -1806,7 +1811,7 @@ function TopicContent({
                   {winterAnnuals.slice(0, 6).map((w) => (
                     <div key={w.id} className="text-center">
                       <div className="aspect-square rounded overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[9px]" />
                     </div>
@@ -1828,7 +1833,7 @@ function TopicContent({
               {biennials.slice(0, 8).map((w) => (
                 <div key={w.id} className="text-center">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                   </div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                 </div>
@@ -1852,7 +1857,7 @@ function TopicContent({
               {perennials.slice(0, 8).map((w) => (
                 <div key={w.id} className="text-center">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                   </div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                 </div>
@@ -2899,16 +2904,22 @@ function TopicContent({
           example: "Walking through a garden and pulling out dandelions before they form their white seed heads.",
         },
         {
-          key: "mulch-cover",
-          label: "Mulch and Cover Crops",
-          desc: "Covering the soil with mulch (straw, wood chips) or planting cover crops (like clover or rye) to block sunlight and prevent weed seeds from germinating. This is a natural, chemical-free approach.",
-          example: "Putting wood chips around your garden plants to stop weeds from growing between them.",
+          key: "cover-crops",
+          label: "Cover Crops",
+          desc: "Planting helper crops (like cereal rye or clover) between cash crops to shade the soil, take up space, and stop weed seeds from germinating. This is a natural, chemical-free approach.",
+          example: "Planting cereal rye after the soybean harvest so the field is not bare during the winter.",
         },
         {
-          key: "mowing",
-          label: "Mowing",
-          desc: "Cutting weeds down before they can spread their seeds. This helps stop weeds from making new weeds, but they may grow back from their roots.",
-          example: "Mowing a field of tall weeds before they flower and drop seeds.",
+          key: "tillage",
+          label: "Tillage",
+          desc: "Using equipment to turn or stir the soil so that small weeds are uprooted and buried. There are different kinds of tillage: deep tillage (like a moldboard plow) flips the soil over, conservation tillage (like a chisel plow or disk) only stirs the top, and row cultivation pulls weeds from between crop rows.",
+          example: "A farmer uses a row cultivator to remove weeds growing between rows of soybeans.",
+        },
+        {
+          key: "chemical",
+          label: "Chemical Methods (Herbicides)",
+          desc: "Herbicides are special chemicals that farmers spray on fields to stop weeds. Pre-emergent herbicides are sprayed before weed seeds sprout. Post-emergent herbicides are sprayed on weeds that are already growing. Farmers wear safety gear and follow the label exactly to keep people, animals, and crops safe.",
+          example: "A farmer sprays a pre-emergent herbicide on a soybean field in early spring to stop weeds before they sprout.",
         },
       ];
 
@@ -3012,7 +3023,7 @@ function TopicContent({
             ) : isHighSchool ? (
               <>
                 <p>
-                  Effective weed management requires an <strong>Integrated Pest Management (IPM)</strong> approach --
+                  Effective weed management requires an <strong>Integrated Pest Management (IPM)</strong> approach —
                   combining multiple control tactics to reduce weed pressure, prevent resistance, and protect crop yield.
                 </p>
                 <p className="text-muted-foreground">

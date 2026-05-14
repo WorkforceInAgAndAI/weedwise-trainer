@@ -331,7 +331,7 @@ export const weeds: Weed[] = [
       species: "Buffalobur",
       difference: "Buffalobur has yellow flowers; Horsenettle has white flowers with yellow anthers",
     },
-    memoryHook: "Horsenettle = irregularly lobed lwaves + white flowers + yellow berries",
+    memoryHook: "Horsenettle = irregularly lobed leaves + white flowers + yellow berries",
     safetyNote:
       "A spiny nightshade with toxic glycoalkaloids in fruit and foliage; ingestion can cause digestive upset and neurological signs in livestock and people.",
   },
@@ -2361,7 +2361,7 @@ export const weeds: Weed[] = [
     origin: "Native",
     traits: [
       "Smooth stem that an grow up to 30 inches",
-      "Prominent, wavy fringe along leaf sheaths ando",
+      "Prominent, wavy fringe along leaf sheaths and ochrea",
       "Reddish-pink cylindrical flower",
       "Elongated, lance-shaped leaves",
     ],
