@@ -1649,16 +1649,7 @@ function TopicContent({
                 spread lots of seeds far and wide to help grow new plants in the spring. The seeds must be strong and
                 resilient to survive all winter.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {(summerAnnuals.length > 0 ? summerAnnuals : annuals).slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
+              <HorizontalWeedRow weeds={annuals} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
 
             {/* Biennial */}
@@ -1678,16 +1669,7 @@ function TopicContent({
                   energy in its roots during the first year.
                 </p>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {biennials.slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
+              <HorizontalWeedRow weeds={biennials} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
 
             {/* Perennial */}
@@ -1698,16 +1680,7 @@ function TopicContent({
                 bulbs each year. Perennials spread by seeds or through <strong>underground stems and roots</strong> that
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {perennials.slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
+              <HorizontalWeedRow weeds={perennials} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
           </div>
         );
