@@ -2831,29 +2831,110 @@ function TopicContent({
       }
 
       // 9-12
-      return (
-        <div className="space-y-4">
-          <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-destructive mb-2">Safety First!</p>
-            <p>
-              Some weeds are <strong>dangerous to touch or handle</strong>. Always wear gloves when working near unknown
-              plants.
-            </p>
-          </div>
-          {topicWeeds.map((w) => (
-            <div key={w.id} className="bg-card border border-destructive/30 rounded-lg p-4 flex gap-4">
-              <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-              </div>
-              <div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                <div className="text-sm text-destructive mt-1">{w.safetyNote}</div>
-                <div className="text-xs text-muted-foreground mt-1">Management: {w.management}</div>
-              </div>
+      {
+        // Group safety weeds by the management technique their `management` field
+        // most closely matches, so the page reads as Mechanical / Cultural / Chemical / etc.
+        const TECHNIQUE_BUCKETS: { key: string; label: string; description: string; match: RegExp }[] = [
+          {
+            key: "mechanical",
+            label: "Mechanical & Physical Removal",
+            description:
+              "Hand-pulling, digging, mowing, cutting, and tillage. Best when crews can wear PPE to avoid skin contact with toxic sap, spines, or allergenic pollen.",
+            match: /hand[- ]?pull|dig|mow|cut|till|cultivat|mechanical|removal/i,
+          },
+          {
+            key: "cultural",
+            label: "Cultural & Preventive Practices",
+            description:
+              "Crop rotation, cover crops, sanitation, livestock exclusion, and signage. Reduces exposure by preventing the toxic species from establishing in the first place.",
+            match: /rotat|cover crop|sanit|prevent|exclud|fenc|sign|graz/i,
+          },
+          {
+            key: "chemical",
+            label: "Chemical Control (Herbicides)",
+            description:
+              "Targeted herbicide application with full PPE — chemical-resistant gloves, eye protection, long sleeves, and respiratory protection when label requires.",
+            match: /herbicid|spray|chemical|spot[- ]?treat/i,
+          },
+          {
+            key: "biological",
+            label: "Biological Control",
+            description:
+              "Using insects, pathogens, or managed grazing animals that selectively attack the weed without putting human handlers at risk of contact.",
+            match: /biolog|insect|pathogen|biocontrol|graz/i,
+          },
+          {
+            key: "ipm",
+            label: "Integrated Pest Management (IPM)",
+            description:
+              "Combining scouting, thresholds, and multiple control tools so no single tactic is overused. Reduces both safety risk and the chance of herbicide resistance.",
+            match: /integrat|ipm|combin|monitor|scout|threshold/i,
+          },
+        ];
+
+        const buckets = TECHNIQUE_BUCKETS.map((b) => ({
+          ...b,
+          weeds: topicWeeds.filter((w) => b.match.test(w.management || "")),
+        }));
+        const placedIds = new Set(buckets.flatMap((b) => b.weeds.map((w) => w.id)));
+        const otherWeeds = topicWeeds.filter((w) => !placedIds.has(w.id));
+
+        return (
+          <div className="space-y-5">
+            <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-2">
+              <p className="font-display font-bold text-destructive text-base">Safety First</p>
+              <p>
+                Some weeds are <strong>dangerous to touch or handle</strong>. Choose the safest combination of control
+                techniques for the species you are working with, and always pair them with the right PPE.
+              </p>
             </div>
-          ))}
-        </div>
-      );
+
+            {buckets.map(
+              (b) =>
+                b.weeds.length > 0 && (
+                  <div key={b.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                    <p className="font-display font-bold text-foreground text-base">{b.label}</p>
+                    <p className="text-sm text-muted-foreground">{b.description}</p>
+                    <div className="overflow-x-auto pb-3 -mx-1">
+                      <div className="flex gap-3 px-1" style={{ minWidth: `${b.weeds.length * 18}rem` }}>
+                        {b.weeds.map((w) => (
+                          <div
+                            key={w.id}
+                            className="shrink-0 w-[17rem] bg-secondary/30 border border-destructive/30 rounded-lg p-3 flex gap-3"
+                          >
+                            <button
+                              onClick={() => onSelectWeed(w)}
+                              className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-border hover:border-primary"
+                            >
+                              <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                            </button>
+                            <div className="min-w-0">
+                              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold text-sm" />
+                              <p className="text-[10px] italic text-primary">{w.scientificName}</p>
+                              <p className="text-xs text-destructive mt-1 line-clamp-3">{w.safetyNote}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">← Scroll to see all {b.weeds.length} →</p>
+                  </div>
+                ),
+            )}
+
+            {otherWeeds.length > 0 && (
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">Other Toxic Species</p>
+                <p className="text-sm text-muted-foreground">
+                  Species whose management notes do not map cleanly to a single technique above. Always check the
+                  toxicology profile before selecting a control strategy.
+                </p>
+                <HorizontalWeedRow weeds={otherWeeds} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+              </div>
+            )}
+          </div>
+        );
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════
