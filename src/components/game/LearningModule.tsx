@@ -944,45 +944,7 @@ function TopicContent({
               </p>
             </div>
 
-            {/* Split panel showing a weed with multiple common names */}
-            <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-              <p className="font-display font-bold text-foreground text-sm text-center">One Plant, Many Names</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {topicWeeds
-                  .filter((w) => w.commonName.includes("/"))
-                  .slice(0, 2)
-                  .concat(topicWeeds.filter((w) => !w.commonName.includes("/")).slice(0, 2))
-                  .slice(0, 4)
-                  .map((w) => (
-                    <div key={w.id} className="bg-secondary/30 border border-border rounded-lg p-3 text-center">
-                      <div className="w-20 h-20 mx-auto rounded-lg overflow-hidden mb-2">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
-                      <div className="text-xs text-primary italic mt-1">{w.scientificName}</div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* All weeds with scientific names */}
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div className="space-y-1">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                    {w.traits.slice(0, 3).map((t, i) => (
-                      <li key={i}>- {t}</li>
-                    ))}
-                  </ul>
-                  <p className="text-xs text-primary">{w.memoryHook}</p>
-                </div>
-              </div>
-            ))}
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -1065,25 +1027,20 @@ function TopicContent({
               </div>
             )}
 
-            {/* All species */}
-            <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div className="space-y-1">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                    {w.traits.slice(0, 3).map((t, i) => (
-                      <li key={i}>- {t}</li>
-                    ))}
-                  </ul>
-                  <p className="text-xs text-primary">{w.memoryHook}</p>
-                </div>
-              </div>
-            ))}
+            {/* Flashcards focused on scientific name recall */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">Scientific Name Flashcards</p>
+              <p className="text-sm text-muted-foreground">
+                Look at the picture, name the genus and species, then tap the card to reveal the
+                scientific name and check yourself. Mark which cards you want to review more.
+              </p>
+              <WeedFlashcardDeck
+                weeds={topicWeeds}
+                onSelectWeed={onSelectWeed}
+                stage="flower"
+                emphasizeScientific
+              />
+            </div>
           </div>
         );
       }
