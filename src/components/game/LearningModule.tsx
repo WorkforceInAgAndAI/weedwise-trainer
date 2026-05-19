@@ -858,6 +858,37 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 viewMode={viewMode}
                 onOpenPractice={onOpenPractice}
               />
+              {(() => {
+                const idx = availableTopics.findIndex((t) => t.id === selectedTopic);
+                const prev = idx > 0 ? availableTopics[idx - 1] : null;
+                const next = idx >= 0 && idx < availableTopics.length - 1 ? availableTopics[idx + 1] : null;
+                return (
+                  <div className="mt-8 pt-5 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
+                    <button
+                      onClick={() => prev && setSelectedTopic(prev.id)}
+                      disabled={!prev}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-left"
+                    >
+                      <ArrowLeft className="w-4 h-4 shrink-0" />
+                      <span className="flex flex-col items-start leading-tight">
+                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Previous module</span>
+                        <span>{prev ? prev.name : "No previous module"}</span>
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => next && setSelectedTopic(next.id)}
+                      disabled={!next}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed text-right sm:flex-row-reverse"
+                    >
+                      <ArrowLeft className="w-4 h-4 shrink-0 rotate-180" />
+                      <span className="flex flex-col items-end leading-tight">
+                        <span className="text-[10px] uppercase tracking-wide opacity-80">Next module</span>
+                        <span>{next ? next.name : "No next module"}</span>
+                      </span>
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
