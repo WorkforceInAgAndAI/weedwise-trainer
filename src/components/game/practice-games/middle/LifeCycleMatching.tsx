@@ -49,7 +49,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [bouncedIds, setBouncedIds] = useState<string[]>([]);
   const [farmerMsg, setFarmerMsg] = useState<{ tone: 'intro' | 'correct' | 'wrong' | 'cheer'; text: string }>(
-    { tone: 'intro', text: `Sort each weed by life cycle. Annuals finish in one year, biennials take two, perennials persist for three or more. Use scientific names and reproductive traits as your clues.` }
+    { tone: 'intro', text: `Sort each weed into its life-cycle type: Summer annuals germinate in spring and die before winter. Winter annuals germinate in the fall, flower the next spring, and die before summer. Biennials live two years — leafy rosette year one, flower & seed year two. Perennials live three or more years, regrowing from roots, rhizomes, or crowns every season.` }
   );
 
   const unplaced = items.filter(i => !placements[i.weed.id]);
@@ -102,7 +102,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
       const example = items.find(i => i.weed.id === wrong[0]);
       setFarmerMsg({
         tone: 'wrong',
-        text: `${wrong.length} popped back out — wrong bin. Hint: ${example?.weed.commonName} (${example?.weed.scientificName}) is a ${example?.correct.toLowerCase()} (${example?.weed.lifeCycle}). Re-sort the highlighted ones.`,
+        text: `${wrong.length} popped back out — wrong bin. Hint: ${example?.weed.commonName} (${example?.weed.scientificName}) is a ${example?.correct.toLowerCase()}. Re-sort the highlighted ones.`,
       });
       setBouncedIds(wrong);
     }
