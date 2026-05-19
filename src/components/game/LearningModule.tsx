@@ -2410,28 +2410,36 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Terrestrial</p>
-              <p className="text-xs text-muted-foreground">
-                Grow in soil on land and compete directly with crops and other plants for light, water, and nutrients
-                in agricultural and natural settings.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Aquatic</p>
-              <p className="text-xs text-muted-foreground">
-                Establish in or around bodies of water such as ponds, lakes, irrigation canals, and wetlands, where
-                they can disrupt water flow and reduce water quality.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Parasitic</p>
-              <p className="text-xs text-muted-foreground">
-                Among the most damaging, as they attach directly to the root or stem tissue of a host plant through
-                specialized structures and extract water and nutrients at the host's expense.
-              </p>
-            </div>
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">
+              Terrestrial Weeds <span className="text-xs text-muted-foreground font-normal">({terrestrial.length})</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Grow in soil on land and compete directly with crops for light, water, and nutrients in agricultural and
+              natural settings.
+            </p>
+            <HorizontalWeedRow weeds={terrestrial} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">
+              Aquatic Weeds <span className="text-xs text-muted-foreground font-normal">({aquatic.length})</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Establish in or around bodies of water such as ponds, lakes, irrigation canals, and wetlands, where they
+              can disrupt water flow and reduce water quality.
+            </p>
+            <HorizontalWeedRow weeds={aquatic} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">Parasitic Weeds</p>
+            <p className="text-sm text-muted-foreground">
+              Among the most damaging — they attach directly to the root or stem tissue of a host plant through
+              specialized structures and extract water and nutrients at the host's expense. Parasitic weeds are not
+              represented in this Midwest dataset, but well-known examples include dodder (<em>Cuscuta</em> spp.) and
+              broomrape (<em>Orobanche</em> spp.).
+            </p>
           </div>
 
           <p className="text-sm text-foreground">
