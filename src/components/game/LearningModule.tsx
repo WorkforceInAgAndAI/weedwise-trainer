@@ -397,25 +397,85 @@ interface Props {
  * Elementary "Weed Names & ID" flashcard deck.
  * One weed per card with large image, sorted into "Confident" and "Review" buckets.
  */
-function ElementaryNamesFlashcards({
-  weeds: deck,
+/**
+ * Reusable horizontally-scrolling weed gallery with larger thumbnails.
+ * Used by topics that need to show every weed without forcing the user to scroll vertically.
+ */
+function HorizontalWeedRow({
+  weeds: list,
   onSelectWeed,
+  stage = "flower",
+  showScientific = false,
+  tileWidth = "9rem",
 }: {
   weeds: Weed[];
   onSelectWeed: (w: Weed) => void;
+  stage?: "whole" | "flower" | "vegetative" | "seed" | "seedling";
+  showScientific?: boolean;
+  tileWidth?: string;
 }) {
+  if (list.length === 0) {
+    return <p className="text-xs text-muted-foreground italic">No species in this group.</p>;
+  }
+  return (
+    <div>
+      <div className="overflow-x-auto pb-3 -mx-1">
+        <div className="flex gap-3 px-1" style={{ minWidth: `${list.length * (parseFloat(tileWidth) + 0.75)}rem` }}>
+          {list.map((w) => (
+            <div key={w.id} className="text-center shrink-0" style={{ width: tileWidth }}>
+              <button
+                onClick={() => onSelectWeed(w)}
+                className="block w-full rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                style={{ aspectRatio: "1 / 1" }}
+              >
+                <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+              </button>
+              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
+              {showScientific && (
+                <p className="text-[10px] text-primary italic leading-tight">{w.scientificName}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground">← Scroll to see all {list.length} species →</p>
+    </div>
+  );
+}
+
+/**
+ * Reusable flip flashcard deck.
+ * - Image is shown on the front; click the card to flip and reveal the name.
+ * - User sorts each card into "I'm confident" or "Want to review more".
+ * - After all cards are sorted, a recap is shown with the option to review only the review pile.
+ */
+function WeedFlashcardDeck({
+  weeds: fullDeck,
+  onSelectWeed,
+  stage = "flower",
+  emphasizeScientific = false,
+}: {
+  weeds: Weed[];
+  onSelectWeed: (w: Weed) => void;
+  stage?: "whole" | "flower" | "vegetative" | "seed" | "seedling";
+  emphasizeScientific?: boolean;
+}) {
+  const [activeDeck, setActiveDeck] = useState<Weed[]>(fullDeck);
   const [index, setIndex] = useState(0);
   const [confident, setConfident] = useState<string[]>([]);
   const [review, setReview] = useState<string[]>([]);
+  const [flipped, setFlipped] = useState(false);
 
-  const total = deck.length;
+  const total = activeDeck.length;
   const done = index >= total;
-  const current = !done ? deck[index] : null;
+  const current = !done ? activeDeck[index] : null;
 
-  const reset = () => {
+  const reset = (deck: Weed[]) => {
+    setActiveDeck(deck);
     setIndex(0);
     setConfident([]);
     setReview([]);
+    setFlipped(false);
   };
 
   const sortCard = (bucket: "confident" | "review") => {
@@ -423,131 +483,156 @@ function ElementaryNamesFlashcards({
     if (bucket === "confident") setConfident((p) => [...p, current.id]);
     else setReview((p) => [...p, current.id]);
     setIndex((i) => i + 1);
+    setFlipped(false);
   };
 
-  return (
-    <div className="space-y-5">
-      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-        <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
-        <p>
-          A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
-          a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
-          plants we want to keep, like crops in a farmer's field.
-        </p>
-        <p>
-          Each weed has a <strong>common name</strong> we use every day. Knowing weed names helps us
-          <strong> identify, manage, and stay safe</strong> around them.
-        </p>
+  const reviewOnly = () => {
+    const reviewDeck = fullDeck.filter((w) => review.includes(w.id));
+    if (reviewDeck.length > 0) reset(reviewDeck);
+  };
+
+  if (!done && current) {
+    return (
+      <div className="bg-card border border-border rounded-xl shadow-card p-5 space-y-4">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>Card {index + 1} of {total}</span>
+          <span>
+            <span className="text-success font-semibold">Confident: {confident.length}</span>{" · "}
+            <span className="text-terracotta font-semibold">Review: {review.length}</span>
+          </span>
+        </div>
+
+        <button
+          onClick={() => setFlipped((f) => !f)}
+          className="block w-full rounded-xl overflow-hidden bg-muted border-2 border-border hover:border-primary transition-colors text-left"
+          style={{ perspective: "1000px" }}
+        >
+          <div className="relative w-full aspect-[4/3] max-h-[26rem]">
+            {!flipped ? (
+              <div className="absolute inset-0 flex flex-col">
+                <div className="flex-1 overflow-hidden">
+                  <WeedImage weedId={current.id} stage={stage} className="w-full h-full" />
+                </div>
+                <p className="text-[11px] text-muted-foreground text-center py-1.5 bg-card border-t border-border">
+                  Tap card to reveal the name
+                </p>
+              </div>
+            ) : (
+              <div className="absolute inset-0 bg-card flex flex-col items-center justify-center gap-2 p-5 text-center">
+                {emphasizeScientific ? (
+                  <>
+                    <p className="font-display font-bold text-primary italic text-2xl sm:text-3xl">
+                      {current.scientificName}
+                    </p>
+                    <p className="text-sm text-foreground">
+                      Common name: <strong>{current.commonName}</strong>
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Family: {current.family} • {current.plantType}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-display font-bold text-foreground text-2xl sm:text-3xl">
+                      {current.commonName}
+                    </p>
+                    <p className="text-sm italic text-primary">{current.scientificName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {current.plantType} • {current.lifeCycle}
+                    </p>
+                  </>
+                )}
+                {current.memoryHook && (
+                  <p className="text-xs text-primary bg-primary/10 rounded-md px-3 py-1.5 mt-1">
+                    <span className="font-bold">Memory trick:</span> {current.memoryHook}
+                  </p>
+                )}
+                <p className="text-[11px] text-muted-foreground mt-1">Tap card to flip back</p>
+              </div>
+            )}
+          </div>
+        </button>
+
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => sortCard("review")}
+            className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-terracotta/40 bg-terracotta/5 text-terracotta font-semibold hover:bg-terracotta/15 transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Want to review more
+          </button>
+          <button
+            onClick={() => sortCard("confident")}
+            className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-success/40 bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
+          >
+            <ThumbsUp className="w-4 h-4" />
+            I'm confident
+          </button>
+        </div>
       </div>
+    );
+  }
 
-      {!done && current ? (
-        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-4">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Card {index + 1} of {total}
-            </span>
-            <span>
-              <span className="text-success font-semibold">Confident: {confident.length}</span>
-              {" · "}
-              <span className="text-terracotta font-semibold">Review: {review.length}</span>
-            </span>
-          </div>
-
-          <div className="w-full aspect-[4/3] max-h-80 mx-auto rounded-xl overflow-hidden bg-muted">
-            <WeedImage weedId={current.id} stage="whole" className="w-full h-full" />
-          </div>
-
-          <div className="text-center space-y-1">
-            <ClickableWeedName
-              weed={current}
-              onSelect={onSelectWeed}
-              className="font-display text-2xl"
-            />
-            <p className="text-xs text-muted-foreground">
-              {current.plantType} • {current.lifeCycle}
-            </p>
-          </div>
-
-          <div className="bg-primary/10 rounded-lg px-3 py-2 text-center">
-            <p className="text-sm text-primary">
-              <span className="font-bold">Memory trick:</span> {current.memoryHook}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
-              onClick={() => sortCard("review")}
-              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-terracotta/40 bg-terracotta/5 text-terracotta font-semibold hover:bg-terracotta/15 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Want to review more
-            </button>
-            <button
-              onClick={() => sortCard("confident")}
-              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-success/40 bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
-            >
-              <ThumbsUp className="w-4 h-4" />
-              I'm confident
-            </button>
+  return (
+    <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-5">
+      <div className="text-center">
+        <h3 className="font-display font-bold text-foreground text-xl">Great work!</h3>
+        <p className="text-sm text-muted-foreground">You sorted all {total} cards.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-lg border border-success/40 bg-success/5 p-4">
+          <p className="font-display font-bold text-success text-sm mb-2">Confident ({confident.length})</p>
+          <div className="grid grid-cols-3 gap-2">
+            {confident.map((id) => {
+              const w = activeDeck.find((d) => d.id === id);
+              if (!w) return null;
+              return (
+                <div key={id} className="text-center">
+                  <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                    <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+                  </div>
+                  <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
-      ) : (
-        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-5">
-          <div className="text-center">
-            <h3 className="font-display font-bold text-foreground text-xl">Great work!</h3>
-            <p className="text-sm text-muted-foreground">You sorted all {total} weeds.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-lg border border-success/40 bg-success/5 p-4">
-              <p className="font-display font-bold text-success text-sm mb-2">
-                Confident ({confident.length})
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {confident.map((id) => {
-                  const w = deck.find((d) => d.id === id);
-                  if (!w) return null;
-                  return (
-                    <div key={id} className="text-center">
-                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="rounded-lg border border-terracotta/40 bg-terracotta/5 p-4">
-              <p className="font-display font-bold text-terracotta text-sm mb-2">
-                Want to review more ({review.length})
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {review.map((id) => {
-                  const w = deck.find((d) => d.id === id);
-                  if (!w) return null;
-                  return (
-                    <div key={id} className="text-center">
-                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <button
-              onClick={reset}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Start over
-            </button>
+        <div className="rounded-lg border border-terracotta/40 bg-terracotta/5 p-4">
+          <p className="font-display font-bold text-terracotta text-sm mb-2">Want to review more ({review.length})</p>
+          <div className="grid grid-cols-3 gap-2">
+            {review.map((id) => {
+              const w = activeDeck.find((d) => d.id === id);
+              if (!w) return null;
+              return (
+                <div key={id} className="text-center">
+                  <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                    <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+                  </div>
+                  <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">
+        {review.length > 0 && (
+          <button
+            onClick={reviewOnly}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-terracotta text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Review only my {review.length} review card{review.length === 1 ? "" : "s"}
+          </button>
+        )}
+        <button
+          onClick={() => reset(fullDeck)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Start over with all {fullDeck.length}
+        </button>
+      </div>
     </div>
   );
 }
@@ -773,6 +858,37 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 viewMode={viewMode}
                 onOpenPractice={onOpenPractice}
               />
+              {(() => {
+                const idx = availableTopics.findIndex((t) => t.id === selectedTopic);
+                const prev = idx > 0 ? availableTopics[idx - 1] : null;
+                const next = idx >= 0 && idx < availableTopics.length - 1 ? availableTopics[idx + 1] : null;
+                return (
+                  <div className="mt-8 pt-5 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
+                    <button
+                      onClick={() => prev && setSelectedTopic(prev.id)}
+                      disabled={!prev}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-semibold hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-left"
+                    >
+                      <ArrowLeft className="w-4 h-4 shrink-0" />
+                      <span className="flex flex-col items-start leading-tight">
+                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Previous module</span>
+                        <span>{prev ? prev.name : "No previous module"}</span>
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => next && setSelectedTopic(next.id)}
+                      disabled={!next}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed text-right sm:flex-row-reverse"
+                    >
+                      <ArrowLeft className="w-4 h-4 shrink-0 rotate-180" />
+                      <span className="flex flex-col items-end leading-tight">
+                        <span className="text-[10px] uppercase tracking-wide opacity-80">Next module</span>
+                        <span>{next ? next.name : "No next module"}</span>
+                      </span>
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
@@ -805,7 +921,23 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "names":
       if (grade === "elementary") {
-        return <ElementaryNamesFlashcards weeds={topicWeeds} onSelectWeed={onSelectWeed} />;
+        return (
+          <div className="space-y-5">
+            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
+              <p>
+                A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
+                a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
+                plants we want to keep, like crops in a farmer's field.
+              </p>
+              <p>
+                Each weed has a <strong>common name</strong> we use every day. Look at the picture, guess the name,
+                then tap the card to check yourself.
+              </p>
+            </div>
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
+          </div>
+        );
       }
 
       if (grade === "middle") {
@@ -843,45 +975,7 @@ function TopicContent({
               </p>
             </div>
 
-            {/* Split panel showing a weed with multiple common names */}
-            <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-              <p className="font-display font-bold text-foreground text-sm text-center">One Plant, Many Names</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {topicWeeds
-                  .filter((w) => w.commonName.includes("/"))
-                  .slice(0, 2)
-                  .concat(topicWeeds.filter((w) => !w.commonName.includes("/")).slice(0, 2))
-                  .slice(0, 4)
-                  .map((w) => (
-                    <div key={w.id} className="bg-secondary/30 border border-border rounded-lg p-3 text-center">
-                      <div className="w-20 h-20 mx-auto rounded-lg overflow-hidden mb-2">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
-                      <div className="text-xs text-primary italic mt-1">{w.scientificName}</div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* All weeds with scientific names */}
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div className="space-y-1">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                    {w.traits.slice(0, 3).map((t, i) => (
-                      <li key={i}>- {t}</li>
-                    ))}
-                  </ul>
-                  <p className="text-xs text-primary">{w.memoryHook}</p>
-                </div>
-              </div>
-            ))}
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -964,25 +1058,20 @@ function TopicContent({
               </div>
             )}
 
-            {/* All species */}
-            <h3 className="font-display font-bold text-foreground text-sm">All Species ({topicWeeds.length})</h3>
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
-                <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div className="space-y-1">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <div className="text-sm text-primary italic">{w.scientificName}</div>
-                  <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-                    {w.traits.slice(0, 3).map((t, i) => (
-                      <li key={i}>- {t}</li>
-                    ))}
-                  </ul>
-                  <p className="text-xs text-primary">{w.memoryHook}</p>
-                </div>
-              </div>
-            ))}
+            {/* Flashcards focused on scientific name recall */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">Scientific Name Flashcards</p>
+              <p className="text-sm text-muted-foreground">
+                Look at the picture, name the genus and species, then tap the card to reveal the
+                scientific name and check yourself. Mark which cards you want to review more.
+              </p>
+              <WeedFlashcardDeck
+                weeds={topicWeeds}
+                onSelectWeed={onSelectWeed}
+                stage="flower"
+                emphasizeScientific
+              />
+            </div>
           </div>
         );
       }
@@ -1076,17 +1165,19 @@ function TopicContent({
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className="w-16 h-16 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
-                  <WeedImage weedId={w.id} stage="seed" className="w-full h-full" />
-                </div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                {grade !== "elementary" && <div className="text-[10px] text-primary italic">{w.scientificName}</div>}
-                <div className="text-[10px] text-muted-foreground">{w.family}</div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
+            <p className="text-sm text-muted-foreground">
+              {grade === "elementary"
+                ? "Look at the seed, guess which weed it comes from, then tap the card to check."
+                : "Identify the seed by its shape, size, and surface, then flip the card to see the species."}
+            </p>
+            <WeedFlashcardDeck
+              weeds={topicWeeds}
+              onSelectWeed={onSelectWeed}
+              stage="seed"
+              emphasizeScientific={grade === "high"}
+            />
           </div>
         </div>
       );
@@ -1470,29 +1561,13 @@ function TopicContent({
               </div>
             </div>
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Monocots ({monocots.length} species)</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {monocots.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                <div className="text-[10px] text-muted-foreground">{w.family}</div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
+            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Dicots ({dicots.length} species)</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {dicots.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                <div className="text-[10px] text-muted-foreground">{w.family}</div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Dicots ({dicots.length} species)</h3>
+            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
           </div>
         </div>
       );
@@ -1589,16 +1664,7 @@ function TopicContent({
                 spread lots of seeds far and wide to help grow new plants in the spring. The seeds must be strong and
                 resilient to survive all winter.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {(summerAnnuals.length > 0 ? summerAnnuals : annuals).slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
+              <HorizontalWeedRow weeds={annuals} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
 
             {/* Biennial */}
@@ -1618,16 +1684,7 @@ function TopicContent({
                   energy in its roots during the first year.
                 </p>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {biennials.slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
+              <HorizontalWeedRow weeds={biennials} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
 
             {/* Perennial */}
@@ -1638,16 +1695,7 @@ function TopicContent({
                 bulbs each year. Perennials spread by seeds or through <strong>underground stems and roots</strong> that
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {perennials.slice(0, 8).map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
+              <HorizontalWeedRow weeds={perennials} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
           </div>
         );
@@ -1943,47 +1991,17 @@ function TopicContent({
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <p className="font-display font-bold text-foreground text-sm">Invasive Weeds in the Midwest</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {invasives.slice(0, 9).map((w) => (
-                    <div key={w.id} className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-center">
-                      <div className="w-16 h-16 mx-auto rounded overflow-hidden mb-1">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                      <p className="text-[10px] text-destructive mt-1">{w.actReason?.split('.')[0]}</p>
-                    </div>
-                  ))}
-                </div>
+                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" />
               </div>
             )}
 
-            <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {natives.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
+              <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
-            <h3 className="font-semibold text-foreground text-sm">Introduced Species ({introduced.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {introduced.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+              <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
           </div>
         );
@@ -2025,34 +2043,13 @@ function TopicContent({
               </p>
             </div>
 
-            <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {natives.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
+              <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
             </div>
-            <h3 className="font-semibold text-foreground text-sm">Introduced Species ({introduced.length})</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {introduced.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-primary italic">{w.scientificName}</div>
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+              <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
             </div>
           </div>
         );
@@ -2081,35 +2078,13 @@ function TopicContent({
               find control solutions.
             </p>
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {natives.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                  <div className="text-xs text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                </div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
+            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Introduced Species ({introduced.length})</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {introduced.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                  <div className="text-xs text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                </div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
           </div>
         </div>
       );
@@ -2202,8 +2177,8 @@ function TopicContent({
               <p className="font-display font-bold text-foreground text-sm text-center">
                 Where These Habitats Live in the U.S.
               </p>
-              <div className="relative w-full max-w-md mx-auto">
-                <svg viewBox="0 0 300 180" className="w-full h-auto">
+              <div className="relative w-full max-w-2xl mx-auto overflow-x-auto">
+                <svg viewBox="0 0 300 180" className="w-full h-auto min-w-[420px]">
                   {/* Simplified continental US outline */}
                   <path
                     d="M30,60 L60,40 L120,30 L180,30 L230,40 L270,55 L275,90 L260,130 L220,150 L160,155 L100,150 L60,140 L35,110 Z"
@@ -2289,20 +2264,11 @@ function TopicContent({
             {habGroups.map((g) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === g.key);
               return (
-                <div key={g.key}>
-                  <h3 className="font-semibold text-foreground text-sm mb-2">
+                <div key={g.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                  <h3 className="font-display font-bold text-foreground text-base">
                     {g.label} ({grouped.length})
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {grouped.map((w) => (
-                      <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                        <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                      </div>
-                    ))}
-                  </div>
+                  <HorizontalWeedRow weeds={grouped} onSelectWeed={onSelectWeed} stage="flower" />
                 </div>
               );
             })}
@@ -2475,28 +2441,36 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Terrestrial</p>
-              <p className="text-xs text-muted-foreground">
-                Grow in soil on land and compete directly with crops and other plants for light, water, and nutrients
-                in agricultural and natural settings.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Aquatic</p>
-              <p className="text-xs text-muted-foreground">
-                Establish in or around bodies of water such as ponds, lakes, irrigation canals, and wetlands, where
-                they can disrupt water flow and reduce water quality.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Parasitic</p>
-              <p className="text-xs text-muted-foreground">
-                Among the most damaging, as they attach directly to the root or stem tissue of a host plant through
-                specialized structures and extract water and nutrients at the host's expense.
-              </p>
-            </div>
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">
+              Terrestrial Weeds <span className="text-xs text-muted-foreground font-normal">({terrestrial.length})</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Grow in soil on land and compete directly with crops for light, water, and nutrients in agricultural and
+              natural settings.
+            </p>
+            <HorizontalWeedRow weeds={terrestrial} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">
+              Aquatic Weeds <span className="text-xs text-muted-foreground font-normal">({aquatic.length})</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Establish in or around bodies of water such as ponds, lakes, irrigation canals, and wetlands, where they
+              can disrupt water flow and reduce water quality.
+            </p>
+            <HorizontalWeedRow weeds={aquatic} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">Parasitic Weeds</p>
+            <p className="text-sm text-muted-foreground">
+              Among the most damaging — they attach directly to the root or stem tissue of a host plant through
+              specialized structures and extract water and nutrients at the host's expense. Parasitic weeds are not
+              represented in this Midwest dataset, but well-known examples include dodder (<em>Cuscuta</em> spp.) and
+              broomrape (<em>Orobanche</em> spp.).
+            </p>
           </div>
 
           <p className="text-sm text-foreground">
@@ -2561,26 +2535,11 @@ function TopicContent({
           {Array.from(famGroups.entries())
             .sort()
             .map(([family, members]) => (
-              <div key={family}>
-                <h3 className="font-semibold text-foreground text-sm mb-2">
+              <div key={family} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <h3 className="font-display font-bold text-foreground text-base">
                   {family} ({members.length} species)
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {members.map((w) => (
-                    <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                      <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                        {grade === "high" && <div className="text-xs text-primary italic">{w.scientificName}</div>}
-                        <div className="text-xs text-muted-foreground">
-                          {w.plantType} • {w.lifeCycle}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <HorizontalWeedRow weeds={members} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
               </div>
             ))}
         </div>
@@ -2903,29 +2862,110 @@ function TopicContent({
       }
 
       // 9-12
-      return (
-        <div className="space-y-4">
-          <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-destructive mb-2">Safety First!</p>
-            <p>
-              Some weeds are <strong>dangerous to touch or handle</strong>. Always wear gloves when working near unknown
-              plants.
-            </p>
-          </div>
-          {topicWeeds.map((w) => (
-            <div key={w.id} className="bg-card border border-destructive/30 rounded-lg p-4 flex gap-4">
-              <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-              </div>
-              <div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                <div className="text-sm text-destructive mt-1">{w.safetyNote}</div>
-                <div className="text-xs text-muted-foreground mt-1">Management: {w.management}</div>
-              </div>
+      {
+        // Group safety weeds by the management technique their `management` field
+        // most closely matches, so the page reads as Mechanical / Cultural / Chemical / etc.
+        const TECHNIQUE_BUCKETS: { key: string; label: string; description: string; match: RegExp }[] = [
+          {
+            key: "mechanical",
+            label: "Mechanical & Physical Removal",
+            description:
+              "Hand-pulling, digging, mowing, cutting, and tillage. Best when crews can wear PPE to avoid skin contact with toxic sap, spines, or allergenic pollen.",
+            match: /hand[- ]?pull|dig|mow|cut|till|cultivat|mechanical|removal/i,
+          },
+          {
+            key: "cultural",
+            label: "Cultural & Preventive Practices",
+            description:
+              "Crop rotation, cover crops, sanitation, livestock exclusion, and signage. Reduces exposure by preventing the toxic species from establishing in the first place.",
+            match: /rotat|cover crop|sanit|prevent|exclud|fenc|sign|graz/i,
+          },
+          {
+            key: "chemical",
+            label: "Chemical Control (Herbicides)",
+            description:
+              "Targeted herbicide application with full PPE — chemical-resistant gloves, eye protection, long sleeves, and respiratory protection when label requires.",
+            match: /herbicid|spray|chemical|spot[- ]?treat/i,
+          },
+          {
+            key: "biological",
+            label: "Biological Control",
+            description:
+              "Using insects, pathogens, or managed grazing animals that selectively attack the weed without putting human handlers at risk of contact.",
+            match: /biolog|insect|pathogen|biocontrol|graz/i,
+          },
+          {
+            key: "ipm",
+            label: "Integrated Pest Management (IPM)",
+            description:
+              "Combining scouting, thresholds, and multiple control tools so no single tactic is overused. Reduces both safety risk and the chance of herbicide resistance.",
+            match: /integrat|ipm|combin|monitor|scout|threshold/i,
+          },
+        ];
+
+        const buckets = TECHNIQUE_BUCKETS.map((b) => ({
+          ...b,
+          weeds: topicWeeds.filter((w) => b.match.test(w.management || "")),
+        }));
+        const placedIds = new Set(buckets.flatMap((b) => b.weeds.map((w) => w.id)));
+        const otherWeeds = topicWeeds.filter((w) => !placedIds.has(w.id));
+
+        return (
+          <div className="space-y-5">
+            <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-2">
+              <p className="font-display font-bold text-destructive text-base">Safety First</p>
+              <p>
+                Some weeds are <strong>dangerous to touch or handle</strong>. Choose the safest combination of control
+                techniques for the species you are working with, and always pair them with the right PPE.
+              </p>
             </div>
-          ))}
-        </div>
-      );
+
+            {buckets.map(
+              (b) =>
+                b.weeds.length > 0 && (
+                  <div key={b.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                    <p className="font-display font-bold text-foreground text-base">{b.label}</p>
+                    <p className="text-sm text-muted-foreground">{b.description}</p>
+                    <div className="overflow-x-auto pb-3 -mx-1">
+                      <div className="flex gap-3 px-1" style={{ minWidth: `${b.weeds.length * 18}rem` }}>
+                        {b.weeds.map((w) => (
+                          <div
+                            key={w.id}
+                            className="shrink-0 w-[17rem] bg-secondary/30 border border-destructive/30 rounded-lg p-3 flex gap-3"
+                          >
+                            <button
+                              onClick={() => onSelectWeed(w)}
+                              className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-border hover:border-primary"
+                            >
+                              <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                            </button>
+                            <div className="min-w-0">
+                              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold text-sm" />
+                              <p className="text-[10px] italic text-primary">{w.scientificName}</p>
+                              <p className="text-xs text-destructive mt-1 line-clamp-3">{w.safetyNote}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">← Scroll to see all {b.weeds.length} →</p>
+                  </div>
+                ),
+            )}
+
+            {otherWeeds.length > 0 && (
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">Other Toxic Species</p>
+                <p className="text-sm text-muted-foreground">
+                  Species whose management notes do not map cleanly to a single technique above. Always check the
+                  toxicology profile before selecting a control strategy.
+                </p>
+                <HorizontalWeedRow weeds={otherWeeds} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+              </div>
+            )}
+          </div>
+        );
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════
