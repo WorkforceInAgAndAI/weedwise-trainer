@@ -2233,20 +2233,11 @@ function TopicContent({
             {habGroups.map((g) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === g.key);
               return (
-                <div key={g.key}>
-                  <h3 className="font-semibold text-foreground text-sm mb-2">
+                <div key={g.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                  <h3 className="font-display font-bold text-foreground text-base">
                     {g.label} ({grouped.length})
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {grouped.map((w) => (
-                      <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                        <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                      </div>
-                    ))}
-                  </div>
+                  <HorizontalWeedRow weeds={grouped} onSelectWeed={onSelectWeed} stage="flower" />
                 </div>
               );
             })}
