@@ -1935,7 +1935,7 @@ export const weeds: Weed[] = [
   {
     id: "annual-ryegrass",
     commonName: "Annual Ryegrass",
-    scientificName: "Lolium multiflorum ssp. multiflorum",
+    scientificName: "Lolium multiflorum",
     family: "Poaceae",
     plantType: "Monocot",
     lifeCycle: "Annual",
