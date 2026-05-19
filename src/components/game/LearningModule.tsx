@@ -2146,8 +2146,8 @@ function TopicContent({
               <p className="font-display font-bold text-foreground text-sm text-center">
                 Where These Habitats Live in the U.S.
               </p>
-              <div className="relative w-full max-w-md mx-auto">
-                <svg viewBox="0 0 300 180" className="w-full h-auto">
+              <div className="relative w-full max-w-2xl mx-auto overflow-x-auto">
+                <svg viewBox="0 0 300 180" className="w-full h-auto min-w-[420px]">
                   {/* Simplified continental US outline */}
                   <path
                     d="M30,60 L60,40 L120,30 L180,30 L230,40 L270,55 L275,90 L260,130 L220,150 L160,155 L100,150 L60,140 L35,110 Z"
