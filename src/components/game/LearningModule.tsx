@@ -1530,29 +1530,13 @@ function TopicContent({
               </div>
             </div>
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Monocots ({monocots.length} species)</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {monocots.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                <div className="text-[10px] text-muted-foreground">{w.family}</div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
+            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Dicots ({dicots.length} species)</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {dicots.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className="w-12 h-12 mx-auto rounded overflow-hidden mb-1">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                <div className="text-[10px] text-muted-foreground">{w.family}</div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Dicots ({dicots.length} species)</h3>
+            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
           </div>
         </div>
       );
