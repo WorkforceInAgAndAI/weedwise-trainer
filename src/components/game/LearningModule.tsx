@@ -1134,17 +1134,19 @@ function TopicContent({
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {topicWeeds.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className="w-16 h-16 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
-                  <WeedImage weedId={w.id} stage="seed" className="w-full h-full" />
-                </div>
-                <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                {grade !== "elementary" && <div className="text-[10px] text-primary italic">{w.scientificName}</div>}
-                <div className="text-[10px] text-muted-foreground">{w.family}</div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
+            <p className="text-sm text-muted-foreground">
+              {grade === "elementary"
+                ? "Look at the seed, guess which weed it comes from, then tap the card to check."
+                : "Identify the seed by its shape, size, and surface, then flip the card to see the species."}
+            </p>
+            <WeedFlashcardDeck
+              weeds={topicWeeds}
+              onSelectWeed={onSelectWeed}
+              stage="seed"
+              emphasizeScientific={grade === "high"}
+            />
           </div>
         </div>
       );
