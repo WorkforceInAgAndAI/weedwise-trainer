@@ -2003,47 +2003,17 @@ function TopicContent({
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <p className="font-display font-bold text-foreground text-sm">Invasive Weeds in the Midwest</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {invasives.slice(0, 9).map((w) => (
-                    <div key={w.id} className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 text-center">
-                      <div className="w-16 h-16 mx-auto rounded overflow-hidden mb-1">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs" />
-                      <p className="text-[10px] text-destructive mt-1">{w.actReason?.split('.')[0]}</p>
-                    </div>
-                  ))}
-                </div>
+                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" />
               </div>
             )}
 
-            <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {natives.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
+              <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
-            <h3 className="font-semibold text-foreground text-sm">Introduced Species ({introduced.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {introduced.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+              <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
           </div>
         );
@@ -2085,34 +2055,13 @@ function TopicContent({
               </p>
             </div>
 
-            <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {natives.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
+              <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
             </div>
-            <h3 className="font-semibold text-foreground text-sm">Introduced Species ({introduced.length})</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {introduced.map((w) => (
-                <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                  <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                    <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                  </div>
-                  <div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                    <div className="text-xs text-primary italic">{w.scientificName}</div>
-                    <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+              <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
             </div>
           </div>
         );
@@ -2141,35 +2090,13 @@ function TopicContent({
               find control solutions.
             </p>
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Native Species ({natives.length})</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {natives.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                  <div className="text-xs text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                </div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
+            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
           </div>
-          <h3 className="font-semibold text-foreground text-sm">Introduced Species ({introduced.length})</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {introduced.map((w) => (
-              <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                </div>
-                <div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                  <div className="text-xs text-primary italic">{w.scientificName}</div>
-                  <div className="text-xs text-muted-foreground">{w.habitat}</div>
-                </div>
-              </div>
-            ))}
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
           </div>
         </div>
       );
