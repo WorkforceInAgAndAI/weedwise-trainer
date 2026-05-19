@@ -73,8 +73,12 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const apply = (moaId: string) => {
     const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
     let killed = 0;
+    // Broadcast effect: herbicide doesn't discriminate. Any LIVING plant in the
+    // field whose best MOA matches the chosen herbicide also dies, even if the
+    // student didn't individually select it. This models how a sprayed broadleaf
+    // herbicide takes out every susceptible broadleaf it contacts.
     setItems(prev => prev.map(it => {
-      if (!selected.includes(it.id)) return it;
+      if (it.killed) return it;
       const best = getBestMOAForWeed(it.weed);
       if (best === moaId) { killed++; return { ...it, killed: true }; }
       return it;
@@ -90,7 +94,15 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
     else setPhase('result'); // last round end
   };
 
-  const isLevelDone = round === TOTAL_ROUNDS && phase === 'result' && appliedMOA;
+  // Continue selecting more weeds in the SAME round (after an application).
+  const sprayAgain = () => {
+    setSelected([]);
+    setAppliedMOA(null);
+    setPhase('select');
+  };
+
+  const livingCount = items.filter(i => !i.killed).length;
+  const isLevelDone = round === TOTAL_ROUNDS && phase === 'result' && appliedMOA && livingCount === 0;
   const finished = isLevelDone;
 
   const restart = () => { setRound(1); setScore(0); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); };
@@ -200,11 +212,26 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                 );
               })()}
               {round < TOTAL_ROUNDS ? (
-                <button onClick={nextRound} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                  Next Round →
-                </button>
+                <>
+                  {livingCount > 0 && (
+                    <button onClick={sprayAgain} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+                      Spray Again ({livingCount} weeds left) →
+                    </button>
+                  )}
+                  <button onClick={nextRound}
+                    className={`w-full py-2.5 rounded-lg font-bold text-sm ${livingCount > 0 ? 'bg-secondary text-foreground' : 'bg-primary text-primary-foreground'}`}>
+                    {livingCount > 0 ? 'End Round Early →' : 'Next Round →'}
+                  </button>
+                </>
               ) : (
-                <LevelComplete level={level} score={score} total={items.length * TOTAL_ROUNDS} onNextLevel={nextLevelFn} onStartOver={startOver} onBack={onBack} />
+                <>
+                  {livingCount > 0 && (
+                    <button onClick={sprayAgain} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+                      Spray Again ({livingCount} weeds left) →
+                    </button>
+                  )}
+                  <LevelComplete level={level} score={score} total={items.length * TOTAL_ROUNDS} onNextLevel={nextLevelFn} onStartOver={startOver} onBack={onBack} />
+                </>
               )}
             </>
           )}
