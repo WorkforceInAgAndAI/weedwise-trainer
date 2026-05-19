@@ -26,7 +26,7 @@ function herbLabel(h: typeof HERBICIDES[0], isMulti: boolean): string {
 }
 
 const CROP_LEVELS = [
-  { id: 'rr-soy', name: 'Roundup Ready Soybean', compatible: ['epsps', 'ppo', 'multi'], rotationValue: 0.4, bg: soyBg },
+  { id: 'rr-soy', name: 'Glyphosate-Tolerant Soybean', compatible: ['epsps', 'ppo', 'multi'], rotationValue: 0.4, bg: soyBg },
   { id: 'conv-corn', name: 'Conventional Corn', compatible: ['als', 'ppo', 'auxin', 'multi'], rotationValue: 0.7, bg: cornBg },
   { id: 'wheat', name: 'Winter Wheat', compatible: ['als', 'auxin', 'ppo', 'multi'], rotationValue: 0.8, bg: wheatBg },
 ];

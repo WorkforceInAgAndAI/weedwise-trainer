@@ -163,7 +163,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-3 text-center">Drag each weed into the habitat it dominates. Wrong placements pop back out.</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-4 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_340px] gap-4 max-w-6xl mx-auto">
           <div className="grid grid-cols-2 gap-3">
             {ZONES.map(z => {
               const ZoneIcon = z.Icon;
@@ -173,32 +173,32 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
                   onClick={() => handleDrop(z.id)}
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => handleDrop(z.id)}
-                  className={`rounded-xl border-2 p-3 min-h-[180px] transition-all ${
+                  className={`rounded-xl border-2 p-4 min-h-[240px] transition-all ${
                     (selected || draggedId) ? 'border-primary bg-primary/5 cursor-pointer hover:bg-primary/10' : 'border-border bg-card'
                   }`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <ZoneIcon className="w-5 h-5 text-foreground" />
-                    <span className="font-bold text-foreground text-sm">{z.label}</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <ZoneIcon className="w-6 h-6 text-foreground" />
+                    <span className="font-bold text-foreground text-base">{z.label}</span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {placed.map(i => {
                       const isWrong = checked && i.zone !== z.id;
                       const isRight = checked && i.zone === z.id;
                       const isBouncing = bouncedIds.includes(i.weed.id);
                       return (
                         <div key={i.weed.id}
-                          className={`flex flex-col items-center gap-1 p-1.5 rounded-lg border-2 transition-all duration-500 ${
+                          className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-500 ${
                             isBouncing ? 'opacity-0 -translate-y-12 scale-50 border-destructive' :
                             isWrong ? 'border-destructive bg-destructive/10' :
                             isRight ? 'border-green-500 bg-green-500/10' :
                             'border-border bg-secondary'
                           }`}>
-                          <div className="w-14 h-14 rounded overflow-hidden bg-muted">
+                          <div className="w-20 h-20 rounded overflow-hidden bg-muted">
                             <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                           </div>
-                          <span className="text-[10px] font-medium text-foreground max-w-[60px] text-center leading-tight">{i.weed.commonName}</span>
+                          <span className="text-xs font-medium text-foreground max-w-[88px] text-center leading-tight">{i.weed.commonName}</span>
                           {!checked && (
-                            <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-[9px] text-muted-foreground hover:text-destructive">remove</button>
+                            <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-[10px] text-muted-foreground hover:text-destructive">remove</button>
                           )}
                         </div>
                       );
@@ -210,7 +210,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="rounded-xl border-2 border-border bg-card p-3 h-fit md:sticky md:top-4">
-            <p className="text-xs font-bold uppercase text-foreground mb-3">Weeds to Sort ({unplaced.length})</p>
+            <p className="text-sm font-bold uppercase text-foreground mb-3">Weeds to Sort ({unplaced.length})</p>
             <div className="space-y-2">
               {unplaced.length === 0 && <p className="text-xs text-muted-foreground italic">All placed! Hit "Check Answers".</p>}
               {unplaced.map(i => (
@@ -219,13 +219,13 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
                   onDragStart={() => setDraggedId(i.weed.id)}
                   onDragEnd={() => setDraggedId(null)}
                   onClick={() => setSelected(selected === i.weed.id ? null : i.weed.id)}
-                  className={`flex items-center gap-2 w-full p-2 rounded-lg border-2 text-sm font-medium transition-all cursor-grab active:cursor-grabbing ${
+                  className={`flex items-center gap-3 w-full p-2.5 rounded-lg border-2 text-sm font-medium transition-all cursor-grab active:cursor-grabbing ${
                     selected === i.weed.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-background text-foreground hover:border-primary/50'
                   }`}>
-                  <div className="w-12 h-12 rounded overflow-hidden bg-muted shrink-0">
+                  <div className="w-16 h-16 rounded overflow-hidden bg-muted shrink-0">
                     <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-left text-xs leading-tight">{i.weed.commonName}</span>
+                  <span className="text-left text-sm leading-tight">{i.weed.commonName}</span>
                 </button>
               ))}
             </div>

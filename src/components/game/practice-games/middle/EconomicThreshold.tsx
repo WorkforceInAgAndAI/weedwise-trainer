@@ -94,13 +94,11 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
     return { weed: w, count: countsBySpecies[id], threshold: thresholdFor(id), above: countsBySpecies[id] > thresholdFor(id) };
   }), [countsBySpecies, field]);
 
-  const [phase, setPhase] = useState<'count' | 'decide' | 'result'>('count');
-  // user's per-species decision: treat or monitor
-  const [decisions, setDecisions] = useState<Record<string, 'treat' | 'monitor'>>({});
+  const [phase, setPhase] = useState<'decide' | 'result'>('decide');
+  // user's per-species decision: manage or leave
+  const [decisions, setDecisions] = useState<Record<string, 'manage' | 'leave'>>({});
 
-  const submitCount = () => setPhase('decide');
-
-  const decide = (id: string, d: 'treat' | 'monitor') => {
+  const decide = (id: string, d: 'manage' | 'leave') => {
     setDecisions(prev => ({ ...prev, [id]: d }));
   };
 
@@ -109,7 +107,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
   const submitDecisions = () => {
     let pts = 0;
     speciesList.forEach(s => {
-      const correct = (s.above && decisions[s.weed.id] === 'treat') || (!s.above && decisions[s.weed.id] === 'monitor');
+      const correct = (s.above && decisions[s.weed.id] === 'manage') || (!s.above && decisions[s.weed.id] === 'leave');
       if (correct) pts += 1;
     });
     setScore(s => s + pts);
@@ -117,7 +115,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
   };
 
   const resetField = () => {
-    setPhase('count');
+    setPhase('decide');
     setDecisions({});
   };
 
@@ -164,31 +162,9 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
           <div className="overflow-y-auto bg-card border border-border rounded-xl p-3 space-y-3">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Field Survey ({field.weeds.length} weeds)</p>
 
-            {phase === 'count' && (
-              <>
-                <p className="text-xs text-muted-foreground">Tally the weed species in your field, then decide species-by-species.</p>
-                <div className="space-y-2">
-                  {speciesList.map(s => (
-                    <div key={s.weed.id} className="flex items-center gap-2 p-2 rounded border border-border bg-background">
-                      <div className="w-10 h-10 rounded overflow-hidden bg-secondary flex-shrink-0">
-                        <WeedImage weedId={s.weed.id} stage="flower" className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-foreground truncate">{s.weed.commonName}</p>
-                        <p className="text-[10px] text-muted-foreground">Counted: {s.count}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={submitCount} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                  Compare to Thresholds →
-                </button>
-              </>
-            )}
-
             {phase === 'decide' && (
               <>
-                <p className="text-xs text-muted-foreground">Each species has its own economic threshold. Decide whether to <span className="font-bold text-foreground">treat</span> or <span className="font-bold text-foreground">monitor</span>.</p>
+                <p className="text-xs text-muted-foreground">Each species has its own <span className="font-bold text-foreground">economic threshold</span> — the density at which yield loss costs more than control. If a species' count is above its threshold, <span className="font-bold text-foreground">Manage</span> it. If it's below, it's not worth the cost — <span className="font-bold text-foreground">Leave</span> it and keep scouting.</p>
                 <div className="space-y-2">
                   {speciesList.map(s => (
                     <div key={s.weed.id} className="p-2 rounded-lg border border-border bg-background">
@@ -202,13 +178,13 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-1">
-                        <button onClick={() => decide(s.weed.id, 'treat')}
-                          className={`py-1.5 rounded text-[11px] font-bold border-2 ${decisions[s.weed.id] === 'treat' ? 'border-destructive bg-destructive/20 text-destructive' : 'border-border bg-card text-foreground hover:border-destructive/40'}`}>
-                          Treat
+                        <button onClick={() => decide(s.weed.id, 'manage')}
+                          className={`py-1.5 rounded text-[11px] font-bold border-2 ${decisions[s.weed.id] === 'manage' ? 'border-destructive bg-destructive/20 text-destructive' : 'border-border bg-card text-foreground hover:border-destructive/40'}`}>
+                          Manage Weeds
                         </button>
-                        <button onClick={() => decide(s.weed.id, 'monitor')}
-                          className={`py-1.5 rounded text-[11px] font-bold border-2 ${decisions[s.weed.id] === 'monitor' ? 'border-green-600 bg-green-600/20 text-green-700' : 'border-border bg-card text-foreground hover:border-green-600/40'}`}>
-                          Monitor
+                        <button onClick={() => decide(s.weed.id, 'leave')}
+                          className={`py-1.5 rounded text-[11px] font-bold border-2 ${decisions[s.weed.id] === 'leave' ? 'border-green-600 bg-green-600/20 text-green-700' : 'border-border bg-card text-foreground hover:border-green-600/40'}`}>
+                          Leave Weeds
                         </button>
                       </div>
                     </div>
@@ -216,7 +192,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                 </div>
                 <button onClick={submitDecisions} disabled={!allDecided}
                   className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50">
-                  Submit Decisions
+                  {allDecided ? 'Submit Decisions' : `Decide all ${speciesList.length} species to continue`}
                 </button>
               </>
             )}
@@ -226,7 +202,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                 <p className="text-sm font-bold text-foreground">Results</p>
                 <div className="space-y-2">
                   {speciesList.map(s => {
-                    const correctChoice = s.above ? 'treat' : 'monitor';
+                    const correctChoice: 'manage' | 'leave' = s.above ? 'manage' : 'leave';
                     const userChoice = decisions[s.weed.id];
                     const correct = userChoice === correctChoice;
                     return (
@@ -241,7 +217,7 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
                           </div>
                         </div>
                         <p className={`text-[10px] mt-1 font-semibold ${correct ? 'text-green-700' : 'text-destructive'}`}>
-                          You chose <span className="capitalize">{userChoice}</span> · Correct: <span className="capitalize">{correctChoice}</span>
+                          You chose <span className="capitalize">{userChoice === 'manage' ? 'Manage' : 'Leave'}</span> · Correct: <span className="capitalize">{correctChoice === 'manage' ? 'Manage' : 'Leave'}</span>
                         </p>
                       </div>
                     );

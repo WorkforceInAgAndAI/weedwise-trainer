@@ -92,12 +92,13 @@ export default function TaxonomyTower({ onBack }: Props) {
             <WeedImage weedId={target.id} stage="flower" className="w-full h-full object-cover" />
           </div>
 
-          <div className="w-full max-w-md flex flex-col items-center gap-2">
+          <div className="w-full max-w-2xl flex flex-col items-center gap-2">
           {pyramid.map((_, i) => {
             const displayIdx = pyramid.length - 1 - i;
             const actualLevel = pyramid[displayIdx];
             const actualIdx = displayIdx;
-            const widthPercent = 50 + (pyramid.length - 1 - actualIdx) * 10;
+            // Wider rows + species level (top) gets full width so long names fit
+            const widthPercent = Math.min(100, 75 + (pyramid.length - 1 - actualIdx) * 8);
 
             return (
               <div key={actualIdx} className="w-full flex justify-center" style={{ maxWidth: `${widthPercent}%` }}>
@@ -110,12 +111,12 @@ export default function TaxonomyTower({ onBack }: Props) {
                     <>
                       <p className="text-xs text-muted-foreground mb-2 text-center">{actualLevel.question}</p>
                       {actualIdx < pyramidLevel || found ? (
-                        <p className="text-sm font-bold text-primary text-center">{actualLevel.options[actualLevel.correctIdx]}</p>
+                        <p className="text-sm font-bold text-primary text-center break-words">{actualLevel.options[actualLevel.correctIdx]}</p>
                       ) : (
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                           {actualLevel.options.map((opt, oi) => (
                             <button key={oi} onClick={() => choose(oi)}
-                              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${wrong ? 'bg-destructive/20 text-destructive' : 'bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground'}`}>
+                              className={`min-h-[3rem] px-3 py-2 rounded-lg text-sm font-medium leading-tight break-words whitespace-normal transition-colors ${wrong ? 'bg-destructive/20 text-destructive' : 'bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground'}`}>
                               {opt}
                             </button>
                           ))}
