@@ -890,7 +890,23 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "names":
       if (grade === "elementary") {
-        return <ElementaryNamesFlashcards weeds={topicWeeds} onSelectWeed={onSelectWeed} />;
+        return (
+          <div className="space-y-5">
+            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
+              <p>
+                A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
+                a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
+                plants we want to keep, like crops in a farmer's field.
+              </p>
+              <p>
+                Each weed has a <strong>common name</strong> we use every day. Look at the picture, guess the name,
+                then tap the card to check yourself.
+              </p>
+            </div>
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
+          </div>
+        );
       }
 
       if (grade === "middle") {
