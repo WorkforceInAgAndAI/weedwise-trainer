@@ -397,25 +397,85 @@ interface Props {
  * Elementary "Weed Names & ID" flashcard deck.
  * One weed per card with large image, sorted into "Confident" and "Review" buckets.
  */
-function ElementaryNamesFlashcards({
-  weeds: deck,
+/**
+ * Reusable horizontally-scrolling weed gallery with larger thumbnails.
+ * Used by topics that need to show every weed without forcing the user to scroll vertically.
+ */
+function HorizontalWeedRow({
+  weeds: list,
   onSelectWeed,
+  stage = "flower",
+  showScientific = false,
+  tileWidth = "9rem",
 }: {
   weeds: Weed[];
   onSelectWeed: (w: Weed) => void;
+  stage?: "whole" | "flower" | "vegetative" | "seed" | "seedling";
+  showScientific?: boolean;
+  tileWidth?: string;
 }) {
+  if (list.length === 0) {
+    return <p className="text-xs text-muted-foreground italic">No species in this group.</p>;
+  }
+  return (
+    <div>
+      <div className="overflow-x-auto pb-3 -mx-1">
+        <div className="flex gap-3 px-1" style={{ minWidth: `${list.length * (parseFloat(tileWidth) + 0.75)}rem` }}>
+          {list.map((w) => (
+            <div key={w.id} className="text-center shrink-0" style={{ width: tileWidth }}>
+              <button
+                onClick={() => onSelectWeed(w)}
+                className="block w-full rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                style={{ aspectRatio: "1 / 1" }}
+              >
+                <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+              </button>
+              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
+              {showScientific && (
+                <p className="text-[10px] text-primary italic leading-tight">{w.scientificName}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground">← Scroll to see all {list.length} species →</p>
+    </div>
+  );
+}
+
+/**
+ * Reusable flip flashcard deck.
+ * - Image is shown on the front; click the card to flip and reveal the name.
+ * - User sorts each card into "I'm confident" or "Want to review more".
+ * - After all cards are sorted, a recap is shown with the option to review only the review pile.
+ */
+function WeedFlashcardDeck({
+  weeds: fullDeck,
+  onSelectWeed,
+  stage = "flower",
+  emphasizeScientific = false,
+}: {
+  weeds: Weed[];
+  onSelectWeed: (w: Weed) => void;
+  stage?: "whole" | "flower" | "vegetative" | "seed" | "seedling";
+  emphasizeScientific?: boolean;
+}) {
+  const [activeDeck, setActiveDeck] = useState<Weed[]>(fullDeck);
   const [index, setIndex] = useState(0);
   const [confident, setConfident] = useState<string[]>([]);
   const [review, setReview] = useState<string[]>([]);
+  const [flipped, setFlipped] = useState(false);
 
-  const total = deck.length;
+  const total = activeDeck.length;
   const done = index >= total;
-  const current = !done ? deck[index] : null;
+  const current = !done ? activeDeck[index] : null;
 
-  const reset = () => {
+  const reset = (deck: Weed[]) => {
+    setActiveDeck(deck);
     setIndex(0);
     setConfident([]);
     setReview([]);
+    setFlipped(false);
   };
 
   const sortCard = (bucket: "confident" | "review") => {
@@ -423,131 +483,156 @@ function ElementaryNamesFlashcards({
     if (bucket === "confident") setConfident((p) => [...p, current.id]);
     else setReview((p) => [...p, current.id]);
     setIndex((i) => i + 1);
+    setFlipped(false);
   };
 
-  return (
-    <div className="space-y-5">
-      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-        <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
-        <p>
-          A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
-          a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
-          plants we want to keep, like crops in a farmer's field.
-        </p>
-        <p>
-          Each weed has a <strong>common name</strong> we use every day. Knowing weed names helps us
-          <strong> identify, manage, and stay safe</strong> around them.
-        </p>
+  const reviewOnly = () => {
+    const reviewDeck = fullDeck.filter((w) => review.includes(w.id));
+    if (reviewDeck.length > 0) reset(reviewDeck);
+  };
+
+  if (!done && current) {
+    return (
+      <div className="bg-card border border-border rounded-xl shadow-card p-5 space-y-4">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>Card {index + 1} of {total}</span>
+          <span>
+            <span className="text-success font-semibold">Confident: {confident.length}</span>{" · "}
+            <span className="text-terracotta font-semibold">Review: {review.length}</span>
+          </span>
+        </div>
+
+        <button
+          onClick={() => setFlipped((f) => !f)}
+          className="block w-full rounded-xl overflow-hidden bg-muted border-2 border-border hover:border-primary transition-colors text-left"
+          style={{ perspective: "1000px" }}
+        >
+          <div className="relative w-full aspect-[4/3] max-h-[26rem]">
+            {!flipped ? (
+              <div className="absolute inset-0 flex flex-col">
+                <div className="flex-1 overflow-hidden">
+                  <WeedImage weedId={current.id} stage={stage} className="w-full h-full" />
+                </div>
+                <p className="text-[11px] text-muted-foreground text-center py-1.5 bg-card border-t border-border">
+                  Tap card to reveal the name
+                </p>
+              </div>
+            ) : (
+              <div className="absolute inset-0 bg-card flex flex-col items-center justify-center gap-2 p-5 text-center">
+                {emphasizeScientific ? (
+                  <>
+                    <p className="font-display font-bold text-primary italic text-2xl sm:text-3xl">
+                      {current.scientificName}
+                    </p>
+                    <p className="text-sm text-foreground">
+                      Common name: <strong>{current.commonName}</strong>
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Family: {current.family} • {current.plantType}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-display font-bold text-foreground text-2xl sm:text-3xl">
+                      {current.commonName}
+                    </p>
+                    <p className="text-sm italic text-primary">{current.scientificName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {current.plantType} • {current.lifeCycle}
+                    </p>
+                  </>
+                )}
+                {current.memoryHook && (
+                  <p className="text-xs text-primary bg-primary/10 rounded-md px-3 py-1.5 mt-1">
+                    <span className="font-bold">Memory trick:</span> {current.memoryHook}
+                  </p>
+                )}
+                <p className="text-[11px] text-muted-foreground mt-1">Tap card to flip back</p>
+              </div>
+            )}
+          </div>
+        </button>
+
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => sortCard("review")}
+            className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-terracotta/40 bg-terracotta/5 text-terracotta font-semibold hover:bg-terracotta/15 transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Want to review more
+          </button>
+          <button
+            onClick={() => sortCard("confident")}
+            className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-success/40 bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
+          >
+            <ThumbsUp className="w-4 h-4" />
+            I'm confident
+          </button>
+        </div>
       </div>
+    );
+  }
 
-      {!done && current ? (
-        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-4">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Card {index + 1} of {total}
-            </span>
-            <span>
-              <span className="text-success font-semibold">Confident: {confident.length}</span>
-              {" · "}
-              <span className="text-terracotta font-semibold">Review: {review.length}</span>
-            </span>
-          </div>
-
-          <div className="w-full aspect-[4/3] max-h-80 mx-auto rounded-xl overflow-hidden bg-muted">
-            <WeedImage weedId={current.id} stage="whole" className="w-full h-full" />
-          </div>
-
-          <div className="text-center space-y-1">
-            <ClickableWeedName
-              weed={current}
-              onSelect={onSelectWeed}
-              className="font-display text-2xl"
-            />
-            <p className="text-xs text-muted-foreground">
-              {current.plantType} • {current.lifeCycle}
-            </p>
-          </div>
-
-          <div className="bg-primary/10 rounded-lg px-3 py-2 text-center">
-            <p className="text-sm text-primary">
-              <span className="font-bold">Memory trick:</span> {current.memoryHook}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
-              onClick={() => sortCard("review")}
-              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-terracotta/40 bg-terracotta/5 text-terracotta font-semibold hover:bg-terracotta/15 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Want to review more
-            </button>
-            <button
-              onClick={() => sortCard("confident")}
-              className="inline-flex items-center justify-center gap-2 py-3 rounded-lg border-2 border-success/40 bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
-            >
-              <ThumbsUp className="w-4 h-4" />
-              I'm confident
-            </button>
+  return (
+    <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-5">
+      <div className="text-center">
+        <h3 className="font-display font-bold text-foreground text-xl">Great work!</h3>
+        <p className="text-sm text-muted-foreground">You sorted all {total} cards.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-lg border border-success/40 bg-success/5 p-4">
+          <p className="font-display font-bold text-success text-sm mb-2">Confident ({confident.length})</p>
+          <div className="grid grid-cols-3 gap-2">
+            {confident.map((id) => {
+              const w = activeDeck.find((d) => d.id === id);
+              if (!w) return null;
+              return (
+                <div key={id} className="text-center">
+                  <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                    <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+                  </div>
+                  <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
-      ) : (
-        <div className="bg-card border border-border rounded-xl shadow-card p-6 space-y-5">
-          <div className="text-center">
-            <h3 className="font-display font-bold text-foreground text-xl">Great work!</h3>
-            <p className="text-sm text-muted-foreground">You sorted all {total} weeds.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-lg border border-success/40 bg-success/5 p-4">
-              <p className="font-display font-bold text-success text-sm mb-2">
-                Confident ({confident.length})
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {confident.map((id) => {
-                  const w = deck.find((d) => d.id === id);
-                  if (!w) return null;
-                  return (
-                    <div key={id} className="text-center">
-                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="rounded-lg border border-terracotta/40 bg-terracotta/5 p-4">
-              <p className="font-display font-bold text-terracotta text-sm mb-2">
-                Want to review more ({review.length})
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {review.map((id) => {
-                  const w = deck.find((d) => d.id === id);
-                  if (!w) return null;
-                  return (
-                    <div key={id} className="text-center">
-                      <div className="aspect-square rounded-md overflow-hidden bg-muted">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <button
-              onClick={reset}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Start over
-            </button>
+        <div className="rounded-lg border border-terracotta/40 bg-terracotta/5 p-4">
+          <p className="font-display font-bold text-terracotta text-sm mb-2">Want to review more ({review.length})</p>
+          <div className="grid grid-cols-3 gap-2">
+            {review.map((id) => {
+              const w = activeDeck.find((d) => d.id === id);
+              if (!w) return null;
+              return (
+                <div key={id} className="text-center">
+                  <div className="aspect-square rounded-md overflow-hidden bg-muted">
+                    <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+                  </div>
+                  <p className="text-[10px] mt-1 text-foreground truncate">{w.commonName}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">
+        {review.length > 0 && (
+          <button
+            onClick={reviewOnly}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-terracotta text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Review only my {review.length} review card{review.length === 1 ? "" : "s"}
+          </button>
+        )}
+        <button
+          onClick={() => reset(fullDeck)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Start over with all {fullDeck.length}
+        </button>
+      </div>
     </div>
   );
 }
