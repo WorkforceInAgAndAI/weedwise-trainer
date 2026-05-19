@@ -2504,26 +2504,11 @@ function TopicContent({
           {Array.from(famGroups.entries())
             .sort()
             .map(([family, members]) => (
-              <div key={family}>
-                <h3 className="font-semibold text-foreground text-sm mb-2">
+              <div key={family} className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <h3 className="font-display font-bold text-foreground text-base">
                   {family} ({members.length} species)
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {members.map((w) => (
-                    <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
-                      <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
-                      </div>
-                      <div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
-                        {grade === "high" && <div className="text-xs text-primary italic">{w.scientificName}</div>}
-                        <div className="text-xs text-muted-foreground">
-                          {w.plantType} • {w.lifeCycle}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <HorizontalWeedRow weeds={members} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
               </div>
             ))}
         </div>
