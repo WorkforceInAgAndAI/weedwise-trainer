@@ -99,7 +99,10 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
         </div>
 
         <p className="text-center font-bold text-foreground text-lg mb-1">{current!.name}</p>
-        <p className="text-center text-sm text-muted-foreground mb-4">Which plant does this description match?</p>
+        <p className="text-center text-xs text-muted-foreground mb-2 max-w-md mx-auto">
+          Some weed species are <span className="font-semibold text-foreground">dioecious</span> — meaning male and female flowers grow on separate plants. Because each sex is built for a different reproductive job (males release pollen, females catch pollen and develop seeds), the two plants can look noticeably different even though they're the same species.
+        </p>
+        <p className="text-center text-sm text-foreground font-medium mb-4">Read the trait clue below — does it describe the male or the female plant?</p>
 
         {/* Description card */}
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4 text-center">
