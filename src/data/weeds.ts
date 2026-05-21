@@ -687,7 +687,7 @@ export const weeds: Weed[] = [
     origin: "Native",
     image: "/images/waterhemp/plant_1.jpg",
     traits: [
-      "Small green flowers arranged in dense, spiny clusters",
+      "Small green flowers arranged in dense, slender terminal spikes",
       "Broad, alternate leaves without hair",
       "Fruit (utricle) characterized by rough texture and wrinkled surface",
       "Dioecious with male and female flowers on separate plants",
@@ -705,7 +705,7 @@ export const weeds: Weed[] = [
       species: "Palmer Amaranth",
       difference: "Palmer Amaranth has petioles longer than leaf blades; Waterhemp petioles are shorter",
     },
-    memoryHook: "Waterhemp = Tall plants with broad leaves + long flower heads + near water",
+    memoryHook: "Waterhemp = Tall plants with broad leaves + long slender flower spikes",
   },
 
   {
