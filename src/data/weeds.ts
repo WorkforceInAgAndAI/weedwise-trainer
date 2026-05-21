@@ -1419,7 +1419,7 @@ export const weeds: Weed[] = [
     origin: "Introduced",
     image: "/images/Common_teasel/plant_1.jpeg",
     traits: [
-      "Prickly sed heads with small, pink to lavender flowers",
+      "Prickly seed heads with small, pink to lavender flowers",
       "Spiny stem and leaves",
       "Tall rigid growth (4–7 feet) second year",
       "Coarse texture throughout",
@@ -2141,7 +2141,7 @@ export const weeds: Weed[] = [
       "Compound leaves with 3 finely serrated leaflets",
       "Yellow umbel flowers",
       "Smooth stems reaching 1-3 feet tall",
-      "Native to prairies",
+      "Native prairie plant; important early-season pollinator resource",
     ],
     habitat: "Prairies, meadows, open woods, roadsides",
     primaryHabitat: "Cool-Season / Early Spring",
