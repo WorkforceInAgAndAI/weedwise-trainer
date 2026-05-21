@@ -553,7 +553,7 @@ export const weeds: Weed[] = [
 
   {
     id: "Horseweed",
-    commonName: "Horseweed",
+    commonName: "Horseweed (Marestail)",
     scientificName: "Erigeron canadensis",
     family: "Asteraceae",
     plantType: "Dicot",
