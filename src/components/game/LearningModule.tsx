@@ -1108,12 +1108,24 @@ function TopicContent({
             {grade === "middle" && (
               <>
                 <p>
-                  Weed seeds are remarkably diverse in shape, size, and color. Understanding seed morphology helps with
-                  identification before plants even emerge.
+                  A <strong>seed</strong> is a tiny package that stores a plant's <strong>genetic
+                  material (DNA)</strong> along with all the <strong>stored nutrients</strong> a young
+                  plant needs to grow its first roots and green leaves before it can make its own food
+                  through photosynthesis. When conditions are right, a seed begins
+                  <strong> imbibition</strong> — soaking up water through its seed coat, which
+                  activates enzymes and kicks off germination.
+                </p>
+                <p>
+                  Weed seeds are remarkably diverse in shape, size, and color. Understanding seed
+                  morphology helps with identification before plants even emerge.
                 </p>
                 <p>
                   The <strong>soil seed bank</strong> is the reservoir of viable seeds in the soil. A single field can
-                  contain millions of weed seeds per acre. Some species produce over 100,000 seeds per plant.
+                  contain millions of weed seeds per acre, and some species produce over 100,000 seeds per plant.
+                  Seed banks are not just deep in the soil — viable seeds collect in <strong>leaf
+                  litter</strong> on the soil surface, in the <strong>topsoil</strong> where most
+                  germination happens, and deeper in the soil profile where seeds can stay dormant
+                  for years until tillage or erosion brings them back up.
                 </p>
                 <p>
                   <strong>Seed dormancy</strong> allows seeds to survive unfavorable conditions. Some weed seeds can
@@ -1138,7 +1150,7 @@ function TopicContent({
                 </p>
                 <p>
                   Weed seeds spread through four main <strong>dispersal vectors</strong>. <strong>Wind
-                  (anemochory)</strong> carries lightweight seeds with wings or tufts, like dandelion and marestail.
+                  (anemochory)</strong> carries lightweight seeds with wings or tufts, like dandelion and horseweed.
                   <strong> Water (hydrochory)</strong> floats seeds along ditches, streams, and irrigation lines.
                   <strong> Animals (zoochory)</strong> move seeds by eating fruit and depositing them, or by
                   carrying burrs and barbs on fur and feathers. <strong>Humans and machinery (anthropochory)</strong>

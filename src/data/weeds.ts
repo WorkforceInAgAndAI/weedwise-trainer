@@ -553,7 +553,7 @@ export const weeds: Weed[] = [
 
   {
     id: "Horseweed",
-    commonName: "Horseweed",
+    commonName: "Horseweed (Marestail)",
     scientificName: "Erigeron canadensis",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -687,7 +687,7 @@ export const weeds: Weed[] = [
     origin: "Native",
     image: "/images/waterhemp/plant_1.jpg",
     traits: [
-      "Small green flowers arranged in dense, spiny clusters",
+      "Small green flowers arranged in dense, slender terminal spikes",
       "Broad, alternate leaves without hair",
       "Fruit (utricle) characterized by rough texture and wrinkled surface",
       "Dioecious with male and female flowers on separate plants",
@@ -705,7 +705,7 @@ export const weeds: Weed[] = [
       species: "Palmer Amaranth",
       difference: "Palmer Amaranth has petioles longer than leaf blades; Waterhemp petioles are shorter",
     },
-    memoryHook: "Waterhemp = Tall plants with broad leaves + long flower heads + near water",
+    memoryHook: "Waterhemp = Tall plants with broad leaves + long slender flower spikes",
   },
 
   {
@@ -1419,7 +1419,7 @@ export const weeds: Weed[] = [
     origin: "Introduced",
     image: "/images/Common_teasel/plant_1.jpeg",
     traits: [
-      "Prickly sed heads with small, pink to lavender flowers",
+      "Prickly seed heads with small, pink to lavender flowers",
       "Spiny stem and leaves",
       "Tall rigid growth (4–7 feet) second year",
       "Coarse texture throughout",
@@ -2141,7 +2141,7 @@ export const weeds: Weed[] = [
       "Compound leaves with 3 finely serrated leaflets",
       "Yellow umbel flowers",
       "Smooth stems reaching 1-3 feet tall",
-      "Native to prairies",
+      "Native prairie plant; important early-season pollinator resource",
     ],
     habitat: "Prairies, meadows, open woods, roadsides",
     primaryHabitat: "Cool-Season / Early Spring",
@@ -2295,60 +2295,6 @@ export const weeds: Weed[] = [
         "Goosegrass has a white/silver center and zipper-like seedheads; Crabgrass has finger-like spreading seedheads",
     },
     memoryHook: "Large crabgrass = finger-like seedheads + hairy + roots at nodes",
-  },
-
-  {
-    id: "marestail",
-    commonName: "Marestail",
-    scientificName: "Erigeron canadensis",
-    family: "Asteraceae",
-    plantType: "Dicot",
-    lifeCycle: "Annual",
-    origin: "Native",
-    traits: [
-      "Unbranched stem reaching up to 6 feet tall",
-      "Narrow, unevenly lobed leaves",
-      "Small, clustered, white flowers",
-      "Alternate arrangement of leaves",
-    ],
-    habitat: "No-till fields, roadsides, waste areas",
-    primaryHabitat: "Dry / Disturbed",
-    management: "PRE herbicides; burndown with multiple modes of action",
-    controlTiming: "Fall rosette or early spring before bolting",
-    actImmediately: true,
-    actReason: "Widespread glyphosate resistance; problematic in no-till systems",
-    lookAlike: {
-      id: "Horseweed",
-      species: "Horseweed",
-      difference: "Marestail and Horseweed are the same species with regional name differences",
-    },
-    memoryHook: "Marestail = tall unbranched wiry stem + glyphosate-resistant + no-till problem",
-  },
-
-  {
-    id: "morningglory",
-    commonName: "Morningglory",
-    scientificName: "Ipomoea spp.",
-    family: "Convolvulaceae",
-    plantType: "Dicot",
-    lifeCycle: "Annual",
-    origin: "Introduced",
-    traits: ["Heart-shaped leaves", "Trumpet flowers", "Twining vine", "Hard-coated seeds"],
-    habitat: "Crop fields, fencerows, gardens, disturbed areas",
-    primaryHabitat: "Warm-Season / Full Sun",
-    management: "Pre-emergent herbicides; post-emergent broadleaf herbicides early",
-    controlTiming: "Before vining stage; seedling to 4-leaf",
-    actImmediately: false,
-    actReason: "Vining habit interferes with harvest; hard seed coat enables long soil persistence",
-    lookAlike: {
-      id: "Field_bindweed",
-      species: "Field Bindweed",
-      difference:
-        "Bindweed is perennial with smaller flowers and arrow-shaped leaves; Morningglory is annual with larger trumpet flowers",
-    },
-    memoryHook: "Morningglory = trumpet flowers + heart leaves + twining annual vine",
-    safetyNote:
-      "Seeds and foliage can cause digestive disturbances and possible neurologic effects when consumed in quantity by animals.",
   },
 
   {
