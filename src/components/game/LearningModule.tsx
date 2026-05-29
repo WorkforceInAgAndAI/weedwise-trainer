@@ -1552,6 +1552,13 @@ function TopicContent({
         <div className="space-y-4">
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
             <p className="font-semibold text-primary">Monocots vs Dicots</p>
+            <p className="text-xs text-foreground">
+              Plants can be grouped by similar characteristics and physical patterns. Plants are grouped into
+              monocots and dicots based on how many <strong>cotyledons</strong> they have as seeds. Cotyledons are
+              structures in seeds and seedlings that store nutrients to act as an energy source during germination.
+              Cotyledons also become the first leaves of a plant. Differentiating monocots and dicots allow us to
+              identify plants and better manage weeds.
+            </p>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-card rounded-lg p-3 border border-border">
                 <p className="font-bold text-foreground">Monocots</p>
@@ -2092,11 +2099,11 @@ function TopicContent({
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
-            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
-            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
           </div>
         </div>
       );
