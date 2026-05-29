@@ -2099,11 +2099,11 @@ function TopicContent({
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
-            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
-            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
+            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
           </div>
         </div>
       );
