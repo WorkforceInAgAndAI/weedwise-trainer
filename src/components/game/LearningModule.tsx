@@ -991,7 +991,17 @@ function TopicContent({
               <p>
                 Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
                 and overall farm success. According to the Weed Science Society of America, without weed control in corn,
-                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>.
+                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>
+                {" "}(
+                <a
+                  href="https://wssa.net/wp-content/uploads/WSSA-Weed-Loss-Studies-Final-Numbers.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-primary hover:text-primary/80"
+                >
+                  WSSA Weed Loss Studies
+                </a>
+                ).
               </p>
               <p>
                 At a national and global level, scientists need more precise terms to ensure they are discussing the same
@@ -1058,19 +1068,48 @@ function TopicContent({
               </div>
             )}
 
-            {/* Flashcards focused on scientific name recall */}
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Scientific Name Flashcards</p>
+            {/* Visual ID reference: large image + side caption with diagnostic features */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+              <p className="font-display font-bold text-foreground text-base">Visual ID Reference</p>
               <p className="text-sm text-muted-foreground">
-                Look at the picture, name the genus and species, then tap the card to reveal the
-                scientific name and check yourself. Mark which cards you want to review more.
+                Each card pairs a clear reproductive-stage photo with the diagnostic features you would use to identify the
+                weed in the field. Study the image first, then read the description to confirm the key traits.
               </p>
-              <WeedFlashcardDeck
-                weeds={topicWeeds}
-                onSelectWeed={onSelectWeed}
-                stage="flower"
-                emphasizeScientific
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {topicWeeds.map((w) => (
+                  <div
+                    key={`idref-${w.id}`}
+                    className="bg-background border border-border rounded-lg p-3 flex gap-3 items-start"
+                  >
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 shrink-0 rounded-lg overflow-hidden border border-border bg-muted">
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <ClickableWeedName
+                        weed={w}
+                        onSelect={onSelectWeed}
+                        className="font-display font-bold text-sm text-foreground block"
+                      />
+                      <p className="text-xs italic text-primary">{w.scientificName}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                        Family: <span className="text-foreground normal-case">{w.family}</span>
+                      </p>
+                      {w.traits && w.traits.length > 0 && (
+                        <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
+                          {w.traits.slice(0, 4).map((t, i) => (
+                            <li key={i}>{t}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {w.memoryHook && (
+                        <p className="text-xs text-muted-foreground italic mt-1">
+                          <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );
@@ -1873,7 +1912,7 @@ function TopicContent({
           <div className="bg-card border border-border rounded-lg p-4">
             <p className="font-display font-bold text-foreground text-sm text-center mb-3">Life Cycle Stages</p>
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((stage, i, arr) => (
+              {["Seed", "Seedling", "Vegetative", "Reproductive / Flowering"].map((stage, i, arr) => (
                 <div key={stage} className="flex items-center gap-2">
                   <div className="bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 text-xs font-bold text-primary">
                     {stage}
@@ -1883,7 +1922,7 @@ function TopicContent({
               ))}
             </div>
             <p className="text-[10px] text-muted-foreground text-center mt-2 italic">
-              The reproductive stage groups flowering, pollination, and fertilization together.
+              The reproductive (or flowering) stage groups flowering, pollination, and fertilization together, ending with the mature plant releasing seeds.
             </p>
           </div>
 
