@@ -29,14 +29,14 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  {/* Image gallery */}
   {(() => {
     const hasSeeds = weed.id !== 'Field_Horsetail';
-    const stages = hasSeeds ? ['seed', 'seedling', 'vegetative', 'flower', 'whole'] as const : ['seedling', 'vegetative', 'flower', 'whole'] as const;
+    const stages = hasSeeds ? ['seed', 'seedling', 'vegetative', 'flower'] as const : ['seedling', 'vegetative', 'flower'] as const;
     const colCount = stages.length + (isGrass ? 1 : 0);
     return (
       <div className={`grid grid-cols-3 sm:grid-cols-${colCount} gap-2`}>
         {stages.map(stage => (
           <div key={stage} className="space-y-1">
             <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">
-              {stage === 'seed' ? 'Seed' : stage === 'whole' ? 'Whole Plant' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+              {stage === 'seed' ? 'Seed' : stage === 'flower' ? 'Reproductive' : stage.charAt(0).toUpperCase() + stage.slice(1)}
             </div>
             <div className="aspect-square rounded-md overflow-hidden bg-muted">
               <WeedImage weedId={weed.id} stage={stage} className="w-full h-full" />
@@ -114,8 +114,8 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
 function WeedCitations({ weedId }: { weedId: string }) {
   const citations = useMemo(() => {
     const stages = weedId === 'Field_Horsetail'
-      ? ['whole', 'seedling', 'vegetative', 'flower', 'ligule']
-      : ['seed', 'whole', 'seedling', 'vegetative', 'flower', 'ligule'];
+      ? ['seedling', 'vegetative', 'flower', 'ligule']
+      : ['seed', 'seedling', 'vegetative', 'flower', 'ligule'];
     return getSessionCitations([weedId], stages);
   }, [weedId]);
 

@@ -36,6 +36,63 @@ type TopicId =
 
 type CategoryId = "identification" | "lifecycle" | "control";
 
+// Friendly, K-5 seed descriptions inferred from species traits.
+function getElementarySeedDescription(w: Weed): string {
+  const name = w.commonName.toLowerCase();
+  if (name.includes("dandelion")) return "Fluffy white parachute that floats on the wind.";
+  if (name.includes("waterhemp")) return "Tiny, shiny, dark seeds — thousands per plant.";
+  if (name.includes("palmer")) return "Very small dark round seeds with a smooth shell.";
+  if (name.includes("foxtail")) return "Oval seeds with bristly hairs to catch on fur and clothes.";
+  if (name.includes("crabgrass")) return "Small flat seeds that scatter near the parent plant.";
+  if (name.includes("velvetleaf")) return "Wedge-shaped seeds with a tough, fuzzy coat.";
+  if (name.includes("cocklebur")) return "Bur covered in hooks that grab onto animal fur.";
+  if (name.includes("morning glory") || name.includes("bindweed")) return "Hard, dark seeds shaped like little wedges.";
+  if (name.includes("thistle")) return "Light seeds with a feathery tuft for flying on the wind.";
+  if (name.includes("ragweed")) return "Small crown-shaped seeds with tiny spines.";
+  if (name.includes("lambsquarter")) return "Tiny round black seeds — millions can hide in one field.";
+  if (name.includes("pigweed")) return "Tiny shiny black seeds that survive a long time in the soil.";
+  if (name.includes("nightshade")) return "Round seeds tucked inside a berry that animals eat.";
+  if (name.includes("kochia")) return "Small flat seeds — the whole plant tumbles to spread them.";
+  if (name.includes("nutsedge")) return "Hard nutlets in the soil that can sprout new plants.";
+  if (name.includes("johnson")) return "Plump seeds that look a bit like little grains.";
+  if (name.includes("milkweed")) return "Flat brown seeds with a silky white parachute.";
+  if (name.includes("burdock")) return "Burs with hooks — the inspiration for Velcro!";
+  if (name.includes("plantain")) return "Tiny seeds that get sticky when wet and hitch a ride on shoes.";
+  if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
+  // Fallback
+  return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
+}
+
+// Simple cross-section diagram showing seeds at different soil depths.
+function SeedBankDiagram() {
+  return (
+    <div className="rounded-lg overflow-hidden border border-border bg-background">
+      <svg viewBox="0 0 400 220" className="w-full h-auto" role="img" aria-label="Seed bank cross-section diagram">
+        {/* Sky */}
+        <rect x="0" y="0" width="400" height="40" fill="hsl(var(--muted))" />
+        {/* Leaf litter */}
+        <rect x="0" y="40" width="400" height="20" fill="#8b6f3a" />
+        {/* Topsoil */}
+        <rect x="0" y="60" width="400" height="60" fill="#6b4a2b" />
+        {/* Deep soil */}
+        <rect x="0" y="120" width="400" height="100" fill="#3f2a17" />
+        {/* Labels */}
+        <text x="8" y="55" fontSize="11" fill="#fff">Leaf litter</text>
+        <text x="8" y="78" fontSize="11" fill="#fff">Topsoil — seeds sprout here</text>
+        <text x="8" y="140" fontSize="11" fill="#fff">Deep soil — seeds wait for years</text>
+        {/* Seeds */}
+        {[[40,52],[120,55],[210,50],[320,54],[70,80],[160,90],[250,85],[340,95],[60,150],[140,170],[230,200],[300,160],[360,190]].map(([x,y],i)=> (
+          <circle key={i} cx={x} cy={y} r={3.5} fill="#f5d678" stroke="#7a5a1f" strokeWidth="0.8" />
+        ))}
+        {/* Sprout from topsoil */}
+        <path d="M180 60 C 180 45, 175 35, 170 28" stroke="#558B2F" strokeWidth="2" fill="none" />
+        <path d="M170 28 q -8 -2 -10 -10" stroke="#558B2F" strokeWidth="2" fill="none" />
+        <path d="M170 28 q 8 -2 10 -10" stroke="#558B2F" strokeWidth="2" fill="none" />
+      </svg>
+    </div>
+  );
+}
+
 interface CategoryStyle {
   id: CategoryId;
   label: string;
@@ -962,7 +1019,7 @@ function TopicContent({
                 then tap the card to check yourself.
               </p>
             </div>
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" hideImage />
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -1002,7 +1059,7 @@ function TopicContent({
               </p>
             </div>
 
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" hideImage />
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -1050,9 +1107,13 @@ function TopicContent({
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
-              <div className="space-y-3">
-                <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
-                <p className="text-sm text-foreground">
+              <div className="grid grid-cols-1 sm:grid-cols-[14rem_1fr] gap-4 items-start">
+                <div className="aspect-square w-full rounded-lg overflow-hidden bg-muted border border-border">
+                  <WeedImage weedId={waterhemp.id} stage="flower" className="w-full h-full object-cover" />
+                </div>
+                <div className="space-y-3">
+                  <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
+                  <p className="text-sm text-foreground">
                   Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
                   edges, known for its smooth hairless stems and distinct leaf shape.
                 </p>
@@ -1065,6 +1126,7 @@ function TopicContent({
                     <p className="text-[10px] text-muted-foreground">SPECIES</p>
                     <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -1080,6 +1142,9 @@ function TopicContent({
                 <div className="grid grid-cols-3 gap-3">
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border mb-2">
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                      </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
                       <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
                     </div>
@@ -1088,40 +1153,45 @@ function TopicContent({
               </div>
             )}
 
-            {/* Visual ID reference (text-only diagnostic cards) */}
+            {/* Visual ID reference */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-4">
-              <p className="font-display font-bold text-foreground text-base">Diagnostic ID Reference</p>
+              <p className="font-display font-bold text-foreground text-base">Visual ID Reference</p>
               <p className="text-sm text-muted-foreground">
-                Each card lists the diagnostic features you would use to identify the weed in the field. Use the
-                trait list to narrow your ID, then confirm with the scientific name and family.
+                Each card pairs a reproductive-stage photo with the diagnostic features you would use in the field.
+                Use the image plus the trait list to narrow your ID, then confirm with the scientific name and family.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topicWeeds.map((w) => (
                   <div
                     key={`idref-${w.id}`}
-                    className="bg-background border border-border rounded-lg p-3 space-y-1.5"
+                    className="bg-background border border-border rounded-lg p-3 grid grid-cols-[7rem_1fr] gap-3"
                   >
-                    <ClickableWeedName
-                      weed={w}
-                      onSelect={onSelectWeed}
-                      className="font-display font-bold text-sm text-foreground block"
-                    />
-                    <p className="text-xs italic text-primary">{w.scientificName}</p>
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                      Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
-                    </p>
-                    {w.traits && w.traits.length > 0 && (
-                      <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
-                        {w.traits.slice(0, 4).map((t, i) => (
-                          <li key={i}>{t}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {w.memoryHook && (
-                      <p className="text-xs text-muted-foreground italic mt-1">
-                        <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
+                    <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="space-y-1.5 min-w-0">
+                      <ClickableWeedName
+                        weed={w}
+                        onSelect={onSelectWeed}
+                        className="font-display font-bold text-sm text-foreground block"
+                      />
+                      <p className="text-xs italic text-primary">{w.scientificName}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                        Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
                       </p>
-                    )}
+                      {w.traits && w.traits.length > 0 && (
+                        <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
+                          {w.traits.slice(0, 4).map((t, i) => (
+                            <li key={i}>{t}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {w.memoryHook && (
+                        <p className="text-xs text-muted-foreground italic mt-1">
+                          <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1220,31 +1290,53 @@ function TopicContent({
           </div>
 
           {grade === "elementary" && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-bold text-primary">Seed Dispersal</p>
-              <p>
-                Seeds have special features that help them travel to new places. Some seeds have <strong>tiny wings
-                or parachutes</strong> that let them float on the wind. Others have <strong>hooks or barbs</strong> that
-                stick to animal fur or clothing. Some seeds can even <strong>float on water</strong> to travel to new
-                locations.
-              </p>
-            </div>
+            <>
+              {/* Seed Bank diagram */}
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">What is a Seed Bank?</p>
+                <p className="text-sm text-foreground">
+                  A <strong>seed bank</strong> is all the weed seeds hiding in the soil, waiting to grow. Some
+                  seeds sit right on top in the leaves, others are tucked into the topsoil where they sprout fastest,
+                  and some get buried deep where they can wait for years until a plow or storm brings them back up.
+                </p>
+                <SeedBankDiagram />
+              </div>
+
+              {/* Seed image grid */}
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">Meet the Seeds</p>
+                <p className="text-sm text-muted-foreground">
+                  Each weed makes its own kind of seed. Look closely — shapes, colors, and bumps are all clues.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {topicWeeds.map((w) => (
+                    <div key={`seed-${w.id}`} className="bg-background border border-border rounded-lg p-3 space-y-2">
+                      <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
+                        <WeedImage weedId={w.id} stage="seed" className="w-full h-full object-cover" />
+                      </div>
+                      <p className="font-display font-bold text-sm text-foreground text-center">{w.commonName} seed</p>
+                      <p className="text-xs text-muted-foreground text-center">{getElementarySeedDescription(w)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
 
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
-            <p className="text-sm text-muted-foreground">
-              {grade === "elementary"
-                ? "Look at the seed, guess which weed it comes from, then tap the card to check."
-                : "Identify the seed by its shape, size, and surface, then flip the card to see the species."}
-            </p>
-            <WeedFlashcardDeck
-              weeds={topicWeeds}
-              onSelectWeed={onSelectWeed}
-              stage="seed"
-              emphasizeScientific={grade === "high"}
-            />
-          </div>
+          {grade !== "elementary" && (
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
+              <p className="text-sm text-muted-foreground">
+                Identify the seed by its shape, size, and surface, then flip the card to see the species.
+              </p>
+              <WeedFlashcardDeck
+                weeds={topicWeeds}
+                onSelectWeed={onSelectWeed}
+                stage="seed"
+                emphasizeScientific={grade === "high"}
+              />
+            </div>
+          )}
         </div>
       );
 
