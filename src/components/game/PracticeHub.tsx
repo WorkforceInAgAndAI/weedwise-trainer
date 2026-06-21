@@ -36,6 +36,7 @@ import PestID from './practice-games/middle/PestID';
 import MSHabitatMapping from './practice-games/middle/HabitatMapping';
 import WeedOrigins from './practice-games/middle/WeedOrigins';
 import NativeLookAlike from './practice-games/middle/NativeLookAlike';
+import MSLookAlike from './practice-games/middle/MSLookAlike';
 import WeedCompetitors from './practice-games/middle/WeedCompetitors';
 import InvasiveQuiz from './practice-games/middle/InvasiveQuiz';
 import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
@@ -126,6 +127,7 @@ const middleGames: GameDef[] = [
  { id: 'ms-habitat', name: 'Habitat Mapping', Icon: Map, category: 'Habitats', description: 'Place weeds in temperate, arid, tropical, or wetland regions.', howToPlay: 'Sort weeds into the correct habitat region. Review any incorrect placements after each round.', component: MSHabitatMapping },
  { id: 'weed-origins', name: 'Weed Origins', Icon: Globe, category: 'Origin', description: 'Identify weed continent of origin.', howToPlay: 'A weed appears over a world map. Click the continent where it came from.', component: WeedOrigins },
  { id: 'native-lookalike', name: 'Native or Introduced?', Icon: Eye, category: 'Look-Alikes', description: 'Sort look-alike pairs into Native or Introduced.', howToPlay: 'Two similar plants are shown. Drag each to the Native or Introduced box.', component: NativeLookAlike },
+ { id: 'ms-look-alike', name: 'Look-Alike Trios', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from three commonly-confused look-alikes.', howToPlay: 'Three look-alike weeds appear. Choose the image that matches the target common + scientific name, then read how to tell them apart.', component: MSLookAlike },
  { id: 'weed-competitors', name: 'Weed Competitors', Icon: Swords, category: 'Competition', description: 'Compete as a weed for resources against rivals.', howToPlay: 'Read the competitor intel, then make strategic decisions about leaves, roots, and reproduction to out-compete your opponent.', component: WeedCompetitors },
  { id: 'invasive-quiz', name: 'Invasive Travelers', Icon: ClipboardList, category: 'Invasive Weeds', description: 'Discover how invasive weeds traveled to North America.', howToPlay: 'An invasive weed is shown. Learn its arrival story and identify how it was introduced.', component: InvasiveQuiz },
  { id: 'ms-safe-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are toxic?', howToPlay: 'A group of weeds appears — identify which one is toxic, learn why it is dangerous, then decide how to safely manage it.', component: MSSafeVsToxic },
