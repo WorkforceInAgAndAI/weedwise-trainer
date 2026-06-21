@@ -1356,30 +1356,59 @@ function TopicContent({
             )}
             {grade === "middle" && (
               <>
+                <p>If competing for light and nutrients is a weed's day job, then seed strategy is its long game.</p>
                 <p>
-                  A <strong>seed</strong> is a tiny package that stores a plant's <strong>genetic
-                  material (DNA)</strong> along with all the <strong>stored nutrients</strong> a young
-                  plant needs to grow its first roots and green leaves before it can make its own food
-                  through photosynthesis. When conditions are right, a seed begins
-                  <strong> imbibition</strong> — soaking up water through its seed coat, which
-                  activates enzymes and kicks off germination.
+                  A single weed plant can produce anywhere from a few hundred to hundreds of thousands of seeds in one
+                  growing season. But raw numbers are only part of the story — what makes weeds truly hard to beat is
+                  how those seeds are built to survive.
                 </p>
                 <p>
-                  Weed seeds are remarkably diverse in shape, size, and color. Understanding seed
-                  morphology helps with identification before plants even emerge.
+                  <strong>Dormancy</strong> is one of the most powerful tricks in a seed's playbook. Rather than
+                  sprouting the moment they hit the ground, many weed seeds can pause their development and wait —
+                  sometimes for decades — until conditions are just right. Common lambsquarters seeds have been found
+                  viable in soil after 40 years. This means that even if you eliminate every weed in a field, a hidden
+                  seed bank underground can reinfest it for years to come.
                 </p>
                 <p>
-                  The <strong>soil seed bank</strong> is the reservoir of viable seeds in the soil. A single field can
-                  contain millions of weed seeds per acre, and some species produce over 100,000 seeds per plant.
-                  Seed banks are not just deep in the soil — viable seeds collect in <strong>leaf
-                  litter</strong> on the soil surface, in the <strong>topsoil</strong> where most
-                  germination happens, and deeper in the soil profile where seeds can stay dormant
-                  for years until tillage or erosion brings them back up.
+                  <strong>Seed dispersal</strong> is how weeds spread their bets across the landscape. Different
+                  species have evolved remarkably creative ways to move their seeds far from the parent plant. Some,
+                  like dandelion and common ragweed, produce lightweight seeds with feathery attachments that float on
+                  the wind. Others, like common burdock and cocklebur, grow hooked burs that hitchhike on animal fur or
+                  clothing — nature's version of velcro. Pokeweed and eastern black nightshade produce fleshy berries
+                  that birds eat and then deposit far away, seeds and all, in a ready-made package of fertilizer.
                 </p>
                 <p>
-                  <strong>Seed dormancy</strong> allows seeds to survive unfavorable conditions. Some weed seeds can
-                  remain viable for decades in the soil.
+                  <strong>Seed quantity vs. seed quality</strong> is another strategic split. Some weeds go all-in on
+                  volume — waterhemp can produce up to 250,000 seeds per plant, betting that sheer numbers guarantee a
+                  few survivors. Others invest more energy into fewer, hardier seeds with thick protective coats that
+                  resist digestion, drought, and even some herbicide applications.
                 </p>
+                <p>
+                  <strong>Timing germination</strong> is the final piece of the puzzle. Many weed seeds don't all
+                  sprout at once — they stagger their germination across weeks or even months. This is called
+                  <strong> germination staggering</strong>, and it's a brilliant survival hedge. If a late frost, a
+                  herbicide application, or a drought wipes out the first wave of seedlings, the next wave is already
+                  queued up and ready to go. It's the same reason you can spray a field and think you've won, only to
+                  see a fresh flush of weeds emerge two weeks later.
+                </p>
+                <div className="bg-card border border-border rounded-lg p-3 mt-2">
+                  <p className="font-bold text-foreground text-sm mb-2">Key definitions</p>
+                  <dl className="text-xs space-y-1.5">
+                    {[
+                      ["Seed bank", "The reservoir of dormant seeds living in the soil, sometimes for many years."],
+                      ["Dormancy", "A seed's ability to pause development and wait until growing conditions are favorable."],
+                      ["Seed dispersal", "The ways seeds travel away from the parent plant — wind, animals, water, or hitchhiking."],
+                      ["Germination staggering", "When seeds in the same population sprout at different times, spreading the risk of total wipeout."],
+                      ["Seed coat", "The tough outer layer of a seed that protects it from physical damage, digestion, and harsh conditions."],
+                      ["Viable", "A seed that is still alive and capable of germinating when conditions are right."],
+                    ].map(([term, def]) => (
+                      <div key={term} className="grid grid-cols-[10rem_1fr] gap-2">
+                        <dt className="font-semibold text-primary">{term}</dt>
+                        <dd className="text-foreground">{def}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
               </>
             )}
             {grade === "high" && (
