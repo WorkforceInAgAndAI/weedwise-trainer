@@ -2683,42 +2683,46 @@ function TopicContent({
           {
             key: "Warm-Season / Full Sun",
             label: "Warm-Season Weeds",
-            desc: "Warm-season weeds thrive in hot summer conditions with full sun exposure. They germinate when soil temperatures rise in late spring and grow most vigorously during the hottest months. Warm-season weeds are common in corn, soybean, and sorghum fields across the Midwest.",
+            desc: "Warm-season weeds wait until late spring, when soil temperatures climb above roughly 60 °F, to germinate. They use the C4 photosynthesis pathway, which is more efficient at high temperatures and during droughty, high-light conditions — that's why species like Palmer Amaranth, Waterhemp, and the foxtails explode in mid-summer corn and soybean fields and can grow more than an inch per day in July heat.",
           },
           {
             key: "Cool-Season / Early Spring",
             label: "Cool-Season Weeds",
-            desc: "Cool-season weeds germinate in fall or early spring when temperatures are lower. They grow rapidly before warm-season crops are planted and can compete early in the growing season. Many are winter annuals that overwinter as rosettes.",
+            desc: "Cool-season weeds germinate in fall or very early spring, when soils are between roughly 40–60 °F. They use the C3 photosynthesis pathway, which works best in cool, moist conditions. Many overwinter as low rosettes (like Henbit, Shepherd's Purse, and Field Pennycress) — a body shape that survives frost and lets the plant start photosynthesizing weeks before spring planting.",
           },
           {
             key: "Wet / Poorly Drained",
             label: "Wet-Habitat Weeds",
-            desc: "Wet-habitat weeds are adapted to poorly drained soils, field edges near waterways, and areas with high water tables. They often have specialized tissues for waterlogged conditions and can indicate drainage problems in fields.",
+            desc: "Wet-habitat species tolerate saturated, low-oxygen soils that would kill most crops. Many have hollow stems or special air channels (aerenchyma) that move oxygen down to flooded roots. Yellow Nutsedge, Barnyardgrass, and the smartweeds are classic indicators of poor drainage — when you see them dominating a patch, it usually points to a compaction or tile-drainage problem, not just a herbicide issue.",
           },
           {
             key: "Dry / Disturbed",
             label: "Dry-Habitat Weeds",
-            desc: "Dry-habitat weeds are adapted to well-drained, often sandy soils and disturbed areas like roadsides, construction sites, and field margins. They are typically drought-tolerant with deep root systems or water-conserving leaf structures.",
+            desc: "Dry-habitat weeds survive on sandy, low-organic, well-drained soils where water is scarce. Adaptations include deep taproots that mine subsoil moisture (Kochia, Russian Thistle), narrow or waxy leaves that lose less water, and CAM/C4 metabolism that allows photosynthesis with the stomata partly closed. These species dominate roadsides, terraces, and the sandy headlands of irrigated fields.",
           },
         ];
         return (
           <div className="space-y-5">
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Habitats</p>
+              <p className="font-display font-bold text-primary text-base">Climate &amp; Habitat Adaptation</p>
               <p>
-                Weeds are adapted to specific growing conditions. Understanding where a weed thrives helps predict where
-                it will appear. Weeds adapt through <strong>high genetic diversity, rapid reproduction</strong>, and high
-                <strong> phenotypic plasticity</strong>.
+                Climate is the single biggest factor that decides which weed species you'll actually see in a field.
+                Temperature controls when a seed germinates, day length tells the plant when to flower, and rainfall
+                decides how much it can grow. Two fields a few hundred miles apart can have completely different weed
+                problems because their growing-season temperatures, frost-free days, and rainfall patterns aren't the
+                same.
               </p>
               <p>
-                <strong>Phenotypic plasticity</strong> is the ability to change form in response to the environment.
-                Environmental factors such as sunlight exposure, rainfall, temperature, and weather effects all impact a
-                weed's adaptation to its environment.
+                Different species are adapted to different climates because of differences in <strong>photosynthesis
+                type (C3 vs. C4)</strong>, <strong>root depth and structure</strong>, <strong>leaf shape and waxy
+                coatings</strong>, and the <strong>temperature range their seeds need to break dormancy</strong>. A
+                cool-season C3 species like Henbit shuts down in July heat, while a C4 species like Palmer Amaranth
+                barely starts growing until the soil is warm enough to fry an egg on.
               </p>
               <p>
-                These environmental factors can be found regionally across the globe, depending on the area's climate.
-                While a weed may be native to North America, it may also thrive in European areas where the climate is
-                similar.
+                The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
+                for. Scroll through each group to see the species that fit — paying attention to leaf size, root depth,
+                and growth habit will show you the adaptations in action.
               </p>
             </div>
 
@@ -2728,20 +2732,27 @@ function TopicContent({
                 <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
                   <p className="font-display font-bold text-foreground text-base">{h.label}</p>
                   <p className="text-sm text-foreground">{h.desc}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Examples: {grouped.slice(0, 5).map(w => w.commonName).join(', ')}{grouped.length > 5 ? `, and ${grouped.length - 5} more` : ''}.
-                  </p>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {grouped.map((w) => (
-                      <div key={w.id} className="text-center">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  {grouped.length > 0 && (
+                    <>
+                      <div className="overflow-x-auto pb-2 -mx-1">
+                        <div className="flex gap-3 px-1" style={{ minWidth: `${grouped.length * 7.5}rem` }}>
+                          {grouped.map((w) => (
+                            <div key={w.id} className="text-center shrink-0 w-28">
+                              <button
+                                onClick={() => onSelectWeed(w)}
+                                className="block w-28 h-28 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary"
+                              >
+                                <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                              </button>
+                              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[11px] mt-1 block" />
+                              <div className="text-[10px] text-primary italic leading-tight">{w.scientificName}</div>
+                            </div>
+                          ))}
                         </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                        <div className="text-[9px] text-primary italic">{w.scientificName}</div>
                       </div>
-                    ))}
-                  </div>
+                      <p className="text-[10px] text-muted-foreground">← Scroll to see all {grouped.length} →</p>
+                    </>
+                  )}
                 </div>
               );
             })}
