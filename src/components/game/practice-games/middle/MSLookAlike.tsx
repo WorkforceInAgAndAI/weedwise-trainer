@@ -50,10 +50,10 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
 
   // Pick a target species per round and shuffle option order
   const { target, options } = useMemo(() => {
-    if (!trio) return { target: null as any, options: [] as any[] };
+    if (!trio) return { target: null as Weed | null, options: [] as Weed[] };
     const idx = Math.floor(Math.random() * trio.weeds.length);
     const t = trio.weeds[idx];
-    return { target: t, options: shuffle([...trio.weeds]) };
+    return { target: t as Weed | null, options: shuffle([...trio.weeds]) };
   }, [trio]);
 
   const restart = () => { setRound(0); setSelected(null); setSubmitted(false); setScore(0); setHistory([]); };
