@@ -4212,23 +4212,14 @@ function TopicContent({
        WEED COMPETITORS
     ═══════════════════════════════════════════════════════════ */
     case "weed-competitors": {
-      const COMPETITION_EXAMPLES = [
-        {
-          trait: "Rapid Germination & Dense Seedling Cohorts",
-          desc: "These weeds emerge in flushes of many small seedlings packed tightly together, claiming sunlight and soil before crops have a chance to compete.",
-          weedIds: ["palmer-amaranth", "waterhemp", "lambsquarters", "Redroot_pigweed"],
-        },
-        {
-          trait: "Large Canopy / Shading",
-          desc: "Tall, fast-growing weeds with broad leaves or sprawling vines that form a canopy over the crop and cut off light.",
-          weedIds: ["giant-ragweed", "velvetleaf", "common_Cocklebur", "Tall_morningglory"],
-        },
-        {
-          trait: "Allelopathy (Chemical Suppression)",
-          desc: "Species that release biochemicals from roots, leaves, or decomposing tissue that inhibit germination and growth of neighboring plants.",
-          weedIds: ["johnsongrass", "Quackgrass", "yellow-nutsedge", "canada-thistle"],
-        },
-      ];
+      // Build trait → species groupings from the curated data file
+      const COMPETITION_EXAMPLES = TRAIT_DEFS.map((t) => ({
+        trait: t.short,
+        desc: t.desc,
+        weedIds: Object.entries(COMPETITION_TRAITS)
+          .filter(([, traits]) => traits.includes(t.key))
+          .map(([id]) => id),
+      }));
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
