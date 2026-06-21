@@ -13,6 +13,7 @@ const DIOECIOUS_CANDIDATES = [
  { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Seed head is soft and drooping, with smooth flowers that release pollen', femaleDesc: 'Seed head is long, stiff, and bristly — covered in sharp bracts that feel prickly to touch' },
  { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Reproductive stem has clusters of small white-pink bell-shaped flowers — no long pods', femaleDesc: 'Reproductive stem develops paired slender seed pods (follicles) that split open to release silky-haired seeds' },
  { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Seed head is loose with hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Seed head is dense and resinous, with protruding white pistils (hairs) at the stem nodes' },
+ { id: 'Shattercane_Sorghums', name: 'Shattercane', maleDesc: 'Seed head is open and loose with feathery anthers shedding pollen — seeds shatter and drop easily at maturity', femaleDesc: 'Seed head is compact with tightly clustered, plump seeds that ripen reddish-brown before shattering off the stalk' },
 ];
 
 interface Round {
