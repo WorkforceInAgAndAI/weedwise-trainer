@@ -243,7 +243,7 @@ const TOPICS: Topic[] = [
     name: "Ecology & Growth Types",
     icon: "ecology",
     description: "Investigate terrestrial, aquatic, and parasitic weeds and explain the unique resources each growth type requires.",
-    grades: ["elementary", "middle"],
+    grades: ["elementary"],
     category: "lifecycle",
   },
 
