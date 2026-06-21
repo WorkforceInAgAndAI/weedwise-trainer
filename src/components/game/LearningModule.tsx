@@ -3812,6 +3812,15 @@ function TopicContent({
        ECONOMIC THRESHOLD
     ═══════════════════════════════════════════════════════════ */
     case "economic-threshold": {
+      const THRESHOLD_EXAMPLES: { weedId: string; name: string; crop: string; threshold: string; note: string }[] = [
+        { weedId: "palmer-amaranth", name: "Palmer Amaranth", crop: "Soybean", threshold: "1–2 plants per 30 ft of row", note: "Extremely low threshold — even sparse populations can cause 10%+ yield loss because of rapid biomass accumulation." },
+        { weedId: "waterhemp", name: "Waterhemp", crop: "Soybean", threshold: "Fewer than 1 plant per ft of row", note: "Aggressive seed production (250k+ seeds/female) makes seedbank prevention as important as yield protection." },
+        { weedId: "Giant_Ragweed", name: "Giant Ragweed", crop: "Corn", threshold: "~1 plant per 100 ft²", note: "Very tall, very competitive — a handful of plants per acre can justify control." },
+        { weedId: "Common_Lambsquarters", name: "Lambsquarters", crop: "Soybean", threshold: "~4–8 plants per m²", note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's." },
+        { weedId: "Velvetleaf", name: "Velvetleaf", crop: "Corn", threshold: "~1 plant per m²", note: "Wide leaves shade corn rapidly, but corn outgrows lower densities." },
+        { weedId: "Giant_Foxtail", name: "Giant Foxtail", crop: "Corn", threshold: "10–20 plants per m²", note: "Much higher tolerance — economic loss only at dense infestations." },
+      ].map(e => ({ ...e, weed: weeds.find(w => w.id === e.weedId) || weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
+        .filter((e): e is typeof e & { weed: Weed } => !!e.weed) as any;
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -3844,6 +3853,43 @@ function TopicContent({
             )}
           </div>
 
+          {/* Economic threshold graph */}
+          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+            <p className="font-display font-bold text-foreground text-sm text-center">Economic Threshold Curve</p>
+            <div className="w-full overflow-x-auto">
+              <svg viewBox="0 0 360 220" className="w-full h-auto max-w-md mx-auto block" role="img" aria-label="Economic threshold graph">
+                {/* Axes */}
+                <line x1="40" y1="180" x2="340" y2="180" stroke="hsl(var(--border))" strokeWidth="1.5" />
+                <line x1="40" y1="20" x2="40" y2="180" stroke="hsl(var(--border))" strokeWidth="1.5" />
+                {/* Y-axis label */}
+                <text x="10" y="100" fontSize="9" fill="hsl(var(--muted-foreground))" transform="rotate(-90 10 100)">Yield Loss ($)</text>
+                {/* X-axis label */}
+                <text x="190" y="210" fontSize="9" fill="hsl(var(--muted-foreground))" textAnchor="middle">Weed Density (plants per m²)</text>
+                {/* Yield-loss curve (rising) */}
+                <path d="M 40 175 Q 120 170 180 130 T 330 30" fill="none" stroke="hsl(var(--destructive))" strokeWidth="2" />
+                {/* Control cost line (flat) */}
+                <line x1="40" y1="110" x2="330" y2="110" stroke="hsl(var(--primary))" strokeWidth="2" strokeDasharray="4 3" />
+                {/* Threshold vertical line */}
+                <line x1="180" y1="20" x2="180" y2="180" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeDasharray="2 3" />
+                {/* Shaded zones */}
+                <rect x="40" y="20" width="140" height="160" fill="hsl(var(--primary))" fillOpacity="0.06" />
+                <rect x="180" y="20" width="150" height="160" fill="hsl(var(--destructive))" fillOpacity="0.08" />
+                {/* Labels */}
+                <text x="110" y="40" fontSize="9" fill="hsl(var(--primary))" textAnchor="middle" fontWeight="bold">Below Threshold</text>
+                <text x="110" y="52" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">Don't spray</text>
+                <text x="255" y="40" fontSize="9" fill="hsl(var(--destructive))" textAnchor="middle" fontWeight="bold">Above Threshold</text>
+                <text x="255" y="52" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">Control pays off</text>
+                <text x="180" y="195" fontSize="9" fill="hsl(var(--accent))" textAnchor="middle" fontWeight="bold">Threshold</text>
+                <text x="335" y="35" fontSize="8" fill="hsl(var(--destructive))" textAnchor="end">Yield loss</text>
+                <text x="335" y="105" fontSize="8" fill="hsl(var(--primary))" textAnchor="end">Control cost</text>
+              </svg>
+            </div>
+            <p className="text-[11px] text-muted-foreground text-center">
+              The threshold is where the rising <span className="text-destructive font-bold">yield-loss curve</span> crosses the
+              <span className="text-primary font-bold"> cost-of-control line</span>. Left of it, treatment costs more than the loss; right of it, every additional weed costs the grower money.
+            </p>
+          </div>
+
           <div className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-bold text-foreground">How It Works</p>
             <div className="grid grid-cols-2 gap-3">
@@ -3861,6 +3907,34 @@ function TopicContent({
               </div>
             </div>
           </div>
+
+          {/* Species-specific thresholds */}
+          {grade === "high" && THRESHOLD_EXAMPLES.length > 0 && (
+            <div className="space-y-2">
+              <p className="font-display font-bold text-foreground text-sm">Thresholds Differ Between Species</p>
+              <p className="text-xs text-muted-foreground">
+                Every weed species has its own competitive ability, so the threshold density that triggers control is very
+                different from one weed to another — even in the same crop.
+              </p>
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                {THRESHOLD_EXAMPLES.map((e: any) => (
+                  <button
+                    key={e.weedId}
+                    onClick={() => onSelectWeed(e.weed)}
+                    className="flex-shrink-0 w-48 bg-card border border-border rounded-lg p-3 text-left hover:border-primary transition-colors"
+                  >
+                    <div className="w-full h-20 rounded overflow-hidden bg-muted mb-2">
+                      <WeedImage weedId={e.weed.id} stage="mature" className="w-full h-full" />
+                    </div>
+                    <p className="font-bold text-foreground text-xs">{e.name}</p>
+                    <p className="text-[10px] italic text-primary">{e.weed.scientificName}</p>
+                    <p className="text-[10px] text-foreground mt-1"><strong>{e.crop}:</strong> {e.threshold}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-2">
             <p className="font-bold text-accent">Key Principle</p>
