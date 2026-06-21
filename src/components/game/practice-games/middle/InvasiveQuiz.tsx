@@ -1,146 +1,50 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import { Ship, Package, Bug } from 'lucide-react';
+import { Ship, Package, Bug, Sprout } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { WEED_ARRIVAL_KNOWLEDGE } from '@/data/weedKnowledge';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-type ArrivalMethod = 'accident' | 'purpose' | 'other-species';
+type ArrivalMethod = 'accident' | 'purpose' | 'other-species' | 'native-spread';
 
 const ARRIVAL_LABELS: Record<ArrivalMethod, { label: string; Icon: typeof Ship }> = {
   accident: { label: 'By Accident', Icon: Ship },
   purpose: { label: 'On Purpose', Icon: Package },
   'other-species': { label: 'Through Other Species', Icon: Bug },
+  'native-spread': { label: 'Native — Spread by Agriculture', Icon: Sprout },
 };
 
 const ARRIVAL_DESCRIPTIONS: Record<ArrivalMethod, string> = {
   accident: 'Arrived unintentionally as a contaminant in shipping, crop seed, soil, or ballast water — no one meant to bring it.',
   purpose: 'Brought intentionally for agriculture, ornamental gardening, fiber, forage, or erosion control — then escaped cultivation.',
   'other-species': 'Hitchhiked on animals, livestock, machinery, or moved through the live-plant/nursery trade with another species.',
-};
-
-// Detailed arrival stories keyed by weed id
-const WEED_ARRIVAL_DATA: Record<string, { method: ArrivalMethod; story: string }> = {
-  'canada-thistle': {
-    method: 'accident',
-    story: 'Canada Thistle (Cirsium arvense) arrived in North America through contaminated imported crop seed in the 1700s. Despite its name, it originated in southeastern Europe and western Asia. Its deep creeping root system and wind-dispersed seeds allowed it to spread rapidly across agricultural lands.',
-  },
-  'caraway': {
-    method: 'purpose',
-    story: 'Caraway (Carum carvi) was intentionally introduced for culinary and medicinal use. Its aromatic seeds are used in baking and traditional medicine. It commonly spread beyond cultivation through seed contamination in hay and grain shipments.',
-  },
-  'lambsquarters': {
-    method: 'purpose',
-    story: 'Common Lambsquarters (Chenopodium album) was likely introduced by early European settlers as a food crop -- its leaves are edible and nutritious. It also spread readily in contaminated seed lots and is now one of the most common weeds in North American croplands.',
-  },
-  'velvetleaf': {
-    method: 'purpose',
-    story: 'Velvetleaf (Abutilon theophrasti) was brought intentionally from China in the early 1700s for fiber production. Farmers hoped to use its stem fibers like jute, but it escaped cultivation and became one of the most persistent weeds in corn and soybean fields across the Midwest.',
-  },
-  'kochia': {
-    method: 'purpose',
-    story: 'Kochia (Bassia scoparia) was introduced to the United States from Europe and Asia as an ornamental plant in the 1800s. It was also valued as drought-tolerant forage. Its tumbleweed-like habit allows mature plants to break off and roll across landscapes, dispersing seeds over great distances.',
-  },
-  'johnsongrass': {
-    method: 'purpose',
-    story: 'Johnsongrass (Sorghum halepense) was deliberately imported from the Mediterranean region in the 1830s as a forage crop for livestock. It escaped cultivation due to its aggressive rhizome system and prolific seed production, becoming one of the most problematic weeds in the southern United States.',
-  },
-  'palmer-amaranth': {
-    method: 'other-species',
-    story: 'Palmer Amaranth (Amaranthus palmeri) is native to the southwestern U.S. and northern Mexico, but spread far beyond its native range through contaminated hay, livestock feed, seed, farm equipment, wildlife, and irrigation water. It is now one of the most aggressive and herbicide-resistant weeds in the Midwest.',
-  },
-  'wild-oat': {
-    method: 'accident',
-    story: 'Wild Oat (Avena fatua) was introduced from Eurasia, likely as a contaminant in crop seed shipments. Its seeds closely resemble cultivated oats, making it difficult to separate from grain. It is now a major weed in small grain crops throughout North America.',
-  },
-  'wild-parsnip': {
-    method: 'purpose',
-    story: 'Wild Parsnip (Pastinaca sativa) was introduced from Europe as a food and medicinal plant. The cultivated parsnip escaped gardens and roadsides and naturalized across much of North America. Its sap contains furanocoumarins that cause severe burns when skin is exposed to sunlight.',
-  },
-  'poison-hemlock': {
-    method: 'accident',
-    story: 'Poison Hemlock (Conium maculatum) was introduced from Europe and West Asia, likely as an accidental contaminant in seed or soil. It may also have been brought as an ornamental or medicinal plant. All parts of the plant are highly toxic to humans and livestock.',
-  },
-  'morningglory': {
-    method: 'purpose',
-    story: 'Morningglory species were introduced from tropical Americas, often as ornamental garden plants prized for their colorful flowers. They escaped cultivation and became persistent weeds in row crops, using their twining habit to climb and smother crop plants.',
-  },
-  'marestail': {
-    method: 'accident',
-    story: 'Marestail/Horseweed (Erigeron canadensis) is actually native to North America but has become increasingly problematic due to herbicide resistance. Its tiny seeds are wind-dispersed and can travel hundreds of miles, allowing resistant populations to spread rapidly across agricultural regions.',
-  },
-  'large-crabgrass': {
-    method: 'accident',
-    story: 'Large Crabgrass (Digitaria sanguinalis) was introduced from Eurasia, likely through contaminated crop seed and soil movement. It thrives in warm-season disturbed soils and is now one of the most common lawn and agricultural weeds across North America.',
-  },
-  'giant-foxtail': {
-    method: 'accident',
-    story: 'Giant Foxtail (Setaria faberi) was introduced from China, likely as a contaminant in millet seed. First identified in the U.S. in the 1930s, it rapidly spread through the Corn Belt and is now one of the most common annual grass weeds in Midwest crop fields.',
-  },
-  'green-foxtail': {
-    method: 'accident',
-    story: 'Green Foxtail (Setaria viridis) was introduced from Eurasia through contaminated grain shipments. It is now found across all of North America and is especially common in disturbed soils, roadsides, and crop fields.',
-  },
-  'yellow-foxtail': {
-    method: 'accident',
-    story: 'Yellow Foxtail (Setaria pumila) was introduced from Europe, arriving as a contaminant in crop seed. It is distinguished from other foxtails by the long hairs at the base of each leaf blade and its compact, yellowish seed head.',
-  },
-  'giant-ragweed': {
-    method: 'accident',
-    story: 'Giant Ragweed (Ambrosia trifida) is actually native to North America but has become increasingly weedy in agricultural settings. Its large seeds and rapid early-season growth make it highly competitive in corn and soybean fields. Herbicide-resistant populations are spreading across the Midwest.',
-  },
-  'annual-ryegrass': {
-    method: 'purpose',
-    story: 'Annual Ryegrass (Lolium multiflorum) was intentionally introduced from Europe as a forage and cover crop. While it provides excellent erosion control and livestock feed, it has escaped managed settings and developed herbicide resistance in some populations, becoming problematic in wheat and other small grain fields.',
-  },
-  'barnyardgrass': {
-    method: 'accident',
-    story: 'Barnyardgrass (Echinochloa crus-galli) was introduced from Eurasia, likely through contaminated rice and grain seed. It is especially problematic in rice paddies and other wet agricultural environments, where it mimics the appearance of rice seedlings.',
-  },
-  'yellow-nutsedge': {
-    method: 'accident',
-    story: 'Yellow Nutsedge (Cyperus esculentus) likely spread to North America through contaminated soil and plant material. Its underground tubers (nutlets) can persist in soil for years and are easily spread by tillage equipment, making it extremely difficult to eradicate once established.',
-  },
-  'pennsylvania-smartweed': {
-    method: 'accident',
-    story: 'Pennsylvania Smartweed (Persicaria pensylvanica) is native to North America. It thrives in moist, fertile soils and is commonly found in crop fields, particularly in low-lying areas. Its seeds can remain viable in soil for decades.',
-  },
-  'golden-alexanders': {
-    method: 'accident',
-    story: 'Golden Alexanders (Zizia aurea) is native to North America and is actually a beneficial wildflower. It supports pollinators and is found in prairies and woodland edges. It can be confused with toxic look-alikes like Wild Parsnip and Poison Hemlock.',
-  },
-  'volunteer-sunflower': {
-    method: 'accident',
-    story: 'Volunteer Sunflower (Helianthus annuus) is native to North America but becomes a weed when it grows from seeds left behind after a sunflower crop. These volunteers compete with the current crop for water, nutrients, and light, and can harbor diseases and pests.',
-  },
+  'native-spread': 'Already lived in North America before farming. Tillage, equipment, and disturbed fields let it spread aggressively into croplands.',
 };
 
 function getArrivalData(w: typeof weeds[0]): { method: ArrivalMethod; story: string } {
-  if (WEED_ARRIVAL_DATA[w.id]) return WEED_ARRIVAL_DATA[w.id];
-  // Fallback based on traits
-  const t = `${w.habitat} ${w.commonName} ${w.management}`.toLowerCase();
-  let method: ArrivalMethod = 'accident';
-  if (t.match(/ornament|garden|crop|forage|pasture|erosion|medicin|landscap/)) method = 'purpose';
-  else if (t.match(/animal|bird|livest|fur|attach|hitchhik/)) method = 'other-species';
-
-  const stories: Record<ArrivalMethod, string> = {
-    purpose: `${w.commonName} (${w.scientificName}) was likely brought to North America intentionally for agricultural use, ornamental planting, or erosion control. Over time it escaped managed areas and established wild populations in ${w.habitat.toLowerCase()}.`,
-    'other-species': `${w.commonName} (${w.scientificName}) likely spread by hitchhiking on animals, livestock, or through contaminated plant trade. Its seeds can attach to fur, feathers, or clothing. It is now commonly found in ${w.habitat.toLowerCase()}.`,
-    accident: `${w.commonName} (${w.scientificName}) likely arrived accidentally through contaminated crop seed, shipping materials, or soil. It now thrives in ${w.habitat.toLowerCase()}.`,
-  };
-  return { method, story: stories[method] };
+  const k = WEED_ARRIVAL_KNOWLEDGE[w.id];
+  if (k) return { method: k.method as ArrivalMethod, story: `${w.commonName} (${w.scientificName}) — ${k.story}` };
+  // Conservative fallback for unmapped weeds
+  const method: ArrivalMethod = w.origin === 'Native' ? 'native-spread' : 'accident';
+  const story =
+    method === 'native-spread'
+      ? `${w.commonName} (${w.scientificName}) is native to North America. It became a problem weed when farming created disturbed habitats where it could spread aggressively across cropland.`
+      : `${w.commonName} (${w.scientificName}) likely arrived accidentally through contaminated crop seed, shipping materials, or soil. It now thrives in ${w.habitat.toLowerCase()}.`;
+  return { method, story };
 }
 
 export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const rounds = useMemo(() => {
-    const introduced = weeds.filter(w => w.origin === 'Introduced' || WEED_ARRIVAL_DATA[w.id]);
-    const offset = ((level - 1) * 8) % introduced.length;
-    const rotated = [...introduced.slice(offset), ...introduced.slice(0, offset)];
+    // Include every weed in the knowledge map — both introduced and native-spread.
+    const pool = weeds.filter(w => WEED_ARRIVAL_KNOWLEDGE[w.id]);
+    const offset = ((level - 1) * 8) % pool.length;
+    const rotated = [...pool.slice(offset), ...pool.slice(0, offset)];
     return shuffle(rotated).slice(0, 8).map(w => {
       const data = getArrivalData(w);
       return { weed: w, method: data.method, story: data.story };
