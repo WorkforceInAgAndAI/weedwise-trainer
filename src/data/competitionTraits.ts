@@ -109,7 +109,7 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
   "White_campion": ["Seed dormancy", "High seed output", "Seed dispersal"],
   "Wild_buckwheat": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "Wild_Carrot": ["Deep/wide roots", "Seed dormancy", "High seed output", "Seed dispersal"],
-  "Wild_Four-o"clock": ["Deep/wide roots", "Seed dormancy", "High seed output"],
+  "Wild_Four-o'clock": ["Deep/wide roots", "Seed dormancy", "High seed output"],
   "Wild_mustard": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "wild-oat": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "wild-parsnip": ["Aggressive canopy", "Deep/wide roots", "Chemical defense", "Seed dormancy", "High seed output"],
