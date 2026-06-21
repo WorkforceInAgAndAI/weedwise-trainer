@@ -10,6 +10,7 @@ export type CompetitionTrait =
   | "Seed dormancy"
   | "High seed output"
   | "Seed dispersal"
+  ;
 
 export interface TraitDef {
   key: CompetitionTrait;
