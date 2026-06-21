@@ -501,6 +501,89 @@ function HorizontalWeedRow({
 }
 
 /**
+ * Curated K-5 look-alike groups. Each group has 2–4 weeds that are genuinely confused
+ * in the field (same genus or very similar morphology), along with a kid-friendly
+ * "How to tell them apart" guide. Family-only matches that aren't truly look-alikes
+ * (e.g. Woolly Cupgrass vs Shattercane) are intentionally excluded.
+ */
+const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: string }[] = [
+  {
+    title: "Pigweed Family (Amaranths)",
+    weedIds: ["waterhemp", "palmer-amaranth", "Redroot_pigweed"],
+    difference:
+      "All three have small green flowers and grow tall. Palmer Amaranth has the longest seedhead (often longer than your hand) and a leaf stem (petiole) longer than the leaf itself. Waterhemp has smooth, hairless stems and skinnier leaves. Redroot Pigweed has hairy stems and a reddish root.",
+  },
+  {
+    title: "Foxtail Grasses",
+    weedIds: ["giant-foxtail", "green-foxtail", "yellow-foxtail"],
+    difference:
+      "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a droopy, nodding head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
+  },
+  {
+    title: "Bindweeds (Climbing Vines)",
+    weedIds: ["Field_bindweed", "Hedge_bindweed"],
+    difference:
+      "Both have white or pink trumpet-shaped flowers and twist around other plants. Field Bindweed has small flowers (about an inch) and arrowhead-shaped leaves. Hedge Bindweed has large flowers (2–3 inches) and bigger leaves with squared-off bottoms.",
+  },
+  {
+    title: "Ragweeds",
+    weedIds: ["common-ragweed", "giant-ragweed"],
+    difference:
+      "Both make lots of pollen that causes allergies. Common Ragweed is short (1–3 feet) with fern-like, lacy leaves. Giant Ragweed grows huge (up to 10 feet!) with big leaves that have 3 to 5 large lobes — like a giant hand.",
+  },
+  {
+    title: "Thistles (Spiny Weeds)",
+    weedIds: ["canada-thistle", "Musk_thistle", "Russian_thistle"],
+    difference:
+      "All three have spines and prickly leaves. Canada Thistle has small purple flowers and spreads underground in big patches. Musk Thistle has a single huge purple flower that nods over to one side. Russian Thistle (tumbleweed) is bushy and rolls across the ground when it dries out.",
+  },
+  {
+    title: "Smartweeds",
+    weedIds: ["pennsylvania-smartweed", "Water_smartweed"],
+    difference:
+      "Both have pink flower spikes and a papery sheath around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems. Water Smartweed grows in wet places like ponds with leaves that often float on the water.",
+  },
+];
+
+function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
+  return (
+    <div className="space-y-4">
+      {ELEM_LOOKALIKE_GROUPS.map((g) => {
+        const members = g.weedIds
+          .map((id) => weeds.find((w) => w.id === id))
+          .filter((w): w is Weed => Boolean(w));
+        if (members.length < 2) return null;
+        return (
+          <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">
+              {g.title} <span className="text-xs text-muted-foreground font-normal">({members.length} look-alikes)</span>
+            </p>
+            <div className={`grid gap-3 ${members.length === 2 ? "grid-cols-2" : members.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}>
+              {members.map((w) => (
+                <div key={w.id} className="text-center">
+                  <button
+                    onClick={() => onSelectWeed(w)}
+                    className="block w-full rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                    style={{ aspectRatio: "1 / 1" }}
+                  >
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  </button>
+                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
+                </div>
+              ))}
+            </div>
+            <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
+              <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
+              <p>{g.difference}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
  * Reusable flip flashcard deck.
  * - Image is shown on the front; click the card to flip and reveal the name.
  * - User sorts each card into "I'm confident" or "Want to review more".
@@ -2155,8 +2238,14 @@ function TopicContent({
 
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <p className="font-display font-bold text-foreground text-sm">Invasive Weeds in the Midwest</p>
-                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" />
+                <p className="font-display font-bold text-foreground text-sm">
+                  Invasive Weeds in the Midwest ({invasives.length})
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  These weeds were introduced from other places and now hurt our farms and native plants. Scroll
+                  across to see them all, and tap any weed to learn more.
+                </p>
+                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" tileWidth="13rem" />
               </div>
             )}
 
@@ -2839,10 +2928,11 @@ function TopicContent({
               <p className="font-display font-bold text-primary text-base">Look-Alike Weeds</p>
               <p>
                 Some weeds look very similar to other weeds. It is important to tell them apart so we can manage them
-                the right way. Look at the pairs below and see if you can spot the differences!
+                the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look
+                alike — see if you can spot what makes each one different!
               </p>
             </div>
-            {pairs.map(([a, b]) => renderPairCard(a, b, `elem-${a.id}`))}
+            <ElementaryLookAlikeGroups onSelectWeed={onSelectWeed} />
           </div>
         );
       }
@@ -2910,16 +3000,64 @@ function TopicContent({
           desc: "Pulling weeds out by hand or with a tool. This works best for small areas and when there are only a few weeds. Always wear gloves!",
         },
         {
-          label: "Mulching",
-          desc: "Covering the soil with materials like straw or wood chips to block sunlight and prevent weed seeds from growing.",
-        },
-        {
           label: "Mowing",
           desc: "Cutting weeds down before they can spread seeds. This does not remove the roots, so weeds may grow back.",
+        },
+        {
+          label: "Herbicides (Plant Sprays)",
+          desc: "Special sprays used by farmers and adults that kill unsafe weeds. Kids should never spray these — they must be handled with gloves, goggles, and training.",
         },
       ];
 
       if (grade === "elementary") {
+        // Group unsafe weeds by WHY they are dangerous, based on keywords in safetyNote.
+        const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
+        const physical = topicWeeds.filter((w) => matches(w, /thorn|spine|prick|bur|sharp|puncture|stab/i));
+        const skin = topicWeeds.filter(
+          (w) =>
+            !physical.includes(w) &&
+            matches(w, /skin|dermat|rash|irrit|sap|sting|blister|burn|contact|allerg/i),
+        );
+        const toxic = topicWeeds.filter(
+          (w) =>
+            !physical.includes(w) &&
+            !skin.includes(w) &&
+            matches(w, /toxic|poison|ingest|consum|eat|swallow|livestock|cattle|horse|hallucin|fatal|death|nausea|vomit|nitrate/i),
+        );
+        const other = topicWeeds.filter(
+          (w) => !physical.includes(w) && !skin.includes(w) && !toxic.includes(w),
+        );
+
+        const renderGroup = (
+          title: string,
+          desc: string,
+          tone: string,
+          group: Weed[],
+        ) =>
+          group.length === 0 ? null : (
+            <div key={title} className={`border rounded-lg p-4 space-y-3 ${tone}`}>
+              <div>
+                <p className="font-display font-bold text-foreground text-sm">
+                  {title} <span className="text-xs text-muted-foreground font-normal">({group.length})</span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+              </div>
+              <div className="space-y-2">
+                {group.map((w) => (
+                  <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                    </div>
+                    <div className="min-w-0">
+                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold text-sm" />
+                      <div className="text-xs text-destructive mt-1">{w.safetyNote}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+
         return (
           <div className="space-y-5">
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -2929,28 +3067,45 @@ function TopicContent({
                 hurt <strong>humans</strong>. These unsafe weeds can look like normal plants. However, when they are
                 touched or ingested, they can cause harm to people.
               </p>
+              <p>
+                Not all unsafe weeds are dangerous in the same way. Some hurt your <strong>skin</strong> when you
+                touch them, some are <strong>poisonous</strong> if eaten, and some have sharp parts that can{" "}
+                <strong>physically</strong> hurt you. They are grouped below by the kind of harm they can cause.
+              </p>
             </div>
 
-            {/* Toxic weeds */}
-            <h3 className="font-display font-bold text-foreground text-sm">Unsafe Weeds to Watch For</h3>
-            {topicWeeds.slice(0, 8).map((w) => (
-              <div key={w.id} className="bg-card border border-destructive/30 rounded-lg p-4 flex gap-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                </div>
-                <div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <div className="text-sm text-destructive mt-1">{w.safetyNote}</div>
-                </div>
-              </div>
-            ))}
+            {/* Unsafe weeds grouped by reason */}
+            {renderGroup(
+              "Skin Irritation",
+              "These weeds can cause a rash, itchy skin, or burns if you touch them. Always wear long sleeves and gloves!",
+              "bg-amber-500/10 border-amber-500/30",
+              skin,
+            )}
+            {renderGroup(
+              "Toxic if Eaten",
+              "These weeds are poisonous if a person or animal swallows any part of the plant. Never put wild plants in your mouth.",
+              "bg-destructive/10 border-destructive/30",
+              toxic,
+            )}
+            {renderGroup(
+              "Physically Harmful (Sharp Parts)",
+              "These weeds have thorns, spines, or prickly burs that can poke or cut your skin. Look before you reach!",
+              "bg-orange-500/10 border-orange-500/30",
+              physical,
+            )}
+            {renderGroup(
+              "Other Hazards",
+              "These weeds can be unsafe in other ways — for example, by causing allergies or harming livestock.",
+              "bg-secondary/40 border-border",
+              other,
+            )}
 
             {/* Control methods */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">How Can We Remove Unsafe Weeds?</p>
               <p>
-                There are three basic ways that agronomists remove unsafe or unwanted weeds. Click on each tile below
-                to learn about each method.
+                Agronomists (plant scientists) use a few different tools to remove unsafe weeds from farms and yards.
+                The right tool depends on how many weeds there are and how dangerous they are to touch.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
