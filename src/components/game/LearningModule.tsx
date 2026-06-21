@@ -4236,38 +4236,51 @@ function TopicContent({
 
           {/* Economic threshold graph */}
           <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-            <p className="font-display font-bold text-foreground text-sm text-center">Economic Threshold Curve</p>
+            <p className="font-display font-bold text-foreground text-sm text-center">Economic Threshold Over Time</p>
             <div className="w-full overflow-x-auto">
-              <svg viewBox="0 0 360 220" className="w-full h-auto max-w-md mx-auto block" role="img" aria-label="Economic threshold graph">
+              <svg viewBox="0 0 420 260" className="w-full h-auto max-w-lg mx-auto block" role="img" aria-label="Economic threshold graph showing weed infestation level over time with and without control">
                 {/* Axes */}
-                <line x1="40" y1="180" x2="340" y2="180" stroke="hsl(var(--border))" strokeWidth="1.5" />
-                <line x1="40" y1="20" x2="40" y2="180" stroke="hsl(var(--border))" strokeWidth="1.5" />
+                <line x1="50" y1="220" x2="390" y2="220" stroke="hsl(var(--border))" strokeWidth="2" />
+                <line x1="50" y1="20" x2="50" y2="220" stroke="hsl(var(--border))" strokeWidth="2" />
                 {/* Y-axis label */}
-                <text x="10" y="100" fontSize="9" fill="hsl(var(--muted-foreground))" transform="rotate(-90 10 100)">Yield Loss ($)</text>
+                <text x="18" y="125" fontSize="11" fill="hsl(var(--foreground))" transform="rotate(-90 18 125)" textAnchor="middle" fontWeight="bold">Weed Infestation Level</text>
                 {/* X-axis label */}
-                <text x="190" y="210" fontSize="9" fill="hsl(var(--muted-foreground))" textAnchor="middle">Weed Density (plants per m²)</text>
-                {/* Yield-loss curve (rising) */}
-                <path d="M 40 175 Q 120 170 180 130 T 330 30" fill="none" stroke="hsl(var(--destructive))" strokeWidth="2" />
-                {/* Control cost line (flat) */}
-                <line x1="40" y1="110" x2="330" y2="110" stroke="hsl(var(--primary))" strokeWidth="2" strokeDasharray="4 3" />
-                {/* Threshold vertical line */}
-                <line x1="180" y1="20" x2="180" y2="180" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeDasharray="2 3" />
-                {/* Shaded zones */}
-                <rect x="40" y="20" width="140" height="160" fill="hsl(var(--primary))" fillOpacity="0.06" />
-                <rect x="180" y="20" width="150" height="160" fill="hsl(var(--destructive))" fillOpacity="0.08" />
-                {/* Labels */}
-                <text x="110" y="40" fontSize="9" fill="hsl(var(--primary))" textAnchor="middle" fontWeight="bold">Below Threshold</text>
-                <text x="110" y="52" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">Don't spray</text>
-                <text x="255" y="40" fontSize="9" fill="hsl(var(--destructive))" textAnchor="middle" fontWeight="bold">Above Threshold</text>
-                <text x="255" y="52" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">Control pays off</text>
-                <text x="180" y="195" fontSize="9" fill="hsl(var(--accent))" textAnchor="middle" fontWeight="bold">Threshold</text>
-                <text x="335" y="35" fontSize="8" fill="hsl(var(--destructive))" textAnchor="end">Yield loss</text>
-                <text x="335" y="105" fontSize="8" fill="hsl(var(--primary))" textAnchor="end">Control cost</text>
+                <text x="225" y="250" fontSize="11" fill="hsl(var(--foreground))" textAnchor="middle" fontWeight="bold">Time</text>
+
+                {/* Economic injury level (dashed, upper) */}
+                <line x1="50" y1="55" x2="390" y2="55" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" strokeDasharray="5 4" />
+                <text x="60" y="50" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">Economic injury level</text>
+
+                {/* Economic threshold (solid, middle) */}
+                <line x1="50" y1="105" x2="390" y2="105" stroke="hsl(var(--foreground))" strokeWidth="1.5" />
+                <text x="60" y="100" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">Economic threshold</text>
+
+                {/* Without control curve (dashed black, rises above injury level) */}
+                <path d="M 50 200 C 110 190, 150 150, 190 110 C 230 70, 280 40, 340 55 C 370 65, 390 90, 390 120" fill="none" stroke="hsl(var(--foreground))" strokeWidth="2.5" strokeDasharray="6 4" />
+                <text x="300" y="35" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">Without control</text>
+
+                {/* With control curve (solid green filled) */}
+                <path d="M 50 200 C 110 190, 150 150, 185 105 L 185 220 L 50 220 Z" fill="#558B2F" fillOpacity="0.25" stroke="none" />
+                <path d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165" fill="none" stroke="#558B2F" strokeWidth="2.5" />
+                <path d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165 L 390 220 L 185 220 Z" fill="#558B2F" fillOpacity="0.25" stroke="none" />
+                <text x="260" y="175" fontSize="10" fill="#558B2F" fontWeight="bold">With control</text>
+
+                {/* Chemical control arrow and label */}
+                <line x1="185" y1="25" x2="185" y2="95" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+                <defs>
+                  <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                    <polygon points="0 0, 8 3, 0 6" fill="hsl(var(--muted-foreground))" />
+                  </marker>
+                </defs>
+                <text x="120" y="22" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">Chemical control</text>
+
+                {/* Drop arrow at intervention */}
+                <line x1="200" y1="95" x2="200" y2="125" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
               </svg>
             </div>
             <p className="text-[11px] text-muted-foreground text-center">
-              The threshold is where the rising <span className="text-destructive font-bold">yield-loss curve</span> crosses the
-              <span className="text-primary font-bold"> cost-of-control line</span>. Left of it, treatment costs more than the loss; right of it, every additional weed costs the grower money.
+              When weed pressure rises past the <span className="text-foreground font-bold">economic threshold</span>, control becomes profitable.
+              Without action, the population may reach the <span className="text-foreground font-bold">economic injury level</span>, where losses exceed any recoverable yield.
             </p>
           </div>
 
