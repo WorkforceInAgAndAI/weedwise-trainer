@@ -3594,37 +3594,37 @@ function TopicContent({
         const TECHNIQUE_BUCKETS: { key: string; label: string; description: string; match: RegExp }[] = [
           {
             key: "mechanical",
-            label: "Mechanical & Physical Removal",
+            label: "Mechanical & Physical Removal (Hand-pulling, Mowing, Tillage)",
             description:
-              "Hand-pulling, digging, mowing, cutting, and tillage. Best when crews can wear PPE to avoid skin contact with toxic sap, spines, or allergenic pollen.",
+              "Crews physically remove or sever the plant — hand-pulling, hoeing, digging taproots, mowing before seed set, brush-cutting, or tillage (chisel, disk, row cultivator). Most effective on small infestations and before seed production, but it brings workers into direct contact with the plant, so PPE (chemical-resistant gloves, long sleeves, eye protection) is mandatory for species with toxic sap, spines, or allergenic pollen. Tillage can also bury herbicide-resistant seed and reset the seedbank.",
             match: /hand[- ]?pull|dig|mow|cut|till|cultivat|mechanical|removal/i,
           },
           {
             key: "cultural",
-            label: "Cultural & Preventive Practices",
+            label: "Cultural & Preventive Practices (Crop Rotation, Cover Crops, Sanitation)",
             description:
-              "Crop rotation, cover crops, sanitation, livestock exclusion, and signage. Reduces exposure by preventing the toxic species from establishing in the first place.",
+              "These practices change the field environment so the weed never gets a foothold. Includes crop rotation (corn → soybean → small grain) to disrupt life cycles, competitive cover crops (cereal rye, crimson clover) that shade and suppress germination, equipment sanitation to stop seed transport, livestock exclusion from infested pastures, and posted signage warning workers of toxic stands. Preventive — lowest worker exposure of any tactic because the dangerous plant ideally never reaches a harvestable size.",
             match: /rotat|cover crop|sanit|prevent|exclud|fenc|sign|graz/i,
           },
           {
             key: "chemical",
-            label: "Chemical Control (Herbicides)",
+            label: "Chemical Control — Herbicides (PRE & POST Applications)",
             description:
-              "Targeted herbicide application with full PPE — chemical-resistant gloves, eye protection, long sleeves, and respiratory protection when label requires.",
+              "Targeted application of a labeled herbicide — broadcast spray, banded over-the-row, or spot-treat with a backpack sprayer or wick. Effective on large infestations and species with deep roots or rhizomes that mechanical removal can't kill. Required PPE per the product label always includes chemical-resistant gloves and eye protection; long-sleeved coveralls and an organic-vapor respirator are required for many Group 4 (auxin) and Group 14 (PPO) products. Always rotate modes of action (Groups 1–27) to slow resistance.",
             match: /herbicid|spray|chemical|spot[- ]?treat/i,
           },
           {
             key: "biological",
-            label: "Biological Control",
+            label: "Biological Control (Insects, Pathogens, Targeted Grazing)",
             description:
-              "Using insects, pathogens, or managed grazing animals that selectively attack the weed without putting human handlers at risk of contact.",
+              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing animal (goats, sheep) — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
             match: /biolog|insect|pathogen|biocontrol|graz/i,
           },
           {
             key: "ipm",
-            label: "Integrated Pest Management (IPM)",
+            label: "Integrated Pest Management — IPM (Scouting, Thresholds, Multiple Tactics)",
             description:
-              "Combining scouting, thresholds, and multiple control tools so no single tactic is overused. Reduces both safety risk and the chance of herbicide resistance.",
+              "An overall decision framework — not a single tactic. IPM stacks regular scouting, economic and action thresholds, and a planned sequence of cultural, mechanical, biological, and chemical tools so no one tactic is overused. For toxic-plant management it also means matching each tool to the worker-exposure risk it carries (lowest-risk tool that still controls the population) and rotating herbicide modes of action to slow resistance.",
             match: /integrat|ipm|combin|monitor|scout|threshold/i,
           },
         ];
@@ -3641,8 +3641,12 @@ function TopicContent({
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-2">
               <p className="font-display font-bold text-destructive text-base">Safety First</p>
               <p>
-                Some weeds are <strong>dangerous to touch or handle</strong>. Choose the safest combination of control
-                techniques for the species you are working with, and always pair them with the right PPE.
+                Some weeds are <strong>dangerous to touch, inhale, or ingest</strong> — they may carry irritating sap,
+                allergenic pollen, sharp spines, or systemic toxins. The species below are grouped by the
+                <strong> management technique</strong> most commonly recommended for them so you can see at a glance
+                which control tool fits which population, and what level of PPE that tool requires. The right choice
+                balances three things: how effective the tactic is on that species, how much it exposes the worker, and
+                how it fits into a longer IPM rotation.
               </p>
             </div>
 
