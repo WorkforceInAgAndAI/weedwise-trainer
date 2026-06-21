@@ -4476,45 +4476,36 @@ function FamilyGroupings({
     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
       <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
       <p className="text-xs text-muted-foreground mb-3">
-        Weeds in the same family share characteristics. Color-coded groups show related species. Tap "+X more" to
-        expand.
+        Weeds in the same family share characteristics. Each card shows the common name, a photo, and the scientific
+        name. Scroll sideways within a family to see every species; tap a card to open its profile.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="space-y-3">
         {Array.from(familyGroups.entries())
           .sort()
           .map(([family, members], fi) => {
-            const isExpanded = expandedFamilies.has(family);
-            const shownMembers = isExpanded ? members : members.slice(0, 4);
             return (
               <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
-                <p className="font-bold text-foreground text-xs">
+                <p className="font-bold text-foreground text-xs mb-2">
                   {family} ({members.length})
                 </p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {shownMembers.map((w) => (
-                    <ClickableWeedName
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                  {members.map((w) => (
+                    <button
                       key={w.id}
-                      weed={w}
-                      onSelect={onSelectWeed}
-                      className="text-[10px] bg-card px-1.5 py-0.5 rounded"
-                    />
+                      onClick={() => onSelectWeed(w)}
+                      className="flex-shrink-0 w-28 bg-card border border-border rounded-md p-2 text-left hover:border-primary transition-colors"
+                    >
+                      <p className="text-[11px] font-bold text-foreground leading-tight mb-1 line-clamp-2 min-h-[2rem]">
+                        {w.commonName}
+                      </p>
+                      <div className="w-full h-20 rounded overflow-hidden bg-muted mb-1">
+                        <WeedImage weedId={w.id} stage="mature" className="w-full h-full" />
+                      </div>
+                      <p className="text-[9px] italic text-muted-foreground leading-tight line-clamp-2">
+                        {w.scientificName}
+                      </p>
+                    </button>
                   ))}
-                  {!isExpanded && members.length > 4 && (
-                    <button
-                      onClick={() => toggleFamily(family)}
-                      className="text-[10px] text-primary font-medium hover:underline cursor-pointer"
-                    >
-                      +{members.length - 4} more
-                    </button>
-                  )}
-                  {isExpanded && members.length > 4 && (
-                    <button
-                      onClick={() => toggleFamily(family)}
-                      className="text-[10px] text-primary font-medium hover:underline cursor-pointer"
-                    >
-                      Show less
-                    </button>
-                  )}
                 </div>
               </div>
             );
