@@ -3996,7 +3996,7 @@ function TopicContent({
                 </p>
                 <p>
                   However, the average Iowa crop farm now spans roughly <strong>345 acres</strong>
-                  <span className="text-xs text-muted-foreground"> (USDA NASS, 2022 Census of Agriculture — Iowa)</span>,
+                  <span className="text-xs text-muted-foreground"> (<a href="https://www.extension.iastate.edu/Agdm/articles/edwards/EdwMar24.html" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-primary/80">Edwards, ISU Extension, March 2024</a>)</span>,
                   which is far too large for a person to cover thoroughly on foot every week. To scale up scouting,
                   agronomists now combine manual walks with <strong>drones, rovers, and satellites</strong> that can survey
                   whole fields quickly and pinpoint problem areas for a closer manual look.
@@ -4696,7 +4696,7 @@ function TopicContent({
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Herbicide Mode of Action (MOA)</p>
-            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are a <strong>multi-billion-dollar industry</strong> in the United States — U.S. growers spend roughly <strong>$9–10 billion per year</strong> on herbicide products alone, more than on insecticides and fungicides combined.</p>
+            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides represent a <strong>major input cost</strong> in United States row-crop production.</p>
             <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA describes the specific biochemical pathway inside the plant that the herbicide disrupts — for example, blocking amino-acid synthesis, photosynthesis, or cell division.</p>
             <p>Chemicals within the same MOA group impact the plant in the same way, so <strong>resistance to one chemical typically results in resistance to every other chemical in that herbicide group</strong>. That is why rotating across different MOA groups — not just different brand names — is essential for long-term weed control.</p>
           </div>
