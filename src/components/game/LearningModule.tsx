@@ -3465,9 +3465,10 @@ function TopicContent({
         {
           key: "pre-emergent",
           label: "General Pre-Emergent Herbicide",
-          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical — applying too early or too late reduces efficacy significantly.",
+          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical. Applying too early or too late reduces efficacy significantly.",
           example:
             "Applying pendimethalin or S-metolachlor to corn fields before planting to prevent annual grass and small-seeded broadleaf emergence.",
+          weedId: "Common_Lambsquarters",
         },
         {
           key: "post-emergent",
@@ -3475,6 +3476,7 @@ function TopicContent({
           desc: "Post-emergent herbicides target actively growing weeds. They can be selective (targeting specific weed types while leaving the crop unharmed) or non-selective (killing all vegetation). Efficacy depends on weed growth stage, environmental conditions, and application rate.",
           example:
             "Applying a selective broadleaf herbicide to a soybean field to control waterhemp at the 2-4 inch stage.",
+          weedId: "waterhemp",
         },
         {
           key: "multi-moa",
@@ -3482,6 +3484,7 @@ function TopicContent({
           desc: "Multi-Mode of Action (MOA) herbicide programs use two or more herbicides with different mechanisms of killing weeds in a single application or across a season. This is the most critical strategy for preventing herbicide resistance.",
           example:
             "Tank-mixing a Group 15 pre-emergent with a Group 27 post-emergent to control resistant Palmer amaranth.",
+          weedId: "palmer-amaranth",
         },
         {
           key: "wait",
@@ -3489,6 +3492,7 @@ function TopicContent({
           desc: "Economic threshold-based decision making is central to IPM. The pest threshold is the specific population density at which control action must be taken to prevent unacceptable harm or economic loss.",
           example:
             "A scout records 1-2 common chickweed plants per square meter in a vigorous winter wheat stand. Published thresholds indicate this causes less than 1% yield loss.",
+          weedId: "Common_Chickweed",
         },
         {
           key: "hand-weeding",
@@ -3496,6 +3500,7 @@ function TopicContent({
           desc: "Manual removal of weeds, particularly important for removing herbicide-resistant escapes before they set seed. In resistance management, 'zero seed tolerance' programs rely on hand weeding.",
           example:
             "Walking bean fields in late summer to hand-pull waterhemp escapes that survived herbicide applications.",
+          weedId: "waterhemp",
         },
         {
           key: "mulch-cover",
@@ -3503,6 +3508,7 @@ function TopicContent({
           desc: "Cover crops suppress weeds through physical biomass that blocks light, allelopathic compounds that inhibit germination, and competition for resources. Species like cereal rye can produce 4,000-8,000 lbs/acre of biomass.",
           example:
             "Planting cereal rye at 60-90 lbs/acre after corn harvest, then roller-crimping in spring before soybean planting.",
+          weedId: "Giant_Foxtail",
         },
         {
           key: "tillage",
@@ -3510,6 +3516,7 @@ function TopicContent({
           desc: "Tillage can be strategic or conventional. Strategic tillage targets specific weed flushes while minimizing soil disturbance. Deep inversion tillage can bury weed seeds below their emergence depth.",
           example:
             "Using a precision inter-row cultivator with guidance systems to mechanically remove weeds between soybean rows.",
+          weedId: "Canada_Thistle",
         },
       ];
 
