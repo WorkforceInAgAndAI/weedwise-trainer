@@ -1018,15 +1018,16 @@ function TopicContent({
               <p>
                 Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
                 and overall farm success. According to the Weed Science Society of America, without weed control in corn,
-                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>
-                {" "}(
+                soybean, and sugar beet fields across North America, farmers would lose roughly{" "}
+                <strong>50% of corn</strong>, <strong>52% of soybean</strong>, and <strong>72% of sugar beet</strong>{" "}
+                yields each year (
                 <a
-                  href="https://wssa.net/wp-content/uploads/WSSA-Weed-Loss-Studies-Final-Numbers.pdf"
+                  href="https://wssa.net/resources/weed-impacts-on-crop-yields/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline text-primary hover:text-primary/80"
                 >
-                  WSSA Weed Loss Studies
+                  WSSA: Weed Impacts on Crop Yields
                 </a>
                 ).
               </p>
@@ -1049,25 +1050,20 @@ function TopicContent({
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
-              <div className="flex gap-4 items-start">
-                <div className="w-40 h-40 rounded-xl overflow-hidden shrink-0 border-2 border-border">
-                  <WeedImage weedId={waterhemp.id} stage="flower" className="w-full h-full" />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
-                  <p className="text-sm text-foreground">
-                    Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
-                    edges, known for its smooth hairless stems and distinct leaf shape.
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-primary/10 rounded-lg p-2 text-center">
-                      <p className="text-[10px] text-muted-foreground">GENUS</p>
-                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
-                    </div>
-                    <div className="bg-accent/10 rounded-lg p-2 text-center">
-                      <p className="text-[10px] text-muted-foreground">SPECIES</p>
-                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
-                    </div>
+              <div className="space-y-3">
+                <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
+                <p className="text-sm text-foreground">
+                  Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
+                  edges, known for its smooth hairless stems and distinct leaf shape.
+                </p>
+                <div className="grid grid-cols-2 gap-2 max-w-sm">
+                  <div className="bg-primary/10 rounded-lg p-2 text-center">
+                    <p className="text-[10px] text-muted-foreground">GENUS</p>
+                    <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
+                  </div>
+                  <div className="bg-accent/10 rounded-lg p-2 text-center">
+                    <p className="text-[10px] text-muted-foreground">SPECIES</p>
+                    <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
                   </div>
                 </div>
               </div>
@@ -1084,9 +1080,6 @@ function TopicContent({
                 <div className="grid grid-cols-3 gap-3">
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                      <div className="w-28 h-28 mx-auto rounded-lg overflow-hidden mb-2">
-                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                      </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
                       <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
                     </div>
