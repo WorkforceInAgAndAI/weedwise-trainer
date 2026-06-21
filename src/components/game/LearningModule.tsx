@@ -454,11 +454,13 @@ function WeedFlashcardDeck({
   onSelectWeed,
   stage = "flower",
   emphasizeScientific = false,
+  hideImage = false,
 }: {
   weeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   stage?: "whole" | "flower" | "vegetative" | "seed" | "seedling";
   emphasizeScientific?: boolean;
+  hideImage?: boolean;
 }) {
   const [activeDeck, setActiveDeck] = useState<Weed[]>(fullDeck);
   const [index, setIndex] = useState(0);
@@ -510,12 +512,37 @@ function WeedFlashcardDeck({
           <div className="relative w-full aspect-[4/3] max-h-[26rem]">
             {!flipped ? (
               <div className="absolute inset-0 flex flex-col">
-                <div className="flex-1 overflow-hidden">
-                  <WeedImage weedId={current.id} stage={stage} className="w-full h-full" />
-                </div>
-                <p className="text-[11px] text-muted-foreground text-center py-1.5 bg-card border-t border-border">
-                  Tap card to reveal the name
-                </p>
+                {hideImage ? (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center bg-card">
+                    <p className="text-[11px] uppercase tracking-wide font-bold text-muted-foreground">
+                      Identify from these traits
+                    </p>
+                    {current.traits && current.traits.length > 0 ? (
+                      <ul className="text-sm text-foreground text-left list-disc list-inside space-y-1 max-w-md">
+                        {current.traits.slice(0, 5).map((t, i) => (
+                          <li key={i}>{t}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-foreground">{current.memoryHook}</p>
+                    )}
+                    <p className="text-[10px] text-muted-foreground italic mt-1">
+                      {current.plantType} • {current.lifeCycle}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground py-1.5 mt-2 border-t border-border w-full">
+                      Tap card to reveal the name
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex-1 overflow-hidden">
+                      <WeedImage weedId={current.id} stage={stage} className="w-full h-full" />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground text-center py-1.5 bg-card border-t border-border">
+                      Tap card to reveal the name
+                    </p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="absolute inset-0 bg-card flex flex-col items-center justify-center gap-2 p-5 text-center">
@@ -935,7 +962,7 @@ function TopicContent({
                 then tap the card to check yourself.
               </p>
             </div>
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" hideImage />
           </div>
         );
       }
@@ -975,7 +1002,7 @@ function TopicContent({
               </p>
             </div>
 
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" hideImage />
           </div>
         );
       }
@@ -991,15 +1018,16 @@ function TopicContent({
               <p>
                 Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
                 and overall farm success. According to the Weed Science Society of America, without weed control in corn,
-                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>
-                {" "}(
+                soybean, and sugar beet fields across North America, farmers would lose roughly{" "}
+                <strong>50% of corn</strong>, <strong>52% of soybean</strong>, and <strong>72% of sugar beet</strong>{" "}
+                yields each year (
                 <a
-                  href="https://wssa.net/wp-content/uploads/WSSA-Weed-Loss-Studies-Final-Numbers.pdf"
+                  href="https://wssa.net/resources/weed-impacts-on-crop-yields/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline text-primary hover:text-primary/80"
                 >
-                  WSSA Weed Loss Studies
+                  WSSA: Weed Impacts on Crop Yields
                 </a>
                 ).
               </p>
@@ -1022,25 +1050,20 @@ function TopicContent({
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
-              <div className="flex gap-4 items-start">
-                <div className="w-40 h-40 rounded-xl overflow-hidden shrink-0 border-2 border-border">
-                  <WeedImage weedId={waterhemp.id} stage="flower" className="w-full h-full" />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
-                  <p className="text-sm text-foreground">
-                    Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
-                    edges, known for its smooth hairless stems and distinct leaf shape.
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-primary/10 rounded-lg p-2 text-center">
-                      <p className="text-[10px] text-muted-foreground">GENUS</p>
-                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
-                    </div>
-                    <div className="bg-accent/10 rounded-lg p-2 text-center">
-                      <p className="text-[10px] text-muted-foreground">SPECIES</p>
-                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
-                    </div>
+              <div className="space-y-3">
+                <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
+                <p className="text-sm text-foreground">
+                  Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
+                  edges, known for its smooth hairless stems and distinct leaf shape.
+                </p>
+                <div className="grid grid-cols-2 gap-2 max-w-sm">
+                  <div className="bg-primary/10 rounded-lg p-2 text-center">
+                    <p className="text-[10px] text-muted-foreground">GENUS</p>
+                    <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
+                  </div>
+                  <div className="bg-accent/10 rounded-lg p-2 text-center">
+                    <p className="text-[10px] text-muted-foreground">SPECIES</p>
+                    <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
                   </div>
                 </div>
               </div>
@@ -1057,9 +1080,6 @@ function TopicContent({
                 <div className="grid grid-cols-3 gap-3">
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
-                      <div className="w-28 h-28 mx-auto rounded-lg overflow-hidden mb-2">
-                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                      </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
                       <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
                     </div>
@@ -1068,45 +1088,40 @@ function TopicContent({
               </div>
             )}
 
-            {/* Visual ID reference: large image + side caption with diagnostic features */}
+            {/* Visual ID reference (text-only diagnostic cards) */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-4">
-              <p className="font-display font-bold text-foreground text-base">Visual ID Reference</p>
+              <p className="font-display font-bold text-foreground text-base">Diagnostic ID Reference</p>
               <p className="text-sm text-muted-foreground">
-                Each card pairs a clear reproductive-stage photo with the diagnostic features you would use to identify the
-                weed in the field. Study the image first, then read the description to confirm the key traits.
+                Each card lists the diagnostic features you would use to identify the weed in the field. Use the
+                trait list to narrow your ID, then confirm with the scientific name and family.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topicWeeds.map((w) => (
                   <div
                     key={`idref-${w.id}`}
-                    className="bg-background border border-border rounded-lg p-3 flex gap-3 items-start"
+                    className="bg-background border border-border rounded-lg p-3 space-y-1.5"
                   >
-                    <div className="w-32 h-32 sm:w-40 sm:h-40 shrink-0 rounded-lg overflow-hidden border border-border bg-muted">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-1.5">
-                      <ClickableWeedName
-                        weed={w}
-                        onSelect={onSelectWeed}
-                        className="font-display font-bold text-sm text-foreground block"
-                      />
-                      <p className="text-xs italic text-primary">{w.scientificName}</p>
-                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                        Family: <span className="text-foreground normal-case">{w.family}</span>
+                    <ClickableWeedName
+                      weed={w}
+                      onSelect={onSelectWeed}
+                      className="font-display font-bold text-sm text-foreground block"
+                    />
+                    <p className="text-xs italic text-primary">{w.scientificName}</p>
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
+                    </p>
+                    {w.traits && w.traits.length > 0 && (
+                      <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
+                        {w.traits.slice(0, 4).map((t, i) => (
+                          <li key={i}>{t}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {w.memoryHook && (
+                      <p className="text-xs text-muted-foreground italic mt-1">
+                        <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
                       </p>
-                      {w.traits && w.traits.length > 0 && (
-                        <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
-                          {w.traits.slice(0, 4).map((t, i) => (
-                            <li key={i}>{t}</li>
-                          ))}
-                        </ul>
-                      )}
-                      {w.memoryHook && (
-                        <p className="text-xs text-muted-foreground italic mt-1">
-                          <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
-                        </p>
-                      )}
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
