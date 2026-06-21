@@ -4171,17 +4171,19 @@ function TopicContent({
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Herbicide Mode of Action (MOA)</p>
-            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are also a <strong>multi-billion-dollar industry</strong> in the United States.</p>
-            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA is the specific way a herbicide affects a plant's growth or survival, similar to how medicine targets a specific part of the human body.</p>
-            <p>Herbicide groups share the same chemical foundation within each category. Because of that, weeds resistant to one herbicide in a group are often resistant to others with the same MOA.</p>
+            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are a <strong>multi-billion-dollar industry</strong> in the United States — U.S. growers spend roughly <strong>$9–10 billion per year</strong> on herbicide products alone, more than on insecticides and fungicides combined.</p>
+            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA describes the specific biochemical pathway inside the plant that the herbicide disrupts — for example, blocking amino-acid synthesis, photosynthesis, or cell division.</p>
+            <p>Chemicals within the same MOA group impact the plant in the same way, so <strong>resistance to one chemical typically results in resistance to every other chemical in that herbicide group</strong>. That is why rotating across different MOA groups — not just different brand names — is essential for long-term weed control.</p>
           </div>
-          <h3 className="font-display font-bold text-foreground text-sm">Key Herbicide Groups</h3>
+          <h3 className="font-display font-bold text-foreground text-sm">Herbicide Groups in Use Today</h3>
           <div className="space-y-3">
-            {MOA_EXAMPLES.map(m => (
-              <div key={m.group} className="bg-card border border-border rounded-lg p-4">
-                <p className="font-bold text-foreground">Group {m.group}: {m.name}</p>
-                <p className="text-sm text-muted-foreground mt-1">{m.desc}</p>
-                <p className="text-xs text-primary mt-1">Example: {m.example}</p>
+            {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(m => (
+              <div key={m.id} className="bg-card border border-border rounded-lg p-4">
+                <p className="font-bold text-foreground">Group {m.group}: {m.moa}</p>
+                <p className="text-sm text-muted-foreground mt-1"><strong>Chemistry:</strong> {m.chemistry}</p>
+                <p className="text-sm text-muted-foreground mt-1"><strong>Timing / Spectrum:</strong> {m.timing} · {m.spectrum}</p>
+                <p className="text-sm text-muted-foreground mt-1"><strong>Resistance risk:</strong> <span className={m.resistanceLevel === 'Very high' || m.resistanceLevel === 'High' ? 'text-destructive font-medium' : 'text-foreground'}>{m.resistanceLevel}</span> — {m.resistanceNotes}</p>
+                <p className="text-xs text-primary mt-1">Examples: {m.brands.join(', ')}</p>
               </div>
             ))}
           </div>
