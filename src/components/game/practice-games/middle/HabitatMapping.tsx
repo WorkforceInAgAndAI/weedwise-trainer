@@ -1,35 +1,36 @@
 import { useState, useMemo, useEffect } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
+import { Sun, Snowflake, Droplets, Wind } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+// Mirrors the four habitat categories used in the 6-8 Learning Module
 const ZONES = [
-  { id: 'temperate', label: 'Temperate', Icon: Sun },
-  { id: 'arid', label: 'Arid / Dry', Icon: Wind },
-  { id: 'tropical', label: 'Tropical / Warm', Icon: Thermometer },
-  { id: 'wetland', label: 'Wetland / Riparian', Icon: Droplets },
+  { id: 'warm', label: 'Warm-Season / Full Sun', Icon: Sun },
+  { id: 'cool', label: 'Cool-Season / Early Spring', Icon: Snowflake },
+  { id: 'wet', label: 'Wet / Poorly Drained', Icon: Droplets },
+  { id: 'dry', label: 'Dry / Disturbed', Icon: Wind },
 ];
 
 function getZone(w: typeof weeds[0]): string {
-  const t = `${w.habitat} ${w.primaryHabitat}`.toLowerCase();
-  if (t.match(/wet|moist|water|flood|river|aquatic|bottom|marsh/)) return 'wetland';
-  if (t.match(/dry|arid|drought|sandy|desert/)) return 'arid';
-  if (t.match(/warm|trop|hot|summer|full sun/)) return 'tropical';
-  return 'temperate';
+  const h = (w.primaryHabitat || '').trim().toLowerCase();
+  if (h.startsWith('wet')) return 'wet';
+  if (h.startsWith('dry')) return 'dry';
+  if (h.startsWith('cool')) return 'cool';
+  return 'warm'; // both "Warm-Season / Full Sun" variants land here
 }
 
 function reasonFor(w: typeof weeds[0], zone: string): string {
   const name = w.commonName;
   switch (zone) {
-    case 'wetland': return `${name} thrives in saturated soils — its roots tolerate low oxygen, so it dominates ditches, riparian areas, and flooded fields.`;
-    case 'arid': return `${name} survives water-scarce sites with deep roots, waxy or hairy leaves, and tough seed coats that retain moisture.`;
-    case 'tropical': return `${name} is a warm-season grower that needs heat and full sun to complete its life cycle quickly.`;
-    case 'temperate':
-    default: return `${name} is adapted to moderate temperatures and seasonal moisture — typical of Midwest cropland and disturbed ground.`;
+    case 'wet': return `${name} thrives in saturated, poorly drained soils — its roots tolerate low oxygen, so it dominates ditches, low spots, and tile-drained fields with compaction.`;
+    case 'dry': return `${name} survives on sandy, dry, disturbed ground using deep roots, waxy or hairy leaves, and tough seed coats that conserve moisture.`;
+    case 'cool': return `${name} germinates in fall or early spring when soils are 40–60 °F. Cool-season C3 species like this often overwinter as a low rosette.`;
+    case 'warm':
+    default: return `${name} is a warm-season grower that waits for soils above ~60 °F and uses the C4 pathway to explode in mid-summer heat and full sun.`;
   }
 }
 
@@ -37,7 +38,7 @@ const ROUNDS_PER_LEVEL = 3;
 const WEEDS_PER_ROUND = 8;
 
 function getItemsForRound(level: number, roundNum: number) {
-  const byZone: Record<string, typeof weeds> = { temperate: [], arid: [], tropical: [], wetland: [] };
+  const byZone: Record<string, typeof weeds> = { warm: [], cool: [], wet: [], dry: [] };
   weeds.forEach(w => byZone[getZone(w)].push(w));
   const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * 2;
   const picks: { weed: typeof weeds[0]; zone: string }[] = [];

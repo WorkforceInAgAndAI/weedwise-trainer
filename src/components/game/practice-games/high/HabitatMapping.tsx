@@ -1,22 +1,25 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import { Trees, Sun, Droplets, Wind } from 'lucide-react';
+import { Sun, Snowflake, Droplets, Wind } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+// Mirrors the four habitat categories used in the 9-12 Learning Module
 const ZONES = [
- { id: 'temperate', label: 'Temperate Forest', Icon: Trees, color: 'bg-green-600', countries: 'USA, Canada, Europe', keywords: ['temperate', 'cool', 'corn', 'soybean', 'field', 'crop'] },
- { id: 'arid', label: 'Arid / Semi-Arid', Icon: Sun, color: 'bg-amber-600', countries: 'SW USA, Australia, Middle East', keywords: ['dry', 'arid', 'desert', 'sand', 'hot'] },
- { id: 'tropical', label: 'Tropical', Icon: Wind, color: 'bg-emerald-600', countries: 'Brazil, SE Asia, Central America', keywords: ['tropic', 'warm', 'humid', 'wet season', 'cotton'] },
- { id: 'wetland', label: 'Wetland / Riparian', Icon: Droplets, color: 'bg-blue-600', countries: 'River basins worldwide', keywords: ['water', 'flood', 'aquatic', 'moist', 'river', 'ditch', 'marsh'] },
+ { id: 'warm', label: 'Warm-Season / Full Sun', Icon: Sun, color: 'bg-amber-600', sub: 'C4 — soils > 60 °F, mid-summer dominators' },
+ { id: 'cool', label: 'Cool-Season / Early Spring', Icon: Snowflake, color: 'bg-sky-600', sub: 'C3 — germinates fall/early spring, often overwinters as rosette' },
+ { id: 'wet', label: 'Wet / Poorly Drained', Icon: Droplets, color: 'bg-blue-600', sub: 'Aerenchyma roots, saturated low-O₂ soils' },
+ { id: 'dry', label: 'Dry / Disturbed', Icon: Wind, color: 'bg-stone-600', sub: 'Deep taproots, waxy/narrow leaves, sandy ground' },
 ];
 
 function getZone(w: typeof weeds[0]) {
- const h = (w.habitat + ' ' + w.primaryHabitat).toLowerCase();
- for (const z of ZONES) { if (z.keywords.some(k => h.includes(k))) return z.id; }
- return 'temperate';
+ const h = (w.primaryHabitat || '').trim().toLowerCase();
+ if (h.startsWith('wet')) return 'wet';
+ if (h.startsWith('dry')) return 'dry';
+ if (h.startsWith('cool')) return 'cool';
+ return 'warm';
 }
 
 const ROUNDS_PER_LEVEL = 2;
@@ -121,7 +124,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
         className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10 cursor-pointer' : 'border-border cursor-default'}`}>
         <ZoneIcon className="w-6 h-6 mx-auto text-foreground mb-1" />
         <p className="text-xs font-bold text-foreground">{z.label}</p>
-        <p className="text-[10px] text-muted-foreground">{z.countries}</p>
+        <p className="text-[10px] text-muted-foreground leading-tight">{z.sub}</p>
         <div className="mt-1 flex flex-wrap gap-1 justify-center">
          {items.filter(it => placements[it.weed.id] === z.id).map(it => (
           <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
