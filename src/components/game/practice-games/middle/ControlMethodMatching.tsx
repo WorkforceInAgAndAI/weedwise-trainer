@@ -31,8 +31,8 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
     return selected.map(w => {
       const bestId = getBestMOAForWeed(w);
       const bestMOA = HERBICIDE_MOA.find(h => h.id === bestId)!;
-      // Build 4 MOA options ensuring no two share a symptom type
-      const distractors = pickDistinctDistractors(bestMOA, msPool, 3);
+      // Simpler 3-option choice: 1 correct + 2 distinct distractors (no two share a symptom type)
+      const distractors = pickDistinctDistractors(bestMOA, msPool, 2);
       const options = shuffle([bestMOA, ...distractors]);
       return { weed: w, bestId, bestMOA, options };
     });

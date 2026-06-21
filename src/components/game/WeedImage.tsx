@@ -49,6 +49,11 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
   if (stage === 'male' || stage === 'female') {
    const prefix = stage;
    const urls: string[] = [];
+   // Prefer seed-head variants when available — they're the clearest way to tell male vs. female apart
+   for (const ext of exts) {
+    const url = resolveImageUrl(weedId, `${prefix}_seedhead.${ext}`);
+    if (url) urls.push(url);
+   }
    for (const ext of exts) {
     const url = resolveImageUrl(weedId, `${prefix}.${ext}`);
     if (url) urls.push(url);

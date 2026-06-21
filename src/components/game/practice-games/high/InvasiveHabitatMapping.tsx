@@ -47,15 +47,17 @@ function getContinent(w: typeof weeds[0]): string {
 }
 
 function getArrivalMethod(w: typeof weeds[0]): string {
- return ARRIVAL_METHODS[w.id] || 'Introduced through contaminated seed or intentional planting';
+ if (ARRIVAL_METHODS[w.id]) return ARRIVAL_METHODS[w.id];
+ if (w.origin === 'Native') return 'Native to North America — became a weed by spreading through agricultural disturbance, equipment, and seed banks';
+ return 'Introduced from outside North America — likely via contaminated seed, ballast, or escaped cultivation';
 }
 
 const ARRIVAL_OPTIONS = [
- 'Contaminated crop seed',
- 'Intentional introduction (food/fiber/ornamental)',
- 'Ship ballast or livestock feed',
- 'Native species that spread through agriculture',
- 'Escaped cultivation',
+ 'Contaminated crop seed (arrived unintentionally as a seed-lot contaminant)',
+ 'Intentional import for food, fiber, or forage — then escaped',
+ 'Ship ballast or livestock feed (arrived unintentionally)',
+ 'Native to North America — spread by farming activity (equipment, hay, runoff)',
+ 'Escaped from ornamental/garden cultivation (was deliberately planted, then jumped the fence)',
 ];
 
 function WorldMap({ onSelect, selected, correctId, showResult }: {
