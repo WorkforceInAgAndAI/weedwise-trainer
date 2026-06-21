@@ -3,91 +3,113 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from '@/data/competitionTraits';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-interface Choice { label: string; advantage: boolean; reason: string; }
+type Weed = typeof weeds[0];
 
-function getCompetitorBehavior(opponent: typeof weeds[0], questionIdx: number): string {
-  const behaviors = [
-    opponent.lifeCycle === 'Annual'
-      ? `${opponent.commonName} is an annual that germinates quickly in spring, racing for early sunlight.`
-      : `${opponent.commonName} is a perennial with established root reserves, giving it a head start each spring.`,
-    opponent.plantType === 'Monocot'
-      ? `${opponent.commonName} grows narrow, upright leaves that form dense stands and intercept light efficiently.`
-      : `${opponent.commonName} spreads broad leaves that shade out shorter plants nearby.`,
-    opponent.actImmediately
-      ? `${opponent.commonName} emerges early and grows aggressively — it will try to dominate before others can establish.`
-      : `${opponent.commonName} waits for warmer conditions before emerging, avoiding early-season competition.`,
-    `${opponent.commonName} has a ${opponent.lifeCycle.toLowerCase()} life cycle and can ${opponent.lifeCycle === 'Perennial' ? 'regrow from roots each year' : 'produce thousands of seeds in a single season'}.`,
-    opponent.plantType === 'Monocot'
-      ? `${opponent.commonName} has fibrous roots that grip the soil tightly, making it hard to remove.`
-      : `${opponent.commonName} has a taproot that reaches deep for water, even during dry spells.`,
-  ];
-  return behaviors[questionIdx % behaviors.length];
+function traitsOf(w: Weed): CompetitionTrait[] {
+  return COMPETITION_TRAITS[w.id] || [];
 }
 
-function buildRound(you: typeof weeds[0], opponent: typeof weeds[0]) {
-  const allChoices: { question: string; competitorInfo: string; options: Choice[] }[] = [
-    {
-      question: 'How will you spread your leaves?',
-      competitorInfo: getCompetitorBehavior(opponent, 0),
-      options: [
-        { label: 'Broad flat leaves', advantage: you.plantType === 'Dicot', reason: 'Dicots shade out competitors with broad leaves.' },
-        { label: 'Narrow upright leaves', advantage: you.plantType === 'Monocot', reason: 'Monocots grow densely and intercept light efficiently.' },
-        { label: 'Rosette of basal leaves', advantage: you.lifeCycle === 'Biennial', reason: 'Rosette-forming plants hug the ground and crowd out neighbors.' },
-      ],
-    },
-    {
-      question: 'How will you reproduce?',
-      competitorInfo: getCompetitorBehavior(opponent, 1),
-      options: [
-        { label: 'Produce thousands of seeds', advantage: you.lifeCycle === 'Annual', reason: 'Annuals rely on massive seed production to persist.' },
-        { label: 'Spread by roots and rhizomes', advantage: you.lifeCycle === 'Perennial', reason: 'Perennials survive by spreading underground.' },
-        { label: 'Produce seeds and vegetative offshoots', advantage: you.lifeCycle === 'Perennial', reason: 'Using both strategies maximizes reproduction success.' },
-      ],
-    },
-    {
-      question: 'When will you grow?',
-      competitorInfo: getCompetitorBehavior(opponent, 2),
-      options: [
-        { label: 'Grow fast in spring', advantage: you.actImmediately, reason: 'Early growth captures resources first.' },
-        { label: 'Wait for summer heat', advantage: !you.actImmediately, reason: 'Late growers avoid early competition.' },
-        { label: 'Grow year-round in mild climates', advantage: you.lifeCycle === 'Perennial', reason: 'Continuous growth means constant resource capture.' },
-      ],
-    },
-    {
-      question: 'How will you compete for water?',
-      competitorInfo: getCompetitorBehavior(opponent, 3),
-      options: [
-        { label: 'Deep taproot to reach groundwater', advantage: you.plantType === 'Dicot', reason: 'Deep roots access water that shallow-rooted plants cannot.' },
-        { label: 'Dense fibrous roots near the surface', advantage: you.plantType === 'Monocot', reason: 'Fibrous roots efficiently absorb rain before it drains deep.' },
-        { label: 'Store water in thick stems', advantage: false, reason: 'Few weeds store water this way — it is more common in succulents.' },
-      ],
-    },
-    {
-      question: 'How will you handle being mowed?',
-      competitorInfo: getCompetitorBehavior(opponent, 4),
-      options: [
-        { label: 'Regrow from buds at the base', advantage: you.lifeCycle === 'Perennial', reason: 'Perennials store energy in roots and crowns for regrowth.' },
-        { label: 'Quickly flower and set seed before the next mowing', advantage: you.lifeCycle === 'Annual', reason: 'Annuals that flower fast can reproduce before being cut again.' },
-        { label: 'Grow flat along the ground below the mower blade', advantage: true, reason: 'Prostrate growth avoids mowing damage entirely.' },
-      ],
-    },
-  ];
-  // Pick 3 random questions for variety
-  return shuffle(allChoices).slice(0, 3);
+interface RoundOption { trait: CompetitionTrait; correct: boolean; reason: string; }
+interface Round { question: string; competitorInfo: string; options: RoundOption[]; }
+
+function buildRound(you: Weed, opponent: Weed): Round[] {
+  const yourTraits = traitsOf(you);
+  const oppTraits = traitsOf(opponent);
+  const advantageTraits = yourTraits.filter(t => !oppTraits.includes(t));
+  const sharedTraits = yourTraits.filter(t => oppTraits.includes(t));
+  const oppOnly = oppTraits.filter(t => !yourTraits.includes(t));
+  const neither = TRAIT_DEFS.map(d => d.key).filter(t => !yourTraits.includes(t) && !oppTraits.includes(t));
+
+  // We want 3 rounds — each presents 3 trait options.
+  const advantagePool = shuffle(advantageTraits);
+  const fillerPool = shuffle([...sharedTraits, ...oppOnly, ...neither]);
+
+  const rounds: Round[] = [];
+  const usedAdvantage = new Set<CompetitionTrait>();
+  const usedFiller = new Set<CompetitionTrait>();
+
+  for (let r = 0; r < 3; r++) {
+    // Pick one advantage trait if available, else a shared trait flagged as not best
+    let advantage = advantagePool.find(t => !usedAdvantage.has(t));
+    if (!advantage) advantage = advantagePool[r % Math.max(advantagePool.length, 1)];
+
+    const options: RoundOption[] = [];
+    if (advantage) {
+      usedAdvantage.add(advantage);
+      options.push({
+        trait: advantage,
+        correct: true,
+        reason: `${you.commonName} has ${advantage}, and ${opponent.commonName} does not — that's a true edge.`,
+      });
+    }
+
+    // Add 2 filler options (incorrect)
+    for (const f of fillerPool) {
+      if (options.length >= 3) break;
+      if (usedFiller.has(f)) continue;
+      if (options.some(o => o.trait === f)) continue;
+      usedFiller.add(f);
+      let reason: string;
+      if (oppTraits.includes(f) && yourTraits.includes(f)) {
+        reason = `Both ${you.commonName} and ${opponent.commonName} share ${f} — it cancels out.`;
+      } else if (oppTraits.includes(f)) {
+        reason = `${opponent.commonName} actually has ${f} and ${you.commonName} doesn't — that would backfire.`;
+      } else {
+        reason = `${you.commonName} doesn't have ${f} as a real survival trait.`;
+      }
+      options.push({ trait: f, correct: false, reason });
+    }
+
+    // Pad with neither-pool if still under 3
+    let pad = 0;
+    while (options.length < 3 && pad < neither.length) {
+      const f = neither[(r + pad) % neither.length];
+      if (!options.some(o => o.trait === f)) {
+        options.push({ trait: f, correct: false, reason: `${you.commonName} doesn't actually have ${f}.` });
+      }
+      pad++;
+    }
+
+    // Fallback if still empty (shouldn't normally happen)
+    if (options.length === 0) continue;
+
+    const oppList = oppTraits.length > 0 ? oppTraits.join(', ') : 'no listed survival traits';
+    rounds.push({
+      question: `Round ${r + 1}: Which of YOUR survival traits gives the best edge over ${opponent.commonName}?`,
+      competitorInfo: `${opponent.commonName} relies on: ${oppList}.`,
+      options: shuffle(options),
+    });
+  }
+
+  return rounds;
 }
 
 function getMatchupsForLevel(level: number) {
+  // Only match weeds that have trait data
+  const pool = weeds.filter(w => (COMPETITION_TRAITS[w.id] || []).length > 0);
   const offset = (level - 1) * 8;
-  const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
-  const pool = shuffle(rotated);
-  const result: { you: typeof weeds[0]; opponent: typeof weeds[0] }[] = [];
-  for (let i = 0; i + 1 < pool.length && result.length < 4; i += 2) {
-    result.push({ you: pool[i], opponent: pool[i + 1] });
+  const rotated = [...pool.slice(offset % pool.length), ...pool.slice(0, offset % pool.length)];
+  const shuffled = shuffle(rotated);
+  const result: { you: Weed; opponent: Weed }[] = [];
+  for (let i = 0; i + 1 < shuffled.length && result.length < 4; i += 2) {
+    result.push({ you: shuffled[i], opponent: shuffled[i + 1] });
   }
   return result;
+}
+
+function TraitBadgeList({ traits }: { traits: CompetitionTrait[] }) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {traits.map(t => (
+        <span key={t} className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium leading-tight">{t}</span>
+      ))}
+      {traits.length === 0 && <span className="text-[10px] text-muted-foreground italic">no listed survival traits</span>}
+    </div>
+  );
 }
 
 export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
@@ -108,32 +130,23 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
   const rounds = useMemo(() => match ? buildRound(match.you, match.opponent) : [], [match]);
 
   const pick = (idx: number) => {
-    if (answered) return;
+    if (answered || !rounds[step]) return;
     setPicked(idx);
     setAnswered(true);
-    if (rounds[step].options[idx].advantage) {
+    if (rounds[step].options[idx].correct) {
       setPoints(p => p + 1);
       setTotalPoints(t => t + 1);
     }
   };
 
   const nextStep = () => {
-    if (step + 1 >= rounds.length) {
-      // Show match result screen
-      setShowMatchResult(true);
-    } else {
-      setStep(s => s + 1);
-    }
-    setPicked(null);
-    setAnswered(false);
+    if (step + 1 >= rounds.length) setShowMatchResult(true);
+    else setStep(s => s + 1);
+    setPicked(null); setAnswered(false);
   };
 
   const nextMatch = () => {
-    setMatchIdx(m => m + 1);
-    setStep(0);
-    setPoints(0);
-    setShowIntro(true);
-    setShowMatchResult(false);
+    setMatchIdx(m => m + 1); setStep(0); setPoints(0); setShowIntro(true); setShowMatchResult(false);
   };
 
   const restart = () => { setMatchIdx(0); setStep(0); setPoints(0); setTotalPoints(0); setPicked(null); setAnswered(false); setShowIntro(true); setShowMatchResult(false); };
@@ -144,7 +157,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
     return <LevelComplete level={level} score={totalPoints} total={matchups.length * 3} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 
-  // Match result screen
   if (showMatchResult && match) {
     const youWon = points >= 2;
     return (
@@ -155,7 +167,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           <span className="text-sm text-muted-foreground">Match {matchIdx + 1}/{matchups.length}</span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-md mx-auto gap-4">
-          <h2 className={`text-2xl font-bold ${youWon ? 'text-green-500' : 'text-destructive'}`}>
+          <h2 className={`text-2xl font-bold ${youWon ? 'text-green-600' : 'text-destructive'}`}>
             {youWon ? `${match.you.commonName} Wins!` : `${match.opponent.commonName} Wins!`}
           </h2>
           <div className="flex items-center gap-6">
@@ -175,11 +187,16 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
               <p className="text-lg font-bold text-foreground">{rounds.length - points}</p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground text-center">
-            {youWon
-              ? `${match.you.commonName} made better strategic choices and out-competed ${match.opponent.commonName}!`
-              : `${match.opponent.commonName} had the advantage this time. Different traits help in different conditions.`}
-          </p>
+          <div className="w-full bg-card border border-border rounded-lg p-3 space-y-2">
+            <div>
+              <p className="text-xs font-bold text-foreground mb-1">{match.you.commonName} survival traits</p>
+              <TraitBadgeList traits={traitsOf(match.you)} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-foreground mb-1">{match.opponent.commonName} survival traits</p>
+              <TraitBadgeList traits={traitsOf(match.opponent)} />
+            </div>
+          </div>
           <button onClick={nextMatch} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
             {matchIdx + 1 < matchups.length ? 'Next Match' : 'See Final Results'}
           </button>
@@ -188,7 +205,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Match intro screen
   if (showIntro && match) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
@@ -198,33 +214,33 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">Match {matchIdx + 1}/{matchups.length}</span>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 max-w-md mx-auto">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4 max-w-md mx-auto">
           <h2 className="text-xl font-bold text-foreground">Match {matchIdx + 1}: Meet the Competitors</h2>
 
-          <div className="w-full border border-border rounded-xl p-4 bg-card">
-            <div className="flex items-center gap-3 mb-2">
+          <div className="w-full border border-border rounded-xl p-4 bg-card space-y-2">
+            <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
                 <WeedImage weedId={match.you.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="font-bold text-foreground text-sm">{match.you.commonName} <span className="text-xs text-muted-foreground">(You)</span></p>
-                <p className="text-xs text-muted-foreground">{match.you.plantType} - {match.you.lifeCycle}</p>
+                <p className="text-xs text-muted-foreground">{match.you.plantType} · {match.you.lifeCycle}</p>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">{match.you.traits[0]}</p>
+            <TraitBadgeList traits={traitsOf(match.you)} />
           </div>
 
-          <div className="w-full border border-border rounded-xl p-4 bg-card">
-            <div className="flex items-center gap-3 mb-2">
+          <div className="w-full border border-border rounded-xl p-4 bg-card space-y-2">
+            <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
                 <WeedImage weedId={match.opponent.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="font-bold text-foreground text-sm">{match.opponent.commonName} <span className="text-xs text-muted-foreground">(Rival)</span></p>
-                <p className="text-xs text-muted-foreground">{match.opponent.plantType} - {match.opponent.lifeCycle}</p>
+                <p className="text-xs text-muted-foreground">{match.opponent.plantType} · {match.opponent.lifeCycle}</p>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">{match.opponent.traits[0]}</p>
+            <TraitBadgeList traits={traitsOf(match.opponent)} />
           </div>
 
           <button onClick={() => setShowIntro(false)} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
@@ -235,6 +251,9 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
     );
   }
 
+  const round = rounds[step];
+  const traitDef = (k: CompetitionTrait) => TRAIT_DEFS.find(d => d.key === k);
+
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
@@ -244,7 +263,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">Match {matchIdx + 1}/{matchups.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
-        {/* Match header */}
         <div className="w-full max-w-md rounded-2xl p-4 mb-4 border border-border bg-card">
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
@@ -261,7 +279,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
                   <div key={i} className={`w-3 h-3 rounded-full ${i < points ? 'bg-green-500' : i < step ? 'bg-destructive' : 'bg-border'}`} />
                 ))}
               </div>
-              <p className="text-[10px] text-muted-foreground mt-1">Round {step + 1}/3</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Round {step + 1}/{rounds.length}</p>
             </div>
             <div className="text-center flex-1">
               <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
@@ -273,31 +291,38 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        {/* Competitor info */}
-        <div className="w-full max-w-md bg-card rounded-xl border border-border p-3 mb-3">
-          <p className="text-xs font-bold text-foreground mb-1">Competitor Intel:</p>
-          <p className="text-xs text-muted-foreground">{rounds[step]?.competitorInfo}</p>
-        </div>
-
-        {/* Question card */}
-        <div className="w-full max-w-md bg-card rounded-xl border border-border p-4 mb-4">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Your Move</p>
-          <p className="font-bold text-foreground text-lg mb-4">{rounds[step]?.question}</p>
-          <div className="flex flex-col gap-3">
-            {rounds[step]?.options.map((opt, idx) => {
-              const bg = !answered ? 'border-border bg-card hover:border-primary' :
-                idx === picked ? (opt.advantage ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
-                opt.advantage ? 'border-green-500 bg-green-500/10' : 'border-border bg-card';
-              return (
-                <button key={idx} onClick={() => pick(idx)}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${bg}`}>
-                  <span className="font-bold text-sm text-foreground">{opt.label}</span>
-                  {answered && <p className="text-xs text-muted-foreground mt-1">{opt.reason}</p>}
-                </button>
-              );
-            })}
+        <div className="w-full max-w-md bg-card rounded-xl border border-border p-3 mb-3 space-y-2">
+          <div>
+            <p className="text-xs font-bold text-foreground mb-1">Your survival traits</p>
+            <TraitBadgeList traits={traitsOf(match!.you)} />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-foreground mb-1">Competitor intel: {match!.opponent.commonName} has</p>
+            <TraitBadgeList traits={traitsOf(match!.opponent)} />
           </div>
         </div>
+
+        {round && (
+          <div className="w-full max-w-md bg-card rounded-xl border border-border p-4 mb-4">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Your Move</p>
+            <p className="font-bold text-foreground text-base mb-4">{round.question}</p>
+            <div className="flex flex-col gap-3">
+              {round.options.map((opt, idx) => {
+                const bg = !answered ? 'border-border bg-card hover:border-primary' :
+                  idx === picked ? (opt.correct ? 'border-green-500 bg-green-500/20' : 'border-destructive bg-destructive/20') :
+                  opt.correct ? 'border-green-500 bg-green-500/10' : 'border-border bg-card';
+                const def = traitDef(opt.trait);
+                return (
+                  <button key={idx} onClick={() => pick(idx)} className={`p-3 rounded-xl border-2 text-left transition-all ${bg}`}>
+                    <span className="font-bold text-sm text-foreground">{opt.trait}</span>
+                    <p className="text-[11px] text-muted-foreground leading-tight mt-1">{def?.desc}</p>
+                    {answered && <p className="text-xs text-foreground mt-2"><span className="font-semibold text-primary">Why:</span> {opt.reason}</p>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {answered && (
           <button onClick={nextStep} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
@@ -305,7 +330,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
           </button>
         )}
       </div>
-          <FloatingCoach grade="6-8" tip={`Weeds compete for light, water, nutrients, and space. Some are more aggressive than others.`} />
-</div>
+      <FloatingCoach grade="6-8" tip="Pick the survival trait YOU have that your rival doesn't. Shared traits cancel out." />
+    </div>
   );
 }
