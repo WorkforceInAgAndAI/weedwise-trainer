@@ -3346,7 +3346,9 @@ function TopicContent({
                   <strong>ligule</strong> row is one of the most reliable ID features.
                 </p>
               </div>
-              {lookAlikeGroups.map((g, i) => renderTripleCard(g, `tri-${i}-${g.map((w) => w.id).join("-")}`))}
+              {lookAlikeGroups.map((g, i) =>
+                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference)
+              )}
             </div>
           )}
 
