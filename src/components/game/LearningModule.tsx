@@ -3260,6 +3260,12 @@ function TopicContent({
                 </div>
               </div>
             )}
+            {customDifference && (
+              <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
+                <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
+                <p>{customDifference}</p>
+              </div>
+            )}
           </div>
         );
       };
