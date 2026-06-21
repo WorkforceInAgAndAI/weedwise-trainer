@@ -3820,10 +3820,22 @@ function TopicContent({
     case "crop-injury": {
       const INJURY_PATTERNS = [
         { group: "1", name: "ACCase Inhibitors", symptoms: "Yellowing in young grass leaves and death at the growing points." },
-        { group: "2", name: "ALS Inhibitors", symptoms: "Stunted plants with purpling on the veins or stems." },
+        { group: "2", name: "ALS Inhibitors", symptoms: "Stunted plants with purpling on the veins or stems and interveinal chlorosis." },
+        { group: "3", name: "Microtubule Inhibitors", symptoms: "Pruned, stubby roots; poor stand establishment and swollen root tips." },
         { group: "4", name: "Synthetic Auxins", symptoms: "Leaf cupping, twisting, and bent stems (epinasty)." },
-        { group: "9", name: "EPSPS Inhibitors", symptoms: "Gradual yellowing and death starting from the oldest leaves." },
-        { group: "14", name: "PPO Inhibitors", symptoms: "Brown or scorched leaf spots soon after application." },
+        { group: "5", name: "PSII Inhibitors (Triazines)", symptoms: "Interveinal chlorosis and necrosis starting on older leaf margins." },
+        { group: "6", name: "PSII Inhibitors (Benzothiadiazoles)", symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure." },
+        { group: "8", name: "Lipid Synthesis Inhibitors", symptoms: "Twisted, malformed seedlings with leaves that fail to unfurl from the whorl." },
+        { group: "9", name: "EPSPS Inhibitors", symptoms: "Gradual yellowing and death starting from the oldest leaves and growing points." },
+        { group: "10", name: "Glutamine Synthase Inhibitors", symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application." },
+        { group: "13", name: "DOXP Inhibitors", symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature." },
+        { group: "14", name: "PPO Inhibitors", symptoms: "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings." },
+        { group: "15", name: "VLCFA Inhibitors", symptoms: "Tightly rolled or 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings." },
+        { group: "19", name: "Auxin Transport Inhibitors", symptoms: "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin injury amplified." },
+        { group: "22", name: "PSI Electron Diverters", symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact." },
+        { group: "23", name: "Mitosis Inhibitors", symptoms: "Outer leaves desiccate and brown while the central whorl stays green." },
+        { group: "25", name: "Cell Wall (Cellulose) Inhibitors", symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips." },
+        { group: "26", name: "Nucleic Acid Inhibitors", symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury." },
       ];
       return (
         <div className="space-y-5">
