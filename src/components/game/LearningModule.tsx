@@ -2155,8 +2155,14 @@ function TopicContent({
 
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <p className="font-display font-bold text-foreground text-sm">Invasive Weeds in the Midwest</p>
-                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" />
+                <p className="font-display font-bold text-foreground text-sm">
+                  Invasive Weeds in the Midwest ({invasives.length})
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  These weeds were introduced from other places and now hurt our farms and native plants. Scroll
+                  across to see them all, and tap any weed to learn more.
+                </p>
+                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" tileWidth="13rem" />
               </div>
             )}
 
