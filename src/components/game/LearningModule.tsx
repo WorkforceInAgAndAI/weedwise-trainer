@@ -501,6 +501,89 @@ function HorizontalWeedRow({
 }
 
 /**
+ * Curated K-5 look-alike groups. Each group has 2–4 weeds that are genuinely confused
+ * in the field (same genus or very similar morphology), along with a kid-friendly
+ * "How to tell them apart" guide. Family-only matches that aren't truly look-alikes
+ * (e.g. Woolly Cupgrass vs Shattercane) are intentionally excluded.
+ */
+const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: string }[] = [
+  {
+    title: "Pigweed Family (Amaranths)",
+    weedIds: ["waterhemp", "palmer-amaranth", "Redroot_pigweed"],
+    difference:
+      "All three have small green flowers and grow tall. Palmer Amaranth has the longest seedhead (often longer than your hand) and a leaf stem (petiole) longer than the leaf itself. Waterhemp has smooth, hairless stems and skinnier leaves. Redroot Pigweed has hairy stems and a reddish root.",
+  },
+  {
+    title: "Foxtail Grasses",
+    weedIds: ["giant-foxtail", "green-foxtail", "yellow-foxtail"],
+    difference:
+      "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a droopy, nodding head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
+  },
+  {
+    title: "Bindweeds (Climbing Vines)",
+    weedIds: ["Field_bindweed", "Hedge_bindweed"],
+    difference:
+      "Both have white or pink trumpet-shaped flowers and twist around other plants. Field Bindweed has small flowers (about an inch) and arrowhead-shaped leaves. Hedge Bindweed has large flowers (2–3 inches) and bigger leaves with squared-off bottoms.",
+  },
+  {
+    title: "Ragweeds",
+    weedIds: ["common-ragweed", "giant-ragweed"],
+    difference:
+      "Both make lots of pollen that causes allergies. Common Ragweed is short (1–3 feet) with fern-like, lacy leaves. Giant Ragweed grows huge (up to 10 feet!) with big leaves that have 3 to 5 large lobes — like a giant hand.",
+  },
+  {
+    title: "Thistles (Spiny Weeds)",
+    weedIds: ["canada-thistle", "Musk_thistle", "Russian_thistle"],
+    difference:
+      "All three have spines and prickly leaves. Canada Thistle has small purple flowers and spreads underground in big patches. Musk Thistle has a single huge purple flower that nods over to one side. Russian Thistle (tumbleweed) is bushy and rolls across the ground when it dries out.",
+  },
+  {
+    title: "Smartweeds",
+    weedIds: ["pennsylvania-smartweed", "Water_smartweed"],
+    difference:
+      "Both have pink flower spikes and a papery sheath around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems. Water Smartweed grows in wet places like ponds with leaves that often float on the water.",
+  },
+];
+
+function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
+  return (
+    <div className="space-y-4">
+      {ELEM_LOOKALIKE_GROUPS.map((g) => {
+        const members = g.weedIds
+          .map((id) => weeds.find((w) => w.id === id))
+          .filter((w): w is Weed => Boolean(w));
+        if (members.length < 2) return null;
+        return (
+          <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">
+              {g.title} <span className="text-xs text-muted-foreground font-normal">({members.length} look-alikes)</span>
+            </p>
+            <div className={`grid gap-3 ${members.length === 2 ? "grid-cols-2" : members.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}>
+              {members.map((w) => (
+                <div key={w.id} className="text-center">
+                  <button
+                    onClick={() => onSelectWeed(w)}
+                    className="block w-full rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                    style={{ aspectRatio: "1 / 1" }}
+                  >
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  </button>
+                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
+                </div>
+              ))}
+            </div>
+            <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
+              <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
+              <p>{g.difference}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
  * Reusable flip flashcard deck.
  * - Image is shown on the front; click the card to flip and reveal the name.
  * - User sorts each card into "I'm confident" or "Want to review more".
