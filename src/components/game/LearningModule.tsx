@@ -3468,7 +3468,7 @@ function TopicContent({
           desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical. Applying too early or too late reduces efficacy significantly.",
           example:
             "Applying pendimethalin or S-metolachlor to corn fields before planting to prevent annual grass and small-seeded broadleaf emergence.",
-          weedId: "Common_Lambsquarters",
+          weedId: "lambsquarters",
         },
         {
           key: "post-emergent",
@@ -3492,7 +3492,7 @@ function TopicContent({
           desc: "Economic threshold-based decision making is central to IPM. The pest threshold is the specific population density at which control action must be taken to prevent unacceptable harm or economic loss.",
           example:
             "A scout records 1-2 common chickweed plants per square meter in a vigorous winter wheat stand. Published thresholds indicate this causes less than 1% yield loss.",
-          weedId: "Common_Chickweed",
+          weedId: "CommonChickweed",
         },
         {
           key: "hand-weeding",
@@ -3508,7 +3508,7 @@ function TopicContent({
           desc: "Cover crops suppress weeds through physical biomass that blocks light, allelopathic compounds that inhibit germination, and competition for resources. Species like cereal rye can produce 4,000-8,000 lbs/acre of biomass.",
           example:
             "Planting cereal rye at 60-90 lbs/acre after corn harvest, then roller-crimping in spring before soybean planting.",
-          weedId: "Giant_Foxtail",
+          weedId: "giant-foxtail",
         },
         {
           key: "tillage",
@@ -3516,7 +3516,7 @@ function TopicContent({
           desc: "Tillage can be strategic or conventional. Strategic tillage targets specific weed flushes while minimizing soil disturbance. Deep inversion tillage can bury weed seeds below their emergence depth.",
           example:
             "Using a precision inter-row cultivator with guidance systems to mechanically remove weeds between soybean rows.",
-          weedId: "Canada_Thistle",
+          weedId: "canada-thistle",
         },
       ];
 
