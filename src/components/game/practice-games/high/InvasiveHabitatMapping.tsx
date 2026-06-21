@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import worldMapImg from '@/assets/images/world.jpg';
+import { WEED_ARRIVAL_KNOWLEDGE } from '@/data/weedKnowledge';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -10,44 +11,19 @@ const CONTINENTS = [
  { id: 'europe', label: 'Europe / Eurasia', x: 48, y: 28 },
  { id: 'asia', label: 'Asia', x: 72, y: 32 },
  { id: 'africa', label: 'Africa', x: 52, y: 55 },
+ { id: 'mediterranean', label: 'Mediterranean', x: 50, y: 38 },
  { id: 'americas', label: 'Americas (native spread)', x: 22, y: 40 },
 ];
 
-const ARRIVAL_METHODS: Record<string, string> = {
- 'canada-thistle': 'Contaminated imported crop seed in the 1700s',
- 'caraway': 'Introduced for culinary/medicinal use; spread with cultivation',
- 'lambsquarters': 'Likely introduced by early settlers as a food crop; also spread in contaminated seed lots',
- 'kochia': 'Introduced to the U.S. from Europe and Asia as an ornamental in the 1800s',
- 'velvetleaf': 'Brought intentionally from China in the early 1700s for fiber, then became a weed',
- 'wild-oat': 'Introduced from Eurasia, likely as a crop contaminant',
- 'wild-parsnip': 'Introduced from Europe as a food/medicinal plant and escaped cultivation',
- 'poison-hemlock': 'Introduced from Europe/West Asia as an accidental contaminant',
- 'morningglory': 'Introduced from tropical Americas and spread as an escaped ornamental',
- 'johnsongrass': 'Introduced from the Mediterranean as a forage grass',
- 'marestail': 'Native to North America but spread globally as a weed',
- 'palmer-amaranth': 'Native to North America (Southwest), spread by contaminated hay, feed, seed, equipment',
- 'waterhemp': 'Native to North America, spread through agricultural movement',
- 'giant-ragweed': 'Native to North America, spread through disturbance',
- 'giant-foxtail': 'Introduced from East Asia, likely through contaminated seed',
- 'green-foxtail': 'Introduced from Eurasia, spread via contaminated seed',
- 'yellow-foxtail': 'Introduced from Eurasia via contaminated grain',
- 'large-crabgrass': 'Introduced from Europe, spread in crop and lawn seed',
- 'barnyardgrass': 'Introduced from Eurasia, spread through rice and crop seed',
- 'yellow-nutsedge': 'Introduced from Eurasia, spread through tubers and soil movement',
- 'golden-alexanders': 'Native to North America',
- 'pennsylvania-smartweed': 'Native to North America',
- 'volunteer-sunflower': 'Native to North America, weedy volunteer from cultivation',
-};
-
 function getContinent(w: typeof weeds[0]): string {
- if (w.origin === 'Native' || ['palmer-amaranth', 'waterhemp', 'giant-ragweed', 'marestail', 'golden-alexanders', 'pennsylvania-smartweed', 'volunteer-sunflower'].includes(w.id)) return 'americas';
- const id = w.id.toLowerCase();
- if (['velvetleaf', 'giant-foxtail'].includes(id)) return 'asia';
- return 'europe';
+ const k = WEED_ARRIVAL_KNOWLEDGE[w.id];
+ if (k) return k.continent;
+ return w.origin === 'Native' ? 'americas' : 'europe';
 }
 
 function getArrivalMethod(w: typeof weeds[0]): string {
- if (ARRIVAL_METHODS[w.id]) return ARRIVAL_METHODS[w.id];
+ const k = WEED_ARRIVAL_KNOWLEDGE[w.id];
+ if (k) return k.story;
  if (w.origin === 'Native') return 'Native to North America — became a weed by spreading through agricultural disturbance, equipment, and seed banks';
  return 'Introduced from outside North America — likely via contaminated seed, ballast, or escaped cultivation';
 }
