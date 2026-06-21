@@ -4239,20 +4239,56 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">Weed Adaptation to Compete</p>
             {grade === "middle" ? (
               <>
+                <p>Plants might look peaceful, but they're locked in a constant battle for survival.</p>
                 <p>
-                  Weeds aren't just competing with crops — they're also fighting each other for space, sunlight, water,
-                  and nutrients in a fierce natural battle.
+                  Every plant needs sunlight, water, and soil nutrients — and there's never enough to go around. To win,
+                  plants have evolved some seriously clever strategies.
                 </p>
                 <p>
-                  Certain weed species have developed highly effective competitive traits that allow them to establish
-                  dominance over other plants, including <strong>rapid germination rates, aggressive canopy spread</strong>
-                  that shades neighboring vegetation, and <strong>deep or extensive root systems</strong> that access soil
-                  resources before competitors can reach them.
+                  <strong>Competing for resources</strong> starts the moment a seed hits the soil. Some weeds have
+                  incredibly fast germination rates — sprouting in just a day or two — which gives them a head start
+                  over slower plants before the competition even begins. Once above ground, fast-growing weeds like
+                  giant ragweed shoot up quickly to form an aggressive canopy, spreading their leaves wide to absorb
+                  sunlight and shade out everything growing below them. Meanwhile, plants like crabgrass stay low and
+                  spread outward, blanketing the ground so nothing else can sprout underneath. The battle continues
+                  underground too, where deep or extensive root systems — like those of field bindweed or Canada
+                  thistle, which can reach several feet down — tap into water and nutrients that shallower-rooted
+                  neighbors simply can't access. Some plants even release toxic chemicals into the soil to poison
+                  competitors, a process called <strong>allelopathy</strong>.
                 </p>
                 <p>
-                  Some species practice <strong>allelopathy</strong>, releasing chemical compounds from their roots or
-                  decomposing tissue into the surrounding soil that inhibit the germination or growth of competing plants.
+                  <strong>Defending against predators</strong> is another survival must. Since plants can't run, they
+                  fight back in other ways. Many grow physical deterrents like spines, thorns, or stiff hairs —
+                  buffalobur and Canada thistle are good examples. Others load their leaves and stems with toxic or
+                  foul-tasting compounds, a strategy called chemical defense. Jimsonweed, poison hemlock, and
+                  horsenettle are all toxic enough to make animals seriously ill — which is a very effective way to
+                  avoid being eaten.
                 </p>
+                <p>
+                  <strong>Surviving human control</strong> may be the most impressive trick of all. Some weeds produce
+                  thousands of seeds that stay dormant in the soil for years, just waiting. Others rely on those same
+                  deep root systems to regrow after being cut or sprayed. And some have even developed herbicide
+                  resistance — small genetic changes that make a plant immune to chemicals designed to kill it.
+                </p>
+                <div className="bg-card border border-border rounded-lg p-3 mt-2">
+                  <p className="font-bold text-foreground text-sm mb-2">Key definitions</p>
+                  <dl className="text-xs space-y-1.5">
+                    {[
+                      ["Germination rate", "How quickly a seed sprouts after hitting the soil — faster means a bigger head start over competitors."],
+                      ["Canopy competition", "Racing to grow tall and spread wide to shade out neighboring plants."],
+                      ["Deep / extensive root systems", "Roots that reach far down or spread wide underground to access water and nutrients others can't reach."],
+                      ["Allelopathy", "Releasing chemicals into the soil to slow or stop nearby plants from growing."],
+                      ["Physical deterrents", "Spines, thorns, or rough hairs that make a plant hard to eat."],
+                      ["Chemical defense", "Toxic or bad-tasting compounds produced inside the plant to discourage predators."],
+                      ["Dormancy", "A seed's ability to pause development and wait in the soil until conditions are right to sprout."],
+                    ].map(([term, def]) => (
+                      <div key={term} className="grid grid-cols-[10rem_1fr] gap-2">
+                        <dt className="font-semibold text-primary">{term}</dt>
+                        <dd className="text-foreground">{def}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
               </>
             ) : (
               <>
