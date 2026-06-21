@@ -3121,7 +3121,7 @@ function TopicContent({
 
       // 3-species comparison card: shows seedling / vegetative / reproductive (+ ligule
       // when any member is a grass) side-by-side for all three species.
-      const renderTripleCard = (group: Weed[], key: string) => {
+      const renderTripleCard = (group: Weed[], key: string, customDifference?: string) => {
         const compareStages = [
           { stage: "seedling", label: "Seedling" },
           { stage: "vegetative", label: "Vegetative" },
@@ -3195,6 +3195,12 @@ function TopicContent({
                 </div>
               </div>
               <p className="text-[10px] text-muted-foreground">← Scroll to see all stages →</p>
+              {customDifference && (
+                <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
+                  <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
+                  <p>{customDifference}</p>
+                </div>
+              )}
             </div>
           );
         }
