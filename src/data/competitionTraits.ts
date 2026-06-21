@@ -10,7 +10,6 @@ export type CompetitionTrait =
   | "Seed dormancy"
   | "High seed output"
   | "Seed dispersal"
-  | "Herbicide resistance";
 
 export interface TraitDef {
   key: CompetitionTrait;
@@ -28,17 +27,16 @@ export const TRAIT_DEFS: TraitDef[] = [
   { key: "Seed dormancy", short: "Seed dormancy", desc: "Seeds can pause and wait in the soil for years until conditions are right, refilling the seed bank between control attempts." },
   { key: "High seed output", short: "High seed output", desc: "A single plant produces thousands — sometimes hundreds of thousands — of seeds, overwhelming any control program." },
   { key: "Seed dispersal", short: "Seed dispersal", desc: "Seeds travel — by wind, water, animals, burs, or machinery — spreading the species to new fields and habitats." },
-  { key: "Herbicide resistance", short: "Herbicide resistance", desc: "Genetic changes let the plant survive herbicides that would normally kill it, making chemical control much harder." },
 ];
 
 export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
-  "annual-ryegrass": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal", "Herbicide resistance"],
+  "annual-ryegrass": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Asian_copperleaf": ["Fast germination", "Seed dormancy", "High seed output"],
   "Asiatic_dayflower": ["Fast germination", "Seed dormancy", "High seed output"],
   "barnyardgrass": ["Fast germination", "Aggressive canopy", "Allelopathy", "Seed dormancy", "High seed output"],
   "Buffalobur": ["Fast germination", "Physical defense", "Chemical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Burcucumber": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
-  "canada-thistle": ["Fast germination", "Aggressive canopy", "Deep/wide roots", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal", "Herbicide resistance"],
+  "canada-thistle": ["Fast germination", "Aggressive canopy", "Deep/wide roots", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
   "caraway": ["Deep/wide roots", "Seed dormancy", "High seed output"],
   "Catchweed_bedstraw": ["Fast germination", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
   "CommonChickweed": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
@@ -47,7 +45,7 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
   "common_Cocklebur": ["Fast germination", "Aggressive canopy", "Allelopathy", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Common_Mallow": ["Fast germination", "Deep/wide roots", "Seed dormancy", "High seed output"],
   "common_Milkweed": ["Aggressive canopy", "Deep/wide roots", "Chemical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
-  "common-ragweed": ["Fast germination", "Aggressive canopy", "Allelopathy", "Seed dormancy", "High seed output", "Seed dispersal", "Herbicide resistance"],
+  "common-ragweed": ["Fast germination", "Aggressive canopy", "Allelopathy", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Common_teasel": ["Aggressive canopy", "Deep/wide roots", "Physical defense", "Seed dormancy", "High seed output"],
   "Corn_speedwell": ["Fast germination", "Seed dormancy", "High seed output"],
   "Curly_dock": ["Deep/wide roots", "Seed dormancy", "High seed output"],
@@ -71,10 +69,10 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
   "Henbit_deadnettle": ["Fast germination", "Seed dormancy", "High seed output"],
   "Honey-vine_climbing_milkweed": ["Aggressive canopy", "Deep/wide roots", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Horsenettle": ["Deep/wide roots", "Physical defense", "Chemical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
-  "Horseweed": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal", "Herbicide resistance"],
+  "Horseweed": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Jimsonweed": ["Fast germination", "Aggressive canopy", "Chemical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
-  "johnsongrass": ["Fast germination", "Aggressive canopy", "Deep/wide roots", "Allelopathy", "Seed dormancy", "High seed output", "Seed dispersal", "Herbicide resistance"],
-  "kochia": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal", "Herbicide resistance"],
+  "johnsongrass": ["Fast germination", "Aggressive canopy", "Deep/wide roots", "Allelopathy", "Seed dormancy", "High seed output", "Seed dispersal"],
+  "kochia": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Ladysthumb": ["Fast germination", "Seed dormancy", "High seed output"],
   "lambsquarters": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "large-crabgrass": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
@@ -83,14 +81,14 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
   "Mouseear_chickweed": ["Fast germination", "Seed dormancy", "High seed output"],
   "Musk_thistle": ["Aggressive canopy", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Nimblewill": ["Aggressive canopy", "Deep/wide roots", "Seed dormancy", "High seed output"],
-  "palmer-amaranth": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Herbicide resistance"],
+  "palmer-amaranth": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "pennsylvania-smartweed": ["Fast germination", "Seed dormancy", "High seed output"],
   "Pinnate_tansymustard": ["Fast germination", "Seed dormancy", "High seed output"],
   "poison-hemlock": ["Aggressive canopy", "Deep/wide roots", "Chemical defense", "Seed dormancy", "High seed output"],
   "Prickly_lettuce": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Prickly_sida": ["Fast germination", "Physical defense", "Seed dormancy", "High seed output"],
   "Quackgrass": ["Fast germination", "Aggressive canopy", "Deep/wide roots", "Allelopathy", "Seed dormancy", "High seed output"],
-  "Redroot_pigweed": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Herbicide resistance"],
+  "Redroot_pigweed": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "Russian_thistle": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Seed dispersal"],
   "Scouringrush": ["Aggressive canopy", "Deep/wide roots", "Chemical defense"],
   "Shattercane_Sorghums": ["Fast germination", "Aggressive canopy", "Allelopathy", "Seed dormancy", "High seed output", "Seed dispersal"],
@@ -104,7 +102,7 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
   "velvetleaf": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "Venice_mallow": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "volunteer-sunflower": ["Fast germination", "Aggressive canopy", "Allelopathy", "Seed dormancy", "High seed output"],
-  "waterhemp": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output", "Herbicide resistance"],
+  "waterhemp": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "Water_smartweed": ["Fast germination", "Seed dormancy", "High seed output"],
   "White_campion": ["Seed dormancy", "High seed output", "Seed dispersal"],
   "Wild_buckwheat": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
