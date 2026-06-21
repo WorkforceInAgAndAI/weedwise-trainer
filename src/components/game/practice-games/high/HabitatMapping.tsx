@@ -124,7 +124,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
         className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10 cursor-pointer' : 'border-border cursor-default'}`}>
         <ZoneIcon className="w-6 h-6 mx-auto text-foreground mb-1" />
         <p className="text-xs font-bold text-foreground">{z.label}</p>
-        <p className="text-[10px] text-muted-foreground">{z.countries}</p>
+        <p className="text-[10px] text-muted-foreground leading-tight">{z.sub}</p>
         <div className="mt-1 flex flex-wrap gap-1 justify-center">
          {items.filter(it => placements[it.weed.id] === z.id).map(it => (
           <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
