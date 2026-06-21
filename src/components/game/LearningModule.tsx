@@ -2845,10 +2845,11 @@ function TopicContent({
               <p className="font-display font-bold text-primary text-base">Look-Alike Weeds</p>
               <p>
                 Some weeds look very similar to other weeds. It is important to tell them apart so we can manage them
-                the right way. Look at the pairs below and see if you can spot the differences!
+                the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look
+                alike — see if you can spot what makes each one different!
               </p>
             </div>
-            {pairs.map(([a, b]) => renderPairCard(a, b, `elem-${a.id}`))}
+            <ElementaryLookAlikeGroups onSelectWeed={onSelectWeed} />
           </div>
         );
       }
