@@ -89,7 +89,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
   'economic-threshold': 'economic-threshold', 'ms-weed-control': 'control-methods',
   'control-matching': 'herbicide-moa', 'herbicide-applicator': 'herbicide-moa',
-  'ligule-lens': 'monocot-dicot',
+  'ligule-lens': 'monocot-dicot', 'ms-sleepy-seeds': 'seeds',
   // 9-12
   'hs-name-weed': 'names', 'hs-taxonomy': 'taxonomy', 'spot-differences': 'dioecious',
   'hs-habitat': 'habitats', 'invasive-habitat': 'native-introduced',
@@ -136,6 +136,7 @@ const middleGames: GameDef[] = [
  { id: 'control-matching', name: 'Control Method Matching', Icon: FlaskConical, category: 'Chemical Control', description: 'Match herbicide groups to the weeds they target.', howToPlay: 'Identify grass vs broadleaf, then pick the correct herbicide group.', component: ControlMethodMatching },
  { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
+ { id: 'ms-sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
 ];
 
 const highGames: GameDef[] = [
