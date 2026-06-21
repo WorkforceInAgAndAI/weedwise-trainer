@@ -4022,13 +4022,16 @@ function TopicContent({
               which have both male and female flowers on the same plant.
             </p>
             <p>
-              To reproduce, dioecious weeds must have female and male plants in <strong>close proximity</strong>.
-              Without one or the other, these weeds struggle to reproduce.
+              Reproduction is <strong>impossible without both sexes</strong>. A dioecious weed population requires
+              female and male plants in <strong>close proximity</strong> — pollen from a male must reach a female for
+              any viable seed to be produced.
             </p>
             <p>
-              However, because of their unique genetic makeups, dioecious plants can have{" "}
-              <strong>significant genetic diversity</strong>, helping them become resistant to many herbicides. They can
-              also produce <strong>vast amounts of seeds</strong>.
+              When both sexes are present, dioecious weeds produce <strong>vast amounts of seed</strong> — a single
+              female Palmer amaranth or waterhemp can produce hundreds of thousands of seeds in one season. Because
+              every seed is the product of cross-pollination between two different parents, populations carry{" "}
+              <strong>significant genetic diversity</strong>, which accelerates the evolution of resistance to many
+              herbicides.
             </p>
           </div>
 
@@ -4059,7 +4062,7 @@ function TopicContent({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-primary/30">
+                    <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-primary/30 mx-auto max-w-[12rem]">
                       <WeedImage weedId={sp.id} stage="male" className="w-full h-full" />
                     </div>
                     <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
@@ -4068,7 +4071,7 @@ function TopicContent({
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-accent/30">
+                    <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-accent/30 mx-auto max-w-[12rem]">
                       <WeedImage weedId={sp.id} stage="female" className="w-full h-full" />
                     </div>
                     <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
@@ -4096,26 +4099,67 @@ function TopicContent({
        SEED DORMANCY (High School)
     ═══════════════════════════════════════════════════════════ */
     case "seed-dormancy": {
-      const DORMANCY_TYPES = [
-        { label: "Physical Dormancy", desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, or microbial activity." },
-        { label: "Physiological Dormancy", desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Environmental cues like temperature shifts or light exposure can break this dormancy." },
-        { label: "Chemical Dormancy", desc: "Part of physiological dormancy, but focuses specifically on high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out or degraded before germination can occur." },
-        { label: "Morphological Dormancy", desc: "Determined by underdeveloped embryos at the time of seed release from the mature plant. By delaying embryo maturity and ability to germinate, seeds can last longer in the soil until they are morphologically ready to develop." },
+      const DORMANCY_TYPES: { label: string; desc: string; examples: string[] }[] = [
+        {
+          label: "Physical Dormancy",
+          desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
+          examples: ["Field Bindweed", "Hedge Bindweed", "Tall Morningglory", "Velvetleaf"],
+        },
+        {
+          label: "Physiological Dormancy",
+          desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
+          examples: ["Lambsquarters", "Redroot Pigweed", "Giant Foxtail", "Green Foxtail", "Yellow Foxtail", "Wild Mustard", "Curly Dock"],
+        },
+        {
+          label: "Chemical Dormancy",
+          desc: "A specialized case of physiological dormancy involving high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out by rainfall or degraded by microbes before germination can occur.",
+          examples: ["Common Cocklebur", "Wild Oat", "Johnsongrass"],
+        },
+        {
+          label: "Morphological Dormancy",
+          desc: "The embryo is underdeveloped at the time the seed is released from the parent plant. The seed must spend additional time in the soil maturing internally before it is structurally ready to germinate.",
+          examples: ["Wild Carrot", "Poison Hemlock"],
+        },
       ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Seed Dormancy</p>
-            <p>To survive in changing environments, weed seeds must adapt and know when to begin germination. To prevent germination in unfavorable conditions, such as the presence of herbicides or cold weather, seeds have developed adaptations to remain dormant.</p>
-            <p><strong>Seed dormancy</strong> is the incapacity of a viable seed to germinate under favorable conditions. For weed seeds under stress, seed dormancy is a good thing. For agronomists trying to eradicate weeds, it can be challenging.</p>
+            <p>To survive <strong>seasonal changes</strong> and other unfavorable conditions — cold winters, summer drought, waterlogged soils, or simply the wrong time of year — weed seeds have evolved the ability to pause germination until conditions improve.</p>
+            <p><strong>Seed dormancy</strong> is the ability of a viable seed to remain dormant and avoid unfavorable conditions, waiting until favorable conditions (the right temperature, moisture, light, and oxygen) arise before germinating. For weed seeds this is a survival advantage; for agronomists trying to eradicate weeds it makes the seedbank persist for years.</p>
           </div>
-          <div className="space-y-3">
-            {DORMANCY_TYPES.map(d => (
-              <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                <p className="font-display font-bold text-foreground">{d.label}</p>
-                <p className="text-sm text-foreground">{d.desc}</p>
-              </div>
-            ))}
+          <div className="space-y-4">
+            {DORMANCY_TYPES.map(d => {
+              const exampleWeeds = d.examples
+                .map(n => weeds.find(w => w.commonName.toLowerCase() === n.toLowerCase()))
+                .filter((w): w is Weed => !!w);
+              return (
+                <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                  <p className="font-display font-bold text-foreground">{d.label}</p>
+                  <p className="text-sm text-foreground">{d.desc}</p>
+                  {exampleWeeds.length > 0 && (
+                    <>
+                      <p className="text-xs font-bold text-primary uppercase tracking-wide">Example Weeds</p>
+                      <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                        {exampleWeeds.map(w => (
+                          <button
+                            key={w.id}
+                            onClick={() => onSelectWeed(w)}
+                            className="flex-shrink-0 w-32 bg-muted/40 border border-border rounded-lg p-2 hover:border-primary transition-colors text-left"
+                          >
+                            <div className="w-full h-20 rounded overflow-hidden bg-muted mb-1">
+                              <WeedImage weedId={w.id} stage="mature" className="w-full h-full" />
+                            </div>
+                            <p className="text-[11px] font-bold text-foreground leading-tight">{w.commonName}</p>
+                            <p className="text-[10px] italic text-muted-foreground leading-tight">{w.scientificName}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       );
@@ -4132,6 +4176,20 @@ function TopicContent({
         { label: "Volatilization", desc: "Chemicals are released into the air that may reduce germination or growth of seedlings nearby." },
         { label: "Soil Accumulation", desc: "Allelopathic chemicals persist and build up over time, reducing soil health and crop vigor." },
       ];
+      const ALLELOPATHIC_EXAMPLES: { id: string; name: string; compound: string; note: string }[] = [
+        { id: "Johnsongrass", name: "Johnsongrass", compound: "Sorgoleone (root exudate)", note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves." },
+        { id: "Quackgrass", name: "Quackgrass", compound: "Phenolic acids & agropyrene from rhizomes", note: "Rhizome residues suppress alfalfa, corn, and soybean establishment." },
+        { id: "Giant_Foxtail", name: "Giant Foxtail", compound: "Phenolic acids from decomposing residue", note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue." },
+        { id: "Yellow_Nutsedge", name: "Yellow Nutsedge", compound: "Tuber-derived phenolics", note: "Suppresses germination of grasses and many broadleaf crops near tuber colonies." },
+        { id: "Velvetleaf", name: "Velvetleaf", compound: "Phenolics & cyanogenic glycosides in residue", note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth." },
+        { id: "Canada_Thistle", name: "Canada Thistle", compound: "Root-exuded phenolic acids", note: "Reduces emergence and biomass of neighboring crops within thistle patches." },
+        { id: "Volunteer_Sunflower", name: "Volunteer Sunflower", compound: "Chlorogenic & isochlorogenic acids", note: "Leaf leachate and residue suppress competing weeds and small-seeded crops." },
+        { id: "Redroot_Pigweed", name: "Redroot Pigweed", compound: "Water-soluble leaf leachates", note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies." },
+        { id: "Common_Lambsquarters", name: "Lambsquarters", compound: "Oxalic acid & phenolic compounds", note: "Residue leachate inhibits germination of small-seeded crops like alfalfa and flax." },
+      ];
+      const availableAllelo = ALLELOPATHIC_EXAMPLES
+        .map(e => ({ ...e, weed: weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
+        .filter(e => !!e.weed);
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -4148,6 +4206,25 @@ function TopicContent({
               </div>
             ))}
           </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Documented Allelopathic Weeds</h3>
+          <p className="text-xs text-muted-foreground -mt-2">Scroll to see species with peer-reviewed evidence of allelopathy.</p>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+            {availableAllelo.map(e => (
+              <button
+                key={e.name}
+                onClick={() => e.weed && onSelectWeed(e.weed)}
+                className="flex-shrink-0 w-48 bg-card border border-border rounded-lg p-3 text-left hover:border-primary transition-colors"
+              >
+                <div className="w-full h-24 rounded-md overflow-hidden bg-muted mb-2">
+                  {e.weed && <WeedImage weedId={e.weed.id} stage="mature" className="w-full h-full" />}
+                </div>
+                <p className="font-bold text-foreground text-xs">{e.name}</p>
+                <p className="text-[10px] italic text-primary">{e.weed?.scientificName}</p>
+                <p className="text-[10px] text-muted-foreground mt-1"><strong>Compound:</strong> {e.compound}</p>
+                <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
+              </button>
+            ))}
+          </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Connection to Economic Thresholds</p>
             <p className="mt-1">These biochemical interactions may influence economic thresholds by intensifying crop stress, sometimes requiring earlier or more strategic management to prevent lasting soil and yield effects.</p>
@@ -4160,28 +4237,23 @@ function TopicContent({
        HERBICIDE MOA (High School)
     ═══════════════════════════════════════════════════════════ */
     case "herbicide-moa": {
-      const MOA_EXAMPLES = [
-        { group: "1", name: "ACCase Inhibitors", desc: "Disrupt enzymes that produce fatty acids, stopping growth in grasses.", example: "clethodim" },
-        { group: "2", name: "ALS Inhibitors", desc: "Block amino acid production needed for proteins.", example: "imazethapyr" },
-        { group: "4", name: "Synthetic Auxins", desc: "Mimic plant growth hormones, causing abnormal growth and death.", example: "2,4-D" },
-        { group: "9", name: "EPSPS Inhibitors", desc: "Shut down amino acid synthesis pathways.", example: "glyphosate" },
-        { group: "14", name: "PPO Inhibitors", desc: "Interfere with chlorophyll production and burn plant leaves.", example: "fomesafen" },
-      ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Herbicide Mode of Action (MOA)</p>
-            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are also a <strong>multi-billion-dollar industry</strong> in the United States.</p>
-            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA is the specific way a herbicide affects a plant's growth or survival, similar to how medicine targets a specific part of the human body.</p>
-            <p>Herbicide groups share the same chemical foundation within each category. Because of that, weeds resistant to one herbicide in a group are often resistant to others with the same MOA.</p>
+            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides are a <strong>multi-billion-dollar industry</strong> in the United States — U.S. growers spend roughly <strong>$9–10 billion per year</strong> on herbicide products alone, more than on insecticides and fungicides combined.</p>
+            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA describes the specific biochemical pathway inside the plant that the herbicide disrupts — for example, blocking amino-acid synthesis, photosynthesis, or cell division.</p>
+            <p>Chemicals within the same MOA group impact the plant in the same way, so <strong>resistance to one chemical typically results in resistance to every other chemical in that herbicide group</strong>. That is why rotating across different MOA groups — not just different brand names — is essential for long-term weed control.</p>
           </div>
-          <h3 className="font-display font-bold text-foreground text-sm">Key Herbicide Groups</h3>
+          <h3 className="font-display font-bold text-foreground text-sm">Herbicide Groups in Use Today</h3>
           <div className="space-y-3">
-            {MOA_EXAMPLES.map(m => (
-              <div key={m.group} className="bg-card border border-border rounded-lg p-4">
-                <p className="font-bold text-foreground">Group {m.group}: {m.name}</p>
-                <p className="text-sm text-muted-foreground mt-1">{m.desc}</p>
-                <p className="text-xs text-primary mt-1">Example: {m.example}</p>
+            {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(m => (
+              <div key={m.id} className="bg-card border border-border rounded-lg p-4">
+                <p className="font-bold text-foreground">Group {m.group}: {m.moa}</p>
+                <p className="text-sm text-muted-foreground mt-1"><strong>Chemistry:</strong> {m.chemistry}</p>
+                <p className="text-sm text-muted-foreground mt-1"><strong>Timing / Spectrum:</strong> {m.timing} · {m.spectrum}</p>
+                <p className="text-sm text-muted-foreground mt-1"><strong>Resistance risk:</strong> <span className={m.resistanceLevel === 'Very high' || m.resistanceLevel === 'High' ? 'text-destructive font-medium' : 'text-foreground'}>{m.resistanceLevel}</span> — {m.resistanceNotes}</p>
+                <p className="text-xs text-primary mt-1">Examples: {m.brands.join(', ')}</p>
               </div>
             ))}
           </div>
@@ -4390,59 +4462,40 @@ function FamilyGroupings({
   familyColors: string[];
   onSelectWeed: (w: Weed) => void;
 }) {
-  const [expandedFamilies, setExpandedFamilies] = useState<Set<string>>(new Set());
-  const toggleFamily = (family: string) => {
-    setExpandedFamilies((prev) => {
-      const next = new Set(prev);
-      if (next.has(family)) next.delete(family);
-      else next.add(family);
-      return next;
-    });
-  };
-
   return (
     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
       <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
       <p className="text-xs text-muted-foreground mb-3">
-        Weeds in the same family share characteristics. Color-coded groups show related species. Tap "+X more" to
-        expand.
+        Weeds in the same family share characteristics. Each card shows the common name, a photo, and the scientific
+        name. Scroll sideways within a family to see every species; tap a card to open its profile.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="space-y-3">
         {Array.from(familyGroups.entries())
           .sort()
           .map(([family, members], fi) => {
-            const isExpanded = expandedFamilies.has(family);
-            const shownMembers = isExpanded ? members : members.slice(0, 4);
             return (
               <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
-                <p className="font-bold text-foreground text-xs">
+                <p className="font-bold text-foreground text-xs mb-2">
                   {family} ({members.length})
                 </p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {shownMembers.map((w) => (
-                    <ClickableWeedName
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                  {members.map((w) => (
+                    <button
                       key={w.id}
-                      weed={w}
-                      onSelect={onSelectWeed}
-                      className="text-[10px] bg-card px-1.5 py-0.5 rounded"
-                    />
+                      onClick={() => onSelectWeed(w)}
+                      className="flex-shrink-0 w-28 bg-card border border-border rounded-md p-2 text-left hover:border-primary transition-colors"
+                    >
+                      <p className="text-[11px] font-bold text-foreground leading-tight mb-1 line-clamp-2 min-h-[2rem]">
+                        {w.commonName}
+                      </p>
+                      <div className="w-full h-20 rounded overflow-hidden bg-muted mb-1">
+                        <WeedImage weedId={w.id} stage="mature" className="w-full h-full" />
+                      </div>
+                      <p className="text-[9px] italic text-muted-foreground leading-tight line-clamp-2">
+                        {w.scientificName}
+                      </p>
+                    </button>
                   ))}
-                  {!isExpanded && members.length > 4 && (
-                    <button
-                      onClick={() => toggleFamily(family)}
-                      className="text-[10px] text-primary font-medium hover:underline cursor-pointer"
-                    >
-                      +{members.length - 4} more
-                    </button>
-                  )}
-                  {isExpanded && members.length > 4 && (
-                    <button
-                      onClick={() => toggleFamily(family)}
-                      className="text-[10px] text-primary font-medium hover:underline cursor-pointer"
-                    >
-                      Show less
-                    </button>
-                  )}
                 </div>
               </div>
             );
