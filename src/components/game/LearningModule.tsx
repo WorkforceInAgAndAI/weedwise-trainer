@@ -4306,11 +4306,11 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "life-stage-control": {
       const STAGE_CONTROL = [
-        { stage: "Seed (Seed Bank)", exampleWeedId: "Common_lambsquarters", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
-        { stage: "Seedling", exampleWeedId: "Palmer_amaranth", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
-        { stage: "Vegetative", exampleWeedId: "Waterhemp", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
-        { stage: "Reproductive", exampleWeedId: "Giant_ragweed", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
-        { stage: "Mature", exampleWeedId: "Canada_thistle", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },
+        { stage: "Seed (Seed Bank)", exampleWeedIds: ["lambsquarters", "waterhemp", "velvetleaf"], desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
+        { stage: "Seedling", exampleWeedIds: ["palmer-amaranth", "giant-foxtail", "common-ragweed"], desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
+        { stage: "Vegetative", exampleWeedIds: ["waterhemp", "kochia", "barnyardgrass"], desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
+        { stage: "Reproductive", exampleWeedIds: ["giant-ragweed", "Horseweed", "velvetleaf"], desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
+        { stage: "Mature", exampleWeedIds: ["canada-thistle", "johnsongrass", "Field_bindweed"], desc: "Mature perennial weeds regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time. (Note: seed dispersal happens during the mature stage — it is not a separate life stage.)", control: "Systemic herbicides, deep tillage, multi-year management plans" },
       ];
       const STAGE_TO_IMAGE_STAGE: Record<string, string> = {
         "Seed (Seed Bank)": "seed",
@@ -4333,8 +4333,8 @@ function TopicContent({
               {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((s, i) => (
                 <div key={s} className="flex-1 text-center">
                   <div className={`rounded-lg p-2 text-xs font-bold ${
-                    i === 0 ? 'bg-success/30 text-success-foreground border border-success/60' :
-                    i === 1 ? 'bg-success/20 text-success border border-success/40' :
+                    i === 0 ? 'bg-success/60 text-success-foreground border-2 border-success' :
+                    i === 1 ? 'bg-success/45 text-success-foreground border-2 border-success/80' :
                     i === 2 ? 'bg-primary/15 text-primary border border-primary/30' :
                     i === 3 ? 'bg-destructive/15 text-destructive border border-destructive/30' :
                     'bg-destructive/25 text-destructive border border-destructive/50'
@@ -4345,22 +4345,28 @@ function TopicContent({
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">Darker green = easiest window to control. Darker red = hardest. Hit weeds early.</p>
+            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">Darker green (Seed &amp; Seedling) = easiest control window. Darker red = hardest. Hit weeds early.</p>
           </div>
           <div className="space-y-3">
             {STAGE_CONTROL.map(s => (
               <div key={s.stage} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                <div className="flex gap-3 items-start">
-                  <div className="w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-secondary border border-border">
-                    <WeedImage weedId={s.exampleWeedId} stage={STAGE_TO_IMAGE_STAGE[s.stage] || 'flower'} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <p className="font-display font-bold text-foreground">{s.stage}</p>
-                    <p className="text-sm text-foreground">{s.desc}</p>
-                    <div className="bg-primary/10 rounded-lg p-3">
-                      <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
-                    </div>
-                  </div>
+                <p className="font-display font-bold text-foreground">{s.stage}</p>
+                <p className="text-sm text-foreground">{s.desc}</p>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {s.exampleWeedIds.map(wid => {
+                    const w = weeds.find(x => x.id === wid);
+                    return (
+                      <figure key={wid} className="space-y-1">
+                        <div className="aspect-square rounded-md overflow-hidden bg-secondary border border-border">
+                          <WeedImage weedId={wid} stage={STAGE_TO_IMAGE_STAGE[s.stage] || 'flower'} className="w-full h-full object-cover" />
+                        </div>
+                        <figcaption className="text-[10px] text-center text-muted-foreground">{w?.commonName ?? wid}</figcaption>
+                      </figure>
+                    );
+                  })}
+                </div>
+                <div className="bg-primary/10 rounded-lg p-3">
+                  <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
                 </div>
               </div>
             ))}
