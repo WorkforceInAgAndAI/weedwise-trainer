@@ -6,6 +6,8 @@
  * rather than defining its own herbicide constants.
  */
 
+import { WEED_TOP_MOAS } from './weedKnowledge';
+
 export interface HerbicideMOA {
   /** Internal stable key */
   id: string;
@@ -365,7 +367,11 @@ export function pickDistinctDistractors(
  * Determine the best MOA for a weed based on its management text and plant type.
  * Returns a MOA id from HERBICIDE_MOA.
  */
-export function getBestMOAForWeed(w: { management: string; plantType: string }): string {
+export function getBestMOAForWeed(w: { id?: string; management: string; plantType: string }): string {
+  // 1) Prefer curated, extension-vetted top MOA per weed (diverse across species).
+  if (w.id && WEED_TOP_MOAS[w.id]) {
+    return WEED_TOP_MOAS[w.id][0];
+  }
   const m = w.management.toLowerCase();
   if (m.includes('group 2') || m.includes('als')) return 'als-post';
   if (m.includes('group 4') || m.includes('auxin') || m.includes('2,4-d') || m.includes('dicamba')) return 'auxin';
@@ -382,6 +388,17 @@ export function getBestMOAForWeed(w: { management: string; plantType: string }):
   // Fallback by plant type
   if (w.plantType === 'Monocot') return 'accase';
   return 'auxin';
+}
+
+/**
+ * Curated top-3 MOAs for a weed: the best MOA plus 2 alternative strong choices.
+ * Used by games to build realistic, diverse 3-option prompts.
+ */
+export function getTopMOAsForWeed(w: { id?: string }): HerbicideMOA[] | null {
+  if (!w.id || !WEED_TOP_MOAS[w.id]) return null;
+  return WEED_TOP_MOAS[w.id]
+    .map(id => HERBICIDE_MOA.find(h => h.id === id))
+    .filter((h): h is HerbicideMOA => !!h);
 }
 
 /**
