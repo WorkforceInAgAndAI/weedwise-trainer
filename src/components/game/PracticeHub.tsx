@@ -85,7 +85,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
-  'native-lookalike': 'look-alikes', 'weed-competitors': 'weed-competitors',
+  'native-lookalike': 'look-alikes', 'ms-look-alike': 'look-alikes', 'weed-competitors': 'weed-competitors',
   'invasive-quiz': 'native-introduced', 'ms-safe-toxic': 'safety',
   'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
   'economic-threshold': 'economic-threshold', 'ms-weed-control': 'control-methods',
