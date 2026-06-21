@@ -4225,23 +4225,26 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "crop-injury": {
       const INJURY_PATTERNS = [
-        { group: "1", name: "ACCase Inhibitors", symptoms: "Yellowing in young grass leaves and death at the growing points." },
-        { group: "2", name: "ALS Inhibitors", symptoms: "Stunted plants with purpling on the veins or stems and interveinal chlorosis." },
-        { group: "3", name: "Microtubule Inhibitors", symptoms: "Pruned, stubby roots; poor stand establishment and swollen root tips." },
-        { group: "4", name: "Synthetic Auxins", symptoms: "Leaf cupping, twisting, and bent stems (epinasty)." },
-        { group: "5", name: "PSII Inhibitors (Triazines)", symptoms: "Interveinal chlorosis and necrosis starting on older leaf margins." },
-        { group: "6", name: "PSII Inhibitors (Benzothiadiazoles)", symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure." },
-        { group: "8", name: "Lipid Synthesis Inhibitors", symptoms: "Twisted, malformed seedlings with leaves that fail to unfurl from the whorl." },
-        { group: "9", name: "EPSPS Inhibitors", symptoms: "Gradual yellowing and death starting from the oldest leaves and growing points." },
-        { group: "10", name: "Glutamine Synthase Inhibitors", symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application." },
-        { group: "13", name: "DOXP Inhibitors", symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature." },
-        { group: "14", name: "PPO Inhibitors", symptoms: "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings." },
-        { group: "15", name: "VLCFA Inhibitors", symptoms: "Tightly rolled or 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings." },
-        { group: "19", name: "Auxin Transport Inhibitors", symptoms: "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin injury amplified." },
-        { group: "22", name: "PSI Electron Diverters", symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact." },
-        { group: "23", name: "Mitosis Inhibitors", symptoms: "Outer leaves desiccate and brown while the central whorl stays green." },
-        { group: "25", name: "Cell Wall (Cellulose) Inhibitors", symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips." },
-        { group: "26", name: "Nucleic Acid Inhibitors", symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury." },
+        { group: "1", name: "ACCase Inhibitors", part: "New grass leaves at the whorl & growing points", symptoms: "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl." },
+        { group: "2", name: "ALS Inhibitors", part: "Top (newest) leaves, veins, and shoot tips", symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis." },
+        { group: "3", name: "Microtubule Inhibitors", part: "Roots and root tips", symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor." },
+        { group: "4", name: "Synthetic Auxins", part: "New growth: top leaves, stems, and petioles", symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty)." },
+        { group: "5", name: "PSII Inhibitors (Triazines)", part: "Older (bottom) leaves first", symptoms: "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward." },
+        { group: "6", name: "PSII Inhibitors (Benzothiadiazoles)", part: "Leaf surface where spray contacted", symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure." },
+        { group: "7", name: "PSII Inhibitors (Ureas & Amides)", part: "Older (bottom) leaves first", symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning." },
+        { group: "8", name: "Lipid Synthesis Inhibitors", part: "Emerging seedling whorl and shoots", symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl." },
+        { group: "9", name: "EPSPS Inhibitors", part: "Whole plant, starting at growing points and newest leaves", symptoms: "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks." },
+        { group: "10", name: "Glutamine Synthase Inhibitors", part: "Leaf surface where spray contacted", symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application." },
+        { group: "12", name: "Phytoene Desaturase Inhibitors", part: "Newest leaves and growing points", symptoms: "Bright white bleached new growth; older leaves stay green." },
+        { group: "13", name: "DOXP Inhibitors", part: "Newest leaves and shoot tips", symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature." },
+        { group: "14", name: "PPO Inhibitors", part: "Leaf surface and emerging cotyledons/stems", symptoms: "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings." },
+        { group: "15", name: "VLCFA Inhibitors", part: "Emerging seedling shoots and hypocotyl", symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings." },
+        { group: "19", name: "Auxin Transport Inhibitors", part: "New growth: top leaves and stems", symptoms: "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified." },
+        { group: "22", name: "PSI Electron Diverters", part: "Leaf surface where spray contacted", symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact." },
+        { group: "23", name: "Mitosis Inhibitors", part: "Outer (oldest) leaves and central whorl", symptoms: "Outer leaves desiccate and brown while the central whorl stays green." },
+        { group: "25", name: "Cell Wall (Cellulose) Inhibitors", part: "Newest leaves at the whorl", symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips." },
+        { group: "26", name: "Nucleic Acid Inhibitors", part: "Leaf surface where spray contacted", symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury." },
+        { group: "27", name: "HPPD Inhibitors", part: "Newest leaves and growing points", symptoms: "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal." },
       ];
       return (
         <div className="space-y-5">
@@ -4263,6 +4266,7 @@ function TopicContent({
             {INJURY_PATTERNS.map(p => (
               <div key={p.group} className="bg-card border border-border rounded-lg p-4">
                 <p className="font-bold text-foreground">Group {p.group}: {p.name}</p>
+                <p className="text-xs text-primary mt-1"><span className="font-semibold">Where injury appears:</span> {p.part}</p>
                 <p className="text-sm text-muted-foreground mt-1">{p.symptoms}</p>
                 {(() => {
                   const g = parseInt(p.group, 10);
@@ -4302,12 +4306,19 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "life-stage-control": {
       const STAGE_CONTROL = [
-        { stage: "Seed (Seed Bank)", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
-        { stage: "Seedling", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
-        { stage: "Vegetative", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
-        { stage: "Reproductive", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
-        { stage: "Mature / Dispersal", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },
+        { stage: "Seed (Seed Bank)", exampleWeedId: "Common_lambsquarters", desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
+        { stage: "Seedling", exampleWeedId: "Palmer_amaranth", desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
+        { stage: "Vegetative", exampleWeedId: "Waterhemp", desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
+        { stage: "Reproductive", exampleWeedId: "Giant_ragweed", desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
+        { stage: "Mature", exampleWeedId: "Canada_thistle", desc: "Perennial weeds can regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time.", control: "Systemic herbicides, deep tillage, multi-year management plans" },
       ];
+      const STAGE_TO_IMAGE_STAGE: Record<string, string> = {
+        "Seed (Seed Bank)": "seed",
+        "Seedling": "seedling",
+        "Vegetative": "vegetative",
+        "Reproductive": "flower",
+        "Mature": "flower",
+      };
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -4321,21 +4332,35 @@ function TopicContent({
             <div className="flex items-center gap-1">
               {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((s, i) => (
                 <div key={s} className="flex-1 text-center">
-                  <div className={`rounded-lg p-2 text-xs font-bold ${i <= 1 ? 'bg-accent/20 text-accent border border-accent/30' : i <= 2 ? 'bg-primary/10 text-primary border border-primary/30' : 'bg-destructive/10 text-destructive border border-destructive/30'}`}>
+                  <div className={`rounded-lg p-2 text-xs font-bold ${
+                    i === 0 ? 'bg-success/30 text-success-foreground border border-success/60' :
+                    i === 1 ? 'bg-success/20 text-success border border-success/40' :
+                    i === 2 ? 'bg-primary/15 text-primary border border-primary/30' :
+                    i === 3 ? 'bg-destructive/15 text-destructive border border-destructive/30' :
+                    'bg-destructive/25 text-destructive border border-destructive/50'
+                  }`}>
                     {s}
                   </div>
-                  <p className="text-[9px] text-muted-foreground mt-1">{i <= 1 ? 'Easiest' : i <= 2 ? 'Moderate' : 'Hardest'}</p>
+                  <p className="text-[9px] text-muted-foreground mt-1">{i === 0 ? 'Easiest' : i === 1 ? 'Easy' : i === 2 ? 'Moderate' : i === 3 ? 'Hard' : 'Hardest'}</p>
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">Darker green = easiest window to control. Darker red = hardest. Hit weeds early.</p>
           </div>
           <div className="space-y-3">
             {STAGE_CONTROL.map(s => (
               <div key={s.stage} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                <p className="font-display font-bold text-foreground">{s.stage}</p>
-                <p className="text-sm text-foreground">{s.desc}</p>
-                <div className="bg-primary/10 rounded-lg p-3">
-                  <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
+                <div className="flex gap-3 items-start">
+                  <div className="w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-secondary border border-border">
+                    <WeedImage weedId={s.exampleWeedId} stage={STAGE_TO_IMAGE_STAGE[s.stage] || 'flower'} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <p className="font-display font-bold text-foreground">{s.stage}</p>
+                    <p className="text-sm text-foreground">{s.desc}</p>
+                    <div className="bg-primary/10 rounded-lg p-3">
+                      <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

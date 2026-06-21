@@ -29,7 +29,7 @@ const ALL_NEEDS: NeedItem[] = [
   { id: 'topsoil', label: 'Loose topsoil to grow in', category: 'terrestrial' },
   { id: 'host-plant', label: 'Host plant to attach to', category: 'parasitic' },
   { id: 'steal-nutrients', label: 'Steal nutrients from host', category: 'parasitic' },
-  { id: 'special-roots', label: 'Special attachment roots', category: 'parasitic' },
+  { id: 'special-roots', label: 'Sucker roots that pierce another plant', category: 'parasitic' },
   { id: 'haustoria', label: 'Haustoria to tap into stems', category: 'parasitic' },
   { id: 'sugars-host', label: 'Sugars made by another plant', category: 'parasitic' },
   { id: 'tree-branch', label: 'A tree branch to grow on', category: 'parasitic' },

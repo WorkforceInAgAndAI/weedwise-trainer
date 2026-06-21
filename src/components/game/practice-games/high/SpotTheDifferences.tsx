@@ -9,10 +9,10 @@ import { hasImage } from '@/lib/imageMap';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const DIOECIOUS_CANDIDATES = [
- { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Has drooping, tassel-like flower clusters that shed pollen into the wind', femaleDesc: 'Has compact, dense seed heads packed tightly along the stem' },
- { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Has soft, drooping seed heads that release pollen', femaleDesc: 'Has long, spiny, rigid seed heads that feel prickly to touch' },
- { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Has clusters of small white-pink bell-shaped flowers that attract pollinators', femaleDesc: 'Has paired slender seed pods (follicles) that split open to release seeds with silky hairs' },
- { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Has loose, hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes' },
+ { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Seed head is loose, soft, and feathery — tassels open up to shed pollen into the wind', femaleDesc: 'Seed head is short, dense, and compact — packed tightly with seeds along the stem' },
+ { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Seed head is soft and drooping, with smooth flowers that release pollen', femaleDesc: 'Seed head is long, stiff, and bristly — covered in sharp bracts that feel prickly to touch' },
+ { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Reproductive stem has clusters of small white-pink bell-shaped flowers — no long pods', femaleDesc: 'Reproductive stem develops paired slender seed pods (follicles) that split open to release silky-haired seeds' },
+ { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Seed head is loose with hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Seed head is dense and resinous, with protruding white pistils (hairs) at the stem nodes' },
 ];
 
 interface Round {

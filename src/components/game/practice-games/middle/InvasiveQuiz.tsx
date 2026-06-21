@@ -17,9 +17,9 @@ const ARRIVAL_LABELS: Record<ArrivalMethod, { label: string; Icon: typeof Ship }
 };
 
 const ARRIVAL_DESCRIPTIONS: Record<ArrivalMethod, string> = {
-  accident: 'Arrived unintentionally through shipping, contaminated seed, or ballast water.',
-  purpose: 'Brought intentionally for agriculture, landscaping, or erosion control.',
-  'other-species': 'Spread by attaching to animals, livestock, or through other plant trade.',
+  accident: 'Arrived unintentionally as a contaminant in shipping, crop seed, soil, or ballast water — no one meant to bring it.',
+  purpose: 'Brought intentionally for agriculture, ornamental gardening, fiber, forage, or erosion control — then escaped cultivation.',
+  'other-species': 'Hitchhiked on animals, livestock, machinery, or moved through the live-plant/nursery trade with another species.',
 };
 
 // Detailed arrival stories keyed by weed id
