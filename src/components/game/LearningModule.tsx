@@ -4462,16 +4462,6 @@ function FamilyGroupings({
   familyColors: string[];
   onSelectWeed: (w: Weed) => void;
 }) {
-  const [expandedFamilies, setExpandedFamilies] = useState<Set<string>>(new Set());
-  const toggleFamily = (family: string) => {
-    setExpandedFamilies((prev) => {
-      const next = new Set(prev);
-      if (next.has(family)) next.delete(family);
-      else next.add(family);
-      return next;
-    });
-  };
-
   return (
     <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
       <p className="font-bold text-primary mb-2">Plant Families in Our Database</p>
