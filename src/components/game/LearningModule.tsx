@@ -3621,7 +3621,8 @@ function TopicContent({
               {isHighSchool ? (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    The table below lists the major herbicide MOA groups used in crop production.
+                    The table below lists the major herbicide MOA groups used in crop production, sorted by group
+                    number. Where a group has both pre- and post-emergent chemistries, the PRE entry is listed first.
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs border-collapse">
@@ -3631,30 +3632,58 @@ function TopicContent({
                           <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Resistance & Documented Resistant Weeds</th>
                         </tr>
                       </thead>
                        <tbody>
-                         {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
+                         {[...HERBICIDE_MOA].sort((a, b) => {
+                           if (a.group !== b.group) return a.group - b.group;
+                           const order = { PRE: 0, BOTH: 1, POST: 2 } as const;
+                           return (order[a.timing] ?? 3) - (order[b.timing] ?? 3);
+                         }).map(h => {
+                           const resistantWeeds = RESISTANT_WEEDS_BY_GROUP[h.group];
+                           return (
                           <tr key={h.id} className="even:bg-muted/20">
                             <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
-                            <td className={`p-2 border border-border font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</td>
+                            <td className="p-2 border border-border align-top">
+                              <span className={`font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</span>
+                              {resistantWeeds && (
+                                <div className="text-[10px] text-muted-foreground mt-1">Examples: {resistantWeeds.join(', ')}</div>
+                              )}
+                            </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
-                  <p className="font-semibold text-primary mt-3">Symptom Types</p>
+                  <p className="font-semibold text-primary mt-3">Injury Symptoms → MOA Groups</p>
+                  <p className="text-xs text-muted-foreground">
+                    Each symptom type below is followed by the MOA groups that produce it, so injury seen in the field
+                    can be traced back to the responsible herbicide group.
+                  </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => (
-                      <div key={key} className="bg-card border border-border rounded-lg p-3">
-                        <p className="font-bold text-foreground text-xs">{info.label}</p>
-                        <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
-                      </div>
-                    ))}
+                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => {
+                      const groups = [...HERBICIDE_MOA]
+                        .filter(h => h.symptomType === key)
+                        .map(h => h.group)
+                        .filter((g, i, arr) => arr.indexOf(g) === i)
+                        .sort((a, b) => a - b);
+                      return (
+                        <div key={key} className="bg-card border border-border rounded-lg p-3">
+                          <p className="font-bold text-foreground text-xs">{info.label}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
+                          {groups.length > 0 && (
+                            <p className="text-[10px] text-primary mt-1">
+                              <span className="font-semibold">MOA groups:</span> {groups.map(g => `Group ${g}`).join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </>
               ) : (
