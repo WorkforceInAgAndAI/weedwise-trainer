@@ -4022,13 +4022,16 @@ function TopicContent({
               which have both male and female flowers on the same plant.
             </p>
             <p>
-              To reproduce, dioecious weeds must have female and male plants in <strong>close proximity</strong>.
-              Without one or the other, these weeds struggle to reproduce.
+              Reproduction is <strong>impossible without both sexes</strong>. A dioecious weed population requires
+              female and male plants in <strong>close proximity</strong> — pollen from a male must reach a female for
+              any viable seed to be produced.
             </p>
             <p>
-              However, because of their unique genetic makeups, dioecious plants can have{" "}
-              <strong>significant genetic diversity</strong>, helping them become resistant to many herbicides. They can
-              also produce <strong>vast amounts of seeds</strong>.
+              When both sexes are present, dioecious weeds produce <strong>vast amounts of seed</strong> — a single
+              female Palmer amaranth or waterhemp can produce hundreds of thousands of seeds in one season. Because
+              every seed is the product of cross-pollination between two different parents, populations carry{" "}
+              <strong>significant genetic diversity</strong>, which accelerates the evolution of resistance to many
+              herbicides.
             </p>
           </div>
 
@@ -4059,7 +4062,7 @@ function TopicContent({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-primary/30">
+                    <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-primary/30 mx-auto max-w-[12rem]">
                       <WeedImage weedId={sp.id} stage="male" className="w-full h-full" />
                     </div>
                     <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
@@ -4068,7 +4071,7 @@ function TopicContent({
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-accent/30">
+                    <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-accent/30 mx-auto max-w-[12rem]">
                       <WeedImage weedId={sp.id} stage="female" className="w-full h-full" />
                     </div>
                     <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
