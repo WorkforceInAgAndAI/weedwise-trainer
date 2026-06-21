@@ -2495,6 +2495,112 @@ function TopicContent({
       }
 
       if (grade === "middle") {
+        const normName = (s: string) =>
+          s.toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, "");
+
+        const COOL_SEASON = [
+          "Annual ryegrass","Downy brome","Field horsetail","Foxtail barley","Quackgrass",
+          "Scouringrush","Wild oat","Catchweed bedstraw","Common chickweed","Corn speedwell",
+          "Curly dock","Dandelion","Field pennycress","Garlic mustard","Ground ivy",
+          "Henbit deadnettle","Mouseear chickweed","Poison hemlock","Shepherd's purse",
+          "Star of Bethlehem","Wild carrot","Wild mustard","Yellow rocket","Canada thistle",
+          "Caraway","Common teasel","False London rocket","Golden alexanders","Musk thistle",
+          "Pinnate tansymustard","Prickly lettuce","Russian thistle","White campion","Wild parsnip",
+        ].map(normName);
+
+        const WARM_SEASON = [
+          "Barnyardgrass","Goosegrass","Johnsongrass","Large crabgrass","Nimblewill",
+          "Yellow nutsedge","Asiatic dayflower","Common pokeweed","Eastern black nightshade",
+          "Ladysthumb","Pennsylvania smartweed","Water smartweed","Waterhemp","Burcucumber",
+          "Honey vine climbing milkweed","Giant foxtail","Green foxtail","Longspine sandbur",
+          "Shattercane Sorghums","Smooth witchgrass","Witchgrass","Woolly cupgrass","Yellow foxtail",
+          "Asian copperleaf","Buffalobur","Common burdock","Common cocklebur","Common mallow",
+          "Common milkweed","Common ragweed","Giant ragweed","Hemp dogbane","Horsenettle",
+          "Horseweed","Jimsonweed","Kochia","Marijuana","Palmer amaranth","Prickly sida",
+          "Redroot pigweed","Russian thistle","Smooth groundcherry","Spotted spurge",
+          "Toothed spurge","Velvetleaf","Venice mallow","Volunteer sunflower","Wild buckwheat",
+          "Wild four o'clock","Wild parsnip","Field bindweed","Hedge bindweed","Morningglory",
+          "Tall morningglory",
+        ].map(normName);
+
+        const WET_COMPACT = [
+          "Annual ryegrass","Downy brome","Field horsetail","Foxtail barley","Quackgrass",
+          "Scouringrush","Wild oat","Catchweed bedstraw","Common chickweed","Corn speedwell",
+          "Curly dock","Dandelion","Field pennycress","Garlic mustard","Ground ivy",
+          "Henbit deadnettle","Mouseear chickweed","Poison hemlock","Shepherd's purse",
+          "Star of Bethlehem","Wild carrot","Wild mustard","Yellow rocket","Barnyardgrass",
+          "Goosegrass","Johnsongrass","Large crabgrass","Nimblewill","Yellow nutsedge",
+          "Asiatic dayflower","Common pokeweed","Eastern black nightshade","Ladysthumb",
+          "Pennsylvania smartweed","Water smartweed","Waterhemp","Burcucumber",
+          "Honey vine climbing milkweed",
+        ].map(normName);
+
+        const DRY_DISTURBED = [
+          "Downy brome","Foxtail barley","Wild oat","Canada thistle","Caraway","Common teasel",
+          "False London rocket","Golden alexanders","Musk thistle","Pinnate tansymustard",
+          "Prickly lettuce","Russian thistle","White campion","Wild parsnip","Giant foxtail",
+          "Green foxtail","Johnsongrass","Longspine sandbur","Shattercane Sorghums",
+          "Smooth witchgrass","Witchgrass","Woolly cupgrass","Yellow foxtail","Asian copperleaf",
+          "Buffalobur","Common burdock","Common cocklebur","Common mallow","Common milkweed",
+          "Common ragweed","Giant ragweed","Hemp dogbane","Horsenettle","Horseweed","Jimsonweed",
+          "Kochia","Marijuana","Palmer amaranth","Prickly sida","Redroot pigweed",
+          "Smooth groundcherry","Spotted spurge","Toothed spurge","Velvetleaf","Venice mallow",
+          "Volunteer sunflower","Wild buckwheat","Wild four o'clock","Field bindweed",
+          "Hedge bindweed","Morningglory","Tall morningglory",
+        ].map(normName);
+
+        const matchAny = (w: Weed, list: string[]) => {
+          const n = normName(w.commonName);
+          return list.some((x) => x === n || n.includes(x) || x.includes(n));
+        };
+
+        const seasonGroups = [
+          {
+            key: "cool",
+            label: "Cool-Season Weeds",
+            desc: "Germinate in fall or early spring when soils are cool. They grow rapidly before warm-season crops are planted and can compete early in the growing season.",
+            color: "bg-sky-500/70",
+            weeds: topicWeeds.filter((w) => matchAny(w, COOL_SEASON)),
+          },
+          {
+            key: "warm",
+            label: "Warm-Season Weeds",
+            desc: "Germinate as soils warm in late spring and grow most vigorously through the hottest summer months. Common in corn and soybean fields.",
+            color: "bg-amber-500/70",
+            weeds: topicWeeds.filter((w) => matchAny(w, WARM_SEASON)),
+          },
+        ];
+
+        const soilGroups = [
+          {
+            key: "wet",
+            label: "Wet / Compact Soil Habitats",
+            desc: "Wet, poorly drained or compacted soils — field edges, low spots, waterways, and high-traffic ground. These weeds tolerate saturated or dense soils.",
+            color: "bg-blue-700/70",
+            weeds: topicWeeds.filter((w) => matchAny(w, WET_COMPACT)),
+          },
+          {
+            key: "dry",
+            label: "Dry / Disturbed Soil Habitats",
+            desc: "Dry, well-drained, or recently disturbed ground — roadsides, field margins, construction sites, and tilled areas. These weeds tolerate drought and rapid colonization of bare soil.",
+            color: "bg-orange-600/70",
+            weeds: topicWeeds.filter((w) => matchAny(w, DRY_DISTURBED)),
+          },
+        ];
+
+        const renderGroup = (g: { key: string; label: string; desc: string; color: string; weeds: Weed[] }) => (
+          <div key={g.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className={`inline-block w-3 h-3 rounded ${g.color}`} />
+              <h3 className="font-display font-bold text-foreground text-base">
+                {g.label} <span className="text-xs text-muted-foreground font-normal">({g.weeds.length})</span>
+              </h3>
+            </div>
+            <p className="text-sm text-foreground">{g.desc}</p>
+            <HorizontalWeedRow weeds={g.weeds} onSelectWeed={onSelectWeed} stage="flower" />
+          </div>
+        );
+
         return (
           <div className="space-y-5">
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -2509,23 +2615,22 @@ function TopicContent({
                 and become dominant in a given location.
               </p>
               <p>
-                Some weed species are highly specialized and only thrive under a narrow set of conditions, while others
-                are broadly adaptable generalists capable of colonizing a wide variety of habitats. Recognizing the
-                relationship between environmental conditions and weed community composition allows land managers to
-                anticipate where new weed pressure is likely to develop.
+                Below, weeds are organized two ways: by the <strong>season</strong> they grow in
+                (cool-season vs. warm-season) and by the <strong>soil-type habitat</strong> they prefer
+                (wet / compact vs. dry / disturbed). The same weed may appear in more than one soil-type
+                group when it tolerates both conditions.
               </p>
             </div>
-            {habGroups.map((g) => {
-              const grouped = topicWeeds.filter((w) => w.primaryHabitat === g.key);
-              return (
-                <div key={g.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                  <h3 className="font-display font-bold text-foreground text-base">
-                    {g.label} ({grouped.length})
-                  </h3>
-                  <HorizontalWeedRow weeds={grouped} onSelectWeed={onSelectWeed} stage="flower" />
-                </div>
-              );
-            })}
+
+            <div className="space-y-2">
+              <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Season</p>
+              {seasonGroups.map(renderGroup)}
+            </div>
+
+            <div className="space-y-2">
+              <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Habitat Soil Type</p>
+              {soilGroups.map(renderGroup)}
+            </div>
           </div>
         );
       }
