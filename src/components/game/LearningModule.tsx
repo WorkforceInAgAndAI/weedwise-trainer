@@ -3823,17 +3823,17 @@ function TopicContent({
         {
           trait: "Rapid Germination & Dense Seedling Cohorts",
           desc: "These weeds emerge in flushes of many small seedlings packed tightly together, claiming sunlight and soil before crops have a chance to compete.",
-          weedIds: ["palmer-amaranth", "waterhemp", "Common_Lambsquarters", "Redroot_Pigweed"],
+          weedIds: ["palmer-amaranth", "waterhemp", "lambsquarters", "Redroot_pigweed"],
         },
         {
           trait: "Large Canopy / Shading",
           desc: "Tall, fast-growing weeds with broad leaves or sprawling vines that form a canopy over the crop and cut off light.",
-          weedIds: ["Giant_Ragweed", "Velvetleaf", "Common_Cocklebur", "Tall_Morningglory"],
+          weedIds: ["giant-ragweed", "velvetleaf", "common_Cocklebur", "Tall_morningglory"],
         },
         {
           trait: "Allelopathy (Chemical Suppression)",
           desc: "Species that release biochemicals from roots, leaves, or decomposing tissue that inhibit germination and growth of neighboring plants.",
-          weedIds: ["Johnsongrass", "Quackgrass", "Yellow_Nutsedge", "Canada_Thistle"],
+          weedIds: ["johnsongrass", "Quackgrass", "yellow-nutsedge", "canada-thistle"],
         },
       ];
       return (
