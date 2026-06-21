@@ -1050,9 +1050,13 @@ function TopicContent({
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
-              <div className="space-y-3">
-                <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
-                <p className="text-sm text-foreground">
+              <div className="grid grid-cols-1 sm:grid-cols-[14rem_1fr] gap-4 items-start">
+                <div className="aspect-square w-full rounded-lg overflow-hidden bg-muted border border-border">
+                  <WeedImage weedId={waterhemp.id} stage="flower" className="w-full h-full object-cover" />
+                </div>
+                <div className="space-y-3">
+                  <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
+                  <p className="text-sm text-foreground">
                   Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
                   edges, known for its smooth hairless stems and distinct leaf shape.
                 </p>
@@ -1065,6 +1069,7 @@ function TopicContent({
                     <p className="text-[10px] text-muted-foreground">SPECIES</p>
                     <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -1080,6 +1085,9 @@ function TopicContent({
                 <div className="grid grid-cols-3 gap-3">
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border mb-2">
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                      </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
                       <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
                     </div>
@@ -1088,40 +1096,45 @@ function TopicContent({
               </div>
             )}
 
-            {/* Visual ID reference (text-only diagnostic cards) */}
+            {/* Visual ID reference */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-4">
-              <p className="font-display font-bold text-foreground text-base">Diagnostic ID Reference</p>
+              <p className="font-display font-bold text-foreground text-base">Visual ID Reference</p>
               <p className="text-sm text-muted-foreground">
-                Each card lists the diagnostic features you would use to identify the weed in the field. Use the
-                trait list to narrow your ID, then confirm with the scientific name and family.
+                Each card pairs a reproductive-stage photo with the diagnostic features you would use in the field.
+                Use the image plus the trait list to narrow your ID, then confirm with the scientific name and family.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topicWeeds.map((w) => (
                   <div
                     key={`idref-${w.id}`}
-                    className="bg-background border border-border rounded-lg p-3 space-y-1.5"
+                    className="bg-background border border-border rounded-lg p-3 grid grid-cols-[7rem_1fr] gap-3"
                   >
-                    <ClickableWeedName
-                      weed={w}
-                      onSelect={onSelectWeed}
-                      className="font-display font-bold text-sm text-foreground block"
-                    />
-                    <p className="text-xs italic text-primary">{w.scientificName}</p>
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                      Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
-                    </p>
-                    {w.traits && w.traits.length > 0 && (
-                      <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
-                        {w.traits.slice(0, 4).map((t, i) => (
-                          <li key={i}>{t}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {w.memoryHook && (
-                      <p className="text-xs text-muted-foreground italic mt-1">
-                        <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
+                    <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="space-y-1.5 min-w-0">
+                      <ClickableWeedName
+                        weed={w}
+                        onSelect={onSelectWeed}
+                        className="font-display font-bold text-sm text-foreground block"
+                      />
+                      <p className="text-xs italic text-primary">{w.scientificName}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                        Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
                       </p>
-                    )}
+                      {w.traits && w.traits.length > 0 && (
+                        <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
+                          {w.traits.slice(0, 4).map((t, i) => (
+                            <li key={i}>{t}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {w.memoryHook && (
+                        <p className="text-xs text-muted-foreground italic mt-1">
+                          <span className="font-semibold text-foreground not-italic">Tip:</span> {w.memoryHook}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
