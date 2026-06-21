@@ -962,7 +962,7 @@ function TopicContent({
                 then tap the card to check yourself.
               </p>
             </div>
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" hideImage />
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -1002,7 +1002,7 @@ function TopicContent({
               </p>
             </div>
 
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" hideImage />
+            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
