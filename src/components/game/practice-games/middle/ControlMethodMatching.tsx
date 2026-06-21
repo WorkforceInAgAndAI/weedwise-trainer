@@ -4,15 +4,15 @@ import WeedImage from '@/components/game/WeedImage';
 import { FlaskConical } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
-import {
-  HERBICIDE_MOA,
-  SYMPTOM_TYPES,
-  getMiddleSchoolMOAs,
-  getBestMOAForWeed,
-  getBestTimingForWeed,
-  pickDistinctDistractors,
-} from '@/data/herbicides';
+import { HERBICIDE_MOA, SYMPTOM_TYPES, getBestMOAForWeed } from '@/data/herbicides';
 import FloatingCoach from '@/components/game/FloatingCoach';
+
+/**
+ * Curriculum-aligned MOA pool for 6-8 control matching.
+ * Covers every MOA group used in the species → MOA mapping so distractors
+ * are realistic and the answer set varies across questions.
+ */
+const MS_MOA_IDS = ['accase', 'als-post', 'auxin', 'psii-5', 'epsps', 'gs', 'ppo-post', 'hppd', 'vlcfa-15'] as const;
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -22,17 +22,52 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
 
-  const msPool = useMemo(() => getMiddleSchoolMOAs(), []);
+  const msPool = useMemo(
+    () => MS_MOA_IDS.map(id => HERBICIDE_MOA.find(h => h.id === id)).filter(Boolean) as typeof HERBICIDE_MOA,
+    [],
+  );
 
   const items = useMemo(() => {
-    const pool = shuffle(weeds);
-    const offset = ((level - 1) * 10) % pool.length;
-    const selected = pool.slice(offset).concat(pool).slice(0, 10);
+    // Group every weed by its primary MOA so we can round-robin select for variety.
+    const byMoa: Record<string, typeof weeds> = {};
+    for (const w of weeds) {
+      const m = getBestMOAForWeed(w);
+      (byMoa[m] ||= []).push(w);
+    }
+    for (const k of Object.keys(byMoa)) byMoa[k] = shuffle(byMoa[k]);
+
+    // Build a balanced 10-question set: cycle through every represented MOA and rotate
+    // by level so consecutive sessions show different species.
+    const moaKeys = shuffle(Object.keys(byMoa));
+    const offsetByMoa: Record<string, number> = {};
+    for (const k of moaKeys) offsetByMoa[k] = (level - 1) % Math.max(byMoa[k].length, 1);
+
+    const selected: typeof weeds = [];
+    let i = 0;
+    while (selected.length < 10) {
+      const k = moaKeys[i % moaKeys.length];
+      const list = byMoa[k];
+      if (list.length > 0) {
+        const w = list[(offsetByMoa[k]++) % list.length];
+        if (!selected.includes(w)) selected.push(w);
+      }
+      i++;
+      if (i > 500) break; // safety
+    }
+
     return selected.map(w => {
       const bestId = getBestMOAForWeed(w);
       const bestMOA = HERBICIDE_MOA.find(h => h.id === bestId)!;
-      // Simpler 3-option choice: 1 correct + 2 distinct distractors (no two share a symptom type)
-      const distractors = pickDistinctDistractors(bestMOA, msPool, 2);
+      // Distractors: 2 MOAs from the MS pool whose HRAC group differs from the correct group.
+      const distractorPool = msPool.filter(h => h.group !== bestMOA.group);
+      const usedGroups = new Set<number>([bestMOA.group]);
+      const distractors: typeof msPool = [];
+      for (const h of shuffle(distractorPool)) {
+        if (usedGroups.has(h.group)) continue;
+        usedGroups.add(h.group);
+        distractors.push(h);
+        if (distractors.length >= 2) break;
+      }
       const options = shuffle([bestMOA, ...distractors]);
       return { weed: w, bestId, bestMOA, options };
     });
@@ -107,7 +142,12 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
                     <button key={g.id} onClick={() => submitMOA(g.id)}
                       className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-left text-sm">
                       <span className="font-bold text-foreground">{g.moa} (Group {g.group})</span>
-                      <span className="text-[10px] text-muted-foreground block mt-0.5">Chemical: {g.brands[0]}</span>
+                      <span className="text-[10px] text-muted-foreground block mt-0.5">
+                        Common chemical: <span className="font-medium text-foreground">{g.brands[0]}</span>
+                      </span>
+                      <span className="text-[10px] text-muted-foreground block">
+                        Timing: {g.timing} · Targets: {g.spectrum === 'Both' ? 'grasses & broadleaves' : g.spectrum === 'Grass' ? 'grasses' : 'broadleaves'}
+                      </span>
                     </button>
                   ))}
                 </div>
