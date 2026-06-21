@@ -3322,10 +3322,34 @@ function TopicContent({
                 </p>
               </>
             ) : (
-              <p>
-                Some weeds look very similar but require different management. Compare them at every growth stage to learn
-                the key differences.
-              </p>
+              <>
+                <p>
+                  In a soybean or corn field, two species that look nearly identical at the seedling stage can demand
+                  completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a textbook
+                  example — both are dioecious pigweeds, both can produce 250,000+ seeds per plant, and both have
+                  evolved resistance to multiple herbicide groups, but Palmer is the more aggressive competitor and
+                  triggers a zero-tolerance threshold across most of the Midwest. Misidentifying one as the other can
+                  cost a grower 30–80% of yield in a heavily infested field.
+                </p>
+                <p>
+                  Reliable identification at the high-school level means moving past general impressions and using
+                  <strong> diagnostic morphological characters</strong>: leaf venation and pubescence, stem cross-section
+                  and trichomes, petiole-to-leaf-blade ratio, inflorescence architecture, ligule and auricle shape in
+                  grasses, and the presence or absence of milky latex, square stems, or sheathing ocreae. Many of these
+                  features only become diagnostic at specific growth stages, so a single photograph at one stage is
+                  rarely enough — you have to compare species across the seedling, vegetative, and reproductive phases.
+                </p>
+                <p>
+                  The consequences of misidentification extend beyond yield loss. Choosing the wrong mode-of-action
+                  herbicide because you confused a Group-9-resistant Waterhemp with a still-susceptible Redroot Pigweed
+                  selects for further resistance and burns through control options. Confusing a native pollinator host
+                  (<em>e.g.</em> Common Milkweed) with an invasive look-alike can waste conservation effort or destroy
+                  monarch habitat. And confusing Wild Carrot with Poison Hemlock is a safety event, not a botany
+                  mistake. The triples below are the species pairings most commonly confused in field-scouting reports;
+                  use the side-by-side layout to build a mental key based on the features that actually distinguish
+                  them.
+                </p>
+              </>
             )}
           </div>
 
