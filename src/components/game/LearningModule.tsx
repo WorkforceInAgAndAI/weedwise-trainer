@@ -3401,6 +3401,22 @@ function TopicContent({
       const isHighSchool = grade === "high";
       const isElementary = grade === "elementary";
 
+      // Documented herbicide-resistant weeds by WSSA/HRAC group (Heap, Intl. Herbicide Resistance Database)
+      const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
+        1: ["Italian ryegrass", "Wild oat", "Johnsongrass", "Giant foxtail"],
+        2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed (marestail)", "Common ragweed"],
+        3: ["Goosegrass", "Green foxtail"],
+        4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
+        5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
+        7: ["Smooth pigweed", "Common groundsel"],
+        9: ["Horseweed (marestail)", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed", "Italian ryegrass"],
+        10: ["Italian ryegrass", "Palmer amaranth (limited)"],
+        14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
+        15: ["Waterhemp (recent reports)"],
+        22: ["Horseweed", "Hairy fleabane"],
+        27: ["Waterhemp", "Palmer amaranth"],
+      };
+
       const ELEM_METHODS = [
         {
           key: "hand-weeding",
