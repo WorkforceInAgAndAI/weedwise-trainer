@@ -3000,16 +3000,64 @@ function TopicContent({
           desc: "Pulling weeds out by hand or with a tool. This works best for small areas and when there are only a few weeds. Always wear gloves!",
         },
         {
-          label: "Mulching",
-          desc: "Covering the soil with materials like straw or wood chips to block sunlight and prevent weed seeds from growing.",
-        },
-        {
           label: "Mowing",
           desc: "Cutting weeds down before they can spread seeds. This does not remove the roots, so weeds may grow back.",
+        },
+        {
+          label: "Herbicides (Plant Sprays)",
+          desc: "Special sprays used by farmers and adults that kill unsafe weeds. Kids should never spray these — they must be handled with gloves, goggles, and training.",
         },
       ];
 
       if (grade === "elementary") {
+        // Group unsafe weeds by WHY they are dangerous, based on keywords in safetyNote.
+        const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
+        const physical = topicWeeds.filter((w) => matches(w, /thorn|spine|prick|bur|sharp|puncture|stab/i));
+        const skin = topicWeeds.filter(
+          (w) =>
+            !physical.includes(w) &&
+            matches(w, /skin|dermat|rash|irrit|sap|sting|blister|burn|contact|allerg/i),
+        );
+        const toxic = topicWeeds.filter(
+          (w) =>
+            !physical.includes(w) &&
+            !skin.includes(w) &&
+            matches(w, /toxic|poison|ingest|consum|eat|swallow|livestock|cattle|horse|hallucin|fatal|death|nausea|vomit|nitrate/i),
+        );
+        const other = topicWeeds.filter(
+          (w) => !physical.includes(w) && !skin.includes(w) && !toxic.includes(w),
+        );
+
+        const renderGroup = (
+          title: string,
+          desc: string,
+          tone: string,
+          group: Weed[],
+        ) =>
+          group.length === 0 ? null : (
+            <div key={title} className={`border rounded-lg p-4 space-y-3 ${tone}`}>
+              <div>
+                <p className="font-display font-bold text-foreground text-sm">
+                  {title} <span className="text-xs text-muted-foreground font-normal">({group.length})</span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+              </div>
+              <div className="space-y-2">
+                {group.map((w) => (
+                  <div key={w.id} className="bg-card border border-border rounded-lg p-3 flex gap-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
+                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                    </div>
+                    <div className="min-w-0">
+                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold text-sm" />
+                      <div className="text-xs text-destructive mt-1">{w.safetyNote}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+
         return (
           <div className="space-y-5">
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -3019,28 +3067,45 @@ function TopicContent({
                 hurt <strong>humans</strong>. These unsafe weeds can look like normal plants. However, when they are
                 touched or ingested, they can cause harm to people.
               </p>
+              <p>
+                Not all unsafe weeds are dangerous in the same way. Some hurt your <strong>skin</strong> when you
+                touch them, some are <strong>poisonous</strong> if eaten, and some have sharp parts that can{" "}
+                <strong>physically</strong> hurt you. They are grouped below by the kind of harm they can cause.
+              </p>
             </div>
 
-            {/* Toxic weeds */}
-            <h3 className="font-display font-bold text-foreground text-sm">Unsafe Weeds to Watch For</h3>
-            {topicWeeds.slice(0, 8).map((w) => (
-              <div key={w.id} className="bg-card border border-destructive/30 rounded-lg p-4 flex gap-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                </div>
-                <div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
-                  <div className="text-sm text-destructive mt-1">{w.safetyNote}</div>
-                </div>
-              </div>
-            ))}
+            {/* Unsafe weeds grouped by reason */}
+            {renderGroup(
+              "Skin Irritation",
+              "These weeds can cause a rash, itchy skin, or burns if you touch them. Always wear long sleeves and gloves!",
+              "bg-amber-500/10 border-amber-500/30",
+              skin,
+            )}
+            {renderGroup(
+              "Toxic if Eaten",
+              "These weeds are poisonous if a person or animal swallows any part of the plant. Never put wild plants in your mouth.",
+              "bg-destructive/10 border-destructive/30",
+              toxic,
+            )}
+            {renderGroup(
+              "Physically Harmful (Sharp Parts)",
+              "These weeds have thorns, spines, or prickly burs that can poke or cut your skin. Look before you reach!",
+              "bg-orange-500/10 border-orange-500/30",
+              physical,
+            )}
+            {renderGroup(
+              "Other Hazards",
+              "These weeds can be unsafe in other ways — for example, by causing allergies or harming livestock.",
+              "bg-secondary/40 border-border",
+              other,
+            )}
 
             {/* Control methods */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">How Can We Remove Unsafe Weeds?</p>
               <p>
-                There are three basic ways that agronomists remove unsafe or unwanted weeds. Click on each tile below
-                to learn about each method.
+                Agronomists (plant scientists) use a few different tools to remove unsafe weeds from farms and yards.
+                The right tool depends on how many weeds there are and how dangerous they are to touch.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
