@@ -3663,18 +3663,50 @@ function TopicContent({
        FIELD SCOUTING
     ═══════════════════════════════════════════════════════════ */
     case "field-scouting": {
-      const PATTERNS = [
+      // Each pattern includes an inline SVG diagram showing how the route fits a typical field shape.
+      const PATTERNS: { name: string; bestFor: string; desc: string; diagram: JSX.Element }[] = [
         {
           name: "W-Pattern",
-          desc: "Walk in a W shape across the field. Good for most rectangular fields and provides broad coverage.",
+          bestFor: "Rectangular fields",
+          desc: "Walk a wide W shape across the field, sampling at each turn. Provides broad, representative coverage of a standard rectangular field.",
+          diagram: (
+            <svg viewBox="0 0 120 70" className="w-full h-auto">
+              <rect x="4" y="6" width="112" height="58" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
+              <polyline points="10,12 35,58 60,12 85,58 110,12" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round" />
+              {[[10,12],[35,58],[60,12],[85,58],[110,12]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--accent))" />
+              ))}
+            </svg>
+          ),
         },
         {
           name: "X-Pattern",
-          desc: "Walk diagonally from corner to corner, forming an X. Best for square fields to cover all quadrants.",
+          bestFor: "Square fields",
+          desc: "Walk diagonally from corner to corner, forming an X. Best for square fields where all four quadrants need quick coverage.",
+          diagram: (
+            <svg viewBox="0 0 70 70" className="w-full h-auto max-w-[6rem] mx-auto">
+              <rect x="4" y="4" width="62" height="62" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
+              <line x1="8" y1="8" x2="62" y2="62" stroke="hsl(var(--primary))" strokeWidth="2.5" />
+              <line x1="62" y1="8" x2="8" y2="62" stroke="hsl(var(--primary))" strokeWidth="2.5" />
+              {[[8,8],[62,62],[62,8],[8,62],[35,35]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--accent))" />
+              ))}
+            </svg>
+          ),
         },
         {
           name: "Zigzag",
-          desc: "Walk back and forth across the field in a zigzag pattern. Ideal for long, narrow fields.",
+          bestFor: "Long, narrow fields",
+          desc: "Walk back and forth across the short axis of the field, advancing along its length. Ideal for long, narrow fields where straight passes would miss too much.",
+          diagram: (
+            <svg viewBox="0 0 160 40" className="w-full h-auto">
+              <rect x="4" y="6" width="152" height="28" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
+              <polyline points="10,30 30,10 50,30 70,10 90,30 110,10 130,30 150,10" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round" />
+              {[[10,30],[30,10],[50,30],[70,10],[90,30],[110,10],[130,30],[150,10]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r="2" fill="hsl(var(--accent))" />
+              ))}
+            </svg>
+          ),
         },
       ];
 
@@ -3705,34 +3737,68 @@ function TopicContent({
               </>
             ) : (
               <>
-                <p>The average Iowa crop farm spans about <strong>345 acres</strong>, which is far too large for field scouts to cover on foot efficiently. By using field scouting tools such as <strong>drones, rovers, and satellites</strong>, agronomists can scout fields more efficiently with greater accuracy.</p>
+                <p>
+                  Field scouting starts with <strong>manual walking patterns</strong> that an agronomist or grower can use on
+                  foot. These patterns are the foundation of every weed assessment — they are how you ground-truth what is
+                  actually growing in the field.
+                </p>
+                <p>
+                  However, the average Iowa crop farm now spans roughly <strong>345 acres</strong>
+                  <span className="text-xs text-muted-foreground"> (USDA NASS, 2022 Census of Agriculture — Iowa)</span>,
+                  which is far too large for a person to cover thoroughly on foot every week. To scale up scouting,
+                  agronomists now combine manual walks with <strong>drones, rovers, and satellites</strong> that can survey
+                  whole fields quickly and pinpoint problem areas for a closer manual look.
+                </p>
               </>
             )}
           </div>
 
-          {grade === "high" && (
-            <div className="space-y-3">
-              {[
-                { label: "Drones", desc: "Cover acres in minutes from above. Collect NDVI plant health maps, weed density and patch mapping, stand counts, nutrient deficiency patterns, and drainage/ponding issues. All information is sent live to smartphone apps for instant analysis." },
-                { label: "Rovers", desc: "Autonomous or remote-controlled machines that drive through fields using AI-powered cameras and sensors. They gather species-level weed identification, soil compaction measurements, root health via ground sensors, emergence uniformity, and disease scouting through close-up leaf images." },
-                { label: "Satellites", desc: "Especially useful for remote or large farms. Provide multi-spectral imagery (6-10 bands beyond visible light), historical yield potential maps, soil moisture, field boundary verification, and cover crop monitoring. Pinpoint exact hotspot zones of anomalies." },
-              ].map(t => (
-                <div key={t.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                  <p className="font-display font-bold text-foreground">{t.label}</p>
-                  <p className="text-sm text-muted-foreground">{t.desc}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
+          {/* Manual scouting patterns (always shown first) */}
+          <h3 className="font-display font-bold text-foreground text-sm">Manual Scouting Patterns</h3>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Match the pattern to the field shape so every part of the field has a fair chance of being sampled. The dots show
+            sampling stops along each route.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {PATTERNS.map((p) => (
               <div key={p.name} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <p className="font-bold text-foreground text-lg text-center">{p.name}</p>
+                <p className="text-[10px] uppercase tracking-wide text-primary text-center font-semibold">Best for: {p.bestFor}</p>
+                <div className="bg-secondary/30 rounded p-2">{p.diagram}</div>
                 <p className="text-xs text-muted-foreground">{p.desc}</p>
               </div>
             ))}
           </div>
+
+          {grade === "high" && (
+            <>
+              <h3 className="font-display font-bold text-foreground text-sm">Technology-Assisted Scouting</h3>
+              <p className="text-xs text-muted-foreground -mt-2">
+                Because modern fields are too large to walk every week, manual patterns are now combined with these tools.
+              </p>
+              <div className="space-y-3">
+                {[
+                  {
+                    label: "Drones",
+                    desc: "Cover acres in minutes from above. Drones do not measure NDVI directly — they collect spectral data and high-resolution images that are then used to calculate vegetation indices, weed density, patch mapping, stand counts, nutrient-deficiency patterns, and drainage or ponding issues.",
+                  },
+                  {
+                    label: "Rovers",
+                    desc: "Autonomous or remote-controlled machines that drive through fields using AI-powered cameras and sensors. They capture close-up images from inside the canopy that can be used to provide detailed information on weed identification, soil compaction, root health, emergence uniformity, and disease symptoms — information that is hard to see from the air.",
+                  },
+                  {
+                    label: "Satellites",
+                    desc: "Especially useful for remote or large farms. Satellites provide multi-spectral imagery from which analysts can extract weed pressure indicators, yield potential, soil moisture, field boundaries, and cover-crop coverage. Over time, this imagery builds a historical record of the field. That history makes it possible to pinpoint exact hotspot zones where abnormalities keep recurring.",
+                  },
+                ].map((t) => (
+                  <div key={t.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                    <p className="font-display font-bold text-foreground">{t.label}</p>
+                    <p className="text-sm text-muted-foreground">{t.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Why Consistent Scouting Matters</p>
