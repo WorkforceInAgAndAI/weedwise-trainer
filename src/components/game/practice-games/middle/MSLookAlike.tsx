@@ -7,8 +7,9 @@ import { LOOKALIKE_TRIPLES } from '@/data/lookAlikeGroups';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+type Weed = typeof weeds[0];
 interface Trio {
-  weeds: typeof weeds;
+  weeds: Weed[];
   difference: string;
 }
 
@@ -17,7 +18,7 @@ function buildTrios(): Trio[] {
     .map(t => {
       const ws = t.ids.map(id => weeds.find(w => w.id === id));
       if (ws.some(w => !w)) return null;
-      return { weeds: ws as typeof weeds, difference: t.difference };
+      return { weeds: ws as Weed[], difference: t.difference };
     })
     .filter((g): g is Trio => g !== null);
 }
