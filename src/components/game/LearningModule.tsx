@@ -4096,26 +4096,67 @@ function TopicContent({
        SEED DORMANCY (High School)
     ═══════════════════════════════════════════════════════════ */
     case "seed-dormancy": {
-      const DORMANCY_TYPES = [
-        { label: "Physical Dormancy", desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, or microbial activity." },
-        { label: "Physiological Dormancy", desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Environmental cues like temperature shifts or light exposure can break this dormancy." },
-        { label: "Chemical Dormancy", desc: "Part of physiological dormancy, but focuses specifically on high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out or degraded before germination can occur." },
-        { label: "Morphological Dormancy", desc: "Determined by underdeveloped embryos at the time of seed release from the mature plant. By delaying embryo maturity and ability to germinate, seeds can last longer in the soil until they are morphologically ready to develop." },
+      const DORMANCY_TYPES: { label: string; desc: string; examples: string[] }[] = [
+        {
+          label: "Physical Dormancy",
+          desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
+          examples: ["Field Bindweed", "Hedge Bindweed", "Tall Morningglory", "Velvetleaf"],
+        },
+        {
+          label: "Physiological Dormancy",
+          desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
+          examples: ["Lambsquarters", "Redroot Pigweed", "Giant Foxtail", "Green Foxtail", "Yellow Foxtail", "Wild Mustard", "Curly Dock"],
+        },
+        {
+          label: "Chemical Dormancy",
+          desc: "A specialized case of physiological dormancy involving high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out by rainfall or degraded by microbes before germination can occur.",
+          examples: ["Common Cocklebur", "Wild Oat", "Johnsongrass"],
+        },
+        {
+          label: "Morphological Dormancy",
+          desc: "The embryo is underdeveloped at the time the seed is released from the parent plant. The seed must spend additional time in the soil maturing internally before it is structurally ready to germinate.",
+          examples: ["Wild Carrot", "Poison Hemlock"],
+        },
       ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Seed Dormancy</p>
-            <p>To survive in changing environments, weed seeds must adapt and know when to begin germination. To prevent germination in unfavorable conditions, such as the presence of herbicides or cold weather, seeds have developed adaptations to remain dormant.</p>
-            <p><strong>Seed dormancy</strong> is the incapacity of a viable seed to germinate under favorable conditions. For weed seeds under stress, seed dormancy is a good thing. For agronomists trying to eradicate weeds, it can be challenging.</p>
+            <p>To survive <strong>seasonal changes</strong> and other unfavorable conditions — cold winters, summer drought, waterlogged soils, or simply the wrong time of year — weed seeds have evolved the ability to pause germination until conditions improve.</p>
+            <p><strong>Seed dormancy</strong> is the ability of a viable seed to remain dormant and avoid unfavorable conditions, waiting until favorable conditions (the right temperature, moisture, light, and oxygen) arise before germinating. For weed seeds this is a survival advantage; for agronomists trying to eradicate weeds it makes the seedbank persist for years.</p>
           </div>
-          <div className="space-y-3">
-            {DORMANCY_TYPES.map(d => (
-              <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                <p className="font-display font-bold text-foreground">{d.label}</p>
-                <p className="text-sm text-foreground">{d.desc}</p>
-              </div>
-            ))}
+          <div className="space-y-4">
+            {DORMANCY_TYPES.map(d => {
+              const exampleWeeds = d.examples
+                .map(n => weeds.find(w => w.commonName.toLowerCase() === n.toLowerCase()))
+                .filter((w): w is Weed => !!w);
+              return (
+                <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                  <p className="font-display font-bold text-foreground">{d.label}</p>
+                  <p className="text-sm text-foreground">{d.desc}</p>
+                  {exampleWeeds.length > 0 && (
+                    <>
+                      <p className="text-xs font-bold text-primary uppercase tracking-wide">Example Weeds</p>
+                      <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                        {exampleWeeds.map(w => (
+                          <button
+                            key={w.id}
+                            onClick={() => onSelectWeed(w)}
+                            className="flex-shrink-0 w-32 bg-muted/40 border border-border rounded-lg p-2 hover:border-primary transition-colors text-left"
+                          >
+                            <div className="w-full h-20 rounded overflow-hidden bg-muted mb-1">
+                              <WeedImage weedId={w.id} stage="mature" className="w-full h-full" />
+                            </div>
+                            <p className="text-[11px] font-bold text-foreground leading-tight">{w.commonName}</p>
+                            <p className="text-[10px] italic text-muted-foreground leading-tight">{w.scientificName}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       );
