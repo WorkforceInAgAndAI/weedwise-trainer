@@ -3028,64 +3028,15 @@ function TopicContent({
         { stage: "whole", label: "Whole Plant" },
       ];
 
-      // Curated 3-species look-alike groups (commonly confused in field ID).
-      // Each group references real weed IDs from the dataset; groups with missing
-      // species are filtered out at render time.
-      const LOOKALIKE_TRIPLES: string[][] = [
-        ["common-ragweed", "velvetleaf", "common_Cocklebur"],
-        ["Shepherds_Purse", "Wild_mustard", "yellow_Rocket"],
-        ["Field_Pennycress", "Wild_mustard", "Pinnate_tansymustard"],
-        ["Shepherds_Purse", "Wild_Carrot", "poison-hemlock"],
-        ["Wild_mustard", "CommonChickweed", "Ground_ivy"],
-        ["Wild_mustard", "yellow_Rocket", "Pinnate_tansymustard"],
-        ["Common_Mallow", "Prickly_sida", "Venice_mallow"],
-        ["giant-ragweed", "Buffalobur", "Common_Burdock"],
-        ["Ladysthumb", "Water_smartweed", "Wild_buckwheat"],
-        ["pennsylvania-smartweed", "Water_smartweed", "Curly_dock"],
-        ["pennsylvania-smartweed", "Ladysthumb", "Curly_dock"],
-        ["Mouseear_chickweed", "Corn_speedwell", "Henbit_deadnettle"],
-        ["CommonChickweed", "Corn_speedwell", "Henbit_deadnettle"],
-        ["common_Cocklebur", "wild-parsnip", "Common_teasel"],
-        ["Prickly_sida", "Buffalobur", "Common_teasel"],
-        ["Horsenettle", "Buffalobur", "Smooth_Groundcherry"],
-        ["Eastern_black_nightshade", "Buffalobur", "Smooth_Groundcherry"],
-        ["Horsenettle", "Eastern_black_nightshade", "Jimsonweed"],
-        ["Eastern_black_nightshade", "Horsenettle", "Smooth_Groundcherry"],
-        ["Hedge_bindweed", "Wild_buckwheat", "Honey-vine_climbing_milkweed"],
-        ["Tall_morningglory", "Hedge_bindweed", "Wild_buckwheat"],
-        ["Field_bindweed", "Hedge_bindweed", "Tall_morningglory"],
-        ["velvetleaf", "Venice_mallow", "Prickly_sida"],
-        ["velvetleaf", "Common_Mallow", "Prickly_sida"],
-        ["velvetleaf", "Common_Mallow", "Venice_mallow"],
-        ["Russian_thistle", "lambsquarters", "Horseweed"],
-        ["Wild_Carrot", "Field_Horsetail", "Corn_speedwell"],
-        ["CommonChickweed", "Mouseear_chickweed", "Henbit_deadnettle"],
-        ["Spotted_spurge", "volunteer-sunflower", "Horseweed"],
-        ["poison-hemlock", "wild-parsnip", "golden-alexanders"],
-        ["Wild_Carrot", "wild-parsnip", "golden-alexanders"],
-        ["golden-alexanders", "Wild_Carrot", "poison-hemlock"],
-        ["wild-parsnip", "golden-alexanders", "poison-hemlock"],
-        ["Common_Burdock", "Musk_thistle", "canada-thistle"],
-        ["Burcucumber", "Tall_morningglory", "Wild_buckwheat"],
-        ["Honey-vine_climbing_milkweed", "Hemp_dogbane", "Common_teasel"],
-        ["Field_bindweed", "Hedge_bindweed", "common_Milkweed"],
-        ["Henbit_deadnettle", "Common_Mallow", "Ground_ivy"],
-        ["Scouringrush", "annual-ryegrass", "barnyardgrass"],
-        ["Field_Horsetail", "annual-ryegrass", "barnyardgrass"],
-        ["Common_Mallow", "Field_bindweed", "common_Milkweed"],
-        ["annual-ryegrass", "barnyardgrass", "Downy_brome"],
-        ["yellow-foxtail", "green-foxtail", "large-crabgrass"],
-        ["green-foxtail", "giant-foxtail", "large-crabgrass"],
-        ["Quackgrass", "Downy_brome", "Foxtail_barley"],
-        ["Witchgrass", "large-crabgrass", "barnyardgrass"],
-        ["annual-ryegrass", "Quackgrass", "Foxtail_barley"],
-        ["Quackgrass", "annual-ryegrass", "Downy_brome"],
-        ["large-crabgrass", "yellow-foxtail", "Woolly_cupgrass"],
-      ];
-
-      const lookAlikeGroups: Weed[][] = LOOKALIKE_TRIPLES
-        .map((ids) => ids.map((id) => weeds.find((w) => w.id === id)))
-        .filter((g): g is Weed[] => g.every((x) => !!x)) as Weed[][];
+      // Curated 3-species look-alike groups live in @/data/lookAlikeGroups
+      // so the 6-8 Look-Alike practice game can share them.
+      const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = LOOKALIKE_TRIPLES
+        .map((t) => {
+          const ws = t.ids.map((id) => weeds.find((w) => w.id === id));
+          if (ws.some((w) => !w)) return null;
+          return { weeds: ws as Weed[], difference: t.difference };
+        })
+        .filter((g): g is { weeds: Weed[]; difference: string } => g !== null);
 
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
         const aIsGrass = a.plantType === "Monocot";
