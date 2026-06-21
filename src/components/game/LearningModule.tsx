@@ -2945,6 +2945,65 @@ function TopicContent({
         { stage: "whole", label: "Whole Plant" },
       ];
 
+      // Curated 3-species look-alike groups (commonly confused in field ID).
+      // Each group references real weed IDs from the dataset; groups with missing
+      // species are filtered out at render time.
+      const LOOKALIKE_TRIPLES: string[][] = [
+        ["common-ragweed", "velvetleaf", "common_Cocklebur"],
+        ["Shepherds_Purse", "Wild_mustard", "yellow_Rocket"],
+        ["Field_Pennycress", "Wild_mustard", "Pinnate_tansymustard"],
+        ["Shepherds_Purse", "Wild_Carrot", "poison-hemlock"],
+        ["Wild_mustard", "CommonChickweed", "Ground_ivy"],
+        ["Wild_mustard", "yellow_Rocket", "Pinnate_tansymustard"],
+        ["Common_Mallow", "Prickly_sida", "Venice_mallow"],
+        ["giant-ragweed", "Buffalobur", "Common_Burdock"],
+        ["Ladysthumb", "Water_smartweed", "Wild_buckwheat"],
+        ["pennsylvania-smartweed", "Water_smartweed", "Curly_dock"],
+        ["pennsylvania-smartweed", "Ladysthumb", "Curly_dock"],
+        ["Mouseear_chickweed", "Corn_speedwell", "Henbit_deadnettle"],
+        ["CommonChickweed", "Corn_speedwell", "Henbit_deadnettle"],
+        ["common_Cocklebur", "wild-parsnip", "Common_teasel"],
+        ["Prickly_sida", "Buffalobur", "Common_teasel"],
+        ["Horsenettle", "Buffalobur", "Smooth_Groundcherry"],
+        ["Eastern_black_nightshade", "Buffalobur", "Smooth_Groundcherry"],
+        ["Horsenettle", "Eastern_black_nightshade", "Jimsonweed"],
+        ["Eastern_black_nightshade", "Horsenettle", "Smooth_Groundcherry"],
+        ["Hedge_bindweed", "Wild_buckwheat", "Honey-vine_climbing_milkweed"],
+        ["Tall_morningglory", "Hedge_bindweed", "Wild_buckwheat"],
+        ["Field_bindweed", "Hedge_bindweed", "Tall_morningglory"],
+        ["velvetleaf", "Venice_mallow", "Prickly_sida"],
+        ["velvetleaf", "Common_Mallow", "Prickly_sida"],
+        ["velvetleaf", "Common_Mallow", "Venice_mallow"],
+        ["Russian_thistle", "lambsquarters", "Horseweed"],
+        ["Wild_Carrot", "Field_Horsetail", "Corn_speedwell"],
+        ["CommonChickweed", "Mouseear_chickweed", "Henbit_deadnettle"],
+        ["Spotted_spurge", "volunteer-sunflower", "Horseweed"],
+        ["poison-hemlock", "wild-parsnip", "golden-alexanders"],
+        ["Wild_Carrot", "wild-parsnip", "golden-alexanders"],
+        ["golden-alexanders", "Wild_Carrot", "poison-hemlock"],
+        ["wild-parsnip", "golden-alexanders", "poison-hemlock"],
+        ["Common_Burdock", "Musk_thistle", "canada-thistle"],
+        ["Burcucumber", "Tall_morningglory", "Wild_buckwheat"],
+        ["Honey-vine_climbing_milkweed", "Hemp_dogbane", "Common_teasel"],
+        ["Field_bindweed", "Hedge_bindweed", "common_Milkweed"],
+        ["Henbit_deadnettle", "Common_Mallow", "Ground_ivy"],
+        ["Scouringrush", "annual-ryegrass", "barnyardgrass"],
+        ["Field_Horsetail", "annual-ryegrass", "barnyardgrass"],
+        ["Common_Mallow", "Field_bindweed", "common_Milkweed"],
+        ["annual-ryegrass", "barnyardgrass", "Downy_brome"],
+        ["yellow-foxtail", "green-foxtail", "large-crabgrass"],
+        ["green-foxtail", "giant-foxtail", "large-crabgrass"],
+        ["Quackgrass", "Downy_brome", "Foxtail_barley"],
+        ["Witchgrass", "large-crabgrass", "barnyardgrass"],
+        ["annual-ryegrass", "Quackgrass", "Foxtail_barley"],
+        ["Quackgrass", "annual-ryegrass", "Downy_brome"],
+        ["large-crabgrass", "yellow-foxtail", "Woolly_cupgrass"],
+      ];
+
+      const lookAlikeGroups: Weed[][] = LOOKALIKE_TRIPLES
+        .map((ids) => ids.map((id) => weeds.find((w) => w.id === id)))
+        .filter((g): g is Weed[] => g.every((x) => !!x)) as Weed[][];
+
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
         const aIsGrass = a.plantType === "Monocot";
         const bIsGrass = b.plantType === "Monocot";
@@ -3026,6 +3085,74 @@ function TopicContent({
         );
       };
 
+      // 3-species comparison card: shows seedling / vegetative / reproductive (+ ligule
+      // when any member is a grass) side-by-side for all three species.
+      const renderTripleCard = (group: Weed[], key: string) => {
+        const compareStages = [
+          { stage: "seedling", label: "Seedling" },
+          { stage: "vegetative", label: "Vegetative" },
+          { stage: "flower", label: "Reproductive" },
+        ];
+        const anyGrass = group.some((w) => w.plantType === "Monocot");
+        return (
+          <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
+            {/* Header row */}
+            <div className="grid grid-cols-3 gap-3">
+              {group.map((w) => (
+                <div key={w.id} className="text-center">
+                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
+                  <div className="text-[11px] text-primary italic leading-tight">{w.scientificName}</div>
+                  <div className="text-[10px] text-muted-foreground">{w.family}</div>
+                  <span
+                    className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
+                  >
+                    {w.origin === "Introduced" ? "Introduced" : "Native"}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Stage-by-stage comparison */}
+            {compareStages.map((s) => (
+              <div key={s.stage}>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">
+                  {s.label}
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {group.map((w) => (
+                    <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                      <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Ligule row (only if at least one species is a grass) */}
+            {anyGrass && (
+              <div>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">
+                  Ligule
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {group.map((w) => (
+                    <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                      {w.plantType === "Monocot" ? (
+                        <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-[10px] text-muted-foreground text-center px-1">
+                          Not a grass (no ligule)
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
@@ -3049,15 +3176,25 @@ function TopicContent({
             {grade === "middle" ? (
               <>
                 <p>
-                  Some weeds are master disguisers — they look almost identical to crop plants or harmless native
-                  plants, which can trick even experienced farmers. Misidentification can result in missed treatment
-                  opportunities, unnecessary herbicide applications, crop damage from incorrectly targeted spraying, or
-                  failure to detect a problematic species before it becomes well established.
+                  Have you ever looked out at a field or a lawn and thought all the weeds looked pretty much the same?
+                  You're not alone — even farmers and scientists sometimes have to look twice. Many common weeds are
+                  like nature's copycats. They have similar leaf shapes, the same spiky seeds, or grow in the exact
+                  same spots, making them really easy to mix up.
                 </p>
                 <p>
-                  Distinguishing between look-alike species requires careful attention to morphological details that may
-                  be subtle, including <strong>leaf margin shape, stem cross-section, surface texture, hair presence or
-                  absence, node structure</strong>, and flower or seedhead characteristics.
+                  But here's why it matters: not all weeds play by the same rules. Some can be pulled out easily, while
+                  others have deep roots that grow back no matter how many times you remove them. Some weeds are just
+                  annoying, while others — like <strong>poison hemlock</strong> — are actually dangerous to touch or
+                  eat. And when farmers need to use herbicides (special sprays that kill unwanted plants), picking the
+                  wrong one because they misidentified the weed is like taking cold medicine when you actually have a
+                  broken arm. It just won't work, and you've wasted time and money.
+                </p>
+                <p>
+                  Getting the ID right is the first step to dealing with a weed the smart way — whether that's pulling
+                  it, spraying it, or knowing to stay away from it entirely. The good news is that once you know what
+                  clues to look for, like <strong>leaf shape, stem texture, flower color, or whether the plant has
+                  milky sap when you break it</strong> — telling these lookalikes apart becomes a lot easier than it
+                  sounds.
                 </p>
               </>
             ) : (
@@ -3068,9 +3205,25 @@ function TopicContent({
             )}
           </div>
 
+          {/* 3-species look-alike groups — primary content for 6-8 and 9-12 */}
+          {lookAlikeGroups.length > 0 && (
+            <div className="space-y-4">
+              <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                <h3 className="font-display font-bold text-foreground text-base mb-1">
+                  Look-Alike Groups (3 species each)
+                </h3>
+                <p className="text-sm text-foreground">
+                  Compare these commonly-confused trios at each growth stage. For grass groups, the{" "}
+                  <strong>ligule</strong> row is one of the most reliable ID features.
+                </p>
+              </div>
+              {lookAlikeGroups.map((g, i) => renderTripleCard(g, `tri-${i}-${g.map((w) => w.id).join("-")}`))}
+            </div>
+          )}
+
           {/* Invasive vs Native Look-Alikes section for 6-8 and 9-12 */}
           {invasiveNativePairs.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-4 border-t border-border pt-4">
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
                 <h3 className="font-display font-bold text-foreground text-base mb-2">
                   Invasive vs Native Look-Alikes
@@ -3084,13 +3237,13 @@ function TopicContent({
             </div>
           )}
 
-          {/* Family-based Look-Alikes */}
-          {invasiveNativePairs.length > 0 && (
-            <div className="border-t border-border pt-4">
-              <h3 className="font-display font-bold text-foreground text-base mb-4">Family-Based Look-Alikes</h3>
+          {/* Family-based Look-Alike Pairs (legacy 2-weed) */}
+          {pairs.length > 0 && (
+            <div className="border-t border-border pt-4 space-y-4">
+              <h3 className="font-display font-bold text-foreground text-base">Family-Based Look-Alike Pairs</h3>
+              {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
             </div>
           )}
-          {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
         </div>
       );
     }
