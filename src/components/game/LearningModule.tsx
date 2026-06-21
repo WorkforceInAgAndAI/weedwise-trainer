@@ -370,7 +370,7 @@ function SubheadingBox({
         {groupWeeds.map((w) => (
           <div key={w.id} className="bg-secondary/30 border border-border rounded-lg p-3 flex gap-3">
             <div className="w-12 h-12 rounded overflow-hidden shrink-0">
-              <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+              <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
             </div>
             <div>
               <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm" />
@@ -1014,7 +1014,7 @@ function TopicContent({
               <p className="font-display font-bold text-foreground text-base">Example: {waterhemp.commonName}</p>
               <div className="flex gap-4 items-start">
                 <div className="w-40 h-40 rounded-xl overflow-hidden shrink-0 border-2 border-border">
-                  <WeedImage weedId={waterhemp.id} stage="whole" className="w-full h-full" />
+                  <WeedImage weedId={waterhemp.id} stage="flower" className="w-full h-full" />
                 </div>
                 <div className="space-y-2">
                   <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
@@ -1048,7 +1048,7 @@ function TopicContent({
                   {foxtails.slice(0, 3).map(w => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
                       <div className="w-28 h-28 mx-auto rounded-lg overflow-hidden mb-2">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold" />
                       <p className="text-xs text-primary italic mt-1">{w.scientificName}</p>
@@ -1582,11 +1582,11 @@ function TopicContent({
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
-            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
+            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Dicots ({dicots.length} species)</h3>
-            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
+            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
           </div>
         </div>
       );
@@ -2244,7 +2244,7 @@ function TopicContent({
                       {grouped.map((w) => (
                         <div key={w.id} className="text-center shrink-0 w-24">
                           <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                            <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                            <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                           </div>
                           <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                         </div>
@@ -2353,7 +2353,7 @@ function TopicContent({
                     {grouped.map((w) => (
                       <div key={w.id} className="text-center">
                         <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                         </div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                         <div className="text-[9px] text-primary italic">{w.scientificName}</div>
@@ -2400,7 +2400,7 @@ function TopicContent({
                   {terrestrial.map((w) => (
                     <div key={w.id} className="text-center shrink-0 w-24">
                       <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                        <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                       </div>
                       <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                     </div>
@@ -2424,7 +2424,7 @@ function TopicContent({
                     {aquatic.map((w) => (
                       <div key={w.id} className="text-center shrink-0 w-24">
                         <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                         </div>
                         <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
                       </div>
@@ -2790,7 +2790,7 @@ function TopicContent({
             {topicWeeds.slice(0, 8).map((w) => (
               <div key={w.id} className="bg-card border border-destructive/30 rounded-lg p-4 flex gap-4">
                 <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                 </div>
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
@@ -2867,7 +2867,7 @@ function TopicContent({
             {topicWeeds.map((w) => (
               <div key={w.id} className="bg-card border border-destructive/30 rounded-lg p-4 flex gap-4">
                 <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                  <WeedImage weedId={w.id} stage="whole" className="w-full h-full" />
+                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                 </div>
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
@@ -3544,7 +3544,7 @@ function TopicContent({
             </p>
             <div className="flex justify-center mb-3">
               <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border">
-                <WeedImage weedId={exampleWeed.id} stage="whole" className="w-full h-full" />
+                <WeedImage weedId={exampleWeed.id} stage="flower" className="w-full h-full" />
               </div>
             </div>
             <div className="flex flex-col items-center gap-1">
