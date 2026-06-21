@@ -1582,11 +1582,11 @@ function TopicContent({
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
-            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
+            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Dicots ({dicots.length} species)</h3>
-            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
+            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
           </div>
         </div>
       );
