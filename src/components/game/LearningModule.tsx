@@ -543,6 +543,48 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
     difference:
       "Both have pink flower spikes and a papery sheath around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems. Water Smartweed grows in wet places like ponds with leaves that often float on the water.",
   },
+  {
+    title: "Mustards (Yellow-Flowered)",
+    weedIds: ["Wild_mustard", "yellow_Rocket", "Shepherds_Purse"],
+    difference:
+      "All three are in the mustard family with four-petal flowers. Wild Mustard has bright yellow flowers and big lobed leaves. Yellow Rocket has yellow flowers too but smaller, shinier leaves that stay green all winter. Shepherd's Purse has tiny white flowers and little heart-shaped seed pods that look like purses.",
+  },
+  {
+    title: "Chickweeds & Small Spring Weeds",
+    weedIds: ["CommonChickweed", "Mouseear_chickweed", "Henbit_deadnettle"],
+    difference:
+      "All three are short weeds you see in early spring. Common Chickweed has tiny white star-shaped flowers and a single line of hairs down one side of the stem. Mouse-ear Chickweed is covered in soft fuzzy hairs all over (like a mouse's ear!). Henbit has pink-purple flowers and square stems because it's in the mint family.",
+  },
+  {
+    title: "Nightshades (Berry-Makers — Don't Eat!)",
+    weedIds: ["Eastern_black_nightshade", "Horsenettle", "Buffalobur"],
+    difference:
+      "All three make round berries that are POISONOUS. Eastern Black Nightshade has smooth leaves and black berries when ripe. Horsenettle has spines on its leaves and yellow berries. Buffalobur is covered in sharp yellow spines everywhere — even on the fruit!",
+  },
+  {
+    title: "Wild Carrot Look-Alikes (Be Careful!)",
+    weedIds: ["Wild_Carrot", "poison-hemlock", "golden-alexanders"],
+    difference:
+      "All three have lacy leaves and flat clusters of small flowers. Wild Carrot (Queen Anne's Lace) has white flowers and a hairy stem that smells like carrot. Poison Hemlock has white flowers too but a SMOOTH stem with purple spots — it is very dangerous and should never be touched. Golden Alexanders has bright yellow flowers instead of white.",
+  },
+  {
+    title: "Crabgrass & Look-Alike Grasses",
+    weedIds: ["large-crabgrass", "Witchgrass", "barnyardgrass"],
+    difference:
+      "All three are summer grasses that sprawl across the ground. Large Crabgrass has wide leaves with hairs and finger-like seed branches. Witchgrass has very hairy leaves and a huge airy seedhead that breaks off and tumbles. Barnyardgrass has thick reddish stems at the base and bumpy seedheads with no hairs.",
+  },
+  {
+    title: "Lambsquarters Look-Alikes",
+    weedIds: ["lambsquarters", "Redroot_pigweed", "Russian_thistle"],
+    difference:
+      "All three are tall summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Redroot Pigweed has hairy stems and a bright reddish-pink root. Russian Thistle has skinny spiny leaves and turns into a tumbleweed when it dries up.",
+  },
+  {
+    title: "Morningglory Vines",
+    weedIds: ["Tall_morningglory", "Field_bindweed", "Wild_buckwheat"],
+    difference:
+      "All three are twining vines that climb on other plants. Tall Morningglory has big purple or blue trumpet flowers and heart-shaped leaves. Field Bindweed has smaller white or pink trumpet flowers and arrowhead leaves. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no trumpets — and a papery sheath where the leaf meets the stem.",
+  },
 ];
 
 function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
