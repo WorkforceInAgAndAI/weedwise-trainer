@@ -36,6 +36,63 @@ type TopicId =
 
 type CategoryId = "identification" | "lifecycle" | "control";
 
+// Friendly, K-5 seed descriptions inferred from species traits.
+function getElementarySeedDescription(w: Weed): string {
+  const name = w.commonName.toLowerCase();
+  if (name.includes("dandelion")) return "Fluffy white parachute that floats on the wind.";
+  if (name.includes("waterhemp")) return "Tiny, shiny, dark seeds — thousands per plant.";
+  if (name.includes("palmer")) return "Very small dark round seeds with a smooth shell.";
+  if (name.includes("foxtail")) return "Oval seeds with bristly hairs to catch on fur and clothes.";
+  if (name.includes("crabgrass")) return "Small flat seeds that scatter near the parent plant.";
+  if (name.includes("velvetleaf")) return "Wedge-shaped seeds with a tough, fuzzy coat.";
+  if (name.includes("cocklebur")) return "Bur covered in hooks that grab onto animal fur.";
+  if (name.includes("morning glory") || name.includes("bindweed")) return "Hard, dark seeds shaped like little wedges.";
+  if (name.includes("thistle")) return "Light seeds with a feathery tuft for flying on the wind.";
+  if (name.includes("ragweed")) return "Small crown-shaped seeds with tiny spines.";
+  if (name.includes("lambsquarter")) return "Tiny round black seeds — millions can hide in one field.";
+  if (name.includes("pigweed")) return "Tiny shiny black seeds that survive a long time in the soil.";
+  if (name.includes("nightshade")) return "Round seeds tucked inside a berry that animals eat.";
+  if (name.includes("kochia")) return "Small flat seeds — the whole plant tumbles to spread them.";
+  if (name.includes("nutsedge")) return "Hard nutlets in the soil that can sprout new plants.";
+  if (name.includes("johnson")) return "Plump seeds that look a bit like little grains.";
+  if (name.includes("milkweed")) return "Flat brown seeds with a silky white parachute.";
+  if (name.includes("burdock")) return "Burs with hooks — the inspiration for Velcro!";
+  if (name.includes("plantain")) return "Tiny seeds that get sticky when wet and hitch a ride on shoes.";
+  if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
+  // Fallback
+  return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
+}
+
+// Simple cross-section diagram showing seeds at different soil depths.
+function SeedBankDiagram() {
+  return (
+    <div className="rounded-lg overflow-hidden border border-border bg-background">
+      <svg viewBox="0 0 400 220" className="w-full h-auto" role="img" aria-label="Seed bank cross-section diagram">
+        {/* Sky */}
+        <rect x="0" y="0" width="400" height="40" fill="hsl(var(--muted))" />
+        {/* Leaf litter */}
+        <rect x="0" y="40" width="400" height="20" fill="#8b6f3a" />
+        {/* Topsoil */}
+        <rect x="0" y="60" width="400" height="60" fill="#6b4a2b" />
+        {/* Deep soil */}
+        <rect x="0" y="120" width="400" height="100" fill="#3f2a17" />
+        {/* Labels */}
+        <text x="8" y="55" fontSize="11" fill="#fff">Leaf litter</text>
+        <text x="8" y="78" fontSize="11" fill="#fff">Topsoil — seeds sprout here</text>
+        <text x="8" y="140" fontSize="11" fill="#fff">Deep soil — seeds wait for years</text>
+        {/* Seeds */}
+        {[[40,52],[120,55],[210,50],[320,54],[70,80],[160,90],[250,85],[340,95],[60,150],[140,170],[230,200],[300,160],[360,190]].map(([x,y],i)=> (
+          <circle key={i} cx={x} cy={y} r={3.5} fill="#f5d678" stroke="#7a5a1f" strokeWidth="0.8" />
+        ))}
+        {/* Sprout from topsoil */}
+        <path d="M180 60 C 180 45, 175 35, 170 28" stroke="#558B2F" strokeWidth="2" fill="none" />
+        <path d="M170 28 q -8 -2 -10 -10" stroke="#558B2F" strokeWidth="2" fill="none" />
+        <path d="M170 28 q 8 -2 10 -10" stroke="#558B2F" strokeWidth="2" fill="none" />
+      </svg>
+    </div>
+  );
+}
+
 interface CategoryStyle {
   id: CategoryId;
   label: string;
