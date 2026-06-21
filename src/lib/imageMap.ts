@@ -50,10 +50,9 @@ for (const [path, url] of Object.entries(injuryModules)) {
  * Falls back to the other type if the requested one is missing.
  */
 export function resolveInjuryImage(group: number, type: 'br' | 'gr'): string | null {
- const primary = injuryMap[`g${group}_${type}.jpg`];
- if (primary) return primary;
- const other: 'br' | 'gr' = type === 'br' ? 'gr' : 'br';
- return injuryMap[`g${group}_${other}.jpg`] || null;
+ // Strict: grass crops must use _gr, broadleaf crops must use _br.
+ // No fallback to the wrong symptom type.
+ return injuryMap[`g${group}_${type}.jpg`] || null;
 }
 
 export function resolveImageUrl(weedId: string, filename: string): string | null {

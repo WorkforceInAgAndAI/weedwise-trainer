@@ -50,7 +50,7 @@ export default function LandingPage({
  <section className="relative overflow-hidden" style={{ minHeight: '480px' }}>
  <div className="absolute inset-0">
  <div className={`absolute inset-0 transition-opacity duration-200 ${fadeClass}`}>
- <WeedImage weedId={CAROUSEL_WEEDS[carouselIdx]} stage="plant" className="w-full h-full object-cover" />
+ <WeedImage weedId={CAROUSEL_WEEDS[carouselIdx]} stage="flower" className="w-full h-full object-cover" />
  </div>
  <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
  </div>

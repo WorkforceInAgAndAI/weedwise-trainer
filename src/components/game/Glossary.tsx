@@ -27,9 +27,9 @@ const FILTERS: FilterOption[] = [
  { key: 'biennial', label: 'Biennial', group: 'Life Cycle' },
  { key: 'winter-annual', label: 'Winter Annual', group: 'Life Cycle' },
  { key: 'stage:seedling', label: 'Seedling', group: 'Life Stage' },
- { key: 'stage:vegetative', label: 'Vegetative', group: 'Life Stage' },
+ { key: 'stage:vegetative', label: 'Leaf', group: 'Life Stage' },
+ { key: 'stage:ligule', label: 'Ligule', group: 'Life Stage' },
  { key: 'stage:flower', label: 'Reproductive', group: 'Life Stage' },
- { key: 'stage:whole', label: 'Whole Plant', group: 'Life Stage' },
 ];
 
 const families = [...new Set(weeds.map(w => w.family))].sort();
@@ -95,7 +95,7 @@ export default function Glossary({ onClose }: Props) {
  for (const f of activeFilters) {
  if (f.startsWith('stage:')) return f.replace('stage:', '');
  }
- return 'whole';
+ return 'flower';
  }, [activeFilters]);
 
  const filtered = useMemo(() => {

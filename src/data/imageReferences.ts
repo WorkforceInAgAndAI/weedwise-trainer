@@ -265,17 +265,17 @@ export function getSessionCitations(weedIds: string[], stages: string[]): string
   const STAGE_PREFIX_MAP: Record<string, string> = {
     seed: 'seed',
     seedling: 'seedling',
-    vegetative: 'veg',
+    vegetative: 'leaf',
     flower: 'repro',
-    whole: 'plant',
-    ligule: 'ligu',
+    whole: 'repro',
+    ligule: 'lig',
   };
 
   const citations = new Set<string>();
 
   for (const weedId of weedIds) {
     for (const stage of stages) {
-      const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+      const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
       // Check variants 1 and 2, common extensions
       for (const variant of [1, 2, 3]) {
         for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {

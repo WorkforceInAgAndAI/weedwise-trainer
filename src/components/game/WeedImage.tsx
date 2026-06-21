@@ -4,10 +4,10 @@ import { resolveImageUrl } from '@/lib/imageMap';
 const STAGE_PREFIX_MAP: Record<string, string> = {
  seed: 'seed',
  seedling: 'seedling',
- vegetative: 'veg',
+ vegetative: 'leaf',
  flower: 'repro',
- whole: 'plant',
- ligule: 'ligu',
+ whole: 'repro',
+ ligule: 'lig',
  male: 'male',
  female: 'female',
 };
@@ -18,7 +18,7 @@ export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, e
   const filename = `Herbicide_Injury_Images/${stage}.${ext}`;
   return resolveImageUrl(weedId, filename) || `/images/${weedId}/Herbicide_Injury_Images/${filename}`;
  }
- const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+ const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
  // male/female images don't have variant numbers
  if (stage === 'male' || stage === 'female') {
   const filename = `${prefix}.${ext}`;
@@ -58,7 +58,7 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
 
   const variant = Math.random() < 0.5 ? 1 : 2;
   const otherVariant = variant === 1 ? 2 : 1;
-  const prefix = STAGE_PREFIX_MAP[stage] || 'veg';
+  const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
   
   const urls: string[] = [];
   // Primary variant first, all extensions
@@ -71,11 +71,11 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
    const url = resolveImageUrl(weedId, `${prefix}_${otherVariant}.${ext}`);
    if (url) urls.push(url);
   }
-  // Fallback: try 'plant' stage if original stage had no images
-  if (urls.length === 0 && prefix !== 'plant') {
+  // Fallback: try 'repro' stage if original stage had no images
+  if (urls.length === 0 && prefix !== 'repro') {
    for (const v of [variant, otherVariant]) {
     for (const ext of exts) {
-     const url = resolveImageUrl(weedId, `plant_${v}.${ext}`);
+     const url = resolveImageUrl(weedId, `repro_${v}.${ext}`);
      if (url) urls.push(url);
     }
    }
