@@ -991,7 +991,17 @@ function TopicContent({
               <p>
                 Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
                 and overall farm success. According to the Weed Science Society of America, without weed control in corn,
-                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>.
+                soybean, and sugar beet fields in Minnesota, farmers would have lost <strong>half their yield</strong>
+                {" "}(
+                <a
+                  href="https://wssa.net/wp-content/uploads/WSSA-Weed-Loss-Studies-Final-Numbers.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-primary hover:text-primary/80"
+                >
+                  WSSA Weed Loss Studies
+                </a>
+                ).
               </p>
               <p>
                 At a national and global level, scientists need more precise terms to ensure they are discussing the same
