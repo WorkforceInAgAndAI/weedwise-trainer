@@ -3746,6 +3746,23 @@ function TopicContent({
        WEED COMPETITORS
     ═══════════════════════════════════════════════════════════ */
     case "weed-competitors": {
+      const COMPETITION_EXAMPLES = [
+        {
+          trait: "Rapid Germination & Dense Seedling Cohorts",
+          desc: "These weeds emerge in flushes of many small seedlings packed tightly together, claiming sunlight and soil before crops have a chance to compete.",
+          weedIds: ["palmer-amaranth", "waterhemp", "Common_Lambsquarters", "Redroot_Pigweed"],
+        },
+        {
+          trait: "Large Canopy / Shading",
+          desc: "Tall, fast-growing weeds with broad leaves or sprawling vines that form a canopy over the crop and cut off light.",
+          weedIds: ["Giant_Ragweed", "Velvetleaf", "Common_Cocklebur", "Tall_Morningglory"],
+        },
+        {
+          trait: "Allelopathy (Chemical Suppression)",
+          desc: "Species that release biochemicals from roots, leaves, or decomposing tissue that inhibit germination and growth of neighboring plants.",
+          weedIds: ["Johnsongrass", "Quackgrass", "Yellow_Nutsedge", "Canada_Thistle"],
+        },
+      ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -3768,10 +3785,24 @@ function TopicContent({
                 </p>
               </>
             ) : (
-              <p>
-                Understanding interspecific competition among weeds helps predict weed succession patterns and supports
-                the design of management strategies that account for the full ecological complexity of weed communities.
-              </p>
+              <>
+                <p>
+                  Weeds compete with crops — and with each other — for the same four limiting resources:
+                  <strong> light, water, nutrients, and physical space</strong>. The most damaging field weeds combine
+                  several competitive traits at once: rapid emergence, high seedling densities, aggressive vertical and
+                  lateral growth, deep or fibrous root systems, and prolific seed production.
+                </p>
+                <p>
+                  Research shows the <strong>critical period for weed control</strong> in corn and soybean usually falls
+                  between the V2–V6 stages, when even short-lived competition can permanently reduce yield. After canopy
+                  closure, late-emerging weeds matter less for yield but still drive next year's seedbank.
+                </p>
+                <p>
+                  Understanding interspecific competition among weeds helps predict <strong>weed succession patterns</strong>
+                  — for example, why repeated glyphosate use shifted Midwest fields toward Palmer amaranth and waterhemp —
+                  and supports management strategies that account for the full ecological complexity of weed communities.
+                </p>
+              </>
             )}
           </div>
 
@@ -3794,6 +3825,38 @@ function TopicContent({
                 Some weeds release chemicals into the soil that prevent nearby seeds from germinating or growing.
               </p>
             </div>
+          </div>
+
+          {/* Visual species examples */}
+          <div className="space-y-4">
+            <p className="font-display font-bold text-foreground text-sm">Real-World Examples</p>
+            {COMPETITION_EXAMPLES.map((cat) => {
+              const ws = cat.weedIds
+                .map((id) => weeds.find((w) => w.id === id) || weeds.find((w) => w.commonName.toLowerCase().replace(/[ _]/g, "") === id.toLowerCase().replace(/[ _]/g, "")))
+                .filter((w): w is Weed => !!w);
+              if (ws.length === 0) return null;
+              return (
+                <div key={cat.trait} className="bg-card border border-border rounded-lg p-3 space-y-2">
+                  <p className="font-bold text-foreground text-sm">{cat.trait}</p>
+                  <p className="text-xs text-muted-foreground">{cat.desc}</p>
+                  <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                    {ws.map((w) => (
+                      <button
+                        key={w.id}
+                        onClick={() => onSelectWeed(w)}
+                        className="flex-shrink-0 w-28 bg-muted/40 border border-border rounded-md p-2 hover:border-primary transition-colors text-left"
+                      >
+                        <div className="w-full h-20 rounded overflow-hidden bg-muted mb-1">
+                          <WeedImage weedId={w.id} stage="mature" className="w-full h-full" />
+                        </div>
+                        <p className="text-[11px] font-bold text-foreground leading-tight">{w.commonName}</p>
+                        <p className="text-[9px] italic text-muted-foreground leading-tight">{w.scientificName}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
