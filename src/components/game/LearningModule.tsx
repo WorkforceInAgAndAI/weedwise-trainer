@@ -454,11 +454,13 @@ function WeedFlashcardDeck({
   onSelectWeed,
   stage = "flower",
   emphasizeScientific = false,
+  hideImage = false,
 }: {
   weeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   stage?: "whole" | "flower" | "vegetative" | "seed" | "seedling";
   emphasizeScientific?: boolean;
+  hideImage?: boolean;
 }) {
   const [activeDeck, setActiveDeck] = useState<Weed[]>(fullDeck);
   const [index, setIndex] = useState(0);
@@ -510,12 +512,37 @@ function WeedFlashcardDeck({
           <div className="relative w-full aspect-[4/3] max-h-[26rem]">
             {!flipped ? (
               <div className="absolute inset-0 flex flex-col">
-                <div className="flex-1 overflow-hidden">
-                  <WeedImage weedId={current.id} stage={stage} className="w-full h-full" />
-                </div>
-                <p className="text-[11px] text-muted-foreground text-center py-1.5 bg-card border-t border-border">
-                  Tap card to reveal the name
-                </p>
+                {hideImage ? (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center bg-card">
+                    <p className="text-[11px] uppercase tracking-wide font-bold text-muted-foreground">
+                      Identify from these traits
+                    </p>
+                    {current.traits && current.traits.length > 0 ? (
+                      <ul className="text-sm text-foreground text-left list-disc list-inside space-y-1 max-w-md">
+                        {current.traits.slice(0, 5).map((t, i) => (
+                          <li key={i}>{t}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-foreground">{current.memoryHook}</p>
+                    )}
+                    <p className="text-[10px] text-muted-foreground italic mt-1">
+                      {current.plantType} • {current.lifeCycle}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground py-1.5 mt-2 border-t border-border w-full">
+                      Tap card to reveal the name
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex-1 overflow-hidden">
+                      <WeedImage weedId={current.id} stage={stage} className="w-full h-full" />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground text-center py-1.5 bg-card border-t border-border">
+                      Tap card to reveal the name
+                    </p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="absolute inset-0 bg-card flex flex-col items-center justify-center gap-2 p-5 text-center">
