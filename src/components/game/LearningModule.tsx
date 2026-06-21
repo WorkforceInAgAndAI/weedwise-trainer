@@ -1233,31 +1233,53 @@ function TopicContent({
           </div>
 
           {grade === "elementary" && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-bold text-primary">Seed Dispersal</p>
-              <p>
-                Seeds have special features that help them travel to new places. Some seeds have <strong>tiny wings
-                or parachutes</strong> that let them float on the wind. Others have <strong>hooks or barbs</strong> that
-                stick to animal fur or clothing. Some seeds can even <strong>float on water</strong> to travel to new
-                locations.
-              </p>
-            </div>
+            <>
+              {/* Seed Bank diagram */}
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">What is a Seed Bank?</p>
+                <p className="text-sm text-foreground">
+                  A <strong>seed bank</strong> is all the weed seeds hiding in the soil, waiting to grow. Some
+                  seeds sit right on top in the leaves, others are tucked into the topsoil where they sprout fastest,
+                  and some get buried deep where they can wait for years until a plow or storm brings them back up.
+                </p>
+                <SeedBankDiagram />
+              </div>
+
+              {/* Seed image grid */}
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <p className="font-display font-bold text-foreground text-base">Meet the Seeds</p>
+                <p className="text-sm text-muted-foreground">
+                  Each weed makes its own kind of seed. Look closely — shapes, colors, and bumps are all clues.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {topicWeeds.map((w) => (
+                    <div key={`seed-${w.id}`} className="bg-background border border-border rounded-lg p-3 space-y-2">
+                      <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
+                        <WeedImage weedId={w.id} stage="seed" className="w-full h-full object-cover" />
+                      </div>
+                      <p className="font-display font-bold text-sm text-foreground text-center">{w.commonName} seed</p>
+                      <p className="text-xs text-muted-foreground text-center">{getElementarySeedDescription(w)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
 
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
-            <p className="text-sm text-muted-foreground">
-              {grade === "elementary"
-                ? "Look at the seed, guess which weed it comes from, then tap the card to check."
-                : "Identify the seed by its shape, size, and surface, then flip the card to see the species."}
-            </p>
-            <WeedFlashcardDeck
-              weeds={topicWeeds}
-              onSelectWeed={onSelectWeed}
-              stage="seed"
-              emphasizeScientific={grade === "high"}
-            />
-          </div>
+          {grade !== "elementary" && (
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
+              <p className="text-sm text-muted-foreground">
+                Identify the seed by its shape, size, and surface, then flip the card to see the species.
+              </p>
+              <WeedFlashcardDeck
+                weeds={topicWeeds}
+                onSelectWeed={onSelectWeed}
+                stage="seed"
+                emphasizeScientific={grade === "high"}
+              />
+            </div>
+          )}
         </div>
       );
 
