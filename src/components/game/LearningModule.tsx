@@ -3558,14 +3558,61 @@ function TopicContent({
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <h3 className="font-display font-bold text-foreground">{method.label}</h3>
                 <p className="text-sm text-foreground">{method.desc}</p>
-                <div className="bg-primary/10 rounded-lg p-3">
-                  <p className="text-xs text-primary">
-                    <span className="font-semibold">Example:</span> {method.example}
-                  </p>
+                <div className="flex gap-3 items-start">
+                  {isHighSchool && (method as any).weedId && (() => {
+                    const exW = weeds.find((w) => w.id === (method as any).weedId);
+                    if (!exW) return null;
+                    return (
+                      <button
+                        onClick={() => onSelectWeed(exW)}
+                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                        aria-label={`Open ${exW.commonName}`}
+                      >
+                        <WeedImage weedId={exW.id} stage="mature" className="w-full h-full" />
+                      </button>
+                    );
+                  })()}
+                  <div className="bg-primary/10 rounded-lg p-3 flex-1">
+                    <p className="text-xs text-primary">
+                      <span className="font-semibold">Example:</span> {method.example}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* High-school-only: crop-mismatch warning + herbicide-resistant traits */}
+          {isHighSchool && (
+            <>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+                <p className="font-bold text-destructive">Match the Herbicide to the Crop</p>
+                <p className="text-xs">
+                  Soybean is itself a <strong>broadleaf</strong>, so spraying a non-selective broadleaf herbicide
+                  over conventional soybean will damage the crop along with the weeds. Corn is a <strong>grass</strong>,
+                  so a non-selective grass herbicide will damage corn. Always read the label and confirm the herbicide is
+                  labeled for the crop you are growing.
+                </p>
+              </div>
+              <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+                <p className="font-bold text-accent">Herbicide-Resistant Crop Traits</p>
+                <p className="text-xs">
+                  Modern corn and soybean varieties can be genetically engineered to tolerate specific herbicides, which
+                  lets growers spray over the top of the crop. Common platforms include:
+                </p>
+                <ul className="text-xs list-disc ml-5 space-y-1">
+                  <li><strong>Roundup Ready</strong> — tolerance to glyphosate (Group 9).</li>
+                  <li><strong>LibertyLink</strong> — tolerance to glufosinate (Group 10).</li>
+                  <li><strong>Xtend / XtendiMax</strong> — tolerance to dicamba (Group 4).</li>
+                  <li><strong>Enlist E3</strong> — tolerance to 2,4-D choline + glyphosate + glufosinate.</li>
+                </ul>
+                <p className="text-xs text-muted-foreground">
+                  Trait stacking allows multiple modes of action over the same crop, which is a key tool for managing
+                  resistant Palmer amaranth and waterhemp.
+                </p>
+              </div>
+            </>
+          )}
 
           {/* Herbicide MOA Reference Table - only for 6-8 and 9-12 */}
           {!isElementary && (
