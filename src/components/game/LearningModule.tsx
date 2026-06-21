@@ -3951,10 +3951,10 @@ function TopicContent({
       const THRESHOLD_EXAMPLES: { weedId: string; name: string; crop: string; threshold: string; note: string }[] = [
         { weedId: "palmer-amaranth", name: "Palmer Amaranth", crop: "Soybean", threshold: "1–2 plants per 30 ft of row", note: "Extremely low threshold — even sparse populations can cause 10%+ yield loss because of rapid biomass accumulation." },
         { weedId: "waterhemp", name: "Waterhemp", crop: "Soybean", threshold: "Fewer than 1 plant per ft of row", note: "Aggressive seed production (250k+ seeds/female) makes seedbank prevention as important as yield protection." },
-        { weedId: "Giant_Ragweed", name: "Giant Ragweed", crop: "Corn", threshold: "~1 plant per 100 ft²", note: "Very tall, very competitive — a handful of plants per acre can justify control." },
-        { weedId: "Common_Lambsquarters", name: "Lambsquarters", crop: "Soybean", threshold: "~4–8 plants per m²", note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's." },
-        { weedId: "Velvetleaf", name: "Velvetleaf", crop: "Corn", threshold: "~1 plant per m²", note: "Wide leaves shade corn rapidly, but corn outgrows lower densities." },
-        { weedId: "Giant_Foxtail", name: "Giant Foxtail", crop: "Corn", threshold: "10–20 plants per m²", note: "Much higher tolerance — economic loss only at dense infestations." },
+        { weedId: "giant-ragweed", name: "Giant Ragweed", crop: "Corn", threshold: "~1 plant per 100 ft²", note: "Very tall, very competitive — a handful of plants per acre can justify control." },
+        { weedId: "lambsquarters", name: "Lambsquarters", crop: "Soybean", threshold: "~4–8 plants per m²", note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's." },
+        { weedId: "velvetleaf", name: "Velvetleaf", crop: "Corn", threshold: "~1 plant per m²", note: "Wide leaves shade corn rapidly, but corn outgrows lower densities." },
+        { weedId: "giant-foxtail", name: "Giant Foxtail", crop: "Corn", threshold: "10–20 plants per m²", note: "Much higher tolerance — economic loss only at dense infestations." },
       ].map(e => ({ ...e, weed: weeds.find(w => w.id === e.weedId) || weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
         .filter((e): e is typeof e & { weed: Weed } => !!e.weed) as any;
       return (
