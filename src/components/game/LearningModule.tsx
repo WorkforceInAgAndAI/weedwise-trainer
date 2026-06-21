@@ -543,6 +543,48 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
     difference:
       "Both have pink flower spikes and a papery sheath around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems. Water Smartweed grows in wet places like ponds with leaves that often float on the water.",
   },
+  {
+    title: "Mustards (Yellow-Flowered)",
+    weedIds: ["Wild_mustard", "yellow_Rocket", "Shepherds_Purse"],
+    difference:
+      "All three are in the mustard family with four-petal flowers. Wild Mustard has bright yellow flowers and big lobed leaves. Yellow Rocket has yellow flowers too but smaller, shinier leaves that stay green all winter. Shepherd's Purse has tiny white flowers and little heart-shaped seed pods that look like purses.",
+  },
+  {
+    title: "Chickweeds & Small Spring Weeds",
+    weedIds: ["CommonChickweed", "Mouseear_chickweed", "Henbit_deadnettle"],
+    difference:
+      "All three are short weeds you see in early spring. Common Chickweed has tiny white star-shaped flowers and a single line of hairs down one side of the stem. Mouse-ear Chickweed is covered in soft fuzzy hairs all over (like a mouse's ear!). Henbit has pink-purple flowers and square stems because it's in the mint family.",
+  },
+  {
+    title: "Nightshades (Berry-Makers — Don't Eat!)",
+    weedIds: ["Eastern_black_nightshade", "Horsenettle", "Buffalobur"],
+    difference:
+      "All three make round berries that are POISONOUS. Eastern Black Nightshade has smooth leaves and black berries when ripe. Horsenettle has spines on its leaves and yellow berries. Buffalobur is covered in sharp yellow spines everywhere — even on the fruit!",
+  },
+  {
+    title: "Wild Carrot Look-Alikes (Be Careful!)",
+    weedIds: ["Wild_Carrot", "poison-hemlock", "golden-alexanders"],
+    difference:
+      "All three have lacy leaves and flat clusters of small flowers. Wild Carrot (Queen Anne's Lace) has white flowers and a hairy stem that smells like carrot. Poison Hemlock has white flowers too but a SMOOTH stem with purple spots — it is very dangerous and should never be touched. Golden Alexanders has bright yellow flowers instead of white.",
+  },
+  {
+    title: "Crabgrass & Look-Alike Grasses",
+    weedIds: ["large-crabgrass", "Witchgrass", "barnyardgrass"],
+    difference:
+      "All three are summer grasses that sprawl across the ground. Large Crabgrass has wide leaves with hairs and finger-like seed branches. Witchgrass has very hairy leaves and a huge airy seedhead that breaks off and tumbles. Barnyardgrass has thick reddish stems at the base and bumpy seedheads with no hairs.",
+  },
+  {
+    title: "Lambsquarters Look-Alikes",
+    weedIds: ["lambsquarters", "Redroot_pigweed", "Russian_thistle"],
+    difference:
+      "All three are tall summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Redroot Pigweed has hairy stems and a bright reddish-pink root. Russian Thistle has skinny spiny leaves and turns into a tumbleweed when it dries up.",
+  },
+  {
+    title: "Morningglory Vines",
+    weedIds: ["Tall_morningglory", "Field_bindweed", "Wild_buckwheat"],
+    difference:
+      "All three are twining vines that climb on other plants. Tall Morningglory has big purple or blue trumpet flowers and heart-shaped leaves. Field Bindweed has smaller white or pink trumpet flowers and arrowhead leaves. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no trumpets — and a papery sheath where the leaf meets the stem.",
+  },
 ];
 
 function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
@@ -2641,42 +2683,46 @@ function TopicContent({
           {
             key: "Warm-Season / Full Sun",
             label: "Warm-Season Weeds",
-            desc: "Warm-season weeds thrive in hot summer conditions with full sun exposure. They germinate when soil temperatures rise in late spring and grow most vigorously during the hottest months. Warm-season weeds are common in corn, soybean, and sorghum fields across the Midwest.",
+            desc: "Warm-season weeds wait until late spring, when soil temperatures climb above roughly 60 °F, to germinate. They use the C4 photosynthesis pathway, which is more efficient at high temperatures and during droughty, high-light conditions — that's why species like Palmer Amaranth, Waterhemp, and the foxtails explode in mid-summer corn and soybean fields and can grow more than an inch per day in July heat.",
           },
           {
             key: "Cool-Season / Early Spring",
             label: "Cool-Season Weeds",
-            desc: "Cool-season weeds germinate in fall or early spring when temperatures are lower. They grow rapidly before warm-season crops are planted and can compete early in the growing season. Many are winter annuals that overwinter as rosettes.",
+            desc: "Cool-season weeds germinate in fall or very early spring, when soils are between roughly 40–60 °F. They use the C3 photosynthesis pathway, which works best in cool, moist conditions. Many overwinter as low rosettes (like Henbit, Shepherd's Purse, and Field Pennycress) — a body shape that survives frost and lets the plant start photosynthesizing weeks before spring planting.",
           },
           {
             key: "Wet / Poorly Drained",
             label: "Wet-Habitat Weeds",
-            desc: "Wet-habitat weeds are adapted to poorly drained soils, field edges near waterways, and areas with high water tables. They often have specialized tissues for waterlogged conditions and can indicate drainage problems in fields.",
+            desc: "Wet-habitat species tolerate saturated, low-oxygen soils that would kill most crops. Many have hollow stems or special air channels (aerenchyma) that move oxygen down to flooded roots. Yellow Nutsedge, Barnyardgrass, and the smartweeds are classic indicators of poor drainage — when you see them dominating a patch, it usually points to a compaction or tile-drainage problem, not just a herbicide issue.",
           },
           {
             key: "Dry / Disturbed",
             label: "Dry-Habitat Weeds",
-            desc: "Dry-habitat weeds are adapted to well-drained, often sandy soils and disturbed areas like roadsides, construction sites, and field margins. They are typically drought-tolerant with deep root systems or water-conserving leaf structures.",
+            desc: "Dry-habitat weeds survive on sandy, low-organic, well-drained soils where water is scarce. Adaptations include deep taproots that mine subsoil moisture (Kochia, Russian Thistle), narrow or waxy leaves that lose less water, and CAM/C4 metabolism that allows photosynthesis with the stomata partly closed. These species dominate roadsides, terraces, and the sandy headlands of irrigated fields.",
           },
         ];
         return (
           <div className="space-y-5">
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Habitats</p>
+              <p className="font-display font-bold text-primary text-base">Climate &amp; Habitat Adaptation</p>
               <p>
-                Weeds are adapted to specific growing conditions. Understanding where a weed thrives helps predict where
-                it will appear. Weeds adapt through <strong>high genetic diversity, rapid reproduction</strong>, and high
-                <strong> phenotypic plasticity</strong>.
+                Climate is the single biggest factor that decides which weed species you'll actually see in a field.
+                Temperature controls when a seed germinates, day length tells the plant when to flower, and rainfall
+                decides how much it can grow. Two fields a few hundred miles apart can have completely different weed
+                problems because their growing-season temperatures, frost-free days, and rainfall patterns aren't the
+                same.
               </p>
               <p>
-                <strong>Phenotypic plasticity</strong> is the ability to change form in response to the environment.
-                Environmental factors such as sunlight exposure, rainfall, temperature, and weather effects all impact a
-                weed's adaptation to its environment.
+                Different species are adapted to different climates because of differences in <strong>photosynthesis
+                type (C3 vs. C4)</strong>, <strong>root depth and structure</strong>, <strong>leaf shape and waxy
+                coatings</strong>, and the <strong>temperature range their seeds need to break dormancy</strong>. A
+                cool-season C3 species like Henbit shuts down in July heat, while a C4 species like Palmer Amaranth
+                barely starts growing until the soil is warm enough to fry an egg on.
               </p>
               <p>
-                These environmental factors can be found regionally across the globe, depending on the area's climate.
-                While a weed may be native to North America, it may also thrive in European areas where the climate is
-                similar.
+                The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
+                for. Scroll through each group to see the species that fit — paying attention to leaf size, root depth,
+                and growth habit will show you the adaptations in action.
               </p>
             </div>
 
@@ -2686,20 +2732,27 @@ function TopicContent({
                 <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
                   <p className="font-display font-bold text-foreground text-base">{h.label}</p>
                   <p className="text-sm text-foreground">{h.desc}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Examples: {grouped.slice(0, 5).map(w => w.commonName).join(', ')}{grouped.length > 5 ? `, and ${grouped.length - 5} more` : ''}.
-                  </p>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {grouped.map((w) => (
-                      <div key={w.id} className="text-center">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  {grouped.length > 0 && (
+                    <>
+                      <div className="overflow-x-auto pb-2 -mx-1">
+                        <div className="flex gap-3 px-1" style={{ minWidth: `${grouped.length * 7.5}rem` }}>
+                          {grouped.map((w) => (
+                            <div key={w.id} className="text-center shrink-0 w-28">
+                              <button
+                                onClick={() => onSelectWeed(w)}
+                                className="block w-28 h-28 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary"
+                              >
+                                <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                              </button>
+                              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[11px] mt-1 block" />
+                              <div className="text-[10px] text-primary italic leading-tight">{w.scientificName}</div>
+                            </div>
+                          ))}
                         </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                        <div className="text-[9px] text-primary italic">{w.scientificName}</div>
                       </div>
-                    ))}
-                  </div>
+                      <p className="text-[10px] text-muted-foreground">← Scroll to see all {grouped.length} →</p>
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -3094,6 +3147,77 @@ function TopicContent({
           { stage: "flower", label: "Reproductive" },
         ];
         const anyGrass = group.some((w) => w.plantType === "Monocot");
+
+        // High school layout: each species is its own ROW, stages laid out as
+        // COLUMNS the user scrolls horizontally. Images are smaller for density.
+        if (grade === "high") {
+          const stageCols = anyGrass
+            ? [...compareStages, { stage: "ligule", label: "Ligule" }]
+            : compareStages;
+          const colWidth = 9; // rem per stage column
+          const nameColWidth = 11; // rem for the species name/label column
+          return (
+            <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-3">
+              <div className="overflow-x-auto -mx-1">
+                <div
+                  className="px-1"
+                  style={{ minWidth: `${nameColWidth + stageCols.length * colWidth}rem` }}
+                >
+                  {/* Stage header row */}
+                  <div
+                    className="grid gap-2 mb-2"
+                    style={{ gridTemplateColumns: `${nameColWidth}rem repeat(${stageCols.length}, ${colWidth}rem)` }}
+                  >
+                    <div />
+                    {stageCols.map((s) => (
+                      <div
+                        key={s.stage}
+                        className="text-[10px] font-bold text-muted-foreground uppercase text-center"
+                      >
+                        {s.label}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Species rows */}
+                  {group.map((w) => (
+                    <div
+                      key={w.id}
+                      className="grid gap-2 mb-2 items-center"
+                      style={{ gridTemplateColumns: `${nameColWidth}rem repeat(${stageCols.length}, ${colWidth}rem)` }}
+                    >
+                      <div className="pr-2">
+                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold leading-tight block" />
+                        <div className="text-[10px] text-primary italic leading-tight">{w.scientificName}</div>
+                        <div className="text-[9px] text-muted-foreground">{w.family}</div>
+                        <span
+                          className={`inline-block text-[9px] px-1.5 py-0.5 rounded-full mt-1 ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
+                        >
+                          {w.origin === "Introduced" ? "Introduced" : "Native"}
+                        </span>
+                      </div>
+                      {stageCols.map((s) => (
+                        <div
+                          key={s.stage}
+                          className="aspect-square rounded-md overflow-hidden bg-muted"
+                        >
+                          {s.stage === "ligule" && w.plantType !== "Monocot" ? (
+                            <div className="flex items-center justify-center h-full text-[9px] text-muted-foreground text-center px-1">
+                              Not a grass
+                            </div>
+                          ) : (
+                            <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground">← Scroll to see all stages →</p>
+            </div>
+          );
+        }
+
         return (
           <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
             {/* Header row */}
@@ -3198,10 +3322,34 @@ function TopicContent({
                 </p>
               </>
             ) : (
-              <p>
-                Some weeds look very similar but require different management. Compare them at every growth stage to learn
-                the key differences.
-              </p>
+              <>
+                <p>
+                  In a soybean or corn field, two species that look nearly identical at the seedling stage can demand
+                  completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a textbook
+                  example — both are dioecious pigweeds, both can produce 250,000+ seeds per plant, and both have
+                  evolved resistance to multiple herbicide groups, but Palmer is the more aggressive competitor and
+                  triggers a zero-tolerance threshold across most of the Midwest. Misidentifying one as the other can
+                  cost a grower 30–80% of yield in a heavily infested field.
+                </p>
+                <p>
+                  Reliable identification at the high-school level means moving past general impressions and using
+                  <strong> diagnostic morphological characters</strong>: leaf venation and pubescence, stem cross-section
+                  and trichomes, petiole-to-leaf-blade ratio, inflorescence architecture, ligule and auricle shape in
+                  grasses, and the presence or absence of milky latex, square stems, or sheathing ocreae. Many of these
+                  features only become diagnostic at specific growth stages, so a single photograph at one stage is
+                  rarely enough — you have to compare species across the seedling, vegetative, and reproductive phases.
+                </p>
+                <p>
+                  The consequences of misidentification extend beyond yield loss. Choosing the wrong mode-of-action
+                  herbicide because you confused a Group-9-resistant Waterhemp with a still-susceptible Redroot Pigweed
+                  selects for further resistance and burns through control options. Confusing a native pollinator host
+                  (<em>e.g.</em> Common Milkweed) with an invasive look-alike can waste conservation effort or destroy
+                  monarch habitat. And confusing Wild Carrot with Poison Hemlock is a safety event, not a botany
+                  mistake. The triples below are the species pairings most commonly confused in field-scouting reports;
+                  use the side-by-side layout to build a mental key based on the features that actually distinguish
+                  them.
+                </p>
+              </>
             )}
           </div>
 
@@ -3446,37 +3594,37 @@ function TopicContent({
         const TECHNIQUE_BUCKETS: { key: string; label: string; description: string; match: RegExp }[] = [
           {
             key: "mechanical",
-            label: "Mechanical & Physical Removal",
+            label: "Mechanical & Physical Removal (Hand-pulling, Mowing, Tillage)",
             description:
-              "Hand-pulling, digging, mowing, cutting, and tillage. Best when crews can wear PPE to avoid skin contact with toxic sap, spines, or allergenic pollen.",
+              "Crews physically remove or sever the plant — hand-pulling, hoeing, digging taproots, mowing before seed set, brush-cutting, or tillage (chisel, disk, row cultivator). Most effective on small infestations and before seed production, but it brings workers into direct contact with the plant, so PPE (chemical-resistant gloves, long sleeves, eye protection) is mandatory for species with toxic sap, spines, or allergenic pollen. Tillage can also bury herbicide-resistant seed and reset the seedbank.",
             match: /hand[- ]?pull|dig|mow|cut|till|cultivat|mechanical|removal/i,
           },
           {
             key: "cultural",
-            label: "Cultural & Preventive Practices",
+            label: "Cultural & Preventive Practices (Crop Rotation, Cover Crops, Sanitation)",
             description:
-              "Crop rotation, cover crops, sanitation, livestock exclusion, and signage. Reduces exposure by preventing the toxic species from establishing in the first place.",
+              "These practices change the field environment so the weed never gets a foothold. Includes crop rotation (corn → soybean → small grain) to disrupt life cycles, competitive cover crops (cereal rye, crimson clover) that shade and suppress germination, equipment sanitation to stop seed transport, livestock exclusion from infested pastures, and posted signage warning workers of toxic stands. Preventive — lowest worker exposure of any tactic because the dangerous plant ideally never reaches a harvestable size.",
             match: /rotat|cover crop|sanit|prevent|exclud|fenc|sign|graz/i,
           },
           {
             key: "chemical",
-            label: "Chemical Control (Herbicides)",
+            label: "Chemical Control — Herbicides (PRE & POST Applications)",
             description:
-              "Targeted herbicide application with full PPE — chemical-resistant gloves, eye protection, long sleeves, and respiratory protection when label requires.",
+              "Targeted application of a labeled herbicide — broadcast spray, banded over-the-row, or spot-treat with a backpack sprayer or wick. Effective on large infestations and species with deep roots or rhizomes that mechanical removal can't kill. Required PPE per the product label always includes chemical-resistant gloves and eye protection; long-sleeved coveralls and an organic-vapor respirator are required for many Group 4 (auxin) and Group 14 (PPO) products. Always rotate modes of action (Groups 1–27) to slow resistance.",
             match: /herbicid|spray|chemical|spot[- ]?treat/i,
           },
           {
             key: "biological",
-            label: "Biological Control",
+            label: "Biological Control (Insects, Pathogens, Targeted Grazing)",
             description:
-              "Using insects, pathogens, or managed grazing animals that selectively attack the weed without putting human handlers at risk of contact.",
+              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing animal (goats, sheep) — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
             match: /biolog|insect|pathogen|biocontrol|graz/i,
           },
           {
             key: "ipm",
-            label: "Integrated Pest Management (IPM)",
+            label: "Integrated Pest Management — IPM (Scouting, Thresholds, Multiple Tactics)",
             description:
-              "Combining scouting, thresholds, and multiple control tools so no single tactic is overused. Reduces both safety risk and the chance of herbicide resistance.",
+              "An overall decision framework — not a single tactic. IPM stacks regular scouting, economic and action thresholds, and a planned sequence of cultural, mechanical, biological, and chemical tools so no one tactic is overused. For toxic-plant management it also means matching each tool to the worker-exposure risk it carries (lowest-risk tool that still controls the population) and rotating herbicide modes of action to slow resistance.",
             match: /integrat|ipm|combin|monitor|scout|threshold/i,
           },
         ];
@@ -3493,8 +3641,12 @@ function TopicContent({
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-2">
               <p className="font-display font-bold text-destructive text-base">Safety First</p>
               <p>
-                Some weeds are <strong>dangerous to touch or handle</strong>. Choose the safest combination of control
-                techniques for the species you are working with, and always pair them with the right PPE.
+                Some weeds are <strong>dangerous to touch, inhale, or ingest</strong> — they may carry irritating sap,
+                allergenic pollen, sharp spines, or systemic toxins. The species below are grouped by the
+                <strong> management technique</strong> most commonly recommended for them so you can see at a glance
+                which control tool fits which population, and what level of PPE that tool requires. The right choice
+                balances three things: how effective the tactic is on that species, how much it exposes the worker, and
+                how it fits into a longer IPM rotation.
               </p>
             </div>
 
