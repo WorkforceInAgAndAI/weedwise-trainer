@@ -3401,6 +3401,22 @@ function TopicContent({
       const isHighSchool = grade === "high";
       const isElementary = grade === "elementary";
 
+      // Documented herbicide-resistant weeds by WSSA/HRAC group (Heap, Intl. Herbicide Resistance Database)
+      const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
+        1: ["Italian ryegrass", "Wild oat", "Johnsongrass", "Giant foxtail"],
+        2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed (marestail)", "Common ragweed"],
+        3: ["Goosegrass", "Green foxtail"],
+        4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
+        5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
+        7: ["Smooth pigweed", "Common groundsel"],
+        9: ["Horseweed (marestail)", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed", "Italian ryegrass"],
+        10: ["Italian ryegrass", "Palmer amaranth (limited)"],
+        14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
+        15: ["Waterhemp (recent reports)"],
+        22: ["Horseweed", "Hairy fleabane"],
+        27: ["Waterhemp", "Palmer amaranth"],
+      };
+
       const ELEM_METHODS = [
         {
           key: "hand-weeding",
@@ -3465,9 +3481,10 @@ function TopicContent({
         {
           key: "pre-emergent",
           label: "General Pre-Emergent Herbicide",
-          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical — applying too early or too late reduces efficacy significantly.",
+          desc: "Pre-emergent herbicides create a chemical barrier in the soil that inhibits cell division in germinating weed seeds. They must be applied before weed emergence and typically require rainfall or irrigation for activation. Timing is critical. Applying too early or too late reduces efficacy significantly.",
           example:
             "Applying pendimethalin or S-metolachlor to corn fields before planting to prevent annual grass and small-seeded broadleaf emergence.",
+          weedId: "lambsquarters",
         },
         {
           key: "post-emergent",
@@ -3475,6 +3492,7 @@ function TopicContent({
           desc: "Post-emergent herbicides target actively growing weeds. They can be selective (targeting specific weed types while leaving the crop unharmed) or non-selective (killing all vegetation). Efficacy depends on weed growth stage, environmental conditions, and application rate.",
           example:
             "Applying a selective broadleaf herbicide to a soybean field to control waterhemp at the 2-4 inch stage.",
+          weedId: "waterhemp",
         },
         {
           key: "multi-moa",
@@ -3482,6 +3500,7 @@ function TopicContent({
           desc: "Multi-Mode of Action (MOA) herbicide programs use two or more herbicides with different mechanisms of killing weeds in a single application or across a season. This is the most critical strategy for preventing herbicide resistance.",
           example:
             "Tank-mixing a Group 15 pre-emergent with a Group 27 post-emergent to control resistant Palmer amaranth.",
+          weedId: "palmer-amaranth",
         },
         {
           key: "wait",
@@ -3489,6 +3508,7 @@ function TopicContent({
           desc: "Economic threshold-based decision making is central to IPM. The pest threshold is the specific population density at which control action must be taken to prevent unacceptable harm or economic loss.",
           example:
             "A scout records 1-2 common chickweed plants per square meter in a vigorous winter wheat stand. Published thresholds indicate this causes less than 1% yield loss.",
+          weedId: "CommonChickweed",
         },
         {
           key: "hand-weeding",
@@ -3496,6 +3516,7 @@ function TopicContent({
           desc: "Manual removal of weeds, particularly important for removing herbicide-resistant escapes before they set seed. In resistance management, 'zero seed tolerance' programs rely on hand weeding.",
           example:
             "Walking bean fields in late summer to hand-pull waterhemp escapes that survived herbicide applications.",
+          weedId: "waterhemp",
         },
         {
           key: "mulch-cover",
@@ -3503,6 +3524,7 @@ function TopicContent({
           desc: "Cover crops suppress weeds through physical biomass that blocks light, allelopathic compounds that inhibit germination, and competition for resources. Species like cereal rye can produce 4,000-8,000 lbs/acre of biomass.",
           example:
             "Planting cereal rye at 60-90 lbs/acre after corn harvest, then roller-crimping in spring before soybean planting.",
+          weedId: "giant-foxtail",
         },
         {
           key: "tillage",
@@ -3510,6 +3532,7 @@ function TopicContent({
           desc: "Tillage can be strategic or conventional. Strategic tillage targets specific weed flushes while minimizing soil disturbance. Deep inversion tillage can bury weed seeds below their emergence depth.",
           example:
             "Using a precision inter-row cultivator with guidance systems to mechanically remove weeds between soybean rows.",
+          weedId: "canada-thistle",
         },
       ];
 
@@ -3551,14 +3574,61 @@ function TopicContent({
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <h3 className="font-display font-bold text-foreground">{method.label}</h3>
                 <p className="text-sm text-foreground">{method.desc}</p>
-                <div className="bg-primary/10 rounded-lg p-3">
-                  <p className="text-xs text-primary">
-                    <span className="font-semibold">Example:</span> {method.example}
-                  </p>
+                <div className="flex gap-3 items-start">
+                  {isHighSchool && (method as any).weedId && (() => {
+                    const exW = weeds.find((w) => w.id === (method as any).weedId);
+                    if (!exW) return null;
+                    return (
+                      <button
+                        onClick={() => onSelectWeed(exW)}
+                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                        aria-label={`Open ${exW.commonName}`}
+                      >
+                        <WeedImage weedId={exW.id} stage="mature" className="w-full h-full" />
+                      </button>
+                    );
+                  })()}
+                  <div className="bg-primary/10 rounded-lg p-3 flex-1">
+                    <p className="text-xs text-primary">
+                      <span className="font-semibold">Example:</span> {method.example}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* High-school-only: crop-mismatch warning + herbicide-resistant traits */}
+          {isHighSchool && (
+            <>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+                <p className="font-bold text-destructive">Match the Herbicide to the Crop</p>
+                <p className="text-xs">
+                  Soybean is itself a <strong>broadleaf</strong>, so spraying a non-selective broadleaf herbicide
+                  over conventional soybean will damage the crop along with the weeds. Corn is a <strong>grass</strong>,
+                  so a non-selective grass herbicide will damage corn. Always read the label and confirm the herbicide is
+                  labeled for the crop you are growing.
+                </p>
+              </div>
+              <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-2">
+                <p className="font-bold text-accent">Herbicide-Resistant Crop Traits</p>
+                <p className="text-xs">
+                  Modern corn and soybean varieties can be genetically engineered to tolerate specific herbicides, which
+                  lets growers spray over the top of the crop. Common platforms include:
+                </p>
+                <ul className="text-xs list-disc ml-5 space-y-1">
+                  <li><strong>Roundup Ready</strong> — tolerance to glyphosate (Group 9).</li>
+                  <li><strong>LibertyLink</strong> — tolerance to glufosinate (Group 10).</li>
+                  <li><strong>Xtend / XtendiMax</strong> — tolerance to dicamba (Group 4).</li>
+                  <li><strong>Enlist E3</strong> — tolerance to 2,4-D choline + glyphosate + glufosinate.</li>
+                </ul>
+                <p className="text-xs text-muted-foreground">
+                  Trait stacking allows multiple modes of action over the same crop, which is a key tool for managing
+                  resistant Palmer amaranth and waterhemp.
+                </p>
+              </div>
+            </>
+          )}
 
           {/* Herbicide MOA Reference Table - only for 6-8 and 9-12 */}
           {!isElementary && (
@@ -3567,7 +3637,8 @@ function TopicContent({
               {isHighSchool ? (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    The table below lists the major herbicide MOA groups used in crop production.
+                    The table below lists the major herbicide MOA groups used in crop production, sorted by group
+                    number. Where a group has both pre- and post-emergent chemistries, the PRE entry is listed first.
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs border-collapse">
@@ -3577,30 +3648,58 @@ function TopicContent({
                           <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Resistance & Documented Resistant Weeds</th>
                         </tr>
                       </thead>
                        <tbody>
-                         {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
+                         {[...HERBICIDE_MOA].sort((a, b) => {
+                           if (a.group !== b.group) return a.group - b.group;
+                           const order = { PRE: 0, BOTH: 1, POST: 2 } as const;
+                           return (order[a.timing] ?? 3) - (order[b.timing] ?? 3);
+                         }).map(h => {
+                           const resistantWeeds = RESISTANT_WEEDS_BY_GROUP[h.group];
+                           return (
                           <tr key={h.id} className="even:bg-muted/20">
                             <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
                             <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
-                            <td className={`p-2 border border-border font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</td>
+                            <td className="p-2 border border-border align-top">
+                              <span className={`font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</span>
+                              {resistantWeeds && (
+                                <div className="text-[10px] text-muted-foreground mt-1">Examples: {resistantWeeds.join(', ')}</div>
+                              )}
+                            </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
-                  <p className="font-semibold text-primary mt-3">Symptom Types</p>
+                  <p className="font-semibold text-primary mt-3">Injury Symptoms → MOA Groups</p>
+                  <p className="text-xs text-muted-foreground">
+                    Each symptom type below is followed by the MOA groups that produce it, so injury seen in the field
+                    can be traced back to the responsible herbicide group.
+                  </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => (
-                      <div key={key} className="bg-card border border-border rounded-lg p-3">
-                        <p className="font-bold text-foreground text-xs">{info.label}</p>
-                        <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
-                      </div>
-                    ))}
+                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => {
+                      const groups = [...HERBICIDE_MOA]
+                        .filter(h => h.symptomType === key)
+                        .map(h => h.group)
+                        .filter((g, i, arr) => arr.indexOf(g) === i)
+                        .sort((a, b) => a - b);
+                      return (
+                        <div key={key} className="bg-card border border-border rounded-lg p-3">
+                          <p className="font-bold text-foreground text-xs">{info.label}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
+                          {groups.length > 0 && (
+                            <p className="text-[10px] text-primary mt-1">
+                              <span className="font-semibold">MOA groups:</span> {groups.map(g => `Group ${g}`).join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </>
               ) : (
@@ -3663,18 +3762,50 @@ function TopicContent({
        FIELD SCOUTING
     ═══════════════════════════════════════════════════════════ */
     case "field-scouting": {
-      const PATTERNS = [
+      // Each pattern includes an inline SVG diagram showing how the route fits a typical field shape.
+      const PATTERNS: { name: string; bestFor: string; desc: string; diagram: JSX.Element }[] = [
         {
           name: "W-Pattern",
-          desc: "Walk in a W shape across the field. Good for most rectangular fields and provides broad coverage.",
+          bestFor: "Rectangular fields",
+          desc: "Walk a wide W shape across the field, sampling at each turn. Provides broad, representative coverage of a standard rectangular field.",
+          diagram: (
+            <svg viewBox="0 0 120 70" className="w-full h-auto">
+              <rect x="4" y="6" width="112" height="58" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
+              <polyline points="10,12 35,58 60,12 85,58 110,12" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round" />
+              {[[10,12],[35,58],[60,12],[85,58],[110,12]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--accent))" />
+              ))}
+            </svg>
+          ),
         },
         {
           name: "X-Pattern",
-          desc: "Walk diagonally from corner to corner, forming an X. Best for square fields to cover all quadrants.",
+          bestFor: "Square fields",
+          desc: "Walk diagonally from corner to corner, forming an X. Best for square fields where all four quadrants need quick coverage.",
+          diagram: (
+            <svg viewBox="0 0 70 70" className="w-full h-auto max-w-[6rem] mx-auto">
+              <rect x="4" y="4" width="62" height="62" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
+              <line x1="8" y1="8" x2="62" y2="62" stroke="hsl(var(--primary))" strokeWidth="2.5" />
+              <line x1="62" y1="8" x2="8" y2="62" stroke="hsl(var(--primary))" strokeWidth="2.5" />
+              {[[8,8],[62,62],[62,8],[8,62],[35,35]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--accent))" />
+              ))}
+            </svg>
+          ),
         },
         {
           name: "Zigzag",
-          desc: "Walk back and forth across the field in a zigzag pattern. Ideal for long, narrow fields.",
+          bestFor: "Long, narrow fields",
+          desc: "Walk back and forth across the short axis of the field, advancing along its length. Ideal for long, narrow fields where straight passes would miss too much.",
+          diagram: (
+            <svg viewBox="0 0 160 40" className="w-full h-auto">
+              <rect x="4" y="6" width="152" height="28" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
+              <polyline points="10,30 30,10 50,30 70,10 90,30 110,10 130,30 150,10" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round" />
+              {[[10,30],[30,10],[50,30],[70,10],[90,30],[110,10],[130,30],[150,10]].map(([x,y],i) => (
+                <circle key={i} cx={x} cy={y} r="2" fill="hsl(var(--accent))" />
+              ))}
+            </svg>
+          ),
         },
       ];
 
@@ -3705,34 +3836,68 @@ function TopicContent({
               </>
             ) : (
               <>
-                <p>The average Iowa crop farm spans about <strong>345 acres</strong>, which is far too large for field scouts to cover on foot efficiently. By using field scouting tools such as <strong>drones, rovers, and satellites</strong>, agronomists can scout fields more efficiently with greater accuracy.</p>
+                <p>
+                  Field scouting starts with <strong>manual walking patterns</strong> that an agronomist or grower can use on
+                  foot. These patterns are the foundation of every weed assessment — they are how you ground-truth what is
+                  actually growing in the field.
+                </p>
+                <p>
+                  However, the average Iowa crop farm now spans roughly <strong>345 acres</strong>
+                  <span className="text-xs text-muted-foreground"> (USDA NASS, 2022 Census of Agriculture — Iowa)</span>,
+                  which is far too large for a person to cover thoroughly on foot every week. To scale up scouting,
+                  agronomists now combine manual walks with <strong>drones, rovers, and satellites</strong> that can survey
+                  whole fields quickly and pinpoint problem areas for a closer manual look.
+                </p>
               </>
             )}
           </div>
 
-          {grade === "high" && (
-            <div className="space-y-3">
-              {[
-                { label: "Drones", desc: "Cover acres in minutes from above. Collect NDVI plant health maps, weed density and patch mapping, stand counts, nutrient deficiency patterns, and drainage/ponding issues. All information is sent live to smartphone apps for instant analysis." },
-                { label: "Rovers", desc: "Autonomous or remote-controlled machines that drive through fields using AI-powered cameras and sensors. They gather species-level weed identification, soil compaction measurements, root health via ground sensors, emergence uniformity, and disease scouting through close-up leaf images." },
-                { label: "Satellites", desc: "Especially useful for remote or large farms. Provide multi-spectral imagery (6-10 bands beyond visible light), historical yield potential maps, soil moisture, field boundary verification, and cover crop monitoring. Pinpoint exact hotspot zones of anomalies." },
-              ].map(t => (
-                <div key={t.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                  <p className="font-display font-bold text-foreground">{t.label}</p>
-                  <p className="text-sm text-muted-foreground">{t.desc}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
+          {/* Manual scouting patterns (always shown first) */}
+          <h3 className="font-display font-bold text-foreground text-sm">Manual Scouting Patterns</h3>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Match the pattern to the field shape so every part of the field has a fair chance of being sampled. The dots show
+            sampling stops along each route.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {PATTERNS.map((p) => (
               <div key={p.name} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <p className="font-bold text-foreground text-lg text-center">{p.name}</p>
+                <p className="text-[10px] uppercase tracking-wide text-primary text-center font-semibold">Best for: {p.bestFor}</p>
+                <div className="bg-secondary/30 rounded p-2">{p.diagram}</div>
                 <p className="text-xs text-muted-foreground">{p.desc}</p>
               </div>
             ))}
           </div>
+
+          {grade === "high" && (
+            <>
+              <h3 className="font-display font-bold text-foreground text-sm">Technology-Assisted Scouting</h3>
+              <p className="text-xs text-muted-foreground -mt-2">
+                Because modern fields are too large to walk every week, manual patterns are now combined with these tools.
+              </p>
+              <div className="space-y-3">
+                {[
+                  {
+                    label: "Drones",
+                    desc: "Cover acres in minutes from above. Drones do not measure NDVI directly — they collect spectral data and high-resolution images that are then used to calculate vegetation indices, weed density, patch mapping, stand counts, nutrient-deficiency patterns, and drainage or ponding issues.",
+                  },
+                  {
+                    label: "Rovers",
+                    desc: "Autonomous or remote-controlled machines that drive through fields using AI-powered cameras and sensors. They capture close-up images from inside the canopy that can be used to provide detailed information on weed identification, soil compaction, root health, emergence uniformity, and disease symptoms — information that is hard to see from the air.",
+                  },
+                  {
+                    label: "Satellites",
+                    desc: "Especially useful for remote or large farms. Satellites provide multi-spectral imagery from which analysts can extract weed pressure indicators, yield potential, soil moisture, field boundaries, and cover-crop coverage. Over time, this imagery builds a historical record of the field. That history makes it possible to pinpoint exact hotspot zones where abnormalities keep recurring.",
+                  },
+                ].map((t) => (
+                  <div key={t.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                    <p className="font-display font-bold text-foreground">{t.label}</p>
+                    <p className="text-sm text-muted-foreground">{t.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Why Consistent Scouting Matters</p>
@@ -3746,6 +3911,23 @@ function TopicContent({
        WEED COMPETITORS
     ═══════════════════════════════════════════════════════════ */
     case "weed-competitors": {
+      const COMPETITION_EXAMPLES = [
+        {
+          trait: "Rapid Germination & Dense Seedling Cohorts",
+          desc: "These weeds emerge in flushes of many small seedlings packed tightly together, claiming sunlight and soil before crops have a chance to compete.",
+          weedIds: ["palmer-amaranth", "waterhemp", "lambsquarters", "Redroot_pigweed"],
+        },
+        {
+          trait: "Large Canopy / Shading",
+          desc: "Tall, fast-growing weeds with broad leaves or sprawling vines that form a canopy over the crop and cut off light.",
+          weedIds: ["giant-ragweed", "velvetleaf", "common_Cocklebur", "Tall_morningglory"],
+        },
+        {
+          trait: "Allelopathy (Chemical Suppression)",
+          desc: "Species that release biochemicals from roots, leaves, or decomposing tissue that inhibit germination and growth of neighboring plants.",
+          weedIds: ["johnsongrass", "Quackgrass", "yellow-nutsedge", "canada-thistle"],
+        },
+      ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -3768,10 +3950,24 @@ function TopicContent({
                 </p>
               </>
             ) : (
-              <p>
-                Understanding interspecific competition among weeds helps predict weed succession patterns and supports
-                the design of management strategies that account for the full ecological complexity of weed communities.
-              </p>
+              <>
+                <p>
+                  Weeds compete with crops — and with each other — for the same four limiting resources:
+                  <strong> light, water, nutrients, and physical space</strong>. The most damaging field weeds combine
+                  several competitive traits at once: rapid emergence, high seedling densities, aggressive vertical and
+                  lateral growth, deep or fibrous root systems, and prolific seed production.
+                </p>
+                <p>
+                  Research shows the <strong>critical period for weed control</strong> in corn and soybean usually falls
+                  between the V2–V6 stages, when even short-lived competition can permanently reduce yield. After canopy
+                  closure, late-emerging weeds matter less for yield but still drive next year's seedbank.
+                </p>
+                <p>
+                  Understanding interspecific competition among weeds helps predict <strong>weed succession patterns</strong>
+                  — for example, why repeated glyphosate use shifted Midwest fields toward Palmer amaranth and waterhemp —
+                  and supports management strategies that account for the full ecological complexity of weed communities.
+                </p>
+              </>
             )}
           </div>
 
@@ -3796,6 +3992,38 @@ function TopicContent({
             </div>
           </div>
 
+          {/* Visual species examples */}
+          <div className="space-y-4">
+            <p className="font-display font-bold text-foreground text-sm">Real-World Examples</p>
+            {COMPETITION_EXAMPLES.map((cat) => {
+              const ws = cat.weedIds
+                .map((id) => weeds.find((w) => w.id === id) || weeds.find((w) => w.commonName.toLowerCase().replace(/[ _]/g, "") === id.toLowerCase().replace(/[ _]/g, "")))
+                .filter((w): w is Weed => !!w);
+              if (ws.length === 0) return null;
+              return (
+                <div key={cat.trait} className="bg-card border border-border rounded-lg p-3 space-y-2">
+                  <p className="font-bold text-foreground text-sm">{cat.trait}</p>
+                  <p className="text-xs text-muted-foreground">{cat.desc}</p>
+                  <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                    {ws.map((w) => (
+                      <button
+                        key={w.id}
+                        onClick={() => onSelectWeed(w)}
+                        className="flex-shrink-0 w-28 bg-muted/40 border border-border rounded-md p-2 hover:border-primary transition-colors text-left"
+                      >
+                        <div className="w-full h-20 rounded overflow-hidden bg-muted mb-1">
+                          <WeedImage weedId={w.id} stage="mature" className="w-full h-full" />
+                        </div>
+                        <p className="text-[11px] font-bold text-foreground leading-tight">{w.commonName}</p>
+                        <p className="text-[9px] italic text-muted-foreground leading-tight">{w.scientificName}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Why This Matters</p>
             <p className="mt-1">
@@ -3812,6 +4040,15 @@ function TopicContent({
        ECONOMIC THRESHOLD
     ═══════════════════════════════════════════════════════════ */
     case "economic-threshold": {
+      const THRESHOLD_EXAMPLES: { weedId: string; name: string; crop: string; threshold: string; note: string }[] = [
+        { weedId: "palmer-amaranth", name: "Palmer Amaranth", crop: "Soybean", threshold: "1–2 plants per 30 ft of row", note: "Extremely low threshold — even sparse populations can cause 10%+ yield loss because of rapid biomass accumulation." },
+        { weedId: "waterhemp", name: "Waterhemp", crop: "Soybean", threshold: "Fewer than 1 plant per ft of row", note: "Aggressive seed production (250k+ seeds/female) makes seedbank prevention as important as yield protection." },
+        { weedId: "giant-ragweed", name: "Giant Ragweed", crop: "Corn", threshold: "~1 plant per 100 ft²", note: "Very tall, very competitive — a handful of plants per acre can justify control." },
+        { weedId: "lambsquarters", name: "Lambsquarters", crop: "Soybean", threshold: "~4–8 plants per m²", note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's." },
+        { weedId: "velvetleaf", name: "Velvetleaf", crop: "Corn", threshold: "~1 plant per m²", note: "Wide leaves shade corn rapidly, but corn outgrows lower densities." },
+        { weedId: "giant-foxtail", name: "Giant Foxtail", crop: "Corn", threshold: "10–20 plants per m²", note: "Much higher tolerance — economic loss only at dense infestations." },
+      ].map(e => ({ ...e, weed: weeds.find(w => w.id === e.weedId) || weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
+        .filter((e): e is typeof e & { weed: Weed } => !!e.weed) as any;
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -3844,6 +4081,43 @@ function TopicContent({
             )}
           </div>
 
+          {/* Economic threshold graph */}
+          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+            <p className="font-display font-bold text-foreground text-sm text-center">Economic Threshold Curve</p>
+            <div className="w-full overflow-x-auto">
+              <svg viewBox="0 0 360 220" className="w-full h-auto max-w-md mx-auto block" role="img" aria-label="Economic threshold graph">
+                {/* Axes */}
+                <line x1="40" y1="180" x2="340" y2="180" stroke="hsl(var(--border))" strokeWidth="1.5" />
+                <line x1="40" y1="20" x2="40" y2="180" stroke="hsl(var(--border))" strokeWidth="1.5" />
+                {/* Y-axis label */}
+                <text x="10" y="100" fontSize="9" fill="hsl(var(--muted-foreground))" transform="rotate(-90 10 100)">Yield Loss ($)</text>
+                {/* X-axis label */}
+                <text x="190" y="210" fontSize="9" fill="hsl(var(--muted-foreground))" textAnchor="middle">Weed Density (plants per m²)</text>
+                {/* Yield-loss curve (rising) */}
+                <path d="M 40 175 Q 120 170 180 130 T 330 30" fill="none" stroke="hsl(var(--destructive))" strokeWidth="2" />
+                {/* Control cost line (flat) */}
+                <line x1="40" y1="110" x2="330" y2="110" stroke="hsl(var(--primary))" strokeWidth="2" strokeDasharray="4 3" />
+                {/* Threshold vertical line */}
+                <line x1="180" y1="20" x2="180" y2="180" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeDasharray="2 3" />
+                {/* Shaded zones */}
+                <rect x="40" y="20" width="140" height="160" fill="hsl(var(--primary))" fillOpacity="0.06" />
+                <rect x="180" y="20" width="150" height="160" fill="hsl(var(--destructive))" fillOpacity="0.08" />
+                {/* Labels */}
+                <text x="110" y="40" fontSize="9" fill="hsl(var(--primary))" textAnchor="middle" fontWeight="bold">Below Threshold</text>
+                <text x="110" y="52" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">Don't spray</text>
+                <text x="255" y="40" fontSize="9" fill="hsl(var(--destructive))" textAnchor="middle" fontWeight="bold">Above Threshold</text>
+                <text x="255" y="52" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">Control pays off</text>
+                <text x="180" y="195" fontSize="9" fill="hsl(var(--accent))" textAnchor="middle" fontWeight="bold">Threshold</text>
+                <text x="335" y="35" fontSize="8" fill="hsl(var(--destructive))" textAnchor="end">Yield loss</text>
+                <text x="335" y="105" fontSize="8" fill="hsl(var(--primary))" textAnchor="end">Control cost</text>
+              </svg>
+            </div>
+            <p className="text-[11px] text-muted-foreground text-center">
+              The threshold is where the rising <span className="text-destructive font-bold">yield-loss curve</span> crosses the
+              <span className="text-primary font-bold"> cost-of-control line</span>. Left of it, treatment costs more than the loss; right of it, every additional weed costs the grower money.
+            </p>
+          </div>
+
           <div className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-bold text-foreground">How It Works</p>
             <div className="grid grid-cols-2 gap-3">
@@ -3861,6 +4135,34 @@ function TopicContent({
               </div>
             </div>
           </div>
+
+          {/* Species-specific thresholds */}
+          {grade === "high" && THRESHOLD_EXAMPLES.length > 0 && (
+            <div className="space-y-2">
+              <p className="font-display font-bold text-foreground text-sm">Thresholds Differ Between Species</p>
+              <p className="text-xs text-muted-foreground">
+                Every weed species has its own competitive ability, so the threshold density that triggers control is very
+                different from one weed to another — even in the same crop.
+              </p>
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                {THRESHOLD_EXAMPLES.map((e: any) => (
+                  <button
+                    key={e.weedId}
+                    onClick={() => onSelectWeed(e.weed)}
+                    className="flex-shrink-0 w-48 bg-card border border-border rounded-lg p-3 text-left hover:border-primary transition-colors"
+                  >
+                    <div className="w-full h-20 rounded overflow-hidden bg-muted mb-2">
+                      <WeedImage weedId={e.weed.id} stage="mature" className="w-full h-full" />
+                    </div>
+                    <p className="font-bold text-foreground text-xs">{e.name}</p>
+                    <p className="text-[10px] italic text-primary">{e.weed.scientificName}</p>
+                    <p className="text-[10px] text-foreground mt-1"><strong>{e.crop}:</strong> {e.threshold}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-2">
             <p className="font-bold text-accent">Key Principle</p>
