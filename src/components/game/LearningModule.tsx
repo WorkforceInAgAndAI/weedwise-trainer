@@ -6,6 +6,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
+import { LOOKALIKE_TRIPLES } from "@/data/lookAlikeGroups";
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
