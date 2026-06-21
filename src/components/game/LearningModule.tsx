@@ -4160,13 +4160,6 @@ function TopicContent({
        HERBICIDE MOA (High School)
     ═══════════════════════════════════════════════════════════ */
     case "herbicide-moa": {
-      const MOA_EXAMPLES = [
-        { group: "1", name: "ACCase Inhibitors", desc: "Disrupt enzymes that produce fatty acids, stopping growth in grasses.", example: "clethodim" },
-        { group: "2", name: "ALS Inhibitors", desc: "Block amino acid production needed for proteins.", example: "imazethapyr" },
-        { group: "4", name: "Synthetic Auxins", desc: "Mimic plant growth hormones, causing abnormal growth and death.", example: "2,4-D" },
-        { group: "9", name: "EPSPS Inhibitors", desc: "Shut down amino acid synthesis pathways.", example: "glyphosate" },
-        { group: "14", name: "PPO Inhibitors", desc: "Interfere with chlorophyll production and burn plant leaves.", example: "fomesafen" },
-      ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
