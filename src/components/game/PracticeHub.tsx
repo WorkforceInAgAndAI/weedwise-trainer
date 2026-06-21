@@ -89,7 +89,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
   'economic-threshold': 'economic-threshold', 'ms-weed-control': 'control-methods',
   'control-matching': 'herbicide-moa', 'herbicide-applicator': 'herbicide-moa',
-  'ligule-lens': 'monocot-dicot',
+  'ligule-lens': 'monocot-dicot', 'ms-sleepy-seeds': 'seeds',
   // 9-12
   'hs-name-weed': 'names', 'hs-taxonomy': 'taxonomy', 'spot-differences': 'dioecious',
   'hs-habitat': 'habitats', 'invasive-habitat': 'native-introduced',
