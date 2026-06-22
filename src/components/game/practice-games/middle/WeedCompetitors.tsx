@@ -16,7 +16,7 @@ function traitsOf(w: Weed): CompetitionTrait[] {
 interface RoundOption { trait: CompetitionTrait; correct: boolean; reason: string; }
 interface Round { question: string; competitorInfo: string; options: RoundOption[]; }
 
-function buildRound(you: Weed, opponent: Weed): Round[] {
+function buildRound(you: Weed, opponent: Weed): Round | null {
   const yourTraits = traitsOf(you);
   const oppTraits = traitsOf(opponent);
   const advantageTraits = yourTraits.filter(t => !oppTraits.includes(t));
@@ -24,79 +24,58 @@ function buildRound(you: Weed, opponent: Weed): Round[] {
   const oppOnly = oppTraits.filter(t => !yourTraits.includes(t));
   const neither = TRAIT_DEFS.map(d => d.key).filter(t => !yourTraits.includes(t) && !oppTraits.includes(t));
 
-  // We want 3 rounds — each presents 3 trait options.
-  const advantagePool = shuffle(advantageTraits);
+  if (advantageTraits.length === 0) return null;
+
+  const correctTrait = shuffle(advantageTraits)[0];
   const fillerPool = shuffle([...sharedTraits, ...oppOnly, ...neither]);
+  const options: RoundOption[] = [{
+    trait: correctTrait,
+    correct: true,
+    reason: `${you.commonName} has ${correctTrait}, and ${opponent.commonName} does not — that's a true edge.`,
+  }];
 
-  const rounds: Round[] = [];
-  const usedAdvantage = new Set<CompetitionTrait>();
-  const usedFiller = new Set<CompetitionTrait>();
-
-  for (let r = 0; r < 3; r++) {
-    // Pick one advantage trait if available, else a shared trait flagged as not best
-    let advantage = advantagePool.find(t => !usedAdvantage.has(t));
-    if (!advantage) advantage = advantagePool[r % Math.max(advantagePool.length, 1)];
-
-    const options: RoundOption[] = [];
-    if (advantage) {
-      usedAdvantage.add(advantage);
-      options.push({
-        trait: advantage,
-        correct: true,
-        reason: `${you.commonName} has ${advantage}, and ${opponent.commonName} does not — that's a true edge.`,
-      });
+  for (const f of fillerPool) {
+    if (options.length >= 3) break;
+    if (options.some(o => o.trait === f)) continue;
+    let reason: string;
+    if (oppTraits.includes(f) && yourTraits.includes(f)) {
+      reason = `Both ${you.commonName} and ${opponent.commonName} share ${f} — it cancels out.`;
+    } else if (oppTraits.includes(f)) {
+      reason = `${opponent.commonName} actually has ${f} and ${you.commonName} doesn't — that would backfire.`;
+    } else {
+      reason = `${you.commonName} doesn't have ${f} as a real survival trait.`;
     }
-
-    // Add 2 filler options (incorrect)
-    for (const f of fillerPool) {
-      if (options.length >= 3) break;
-      if (usedFiller.has(f)) continue;
-      if (options.some(o => o.trait === f)) continue;
-      usedFiller.add(f);
-      let reason: string;
-      if (oppTraits.includes(f) && yourTraits.includes(f)) {
-        reason = `Both ${you.commonName} and ${opponent.commonName} share ${f} — it cancels out.`;
-      } else if (oppTraits.includes(f)) {
-        reason = `${opponent.commonName} actually has ${f} and ${you.commonName} doesn't — that would backfire.`;
-      } else {
-        reason = `${you.commonName} doesn't have ${f} as a real survival trait.`;
-      }
-      options.push({ trait: f, correct: false, reason });
-    }
-
-    // Pad with neither-pool if still under 3
-    let pad = 0;
-    while (options.length < 3 && pad < neither.length) {
-      const f = neither[(r + pad) % neither.length];
-      if (!options.some(o => o.trait === f)) {
-        options.push({ trait: f, correct: false, reason: `${you.commonName} doesn't actually have ${f}.` });
-      }
-      pad++;
-    }
-
-    // Fallback if still empty (shouldn't normally happen)
-    if (options.length === 0) continue;
-
-    const oppList = oppTraits.length > 0 ? oppTraits.join(', ') : 'no listed survival traits';
-    rounds.push({
-      question: `Round ${r + 1}: Which of YOUR survival traits gives the best edge over ${opponent.commonName}?`,
-      competitorInfo: `${opponent.commonName} relies on: ${oppList}.`,
-      options: shuffle(options),
-    });
+    options.push({ trait: f, correct: false, reason });
   }
 
-  return rounds;
+  return {
+    question: `Which of YOUR survival traits gives the best edge over ${opponent.commonName}?`,
+    competitorInfo: '',
+    options: shuffle(options),
+  };
 }
 
 function getMatchupsForLevel(level: number) {
-  // Only match weeds that have trait data
+  // Only weeds that have trait data
   const pool = weeds.filter(w => (COMPETITION_TRAITS[w.id] || []).length > 0);
   const offset = (level - 1) * 8;
   const rotated = [...pool.slice(offset % pool.length), ...pool.slice(0, offset % pool.length)];
   const shuffled = shuffle(rotated);
   const result: { you: Weed; opponent: Weed }[] = [];
-  for (let i = 0; i + 1 < shuffled.length && result.length < 4; i += 2) {
-    result.push({ you: shuffled[i], opponent: shuffled[i + 1] });
+  // Only include matchups where 'you' has at least one trait the opponent doesn't
+  for (let i = 0; i < shuffled.length && result.length < 4; i++) {
+    const you = shuffled[i];
+    const yourTraits = traitsOf(you);
+    const opponent = shuffled.find(o => {
+      if (o.id === you.id) return false;
+      if (result.some(r => r.you.id === o.id || r.opponent.id === o.id)) return false;
+      if (result.some(r => r.you.id === you.id)) return false;
+      const oppT = traitsOf(o);
+      return yourTraits.some(t => !oppT.includes(t));
+    });
+    if (opponent && !result.some(r => r.you.id === you.id)) {
+      result.push({ you, opponent });
+    }
   }
   return result;
 }
@@ -117,92 +96,34 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
   const matchups = useMemo(() => getMatchupsForLevel(level), [level]);
 
   const [matchIdx, setMatchIdx] = useState(0);
-  const [step, setStep] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
-  const [showMatchResult, setShowMatchResult] = useState(false);
-  const [points, setPoints] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
 
   const done = matchIdx >= matchups.length;
   const match = !done ? matchups[matchIdx] : null;
-  const rounds = useMemo(() => match ? buildRound(match.you, match.opponent) : [], [match]);
+  const round = useMemo(() => match ? buildRound(match.you, match.opponent) : null, [match]);
 
   const pick = (idx: number) => {
-    if (answered || !rounds[step]) return;
+    if (answered || !round) return;
     setPicked(idx);
     setAnswered(true);
-    if (rounds[step].options[idx].correct) {
-      setPoints(p => p + 1);
+    if (round.options[idx].correct) {
       setTotalPoints(t => t + 1);
     }
   };
 
-  const nextStep = () => {
-    if (step + 1 >= rounds.length) setShowMatchResult(true);
-    else setStep(s => s + 1);
-    setPicked(null); setAnswered(false);
-  };
-
   const nextMatch = () => {
-    setMatchIdx(m => m + 1); setStep(0); setPoints(0); setShowIntro(true); setShowMatchResult(false);
+    setMatchIdx(m => m + 1); setShowIntro(true); setPicked(null); setAnswered(false);
   };
 
-  const restart = () => { setMatchIdx(0); setStep(0); setPoints(0); setTotalPoints(0); setPicked(null); setAnswered(false); setShowIntro(true); setShowMatchResult(false); };
+  const restart = () => { setMatchIdx(0); setTotalPoints(0); setPicked(null); setAnswered(false); setShowIntro(true); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    return <LevelComplete level={level} score={totalPoints} total={matchups.length * 3} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
-  }
-
-  if (showMatchResult && match) {
-    const youWon = points >= 2;
-    return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col">
-        <div className="flex items-center gap-3 p-4 border-b border-border">
-          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-          <h1 className="font-bold text-foreground text-lg flex-1">Match Result</h1>
-          <span className="text-sm text-muted-foreground">Match {matchIdx + 1}/{matchups.length}</span>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-md mx-auto gap-4">
-          <h2 className={`text-2xl font-bold ${youWon ? 'text-green-600' : 'text-destructive'}`}>
-            {youWon ? `${match.you.commonName} Wins!` : `${match.opponent.commonName} Wins!`}
-          </h2>
-          <div className="flex items-center gap-6">
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border mb-2">
-                <WeedImage weedId={match.you.id} stage="flower" className="w-full h-full object-cover" />
-              </div>
-              <p className="text-xs font-bold text-foreground">{match.you.commonName}</p>
-              <p className="text-lg font-bold text-foreground">{points}</p>
-            </div>
-            <span className="text-2xl font-black text-muted-foreground">-</span>
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border mb-2">
-                <WeedImage weedId={match.opponent.id} stage="flower" className="w-full h-full object-cover" />
-              </div>
-              <p className="text-xs font-bold text-foreground">{match.opponent.commonName}</p>
-              <p className="text-lg font-bold text-foreground">{rounds.length - points}</p>
-            </div>
-          </div>
-          <div className="w-full bg-card border border-border rounded-lg p-3 space-y-2">
-            <div>
-              <p className="text-xs font-bold text-foreground mb-1">{match.you.commonName} survival traits</p>
-              <TraitBadgeList traits={traitsOf(match.you)} />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-foreground mb-1">{match.opponent.commonName} survival traits</p>
-              <TraitBadgeList traits={traitsOf(match.opponent)} />
-            </div>
-          </div>
-          <button onClick={nextMatch} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-            {matchIdx + 1 < matchups.length ? 'Next Match' : 'See Final Results'}
-          </button>
-        </div>
-      </div>
-    );
+    return <LevelComplete level={level} score={totalPoints} total={matchups.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 
   if (showIntro && match) {
@@ -217,7 +138,7 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4 max-w-md mx-auto">
           <h2 className="text-xl font-bold text-foreground">Match {matchIdx + 1}: Meet the Competitors</h2>
 
-          <div className="w-full border border-border rounded-xl p-4 bg-card space-y-2">
+          <div className="w-full border border-border rounded-xl p-4 bg-card">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
                 <WeedImage weedId={match.you.id} stage="flower" className="w-full h-full object-cover" />
@@ -227,10 +148,9 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
                 <p className="text-xs text-muted-foreground">{match.you.plantType} · {match.you.lifeCycle}</p>
               </div>
             </div>
-            <TraitBadgeList traits={traitsOf(match.you)} />
           </div>
 
-          <div className="w-full border border-border rounded-xl p-4 bg-card space-y-2">
+          <div className="w-full border border-border rounded-xl p-4 bg-card">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shrink-0">
                 <WeedImage weedId={match.opponent.id} stage="flower" className="w-full h-full object-cover" />
@@ -240,7 +160,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
                 <p className="text-xs text-muted-foreground">{match.opponent.plantType} · {match.opponent.lifeCycle}</p>
               </div>
             </div>
-            <TraitBadgeList traits={traitsOf(match.opponent)} />
           </div>
 
           <button onClick={() => setShowIntro(false)} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
@@ -251,7 +170,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
     );
   }
 
-  const round = rounds[step];
   const traitDef = (k: CompetitionTrait) => TRAIT_DEFS.find(d => d.key === k);
 
   return (
@@ -274,12 +192,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
             </div>
             <div className="flex flex-col items-center px-2">
               <span className="text-3xl font-black text-foreground">VS</span>
-              <div className="flex gap-1 mt-1">
-                {[0, 1, 2].map(i => (
-                  <div key={i} className={`w-3 h-3 rounded-full ${i < points ? 'bg-green-500' : i < step ? 'bg-destructive' : 'bg-border'}`} />
-                ))}
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-1">Round {step + 1}/{rounds.length}</p>
             </div>
             <div className="text-center flex-1">
               <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-border mb-2">
@@ -288,17 +200,6 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
               <p className="text-xs font-bold text-foreground">{match!.opponent.commonName}</p>
               <p className="text-[10px] text-muted-foreground font-bold uppercase">Rival</p>
             </div>
-          </div>
-        </div>
-
-        <div className="w-full max-w-md bg-card rounded-xl border border-border p-3 mb-3 space-y-2">
-          <div>
-            <p className="text-xs font-bold text-foreground mb-1">Your survival traits</p>
-            <TraitBadgeList traits={traitsOf(match!.you)} />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-foreground mb-1">Competitor intel: {match!.opponent.commonName} has</p>
-            <TraitBadgeList traits={traitsOf(match!.opponent)} />
           </div>
         </div>
 
@@ -325,12 +226,12 @@ export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
         )}
 
         {answered && (
-          <button onClick={nextStep} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
-            {step + 1 >= rounds.length ? 'See Match Result' : 'Next Round'}
+          <button onClick={nextMatch} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold">
+            {matchIdx + 1 >= matchups.length ? 'See Final Results' : 'Next Match'}
           </button>
         )}
       </div>
-      <FloatingCoach grade="6-8" tip="Pick the survival trait YOU have that your rival doesn't. Shared traits cancel out." />
+      <FloatingCoach grade="6-8" tip="Recall your weed's survival traits. Pick the one your rival doesn't share." />
     </div>
   );
 }
