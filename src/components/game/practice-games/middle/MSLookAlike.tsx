@@ -114,7 +114,9 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
           ) : (
             <div className="text-center max-w-2xl bg-card border border-border rounded-lg p-4 space-y-2">
               <p className={`text-lg font-bold ${selected === target?.id ? 'text-green-600' : 'text-destructive'}`}>
-                {selected === target?.id ? 'Correct!' : `Not quite — that was ${target?.commonName} (${target?.scientificName}).`}
+                {selected === target?.id
+                  ? 'Correct!'
+                  : `Not quite! You chose ${options.find(o => o.id === selected)?.commonName} (${options.find(o => o.id === selected)?.scientificName}). The correct answer was ${target?.commonName} (${target?.scientificName}).`}
               </p>
               <p className="text-sm text-foreground"><span className="font-semibold text-primary">How to tell them apart:</span> {trio?.difference}</p>
               <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
