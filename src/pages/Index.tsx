@@ -20,6 +20,7 @@ import PracticeHub from "@/components/game/PracticeHub";
 import StatsPanel from "@/components/game/StatsPanel";
 import ReferencesPage from "@/components/game/ReferencesPage";
 import GameProgressSidebar from "@/components/game/GameProgressSidebar";
+import FeedbackDialog from "@/components/game/FeedbackDialog";
 import type { GradeLevel } from "@/types/game";
 import { useEffect, useRef } from "react";
 
@@ -37,6 +38,7 @@ const Index = () => {
   const [showPracticeHub, setShowPracticeHub] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showReferences, setShowReferences] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [globalGrade, setGlobalGrade] = useState<GradeLevel>("elementary");
   const [practiceInitial, setPracticeInitial] = useState<{ grade?: string; gameId?: string } | null>(null);
   const [learningInitialTopic, setLearningInitialTopic] = useState<string | null>(null);
@@ -101,6 +103,7 @@ const Index = () => {
     onOpenGlossary: () => setShowGlossaryDirect(true),
     onOpenReferences: () => setShowReferences(true),
     onOpenInstructor: () => setShowClassJoin(true),
+    onOpenFeedback: () => setShowFeedback(true),
     auth,
   };
 
@@ -184,6 +187,7 @@ const Index = () => {
       )}
       {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}
       {showReferences && <ReferencesPage onClose={() => setShowReferences(false)} />}
+      {showFeedback && <FeedbackDialog onClose={() => setShowFeedback(false)} />}
     </div>
   );
 };

@@ -172,6 +172,42 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          category: string
+          class_name: string | null
+          created_at: string
+          emailed_at: string | null
+          id: string
+          message: string
+          nickname: string | null
+          page_url: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          category: string
+          class_name?: string | null
+          created_at?: string
+          emailed_at?: string | null
+          id?: string
+          message: string
+          nickname?: string | null
+          page_url?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          category?: string
+          class_name?: string | null
+          created_at?: string
+          emailed_at?: string | null
+          id?: string
+          message?: string
+          nickname?: string | null
+          page_url?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           created_at: string
