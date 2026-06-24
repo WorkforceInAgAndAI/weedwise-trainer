@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { weeds } from "@/data/weeds";
 import type { GradeLevel, Weed } from "@/types/game";
-import { GRADE_NAMES, GRADE_RANGES } from "@/data/phases";
 import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
@@ -899,23 +898,49 @@ function PracticeButton({
 }
 
 export default function LearningModule({ onClose, onOpenPractice, initialTopicId, onBackToPractice }: Props) {
-  // Infer grade from the initial topic so the topic actually appears in the grade's list.
-  const initialGrade: GradeLevel = (() => {
-    if (!initialTopicId) return "elementary";
+  // Learning modules have been shifted up one level. The UI tab the user picks
+  // ("displayGrade") is mapped to the original data grade ("sourceGrade") so all
+  // existing topic content, weed lists, and practice mappings keep working:
+  //   Plant Explorer (K-5)        -> coming soon (placeholder)
+  //   Field Scout (6-8)           <- old K-5 (elementary) content
+  //   IPM Specialist (9-12)       <- old 6-8 (middle) content
+  //   Collegiate                  <- old 9-12 (high) content
+  type LearningGradeLevel = GradeLevel | "collegiate";
+  const displayToSource: Record<LearningGradeLevel, GradeLevel | null> = {
+    elementary: null,
+    middle: "elementary",
+    high: "middle",
+    collegiate: "high",
+  };
+  const sourceToDisplay: Record<GradeLevel, LearningGradeLevel> = {
+    elementary: "middle",
+    middle: "high",
+    high: "collegiate",
+  };
+  // Infer display grade from the initial topic so the topic actually appears in the tab.
+  const initialGrade: LearningGradeLevel = (() => {
+    if (!initialTopicId) return "middle";
     const t = TOPICS.find((x) => x.id === (initialTopicId as TopicId));
-    if (!t) return "elementary";
-    if (t.grades.includes("middle")) return "middle";
-    if (t.grades.includes("high")) return "high";
-    return "elementary";
+    if (!t) return "middle";
+    // Prefer the lowest source grade the topic supports, then shift up.
+    if (t.grades.includes("elementary")) return sourceToDisplay.elementary;
+    if (t.grades.includes("middle")) return sourceToDisplay.middle;
+    if (t.grades.includes("high")) return sourceToDisplay.high;
+    return "middle";
   })();
-  const [selectedGrade, setSelectedGrade] = useState<GradeLevel>(initialGrade);
+  const [selectedGrade, setSelectedGrade] = useState<LearningGradeLevel>(initialGrade);
+  const sourceGrade: GradeLevel = displayToSource[selectedGrade] ?? "elementary";
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
   const [selectedWeed, setSelectedWeed] = useState<Weed | null>(null);
   const viewMode: "list" | "box" = "list";
 
-  const availableTopics = useMemo(() => TOPICS.filter((t) => t.grades.includes(selectedGrade)), [selectedGrade]);
+  const availableTopics = useMemo(() => {
+    const src = displayToSource[selectedGrade];
+    if (!src) return [];
+    return TOPICS.filter((t) => t.grades.includes(src));
+  }, [selectedGrade]);
 
   const topicsByCategory = useMemo(() => {
     const order: CategoryId[] = ["identification", "lifecycle", "control"];
@@ -924,10 +949,11 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
       .filter((g) => g.topics.length > 0);
   }, [availableTopics]);
 
-  const gradeCards: { grade: GradeLevel; label: string; color: string }[] = [
-    { grade: "elementary", label: "K-5", color: "border-grade-elementary" },
-    { grade: "middle", label: "6-8", color: "border-grade-middle" },
-    { grade: "high", label: "9-12", color: "border-grade-high" },
+  const gradeCards: { grade: LearningGradeLevel; label: string; color: string }[] = [
+    { grade: "elementary", label: "Plant Explorer (K-5)", color: "border-grade-elementary" },
+    { grade: "middle", label: "Field Scout (6-8)", color: "border-grade-middle" },
+    { grade: "high", label: "IPM Specialist (9-12)", color: "border-grade-high" },
+    { grade: "collegiate", label: "Collegiate", color: "border-primary" },
   ];
 
   return (
@@ -981,12 +1007,22 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                   : "border-border text-muted-foreground hover:bg-secondary"
               }`}
             >
-              {GRADE_NAMES[grade]} ({GRADE_RANGES[grade]})
+              {label}
             </button>
           ))}
         </div>
 
-        {!selectedTopic ? (
+        {selectedGrade === "elementary" ? (
+          <div className="rounded-lg border border-dashed border-border bg-card/50 p-12 text-center">
+            <h2 className="font-display font-bold text-foreground text-lg mb-2">
+              Plant Explorer modules coming soon
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Lower-level, more playful learning modules for K-5 are in development. In the
+              meantime, K-5 practice mini-games are still available from the Practice hub.
+            </p>
+          </div>
+        ) : !selectedTopic ? (
           <div className="space-y-6">
             {topicsByCategory.map(({ category, topics }) => (
               <section key={category.id}>
@@ -1057,13 +1093,13 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 </h2>
                 <PracticeButton
                   topicId={selectedTopic}
-                  grade={selectedGrade}
+                  grade={sourceGrade}
                   onOpenPractice={onOpenPractice}
                 />
               </div>
               <TopicContent
                 topicId={selectedTopic}
-                grade={selectedGrade}
+                grade={sourceGrade}
                 topicWeeds={getTopicWeeds(selectedTopic)}
                 onSelectWeed={setSelectedWeed}
                 viewMode={viewMode}
