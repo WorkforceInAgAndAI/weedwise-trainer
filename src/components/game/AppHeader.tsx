@@ -1,4 +1,4 @@
-import { Leaf, BookOpen, Gamepad2, Target, BookMarked, FileText, GraduationCap } from 'lucide-react';
+import { Leaf, BookOpen, Gamepad2, Target, BookMarked, FileText, GraduationCap, MessageSquare } from 'lucide-react';
 import type { useAuth } from '@/hooks/useAuth';
 
 interface Props {
@@ -8,12 +8,13 @@ interface Props {
   onOpenGlossary: () => void;
   onOpenReferences: () => void;
   onOpenInstructor: () => void;
+  onOpenFeedback: () => void;
   auth: ReturnType<typeof useAuth>;
 }
 
 export default function AppHeader({
   onOpenLearning, onOpenFarmMode, onOpenPracticeHub, onOpenGlossary,
-  onOpenReferences, onOpenInstructor,
+  onOpenReferences, onOpenInstructor, onOpenFeedback,
 }: Props) {
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
@@ -49,6 +50,13 @@ export default function AppHeader({
 
         {/* Right: Instructor button */}
         <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={onOpenFeedback}
+            title="Send feedback"
+            className="flex items-center gap-2 px-3 py-2 rounded-md border border-primary/30 bg-primary/5 text-primary text-sm font-medium hover:bg-primary/10 hover:shadow-subtle transition-all"
+          >
+            <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Feedback</span>
+          </button>
           <button onClick={onOpenInstructor} className="flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all">
             <GraduationCap className="w-4 h-4 text-primary" /> Instructor
           </button>
