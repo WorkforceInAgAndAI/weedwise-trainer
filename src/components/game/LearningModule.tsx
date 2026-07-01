@@ -28,6 +28,7 @@ type TopicId =
   | "ecology"
   | "plant-needs"
   | "intro-control-methods"
+  | "plant-parts"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
