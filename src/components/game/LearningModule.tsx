@@ -3113,6 +3113,118 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
+       INTRO CONTROL METHODS (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "intro-control-methods": {
+      const METHODS = [
+        {
+          key: "physical",
+          title: "Physical Control",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          what: "Using your hands or tools to pull, cut, dig, or till weeds out of the soil.",
+          examples: "Pulling dandelions by hand, hoeing the garden, or mowing tall weeds along a fence.",
+          bestFor: "Great when there are only a few weeds, or in small gardens where sprays could hurt other plants.",
+        },
+        {
+          key: "cultural",
+          title: "Cultural Control",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          what: "Growing crops in smart ways that make it hard for weeds to sneak in.",
+          examples: "Planting rows close together so crop leaves shade the soil, rotating corn and soybeans each year, or planting a cover crop in winter.",
+          bestFor: "Best on big farm fields where the farmer wants weeds to lose the race before they even start.",
+        },
+        {
+          key: "chemical",
+          title: "Chemical Control",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          what: "Using special sprays called herbicides that stop weeds from growing.",
+          examples: "A farmer spraying a soybean field so weeds like waterhemp can't take over.",
+          bestFor: "Helpful when there are too many weeds to pull by hand — but must be used carefully so crops, people, and animals stay safe.",
+        },
+        {
+          key: "biological",
+          title: "Biological Control",
+          dot: "bg-accent",
+          bg: "bg-accent/10 border-accent/40",
+          what: "Using living helpers — like insects, animals, or tiny germs — to eat or weaken weeds.",
+          examples: "Beetles that munch on leafy spurge, or goats that love to eat prickly thistle.",
+          bestFor: "A good fit for pastures, parks, and wild areas where sprays are hard to use.",
+        },
+        {
+          key: "preventative",
+          title: "Preventative Control",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          what: "Stopping weeds before they ever get a chance to grow.",
+          examples: "Cleaning mud off tractors and boots, using clean seed, and pulling one weed before it makes thousands of new seeds.",
+          bestFor: "The smartest kind of control — a little bit of prevention saves a whole lot of work later!",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Five Ways to Control Weeds</p>
+            <p>
+              Weeds can steal sunlight, water, air, nutrients, and space from crops. So how do farmers and
+              gardeners fight back? There are <strong>five main ways</strong> to control weeds, and each one
+              works best in a different kind of situation.
+            </p>
+            <p>
+              A good farmer usually mixes several of them together — this is called an <strong>integrated</strong>
+              {" "}approach, and it keeps weeds from ever getting the upper hand.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {METHODS.map((m) => (
+              <div key={m.key} className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${m.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{m.title}</p>
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>What it is:</strong> {m.what}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Examples:</strong> {m.examples}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>When it works best:</strong> {m.bestFor}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-success text-base">Different Tools for Different Jobs</p>
+            <p className="text-sm text-foreground">
+              No single method can stop every weed on its own. Pulling weeds by hand works in a small garden
+              but not on a huge field. A spray might knock back a giant patch of weeds, but it won't help if
+              new weed seeds keep hitching a ride on dirty boots.
+            </p>
+            <p className="text-sm text-foreground">
+              That's why the best weed fighters <strong>pick the right tool for the right situation</strong>{" "}
+              and use two or three methods together. Physical, cultural, chemical, biological, and preventative —
+              five ways to keep crops winning the race!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>
+              Physical, cultural, chemical, biological, preventative. Five ways to control weeds — and each one
+              shines in a different job.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        FAMILIES
     ═══════════════════════════════════════════════════════════ */
     case "families": {
