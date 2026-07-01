@@ -248,6 +248,14 @@ const TOPICS: Topic[] = [
     grades: ["elementary"],
     category: "lifecycle",
   },
+  {
+    id: "plant-needs",
+    name: "What Plants Need",
+    icon: "sun",
+    description: "Discover the five things every plant needs to grow — sunlight, water, air, nutrients, and space — and learn how weeds steal them from crops.",
+    grades: ["elementary"],
+    category: "lifecycle",
+  },
 
   // Control, Safety & Field Management
   {
