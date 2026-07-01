@@ -27,6 +27,7 @@ type TopicId =
   | "dioecious"
   | "ecology"
   | "plant-needs"
+  | "intro-control-methods"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -138,6 +139,8 @@ interface Topic {
   description: string;
   grades: GradeLevel[];
   category: CategoryId;
+  /** When true, this topic is shown in the Plant Explorer (K-5) tab. */
+  plantExplorer?: boolean;
 }
 
 const TOPICS: Topic[] = [
@@ -253,8 +256,18 @@ const TOPICS: Topic[] = [
     name: "What Plants Need",
     icon: "sun",
     description: "Discover the five things every plant needs to grow — sunlight, water, air, nutrients, and space — and learn how weeds steal them from crops.",
-    grades: ["elementary"],
+    grades: [],
+    plantExplorer: true,
     category: "lifecycle",
+  },
+  {
+    id: "intro-control-methods",
+    name: "Ways to Control Weeds",
+    icon: "control",
+    description: "Meet the five main kinds of weed control — physical, cultural, chemical, biological, and preventative — and see when each one is the right tool for the job.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
   },
 
   // Control, Safety & Field Management
