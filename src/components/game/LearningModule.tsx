@@ -929,7 +929,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   //   Collegiate                  <- old 9-12 (high) content
   type LearningGradeLevel = GradeLevel | "collegiate";
   const displayToSource: Record<LearningGradeLevel, GradeLevel | null> = {
-    elementary: null,
+    elementary: "elementary",
     middle: "elementary",
     high: "middle",
     collegiate: "high",
@@ -944,6 +944,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
     if (!initialTopicId) return "middle";
     const t = TOPICS.find((x) => x.id === (initialTopicId as TopicId));
     if (!t) return "middle";
+    if (t.plantExplorer) return "elementary";
     // Prefer the lowest source grade the topic supports, then shift up.
     if (t.grades.includes("elementary")) return sourceToDisplay.elementary;
     if (t.grades.includes("middle")) return sourceToDisplay.middle;
@@ -959,9 +960,12 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   const viewMode: "list" | "box" = "list";
 
   const availableTopics = useMemo(() => {
+    if (selectedGrade === "elementary") {
+      return TOPICS.filter((t) => t.plantExplorer);
+    }
     const src = displayToSource[selectedGrade];
     if (!src) return [];
-    return TOPICS.filter((t) => t.grades.includes(src));
+    return TOPICS.filter((t) => !t.plantExplorer && t.grades.includes(src));
   }, [selectedGrade]);
 
   const topicsByCategory = useMemo(() => {
@@ -1034,17 +1038,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
           ))}
         </div>
 
-        {selectedGrade === "elementary" ? (
-          <div className="rounded-lg border border-dashed border-border bg-card/50 p-12 text-center">
-            <h2 className="font-display font-bold text-foreground text-lg mb-2">
-              Plant Explorer modules coming soon
-            </h2>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Lower-level, more playful learning modules for K-5 are in development. In the
-              meantime, K-5 practice mini-games are still available from the Practice hub.
-            </p>
-          </div>
-        ) : !selectedTopic ? (
+        {!selectedTopic ? (
           <div className="space-y-6">
             {topicsByCategory.map(({ category, topics }) => (
               <section key={category.id}>
