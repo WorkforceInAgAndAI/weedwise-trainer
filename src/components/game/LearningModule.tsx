@@ -270,6 +270,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "control",
   },
+  {
+    id: "plant-parts",
+    name: "Parts of a Plant",
+    icon: "leaf",
+    description: "Take a ground-up tour of a weed — from roots to stem to leaves to flowers to seeds — and learn what each part does for the plant.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
+  },
 
   // Control, Safety & Field Management
   {
