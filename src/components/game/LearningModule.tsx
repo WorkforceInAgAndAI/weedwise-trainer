@@ -26,6 +26,7 @@ type TopicId =
   | "taxonomy"
   | "dioecious"
   | "ecology"
+  | "plant-needs"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
