@@ -2971,6 +2971,141 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
+       PLANT NEEDS (K-5) — resources plants need & weed competition
+    ═══════════════════════════════════════════════════════════ */
+    case "plant-needs": {
+      const NEEDS = [
+        {
+          key: "sun",
+          title: "Sunlight",
+          emoji: "Sun",
+          plantUses: "Plants use sunlight to make their own food in their leaves. This is called photosynthesis.",
+          weedSteals: "Tall weeds like giant ragweed can grow up over corn and soybean plants and shade them out — the crop leaves get less light and can't make as much food.",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          dot: "bg-yellow-500",
+        },
+        {
+          key: "water",
+          title: "Water",
+          emoji: "Drop",
+          plantUses: "Plants drink water through their roots. Water carries food all around the plant and keeps the leaves strong.",
+          weedSteals: "Weeds have thirsty roots too. When a weed grows next to a soybean plant, it sips up water the crop needed — especially on hot, dry summer days.",
+          bg: "bg-info/10 border-info/40",
+          dot: "bg-info",
+        },
+        {
+          key: "air",
+          title: "Air",
+          emoji: "Wind",
+          plantUses: "Plants breathe in a gas from the air called carbon dioxide (CO₂) and use it to make food. Their roots also need air pockets in the soil.",
+          weedSteals: "When lots of weeds crowd a field, they fill the air around crops with their own leaves and roots — leaving less fresh air moving around the crop.",
+          bg: "bg-secondary/40 border-border",
+          dot: "bg-muted-foreground",
+        },
+        {
+          key: "nutrients",
+          title: "Nutrients",
+          emoji: "Seedling",
+          plantUses: "Nutrients are like plant vitamins in the soil. They help plants grow big, green, and strong.",
+          weedSteals: "Weeds like waterhemp are greedy eaters. They gobble up nutrients from the soil that the farmer wanted the corn or soybeans to have.",
+          bg: "bg-success/10 border-success/40",
+          dot: "bg-success",
+        },
+        {
+          key: "space",
+          title: "Space",
+          emoji: "Expand",
+          plantUses: "Plants need room for their leaves to spread out and their roots to grow deep. Crowded plants can't grow their best.",
+          weedSteals: "Weeds squeeze in between rows and push against crops. The crops end up short, skinny, and unhappy because they don't have room to stretch.",
+          bg: "bg-accent/10 border-accent/40",
+          dot: "bg-accent",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">The Five Things Every Plant Needs</p>
+            <p>
+              Every plant — whether it's a tiny sprout in your backyard or a huge corn plant on a farm — needs
+              <strong> five special things</strong> to live and grow: <strong>sunlight, water, air, nutrients,</strong>
+              and <strong>space</strong>.
+            </p>
+            <p>
+              When a plant gets all five, it grows tall, green, and healthy. When something is missing, the plant
+              gets weak. That's why farmers work hard to make sure their crops get every single one!
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {NEEDS.map((n) => (
+              <div key={n.key} className={`rounded-lg border-2 p-4 space-y-2 ${n.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${n.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{n.title}</p>
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>What plants use it for:</strong> {n.plantUses}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>How weeds steal it:</strong> {n.weedSteals}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-terracotta/10 border-2 border-terracotta/40 rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-terracotta text-base">Weeds vs. Crops: A Race for Resources</p>
+            <p className="text-sm text-foreground">
+              A cornfield or soybean field is like a big lunch table. The farmer set the table for the crops so
+              they can eat sunlight, drink water, breathe in air, munch on nutrients, and spread out in their own
+              chairs.
+            </p>
+            <p className="text-sm text-foreground">
+              But <strong>weeds are uninvited guests</strong>. They sneak in and grab food, drinks, and seats meant
+              for the crops. The more weeds there are, the less there is left for the corn or soybeans.
+            </p>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-foreground text-base">Why This Hurts the Crop</p>
+            <ul className="text-sm text-foreground space-y-2 list-disc list-inside">
+              <li>Crops that don't get enough sunlight grow short and floppy.</li>
+              <li>Crops that don't get enough water wilt and their leaves droop.</li>
+              <li>Crops that don't get enough nutrients turn yellow instead of bright green.</li>
+              <li>Crops that don't have enough space grow skinny stems that snap in the wind.</li>
+            </ul>
+            <p className="text-sm text-foreground">
+              When crops are weak, they make less food for us to eat. Farmers call the amount of food a field
+              produces the <strong>yield</strong>. Weeds lower the yield — sometimes by a lot!
+            </p>
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-success text-base">The Farmer's Goal</p>
+            <p className="text-sm text-foreground">
+              A farmer's job is to keep crops <strong>healthy and happy</strong> so they grow lots of food. That
+              means making sure crops always win the race for sunlight, water, air, nutrients, and space.
+            </p>
+            <p className="text-sm text-foreground">
+              Farmers pull weeds, use tools, and plant crops close together so weeds can't sneak in. When crops
+              stay healthy, farmers get a <strong>big yield</strong> — and that means more corn, more soybeans,
+              and more food for everyone!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>
+              Sunlight, water, air, nutrients, space. Five things every plant needs — and five things weeds try
+              to steal!
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        FAMILIES
     ═══════════════════════════════════════════════════════════ */
     case "families": {
