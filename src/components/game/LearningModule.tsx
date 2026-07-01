@@ -3125,6 +3125,108 @@ function TopicContent({
     /* ═══════════════════════════════════════════════════════════
        INTRO CONTROL METHODS (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
+    case "plant-parts": {
+      const PARTS = [
+        {
+          key: "roots",
+          title: "1. Roots",
+          where: "Underground — the very bottom of the plant.",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          job: "Roots anchor the plant so wind and rain can't knock it over. They also soak up water and nutrients from the soil, like a straw drinking from the dirt.",
+          weedFact: "Some weeds, like Canada Thistle and Field Bindweed, have long creeping roots that spread underground and pop up as brand-new plants far away!",
+        },
+        {
+          key: "stem",
+          title: "2. Stem",
+          where: "Just above the roots — the trunk or stalk of the plant.",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          job: "The stem holds the plant up tall so leaves can reach the sunlight. It's also a highway — carrying water up from the roots and food down from the leaves.",
+          weedFact: "Weeds like Giant Ragweed grow super tall, thick stems so they can shade out crops below them.",
+        },
+        {
+          key: "leaves",
+          title: "3. Leaves",
+          where: "Along the stem — spreading out to catch sunshine.",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+          job: "Leaves are the plant's kitchen. They use sunlight, air, and water to make food in a process called photosynthesis.",
+          weedFact: "Big, flat weed leaves — like on Velvetleaf — grab lots of sunlight and block it from reaching crop leaves underneath.",
+        },
+        {
+          key: "flower",
+          title: "4. Flowers",
+          where: "Near the top of the plant, usually after leaves have grown.",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          job: "Flowers are how plants make new plants. Bees, wind, and other pollinators move pollen between flowers so seeds can start to form.",
+          weedFact: "A Dandelion's yellow flower turns into a fluffy white puffball packed with tiny parachute seeds ready to fly away.",
+        },
+        {
+          key: "seeds",
+          title: "5. Seeds",
+          where: "Inside the flower once it's done blooming — the very top of the plant's life cycle.",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          job: "Seeds are baby plants in tiny packages. They travel by wind, water, animals, or people and grow into new plants next season.",
+          weedFact: "One Waterhemp plant can make over a MILLION seeds — that's why one weed today can turn into a whole field of weeds next year!",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Parts of a Plant — From the Ground Up</p>
+            <p>
+              Every weed, crop, flower, and tree is built from the same basic parts. Let's take a tour starting
+              deep underground and climbing all the way to the tippy-top of the plant.
+            </p>
+            <p>
+              Each part has its own special job — and when you know the parts, you can spot exactly how a weed
+              grows and where to stop it!
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {PARTS.map((p) => (
+              <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>Where you'll find it:</strong> {p.where}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>What it does:</strong> {p.job}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Weed fact:</strong> {p.weedFact}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-success text-base">The Whole Plant Working Together</p>
+            <p className="text-sm text-foreground">
+              Roots drink, stems carry, leaves cook, flowers bloom, and seeds start the whole thing over again.
+              Every part depends on the others — take one away and the plant can't survive.
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember (from the ground up):</p>
+            <p>Roots → Stem → Leaves → Flowers → Seeds.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       INTRO CONTROL METHODS (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
     case "intro-control-methods": {
       const METHODS = [
         {
