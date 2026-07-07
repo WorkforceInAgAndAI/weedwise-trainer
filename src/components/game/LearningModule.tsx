@@ -35,6 +35,7 @@ type TopicId =
   | "weed-problem-picnic"
   | "weed-superheroes"
   | "safe-vs-toxic-explorer"
+  | "invasive-playground"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -338,6 +339,15 @@ const TOPICS: Topic[] = [
     grades: [],
     plantExplorer: true,
     category: "control",
+  },
+  {
+    id: "invasive-playground",
+    name: "Invasive Plants: The Playground Bullies",
+    icon: "leaf",
+    description: "Ever played tag with someone way too fast? Meet invasive plants — the players who take over the playground and crowd out the natives.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
   },
 
   // Control, Safety & Field Management
@@ -3898,6 +3908,107 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       INVASIVE PLANTS — PLAYGROUND THEME (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "invasive-playground": {
+      const SUPERPOWERS = [
+        {
+          key: "fast",
+          name: "Super Speed",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          detail: "Invasive plants grow really fast — sometimes faster than any of the native plants around them.",
+        },
+        {
+          key: "no-rivals",
+          name: "No Rivals",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          detail: "They came from far away, so the bugs and diseases that usually slow them down aren't around here.",
+        },
+        {
+          key: "seeds",
+          name: "Tons of Seeds",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          detail: "Many invasive plants make loads and loads of seeds, so new plants pop up everywhere.",
+        },
+        {
+          key: "space",
+          name: "Space Grabbers",
+          dot: "bg-destructive",
+          bg: "bg-destructive/10 border-destructive/40",
+          detail: "They gobble up sunlight, water, nutrients, and space — leaving barely any for native plants.",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Recess Tag… Gone Wild!</p>
+            <p>
+              Imagine you're playing a game of tag on the playground. Everyone is following the rules and
+              taking turns. Then one player runs <em>way</em> faster than everyone else, tags everyone, and
+              takes over the whole playground! Pretty soon, the other kids don't have much room left to
+              play.
+            </p>
+            <p>
+              Some plants act the same way. We call them <strong>invasive plants</strong>.
+            </p>
+          </div>
+
+          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-info text-base">What Is an Invasive Plant?</p>
+            <p className="text-sm text-foreground">
+              Invasive plants are plants that spread into new places and grow very quickly. Because they're
+              growing where they have less competition — and where the bugs and diseases that usually keep
+              them in check aren't around — they can spread <strong>much faster</strong> than the native
+              plants that belong there.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <p className="font-display font-bold text-primary text-base">Invasive Plant "Superpowers"</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              {SUPERPOWERS.map((s) => (
+                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg}`}>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-3 h-3 rounded-full ${s.dot}`} />
+                    <p className="font-display font-bold text-foreground text-base">{s.name}</p>
+                  </div>
+                  <p className="text-sm text-foreground">{s.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-destructive text-base">Who Gets Left Out?</p>
+            <p className="text-sm text-foreground">
+              As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for
+              the plants that belong there. That makes it harder for native plants, wildflowers, and even
+              some animals to survive.
+            </p>
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-success text-base">Team Up to Keep Things Fair</p>
+            <p className="text-sm text-foreground">
+              Farmers, gardeners, and scientists work together to stop invasive plants before they take over.
+              By protecting native plants and keeping invasive plants under control, we help our forests,
+              parks, gardens, and farms stay healthy for everyone — plants, animals, and people!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>Invasive plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong there.</p>
           </div>
         </div>
       );
