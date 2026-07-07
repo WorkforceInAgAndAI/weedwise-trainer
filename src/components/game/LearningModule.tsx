@@ -29,6 +29,7 @@ type TopicId =
   | "plant-needs"
   | "intro-control-methods"
   | "plant-parts"
+  | "crop-vs-weed"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -275,6 +276,15 @@ const TOPICS: Topic[] = [
     name: "Parts of a Plant",
     icon: "leaf",
     description: "Take a ground-up tour of a weed — from roots to stem to leaves to flowers to seeds — and learn what each part does for the plant.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
+  },
+  {
+    id: "crop-vs-weed",
+    name: "Crop or Weed?",
+    icon: "leaf",
+    description: "Learn the difference between a crop and a weed — it's less about the plant and more about where it's growing.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -3219,6 +3229,102 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember (from the ground up):</p>
             <p>Roots → Stem → Leaves → Flowers → Seeds.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CROP OR WEED? (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "crop-vs-weed": {
+      const CROP_EXAMPLES = [
+        { name: "Corn", why: "Grown for food we eat and to feed animals." },
+        { name: "Wheat", why: "Ground into flour for bread, pasta, and cereal." },
+        { name: "Carrots", why: "A crunchy root vegetable planted on purpose." },
+        { name: "Soybeans", why: "Used in food, animal feed, and lots of everyday products." },
+      ];
+
+      const WEED_TRAITS = [
+        { label: "Not planted on purpose", detail: "Nobody chose to grow them there — they just showed up." },
+        { label: "Growing in the wrong place", detail: "A sunflower is pretty in a garden, but a weed if it pops up in a cornfield." },
+        { label: "Competing with crops", detail: "They take sunlight, water, nutrients, and space away from the plants farmers want." },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Crop or Weed? It's All About Where It Grows</p>
+            <p>
+              At first glance, crops and weeds can look a lot alike — they're both plants! The biggest
+              difference isn't <em>what</em> the plant is, it's <em>where</em> it's growing.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-success" />
+                <p className="font-display font-bold text-success text-base">Crops</p>
+              </div>
+              <p className="text-sm text-foreground">
+                Crops are plants that farmers grow <strong>on purpose</strong>. They give us food, feed animals,
+                or make useful products like fabric and fuel.
+              </p>
+              <div className="space-y-2">
+                {CROP_EXAMPLES.map((c) => (
+                  <div key={c.name} className="bg-background/60 rounded-md p-2">
+                    <p className="font-semibold text-foreground text-sm">{c.name}</p>
+                    <p className="text-xs text-muted-foreground">{c.why}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-destructive" />
+                <p className="font-display font-bold text-destructive text-base">Weeds</p>
+              </div>
+              <p className="text-sm text-foreground">
+                Weeds are plants growing <strong>where they aren't wanted</strong>. Nobody planted them, and
+                they compete with crops for the things every plant needs.
+              </p>
+              <div className="space-y-2">
+                {WEED_TRAITS.map((w) => (
+                  <div key={w.label} className="bg-background/60 rounded-md p-2">
+                    <p className="font-semibold text-foreground text-sm">{w.label}</p>
+                    <p className="text-xs text-muted-foreground">{w.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
+            <p className="text-sm text-foreground">
+              Imagine your classroom. Every student has an assigned desk. Now imagine someone from another
+              class walks in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just
+              in the wrong place! They take up your space and make it harder for you to do your work.
+            </p>
+            <p className="text-sm text-foreground">
+              Weeds are like that student in the wrong seat. They aren't bad plants, but when they grow in a
+              crop field, they take the sunlight, water, nutrients, and space that the crops need.
+            </p>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-primary text-base">Why Farmers Remove Weeds</p>
+            <p className="text-sm text-foreground">
+              Farmers pull, mow, or manage weeds so their crops can stay healthy and grow strong. Healthy
+              crops give us more food — like the corn, bread, and vegetables we eat every day.
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>A weed isn't a "bad" plant — it's just a plant growing in the wrong place.</p>
           </div>
         </div>
       );
