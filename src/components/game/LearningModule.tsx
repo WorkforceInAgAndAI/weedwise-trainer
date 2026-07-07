@@ -290,6 +290,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "identification",
   },
+  {
+    id: "seasonal-life-cycle",
+    name: "A Plant's Life Cycle",
+    icon: "sun",
+    description: "Follow a plant's journey through the seasons — from tiny seed to sprout to flower to new seeds — and meet annuals and perennials.",
+    grades: [],
+    plantExplorer: true,
+    category: "lifecycle",
+  },
 
   // Control, Safety & Field Management
   {
