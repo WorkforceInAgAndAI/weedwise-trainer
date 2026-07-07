@@ -31,6 +31,7 @@ type TopicId =
   | "plant-parts"
   | "crop-vs-weed"
   | "seasonal-life-cycle"
+  | "seed-travel"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
