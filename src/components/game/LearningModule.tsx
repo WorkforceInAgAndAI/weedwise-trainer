@@ -33,6 +33,7 @@ type TopicId =
   | "seasonal-life-cycle"
   | "seed-travel"
   | "weed-problem-picnic"
+  | "weed-superheroes"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -315,6 +316,15 @@ const TOPICS: Topic[] = [
     name: "Why Are Weeds a Problem?",
     icon: "control",
     description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
+  {
+    id: "weed-superheroes",
+    name: "The 5 Weed-Fighting Superheroes",
+    icon: "control",
+    description: "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -3656,6 +3666,117 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>Weeds steal sunlight, water, nutrients, and space — so crops grow smaller and farmers harvest less food.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       THE 5 WEED-FIGHTING SUPERHEROES (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "weed-superheroes": {
+      const HEROES = [
+        {
+          key: "pull",
+          hero: "Pull It!",
+          power: "Super Strength",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          how: "Remove weeds by hand or with tools like hoes and shovels — before they grow big or drop seeds.",
+          bestFor: "Small gardens and fields with just a few weeds to fight.",
+          reallife: "This is called physical control.",
+        },
+        {
+          key: "block",
+          hero: "Block It!",
+          power: "Force Field",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          how: "Cover the soil with mulch, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
+          bestFor: "Around trees, flower beds, and vegetable rows.",
+          reallife: "This is a kind of cultural control.",
+        },
+        {
+          key: "outsmart",
+          hero: "Outsmart It!",
+          power: "Brain Power",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+          how: "Plant strong, healthy crops close together so they grow fast and leave no room for weeds to sneak in.",
+          bestFor: "Big fields, where healthy crops out-race weeds for sunlight and space.",
+          reallife: "This is another kind of cultural control — and it's also preventative!",
+        },
+        {
+          key: "eat",
+          hero: "Eat It!",
+          power: "Animal Allies",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          how: "Bring in helpers like goats, sheep, or bugs that love to munch on certain weeds.",
+          bestFor: "Hillsides, pastures, and places where machines or sprays are hard to use.",
+          reallife: "This is called biological control.",
+        },
+        {
+          key: "stop",
+          hero: "Stop It!",
+          power: "Precision Blast",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          how: "Farmers carefully use special weed-control products called herbicides to stop weeds in large fields.",
+          bestFor: "Huge crop fields where pulling every weed by hand would be impossible.",
+          reallife: "This is called chemical control — used safely and only when needed.",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">The Five Weed-Fighting Superpowers!</p>
+            <p>
+              Weeds may be tough, but farmers and gardeners have <strong>five weed-fighting superpowers</strong>
+              to help protect their crops! Since weeds steal sunlight, water, nutrients, and space, farmers
+              use different strategies to keep their plants healthy and growing strong.
+            </p>
+            <p>
+              Each superpower works best in a different situation, so farmers often use more than one at a
+              time. Teaming them up is called an <strong>integrated approach</strong> — the ultimate
+              weed-fighting team!
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {HEROES.map((h) => (
+              <div key={h.key} className={`rounded-lg border-2 p-4 space-y-2 ${h.bg}`}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`w-3 h-3 rounded-full ${h.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{h.hero}</p>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background/70 text-muted-foreground">
+                    Power: {h.power}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>How the power works:</strong> {h.how}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Best for:</strong> {h.bestFor}
+                </p>
+                <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-success text-base">Assemble the Team!</p>
+            <p className="text-sm text-foreground">
+              Just like superheroes work together to save the day, farmers combine these five superpowers to
+              protect their crops and grow the delicious food we eat every day. One hero alone can't defeat
+              every weed — but together, they're unstoppable!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember the 5 Superpowers:</p>
+            <p>Pull It • Block It • Outsmart It • Eat It • Stop It.</p>
           </div>
         </div>
       );
