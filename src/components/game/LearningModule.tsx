@@ -3793,6 +3793,117 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
+       SAFE VS TOXIC WEEDS (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "safe-vs-toxic-explorer": {
+      const DETECTIVE_RULES = [
+        {
+          key: "eyes",
+          rule: "Use Your Eyes, Not Your Hands",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          detail: "Look at the plant from a safe distance. Don't touch, pick, or taste any weed you don't already know.",
+        },
+        {
+          key: "observe",
+          rule: "Observe the Clues",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+          detail: "Notice the leaves, flowers, colors, and seeds. Those clues help a grown-up identify the plant.",
+        },
+        {
+          key: "ask",
+          rule: "Ask a Trusted Adult",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          detail: "Show a parent, teacher, or another trusted adult. They can help figure out if it's safe.",
+        },
+        {
+          key: "wash",
+          rule: "Wash Up After Playing Outside",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          detail: "Even if you didn't touch a plant on purpose, washing your hands helps keep you safe.",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Not All Weeds Are the Same!</p>
+            <p>
+              Did you know that not all weeds are alike? Some are totally harmless, but others can be
+              <strong> toxic</strong> — meaning they can make people or animals sick if they're touched or
+              eaten.
+            </p>
+          </div>
+
+          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-info text-base">The Mystery Surprise Box</p>
+            <p className="text-sm text-foreground">
+              Think of weeds like mystery surprise boxes. Some boxes have fun surprises inside — but others
+              might have something you really shouldn't play with. Since you can't tell what's inside just by
+              looking, the safest thing to do is <strong>not open the box</strong>.
+            </p>
+            <p className="text-sm text-foreground">
+              Plants work the same way! You can't always tell if a weed is safe or toxic just by looking at
+              it.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-2">
+              <p className="font-display font-bold text-success text-base">Many Weeds Are Safe to Look At</p>
+              <p className="text-sm text-foreground">
+                Lots of weeds are perfectly fine to observe from a distance. Watching how they grow is a
+                great way to learn about nature!
+              </p>
+            </div>
+            <div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 space-y-2">
+              <p className="font-display font-bold text-destructive text-base">Some Weeds Can Cause Trouble</p>
+              <p className="text-sm text-foreground">
+                A few weeds can cause itchy skin, rashes, stomach aches, or other health problems if you
+                touch or taste them. That's why we stay careful!
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-3">
+            <p className="font-display font-bold text-primary text-base">Be a Plant Detective!</p>
+            <p className="text-sm text-foreground">
+              If you spot a plant you don't recognize, put on your Plant Detective hat and follow these
+              rules:
+            </p>
+            <div className="space-y-3">
+              {DETECTIVE_RULES.map((r) => (
+                <div key={r.key} className={`rounded-lg border-2 p-3 ${r.bg}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`w-3 h-3 rounded-full ${r.dot}`} />
+                    <p className="font-display font-bold text-foreground text-sm">{r.rule}</p>
+                  </div>
+                  <p className="text-sm text-foreground">{r.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-destructive text-base">The Golden Safety Rule</p>
+            <p className="text-sm text-foreground">
+              Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
+              your <strong>mouth</strong>!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        INTRO CONTROL METHODS (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "intro-control-methods": {
