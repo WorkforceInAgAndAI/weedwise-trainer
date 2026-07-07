@@ -32,6 +32,7 @@ type TopicId =
   | "crop-vs-weed"
   | "seasonal-life-cycle"
   | "seed-travel"
+  | "weed-problem-picnic"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -308,6 +309,15 @@ const TOPICS: Topic[] = [
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
+  },
+  {
+    id: "weed-problem-picnic",
+    name: "Why Are Weeds a Problem?",
+    icon: "control",
+    description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
   },
 
   // Control, Safety & Field Management
@@ -3546,6 +3556,106 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember (three ways seeds travel):</p>
             <p>Wind (parachute) • Water (surfing) • Animals (hitchhiking).</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       WHY ARE WEEDS A PROBLEM? — PICNIC THEME (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "weed-problem-picnic": {
+      const PICNIC_ITEMS = [
+        {
+          key: "sun",
+          resource: "Sunlight",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          crop: "Crops soak up sunlight to make their food (like a warm plate at the picnic).",
+          weed: "Tall weeds shoot up above the crops and steal the sunlight before it can reach them.",
+        },
+        {
+          key: "water",
+          resource: "Water",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          crop: "Crops need sips of water from the soil to stay strong (like drinks at the picnic).",
+          weed: "Thirsty weeds gulp up water first, leaving less for the crops.",
+        },
+        {
+          key: "nutrients",
+          resource: "Nutrients",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          crop: "Nutrients in the soil are the crop's healthy snacks (the picnic food!).",
+          weed: "Weeds grab those snacks with their roots before crops can get their share.",
+        },
+        {
+          key: "space",
+          resource: "Space",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          crop: "Crops need room to spread their leaves and roots (like a big picnic blanket).",
+          weed: "Weeds squeeze onto the blanket and push crops out of the way.",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">Welcome to the Field Picnic!</p>
+            <p>
+              Imagine all the plants in the field are having a picnic. There is just enough sunlight, water,
+              nutrients, and space for all the crop plants to grow big and healthy.
+            </p>
+            <p>
+              Now imagine some <strong>weeds</strong> show up… uninvited. They start using the sunlight,
+              drinking the water, taking the nutrients, and filling up the space. Suddenly, there isn't
+              enough for everyone!
+            </p>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {PICNIC_ITEMS.map((p) => (
+              <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{p.resource}</p>
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>At the picnic:</strong> {p.crop}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Uninvited weeds:</strong> {p.weed}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-destructive text-base">What Happens to the Crops?</p>
+            <p className="text-sm text-foreground">
+              When weeds take these important things, crop plants can't grow as big or as healthy. They end
+              up short, thirsty, and hungry — no fun at the picnic!
+            </p>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-primary text-base">Why That Matters for Our Food</p>
+            <p className="text-sm text-foreground">
+              Farmers grow crops to produce the grains, fruits, and vegetables we eat. When weeds crash the
+              picnic, farmers harvest fewer crops — this is called a <strong>lower yield</strong> — so there
+              is less food for everyone.
+            </p>
+            <p className="text-sm text-foreground">
+              That's why farmers work hard to keep weeds out of their fields — so the crops can enjoy the
+              whole picnic and grow into the food on your plate!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>Weeds steal sunlight, water, nutrients, and space — so crops grow smaller and farmers harvest less food.</p>
           </div>
         </div>
       );
