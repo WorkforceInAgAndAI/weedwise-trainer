@@ -29,6 +29,7 @@ type TopicId =
   | "plant-needs"
   | "intro-control-methods"
   | "plant-parts"
+  | "crop-vs-weed"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
