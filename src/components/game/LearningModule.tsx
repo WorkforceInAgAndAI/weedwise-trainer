@@ -37,6 +37,7 @@ type TopicId =
   | "safe-vs-toxic-explorer"
   | "invasive-playground"
   | "root-tunnels"
+  | "distinctive-weeds"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -358,6 +359,15 @@ const TOPICS: Topic[] = [
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
+  },
+  {
+    id: "distinctive-weeds",
+    name: "10 Weeds You Can Spot!",
+    icon: "leaf",
+    description: "Get to know 10 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
   },
 
   // Control, Safety & Field Management
@@ -4106,6 +4116,146 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>Next time you see a weed, remember — there might be a whole network of secret tunnels hiding right beneath your feet!</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       10 DISTINCTIVE WEEDS (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "distinctive-weeds": {
+      const WEEDS_TO_SPOT: Array<{
+        id: string;
+        name: string;
+        spotIt: string;
+        funFact: string;
+        dot: string;
+        bg: string;
+      }> = [
+        {
+          id: "Dandelion",
+          name: "1. Dandelion",
+          spotIt: "Bright yellow flowers that turn into fluffy white puffballs — nature's little parachutes for the seeds.",
+          funFact: "One big puff of wind and those parachute seeds can float far, far away!",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+        },
+        {
+          id: "common_Cocklebur",
+          name: "2. Common Cocklebur",
+          spotIt: "Prickly, sticky burs that grab onto clothes and animal fur like tiny hitchhikers.",
+          funFact: "Those burs are the weed's way of catching a free ride to a brand-new spot!",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+        },
+        {
+          id: "large-crabgrass",
+          name: "3. Large Crabgrass",
+          spotIt: "Wide, flat grass blades that sprawl out sideways — often popping up on lawns and playgrounds.",
+          funFact: "It's still a grass, but it's a weed because it shows up where we don't want it!",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+        },
+        {
+          id: "giant-foxtail",
+          name: "4. Giant Foxtail",
+          spotIt: "A fuzzy seed head that curves over — just like a fox's bushy tail. Its leaves are covered in tiny short hairs.",
+          funFact: "If you gently rub a leaf, you can feel the tiny hairs like soft fuzz.",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+        },
+        {
+          id: "yellow-foxtail",
+          name: "5. Yellow Foxtail",
+          spotIt: "Looks like giant foxtail but shorter, with a chubbier yellow seed head. The leaves are smooth — hairs only near the base.",
+          funFact: "Two foxtails, two personalities! Check the leaves to tell them apart.",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+        },
+        {
+          id: "common_Milkweed",
+          name: "6. Common Milkweed",
+          spotIt: "Big broad leaves and clusters of pink-purple flowers. Snap a leaf and you'll see milky white sap!",
+          funFact: "In nature, it's a hero — monarch butterflies NEED it! But in a crop field, it's still a weed.",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+        },
+        {
+          id: "lambsquarters",
+          name: "7. Common Lambsquarters",
+          spotIt: "Green leaves that look like they've been sprinkled with a light dusting of flour.",
+          funFact: "That 'flour' is really a natural waxy powder — try wiping it and it comes right off.",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+        },
+        {
+          id: "Common_Burdock",
+          name: "8. Common Burdock",
+          spotIt: "HUGE round burs with tiny hooks that stick to clothes, pets, and just about anything else.",
+          funFact: "Burdock burs actually inspired the invention of VELCRO® — nature is a great engineer!",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+        },
+        {
+          id: "Wild_Carrot",
+          name: "9. Wild Carrot",
+          spotIt: "Flat clusters of tiny white flowers that look like lacy umbrellas — sometimes called 'Queen Anne's Lace.'",
+          funFact: "It's a biennial — that means it takes TWO years to finish its whole life cycle.",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+        },
+        {
+          id: "canada-thistle",
+          name: "10. Canada Thistle",
+          spotIt: "Spiny, prickly lobed leaves and small purple flower puffs.",
+          funFact: "It's super tricky to remove because its long roots stretch out underground like secret tunnels!",
+          dot: "bg-destructive",
+          bg: "bg-destructive/10 border-destructive/40",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">10 Weeds You Can Spot!</p>
+            <p>
+              Ready to become a Weed Spotter? Here are 10 famous weeds that show up in yards, fields, and
+              parks. Each one has a special clue — like a shape, color, or texture — that makes it easy to
+              recognize once you know what to look for.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              The photos below show the flower or seed part of each weed — the part that helps you tell them
+              apart the fastest.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {WEEDS_TO_SPOT.map((w) => (
+              <div key={w.id} className={`rounded-lg border-2 p-4 space-y-3 ${w.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${w.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{w.name}</p>
+                </div>
+                <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
+                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>Spot it:</strong> {w.spotIt}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Fun fact:</strong> {w.funFact}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-success text-base">You're a Weed Spotter Now!</p>
+            <p className="text-sm text-foreground">
+              Next time you're outside, see how many of these 10 weeds you can spot. Just remember — look
+              with your eyes, and if you don't recognize a plant, ask a trusted adult before touching it!
+            </p>
           </div>
         </div>
       );
