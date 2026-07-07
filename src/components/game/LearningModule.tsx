@@ -3461,6 +3461,97 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
+       HOW DO WEED SEEDS TRAVEL? (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "seed-travel": {
+      const TRAVELERS = [
+        {
+          key: "wind",
+          title: "Wind Riders",
+          nickname: "The Parachute Jumpers",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          how: "Some seeds have fluffy tops that work just like tiny parachutes. When the wind blows, they float through the air to find a new place to grow.",
+          example: "Dandelion seeds are famous parachute jumpers — one puff of breath and they're off!",
+          extras: "Other wind riders: Milkweed, Canada Thistle, and Horseweed.",
+        },
+        {
+          key: "water",
+          title: "Water Surfers",
+          nickname: "Catch the Wave!",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+          how: "Some seeds love to surf on water! Rain puddles, streams, and rivers can carry them far away, just like a surfer riding a wave. When the water slows down, the seed lands and can start growing.",
+          example: "Curly Dock seeds float on water and travel down streams to brand-new spots.",
+          extras: "Other water surfers: Smartweed and many wetland weeds.",
+        },
+        {
+          key: "animal",
+          title: "Animal Hitchhikers",
+          nickname: "Can I Catch a Ride?",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          how: "Some seeds have tiny hooks, spikes, or sticky parts that cling to an animal's fur — or even your socks! They're like hitchhikers asking for a free ride. When the seed falls off later, it might grow in a brand-new place.",
+          example: "Common Burdock and Cocklebur have prickly seed pods that stick to almost anything.",
+          extras: "Other hitchhikers: Beggarticks and Foxtail bristles.",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">How Do Weed Seeds Travel?</p>
+            <p>
+              Have you ever wondered how tiny seeds move from one place to another? Seeds can't walk, so
+              they've come up with some really clever ways to travel! Let's meet three amazing seed travelers.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {TRAVELERS.map((t) => (
+              <div key={t.key} className={`rounded-lg border-2 p-4 space-y-2 ${t.bg}`}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`w-3 h-3 rounded-full ${t.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{t.title}</p>
+                  <span className="text-xs italic text-muted-foreground">— "{t.nickname}"</span>
+                </div>
+                <p className="text-sm text-foreground">
+                  <strong>How it works:</strong> {t.how}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Weed example:</strong> {t.example}
+                </p>
+                <p className="text-xs text-muted-foreground">{t.extras}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-success text-base">Seeds Are Great Travelers!</p>
+            <p className="text-sm text-foreground">
+              Whether they're parachuting through the sky, surfing on the water, or hitchhiking on an animal,
+              seeds have amazing ways to explore the world and find new places to grow.
+            </p>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-primary text-base">Why Farmers Care</p>
+            <p className="text-sm text-foreground">
+              Because seeds are such good travelers, weeds can show up in fields where nobody planted them.
+              Farmers even wash off boots, tools, and tractors so they don't accidentally give weed seeds a
+              free ride into a new field!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember (three ways seeds travel):</p>
+            <p>Wind (parachute) • Water (surfing) • Animals (hitchhiking).</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        INTRO CONTROL METHODS (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "intro-control-methods": {
