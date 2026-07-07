@@ -350,6 +350,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "identification",
   },
+  {
+    id: "root-tunnels",
+    name: "The Secret Tunnels of Roots",
+    icon: "leaf",
+    description: "Some weeds are secret underground explorers! Discover how creeping roots build hidden tunnels and pop up as brand-new plants.",
+    grades: [],
+    plantExplorer: true,
+    category: "lifecycle",
+  },
 
   // Control, Safety & Field Management
   {
