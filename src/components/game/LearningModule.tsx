@@ -37,6 +37,7 @@ type TopicId =
   | "safe-vs-toxic-explorer"
   | "invasive-playground"
   | "root-tunnels"
+  | "distinctive-weeds"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
