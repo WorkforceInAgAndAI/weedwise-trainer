@@ -36,6 +36,7 @@ type TopicId =
   | "weed-superheroes"
   | "safe-vs-toxic-explorer"
   | "invasive-playground"
+  | "root-tunnels"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
