@@ -30,6 +30,7 @@ type TopicId =
   | "intro-control-methods"
   | "plant-parts"
   | "crop-vs-weed"
+  | "seasonal-life-cycle"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
