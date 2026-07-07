@@ -4025,6 +4025,93 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
+       THE SECRET TUNNELS OF ROOTS (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "root-tunnels": {
+      const TUNNEL_FACTS = [
+        {
+          key: "explorer",
+          title: "Underground Explorers",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          detail: "Some weeds send long roots creeping sideways through the soil — like secret tunnels no one can see from above.",
+        },
+        {
+          key: "popup",
+          title: "Surprise Pop-Ups",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          detail: "Every so often, a tunnel sends a new shoot up to the surface. A brand-new weed pops up — sometimes several feet away from the first one!",
+        },
+        {
+          key: "connected",
+          title: "All Connected",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          detail: "Even though they look like separate plants above ground, they're all part of one big hidden network below.",
+        },
+        {
+          key: "tricky",
+          title: "Tricky to Remove",
+          dot: "bg-destructive",
+          bg: "bg-destructive/10 border-destructive/40",
+          detail: "If even a tiny piece of tunnel is left behind, it can grow into a brand-new weed. That's why root weeds are so hard to get rid of!",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">The Secret Tunnels of Roots</p>
+            <p>
+              Most plants spread by making seeds — but some weeds have another clever trick up their leafy
+              sleeves!
+            </p>
+            <p>
+              Imagine a weed is a <strong>secret explorer building underground tunnels</strong>. Those
+              tunnels are actually long roots growing beneath the soil, hidden from view.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {TUNNEL_FACTS.map((f) => (
+              <div key={f.key} className={`rounded-lg border-2 p-4 space-y-2 ${f.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${f.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{f.title}</p>
+                </div>
+                <p className="text-sm text-foreground">{f.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-info text-base">Tunnel-Building Weeds</p>
+            <p className="text-sm text-foreground">
+              A few famous underground tunnelers you might spot: <strong>Canada Thistle</strong>,{" "}
+              <strong>Field Bindweed</strong>, and <strong>Quackgrass</strong>. Their tunnels can stretch
+              many feet in every direction!
+            </p>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-primary text-base">Why Farmers Dig Deep</p>
+            <p className="text-sm text-foreground">
+              Farmers and gardeners have to remove as much of the root system as they can. If they only pull
+              the top off, the hidden tunnels keep sending up brand-new weeds. Getting the whole root helps
+              stop the weed for good.
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>Next time you see a weed, remember — there might be a whole network of secret tunnels hiding right beneath your feet!</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        INTRO CONTROL METHODS (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "intro-control-methods": {
