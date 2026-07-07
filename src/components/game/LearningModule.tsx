@@ -300,6 +300,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "lifecycle",
   },
+  {
+    id: "seed-travel",
+    name: "How Do Weed Seeds Travel?",
+    icon: "seed",
+    description: "Meet three clever seed travelers — parachute jumpers, water surfers, and animal hitchhikers — and see how weeds spread to new places.",
+    grades: [],
+    plantExplorer: true,
+    category: "lifecycle",
+  },
 
   // Control, Safety & Field Management
   {
