@@ -310,6 +310,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "lifecycle",
   },
+  {
+    id: "weed-problem-picnic",
+    name: "Why Are Weeds a Problem?",
+    icon: "control",
+    description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
 
   // Control, Safety & Field Management
   {
