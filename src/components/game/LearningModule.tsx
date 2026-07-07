@@ -340,6 +340,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "control",
   },
+  {
+    id: "invasive-playground",
+    name: "Invasive Plants: The Playground Bullies",
+    icon: "leaf",
+    description: "Ever played tag with someone way too fast? Meet invasive plants — the players who take over the playground and crowd out the natives.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
+  },
 
   // Control, Safety & Field Management
   {
