@@ -280,6 +280,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "identification",
   },
+  {
+    id: "crop-vs-weed",
+    name: "Crop or Weed?",
+    icon: "leaf",
+    description: "Learn the difference between a crop and a weed — it's less about the plant and more about where it's growing.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
+  },
 
   // Control, Safety & Field Management
   {
