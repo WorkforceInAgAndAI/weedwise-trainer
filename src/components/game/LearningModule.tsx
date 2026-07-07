@@ -30,6 +30,7 @@ type TopicId =
   | "intro-control-methods"
   | "plant-parts"
   | "crop-vs-weed"
+  | "seasonal-life-cycle"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -288,6 +289,15 @@ const TOPICS: Topic[] = [
     grades: [],
     plantExplorer: true,
     category: "identification",
+  },
+  {
+    id: "seasonal-life-cycle",
+    name: "A Plant's Life Cycle",
+    icon: "sun",
+    description: "Follow a plant's journey through the seasons — from tiny seed to sprout to flower to new seeds — and meet annuals and perennials.",
+    grades: [],
+    plantExplorer: true,
+    category: "lifecycle",
   },
 
   // Control, Safety & Field Management
@@ -3325,6 +3335,116 @@ function TopicContent({
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>A weed isn't a "bad" plant — it's just a plant growing in the wrong place.</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SEASONAL LIFE CYCLE (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "seasonal-life-cycle": {
+      const STEPS = [
+        {
+          key: "wake",
+          title: "Step 1: Wake Up!",
+          season: "Early Spring",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+          body: "Everything starts with a tiny seed hiding in the soil. When the seed gets water, warmth, and sunlight, it wakes up and begins to sprout.",
+        },
+        {
+          key: "grow",
+          title: "Step 2: Grow Big and Strong!",
+          season: "Spring into Summer",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          body: "The little sprout grows into a healthy plant. It drinks water, breathes air, catches sunlight, and pulls nutrients from the soil to grow bigger every day.",
+        },
+        {
+          key: "flower",
+          title: "Step 3: Make Flowers and Seeds!",
+          season: "Summer",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          body: "When the plant is fully grown, it makes flowers or seed heads. Those flowers turn into brand new seeds — like tiny baby plants waiting for their turn.",
+        },
+        {
+          key: "spread",
+          title: "Step 4: Spread the Seeds!",
+          season: "Late Summer & Fall",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+          body: "New seeds travel by floating like parachutes in the wind, surfing on water, or hitchhiking on animals and shoes. When they land in a good spot, the cycle starts all over again!",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">A Plant's Life Cycle: From Tiny Seed to New Seeds</p>
+            <p>
+              Plants have a life cycle, just like butterflies and frogs! You can think of it as a plant's
+              journey through the seasons — waking up, growing tall, making seeds, and starting over again.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {STEPS.map((s) => (
+              <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg}`}>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-3 h-3 rounded-full ${s.dot}`} />
+                    <p className="font-display font-bold text-foreground text-base">{s.title}</p>
+                  </div>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background/70 text-muted-foreground">
+                    {s.season}
+                  </span>
+                </div>
+                <p className="text-sm text-foreground">{s.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-2">
+            <p className="font-display font-bold text-primary text-base">Not All Plants Grow the Same Way</p>
+            <p>Just like people have different schedules, plants do too!</p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-2">
+              <p className="font-display font-bold text-success text-base">Annuals — One-Season Plants</p>
+              <p className="text-sm text-foreground">
+                Annuals finish their whole life cycle in <strong>one growing season</strong>. They sprout, grow,
+                make new seeds, and then die before the next season begins.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Weedy examples: Waterhemp, Foxtail, and Common Lambsquarters.
+              </p>
+            </div>
+            <div className="rounded-lg border-2 border-info/40 bg-info/10 p-4 space-y-2">
+              <p className="font-display font-bold text-info text-base">Perennials — Year-After-Year Plants</p>
+              <p className="text-sm text-foreground">
+                Perennials come back <strong>year after year</strong>. Even when their leaves disappear in
+                winter, their roots stay alive underground, ready to grow again when spring arrives.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Weedy examples: Dandelion, Canada Thistle, and Field Bindweed.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
+            <p className="text-sm text-foreground">
+              If a farmer knows a weed is an annual, they can stop it before it makes new seeds. If it's a
+              perennial, they know its roots will try to come back next year — so they plan ahead!
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember (the plant's journey):</p>
+            <p>Seed → Sprout → Grown Plant → Flowers → New Seeds → Spread → Start Again!</p>
           </div>
         </div>
       );
