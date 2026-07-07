@@ -330,6 +330,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "control",
   },
+  {
+    id: "safe-vs-toxic-explorer",
+    name: "Safe vs. Toxic Weeds",
+    icon: "safety",
+    description: "Become a Plant Detective! Learn why some weeds are safe and others are toxic — and how to stay safe when you spot a plant you don't know.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
 
   // Control, Safety & Field Management
   {
