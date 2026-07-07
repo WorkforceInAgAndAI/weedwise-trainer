@@ -320,6 +320,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "control",
   },
+  {
+    id: "weed-superheroes",
+    name: "The 5 Weed-Fighting Superheroes",
+    icon: "control",
+    description: "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
 
   // Control, Safety & Field Management
   {
