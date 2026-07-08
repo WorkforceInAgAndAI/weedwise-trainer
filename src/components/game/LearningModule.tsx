@@ -38,6 +38,7 @@ type TopicId =
   | "invasive-playground"
   | "root-tunnels"
   | "distinctive-weeds"
+  | "resource-race"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
