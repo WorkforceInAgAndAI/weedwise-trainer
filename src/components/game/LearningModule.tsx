@@ -380,6 +380,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "control",
   },
+  {
+    id: "weed-helpers",
+    name: "Weeds Can Be Helpers Too!",
+    icon: "leaf",
+    description: "Not every weed is a bad guy! Discover three superpowers that make weeds helpful — feeding bees, holding soil, and loosening the earth.",
+    grades: [],
+    plantExplorer: true,
+    category: "identification",
+  },
 
   // Control, Safety & Field Management
   {
