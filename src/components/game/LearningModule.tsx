@@ -39,6 +39,7 @@ type TopicId =
   | "root-tunnels"
   | "distinctive-weeds"
   | "resource-race"
+  | "weed-helpers"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
