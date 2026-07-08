@@ -370,6 +370,15 @@ const TOPICS: Topic[] = [
     plantExplorer: true,
     category: "identification",
   },
+  {
+    id: "resource-race",
+    name: "The Great Garden Race",
+    icon: "competition",
+    description: "On your mark, get set, grow! Cheer on the crop and farmer as they race the weed for sunlight, water, and nutrients.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
 
   // Control, Safety & Field Management
   {
