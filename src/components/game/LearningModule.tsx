@@ -38,6 +38,7 @@ type TopicId =
   | "invasive-playground"
   | "root-tunnels"
   | "distinctive-weeds"
+  | "resource-race"
   | "field-scouting"
   | "weed-competitors"
   | "economic-threshold"
@@ -368,6 +369,15 @@ const TOPICS: Topic[] = [
     grades: [],
     plantExplorer: true,
     category: "identification",
+  },
+  {
+    id: "resource-race",
+    name: "The Great Garden Race",
+    icon: "competition",
+    description: "On your mark, get set, grow! Cheer on the crop and farmer as they race the weed for sunlight, water, and nutrients.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
   },
 
   // Control, Safety & Field Management
@@ -4255,6 +4265,250 @@ function TopicContent({
             <p className="text-sm text-foreground">
               Next time you're outside, see how many of these 10 weeds you can spot. Just remember — look
               with your eyes, and if you don't recognize a plant, ask a trusted adult before touching it!
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       INTRO CONTROL METHODS (K-5 Plant Explorer)
+    ═══════════════════════════════════════════════════════════ */
+    case "resource-race": {
+      const RESOURCES = [
+        {
+          key: "sunlight",
+          title: "Sunlight",
+          dot: "bg-warning",
+          bg: "bg-warning/10 border-warning/40",
+          detail: "The energy plants use to cook their own food. Whoever grows tallest first hogs the biggest slice of sunshine!",
+        },
+        {
+          key: "water",
+          title: "Water",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+          detail: "Every racer needs a drink. Roots race down through the soil to sip up as much water as they can.",
+        },
+        {
+          key: "nutrients",
+          title: "Nutrients",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+          detail: "Plant vitamins pulled from the soil. Big strong roots grab the most and grow the strongest stems.",
+        },
+      ];
+
+      const RACERS: Array<{
+        key: "farmer" | "crop" | "weed";
+        label: string;
+        color: string;
+        chip: string;
+        blurb: string;
+      }> = [
+        {
+          key: "farmer",
+          label: "The Farmer",
+          color: "bg-primary/10 border-primary/40",
+          chip: "bg-primary text-primary-foreground",
+          blurb: "The coach of the whole race! Farmers plant crops, pull weeds, and cheer the crops on toward a big harvest.",
+        },
+        {
+          key: "crop",
+          label: "The Crop",
+          color: "bg-success/10 border-success/40",
+          chip: "bg-success text-white",
+          blurb: "Corn, wheat, tomatoes — the plants we grow on purpose. Their prize is turning sunshine and water into the food we eat.",
+        },
+        {
+          key: "weed",
+          label: "The Weed",
+          color: "bg-destructive/10 border-destructive/40",
+          chip: "bg-destructive text-white",
+          blurb: "The uninvited speed demon. Weeds sprout fast, grab resources, and try to make as many seeds as possible before the season ends.",
+        },
+      ];
+
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+            <p className="font-display font-bold text-primary text-base">On Your Mark, Get Set, Grow!</p>
+            <p>
+              Imagine a garden or farm field isn't just a place for plants to grow — it's the site of a{" "}
+              <strong>high-stakes, season-long race!</strong> The finish line isn't about being the tallest
+              or the fastest. The ultimate prize is to <strong>reproduce</strong> and send as many seeds as
+              possible out into the world to start the next generation.
+            </p>
+          </div>
+
+          {/* Race track illustration */}
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <svg viewBox="0 0 400 180" className="w-full h-auto" role="img" aria-label="Cartoon race between a farmer, a crop, and a weed">
+              {/* sun */}
+              <circle cx="360" cy="30" r="18" fill="#FCD34D" />
+              <g stroke="#F59E0B" strokeWidth="2">
+                <line x1="360" y1="4" x2="360" y2="14" />
+                <line x1="360" y1="46" x2="360" y2="56" />
+                <line x1="334" y1="30" x2="344" y2="30" />
+                <line x1="376" y1="30" x2="386" y2="30" />
+              </g>
+
+              {/* ground */}
+              <rect x="0" y="140" width="400" height="40" fill="#8B5A2B" />
+              <rect x="0" y="135" width="400" height="6" fill="#4A7C2A" />
+
+              {/* track lanes */}
+              <line x1="10" y1="155" x2="360" y2="155" stroke="#F5F5DC" strokeWidth="2" strokeDasharray="8 6" />
+              <line x1="10" y1="170" x2="360" y2="170" stroke="#F5F5DC" strokeWidth="2" strokeDasharray="8 6" />
+
+              {/* finish line */}
+              <g>
+                <rect x="360" y="60" width="4" height="90" fill="#333" />
+                <g fill="#333">
+                  <rect x="364" y="60" width="10" height="10" />
+                  <rect x="374" y="70" width="10" height="10" />
+                  <rect x="364" y="80" width="10" height="10" />
+                  <rect x="374" y="90" width="10" height="10" />
+                  <rect x="364" y="100" width="10" height="10" />
+                </g>
+                <g fill="#fff">
+                  <rect x="374" y="60" width="10" height="10" />
+                  <rect x="364" y="70" width="10" height="10" />
+                  <rect x="374" y="80" width="10" height="10" />
+                  <rect x="364" y="90" width="10" height="10" />
+                  <rect x="374" y="100" width="10" height="10" />
+                </g>
+                <text x="345" y="55" fontFamily="sans-serif" fontSize="10" fontWeight="bold" fill="#333">FINISH</text>
+              </g>
+
+              {/* Farmer runner (behind, cheering) */}
+              <g transform="translate(60,110)">
+                {/* hat */}
+                <ellipse cx="0" cy="-2" rx="14" ry="3" fill="#B45309" />
+                <path d="M -8 -2 Q 0 -14 8 -2 Z" fill="#D97706" />
+                {/* head */}
+                <circle cx="0" cy="6" r="6" fill="#FCD9B8" />
+                {/* body (overalls) */}
+                <rect x="-6" y="12" width="12" height="16" fill="#1D4ED8" rx="2" />
+                <rect x="-6" y="12" width="12" height="4" fill="#DC2626" />
+                {/* arms up cheering */}
+                <line x1="-6" y1="15" x2="-14" y2="6" stroke="#FCD9B8" strokeWidth="3" strokeLinecap="round" />
+                <line x1="6" y1="15" x2="14" y2="6" stroke="#FCD9B8" strokeWidth="3" strokeLinecap="round" />
+                {/* legs running */}
+                <line x1="-3" y1="28" x2="-6" y2="40" stroke="#1D4ED8" strokeWidth="4" strokeLinecap="round" />
+                <line x1="3" y1="28" x2="8" y2="40" stroke="#1D4ED8" strokeWidth="4" strokeLinecap="round" />
+                {/* smile */}
+                <path d="M -2 7 Q 0 9 2 7" stroke="#333" strokeWidth="1" fill="none" />
+                <circle cx="-2" cy="5" r="0.8" fill="#333" />
+                <circle cx="2" cy="5" r="0.8" fill="#333" />
+                <text x="-18" y="-10" fontFamily="sans-serif" fontSize="8" fontWeight="bold" fill="#1D4ED8">Farmer</text>
+              </g>
+
+              {/* Crop runner (corn) — middle */}
+              <g transform="translate(180,105)">
+                <text x="-12" y="-16" fontFamily="sans-serif" fontSize="8" fontWeight="bold" fill="#166534">Crop</text>
+                {/* stalk */}
+                <rect x="-2" y="0" width="4" height="30" fill="#4A7C2A" rx="1" />
+                {/* leaves */}
+                <path d="M 0 6 Q -14 2 -18 -6 Q -8 4 0 10 Z" fill="#65A30D" />
+                <path d="M 0 12 Q 14 8 18 0 Q 8 10 0 16 Z" fill="#65A30D" />
+                {/* corn cob head */}
+                <ellipse cx="0" cy="-4" rx="6" ry="9" fill="#FCD34D" />
+                <ellipse cx="-2" cy="-6" rx="0.8" ry="0.8" fill="#333" />
+                <ellipse cx="2" cy="-6" rx="0.8" ry="0.8" fill="#333" />
+                <path d="M -2 -2 Q 0 0 2 -2" stroke="#333" strokeWidth="1" fill="none" />
+                {/* husk arms */}
+                <path d="M -4 -6 L -12 -14" stroke="#65A30D" strokeWidth="3" strokeLinecap="round" />
+                <path d="M 4 -6 L 12 -14" stroke="#65A30D" strokeWidth="3" strokeLinecap="round" />
+                {/* running legs */}
+                <line x1="-2" y1="30" x2="-6" y2="40" stroke="#4A7C2A" strokeWidth="3" strokeLinecap="round" />
+                <line x1="2" y1="30" x2="6" y2="40" stroke="#4A7C2A" strokeWidth="3" strokeLinecap="round" />
+              </g>
+
+              {/* Weed runner — leading */}
+              <g transform="translate(300,105)">
+                <text x="-10" y="-22" fontFamily="sans-serif" fontSize="8" fontWeight="bold" fill="#B91C1C">Weed</text>
+                {/* wild leaves */}
+                <path d="M 0 4 Q -18 -6 -20 -18 Q -6 -6 0 4 Z" fill="#166534" />
+                <path d="M 0 4 Q 18 -6 20 -18 Q 6 -6 0 4 Z" fill="#166534" />
+                <path d="M 0 4 Q -10 -14 0 -22 Q 10 -14 0 4 Z" fill="#15803D" />
+                {/* stem */}
+                <rect x="-2" y="4" width="4" height="26" fill="#166534" rx="1" />
+                {/* sneaky face */}
+                <circle cx="0" cy="-8" r="6" fill="#84CC16" />
+                <circle cx="-2" cy="-9" r="0.9" fill="#333" />
+                <circle cx="2" cy="-9" r="0.9" fill="#333" />
+                <path d="M -3 -5 Q 0 -3 3 -6" stroke="#333" strokeWidth="1" fill="none" />
+                {/* fast legs with speed lines */}
+                <line x1="-2" y1="30" x2="-8" y2="42" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
+                <line x1="2" y1="30" x2="8" y2="42" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
+                <g stroke="#B91C1C" strokeWidth="1.5" strokeLinecap="round">
+                  <line x1="-18" y1="20" x2="-28" y2="20" />
+                  <line x1="-18" y1="26" x2="-30" y2="26" />
+                  <line x1="-18" y1="32" x2="-26" y2="32" />
+                </g>
+              </g>
+            </svg>
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              And they're off! Every plant is racing to make seeds before the season ends.
+            </p>
+          </div>
+
+          {/* Contenders */}
+          <div className="space-y-3">
+            <p className="font-display font-bold text-primary text-base">Meet the Contenders</p>
+            {RACERS.map((r) => (
+              <div key={r.key} className={`rounded-lg border-2 p-4 space-y-2 ${r.color}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${r.chip}`}>{r.label}</span>
+                </div>
+                <p className="text-sm text-foreground">{r.blurb}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Resources */}
+          <div className="space-y-3">
+            <p className="font-display font-bold text-primary text-base">The Race for Resources</p>
+            <p className="text-sm text-foreground">
+              To win the race, a plant needs fuel. Every racer is scrambling to grab three big prizes from
+              the field:
+            </p>
+            {RESOURCES.map((r) => (
+              <div key={r.key} className={`rounded-lg border-2 p-4 space-y-2 ${r.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${r.dot}`} />
+                  <p className="font-display font-bold text-foreground text-base">{r.title}</p>
+                </div>
+                <p className="text-sm text-foreground">{r.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-warning/10 border-2 border-warning/40 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-warning-foreground text-base">How the Race Plays Out</p>
+            <p className="text-sm text-foreground">
+              Weeds are the ultimate <strong>race car drivers</strong> of the plant world — built for speed
+              and survival. They sprout quickly, drink up water, soak up sunshine, and pull nutrients out of
+              the soil before the crops can catch up. If nobody helps, the weeds can zoom right past the
+              crops and hog the whole field!
+            </p>
+          </div>
+
+          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+            <p className="font-display font-bold text-primary text-base">Who Cheers the Crops On?</p>
+            <p className="text-sm text-foreground">
+              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close
+              together, mulch the soil, and use the 5 weed-fighting superpowers so the crops can reach the
+              finish line first — and fill our plates with delicious food.
+            </p>
+          </div>
+
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-semibold text-primary mb-1">Remember:</p>
+            <p>
+              Every field is a race for sunlight, water, and nutrients. With a good coach — the farmer — the
+              crops can beat the weeds to the finish line and win a big harvest!
             </p>
           </div>
         </div>
