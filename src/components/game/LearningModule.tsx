@@ -4539,113 +4539,11 @@ function TopicContent({
 
           {/* Meadow illustration */}
           <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <svg viewBox="0 0 400 200" className="w-full h-auto" role="img" aria-label="Cartoon meadow with a smiling flower, a bee, a butterfly, and a weed with deep roots holding soil">
-              {/* sun */}
-              <circle cx="50" cy="30" r="16" fill="#FCD34D" />
-              <g stroke="#F59E0B" strokeWidth="2">
-                <line x1="50" y1="6" x2="50" y2="14" />
-                <line x1="50" y1="46" x2="50" y2="54" />
-                <line x1="26" y1="30" x2="34" y2="30" />
-                <line x1="66" y1="30" x2="74" y2="30" />
-              </g>
-
-              {/* clouds */}
-              <ellipse cx="200" cy="30" rx="24" ry="10" fill="#fff" />
-              <ellipse cx="215" cy="26" rx="16" ry="8" fill="#fff" />
-
-              {/* sky/ground split */}
-              <rect x="0" y="120" width="400" height="14" fill="#4A7C2A" />
-              <rect x="0" y="134" width="400" height="66" fill="#8B5A2B" />
-
-              {/* Flower with smiling face (pollinator support) */}
-              <g transform="translate(110,110)">
-                <rect x="-2" y="0" width="4" height="20" fill="#4A7C2A" />
-                {/* petals */}
-                <g fill="#F472B6">
-                  <circle cx="0" cy="-14" r="7" />
-                  <circle cx="-10" cy="-8" r="7" />
-                  <circle cx="10" cy="-8" r="7" />
-                  <circle cx="-8" cy="2" r="7" />
-                  <circle cx="8" cy="2" r="7" />
-                </g>
-                <circle cx="0" cy="-6" r="6" fill="#FCD34D" />
-                <circle cx="-2" cy="-7" r="0.8" fill="#333" />
-                <circle cx="2" cy="-7" r="0.8" fill="#333" />
-                <path d="M -2 -4 Q 0 -2 2 -4" stroke="#333" strokeWidth="1" fill="none" />
-                {/* leaf */}
-                <path d="M 0 8 Q 10 6 12 0 Q 4 6 0 12 Z" fill="#65A30D" />
-              </g>
-
-              {/* Bee */}
-              <g transform="translate(150,70)">
-                <ellipse cx="0" cy="0" rx="8" ry="5" fill="#FCD34D" />
-                <rect x="-6" y="-4" width="3" height="8" fill="#333" />
-                <rect x="0" y="-4" width="3" height="8" fill="#333" />
-                <ellipse cx="-4" cy="-6" rx="5" ry="3" fill="#fff" opacity="0.8" />
-                <ellipse cx="4" cy="-6" rx="5" ry="3" fill="#fff" opacity="0.8" />
-                <circle cx="7" cy="-1" r="1" fill="#333" />
-                {/* flight path */}
-                <path d="M -30 10 Q -20 -4 -10 6 Q 0 -4 10 6" stroke="#F59E0B" strokeWidth="1.2" strokeDasharray="3 3" fill="none" />
-              </g>
-
-              {/* Butterfly */}
-              <g transform="translate(240,60)">
-                <ellipse cx="-6" cy="-2" rx="7" ry="10" fill="#A78BFA" />
-                <ellipse cx="6" cy="-2" rx="7" ry="10" fill="#A78BFA" />
-                <ellipse cx="-6" cy="6" rx="6" ry="7" fill="#F472B6" />
-                <ellipse cx="6" cy="6" rx="6" ry="7" fill="#F472B6" />
-                <rect x="-1" y="-8" width="2" height="18" fill="#333" rx="1" />
-                <line x1="0" y1="-8" x2="-3" y2="-14" stroke="#333" strokeWidth="1" />
-                <line x1="0" y1="-8" x2="3" y2="-14" stroke="#333" strokeWidth="1" />
-              </g>
-
-              {/* Weed with cartoon face holding soil, deep taproot */}
-              <g transform="translate(310,110)">
-                {/* leaves */}
-                <path d="M 0 4 Q -18 -6 -22 -18 Q -8 -8 0 4 Z" fill="#166534" />
-                <path d="M 0 4 Q 18 -6 22 -18 Q 8 -8 0 4 Z" fill="#166534" />
-                <path d="M 0 4 Q -6 -12 0 -22 Q 6 -12 0 4 Z" fill="#15803D" />
-                {/* dandelion puff on top */}
-                <circle cx="0" cy="-24" r="6" fill="#fff" opacity="0.9" />
-                <g stroke="#fff" strokeWidth="1">
-                  <line x1="0" y1="-24" x2="0" y2="-32" />
-                  <line x1="0" y1="-24" x2="-6" y2="-30" />
-                  <line x1="0" y1="-24" x2="6" y2="-30" />
-                  <line x1="0" y1="-24" x2="-8" y2="-24" />
-                  <line x1="0" y1="-24" x2="8" y2="-24" />
-                </g>
-                {/* stem */}
-                <rect x="-2" y="4" width="4" height="18" fill="#166534" />
-                {/* smiley face on leaves */}
-                <circle cx="-4" cy="-6" r="0.9" fill="#fff" />
-                <circle cx="4" cy="-6" r="0.9" fill="#fff" />
-                <path d="M -3 -2 Q 0 1 3 -2" stroke="#fff" strokeWidth="1" fill="none" />
-                {/* deep taproot with side roots */}
-                <path d="M 0 22 L 0 78" stroke="#8B4513" strokeWidth="4" strokeLinecap="round" />
-                <path d="M 0 34 L -10 42" stroke="#8B4513" strokeWidth="2" strokeLinecap="round" />
-                <path d="M 0 46 L 12 54" stroke="#8B4513" strokeWidth="2" strokeLinecap="round" />
-                <path d="M 0 58 L -12 68" stroke="#8B4513" strokeWidth="2" strokeLinecap="round" />
-                <path d="M 0 70 L 10 78" stroke="#8B4513" strokeWidth="2" strokeLinecap="round" />
-                {/* soil crumbs */}
-                <circle cx="-16" cy="150" r="2" fill="#5C3317" />
-                <circle cx="14" cy="160" r="2" fill="#5C3317" />
-                <circle cx="4" cy="170" r="2" fill="#5C3317" />
-              </g>
-
-              {/* Wind swoosh (erosion prevented) */}
-              <g stroke="#93C5FD" strokeWidth="2" fill="none" strokeLinecap="round">
-                <path d="M 20 90 Q 60 82 100 90" />
-                <path d="M 20 100 Q 60 92 90 100" />
-              </g>
-
-              {/* Small grass tufts on ground */}
-              <g stroke="#4A7C2A" strokeWidth="1.5" strokeLinecap="round">
-                <line x1="60" y1="132" x2="60" y2="122" />
-                <line x1="64" y1="132" x2="66" y2="124" />
-                <line x1="200" y1="132" x2="200" y2="123" />
-                <line x1="360" y1="132" x2="360" y2="122" />
-              </g>
-            </svg>
+            <img
+              src={goodWeedsImg}
+              alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
             <p className="text-center text-xs text-muted-foreground mt-2">
               A flower feeds a bee, a butterfly flutters by, and a weed's deep roots hold the soil in place.
             </p>
