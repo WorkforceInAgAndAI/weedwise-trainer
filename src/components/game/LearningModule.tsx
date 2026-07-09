@@ -4169,6 +4169,11 @@ function TopicContent({
               <strong>Field Bindweed</strong>, and <strong>Quackgrass</strong>. Their tunnels can stretch
               many feet in every direction!
             </p>
+            <img
+              src={rootTunnelsImg}
+              alt="Cartoon weed digging secret underground tunnels with a lantern and pickaxe"
+              className="w-full rounded-lg bg-background/60 object-contain mt-2"
+            />
           </div>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
