@@ -3738,6 +3738,17 @@ function TopicContent({
             </p>
           </div>
 
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={plantPicnicImg}
+              alt="Two picnic panels — overcrowded and cramped versus spacious and plentiful"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              When weeds crash the picnic, there's no room to breathe. With space to grow, the picnic is a feast!
+            </p>
+          </div>
+
           <div className="grid gap-3 md:grid-cols-2">
             {PICNIC_ITEMS.map((p) => (
               <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
