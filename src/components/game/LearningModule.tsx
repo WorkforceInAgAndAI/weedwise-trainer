@@ -3879,6 +3879,17 @@ function TopicContent({
             </p>
           </div>
 
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={weedSuperheroesImg}
+              alt="The Weed Control Squad — five weed-fighting heroes: Outsmart It, Pull It, Eat It, Block It, and Stop It"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              Meet the Weed Control Squad — five heroes teaming up to keep crops healthy.
+            </p>
+          </div>
+
           <div className="space-y-4">
             {HEROES.map((h) => (
               <div key={h.key} className={`rounded-lg border-2 p-4 space-y-2 ${h.bg}`}>
