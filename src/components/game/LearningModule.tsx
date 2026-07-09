@@ -10,6 +10,16 @@ import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/co
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
+import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
+import surfSeedImg from "@/assets/learning/surf_seed.jpg";
+import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
+import annualVsPerennialImg from "@/assets/learning/annual_vs_perennial.jpg";
+import weedLifeCycleImg from "@/assets/learning/weed_life_cycle.jpg";
+import cropsVsWeedsImg from "@/assets/learning/crops_vs_weeds.jpg";
+import partsOfWeedsImg from "@/assets/learning/parts_of_weeds.jpg";
+import rootTunnelsImg from "@/assets/learning/root_tunnels.jpg";
+import weedInvestigatorImg from "@/assets/learning/weed_investigator.jpg";
+import weedInvestigator2Img from "@/assets/learning/weed_investigator_2.jpg";
 
 type TopicId =
   | "names"
