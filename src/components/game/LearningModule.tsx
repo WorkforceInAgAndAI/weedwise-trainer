@@ -3411,6 +3411,12 @@ function TopicContent({
             </div>
           </div>
 
+          <img
+            src={cropsVsWeedsImg}
+            alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
+            className="w-full rounded-lg bg-background/60 object-contain"
+          />
+
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
             <p className="text-sm text-foreground">
