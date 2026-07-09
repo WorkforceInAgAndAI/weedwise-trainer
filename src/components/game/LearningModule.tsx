@@ -4102,6 +4102,17 @@ function TopicContent({
             </p>
           </div>
 
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={invasivePlantImg}
+              alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
+            </p>
+          </div>
+
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">What Is an Invasive Plant?</p>
             <p className="text-sm text-foreground">
