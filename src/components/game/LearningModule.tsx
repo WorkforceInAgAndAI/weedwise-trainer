@@ -3564,6 +3564,8 @@ function TopicContent({
           how: "Some seeds have fluffy tops that work just like tiny parachutes. When the wind blows, they float through the air to find a new place to grow.",
           example: "Dandelion seeds are famous parachute jumpers — one puff of breath and they're off!",
           extras: "Other wind riders: Milkweed, Canada Thistle, and Horseweed.",
+          image: dandelionHelicopterImg,
+          imageAlt: "Cartoon dandelion seed floating with a fluffy parachute",
         },
         {
           key: "water",
@@ -3574,6 +3576,8 @@ function TopicContent({
           how: "Some seeds love to surf on water! Rain puddles, streams, and rivers can carry them far away, just like a surfer riding a wave. When the water slows down, the seed lands and can start growing.",
           example: "Curly Dock seeds float on water and travel down streams to brand-new spots.",
           extras: "Other water surfers: Smartweed and many wetland weeds.",
+          image: surfSeedImg,
+          imageAlt: "Cartoon seed with a surfboard heading to the beach",
         },
         {
           key: "animal",
@@ -3584,6 +3588,8 @@ function TopicContent({
           how: "Some seeds have tiny hooks, spikes, or sticky parts that cling to an animal's fur — or even your socks! They're like hitchhikers asking for a free ride. When the seed falls off later, it might grow in a brand-new place.",
           example: "Common Burdock and Cocklebur have prickly seed pods that stick to almost anything.",
           extras: "Other hitchhikers: Beggarticks and Foxtail bristles.",
+          image: seedHitchhikerImg,
+          imageAlt: "Cartoon corn seed hitchhiking on the back of a skunk",
         },
       ];
 
@@ -3605,6 +3611,11 @@ function TopicContent({
                   <p className="font-display font-bold text-foreground text-base">{t.title}</p>
                   <span className="text-xs italic text-muted-foreground">— "{t.nickname}"</span>
                 </div>
+                <img
+                  src={t.image}
+                  alt={t.imageAlt}
+                  className="w-full max-w-sm mx-auto rounded-lg bg-background/60 object-contain"
+                />
                 <p className="text-sm text-foreground">
                   <strong>How it works:</strong> {t.how}
                 </p>
