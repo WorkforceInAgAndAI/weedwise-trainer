@@ -3996,6 +3996,19 @@ function TopicContent({
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
           </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <img
+              src={weedInvestigatorImg}
+              alt="Cartoon weed detective with a magnifying glass investigating clues underground"
+              className="w-full rounded-lg bg-background/60 object-contain"
+            />
+            <img
+              src={weedInvestigator2Img}
+              alt="Cartoon weed detective following clues toward an evidence lock-box"
+              className="w-full rounded-lg bg-background/60 object-contain"
+            />
+          </div>
         </div>
       );
     }
