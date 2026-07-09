@@ -3197,6 +3197,17 @@ function TopicContent({
             ))}
           </div>
 
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={fiveEssentialsImg}
+              alt="Plant comparison — a thriving sunflower with sunlight, water, air, nutrients, and space, next to a struggling plant with weed competition"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              With all five essentials, plants thrive. Take one away — or add weed competition — and they struggle.
+            </p>
+          </div>
+
           <div className="bg-terracotta/10 border-2 border-terracotta/40 rounded-lg p-5 space-y-3">
             <p className="font-display font-bold text-terracotta text-base">Weeds vs. Crops: A Race for Resources</p>
             <p className="text-sm text-foreground">
