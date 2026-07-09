@@ -20,6 +20,12 @@ import partsOfWeedsImg from "@/assets/learning/parts_of_weeds.jpg";
 import rootTunnelsImg from "@/assets/learning/root_tunnels.jpg";
 import weedInvestigatorImg from "@/assets/learning/weed_investigator.jpg";
 import weedInvestigator2Img from "@/assets/learning/weed_investigator_2.jpg";
+import fieldMarathonImg from "@/assets/learning/field_marathon.jpg";
+import plantPicnicImg from "@/assets/learning/plant_picnic.jpg";
+import fiveEssentialsImg from "@/assets/learning/5_essentials.jpg";
+import weedSuperheroesImg from "@/assets/learning/weed_fighting_superheroes.jpg";
+import invasivePlantImg from "@/assets/learning/invasive_plant.jpg";
+import goodWeedsImg from "@/assets/learning/good_weeds.jpg";
 
 type TopicId =
   | "names"
