@@ -4424,112 +4424,11 @@ function TopicContent({
 
           {/* Race track illustration */}
           <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <svg viewBox="0 0 400 180" className="w-full h-auto" role="img" aria-label="Cartoon race between a farmer, a crop, and a weed">
-              {/* sun */}
-              <circle cx="360" cy="30" r="18" fill="#FCD34D" />
-              <g stroke="#F59E0B" strokeWidth="2">
-                <line x1="360" y1="4" x2="360" y2="14" />
-                <line x1="360" y1="46" x2="360" y2="56" />
-                <line x1="334" y1="30" x2="344" y2="30" />
-                <line x1="376" y1="30" x2="386" y2="30" />
-              </g>
-
-              {/* ground */}
-              <rect x="0" y="140" width="400" height="40" fill="#8B5A2B" />
-              <rect x="0" y="135" width="400" height="6" fill="#4A7C2A" />
-
-              {/* track lanes */}
-              <line x1="10" y1="155" x2="360" y2="155" stroke="#F5F5DC" strokeWidth="2" strokeDasharray="8 6" />
-              <line x1="10" y1="170" x2="360" y2="170" stroke="#F5F5DC" strokeWidth="2" strokeDasharray="8 6" />
-
-              {/* finish line */}
-              <g>
-                <rect x="360" y="60" width="4" height="90" fill="#333" />
-                <g fill="#333">
-                  <rect x="364" y="60" width="10" height="10" />
-                  <rect x="374" y="70" width="10" height="10" />
-                  <rect x="364" y="80" width="10" height="10" />
-                  <rect x="374" y="90" width="10" height="10" />
-                  <rect x="364" y="100" width="10" height="10" />
-                </g>
-                <g fill="#fff">
-                  <rect x="374" y="60" width="10" height="10" />
-                  <rect x="364" y="70" width="10" height="10" />
-                  <rect x="374" y="80" width="10" height="10" />
-                  <rect x="364" y="90" width="10" height="10" />
-                  <rect x="374" y="100" width="10" height="10" />
-                </g>
-                <text x="345" y="55" fontFamily="sans-serif" fontSize="10" fontWeight="bold" fill="#333">FINISH</text>
-              </g>
-
-              {/* Farmer runner (behind, cheering) */}
-              <g transform="translate(60,110)">
-                {/* hat */}
-                <ellipse cx="0" cy="-2" rx="14" ry="3" fill="#B45309" />
-                <path d="M -8 -2 Q 0 -14 8 -2 Z" fill="#D97706" />
-                {/* head */}
-                <circle cx="0" cy="6" r="6" fill="#FCD9B8" />
-                {/* body (overalls) */}
-                <rect x="-6" y="12" width="12" height="16" fill="#1D4ED8" rx="2" />
-                <rect x="-6" y="12" width="12" height="4" fill="#DC2626" />
-                {/* arms up cheering */}
-                <line x1="-6" y1="15" x2="-14" y2="6" stroke="#FCD9B8" strokeWidth="3" strokeLinecap="round" />
-                <line x1="6" y1="15" x2="14" y2="6" stroke="#FCD9B8" strokeWidth="3" strokeLinecap="round" />
-                {/* legs running */}
-                <line x1="-3" y1="28" x2="-6" y2="40" stroke="#1D4ED8" strokeWidth="4" strokeLinecap="round" />
-                <line x1="3" y1="28" x2="8" y2="40" stroke="#1D4ED8" strokeWidth="4" strokeLinecap="round" />
-                {/* smile */}
-                <path d="M -2 7 Q 0 9 2 7" stroke="#333" strokeWidth="1" fill="none" />
-                <circle cx="-2" cy="5" r="0.8" fill="#333" />
-                <circle cx="2" cy="5" r="0.8" fill="#333" />
-                <text x="-18" y="-10" fontFamily="sans-serif" fontSize="8" fontWeight="bold" fill="#1D4ED8">Farmer</text>
-              </g>
-
-              {/* Crop runner (corn) — middle */}
-              <g transform="translate(180,105)">
-                <text x="-12" y="-16" fontFamily="sans-serif" fontSize="8" fontWeight="bold" fill="#166534">Crop</text>
-                {/* stalk */}
-                <rect x="-2" y="0" width="4" height="30" fill="#4A7C2A" rx="1" />
-                {/* leaves */}
-                <path d="M 0 6 Q -14 2 -18 -6 Q -8 4 0 10 Z" fill="#65A30D" />
-                <path d="M 0 12 Q 14 8 18 0 Q 8 10 0 16 Z" fill="#65A30D" />
-                {/* corn cob head */}
-                <ellipse cx="0" cy="-4" rx="6" ry="9" fill="#FCD34D" />
-                <ellipse cx="-2" cy="-6" rx="0.8" ry="0.8" fill="#333" />
-                <ellipse cx="2" cy="-6" rx="0.8" ry="0.8" fill="#333" />
-                <path d="M -2 -2 Q 0 0 2 -2" stroke="#333" strokeWidth="1" fill="none" />
-                {/* husk arms */}
-                <path d="M -4 -6 L -12 -14" stroke="#65A30D" strokeWidth="3" strokeLinecap="round" />
-                <path d="M 4 -6 L 12 -14" stroke="#65A30D" strokeWidth="3" strokeLinecap="round" />
-                {/* running legs */}
-                <line x1="-2" y1="30" x2="-6" y2="40" stroke="#4A7C2A" strokeWidth="3" strokeLinecap="round" />
-                <line x1="2" y1="30" x2="6" y2="40" stroke="#4A7C2A" strokeWidth="3" strokeLinecap="round" />
-              </g>
-
-              {/* Weed runner — leading */}
-              <g transform="translate(300,105)">
-                <text x="-10" y="-22" fontFamily="sans-serif" fontSize="8" fontWeight="bold" fill="#B91C1C">Weed</text>
-                {/* wild leaves */}
-                <path d="M 0 4 Q -18 -6 -20 -18 Q -6 -6 0 4 Z" fill="#166534" />
-                <path d="M 0 4 Q 18 -6 20 -18 Q 6 -6 0 4 Z" fill="#166534" />
-                <path d="M 0 4 Q -10 -14 0 -22 Q 10 -14 0 4 Z" fill="#15803D" />
-                {/* stem */}
-                <rect x="-2" y="4" width="4" height="26" fill="#166534" rx="1" />
-                {/* sneaky face */}
-                <circle cx="0" cy="-8" r="6" fill="#84CC16" />
-                <circle cx="-2" cy="-9" r="0.9" fill="#333" />
-                <circle cx="2" cy="-9" r="0.9" fill="#333" />
-                <path d="M -3 -5 Q 0 -3 3 -6" stroke="#333" strokeWidth="1" fill="none" />
-                {/* fast legs with speed lines */}
-                <line x1="-2" y1="30" x2="-8" y2="42" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
-                <line x1="2" y1="30" x2="8" y2="42" stroke="#166534" strokeWidth="3" strokeLinecap="round" />
-                <g stroke="#B91C1C" strokeWidth="1.5" strokeLinecap="round">
-                  <line x1="-18" y1="20" x2="-28" y2="20" />
-                  <line x1="-18" y1="26" x2="-30" y2="26" />
-                  <line x1="-18" y1="32" x2="-26" y2="32" />
-                </g>
-              </g>
-            </svg>
+            <img
+              src={fieldMarathonImg}
+              alt="Cartoon of Farmer Frank, Cornelius Cob, and Wally Weed racing in the Field Day Marathon"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
             <p className="text-center text-xs text-muted-foreground mt-2">
               And they're off! Every plant is racing to make seeds before the season ends.
             </p>
