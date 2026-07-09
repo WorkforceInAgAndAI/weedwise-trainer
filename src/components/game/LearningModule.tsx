@@ -3502,6 +3502,13 @@ function TopicContent({
                   </span>
                 </div>
                 <p className="text-sm text-foreground">{s.body}</p>
+                {s.key === "spread" && (
+                  <img
+                    src={weedLifeCycleImg}
+                    alt="Illustrated map of a plant's life cycle from seed through spreading seeds"
+                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -3533,6 +3540,12 @@ function TopicContent({
               </p>
             </div>
           </div>
+
+          <img
+            src={annualVsPerennialImg}
+            alt="Side-by-side diagram comparing an annual plant's one-year life cycle to a perennial plant that regrows for multiple years"
+            className="w-full rounded-lg bg-background/60 object-contain"
+          />
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
