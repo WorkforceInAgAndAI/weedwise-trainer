@@ -3324,6 +3324,13 @@ function TopicContent({
                 <p className="text-sm text-foreground">
                   <strong>Weed fact:</strong> {p.weedFact}
                 </p>
+                {p.key === "seeds" && (
+                  <img
+                    src={partsOfWeedsImg}
+                    alt="Detailed illustration labeling the parts of a weed: roots, stem, leaves, flowers, and seeds"
+                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
+                  />
+                )}
               </div>
             ))}
           </div>
