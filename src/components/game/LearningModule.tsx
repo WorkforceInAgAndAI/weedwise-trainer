@@ -10,6 +10,16 @@ import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/co
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
+import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
+import surfSeedImg from "@/assets/learning/surf_seed.jpg";
+import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
+import annualVsPerennialImg from "@/assets/learning/annual_vs_perennial.jpg";
+import weedLifeCycleImg from "@/assets/learning/weed_life_cycle.jpg";
+import cropsVsWeedsImg from "@/assets/learning/crops_vs_weeds.jpg";
+import partsOfWeedsImg from "@/assets/learning/parts_of_weeds.jpg";
+import rootTunnelsImg from "@/assets/learning/root_tunnels.jpg";
+import weedInvestigatorImg from "@/assets/learning/weed_investigator.jpg";
+import weedInvestigator2Img from "@/assets/learning/weed_investigator_2.jpg";
 
 type TopicId =
   | "names"
@@ -3314,6 +3324,13 @@ function TopicContent({
                 <p className="text-sm text-foreground">
                   <strong>Weed fact:</strong> {p.weedFact}
                 </p>
+                {p.key === "seeds" && (
+                  <img
+                    src={partsOfWeedsImg}
+                    alt="Detailed illustration labeling the parts of a weed: roots, stem, leaves, flowers, and seeds"
+                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -3400,6 +3417,12 @@ function TopicContent({
               </div>
             </div>
           </div>
+
+          <img
+            src={cropsVsWeedsImg}
+            alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
+            className="w-full rounded-lg bg-background/60 object-contain"
+          />
 
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
@@ -3492,6 +3515,13 @@ function TopicContent({
                   </span>
                 </div>
                 <p className="text-sm text-foreground">{s.body}</p>
+                {s.key === "spread" && (
+                  <img
+                    src={weedLifeCycleImg}
+                    alt="Illustrated map of a plant's life cycle from seed through spreading seeds"
+                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -3524,6 +3554,12 @@ function TopicContent({
             </div>
           </div>
 
+          <img
+            src={annualVsPerennialImg}
+            alt="Side-by-side diagram comparing an annual plant's one-year life cycle to a perennial plant that regrows for multiple years"
+            className="w-full rounded-lg bg-background/60 object-contain"
+          />
+
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
             <p className="text-sm text-foreground">
@@ -3554,6 +3590,8 @@ function TopicContent({
           how: "Some seeds have fluffy tops that work just like tiny parachutes. When the wind blows, they float through the air to find a new place to grow.",
           example: "Dandelion seeds are famous parachute jumpers — one puff of breath and they're off!",
           extras: "Other wind riders: Milkweed, Canada Thistle, and Horseweed.",
+          image: dandelionHelicopterImg,
+          imageAlt: "Cartoon dandelion seed floating with a fluffy parachute",
         },
         {
           key: "water",
@@ -3564,6 +3602,8 @@ function TopicContent({
           how: "Some seeds love to surf on water! Rain puddles, streams, and rivers can carry them far away, just like a surfer riding a wave. When the water slows down, the seed lands and can start growing.",
           example: "Curly Dock seeds float on water and travel down streams to brand-new spots.",
           extras: "Other water surfers: Smartweed and many wetland weeds.",
+          image: surfSeedImg,
+          imageAlt: "Cartoon seed with a surfboard heading to the beach",
         },
         {
           key: "animal",
@@ -3574,6 +3614,8 @@ function TopicContent({
           how: "Some seeds have tiny hooks, spikes, or sticky parts that cling to an animal's fur — or even your socks! They're like hitchhikers asking for a free ride. When the seed falls off later, it might grow in a brand-new place.",
           example: "Common Burdock and Cocklebur have prickly seed pods that stick to almost anything.",
           extras: "Other hitchhikers: Beggarticks and Foxtail bristles.",
+          image: seedHitchhikerImg,
+          imageAlt: "Cartoon corn seed hitchhiking on the back of a skunk",
         },
       ];
 
@@ -3595,6 +3637,11 @@ function TopicContent({
                   <p className="font-display font-bold text-foreground text-base">{t.title}</p>
                   <span className="text-xs italic text-muted-foreground">— "{t.nickname}"</span>
                 </div>
+                <img
+                  src={t.image}
+                  alt={t.imageAlt}
+                  className="w-full max-w-sm mx-auto rounded-lg bg-background/60 object-contain"
+                />
                 <p className="text-sm text-foreground">
                   <strong>How it works:</strong> {t.how}
                 </p>
@@ -3949,6 +3996,19 @@ function TopicContent({
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
           </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <img
+              src={weedInvestigatorImg}
+              alt="Cartoon weed detective with a magnifying glass investigating clues underground"
+              className="w-full rounded-lg bg-background/60 object-contain"
+            />
+            <img
+              src={weedInvestigator2Img}
+              alt="Cartoon weed detective following clues toward an evidence lock-box"
+              className="w-full rounded-lg bg-background/60 object-contain"
+            />
+          </div>
         </div>
       );
     }
@@ -4122,6 +4182,11 @@ function TopicContent({
               <strong>Field Bindweed</strong>, and <strong>Quackgrass</strong>. Their tunnels can stretch
               many feet in every direction!
             </p>
+            <img
+              src={rootTunnelsImg}
+              alt="Cartoon weed digging secret underground tunnels with a lantern and pickaxe"
+              className="w-full rounded-lg bg-background/60 object-contain mt-2"
+            />
           </div>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
