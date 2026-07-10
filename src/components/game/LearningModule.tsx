@@ -4286,6 +4286,8 @@ function TopicContent({
         funFact: string;
         dot: string;
         bg: string;
+        photo?: string;
+        photoAlt?: string;
       }> = [
         {
           id: "Dandelion",
