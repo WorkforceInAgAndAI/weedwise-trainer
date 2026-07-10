@@ -4113,12 +4113,12 @@ function TopicContent({
 
           <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
             <img
-              src={invasivePlantImg}
-              alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
+              src={weedBulliesImg}
+              alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
             <p className="text-center text-xs text-muted-foreground mt-2">
-              Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
+              Invasive plants act like playground bullies — pushing native plants out of their space.
             </p>
           </div>
 
@@ -4153,6 +4153,17 @@ function TopicContent({
               As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for
               the plants that belong there. That makes it harder for native plants, wildflowers, and even
               some animals to survive.
+            </p>
+          </div>
+
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={invasivePlantImg}
+              alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
             </p>
           </div>
 
