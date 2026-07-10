@@ -1083,9 +1083,9 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   };
   // Infer display grade from the initial topic so the topic actually appears in the tab.
   const initialGrade: LearningGradeLevel = (() => {
-    if (!initialTopicId) return "middle";
+    if (!initialTopicId) return "elementary";
     const t = TOPICS.find((x) => x.id === (initialTopicId as TopicId));
-    if (!t) return "middle";
+    if (!t) return "elementary";
     if (t.plantExplorer) return "elementary";
     // Prefer the lowest source grade the topic supports, then shift up.
     if (t.grades.includes("elementary")) return sourceToDisplay.elementary;
