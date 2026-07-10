@@ -3543,8 +3543,8 @@ function TopicContent({
                 <p className="text-sm text-foreground">{s.body}</p>
                 {s.key === "spread" && (
                   <img
-                    src={weedLifeCycleImg}
-                    alt="Illustrated map of a plant's life cycle from seed through spreading seeds"
+                    src={plantLifeCycleImg}
+                    alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
                     className="w-full rounded-lg bg-background/60 object-contain mt-2"
                   />
                 )}
