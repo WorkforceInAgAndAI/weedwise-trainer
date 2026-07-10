@@ -26,6 +26,12 @@ import fiveEssentialsImg from "@/assets/learning/5_essentials.jpg";
 import weedSuperheroesImg from "@/assets/learning/weed_fighting_superheroes.jpg";
 import invasivePlantImg from "@/assets/learning/invasive_plant.jpg";
 import goodWeedsImg from "@/assets/learning/good_weeds.jpg";
+import weedBulliesImg from "@/assets/learning/weed_bullies.jpg";
+import largeCrabgrassPhoto from "@/assets/learning/large_crabgrass_photo.jpg";
+import commonMilkweedPhoto from "@/assets/learning/common_milkweed_photo.jpg";
+import plantLifeCycleImg from "@/assets/learning/plant_life_cycle.jpg";
+import weedControlToolsImg from "@/assets/learning/weed_control_tools.jpg";
+import plantDetectiveImg from "@/assets/learning/plant_detective.jpg";
 
 type TopicId =
   | "names"
