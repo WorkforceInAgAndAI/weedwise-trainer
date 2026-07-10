@@ -14,7 +14,6 @@ import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
 import annualVsPerennialImg from "@/assets/learning/annual_vs_perennial.jpg";
-import weedLifeCycleImg from "@/assets/learning/weed_life_cycle.jpg";
 import cropsVsWeedsImg from "@/assets/learning/crops_vs_weeds.jpg";
 import partsOfWeedsImg from "@/assets/learning/parts_of_weeds.jpg";
 import rootTunnelsImg from "@/assets/learning/root_tunnels.jpg";
@@ -26,6 +25,12 @@ import fiveEssentialsImg from "@/assets/learning/5_essentials.jpg";
 import weedSuperheroesImg from "@/assets/learning/weed_fighting_superheroes.jpg";
 import invasivePlantImg from "@/assets/learning/invasive_plant.jpg";
 import goodWeedsImg from "@/assets/learning/good_weeds.jpg";
+import weedBulliesImg from "@/assets/learning/weed_bullies.jpg";
+import largeCrabgrassPhoto from "@/assets/learning/large_crabgrass_photo.jpg";
+import commonMilkweedPhoto from "@/assets/learning/common_milkweed_photo.jpg";
+import plantLifeCycleImg from "@/assets/learning/plant_life_cycle.jpg";
+import weedControlToolsImg from "@/assets/learning/weed_control_tools.jpg";
+import plantDetectiveImg from "@/assets/learning/plant_detective.jpg";
 
 type TopicId =
   | "names"
@@ -298,6 +303,15 @@ const TOPICS: Topic[] = [
     category: "control",
   },
   {
+    id: "weed-superheroes",
+    name: "The 5 Weed-Fighting Superheroes",
+    icon: "control",
+    description: "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
+  {
     id: "plant-parts",
     name: "Parts of a Plant",
     icon: "leaf",
@@ -338,15 +352,6 @@ const TOPICS: Topic[] = [
     name: "Why Are Weeds a Problem?",
     icon: "control",
     description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
-    grades: [],
-    plantExplorer: true,
-    category: "control",
-  },
-  {
-    id: "weed-superheroes",
-    name: "The 5 Weed-Fighting Superheroes",
-    icon: "control",
-    description: "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -1077,9 +1082,9 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   };
   // Infer display grade from the initial topic so the topic actually appears in the tab.
   const initialGrade: LearningGradeLevel = (() => {
-    if (!initialTopicId) return "middle";
+    if (!initialTopicId) return "elementary";
     const t = TOPICS.find((x) => x.id === (initialTopicId as TopicId));
-    if (!t) return "middle";
+    if (!t) return "elementary";
     if (t.plantExplorer) return "elementary";
     // Prefer the lowest source grade the topic supports, then shift up.
     if (t.grades.includes("elementary")) return sourceToDisplay.elementary;
@@ -1258,9 +1263,12 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 onOpenPractice={onOpenPractice}
               />
               {(() => {
-                const idx = availableTopics.findIndex((t) => t.id === selectedTopic);
-                const prev = idx > 0 ? availableTopics[idx - 1] : null;
-                const next = idx >= 0 && idx < availableTopics.length - 1 ? availableTopics[idx + 1] : null;
+                // Match the display order (grouped by category) so Previous/Next
+                // walks the modules in the same order the user sees them.
+                const orderedTopics = topicsByCategory.flatMap((g) => g.topics);
+                const idx = orderedTopics.findIndex((t) => t.id === selectedTopic);
+                const prev = idx > 0 ? orderedTopics[idx - 1] : null;
+                const next = idx >= 0 && idx < orderedTopics.length - 1 ? orderedTopics[idx + 1] : null;
                 return (
                   <div className="mt-8 pt-5 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
                     <button
@@ -3534,8 +3542,8 @@ function TopicContent({
                 <p className="text-sm text-foreground">{s.body}</p>
                 {s.key === "spread" && (
                   <img
-                    src={weedLifeCycleImg}
-                    alt="Illustrated map of a plant's life cycle from seed through spreading seeds"
+                    src={plantLifeCycleImg}
+                    alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
                     className="w-full rounded-lg bg-background/60 object-contain mt-2"
                   />
                 )}
@@ -4021,6 +4029,11 @@ function TopicContent({
                 </div>
               ))}
             </div>
+            <img
+              src={plantDetectiveImg}
+              alt="Be a Plant Detective poster — use your eyes not your hands, observe clues, ask a trusted adult, and wash up after playing"
+              className="w-full rounded-lg bg-background/60 object-contain mt-3"
+            />
           </div>
 
           <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
@@ -4104,12 +4117,12 @@ function TopicContent({
 
           <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
             <img
-              src={invasivePlantImg}
-              alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
+              src={weedBulliesImg}
+              alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
             <p className="text-center text-xs text-muted-foreground mt-2">
-              Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
+              Invasive plants act like playground bullies — pushing native plants out of their space.
             </p>
           </div>
 
@@ -4144,6 +4157,17 @@ function TopicContent({
               As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for
               the plants that belong there. That makes it harder for native plants, wildflowers, and even
               some animals to survive.
+            </p>
+          </div>
+
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={invasivePlantImg}
+              alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
             </p>
           </div>
 
@@ -4267,6 +4291,8 @@ function TopicContent({
         funFact: string;
         dot: string;
         bg: string;
+        photo?: string;
+        photoAlt?: string;
       }> = [
         {
           id: "Dandelion",
@@ -4291,6 +4317,8 @@ function TopicContent({
           funFact: "It's still a grass, but it's a weed because it shows up where we don't want it!",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
+          photo: largeCrabgrassPhoto,
+          photoAlt: "Large Crabgrass sprawling on gravel with wide flat blades",
         },
         {
           id: "giant-foxtail",
@@ -4315,6 +4343,8 @@ function TopicContent({
           funFact: "In nature, it's a hero — monarch butterflies NEED it! But in a crop field, it's still a weed.",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
+          photo: commonMilkweedPhoto,
+          photoAlt: "Cluster of pink-purple Common Milkweed flowers with broad green leaves",
         },
         {
           id: "lambsquarters",
@@ -4348,7 +4378,7 @@ function TopicContent({
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
         },
-      ];
+      ] as Array<{ id: string; name: string; spotIt: string; funFact: string; dot: string; bg: string; photo?: string; photoAlt?: string }>;
 
       return (
         <div className="space-y-5">
@@ -4373,7 +4403,11 @@ function TopicContent({
                   <p className="font-display font-bold text-foreground text-base">{w.name}</p>
                 </div>
                 <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
-                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  {w.photo ? (
+                    <img src={w.photo} alt={w.photoAlt ?? w.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  )}
                 </div>
                 <p className="text-sm text-foreground">
                   <strong>Spot it:</strong> {w.spotIt}
@@ -4735,6 +4769,11 @@ function TopicContent({
               and use two or three methods together. Physical, cultural, chemical, biological, and preventative —
               five ways to keep crops winning the race!
             </p>
+            <img
+              src={weedControlToolsImg}
+              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
+              className="w-full rounded-lg bg-background/60 object-contain mt-2"
+            />
           </div>
 
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
