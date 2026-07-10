@@ -4764,6 +4764,11 @@ function TopicContent({
               and use two or three methods together. Physical, cultural, chemical, biological, and preventative —
               five ways to keep crops winning the race!
             </p>
+            <img
+              src={weedControlToolsImg}
+              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
+              className="w-full rounded-lg bg-background/60 object-contain mt-2"
+            />
           </div>
 
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
