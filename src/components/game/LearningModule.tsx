@@ -1264,9 +1264,12 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 onOpenPractice={onOpenPractice}
               />
               {(() => {
-                const idx = availableTopics.findIndex((t) => t.id === selectedTopic);
-                const prev = idx > 0 ? availableTopics[idx - 1] : null;
-                const next = idx >= 0 && idx < availableTopics.length - 1 ? availableTopics[idx + 1] : null;
+                // Match the display order (grouped by category) so Previous/Next
+                // walks the modules in the same order the user sees them.
+                const orderedTopics = topicsByCategory.flatMap((g) => g.topics);
+                const idx = orderedTopics.findIndex((t) => t.id === selectedTopic);
+                const prev = idx > 0 ? orderedTopics[idx - 1] : null;
+                const next = idx >= 0 && idx < orderedTopics.length - 1 ? orderedTopics[idx + 1] : null;
                 return (
                   <div className="mt-8 pt-5 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
                     <button
