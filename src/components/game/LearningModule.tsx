@@ -4396,7 +4396,11 @@ function TopicContent({
                   <p className="font-display font-bold text-foreground text-base">{w.name}</p>
                 </div>
                 <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
-                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  {w.photo ? (
+                    <img src={w.photo} alt={w.photoAlt ?? w.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                  )}
                 </div>
                 <p className="text-sm text-foreground">
                   <strong>Spot it:</strong> {w.spotIt}
