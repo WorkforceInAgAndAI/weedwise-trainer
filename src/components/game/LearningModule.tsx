@@ -4029,6 +4029,11 @@ function TopicContent({
                 </div>
               ))}
             </div>
+            <img
+              src={plantDetectiveImg}
+              alt="Be a Plant Detective poster — use your eyes not your hands, observe clues, ask a trusted adult, and wash up after playing"
+              className="w-full rounded-lg bg-background/60 object-contain mt-3"
+            />
           </div>
 
           <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
