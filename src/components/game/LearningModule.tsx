@@ -4371,7 +4371,7 @@ function TopicContent({
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
         },
-      ];
+      ] as Array<{ id: string; name: string; spotIt: string; funFact: string; dot: string; bg: string; photo?: string; photoAlt?: string }>;
 
       return (
         <div className="space-y-5">
