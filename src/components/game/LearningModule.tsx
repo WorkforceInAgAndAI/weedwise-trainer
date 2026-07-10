@@ -4310,6 +4310,8 @@ function TopicContent({
           funFact: "It's still a grass, but it's a weed because it shows up where we don't want it!",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
+          photo: largeCrabgrassPhoto,
+          photoAlt: "Large Crabgrass sprawling on gravel with wide flat blades",
         },
         {
           id: "giant-foxtail",
@@ -4334,6 +4336,8 @@ function TopicContent({
           funFact: "In nature, it's a hero — monarch butterflies NEED it! But in a crop field, it's still a weed.",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
+          photo: commonMilkweedPhoto,
+          photoAlt: "Cluster of pink-purple Common Milkweed flowers with broad green leaves",
         },
         {
           id: "lambsquarters",
