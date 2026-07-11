@@ -43,7 +43,7 @@ const CATEGORIES = [
   { id: 'parasitic', label: 'Parasitic Plants', Icon: Link, borderColor: 'border-accent/50' },
 ];
 
-const TIMER_SECONDS = 10;
+const TIMER_SECONDS = 15;
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
@@ -158,7 +158,7 @@ export default function EcologyScramble({ onBack, gradeLabel }: Props) {
                 ? isCorrect
                   ? `Bullseye! "${round.need.label}" lives with ${correctLabel?.toLowerCase()}.`
                   : `Not quite — "${round.need.label}" belongs with ${correctLabel}. ${round.correctCategory === 'aquatic' ? 'Think water plants like duckweed.' : round.correctCategory === 'parasitic' ? 'Parasitic plants steal from a host.' : 'Most weeds in your fields live on land.'}`
-                : `Read the survival need, then tap the plant type that needs it. You've got 10 seconds — go!`
+                : `Read the survival need, then tap the plant type that needs it. You've got 15 seconds — go!`
             }
           />
           {/* Timer bar */}
