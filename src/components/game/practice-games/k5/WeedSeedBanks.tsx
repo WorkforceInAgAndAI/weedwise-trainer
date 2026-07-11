@@ -51,6 +51,10 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const mostPrevalent = sortedPiles[0]?.weed.commonName ?? '';
   const leastPrevalent = sortedPiles[sortedPiles.length - 1]?.weed.commonName ?? '';
 
+  // Shuffled version for the prediction screens so students can't just pick the
+  // first/last option in a sorted list. Recap panel still shows sorted order.
+  const shuffledPiles = useMemo(() => shuffle(piles), [piles]);
+
   // Choices for matching: shuffled list of weed names from these piles.
   const nameChoices = useMemo(() => shuffle(piles.map(p => p.weed.commonName)), [piles]);
 
@@ -166,7 +170,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
               />
               <p className="text-sm text-muted-foreground mb-4">Which weed will be <span className="font-bold">{isMost ? 'most' : 'least'}</span> prevalent next year?</p>
               <div className="grid gap-2 mb-4">
-                {sortedPiles.map(p => {
+                {shuffledPiles.map(p => {
                   let cls = 'border-border bg-card text-foreground';
                   if (checked && p.weed.commonName === correctName) cls = 'border-green-500 bg-green-500/20 text-foreground';
                   else if (checked && answer === p.weed.commonName && p.weed.commonName !== correctName) cls = 'border-destructive bg-destructive/20 text-foreground';
