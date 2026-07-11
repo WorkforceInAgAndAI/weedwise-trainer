@@ -4143,20 +4143,24 @@ function TopicContent({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-2">
-              <p className="font-display font-bold text-success text-base">Many Weeds Are Safe to Look At</p>
-              <p className="text-sm text-foreground">
-                Lots of weeds are perfectly fine to observe from a distance. Watching how they grow is a
-                great way to learn about nature!
-              </p>
-            </div>
-            <div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 space-y-2">
-              <p className="font-display font-bold text-destructive text-base">Some Weeds Can Cause Trouble</p>
-              <p className="text-sm text-foreground">
-                A few weeds can cause itchy skin, rashes, stomach aches, or other health problems if you
-                touch or taste them. That's why we stay careful!
-              </p>
-            </div>
+            <RevealBox
+              title="Many Weeds Are Safe to Look At"
+              titleClass="text-emerald-100"
+              borderClass="border-emerald-400"
+              coverClass="bg-emerald-700"
+              openClass="bg-emerald-50"
+              textClass="text-emerald-950"
+              body="Lots of weeds are perfectly fine to observe from a distance. Watching how they grow is a great way to learn about nature!"
+            />
+            <RevealBox
+              title="Some Weeds Can Cause Trouble"
+              titleClass="text-red-50"
+              borderClass="border-red-400"
+              coverClass="bg-red-700"
+              openClass="bg-red-50"
+              textClass="text-red-950"
+              body="A few weeds can cause itchy skin, rashes, stomach aches, or other health problems if you touch or taste them. That's why we stay careful!"
+            />
           </div>
 
           {/* Image moved above the Detective section per request */}
@@ -4179,13 +4183,15 @@ function TopicContent({
 
           <div className="grid gap-4 md:grid-cols-2 items-start">
             <div className="space-y-3">
-              <div className="bg-destructive/10 border-4 border-destructive/60 rounded-lg p-5 space-y-2">
-                <p className="font-display font-bold text-destructive text-base">🏆 The Golden Safety Rule</p>
-                <p className="text-sm text-foreground">
-                  Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
-                  your <strong>mouth</strong>!
-                </p>
-              </div>
+              <RevealBox
+                title="🏆 The Golden Safety Rule"
+                titleClass="text-yellow-50"
+                borderClass="border-yellow-400"
+                coverClass="bg-gradient-to-br from-amber-600 to-red-700"
+                openClass="bg-amber-50"
+                textClass="text-amber-950"
+                body={<>Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with your <strong>mouth</strong>!</>}
+              />
               <div className="bg-amber-50/95 border-2 border-amber-900 rounded-lg p-4 text-sm text-foreground shadow">
                 <p className="font-semibold text-slate-900 mb-1">Remember:</p>
                 <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
