@@ -2870,6 +2870,7 @@ function TopicContent({
                 </div>
               ))}
             </div>
+            <BiennialYearComparison />
           </div>
 
           {/* Perennial */}
