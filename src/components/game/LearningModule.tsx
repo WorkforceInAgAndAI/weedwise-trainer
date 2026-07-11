@@ -3959,27 +3959,7 @@ function TopicContent({
       );
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       (unused legacy) — keep placeholder to avoid touching more code
-    ═══════════════════════════════════════════════════════════ */
-    case "__picnic_legacy_never__": {
-      return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Welcome to the Field Picnic!</p>
-            <p>
-              Imagine all the plants in the field are having a picnic. There is just enough sunlight, water,
-              nutrients, and space for all the crop plants to grow big and healthy.
-            </p>
-            <p>
-              Now imagine some <strong>weeds</strong> show up… uninvited. They start using the sunlight,
-              drinking the water, taking the nutrients, and filling up the space. Suddenly, there isn't
-              enough for everyone!
-            </p>
-          </div>
-        </div>
-      );
-    }
+    /* placeholder removed */
 
     /* ═══════════════════════════════════════════════════════════
        THE 5 WEED-FIGHTING SUPERHEROES (K-5 Plant Explorer)
