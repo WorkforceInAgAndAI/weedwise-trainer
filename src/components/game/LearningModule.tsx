@@ -4642,6 +4642,8 @@ function TopicContent({
         {
           key: "sunlight",
           title: "Sunlight",
+          emoji: "☀️",
+          prize: "🥇",
           dot: "bg-warning",
           bg: "bg-warning/10 border-warning/40",
           detail: "The energy plants use to cook their own food. Whoever grows tallest first hogs the biggest slice of sunshine!",
@@ -4649,6 +4651,8 @@ function TopicContent({
         {
           key: "water",
           title: "Water",
+          emoji: "💧",
+          prize: "🥈",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "Every racer needs a drink. Roots race down through the soil to sip up as much water as they can.",
@@ -4656,6 +4660,8 @@ function TopicContent({
         {
           key: "nutrients",
           title: "Nutrients",
+          emoji: "🌾",
+          prize: "🥉",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           detail: "Plant vitamins pulled from the soil. Big strong roots grab the most and grow the strongest stems.",
@@ -4665,6 +4671,7 @@ function TopicContent({
       const RACERS: Array<{
         key: "farmer" | "crop" | "weed";
         label: string;
+        emoji: string;
         color: string;
         chip: string;
         blurb: string;
@@ -4672,6 +4679,7 @@ function TopicContent({
         {
           key: "farmer",
           label: "The Farmer",
+          emoji: "👨‍🌾",
           color: "bg-primary/10 border-primary/40",
           chip: "bg-primary text-primary-foreground",
           blurb: "The coach of the whole race! Farmers plant crops, pull weeds, and cheer the crops on toward a big harvest.",
@@ -4679,6 +4687,7 @@ function TopicContent({
         {
           key: "crop",
           label: "The Crop",
+          emoji: "🌽",
           color: "bg-success/10 border-success/40",
           chip: "bg-success text-white",
           blurb: "Corn, wheat, tomatoes — the plants we grow on purpose. Their prize is turning sunshine and water into the food we eat.",
@@ -4686,6 +4695,7 @@ function TopicContent({
         {
           key: "weed",
           label: "The Weed",
+          emoji: "🌿",
           color: "bg-destructive/10 border-destructive/40",
           chip: "bg-destructive text-white",
           blurb: "The uninvited speed demon. Weeds sprout fast, grab resources, and try to make as many seeds as possible before the season ends.",
@@ -4693,8 +4703,19 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <div
+          className="space-y-5 p-5 rounded-2xl relative overflow-hidden"
+          style={{
+            background:
+              "repeating-linear-gradient(90deg, hsl(0 0% 5%) 0 24px, hsl(0 0% 100%) 24px 48px)",
+          }}
+        >
+          <div className="rounded-2xl bg-white border-4 border-black p-5 text-center shadow-lg">
+            <p className="font-display font-extrabold text-black text-2xl tracking-wider">🏁 THE GREAT GARDEN RACE 🏁</p>
+            <p className="text-xs text-black mt-1">🏃 Ready, set, GROW!</p>
+          </div>
+
+          <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-4 border-black">
             <p className="font-display font-bold text-primary text-base">On Your Mark, Get Set, Grow!</p>
             <p>
               Imagine a garden or farm field isn't just a place for plants to grow — it's the site of a{" "}
@@ -4705,7 +4726,7 @@ function TopicContent({
           </div>
 
           {/* Race track illustration */}
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-black bg-gradient-to-b from-sky-100 to-amber-200 p-4">
             <img
               src={fieldMarathonImg}
               alt="Cartoon of Farmer Frank, Cornelius Cob, and Wally Weed racing in the Field Day Marathon"
@@ -4717,38 +4738,42 @@ function TopicContent({
             </p>
           </div>
 
-          {/* Contenders */}
-          <div className="space-y-3">
-            <p className="font-display font-bold text-primary text-base">Meet the Contenders</p>
-            {RACERS.map((r) => (
-              <div key={r.key} className={`rounded-lg border-2 p-4 space-y-2 ${r.color}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${r.chip}`}>{r.label}</span>
+          {/* Contenders side by side on a tan road */}
+          <div
+            className="rounded-xl p-4 border-4 border-black shadow-lg"
+            style={{ background: "linear-gradient(180deg, hsl(35 45% 75%) 0%, hsl(30 40% 60%) 100%)" }}
+          >
+            <p className="font-display font-extrabold text-black text-center text-lg mb-3">🏟️ Meet the Contenders</p>
+            <div className="grid grid-cols-3 gap-3">
+              {RACERS.map((r) => (
+                <div key={r.key} className={`rounded-lg border-4 border-black p-3 text-center space-y-2 bg-white`}>
+                  <div className="text-5xl">{r.emoji}</div>
+                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${r.chip}`}>{r.label}</span>
+                  <p className="text-xs text-foreground">{r.blurb}</p>
                 </div>
-                <p className="text-sm text-foreground">{r.blurb}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Resources */}
-          <div className="space-y-3">
-            <p className="font-display font-bold text-primary text-base">The Race for Resources</p>
-            <p className="text-sm text-foreground">
-              To win the race, a plant needs fuel. Every racer is scrambling to grab three big prizes from
-              the field:
+          {/* Resources shown as podium-style prizes */}
+          <div className="bg-white/95 rounded-xl p-4 border-4 border-black shadow-lg space-y-3">
+            <p className="font-display font-extrabold text-black text-center text-lg">🏆 The Race for Resources — 3 Big Prizes!</p>
+            <p className="text-sm text-foreground text-center">
+              To win the race, a plant needs fuel. Here are the prizes every racer is scrambling to grab:
             </p>
-            {RESOURCES.map((r) => (
-              <div key={r.key} className={`rounded-lg border-2 p-4 space-y-2 ${r.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${r.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{r.title}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {RESOURCES.map((r) => (
+                <div key={r.key} className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 text-center ${r.bg} relative`}>
+                  <div className="absolute -top-3 -right-2 text-3xl">{r.prize}</div>
+                  <div className="text-5xl">{r.emoji}</div>
+                  <p className="font-display font-extrabold text-foreground text-base">{r.title}</p>
+                  <p className="text-xs text-foreground">{r.detail}</p>
                 </div>
-                <p className="text-sm text-foreground">{r.detail}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <div className="bg-warning/10 border-2 border-warning/40 rounded-lg p-5 space-y-2">
+          <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-warning-foreground text-base">How the Race Plays Out</p>
             <p className="text-sm text-foreground">
               Weeds are the ultimate <strong>race car drivers</strong> of the plant world — built for speed
@@ -4758,7 +4783,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+          <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Who Cheers the Crops On?</p>
             <p className="text-sm text-foreground">
               That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close
@@ -4767,7 +4792,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+          <div className="bg-white/95 border-4 border-black rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>
               Every field is a race for sunlight, water, and nutrients. With a good coach — the farmer — the
