@@ -7501,12 +7501,12 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
       {open && (() => {
         const h = heroes.find((x) => x.key === open)!;
         return (
-          <div className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 ${h.bg}`}>
-            <p className="font-display font-extrabold text-foreground text-lg">{h.emoji} {h.hero}</p>
-            <span className="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-900">Power: {h.power}</span>
-            <p className="text-sm text-foreground"><strong>How the power works:</strong> {h.how}</p>
-            <p className="text-sm text-foreground"><strong>Best for:</strong> {h.bestFor}</p>
-            <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
+          <div className="rounded-lg border-4 border-yellow-400 p-4 space-y-2 bg-white shadow-xl">
+            <p className="font-display font-extrabold text-emerald-900 text-lg">{h.emoji} {h.hero}</p>
+            <span className="inline-block text-xs font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-950 border-2 border-emerald-900">Power: {h.power}</span>
+            <p className="text-sm text-slate-900 font-medium"><strong className="text-emerald-800">How the power works:</strong> {h.how}</p>
+            <p className="text-sm text-slate-900 font-medium"><strong className="text-emerald-800">Best for:</strong> {h.bestFor}</p>
+            <p className="text-xs text-slate-700 italic">{h.reallife}</p>
           </div>
         );
       })()}
