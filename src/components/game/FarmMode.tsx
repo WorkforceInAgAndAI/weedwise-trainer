@@ -479,12 +479,13 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  <h2 className="font-display font-bold text-lg text-foreground mb-4">Select Difficulty</h2>
  <div className="grid gap-3">
  {([
- { grade: 'elementary' as GradeLevel, label: 'Elementary (K-5)', desc: 'Identify weeds by common name. Simpler management choices.' },
- { grade: 'middle' as GradeLevel, label: 'Middle School (6-8)', desc: 'Economic thresholds, herbicide selectivity, and scouting patterns.' },
- { grade: 'high' as GradeLevel, label: 'High School (9-12)', desc: 'Identify by scientific name. Advanced herbicide and resistance management.' },
+ { grade: null, label: 'Grades K-5 · Explorer', desc: 'Coming soon — new K-5 farm experience in development.', disabled: true },
+ { grade: 'elementary' as GradeLevel, label: 'Grades 6-8 · Investigator', desc: 'Identify weeds by common name. Simpler management choices.' },
+ { grade: 'middle' as GradeLevel, label: 'Grades 9-12 · Specialist', desc: 'Economic thresholds, herbicide selectivity, and scouting patterns.' },
+ { grade: 'high' as GradeLevel, label: 'Collegiate · Scholar', desc: 'Identify by scientific name. Advanced herbicide and resistance management.' },
  ]).map(g => (
- <button key={g.grade} onClick={() => startGame(g.grade)}
- className="p-5 rounded-lg border border-border bg-card shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all text-left">
+ <button key={g.label} onClick={() => g.grade && startGame(g.grade)} disabled={!g.grade}
+ className={`p-5 rounded-lg border border-border bg-card shadow-card text-left transition-all ${g.grade ? 'hover:shadow-card-hover hover:border-primary/30' : 'opacity-60 cursor-not-allowed'}`}>
  <h3 className="font-semibold text-foreground">{g.label}</h3>
  <p className="text-sm text-muted-foreground mt-1">{g.desc}</p>
  </button>
