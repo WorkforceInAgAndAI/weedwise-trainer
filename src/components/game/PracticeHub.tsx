@@ -200,7 +200,11 @@ export default function PracticeHub({
 
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
- const gradeLabel = selectedGrade === 'k5' ? 'K-5' : selectedGrade === '68' ? '6-8' : '9-12';
+ const gradeLabel =
+   selectedGrade === 'newk5' ? 'K-5'
+   : selectedGrade === 'k5' ? '6-8'
+   : selectedGrade === '68' ? '9-12'
+   : 'Collegiate';
  const topicId = GAME_TO_TOPIC[selectedGame.id];
  return (
    <>
@@ -218,7 +222,12 @@ export default function PracticeHub({
  );
  }
 
- const games = selectedGrade === 'k5' ? k5Games : selectedGrade === '68' ? middleGames : selectedGrade === '912' ? highGames : [];
+ const games =
+   selectedGrade === 'newk5' ? []
+   : selectedGrade === 'k5' ? k5Games
+   : selectedGrade === '68' ? middleGames
+   : selectedGrade === '912' ? highGames
+   : [];
 
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
@@ -237,7 +246,10 @@ export default function PracticeHub({
  <h1 className="font-display font-bold text-xl text-foreground">Practice Games</h1>
  {screen !== 'grades' && (
  <p className="text-sm text-muted-foreground">
- {selectedGrade === 'k5' ? 'Grades K-5 · Explorer' : selectedGrade === '68' ? 'Grades 6-8 · Investigator' : 'Grades 9-12 · Specialist'}
+ {selectedGrade === 'newk5' ? 'Grades K-5 · Explorer'
+  : selectedGrade === 'k5' ? 'Grades 6-8 · Investigator'
+  : selectedGrade === '68' ? 'Grades 9-12 · Specialist'
+  : 'Collegiate · Scholar'}
  </p>
  )}
  </div>
@@ -279,9 +291,10 @@ export default function PracticeHub({
  <div className="grid gap-4 max-w-lg mx-auto mt-8">
  <h2 className="text-center text-muted-foreground mb-4 text-sm font-medium uppercase tracking-wider">Choose Your Level</h2>
  {[
- { id: 'k5', label: 'Grades K-5', sub: 'Explorer', Icon: Leaf, count: 15, accent: 'grade-elementary' },
- { id: '68', label: 'Grades 6-8', sub: 'Investigator', Icon: Microscope, count: 17, accent: 'grade-middle' },
- { id: '912', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: 14, accent: 'grade-high' },
+ { id: 'newk5', label: 'Grades K-5', sub: 'Explorer', Icon: Leaf, count: 0, accent: 'grade-elementary' },
+ { id: 'k5', label: 'Grades 6-8', sub: 'Investigator', Icon: Microscope, count: 15, accent: 'grade-middle' },
+ { id: '68', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: 17, accent: 'grade-high' },
+ { id: '912', label: 'Collegiate', sub: 'Scholar', Icon: GraduationCap, count: 14, accent: 'grade-high' },
  ].map(g => (
  <button
  key={g.id}
@@ -303,6 +316,13 @@ export default function PracticeHub({
 
  {/* Game Grid */}
  {screen === 'games' && (
+  games.length === 0 ? (
+    <div className="max-w-md mx-auto mt-16 text-center p-8 rounded-lg border border-dashed border-border bg-card/50">
+      <Leaf className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+      <h3 className="font-display font-bold text-foreground text-lg mb-1">Games coming soon</h3>
+      <p className="text-sm text-muted-foreground">New K-5 practice games will be added here.</p>
+    </div>
+  ) : (
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
  {games.map(g => {
  const earned = badges.filter(b => b.gameId.startsWith(`${g.id}-lv`));
@@ -331,6 +351,7 @@ export default function PracticeHub({
  </button>
  );})}
  </div>
+  )
  )}
 
  {/* Game Info / Launcher */}
@@ -357,10 +378,10 @@ export default function PracticeHub({
   {selectedGrade !== '912' && (
     <div className="mb-6 text-left">
       <FarmerGuide
-        gradeLabel={selectedGrade === 'k5' ? 'K-5' : '6-8'}
+         gradeLabel={selectedGrade === 'newk5' ? 'K-5' : selectedGrade === 'k5' ? '6-8' : '9-12'}
         tone="intro"
         message={
-          selectedGrade === 'k5'
+           selectedGrade === 'newk5'
             ? `Howdy partner! I'm Farmer Joe and I'll be your buddy through ${selectedGame.name}. Don't worry — I'll cheer you on and help if you get stuck. Ready? Let's go grow some smart weed scientists!`
             : `Welcome, scout. I'm Farmer Joe. I'll set the scene for ${selectedGame.name}, but you'll do the thinking. If you ever feel stuck, ask for a hint — otherwise, trust your training.`
         }
