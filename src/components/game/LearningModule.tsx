@@ -4399,7 +4399,7 @@ function TopicContent({
           id: "wild-parsnip",
           name: "10. Wild Parsnip",
           spotIt: "Tall plant with flat-topped clusters of tiny yellow flowers.",
-          funFact: "⚠️ Never touch it! Its sap plus sunlight can give you a nasty burn — always tell an adult if you see it.",
+          funFact: "WARNING — never touch it! Its sap plus sunlight can give you a nasty burn. Always tell an adult if you see it.",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
         },
