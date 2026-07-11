@@ -132,6 +132,66 @@ function SeedBankDiagram() {
   );
 }
 
+// Interactive multi-stage viewer for the "14 Weeds You Can Spot" module.
+function WeedSpotterCard({
+  w,
+}: {
+  w: {
+    id: string;
+    name: string;
+    spotIt: string;
+    funFact: string;
+    dot: string;
+    bg: string;
+    photo?: string;
+    photoAlt?: string;
+  };
+}) {
+  const STAGES = [
+    { key: "seed", label: "Seed" },
+    { key: "seedling", label: "Sprout" },
+    { key: "vegetative", label: "Leaves" },
+    { key: "flower", label: "Flower" },
+  ] as const;
+  const [stage, setStage] = useState<(typeof STAGES)[number]["key"]>("flower");
+  return (
+    <div className={`rounded-lg border-2 p-4 space-y-3 ${w.bg}`}>
+      <div className="flex items-center gap-2">
+        <span className={`w-3 h-3 rounded-full ${w.dot}`} />
+        <p className="font-display font-bold text-foreground text-base">{w.name}</p>
+      </div>
+      <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
+        {w.photo && stage === "flower" ? (
+          <img src={w.photo} alt={w.photoAlt ?? w.name} className="w-full h-full object-cover" />
+        ) : (
+          <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {STAGES.map((s) => (
+          <button
+            key={s.key}
+            onClick={() => setStage(s.key)}
+            className={`text-[11px] font-bold px-2 py-1 rounded-full border transition-all ${
+              stage === s.key
+                ? "bg-primary text-primary-foreground border-primary shadow"
+                : "bg-background/70 text-foreground border-border hover:border-primary/60"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      <p className="text-sm text-foreground">
+        <strong>Spot it:</strong> {w.spotIt}
+      </p>
+      <p className="text-sm text-foreground">
+        <strong>Fun fact:</strong> {w.funFact}
+      </p>
+    </div>
+  );
+}
+
 interface CategoryStyle {
   id: CategoryId;
   label: string;
