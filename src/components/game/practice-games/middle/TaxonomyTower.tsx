@@ -8,7 +8,8 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 interface PyramidLevel { question: string; options: [string, string]; correctIdx: number; }
 
-function buildPyramid(target: typeof weeds[0]): PyramidLevel[] {
+function buildPyramid(target: typeof weeds[0] | undefined): PyramidLevel[] {
+  if (!target) return [];
   const isMonocot = target.plantType === 'Monocot';
   const wrongName = shuffle(weeds.filter(w => w.id !== target.id))[0]?.commonName || 'Unknown';
   const nameOptions: [string, string] = Math.random() > 0.5
