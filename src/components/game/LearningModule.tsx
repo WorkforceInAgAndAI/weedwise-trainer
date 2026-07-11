@@ -31,6 +31,7 @@ import commonMilkweedPhoto from "@/assets/learning/common_milkweed_photo.jpg";
 import plantLifeCycleImg from "@/assets/learning/plant_life_cycle.jpg";
 import weedControlToolsImg from "@/assets/learning/weed_control_tools.jpg";
 import plantDetectiveImg from "@/assets/learning/plant_detective.jpg";
+import cornVsWeedImg from "@/assets/learning/corn_vs_weed.png";
 
 type TopicId =
   | "names"
