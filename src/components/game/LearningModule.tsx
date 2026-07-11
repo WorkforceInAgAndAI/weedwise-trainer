@@ -32,6 +32,8 @@ import plantLifeCycleImg from "@/assets/learning/plant_life_cycle.jpg";
 import weedControlToolsImg from "@/assets/learning/weed_control_tools.jpg";
 import plantDetectiveImg from "@/assets/learning/plant_detective.jpg";
 import cornVsWeedImg from "@/assets/learning/corn_vs_weed.png";
+import plantComparisonImg from "@/assets/learning/plant_comparison.png";
+import annualPerennialDiagramImg from "@/assets/learning/annual_perennial_diagram.png";
 
 type TopicId =
   | "names"
@@ -3176,94 +3178,81 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">The Five Things Every Plant Needs</p>
-            <p>
-              Every plant — whether it's a tiny sprout in your backyard or a huge corn plant on a farm — needs
-              <strong> five special things</strong> to live and grow: <strong>sunlight, water, air, nutrients,</strong>
-              and <strong>space</strong>.
-            </p>
-            <p>
-              When a plant gets all five, it grows tall, green, and healthy. When something is missing, the plant
-              gets weak. That's why farmers work hard to make sure their crops get every single one!
-            </p>
+          <div className="bg-gradient-to-br from-yellow-100 via-emerald-50 to-sky-100 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
+            <p className="font-display font-extrabold text-primary text-xl">5 Things Every Plant Needs!</p>
+            <p className="text-sm text-foreground">Say it with me: <strong>Sun, Water, Air, Food, and Space!</strong></p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <img
+            src={plantComparisonImg}
+            alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
+            className="w-full rounded-lg border-2 border-border object-contain bg-background"
+          />
+
+          {/* Big tappable icon cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {NEEDS.map((n) => (
-              <div key={n.key} className={`rounded-lg border-2 p-4 space-y-2 ${n.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${n.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{n.title}</p>
+              <details key={n.key} className={`group rounded-2xl border-2 p-3 cursor-pointer transition-transform hover:scale-105 ${n.bg}`}>
+                <summary className="list-none text-center space-y-1">
+                  <div className={`mx-auto w-12 h-12 rounded-full ${n.dot} flex items-center justify-center shadow-md`}>
+                    {n.key === "sun" && <Sparkles className="h-6 w-6 text-white" />}
+                    {n.key === "water" && <span className="text-2xl">💧</span>}
+                    {n.key === "air" && <span className="text-2xl">🌬️</span>}
+                    {n.key === "nutrients" && <Sprout className="h-6 w-6 text-white" />}
+                    {n.key === "space" && <span className="text-2xl">↔️</span>}
+                  </div>
+                  <p className="font-display font-extrabold text-foreground text-sm">{n.title}</p>
+                  <p className="text-[10px] text-muted-foreground italic">tap to peek!</p>
+                </summary>
+                <div className="mt-2 space-y-2 text-xs text-foreground">
+                  <p><strong>Plants use it to:</strong> {n.plantUses}</p>
+                  <p className="bg-destructive/10 rounded p-1"><strong>Weeds steal it:</strong> {n.weedSteals}</p>
                 </div>
-                <p className="text-sm text-foreground">
-                  <strong>What plants use it for:</strong> {n.plantUses}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>How weeds steal it:</strong> {n.weedSteals}
-                </p>
-              </div>
+              </details>
             ))}
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <img
-              src={fiveEssentialsImg}
-              alt="Plant comparison — a thriving sunflower with sunlight, water, air, nutrients, and space, next to a struggling plant with weed competition"
-              className="w-full h-auto rounded-md bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              With all five essentials, plants thrive. Take one away — or add weed competition — and they struggle.
+          {/* Weeds stealing from the table — VISUAL */}
+          <div className="rounded-2xl border-2 border-terracotta/50 bg-gradient-to-b from-amber-50 to-terracotta/10 p-5 space-y-4">
+            <p className="font-display font-extrabold text-terracotta text-lg text-center">🍽️ The Lunch Table Problem!</p>
+            <p className="text-sm text-foreground text-center">
+              Imagine the field is a lunch table. Farmer set out food for the crops — but weeds sneak in!
+            </p>
+            <div className="rounded-xl bg-amber-800/80 p-4 shadow-inner">
+              {/* Table with plates */}
+              <div className="grid grid-cols-5 gap-2 mb-2">
+                {["☀️","💧","🌬️","🌱","↔️"].map((emoji, i) => (
+                  <div key={i} className="aspect-square rounded-full bg-white/90 flex items-center justify-center text-2xl shadow">{emoji}</div>
+                ))}
+              </div>
+              <div className="h-2 bg-amber-950 rounded" />
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="rounded-lg bg-success/90 p-2 text-center">
+                  <p className="text-2xl">🌽</p>
+                  <p className="text-[11px] font-bold text-white">Crop = invited</p>
+                </div>
+                <div className="rounded-lg bg-destructive/90 p-2 text-center animate-pulse">
+                  <p className="text-2xl">🌿</p>
+                  <p className="text-[11px] font-bold text-white">Weed = crashing the party!</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-foreground text-center">
+              Every bite a weed takes = less for the crop. That's why the crop gets small and weak!
             </p>
           </div>
 
-          <div className="bg-terracotta/10 border-2 border-terracotta/40 rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-terracotta text-base">Weeds vs. Crops: A Race for Resources</p>
+          <div className="bg-primary/10 border-2 border-primary/40 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-primary text-base mb-1">🏆 The Farmer's Job</p>
             <p className="text-sm text-foreground">
-              A cornfield or soybean field is like a big lunch table. The farmer set the table for the crops so
-              they can eat sunlight, drink water, breathe in air, munch on nutrients, and spread out in their own
-              chairs.
-            </p>
-            <p className="text-sm text-foreground">
-              But <strong>weeds are uninvited guests</strong>. They sneak in and grab food, drinks, and seats meant
-              for the crops. The more weeds there are, the less there is left for the corn or soybeans.
+              Kick out the weeds so the crops get ALL 5 things — and grow BIG!
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">Why This Hurts the Crop</p>
-            <ul className="text-sm text-foreground space-y-2 list-disc list-inside">
-              <li>Crops that don't get enough sunlight grow short and floppy.</li>
-              <li>Crops that don't get enough water wilt and their leaves droop.</li>
-              <li>Crops that don't get enough nutrients turn yellow instead of bright green.</li>
-              <li>Crops that don't have enough space grow skinny stems that snap in the wind.</li>
-            </ul>
-            <p className="text-sm text-foreground">
-              When crops are weak, they make less food for us to eat. Farmers call the amount of food a field
-              produces the <strong>yield</strong>. Weeds lower the yield — sometimes by a lot!
-            </p>
-          </div>
-
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-success text-base">The Farmer's Goal</p>
-            <p className="text-sm text-foreground">
-              A farmer's job is to keep crops <strong>healthy and happy</strong> so they grow lots of food. That
-              means making sure crops always win the race for sunlight, water, air, nutrients, and space.
-            </p>
-            <p className="text-sm text-foreground">
-              Farmers pull weeds, use tools, and plant crops close together so weeds can't sneak in. When crops
-              stay healthy, farmers get a <strong>big yield</strong> — and that means more corn, more soybeans,
-              and more food for everyone!
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>
-              Sunlight, water, air, nutrients, space. Five things every plant needs — and five things weeds try
-              to steal!
-            </p>
+          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-foreground text-base">✨ Remember ✨</p>
+            <p className="text-sm text-foreground mt-1"><strong>Sun • Water • Air • Food • Space</strong></p>
+            <p className="text-xs text-muted-foreground mt-1">Five things every plant needs — and five things weeds try to steal!</p>
           </div>
         </div>
       );
@@ -3532,67 +3521,123 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="space-y-4">
-            {STEPS.map((s) => (
-              <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg}`}>
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${s.dot}`} />
-                    <p className="font-display font-bold text-foreground text-base">{s.title}</p>
-                  </div>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background/70 text-muted-foreground">
-                    {s.season}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground">{s.body}</p>
-                {s.key === "spread" && (
-                  <>
-                  <img
-                    src={plantLifeCycleImg}
-                    alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
-                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
-                  />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-                  </>
-                )}
+          {/* Diagram at top */}
+          <img
+            src={plantLifeCycleImg}
+            alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
+            className="w-full rounded-lg bg-background/60 object-contain border-2 border-border"
+          />
+          <p className="text-center text-[11px] text-muted-foreground italic -mt-3">Image generated with Google Gemini 1.5 Pro.</p>
+
+          {/* Steps arranged as a CYCLE (2x2 grid with arrows) */}
+          <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle! →</p>
+          <div className="relative grid grid-cols-2 gap-3">
+            {STEPS.map((s, i) => (
+              <div key={s.key} className={`rounded-2xl border-2 p-3 ${s.bg} relative`}>
+                <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
+                <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1">{s.season}</p>
+                <p className="text-xs text-foreground leading-snug">{s.body}</p>
               </div>
             ))}
+            {/* center circular arrow badge */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg animate-spin-slow" style={{ animation: "spin 8s linear infinite" }}>
+              <RotateCcw className="h-7 w-7" />
+            </div>
           </div>
+          <p className="text-center text-xs text-muted-foreground italic">…and back to step 1! It never stops.</p>
 
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-2">
             <p className="font-display font-bold text-primary text-base">Not All Plants Grow the Same Way</p>
             <p>Just like people have different schedules, plants do too!</p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-2">
-              <p className="font-display font-bold text-success text-base">Annuals — One-Season Plants</p>
-              <p className="text-sm text-foreground">
-                Annuals finish their whole life cycle in <strong>one growing season</strong>. They sprout, grow,
-                make new seeds, and then die before the next season begins.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Weedy examples: Waterhemp, Foxtail, and Common Lambsquarters.
-              </p>
+          {/* Annual — straight line of Kochia stages */}
+          <div className="rounded-2xl border-2 border-success/50 bg-success/10 p-4 space-y-3">
+            <p className="font-display font-extrabold text-success text-base">🌱 Annuals — One-Season Plants</p>
+            <p className="text-sm text-foreground">
+              Annuals live for <strong>ONE year</strong>. Sprout → grow → make seeds → done! Like <strong>Kochia</strong>:
+            </p>
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
+              {[
+                { stage: "seed", label: "Seed" },
+                { stage: "seedling", label: "Sprout" },
+                { stage: "vegetative", label: "Grow" },
+                { stage: "flower", label: "Seeds!" },
+                { stage: null as string | null, label: "The End" },
+              ].map((s, i) => (
+                <div key={i} className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  <div className="text-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-background border-2 border-success/40 flex items-center justify-center">
+                      {s.stage ? (
+                        <WeedImage weedId="kochia" stage={s.stage} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-2xl">💀</span>
+                      )}
+                    </div>
+                    <p className="text-[10px] font-bold text-foreground mt-1">{s.label}</p>
+                  </div>
+                  {i < 4 && <span className="text-success font-bold text-lg">→</span>}
+                </div>
+              ))}
             </div>
-            <div className="rounded-lg border-2 border-info/40 bg-info/10 p-4 space-y-2">
-              <p className="font-display font-bold text-info text-base">Perennials — Year-After-Year Plants</p>
-              <p className="text-sm text-foreground">
-                Perennials come back <strong>year after year</strong>. Even when their leaves disappear in
-                winter, their roots stay alive underground, ready to grow again when spring arrives.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Weedy examples: Dandelion, Canada Thistle, and Field Bindweed.
-              </p>
+            <p className="text-xs text-muted-foreground italic">A straight line — one and done!</p>
+          </div>
+
+          {/* Perennial — line into a circle for Canada Thistle */}
+          <div className="rounded-2xl border-2 border-info/50 bg-info/10 p-4 space-y-3">
+            <p className="font-display font-extrabold text-info text-base">🔄 Perennials — Year-After-Year Plants</p>
+            <p className="text-sm text-foreground">
+              Perennials come back <strong>every year</strong>. They start from a seed, then loop forever!
+              Like <strong>Canada Thistle</strong>:
+            </p>
+            {/* Line: seed -> seedling */}
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
+              {[
+                { stage: "seed", label: "Seed" },
+                { stage: "seedling", label: "Sprout" },
+              ].map((s, i) => (
+                <div key={i} className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  <div className="text-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-background border-2 border-info/40">
+                      <WeedImage weedId="canada-thistle" stage={s.stage} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[10px] font-bold text-foreground mt-1">{s.label}</p>
+                  </div>
+                  <span className="text-info font-bold text-lg">→</span>
+                </div>
+              ))}
+              {/* into circle */}
+              <div className="shrink-0 text-center">
+                <p className="text-[10px] font-bold text-info mb-1">Then loops forever!</p>
+                <div className="relative w-36 h-36 sm:w-40 sm:h-40">
+                  {[
+                    { stage: "vegetative", label: "Grow", pos: "top-0 left-1/2 -translate-x-1/2" },
+                    { stage: "flower", label: "Flowers", pos: "top-1/2 right-0 -translate-y-1/2" },
+                    { stage: "seed", label: "Seeds", pos: "bottom-0 left-1/2 -translate-x-1/2" },
+                    { stage: "seedling", label: "Regrow", pos: "top-1/2 left-0 -translate-y-1/2" },
+                  ].map((s, i) => (
+                    <div key={i} className={`absolute ${s.pos} text-center`}>
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-background border-2 border-info/60">
+                        <WeedImage weedId="canada-thistle" stage={s.stage} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[9px] font-bold text-foreground">{s.label}</p>
+                    </div>
+                  ))}
+                  <div className="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-info/20 flex items-center justify-center animate-spin" style={{ animation: "spin 6s linear infinite" }}>
+                    <RotateCcw className="h-6 w-6 text-info" />
+                  </div>
+                </div>
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground italic">A line into a circle — it never stops coming back!</p>
           </div>
 
           <img
-            src={annualVsPerennialImg}
-            alt="Side-by-side diagram comparing an annual plant's one-year life cycle to a perennial plant that regrows for multiple years"
-            className="w-full rounded-lg bg-background/60 object-contain"
+            src={annualPerennialDiagramImg}
+            alt="Scientific diagram comparing an annual plant's straight-line life cycle to a perennial's cyclical life cycle across seasons"
+            className="w-full rounded-lg bg-background object-contain border-2 border-border"
           />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
@@ -3618,36 +3663,39 @@ function TopicContent({
         {
           key: "wind",
           title: "Wind Riders",
-          nickname: "The Parachute Jumpers",
+          nickname: "Parachute Jumpers",
+          emoji: "🌬️",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          how: "Some seeds have fluffy tops that work just like tiny parachutes. When the wind blows, they float through the air to find a new place to grow.",
-          example: "Dandelion seeds are famous parachute jumpers — one puff of breath and they're off!",
-          extras: "Other wind riders: Milkweed, Canada Thistle, and Horseweed.",
+          how: "Fluffy seeds catch the wind and float like tiny parachutes!",
+          example: "Blow on a dandelion — WHOOSH! Off they go!",
+          extras: "Other flyers: Milkweed, Canada Thistle, Horseweed.",
           image: dandelionHelicopterImg,
           imageAlt: "Cartoon dandelion seed floating with a fluffy parachute",
         },
         {
           key: "water",
           title: "Water Surfers",
-          nickname: "Catch the Wave!",
+          nickname: "Wave Riders",
+          emoji: "🌊",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
-          how: "Some seeds love to surf on water! Rain puddles, streams, and rivers can carry them far away, just like a surfer riding a wave. When the water slows down, the seed lands and can start growing.",
-          example: "Curly Dock seeds float on water and travel down streams to brand-new spots.",
-          extras: "Other water surfers: Smartweed and many wetland weeds.",
+          how: "These seeds float! Rain, puddles, and streams carry them to new spots.",
+          example: "Curly Dock seeds ride streams like little surfboards!",
+          extras: "Other surfers: Smartweed and marsh weeds.",
           image: surfSeedImg,
           imageAlt: "Cartoon seed with a surfboard heading to the beach",
         },
         {
           key: "animal",
           title: "Animal Hitchhikers",
-          nickname: "Can I Catch a Ride?",
+          nickname: "Sneaky Stickers",
+          emoji: "🐾",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
-          how: "Some seeds have tiny hooks, spikes, or sticky parts that cling to an animal's fur — or even your socks! They're like hitchhikers asking for a free ride. When the seed falls off later, it might grow in a brand-new place.",
-          example: "Common Burdock and Cocklebur have prickly seed pods that stick to almost anything.",
-          extras: "Other hitchhikers: Beggarticks and Foxtail bristles.",
+          how: "Sticky, spiky seeds grab onto fur, feathers — even your socks!",
+          example: "Ever pulled a burr off your sock? That was a hitchhiker seed!",
+          extras: "Other stickers: Cocklebur, Beggarticks, Foxtail.",
           image: seedHitchhikerImg,
           imageAlt: "Cartoon corn seed hitchhiking on the back of a skunk",
         },
@@ -3655,58 +3703,42 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">How Do Weed Seeds Travel?</p>
-            <p>
-              Have you ever wondered how tiny seeds move from one place to another? Seeds can't walk, so
-              they've come up with some really clever ways to travel! Let's meet three amazing seed travelers.
-            </p>
+          <div className="bg-gradient-to-br from-sky-100 via-primary/10 to-terracotta/20 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
+            <p className="font-display font-extrabold text-primary text-xl">✈️ How Do Seeds Travel?</p>
+            <p className="text-sm text-foreground">Seeds can't walk… so how do they get around?</p>
+            <p className="text-sm text-foreground font-semibold">Tap each traveler below to find out!</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-3">
             {TRAVELERS.map((t) => (
-              <div key={t.key} className={`rounded-lg border-2 p-4 space-y-2 ${t.bg}`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`w-3 h-3 rounded-full ${t.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{t.title}</p>
-                  <span className="text-xs italic text-muted-foreground">— "{t.nickname}"</span>
+              <details key={t.key} className={`rounded-2xl border-2 p-3 cursor-pointer group transition-transform hover:scale-[1.02] ${t.bg}`}>
+                <summary className="list-none text-center space-y-2">
+                  <div className="text-4xl">{t.emoji}</div>
+                  <p className="font-display font-extrabold text-foreground text-base">{t.title}</p>
+                  <p className="text-xs italic text-muted-foreground">"{t.nickname}"</p>
+                  <p className="text-[10px] text-primary font-bold group-open:hidden">👆 tap me!</p>
+                </summary>
+                <div className="mt-3 space-y-2">
+                  <img src={t.image} alt={t.imageAlt} className="w-full rounded-lg bg-background object-contain" />
+                  <p className="text-center text-[10px] text-muted-foreground italic">Image generated with Google Gemini 1.5 Pro.</p>
+                  <p className="text-sm text-foreground"><strong>How:</strong> {t.how}</p>
+                  <p className="text-sm text-foreground"><strong>Example:</strong> {t.example}</p>
+                  <p className="text-xs text-muted-foreground">{t.extras}</p>
                 </div>
-                <img
-                  src={t.image}
-                  alt={t.imageAlt}
-                  className="w-full max-w-sm mx-auto rounded-lg bg-background/60 object-contain"
-                />
-                <p className="text-sm text-foreground">
-                  <strong>How it works:</strong> {t.how}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Weed example:</strong> {t.example}
-                </p>
-                <p className="text-xs text-muted-foreground">{t.extras}</p>
-              </div>
+              </details>
             ))}
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">Seeds Are Great Travelers!</p>
-            <p className="text-sm text-foreground">
-              Whether they're parachuting through the sky, surfing on the water, or hitchhiking on an animal,
-              seeds have amazing ways to explore the world and find new places to grow.
+          <div className="bg-warning/10 border-2 border-warning/40 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-warning-foreground text-base">🚜 Why Farmers Care</p>
+            <p className="text-sm text-foreground mt-1">
+              Weeds sneak into fields as free riders! Farmers even wash their boots and tractors so seeds don't hitch a ride.
             </p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">Why Farmers Care</p>
-            <p className="text-sm text-foreground">
-              Because seeds are such good travelers, weeds can show up in fields where nobody planted them.
-              Farmers even wash off boots, tools, and tractors so they don't accidentally give weed seeds a
-              free ride into a new field!
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember (three ways seeds travel):</p>
-            <p>Wind (parachute) • Water (surfing) • Animals (hitchhiking).</p>
+          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-foreground text-base">✨ Remember: 3 Ways Seeds Travel ✨</p>
+            <p className="text-sm text-foreground mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
           </div>
         </div>
       );
@@ -4250,58 +4282,74 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">The Secret Tunnels of Roots</p>
-            <p>
-              Most plants spread by making seeds — but some weeds have another clever trick up their leafy
-              sleeves!
-            </p>
-            <p>
-              Imagine a weed is a <strong>secret explorer building underground tunnels</strong>. Those
-              tunnels are actually long roots growing beneath the soil, hidden from view.
-            </p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(30 40% 92%) 0%, hsl(28 45% 70%) 15%, hsl(25 50% 40%) 30%, hsl(22 55% 25%) 100%)",
+          }}
+        >
+          {/* Header with grass and dirt */}
+          <div className="rounded-xl bg-amber-950/70 p-5 text-center space-y-2 border-2 border-amber-700 shadow-inner">
+            <p className="font-display font-extrabold text-yellow-100 text-xl drop-shadow">⛏️ The Secret Tunnels of Roots</p>
+            <p className="text-sm text-amber-100">Grab your flashlight — we're going UNDERGROUND! 🔦</p>
           </div>
 
-          <div className="space-y-3">
-            {TUNNEL_FACTS.map((f) => (
-              <div key={f.key} className={`rounded-lg border-2 p-4 space-y-2 ${f.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${f.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{f.title}</p>
-                </div>
-                <p className="text-sm text-foreground">{f.detail}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">Tunnel-Building Weeds</p>
-            <p className="text-sm text-foreground">
-              A few famous underground tunnelers you might spot: <strong>Canada Thistle</strong>,{" "}
-              <strong>Field Bindweed</strong>, and <strong>Quackgrass</strong>. Their tunnels can stretch
-              many feet in every direction!
-            </p>
+          {/* Image at the top */}
+          <div className="rounded-xl border-4 border-amber-900 bg-amber-950/40 p-2">
             <img
               src={rootTunnelsImg}
               alt="Cartoon weed digging secret underground tunnels with a lantern and pickaxe"
-              className="w-full rounded-lg bg-background/60 object-contain mt-2"
+              className="w-full rounded-lg object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-amber-100/80 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">Why Farmers Dig Deep</p>
-            <p className="text-sm text-foreground">
-              Farmers and gardeners have to remove as much of the root system as they can. If they only pull
-              the top off, the hidden tunnels keep sending up brand-new weeds. Getting the whole root helps
-              stop the weed for good.
+          <div className="rounded-xl bg-amber-900/60 p-4 text-sm text-amber-50 space-y-2 border border-amber-700">
+            <p>Most weeds spread with seeds. But some are <strong className="text-yellow-200">sneaky diggers</strong>!</p>
+            <p>Their roots stretch out under the dirt like <strong className="text-yellow-200">secret tunnels</strong> — connecting one plant to a whole hidden family!</p>
+          </div>
+
+          {/* Interactive dirt-clod boxes */}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {TUNNEL_FACTS.map((f, i) => (
+              <details
+                key={f.key}
+                className="group rounded-2xl p-4 cursor-pointer transition-transform hover:scale-[1.02] border-4 border-amber-950 shadow-lg"
+                style={{
+                  background:
+                    "radial-gradient(circle at 30% 20%, hsl(30 40% 55%) 0%, hsl(25 45% 35%) 60%, hsl(22 50% 22%) 100%)",
+                }}
+              >
+                <summary className="list-none text-center space-y-1">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-amber-950 flex items-center justify-center text-2xl shadow-inner border-2 border-amber-800">
+                    {["🕳️","🌱","🕸️","⚠️"][i]}
+                  </div>
+                  <p className="font-display font-extrabold text-yellow-100 text-base drop-shadow">{f.title}</p>
+                  <p className="text-[10px] text-amber-200 font-bold group-open:hidden">🔦 tap to dig!</p>
+                </summary>
+                <p className="text-sm text-amber-50 mt-2 bg-amber-950/50 rounded p-2">{f.detail}</p>
+              </details>
+            ))}
+          </div>
+
+          <div className="rounded-xl bg-amber-950/70 p-4 border-2 border-amber-700 space-y-2">
+            <p className="font-display font-extrabold text-yellow-200 text-base">🌿 Famous Tunnel Builders</p>
+            <p className="text-sm text-amber-50">
+              <strong className="text-yellow-100">Canada Thistle</strong>, <strong className="text-yellow-100">Field Bindweed</strong>, and <strong className="text-yellow-100">Quackgrass</strong> can stretch tunnels many feet in every direction!
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>Next time you see a weed, remember — there might be a whole network of secret tunnels hiding right beneath your feet!</p>
+          <div className="rounded-xl bg-amber-900/60 p-4 border border-amber-700">
+            <p className="font-display font-extrabold text-yellow-200 text-base">🚜 Why Farmers Dig Deep</p>
+            <p className="text-sm text-amber-50 mt-1">
+              If you only pull the top, the hidden tunnels sprout NEW weeds! Farmers dig up the whole root to stop them for good.
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-yellow-100 border-4 border-yellow-500 p-4 text-center">
+            <p className="font-display font-extrabold text-amber-900 text-base">✨ Remember ✨</p>
+            <p className="text-sm text-amber-900 mt-1">Every weed you see might have a <strong>whole hidden world</strong> under your feet!</p>
           </div>
         </div>
       );
