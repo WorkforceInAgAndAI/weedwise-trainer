@@ -3521,67 +3521,123 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="space-y-4">
-            {STEPS.map((s) => (
-              <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg}`}>
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${s.dot}`} />
-                    <p className="font-display font-bold text-foreground text-base">{s.title}</p>
-                  </div>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background/70 text-muted-foreground">
-                    {s.season}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground">{s.body}</p>
-                {s.key === "spread" && (
-                  <>
-                  <img
-                    src={plantLifeCycleImg}
-                    alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
-                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
-                  />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-                  </>
-                )}
+          {/* Diagram at top */}
+          <img
+            src={plantLifeCycleImg}
+            alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
+            className="w-full rounded-lg bg-background/60 object-contain border-2 border-border"
+          />
+          <p className="text-center text-[11px] text-muted-foreground italic -mt-3">Image generated with Google Gemini 1.5 Pro.</p>
+
+          {/* Steps arranged as a CYCLE (2x2 grid with arrows) */}
+          <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle! →</p>
+          <div className="relative grid grid-cols-2 gap-3">
+            {STEPS.map((s, i) => (
+              <div key={s.key} className={`rounded-2xl border-2 p-3 ${s.bg} relative`}>
+                <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
+                <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1">{s.season}</p>
+                <p className="text-xs text-foreground leading-snug">{s.body}</p>
               </div>
             ))}
+            {/* center circular arrow badge */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg animate-spin-slow" style={{ animation: "spin 8s linear infinite" }}>
+              <RotateCcw className="h-7 w-7" />
+            </div>
           </div>
+          <p className="text-center text-xs text-muted-foreground italic">…and back to step 1! It never stops.</p>
 
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-2">
             <p className="font-display font-bold text-primary text-base">Not All Plants Grow the Same Way</p>
             <p>Just like people have different schedules, plants do too!</p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-2">
-              <p className="font-display font-bold text-success text-base">Annuals — One-Season Plants</p>
-              <p className="text-sm text-foreground">
-                Annuals finish their whole life cycle in <strong>one growing season</strong>. They sprout, grow,
-                make new seeds, and then die before the next season begins.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Weedy examples: Waterhemp, Foxtail, and Common Lambsquarters.
-              </p>
+          {/* Annual — straight line of Kochia stages */}
+          <div className="rounded-2xl border-2 border-success/50 bg-success/10 p-4 space-y-3">
+            <p className="font-display font-extrabold text-success text-base">🌱 Annuals — One-Season Plants</p>
+            <p className="text-sm text-foreground">
+              Annuals live for <strong>ONE year</strong>. Sprout → grow → make seeds → done! Like <strong>Kochia</strong>:
+            </p>
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
+              {[
+                { stage: "seed", label: "Seed" },
+                { stage: "seedling", label: "Sprout" },
+                { stage: "vegetative", label: "Grow" },
+                { stage: "flower", label: "Seeds!" },
+                { stage: null as string | null, label: "The End" },
+              ].map((s, i) => (
+                <div key={i} className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  <div className="text-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-background border-2 border-success/40 flex items-center justify-center">
+                      {s.stage ? (
+                        <WeedImage weedId="kochia" stage={s.stage} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-2xl">💀</span>
+                      )}
+                    </div>
+                    <p className="text-[10px] font-bold text-foreground mt-1">{s.label}</p>
+                  </div>
+                  {i < 4 && <span className="text-success font-bold text-lg">→</span>}
+                </div>
+              ))}
             </div>
-            <div className="rounded-lg border-2 border-info/40 bg-info/10 p-4 space-y-2">
-              <p className="font-display font-bold text-info text-base">Perennials — Year-After-Year Plants</p>
-              <p className="text-sm text-foreground">
-                Perennials come back <strong>year after year</strong>. Even when their leaves disappear in
-                winter, their roots stay alive underground, ready to grow again when spring arrives.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Weedy examples: Dandelion, Canada Thistle, and Field Bindweed.
-              </p>
+            <p className="text-xs text-muted-foreground italic">A straight line — one and done!</p>
+          </div>
+
+          {/* Perennial — line into a circle for Canada Thistle */}
+          <div className="rounded-2xl border-2 border-info/50 bg-info/10 p-4 space-y-3">
+            <p className="font-display font-extrabold text-info text-base">🔄 Perennials — Year-After-Year Plants</p>
+            <p className="text-sm text-foreground">
+              Perennials come back <strong>every year</strong>. They start from a seed, then loop forever!
+              Like <strong>Canada Thistle</strong>:
+            </p>
+            {/* Line: seed -> seedling */}
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
+              {[
+                { stage: "seed", label: "Seed" },
+                { stage: "seedling", label: "Sprout" },
+              ].map((s, i) => (
+                <div key={i} className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  <div className="text-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-background border-2 border-info/40">
+                      <WeedImage weedId="canada-thistle" stage={s.stage} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[10px] font-bold text-foreground mt-1">{s.label}</p>
+                  </div>
+                  <span className="text-info font-bold text-lg">→</span>
+                </div>
+              ))}
+              {/* into circle */}
+              <div className="shrink-0 text-center">
+                <p className="text-[10px] font-bold text-info mb-1">Then loops forever!</p>
+                <div className="relative w-36 h-36 sm:w-40 sm:h-40">
+                  {[
+                    { stage: "vegetative", label: "Grow", pos: "top-0 left-1/2 -translate-x-1/2" },
+                    { stage: "flower", label: "Flowers", pos: "top-1/2 right-0 -translate-y-1/2" },
+                    { stage: "seed", label: "Seeds", pos: "bottom-0 left-1/2 -translate-x-1/2" },
+                    { stage: "seedling", label: "Regrow", pos: "top-1/2 left-0 -translate-y-1/2" },
+                  ].map((s, i) => (
+                    <div key={i} className={`absolute ${s.pos} text-center`}>
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-background border-2 border-info/60">
+                        <WeedImage weedId="canada-thistle" stage={s.stage} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[9px] font-bold text-foreground">{s.label}</p>
+                    </div>
+                  ))}
+                  <div className="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-info/20 flex items-center justify-center animate-spin" style={{ animation: "spin 6s linear infinite" }}>
+                    <RotateCcw className="h-6 w-6 text-info" />
+                  </div>
+                </div>
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground italic">A line into a circle — it never stops coming back!</p>
           </div>
 
           <img
-            src={annualVsPerennialImg}
-            alt="Side-by-side diagram comparing an annual plant's one-year life cycle to a perennial plant that regrows for multiple years"
-            className="w-full rounded-lg bg-background/60 object-contain"
+            src={annualPerennialDiagramImg}
+            alt="Scientific diagram comparing an annual plant's straight-line life cycle to a perennial's cyclical life cycle across seasons"
+            className="w-full rounded-lg bg-background object-contain border-2 border-border"
           />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
