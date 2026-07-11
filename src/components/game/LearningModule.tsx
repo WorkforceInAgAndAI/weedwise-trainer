@@ -3904,7 +3904,7 @@ function TopicContent({
 
           <div className="bg-slate-900 border-4 border-yellow-500 rounded-2xl p-4 text-center font-mono shadow-lg">
             <p className="font-display font-extrabold text-yellow-400 text-base">📋 3 FLIGHT ROUTES</p>
-            <p className="text-sm text-foreground mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
+            <p className="text-sm text-yellow-100 mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
             <p className="text-yellow-200 text-xs mt-1 tracking-wider">HAVE A GREAT FLIGHT, SEEDS!</p>
           </div>
         </div>
