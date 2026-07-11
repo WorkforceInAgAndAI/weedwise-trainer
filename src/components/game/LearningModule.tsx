@@ -7522,6 +7522,44 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
 
 interface DetectiveRule { key: string; rule: string; emoji: string; dot: string; bg: string; detail: string; }
 
+function RevealBox({
+  title,
+  body,
+  titleClass,
+  borderClass,
+  coverClass,
+  openClass,
+  textClass,
+}: {
+  title: string;
+  body: React.ReactNode;
+  titleClass: string;
+  borderClass: string;
+  coverClass: string;
+  openClass: string;
+  textClass: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen((o) => !o)}
+      className={`w-full text-left rounded-lg border-4 ${borderClass} p-4 space-y-2 transition-all duration-300 shadow-lg ${
+        open ? openClass : `${coverClass} hover:scale-[1.02]`
+      }`}
+    >
+      <p className={`font-display font-extrabold text-base ${open ? textClass : titleClass}`}>
+        {title}
+      </p>
+      {open ? (
+        <p className={`text-sm font-medium animate-fade-in ${textClass}`}>{body}</p>
+      ) : (
+        <p className={`text-xs italic ${titleClass} opacity-90`}>👆 Tap to reveal</p>
+      )}
+    </button>
+  );
+}
+
 function DetectiveNotebook({ rules }: { rules: DetectiveRule[] }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
