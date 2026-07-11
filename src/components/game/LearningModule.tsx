@@ -3464,28 +3464,6 @@ function TopicContent({
 
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
-            <div className="grid grid-cols-2 gap-3 my-3">
-              <div className="bg-success/10 border-2 border-success/40 rounded-lg p-3 text-center">
-                <div className="flex justify-center gap-1 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-success/30 flex items-center justify-center">
-                    <Sprout className="h-5 w-5 text-success" />
-                  </div>
-                  <div className="w-10 h-10 rounded-md bg-success/20 border-2 border-success/40" />
-                </div>
-                <p className="text-xs font-bold text-success">Right seat!</p>
-                <p className="text-[11px] text-muted-foreground">A crop growing in the farm field.</p>
-              </div>
-              <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-3 text-center">
-                <div className="flex justify-center gap-1 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-destructive/30 flex items-center justify-center">
-                    <Leaf className="h-5 w-5 text-destructive" />
-                  </div>
-                  <div className="w-10 h-10 rounded-md bg-success/20 border-2 border-success/40" />
-                </div>
-                <p className="text-xs font-bold text-destructive">Wrong seat!</p>
-                <p className="text-[11px] text-muted-foreground">A weed sitting where the crop belongs.</p>
-              </div>
-            </div>
             <p className="text-sm text-foreground">
               Imagine your classroom. Every student has an assigned desk. Now imagine someone from another
               class walks in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just
@@ -4109,6 +4087,8 @@ function TopicContent({
         {
           key: "fast",
           name: "Super Speed",
+          Icon: Zap,
+          animate: "animate-bounce",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           detail: "Invasive plants grow really fast — sometimes faster than any of the native plants around them.",
@@ -4116,6 +4096,8 @@ function TopicContent({
         {
           key: "no-rivals",
           name: "No Rivals",
+          Icon: Star,
+          animate: "animate-pulse",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "They came from far away, so the bugs and diseases that usually slow them down aren't around here.",
@@ -4123,6 +4105,8 @@ function TopicContent({
         {
           key: "seeds",
           name: "Tons of Seeds",
+          Icon: Sparkles,
+          animate: "animate-pulse",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           detail: "Many invasive plants make loads and loads of seeds, so new plants pop up everywhere.",
@@ -4130,6 +4114,8 @@ function TopicContent({
         {
           key: "space",
           name: "Space Grabbers",
+          Icon: Hand,
+          animate: "animate-pulse",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
           detail: "They gobble up sunlight, water, nutrients, and space — leaving barely any for native plants.",
@@ -4177,10 +4163,12 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">Invasive Plant "Superpowers"</p>
             <div className="grid gap-3 md:grid-cols-2">
               {SUPERPOWERS.map((s) => (
-                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg}`}>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${s.dot}`} />
-                    <p className="font-display font-bold text-foreground text-base">{s.name}</p>
+                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg} transition-transform hover:scale-[1.02]`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-full ${s.dot} flex items-center justify-center shadow-md`}>
+                      <s.Icon className={`h-7 w-7 text-white ${s.animate}`} />
+                    </div>
+                    <p className="font-display font-bold text-foreground text-lg">{s.name}</p>
                   </div>
                   <p className="text-sm text-foreground">{s.detail}</p>
                 </div>
@@ -4320,7 +4308,7 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
-       10 DISTINCTIVE WEEDS (K-5 Plant Explorer)
+       14 DISTINCTIVE WEEDS (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "distinctive-weeds": {
       const WEEDS_TO_SPOT: Array<{
@@ -4342,42 +4330,24 @@ function TopicContent({
           bg: "bg-yellow-500/10 border-yellow-500/40",
         },
         {
-          id: "common_Cocklebur",
-          name: "2. Common Cocklebur",
-          spotIt: "Prickly, sticky burs that grab onto clothes and animal fur like tiny hitchhikers.",
-          funFact: "Those burs are the weed's way of catching a free ride to a brand-new spot!",
-          dot: "bg-terracotta",
-          bg: "bg-terracotta/10 border-terracotta/40",
-        },
-        {
-          id: "large-crabgrass",
-          name: "3. Large Crabgrass",
-          spotIt: "Wide, flat grass blades that sprawl out sideways — often popping up on lawns and playgrounds.",
-          funFact: "It's still a grass, but it's a weed because it shows up where we don't want it!",
-          dot: "bg-success",
-          bg: "bg-success/10 border-success/40",
-          photo: largeCrabgrassPhoto,
-          photoAlt: "Large Crabgrass sprawling on gravel with wide flat blades",
-        },
-        {
           id: "giant-foxtail",
-          name: "4. Giant Foxtail",
+          name: "2. Giant Foxtail",
           spotIt: "A fuzzy seed head that curves over — just like a fox's bushy tail. Its leaves are covered in tiny short hairs.",
           funFact: "If you gently rub a leaf, you can feel the tiny hairs like soft fuzz.",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
         },
         {
-          id: "yellow-foxtail",
-          name: "5. Yellow Foxtail",
-          spotIt: "Looks like giant foxtail but shorter, with a chubbier yellow seed head. The leaves are smooth — hairs only near the base.",
-          funFact: "Two foxtails, two personalities! Check the leaves to tell them apart.",
-          dot: "bg-yellow-500",
-          bg: "bg-yellow-500/10 border-yellow-500/40",
+          id: "lambsquarters",
+          name: "3. Common Lambsquarters",
+          spotIt: "Green leaves that look like they've been sprinkled with a light dusting of flour.",
+          funFact: "That 'flour' is really a natural waxy powder — try wiping it and it comes right off!",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
         },
         {
           id: "common_Milkweed",
-          name: "6. Common Milkweed",
+          name: "4. Common Milkweed",
           spotIt: "Big broad leaves and clusters of pink-purple flowers. Snap a leaf and you'll see milky white sap!",
           funFact: "In nature, it's a hero — monarch butterflies NEED it! But in a crop field, it's still a weed.",
           dot: "bg-info",
@@ -4386,24 +4356,8 @@ function TopicContent({
           photoAlt: "Cluster of pink-purple Common Milkweed flowers with broad green leaves",
         },
         {
-          id: "lambsquarters",
-          name: "7. Common Lambsquarters",
-          spotIt: "Green leaves that look like they've been sprinkled with a light dusting of flour.",
-          funFact: "That 'flour' is really a natural waxy powder — try wiping it and it comes right off.",
-          dot: "bg-primary",
-          bg: "bg-primary/10 border-primary/40",
-        },
-        {
-          id: "Common_Burdock",
-          name: "8. Common Burdock",
-          spotIt: "HUGE round burs with tiny hooks that stick to clothes, pets, and just about anything else.",
-          funFact: "Burdock burs actually inspired the invention of VELCRO® — nature is a great engineer!",
-          dot: "bg-terracotta",
-          bg: "bg-terracotta/10 border-terracotta/40",
-        },
-        {
           id: "Wild_Carrot",
-          name: "9. Wild Carrot",
+          name: "5. Wild Carrot",
           spotIt: "Flat clusters of tiny white flowers that look like lacy umbrellas — sometimes called 'Queen Anne's Lace.'",
           funFact: "It's a biennial — that means it takes TWO years to finish its whole life cycle.",
           dot: "bg-info",
@@ -4411,20 +4365,84 @@ function TopicContent({
         },
         {
           id: "canada-thistle",
-          name: "10. Canada Thistle",
+          name: "6. Canada Thistle",
           spotIt: "Spiny, prickly lobed leaves and small purple flower puffs.",
           funFact: "It's super tricky to remove because its long roots stretch out underground like secret tunnels!",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
+        },
+        {
+          id: "giant-ragweed",
+          name: "7. Giant Ragweed",
+          spotIt: "HUGE 3-lobed leaves shaped like giant hands — some plants grow taller than you!",
+          funFact: "Its tiny green flowers make so much pollen that they can make people sneeze all summer.",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+        },
+        {
+          id: "pennsylvania-smartweed",
+          name: "8. Pennsylvania Smartweed",
+          spotIt: "Pink flower spikes at the top and leaves that often have a dark smudge shaped like a thumbprint.",
+          funFact: "That thumbprint mark is one of the fastest ways to be a smartweed detective!",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+        },
+        {
+          id: "kochia",
+          name: "9. Kochia",
+          spotIt: "A bushy, feathery green plant that turns red in fall — sometimes it snaps off and tumbles like a tumbleweed!",
+          funFact: "One kochia plant can roll for miles, scattering seeds the whole way.",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+        },
+        {
+          id: "wild-parsnip",
+          name: "10. Wild Parsnip",
+          spotIt: "Tall plant with flat-topped clusters of tiny yellow flowers.",
+          funFact: "WARNING — never touch it! Its sap plus sunlight can give you a nasty burn. Always tell an adult if you see it.",
+          dot: "bg-destructive",
+          bg: "bg-destructive/10 border-destructive/40",
+        },
+        {
+          id: "yellow-nutsedge",
+          name: "11. Yellow Nutsedge",
+          spotIt: "Looks like a shiny yellow-green grass, but the stem is a triangle — you can feel the 3 sides!",
+          funFact: "\"Sedges have edges\" — a rhyme scientists use to remember that trick.",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+        },
+        {
+          id: "velvetleaf",
+          name: "12. Velvetleaf",
+          spotIt: "Big heart-shaped leaves that feel soft and fuzzy — just like velvet!",
+          funFact: "The seed pods look like tiny crowns sitting on top of the plant.",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+        },
+        {
+          id: "Tall_morningglory",
+          name: "13. Morningglory",
+          spotIt: "Twisty vines that climb up other plants, with trumpet-shaped purple, pink, or blue flowers.",
+          funFact: "The flowers open in the morning and close up when the sun gets hot — that's how it got its name!",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+        },
+        {
+          id: "Venice_mallow",
+          name: "14. Venice Mallow",
+          spotIt: "Creamy white or pale-yellow flowers with a dark purple center — like a bullseye!",
+          funFact: "Each flower only stays open for a few hours before it closes forever.",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
         },
       ] as Array<{ id: string; name: string; spotIt: string; funFact: string; dot: string; bg: string; photo?: string; photoAlt?: string }>;
 
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">10 Weeds You Can Spot!</p>
+            <p className="font-display font-bold text-primary text-base">14 Weeds You Can Spot!</p>
             <p>
-              Ready to become a Weed Spotter? Here are 10 famous weeds that show up in yards, fields, and
+              Ready to become a Weed Spotter? Here are 14 famous weeds that show up in yards, fields, and
               parks. Each one has a special clue — like a shape, color, or texture — that makes it easy to
               recognize once you know what to look for.
             </p>
@@ -4461,7 +4479,7 @@ function TopicContent({
           <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-success text-base">You're a Weed Spotter Now!</p>
             <p className="text-sm text-foreground">
-              Next time you're outside, see how many of these 10 weeds you can spot. Just remember — look
+              Next time you're outside, see how many of these 14 weeds you can spot. Just remember — look
               with your eyes, and if you don't recognize a plant, ask a trusted adult before touching it!
             </p>
           </div>
@@ -4625,6 +4643,19 @@ function TopicContent({
           bg: "bg-warning/10 border-warning/40",
           detail:
             "Weed flowers are like tiny snack bars for bees, butterflies, and other pollinators. When they sip the sweet nectar, they carry pollen from flower to flower and help lots of plants make new seeds!",
+          examples: "Common Milkweed (a monarch butterfly favorite!), Wild Carrot, Canada Thistle",
+          animation: (
+            <div className="relative w-20 h-20 shrink-0">
+              <div className="absolute inset-0 rounded-full bg-warning/30 flex items-center justify-center">
+                <Flower2 className="h-10 w-10 text-warning" />
+              </div>
+              <div className="absolute -top-2 -right-2 animate-[slide-in-right_2s_ease-out_infinite]">
+                <div className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-yellow-600 flex items-center justify-center shadow-md">
+                  <Sparkles className="h-4 w-4 text-yellow-900" />
+                </div>
+              </div>
+            </div>
+          ),
         },
         {
           key: "erosion",
@@ -4633,6 +4664,17 @@ function TopicContent({
           bg: "bg-terracotta/10 border-terracotta/40",
           detail:
             "The roots of weeds work like tiny anchors, gripping the dirt tight. When wind blows or rain pours down, those roots keep the soil from washing or blowing away.",
+          examples: "Canada Thistle, Yellow Nutsedge, Giant Foxtail",
+          animation: (
+            <div className="relative w-20 h-20 shrink-0 flex items-end justify-center">
+              <div className="absolute top-0 animate-bounce">
+                <div className="w-12 h-12 rounded-full bg-terracotta/40 border-2 border-terracotta flex items-center justify-center shadow-md">
+                  <Hand className="h-7 w-7 text-terracotta" />
+                </div>
+              </div>
+              <div className="w-14 h-3 rounded-md bg-amber-800/70 mb-1" />
+            </div>
+          ),
         },
         {
           key: "soil",
@@ -4641,6 +4683,16 @@ function TopicContent({
           bg: "bg-success/10 border-success/40",
           detail:
             "Some weeds grow long, deep taproots — like nature's tiny shovels. They break up hard, packed dirt so water and air can sneak down to help other plants grow strong.",
+          examples: "Dandelion, Wild Carrot, Wild Parsnip",
+          animation: (
+            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+              <span className="absolute inline-flex h-16 w-16 rounded-full bg-success/40 animate-ping" />
+              <span className="absolute inline-flex h-12 w-12 rounded-full bg-success/60 animate-ping [animation-delay:0.4s]" />
+              <div className="relative w-14 h-14 rounded-full bg-success flex items-center justify-center shadow-md">
+                <Sparkles className="h-8 w-8 text-white" />
+              </div>
+            </div>
+          ),
         },
       ];
 
@@ -4671,18 +4723,33 @@ function TopicContent({
           {/* Three superpowers */}
           <div className="space-y-3">
             {POWERS.map((p) => (
-              <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+              <div key={p.key} className={`rounded-lg border-2 p-4 ${p.bg} transition-transform hover:scale-[1.01]`}>
+                <div className="flex items-start gap-4">
+                  {p.animation}
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-3 h-3 rounded-full ${p.dot}`} />
+                      <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+                    </div>
+                    <p className="text-sm text-foreground">{p.detail}</p>
+                    <p className="text-xs text-foreground bg-background/60 rounded px-2 py-1">
+                      <strong>Weed examples:</strong> {p.examples}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-foreground">{p.detail}</p>
               </div>
             ))}
           </div>
 
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Right Plant, Right Place</p>
+            <div className="bg-background/60 rounded-md p-3 border border-info/30">
+              <p className="font-semibold text-primary text-sm mb-1">Remember:</p>
+              <p className="text-sm text-foreground">
+                Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
+                and loosen the dirt — three superpowers that keep nature strong!
+              </p>
+            </div>
             <p className="text-sm text-foreground">
               A plant is only a "weed" when it's growing somewhere we don't want it. That same plant, out in
               a meadow or on the edge of a forest, might be feeding butterflies and holding the soil
@@ -4697,14 +4764,6 @@ function TopicContent({
               Pollinators like bees and butterflies need flowers. Soil needs roots. Ecosystems need lots of
               different plants working together. When weeds do their jobs, they help keep our whole
               <strong> earth healthy</strong>.
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>
-              Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
-              and loosen the dirt — three superpowers that keep nature strong!
             </p>
           </div>
         </div>
