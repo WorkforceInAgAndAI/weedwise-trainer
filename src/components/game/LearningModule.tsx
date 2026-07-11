@@ -7394,3 +7394,100 @@ function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
     </div>
   );
 }
+
+interface Method {
+  key: string;
+  title: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  what: string;
+  examples: string;
+  bestFor: string;
+}
+
+function ToolShelf({ methods }: { methods: Method[] }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="rounded-xl bg-amber-900/90 border-4 border-amber-950 p-4 shadow-inner space-y-3">
+      <p className="text-center font-display font-extrabold text-yellow-100 text-base">🛠️ The Weed-Control Tool Shelf</p>
+      <p className="text-center text-xs text-yellow-100/90">Click a tool to grab it off the shelf!</p>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-amber-950 rounded-md p-3 border-t-4 border-b-4 border-amber-800">
+        {methods.map((m) => (
+          <button
+            key={m.key}
+            onClick={() => setOpen(open === m.key ? null : m.key)}
+            className={`rounded-lg border-2 p-3 bg-yellow-50 hover:bg-yellow-100 transition-all text-center ${open === m.key ? "ring-4 ring-yellow-400 scale-105" : "hover:scale-105"}`}
+          >
+            <div className="text-3xl">{m.emoji}</div>
+            <p className="text-[11px] font-bold text-foreground mt-1 leading-tight">{m.title}</p>
+          </button>
+        ))}
+      </div>
+      {open && (() => {
+        const m = methods.find((x) => x.key === open)!;
+        return (
+          <div className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
+            <p className="font-display font-bold text-foreground text-base">{m.emoji} {m.title}</p>
+            <p className="text-sm text-foreground"><strong>What it is:</strong> {m.what}</p>
+            <p className="text-sm text-foreground"><strong>Examples:</strong> {m.examples}</p>
+            <p className="text-sm text-foreground"><strong>When it works best:</strong> {m.bestFor}</p>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+interface Hero {
+  key: string;
+  hero: string;
+  power: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  how: string;
+  bestFor: string;
+  reallife: string;
+}
+
+function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="space-y-3">
+      <div className="relative rounded-xl border-4 border-yellow-400 bg-gradient-to-b from-emerald-900 to-amber-800 p-3 shadow-lg">
+        <img
+          src={img}
+          alt="The Weed Control Squad — five weed-fighting heroes"
+          className="w-full h-auto rounded-md bg-background/60 object-contain"
+        />
+        <p className="text-center text-[11px] text-yellow-100 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+        <p className="text-center text-xs text-yellow-100 mt-1">🦸 Click a hero below to reveal their superpower!</p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        {heroes.map((h) => (
+          <button
+            key={h.key}
+            onClick={() => setOpen(open === h.key ? null : h.key)}
+            className={`rounded-lg border-4 border-yellow-500 bg-emerald-800 hover:bg-emerald-700 text-yellow-100 p-3 text-center transition-transform ${open === h.key ? "scale-110 ring-4 ring-amber-400" : "hover:scale-105"}`}
+          >
+            <div className="text-3xl">{h.emoji}</div>
+            <p className="text-[11px] font-extrabold mt-1 leading-tight">{h.hero}</p>
+          </button>
+        ))}
+      </div>
+      {open && (() => {
+        const h = heroes.find((x) => x.key === open)!;
+        return (
+          <div className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 ${h.bg}`}>
+            <p className="font-display font-extrabold text-foreground text-lg">{h.emoji} {h.hero}</p>
+            <span className="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-900">Power: {h.power}</span>
+            <p className="text-sm text-foreground"><strong>How the power works:</strong> {h.how}</p>
+            <p className="text-sm text-foreground"><strong>Best for:</strong> {h.bestFor}</p>
+            <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
