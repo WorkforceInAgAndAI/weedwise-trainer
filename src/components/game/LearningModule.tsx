@@ -4991,7 +4991,17 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+          <div
+            className="rounded-2xl p-5 space-y-5 relative overflow-hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, hsl(32 55% 78%) 0%, hsl(28 45% 58%) 100%)",
+              boxShadow: "inset 0 0 60px hsl(40 80% 85% / 0.5)",
+            }}
+          >
+          <div className="absolute top-2 right-4 text-2xl">🔨</div>
+          <div className="absolute top-2 left-4 text-2xl">🔧</div>
+          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
             <p className="font-display font-bold text-primary text-base">Five Ways to Control Weeds</p>
             <p>
               Weeds can steal sunlight, water, air, nutrients, and space from crops. So how do farmers and
@@ -5004,27 +5014,19 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {METHODS.map((m) => (
-              <div key={m.key} className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${m.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{m.title}</p>
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>What it is:</strong> {m.what}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Examples:</strong> {m.examples}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>When it works best:</strong> {m.bestFor}
-                </p>
-              </div>
-            ))}
+          <div className="rounded-xl border-4 border-amber-800 bg-yellow-50/95 p-3 shadow-lg">
+            <img
+              src={weedControlToolsImg}
+              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
+              className="w-full rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-xs text-amber-900 font-semibold mt-1">🏚️ Step into the Weed-Control Shed — pick a tool off the shelf!</p>
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-3">
+          <ToolShelf methods={METHODS} />
+
+          <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-3 shadow">
             <p className="font-display font-bold text-success text-base">Different Tools for Different Jobs</p>
             <p className="text-sm text-foreground">
               No single method can stop every weed on its own. Pulling weeds by hand works in a small garden
@@ -5036,20 +5038,15 @@ function TopicContent({
               and use two or three methods together. Physical, cultural, chemical, biological, and preventative —
               five ways to keep crops winning the race!
             </p>
-            <img
-              src={weedControlToolsImg}
-              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
-              className="w-full rounded-lg bg-background/60 object-contain mt-2"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>
               Physical, cultural, chemical, biological, preventative. Five ways to control weeds — and each one
               shines in a different job.
             </p>
+          </div>
           </div>
         </div>
       );
