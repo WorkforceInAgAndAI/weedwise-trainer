@@ -75,6 +75,54 @@ type TopicId =
 
 type CategoryId = "identification" | "lifecycle" | "control";
 
+// Biennial species with rosette (Year 1) and shoot/bolted (Year 2) photos.
+// Used inside the Life Cycles topic to show the two-year transformation.
+const BIENNIAL_YEAR_PHOTOS: { id: string; name: string }[] = [
+  { id: "Common_Burdock", name: "Common Burdock" },
+  { id: "Musk_thistle", name: "Musk Thistle" },
+  { id: "Common_teasel", name: "Common Teasel" },
+  { id: "Garlic_mustard", name: "Garlic Mustard" },
+  { id: "caraway", name: "Caraway" },
+];
+
+function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="mt-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+          Year 1 vs. Year 2 — Real Biennials
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Biennials look completely different in each year. In <strong>Year 1</strong> they stay low as a{" "}
+        <strong>rosette</strong>. In <strong>Year 2</strong> they <strong>bolt</strong> — a tall flowering shoot
+        shoots up, sets seed, and the plant dies.
+      </p>
+      <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+        {BIENNIAL_YEAR_PHOTOS.map((w) => (
+          <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
+            <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
+            <div className="grid grid-cols-2">
+              <div className="relative aspect-square bg-muted">
+                <WeedImage weedId={w.id} stage="rosette" className="w-full h-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">
+                  Year 1 · Rosette
+                </span>
+              </div>
+              <div className="relative aspect-square bg-muted">
+                <WeedImage weedId={w.id} stage="shoot" className="w-full h-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white">
+                  Year 2 · Shoot
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Friendly, K-5 seed descriptions inferred from species traits.
 function getElementarySeedDescription(w: Weed): string {
   const name = w.commonName.toLowerCase();
