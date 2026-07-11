@@ -4087,6 +4087,8 @@ function TopicContent({
         {
           key: "fast",
           name: "Super Speed",
+          Icon: Zap,
+          animate: "animate-bounce",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           detail: "Invasive plants grow really fast — sometimes faster than any of the native plants around them.",
@@ -4094,6 +4096,8 @@ function TopicContent({
         {
           key: "no-rivals",
           name: "No Rivals",
+          Icon: Star,
+          animate: "animate-spin-slow",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "They came from far away, so the bugs and diseases that usually slow them down aren't around here.",
@@ -4101,6 +4105,8 @@ function TopicContent({
         {
           key: "seeds",
           name: "Tons of Seeds",
+          Icon: Sparkles,
+          animate: "animate-pulse",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           detail: "Many invasive plants make loads and loads of seeds, so new plants pop up everywhere.",
@@ -4108,6 +4114,8 @@ function TopicContent({
         {
           key: "space",
           name: "Space Grabbers",
+          Icon: Hand,
+          animate: "animate-pulse",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
           detail: "They gobble up sunlight, water, nutrients, and space — leaving barely any for native plants.",
@@ -4155,10 +4163,12 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">Invasive Plant "Superpowers"</p>
             <div className="grid gap-3 md:grid-cols-2">
               {SUPERPOWERS.map((s) => (
-                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg}`}>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${s.dot}`} />
-                    <p className="font-display font-bold text-foreground text-base">{s.name}</p>
+                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg} transition-transform hover:scale-[1.02]`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-full ${s.dot} flex items-center justify-center shadow-md`}>
+                      <s.Icon className={`h-7 w-7 text-white ${s.animate}`} />
+                    </div>
+                    <p className="font-display font-bold text-foreground text-lg">{s.name}</p>
                   </div>
                   <p className="text-sm text-foreground">{s.detail}</p>
                 </div>
