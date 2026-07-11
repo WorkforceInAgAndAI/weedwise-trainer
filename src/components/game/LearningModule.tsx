@@ -2626,6 +2626,7 @@ function TopicContent({
                 </p>
               </div>
               <HorizontalWeedRow weeds={biennials} onSelectWeed={onSelectWeed} stage="flower" />
+              <BiennialYearComparison compact />
             </div>
 
             {/* Perennial */}
@@ -2728,6 +2729,7 @@ function TopicContent({
               <p className="text-xs text-muted-foreground">
                 Examples: Common burdock, garlic mustard, and wild parsnip.
               </p>
+              <BiennialYearComparison />
             </div>
 
             {/* Perennial section */}
