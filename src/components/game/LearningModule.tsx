@@ -33,7 +33,6 @@ import weedControlToolsImg from "@/assets/learning/weed_control_tools.jpg";
 import plantDetectiveImg from "@/assets/learning/plant_detective.jpg";
 import cornVsWeedImg from "@/assets/learning/corn_vs_weed.png";
 import plantComparisonImg from "@/assets/learning/plant_comparison.png";
-import annualPerennialDiagramImg from "@/assets/learning/annual_perennial_diagram.png";
 
 type TopicId =
   | "names"
@@ -129,6 +128,115 @@ function SeedBankDiagram() {
         <path d="M170 28 q 8 -2 10 -10" stroke="#558B2F" strokeWidth="2" fill="none" />
       </svg>
     </div>
+  );
+}
+
+// Interactive multi-stage viewer for the "14 Weeds You Can Spot" module.
+function WeedSpotterCard({
+  w,
+}: {
+  w: {
+    id: string;
+    name: string;
+    spotIt: string;
+    funFact: string;
+    dot: string;
+    bg: string;
+    photo?: string;
+    photoAlt?: string;
+  };
+}) {
+  const STAGES = [
+    { key: "seed", label: "Seed" },
+    { key: "seedling", label: "Sprout" },
+    { key: "vegetative", label: "Leaves" },
+    { key: "flower", label: "Flower" },
+  ] as const;
+  const [stage, setStage] = useState<(typeof STAGES)[number]["key"]>("flower");
+  return (
+    <div className={`rounded-lg border-2 p-4 space-y-3 ${w.bg}`}>
+      <div className="flex items-center gap-2">
+        <span className={`w-3 h-3 rounded-full ${w.dot}`} />
+        <p className="font-display font-bold text-foreground text-base">{w.name}</p>
+      </div>
+      <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
+        {w.photo && stage === "flower" ? (
+          <img src={w.photo} alt={w.photoAlt ?? w.name} className="w-full h-full object-cover" />
+        ) : (
+          <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {STAGES.map((s) => (
+          <button
+            key={s.key}
+            onClick={() => setStage(s.key)}
+            className={`text-[11px] font-bold px-2 py-1 rounded-full border transition-all ${
+              stage === s.key
+                ? "bg-primary text-primary-foreground border-primary shadow"
+                : "bg-background/70 text-foreground border-border hover:border-primary/60"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      <p className="text-sm text-foreground">
+        <strong>Spot it:</strong> {w.spotIt}
+      </p>
+      <p className="text-sm text-foreground">
+        <strong>Fun fact:</strong> {w.funFact}
+      </p>
+    </div>
+  );
+}
+
+// Flip card for the "What Plants Need" dinner-themed module.
+function FlipPlateCard({
+  n,
+}: {
+  n: {
+    key: string;
+    title: string;
+    plantUses: string;
+    weedSteals: string;
+    bg: string;
+    dot: string;
+  };
+}) {
+  const [flipped, setFlipped] = useState(false);
+  const icons: Record<string, JSX.Element> = {
+    sun: <span className="text-3xl">☀️</span>,
+    water: <span className="text-3xl">💧</span>,
+    air: <span className="text-3xl">🌬️</span>,
+    nutrients: <span className="text-3xl">🥕</span>,
+    space: <span className="text-3xl">🪑</span>,
+  };
+  return (
+    <button
+      onClick={() => setFlipped((f) => !f)}
+      className="relative w-full aspect-square [perspective:800px] focus:outline-none"
+      aria-label={`Flip ${n.title} card`}
+    >
+      <div
+        className="absolute inset-0 transition-transform duration-500 [transform-style:preserve-3d]"
+        style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+      >
+        {/* Front — the plate */}
+        <div className={`absolute inset-0 rounded-full border-4 border-amber-700 shadow-lg flex flex-col items-center justify-center gap-1 [backface-visibility:hidden] ${n.bg}`}>
+          {icons[n.key]}
+          <p className="font-display font-extrabold text-foreground text-xs sm:text-sm">{n.title}</p>
+          <p className="text-[9px] text-muted-foreground italic">flip me!</p>
+        </div>
+        {/* Back */}
+        <div className="absolute inset-0 rounded-2xl bg-amber-50 border-4 border-amber-700 shadow-lg p-2 flex flex-col justify-center text-left [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <p className="text-[10px] font-bold text-amber-900 mb-1">🌽 Plants use it to:</p>
+          <p className="text-[10px] text-foreground leading-tight mb-1">{n.plantUses}</p>
+          <p className="text-[10px] font-bold text-destructive">🌿 Weeds steal it:</p>
+          <p className="text-[10px] text-foreground leading-tight">{n.weedSteals}</p>
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -388,9 +496,9 @@ const TOPICS: Topic[] = [
   },
   {
     id: "distinctive-weeds",
-    name: "10 Weeds You Can Spot!",
+    name: "14 Weeds You Can Spot!",
     icon: "leaf",
-    description: "Get to know 10 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
+    description: "Get to know 14 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -3177,79 +3285,81 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-gradient-to-br from-yellow-100 via-emerald-50 to-sky-100 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
-            <p className="font-display font-extrabold text-primary text-xl">5 Things Every Plant Needs!</p>
-            <p className="text-sm text-foreground">Say it with me: <strong>Sun, Water, Air, Food, and Space!</strong></p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(215 35% 22%) 0%, hsl(215 30% 30%) 60%, hsl(30 30% 55%) 100%)",
+          }}
+        >
+          {/* Cozy dinner-table header */}
+          <div className="rounded-xl bg-amber-50/95 p-5 text-center space-y-2 border-4 border-amber-700 shadow-lg">
+            <p className="font-display font-extrabold text-amber-900 text-xl">🕯️ Welcome to Plant Dinner!</p>
+            <p className="text-sm text-amber-950">Every plant needs 5 things at the table: <strong>Sun • Water • Air • Food • Space</strong></p>
           </div>
 
-          <img
-            src={plantComparisonImg}
-            alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
-            className="w-full rounded-lg border-2 border-border object-contain bg-background"
-          />
+          <div className="rounded-xl border-4 border-amber-700 bg-amber-100/90 p-3">
+            <img
+              src={plantComparisonImg}
+              alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
+              className="w-full rounded-lg object-contain bg-background"
+            />
+            <p className="text-center text-[11px] text-amber-900 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+          </div>
 
-          {/* Big tappable icon cards */}
+          {/* FLIP CARDS - front shows need, back shows the "weed steals" detail */}
+          <p className="font-display font-extrabold text-amber-100 text-center text-base">🍽️ Tap a plate to flip it!</p>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {NEEDS.map((n) => (
-              <details key={n.key} className={`group rounded-2xl border-2 p-3 cursor-pointer transition-transform hover:scale-105 ${n.bg}`}>
-                <summary className="list-none text-center space-y-1">
-                  <div className={`mx-auto w-12 h-12 rounded-full ${n.dot} flex items-center justify-center shadow-md`}>
-                    {n.key === "sun" && <Sparkles className="h-6 w-6 text-white" />}
-                    {n.key === "water" && <span className="text-2xl">💧</span>}
-                    {n.key === "air" && <span className="text-2xl">🌬️</span>}
-                    {n.key === "nutrients" && <Sprout className="h-6 w-6 text-white" />}
-                    {n.key === "space" && <span className="text-2xl">↔️</span>}
-                  </div>
-                  <p className="font-display font-extrabold text-foreground text-sm">{n.title}</p>
-                  <p className="text-[10px] text-muted-foreground italic">tap to peek!</p>
-                </summary>
-                <div className="mt-2 space-y-2 text-xs text-foreground">
-                  <p><strong>Plants use it to:</strong> {n.plantUses}</p>
-                  <p className="bg-destructive/10 rounded p-1"><strong>Weeds steal it:</strong> {n.weedSteals}</p>
-                </div>
-              </details>
+              <FlipPlateCard key={n.key} n={n} />
             ))}
           </div>
 
-          {/* Weeds stealing from the table — VISUAL */}
-          <div className="rounded-2xl border-2 border-terracotta/50 bg-gradient-to-b from-amber-50 to-terracotta/10 p-5 space-y-4">
-            <p className="font-display font-extrabold text-terracotta text-lg text-center">🍽️ The Lunch Table Problem!</p>
-            <p className="text-sm text-foreground text-center">
-              Imagine the field is a lunch table. Farmer set out food for the crops — but weeds sneak in!
-            </p>
-            <div className="rounded-xl bg-amber-800/80 p-4 shadow-inner">
-              {/* Table with plates */}
-              <div className="grid grid-cols-5 gap-2 mb-2">
-                {["☀️","💧","🌬️","🌱","↔️"].map((emoji, i) => (
-                  <div key={i} className="aspect-square rounded-full bg-white/90 flex items-center justify-center text-2xl shadow">{emoji}</div>
-                ))}
-              </div>
-              <div className="h-2 bg-amber-950 rounded" />
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                <div className="rounded-lg bg-success/90 p-2 text-center">
-                  <p className="text-2xl">🌽</p>
-                  <p className="text-[11px] font-bold text-white">Crop = invited</p>
+          {/* Character conversation replacing the lunch table diagram */}
+          <div className="rounded-2xl border-4 border-amber-700 bg-amber-50/95 p-4 space-y-3">
+            <p className="font-display font-extrabold text-amber-900 text-base text-center">🌽 Dinner-Table Talk</p>
+            <div className="space-y-3">
+              {/* Crop speaks */}
+              <div className="flex items-start gap-2">
+                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌽</div>
+                <div className="relative bg-success/20 border-2 border-success rounded-2xl rounded-tl-none p-3 flex-1">
+                  <p className="text-xs font-bold text-success mb-0.5">Cornelius the Crop</p>
+                  <p className="text-sm text-foreground">"I was really looking forward to my sunshine and water tonight!"</p>
                 </div>
-                <div className="rounded-lg bg-destructive/90 p-2 text-center animate-pulse">
-                  <p className="text-2xl">🌿</p>
-                  <p className="text-[11px] font-bold text-white">Weed = crashing the party!</p>
+              </div>
+              {/* Weed speaks */}
+              <div className="flex items-start gap-2 flex-row-reverse">
+                <div className="w-12 h-12 rounded-full bg-destructive/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌿</div>
+                <div className="relative bg-destructive/20 border-2 border-destructive rounded-2xl rounded-tr-none p-3 flex-1">
+                  <p className="text-xs font-bold text-destructive mb-0.5">Wally the Weed</p>
+                  <p className="text-sm text-foreground">"Too bad! I got here first and I'm eating YOUR share too!"</p>
+                </div>
+              </div>
+              {/* Crop replies */}
+              <div className="flex items-start gap-2">
+                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌽</div>
+                <div className="relative bg-success/20 border-2 border-success rounded-2xl rounded-tl-none p-3 flex-1">
+                  <p className="text-xs font-bold text-success mb-0.5">Cornelius the Crop</p>
+                  <p className="text-sm text-foreground">"But… I need those to grow big! Now I'm going to be tiny and thirsty!"</p>
+                </div>
+              </div>
+              {/* Farmer speaks */}
+              <div className="flex items-start gap-2 flex-row-reverse">
+                <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">👩‍🌾</div>
+                <div className="relative bg-primary/20 border-2 border-primary rounded-2xl rounded-tr-none p-3 flex-1">
+                  <p className="text-xs font-bold text-primary mb-0.5">Farmer Frank</p>
+                  <p className="text-sm text-foreground">"Not on my watch, Wally! I'll clear you out so Cornelius gets his full dinner."</p>
                 </div>
               </div>
             </div>
-            <p className="text-sm text-foreground text-center">
-              Every bite a weed takes = less for the crop. That's why the crop gets small and weak!
-            </p>
           </div>
 
-          <div className="bg-primary/10 border-2 border-primary/40 rounded-2xl p-4 text-center">
-            <p className="font-display font-extrabold text-primary text-base mb-1">🏆 The Farmer's Job</p>
-            <p className="text-sm text-foreground">
-              Kick out the weeds so the crops get ALL 5 things — and grow BIG!
-            </p>
+          <div className="rounded-xl bg-amber-100/90 border-2 border-amber-700 p-4 text-center">
+            <p className="font-display font-extrabold text-amber-900 text-base mb-1">🏆 The Farmer's Job</p>
+            <p className="text-sm text-amber-950">Kick out the weeds so the crops get ALL 5 things — and grow BIG!</p>
           </div>
 
-          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
+          <div className="rounded-xl bg-yellow-100 border-4 border-yellow-500 p-4 text-center">
             <p className="font-display font-extrabold text-foreground text-base">✨ Remember ✨</p>
             <p className="text-sm text-foreground mt-1"><strong>Sun • Water • Air • Food • Space</strong></p>
             <p className="text-xs text-muted-foreground mt-1">Five things every plant needs — and five things weeds try to steal!</p>
@@ -3316,10 +3426,22 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Meet the 5 Parts of a Plant!</p>
-            <p>Every plant — crops AND weeds — is built from 5 super-important parts. Let's meet them!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(0 0% 98%) 0%, hsl(200 40% 92%) 100%)",
+          }}
+        >
+          {/* Doctor-themed header */}
+          <div className="rounded-xl bg-white border-4 border-red-500 p-5 text-center space-y-2 shadow-lg">
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">+</div>
+              <p className="font-display font-extrabold text-red-600 text-2xl">Plant Checkup!</p>
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">+</div>
+            </div>
+            <p className="text-sm text-foreground">🩺 Dr. Green here — let's examine the <strong>5 parts</strong> every plant has!</p>
+            <p className="text-xs text-muted-foreground">🍭 Good job! Here's a lollipop after your visit!</p>
           </div>
 
           <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
@@ -3332,19 +3454,20 @@ function TopicContent({
             <p className="text-center text-xs text-muted-foreground mt-2">A crop and a weed share the same parts — but use them very differently!</p>
           </div>
 
-          <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-3 text-center text-sm font-semibold text-primary">
-            <span className="inline-flex items-center gap-2"><Hand className="h-4 w-4" /> Tap each part to see its secret job!</span>
+          <div className="bg-red-50 border-2 border-red-400 rounded-lg p-3 text-center text-sm font-semibold text-red-700 shadow">
+            <span className="inline-flex items-center gap-2">🩺 Tap each part to open its chart!</span>
           </div>
 
           <div className="space-y-4">
             {PARTS.map((p) => (
-              <details key={p.key} className={`group rounded-xl border-2 p-4 ${p.bg} transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden`}>
+              <details key={p.key} className="group rounded-xl border-4 border-red-300 bg-white p-4 transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden shadow">
                 <summary className="flex items-center gap-3 list-none cursor-pointer select-none">
-                  <p.Icon className="h-7 w-7 text-primary shrink-0" />
-                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                  <p className="font-display font-bold text-foreground text-lg flex-1">{p.title}</p>
-                  <span className="text-xs font-bold text-muted-foreground bg-background/70 rounded-full px-2 py-1 group-open:hidden">Tap!</span>
-                  <ChevronDown className="h-5 w-5 text-primary transition-transform group-open:rotate-180" />
+                  <div className={`w-10 h-10 rounded-full ${p.dot} flex items-center justify-center shadow shrink-0`}>
+                    <p.Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="font-display font-extrabold text-foreground text-lg flex-1">{p.title}</p>
+                  <span className="text-xs font-bold text-red-700 bg-red-100 border border-red-400 rounded-full px-2 py-1 group-open:hidden">🩺 Chart</span>
+                  <ChevronDown className="h-5 w-5 text-red-600 transition-transform group-open:rotate-180" />
                 </summary>
                 <div className="mt-3 space-y-2 pl-1">
                   <p className="text-sm text-foreground flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-terracotta shrink-0" /><span><strong>Where:</strong> {p.where}</span></p>
@@ -3357,13 +3480,13 @@ function TopicContent({
             ))}
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">A Plant Is a Team!</p>
+          <div className="bg-white border-4 border-emerald-500 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-emerald-700 text-base">💊 Clean Bill of Health!</p>
             <p className="text-sm text-foreground">Roots drink, stems carry, leaves cook, flowers bloom, seeds travel. Every part needs the others!</p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember the order:</p>
+          <div className="bg-white border-4 border-red-500 rounded-lg p-4 text-sm text-foreground shadow">
+            <p className="font-semibold text-red-700 mb-1">🍭 Doctor's Reminder:</p>
             <p className="text-base flex items-center gap-1 flex-wrap font-semibold">
               <Sprout className="h-4 w-4 text-terracotta" /> Roots →
               <Trees className="h-4 w-4 text-success" /> Stem →
@@ -3393,9 +3516,26 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Crop or Weed? It's All About Where It Grows</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl relative"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(200 80% 78%) 0%, hsl(90 55% 65%) 40%, hsl(90 45% 45%) 70%, hsl(28 55% 30%) 100%)",
+          }}
+        >
+          {/* Sky birds */}
+          <div className="text-2xl absolute top-2 right-6 animate-bounce">🐦</div>
+          <div className="text-xl absolute top-6 left-10 animate-pulse">🐦</div>
+          <div className="text-lg absolute top-4 right-24">☁️</div>
+
+          {/* Farm barn header */}
+          <div className="rounded-xl bg-red-700 p-5 text-center space-y-2 border-4 border-amber-900 shadow-lg relative">
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-3xl">🌾</div>
+            <p className="font-display font-extrabold text-yellow-100 text-2xl drop-shadow">🚜 Crop or Weed? 🌽</p>
+            <p className="text-sm text-yellow-50">Down on the farm — is it a friend or a sneaker?</p>
+          </div>
+          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
+            <p className="font-display font-bold text-amber-900 text-base">🌱 It's All About WHERE It Grows</p>
             <p>
               At first glance, crops and weeds can look a lot alike — they're both plants! The biggest
               difference isn't <em>what</em> the plant is, it's <em>where</em> it's growing.
@@ -3403,10 +3543,10 @@ function TopicContent({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-3">
+            <div className="rounded-lg border-4 border-amber-800 bg-white/95 p-4 space-y-3 shadow">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-success" />
-                <p className="font-display font-bold text-success text-base">Crops</p>
+                <span className="text-2xl">🌽</span>
+                <p className="font-display font-extrabold text-emerald-700 text-base">Crops (Friends!)</p>
               </div>
               <p className="text-sm text-foreground">
                 Crops are plants that farmers grow <strong>on purpose</strong>. They give us food, feed animals,
@@ -3414,19 +3554,19 @@ function TopicContent({
               </p>
               <div className="space-y-2">
                 {CROP_TRAITS.map((c) => (
-                  <div key={c.label} className="bg-background/60 rounded-md p-2">
+                  <div key={c.label} className="bg-green-50 border border-emerald-500 rounded-md p-2">
                     <p className="font-semibold text-foreground text-sm">{c.label}</p>
                     <p className="text-xs text-muted-foreground">{c.detail}</p>
-                    <p className="text-xs text-success font-semibold mt-1">Examples: {c.examples}</p>
+                    <p className="text-xs text-emerald-700 font-semibold mt-1">Examples: {c.examples}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 space-y-3">
+            <div className="rounded-lg border-4 border-amber-800 bg-white/95 p-4 space-y-3 shadow">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-destructive" />
-                <p className="font-display font-bold text-destructive text-base">Weeds</p>
+                <span className="text-2xl">🌿</span>
+                <p className="font-display font-extrabold text-destructive text-base">Weeds (Sneakers!)</p>
               </div>
               <p className="text-sm text-foreground">
                 Weeds are plants growing <strong>where they aren't wanted</strong>. Nobody planted them, and
@@ -3434,7 +3574,7 @@ function TopicContent({
               </p>
               <div className="space-y-2">
                 {WEED_TRAITS.map((w) => (
-                  <div key={w.label} className="bg-background/60 rounded-md p-2">
+                  <div key={w.label} className="bg-red-50 border border-destructive rounded-md p-2">
                     <p className="font-semibold text-foreground text-sm">{w.label}</p>
                     <p className="text-xs text-muted-foreground">{w.detail}</p>
                     <p className="text-xs text-destructive font-semibold mt-1">Examples: {w.examples}</p>
@@ -3444,15 +3584,17 @@ function TopicContent({
             </div>
           </div>
 
-          <img
-            src={cropsVsWeedsImg}
-            alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
-            className="w-full rounded-lg bg-background/60 object-contain"
-          />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+          <div className="rounded-lg border-4 border-amber-800 bg-white/90 p-3 shadow">
+            <img
+              src={cropsVsWeedsImg}
+              alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
+              className="w-full rounded-lg bg-background/60 object-contain"
+            />
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+          </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
+          <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-amber-900 text-base">🐄 Think About It Like This…</p>
             <p className="text-sm text-foreground">
               Imagine your classroom. Every student has an assigned desk. Now imagine someone from another
               class walks in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just
@@ -3464,8 +3606,8 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
+          <div className="bg-amber-900 border-4 border-yellow-500 rounded-lg p-4 text-yellow-50 shadow">
+            <p className="font-semibold text-yellow-300 mb-1">🌾 Remember:</p>
             <p>A weed isn't a "bad" plant — it's just a plant growing in the wrong place.</p>
           </div>
         </div>
@@ -3529,20 +3671,32 @@ function TopicContent({
           />
           <p className="text-center text-[11px] text-muted-foreground italic -mt-3">Image generated with Google Gemini 1.5 Pro.</p>
 
-          {/* Steps arranged as a CYCLE (2x2 grid with arrows) */}
-          <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle! →</p>
-          <div className="relative grid grid-cols-2 gap-3">
-            {STEPS.map((s, i) => (
-              <div key={s.key} className={`rounded-2xl border-2 p-3 ${s.bg} relative`}>
-                <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
-                <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
-                <p className="text-[11px] font-semibold text-muted-foreground mb-1">{s.season}</p>
-                <p className="text-xs text-foreground leading-snug">{s.body}</p>
-              </div>
-            ))}
-            {/* center circular arrow badge */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg animate-spin-slow" style={{ animation: "spin 8s linear infinite" }}>
-              <RotateCcw className="h-7 w-7" />
+          {/* Steps arranged in a real CIRCLE (clockwise: top, right, bottom, left) */}
+          <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle — Clockwise! ↻</p>
+          <div className="relative mx-auto w-full max-w-md aspect-square">
+            {STEPS.map((s, i) => {
+              // Clockwise positions: 0=top, 1=right, 2=bottom, 3=left
+              const positions = [
+                "top-0 left-1/2 -translate-x-1/2",
+                "top-1/2 right-0 -translate-y-1/2",
+                "bottom-0 left-1/2 -translate-x-1/2",
+                "top-1/2 left-0 -translate-y-1/2",
+              ];
+              return (
+                <div
+                  key={s.key}
+                  className={`absolute ${positions[i]} w-[46%] rounded-2xl border-2 p-3 ${s.bg} shadow`}
+                >
+                  <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
+                  <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground mb-1">{s.season}</p>
+                  <p className="text-[11px] text-foreground leading-snug">{s.body}</p>
+                </div>
+              );
+            })}
+            {/* Center clockwise arrow */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+              <RotateCcw className="h-8 w-8 -scale-x-100" />
             </div>
           </div>
           <p className="text-center text-xs text-muted-foreground italic">…and back to step 1! It never stops.</p>
@@ -3563,7 +3717,7 @@ function TopicContent({
                 { stage: "seed", label: "Seed" },
                 { stage: "seedling", label: "Sprout" },
                 { stage: "vegetative", label: "Grow" },
-                { stage: "flower", label: "Seeds!" },
+                { stage: "flower", label: "Mature" },
                 { stage: null as string | null, label: "The End" },
               ].map((s, i) => (
                 <div key={i} className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -3614,7 +3768,6 @@ function TopicContent({
                   {[
                     { stage: "vegetative", label: "Grow", pos: "top-0 left-1/2 -translate-x-1/2" },
                     { stage: "flower", label: "Flowers", pos: "top-1/2 right-0 -translate-y-1/2" },
-                    { stage: "seed", label: "Seeds", pos: "bottom-0 left-1/2 -translate-x-1/2" },
                     { stage: "seedling", label: "Regrow", pos: "top-1/2 left-0 -translate-y-1/2" },
                   ].map((s, i) => (
                     <div key={i} className={`absolute ${s.pos} text-center`}>
@@ -3624,20 +3777,14 @@ function TopicContent({
                       <p className="text-[9px] font-bold text-foreground">{s.label}</p>
                     </div>
                   ))}
-                  <div className="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-info/20 flex items-center justify-center animate-spin" style={{ animation: "spin 6s linear infinite" }}>
-                    <RotateCcw className="h-6 w-6 text-info" />
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-info/20 flex items-center justify-center">
+                    <RotateCcw className="h-6 w-6 text-info -scale-x-100" />
                   </div>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground italic">A line into a circle — it never stops coming back!</p>
+            <p className="text-xs text-muted-foreground italic">A line into a circle — underground roots keep it coming back!</p>
           </div>
-
-          <img
-            src={annualPerennialDiagramImg}
-            alt="Scientific diagram comparing an annual plant's straight-line life cycle to a perennial's cyclical life cycle across seasons"
-            className="w-full rounded-lg bg-background object-contain border-2 border-border"
-          />
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
@@ -3702,21 +3849,40 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-gradient-to-br from-sky-100 via-primary/10 to-terracotta/20 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
-            <p className="font-display font-extrabold text-primary text-xl">✈️ How Do Seeds Travel?</p>
-            <p className="text-sm text-foreground">Seeds can't walk… so how do they get around?</p>
-            <p className="text-sm text-foreground font-semibold">Tap each traveler below to find out!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(210 60% 88%) 0%, hsl(210 45% 78%) 50%, hsl(215 30% 60%) 100%)",
+          }}
+        >
+          {/* Airport departures board header */}
+          <div className="rounded-xl bg-slate-900 p-5 text-center space-y-2 border-4 border-yellow-500 shadow-lg font-mono">
+            <p className="text-yellow-300 text-xs tracking-widest">◆ SEED INTERNATIONAL AIRPORT ◆ DEPARTURES ◆</p>
+            <p className="font-display font-extrabold text-yellow-400 text-2xl">✈️ HOW DO SEEDS TRAVEL?</p>
+            <p className="text-xs text-yellow-200 tracking-wider">🛫  ON TIME  •  NOW BOARDING  •  🛬</p>
+          </div>
+          <div className="rounded-lg bg-white/95 border-2 border-slate-400 p-4 text-sm text-foreground">
+            <p>Seeds can't walk… so how do they get around? Tap each <strong>gate</strong> to see the flight!</p>
+          </div>
+          {/* Runway strip */}
+          <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden">
+            <div className="absolute inset-y-0 left-0 right-0 flex items-center gap-2 px-2">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="h-1 w-6 bg-yellow-300 rounded" />
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             {TRAVELERS.map((t) => (
-              <details key={t.key} className={`rounded-2xl border-2 p-3 cursor-pointer group transition-transform hover:scale-[1.02] ${t.bg}`}>
+              <details key={t.key} className="rounded-2xl border-4 border-slate-400 bg-white/95 p-3 cursor-pointer group transition-transform hover:scale-[1.02] shadow-lg">
                 <summary className="list-none text-center space-y-2">
+                  <div className="text-[10px] font-mono font-bold text-slate-500 tracking-widest bg-slate-100 rounded py-1">GATE {t.key.toUpperCase().slice(0, 3)}-{["01","07","23"][["wind","water","animal"].indexOf(t.key)]}</div>
                   <div className="text-4xl">{t.emoji}</div>
                   <p className="font-display font-extrabold text-foreground text-base">{t.title}</p>
                   <p className="text-xs italic text-muted-foreground">"{t.nickname}"</p>
-                  <p className="text-[10px] text-primary font-bold group-open:hidden">👆 tap me!</p>
+                  <p className="text-[10px] text-primary font-bold group-open:hidden bg-yellow-200 rounded px-2 py-0.5 inline-block">🎫 tap ticket!</p>
                 </summary>
                 <div className="mt-3 space-y-2">
                   <img src={t.image} alt={t.imageAlt} className="w-full rounded-lg bg-background object-contain" />
@@ -3729,16 +3895,17 @@ function TopicContent({
             ))}
           </div>
 
-          <div className="bg-warning/10 border-2 border-warning/40 rounded-2xl p-4 text-center">
-            <p className="font-display font-extrabold text-warning-foreground text-base">🚜 Why Farmers Care</p>
+          <div className="bg-yellow-100 border-4 border-yellow-500 rounded-2xl p-4 text-center shadow">
+            <p className="font-display font-extrabold text-amber-900 text-base">🚜 Why Farmers Care (Airport Security!)</p>
             <p className="text-sm text-foreground mt-1">
-              Weeds sneak into fields as free riders! Farmers even wash their boots and tractors so seeds don't hitch a ride.
+              Weeds sneak into fields as stowaways! Farmers even wash their boots and tractors — like TSA for seeds — so no free rides!
             </p>
           </div>
 
-          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
-            <p className="font-display font-extrabold text-foreground text-base">✨ Remember: 3 Ways Seeds Travel ✨</p>
+          <div className="bg-slate-900 border-4 border-yellow-500 rounded-2xl p-4 text-center font-mono shadow-lg">
+            <p className="font-display font-extrabold text-yellow-400 text-base">📋 3 FLIGHT ROUTES</p>
             <p className="text-sm text-foreground mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
+            <p className="text-yellow-200 text-xs mt-1 tracking-wider">HAVE A GREAT FLIGHT, SEEDS!</p>
           </div>
         </div>
       );
@@ -4123,41 +4290,55 @@ function TopicContent({
           animate: "animate-bounce",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
-          detail: "Invasive plants grow really fast — sometimes faster than any of the native plants around them.",
+          detail: "These plants zoom! They grow way faster than the plants that live here.",
+          emoji: "🏃💨",
         },
         {
           key: "no-rivals",
           name: "No Rivals",
           Icon: Star,
-          animate: "animate-pulse",
+          animate: "animate-spin",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          detail: "They came from far away, so the bugs and diseases that usually slow them down aren't around here.",
+          detail: "They came from far away. The bugs that eat them at home don't live here!",
+          emoji: "🌎✈️",
         },
         {
           key: "seeds",
           name: "Tons of Seeds",
           Icon: Sparkles,
-          animate: "animate-pulse",
+          animate: "animate-ping",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
-          detail: "Many invasive plants make loads and loads of seeds, so new plants pop up everywhere.",
+          detail: "They make SO many seeds — like popcorn popping! New baby weeds everywhere.",
+          emoji: "🌰🌰🌰",
         },
         {
           key: "space",
           name: "Space Grabbers",
           Icon: Hand,
-          animate: "animate-pulse",
+          animate: "animate-bounce",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
-          detail: "They gobble up sunlight, water, nutrients, and space — leaving barely any for native plants.",
+          detail: "They hog the sun, water, food, and space. No sharing!",
+          emoji: "🙌",
         },
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Recess Tag… Gone Wild!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(48 95% 85%) 0%, hsl(45 90% 75%) 100%)",
+          }}
+        >
+          {/* School-themed header — chalkboard */}
+          <div className="rounded-xl bg-emerald-900 p-5 text-center space-y-2 border-4 border-amber-800 shadow-lg">
+            <p className="font-display font-extrabold text-yellow-100 text-xl">🏫 Recess Tag… Gone Wild! 🚌</p>
+            <p className="text-sm text-yellow-50">✏️ 🍎 Ring the bell — class is in session! 🔔</p>
+          </div>
+          <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
             <p>
               Imagine you're playing a game of tag on the playground. Everyone is following the rules and
               taking turns. Then one player runs <em>way</em> faster than everyone else, tags everyone, and
@@ -4169,7 +4350,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-amber-700 bg-yellow-50 p-4 shadow">
             <img
               src={weedBulliesImg}
               alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
@@ -4181,26 +4362,27 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">What Is an Invasive Plant?</p>
+          <div className="bg-white/95 border-2 border-amber-700 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-amber-900 text-base">📓 What Is an Invasive Plant?</p>
             <p className="text-sm text-foreground">
-              Invasive plants are plants that spread into new places and grow very quickly. Because they're
-              growing where they have less competition — and where the bugs and diseases that usually keep
-              them in check aren't around — they can spread <strong>much faster</strong> than the native
-              plants that belong there.
+              An invasive plant is a plant that <strong>moved in from far away</strong> and grows SUPER fast.
+              It shoots past the plants that were already living there — like a new kid who takes over the whole recess game!
             </p>
           </div>
 
           <div className="space-y-3">
-            <p className="font-display font-bold text-primary text-base">Invasive Plant "Superpowers"</p>
+            <p className="font-display font-extrabold text-amber-900 text-lg text-center bg-yellow-200 border-4 border-amber-700 rounded-full px-4 py-2 shadow">
+              🦸 Invasive Plant Superpowers 🦸
+            </p>
             <div className="grid gap-3 md:grid-cols-2">
               {SUPERPOWERS.map((s) => (
-                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg} transition-transform hover:scale-[1.02]`}>
+                <div key={s.key} className={`rounded-2xl border-4 border-amber-700 p-4 space-y-2 bg-white/95 shadow-lg transition-transform hover:scale-[1.03]`}>
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-full ${s.dot} flex items-center justify-center shadow-md`}>
+                    <div className={`relative w-14 h-14 rounded-full ${s.dot} flex items-center justify-center shadow-md border-2 border-amber-800`}>
                       <s.Icon className={`h-7 w-7 text-white ${s.animate}`} />
+                      <span className="absolute -top-2 -right-2 text-lg">{s.emoji}</span>
                     </div>
-                    <p className="font-display font-bold text-foreground text-lg">{s.name}</p>
+                    <p className="font-display font-extrabold text-amber-900 text-lg">{s.name}</p>
                   </div>
                   <p className="text-sm text-foreground">{s.detail}</p>
                 </div>
@@ -4208,7 +4390,7 @@ function TopicContent({
             </div>
           </div>
 
-          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
+          <div className="bg-red-100 border-4 border-red-600 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-destructive text-base">Who Gets Left Out?</p>
             <p className="text-sm text-foreground">
               As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for
@@ -4217,7 +4399,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-amber-700 bg-yellow-50 p-4 shadow">
             <img
               src={invasivePlantImg}
               alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
@@ -4229,8 +4411,8 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">Team Up to Keep Things Fair</p>
+          <div className="bg-white/95 border-4 border-emerald-700 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-emerald-800 text-base">🍎 Team Up to Keep Things Fair</p>
             <p className="text-sm text-foreground">
               Farmers, gardeners, and scientists work together to stop invasive plants before they take over.
               By protecting native plants and keeping invasive plants under control, we help our forests,
@@ -4238,8 +4420,8 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
+          <div className="bg-yellow-200 border-4 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
+            <p className="font-semibold text-amber-900 mb-1">✏️ Remember:</p>
             <p>Invasive plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong there.</p>
           </div>
         </div>
@@ -4468,7 +4650,7 @@ function TopicContent({
           bg: "bg-success/10 border-success/40",
         },
         {
-          id: "Tall_morningglory",
+          id: "Field_bindweed",
           name: "13. Morningglory",
           spotIt: "Twisty vines that climb up other plants, with trumpet-shaped purple, pink, or blue flowers.",
           funFact: "The flowers open in the morning and close up when the sun gets hot — that's how it got its name!",
@@ -4502,25 +4684,7 @@ function TopicContent({
 
           <div className="grid gap-4 md:grid-cols-2">
             {WEEDS_TO_SPOT.map((w) => (
-              <div key={w.id} className={`rounded-lg border-2 p-4 space-y-3 ${w.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${w.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{w.name}</p>
-                </div>
-                <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
-                  {w.photo ? (
-                    <img src={w.photo} alt={w.photoAlt ?? w.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                  )}
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>Spot it:</strong> {w.spotIt}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Fun fact:</strong> {w.funFact}
-                </p>
-              </div>
+              <WeedSpotterCard key={w.id} w={w} />
             ))}
           </div>
 
@@ -4693,15 +4857,17 @@ function TopicContent({
             "Weed flowers are like tiny snack bars for bees, butterflies, and other pollinators. When they sip the sweet nectar, they carry pollen from flower to flower and help lots of plants make new seeds!",
           examples: "Common Milkweed (a monarch butterfly favorite!), Wild Carrot, Canada Thistle",
           animation: (
-            <div className="relative w-20 h-20 shrink-0">
-              <div className="absolute inset-0 rounded-full bg-warning/30 flex items-center justify-center">
-                <Flower2 className="h-10 w-10 text-warning" />
-              </div>
-              <div className="absolute -top-2 -right-2 animate-[slide-in-right_2s_ease-out_infinite]">
-                <div className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-yellow-600 flex items-center justify-center shadow-md">
-                  <Sparkles className="h-4 w-4 text-yellow-900" />
-                </div>
-              </div>
+            <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-100 to-pink-100 border-2 border-yellow-500">
+              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-4xl animate-bounce">🌸</div>
+              <div
+                className="absolute text-2xl"
+                style={{ animation: "bee-fly 3s ease-in-out infinite" }}
+              >🐝</div>
+              <div
+                className="absolute text-xl"
+                style={{ animation: "bee-fly 3.5s ease-in-out infinite 0.5s", top: "10%" }}
+              >🦋</div>
+              <style>{`@keyframes bee-fly { 0%{left:-15%;top:20%} 50%{left:60%;top:50%} 100%{left:110%;top:15%} }`}</style>
             </div>
           ),
         },
@@ -4714,13 +4880,15 @@ function TopicContent({
             "The roots of weeds work like tiny anchors, gripping the dirt tight. When wind blows or rain pours down, those roots keep the soil from washing or blowing away.",
           examples: "Canada Thistle, Yellow Nutsedge, Giant Foxtail",
           animation: (
-            <div className="relative w-20 h-20 shrink-0 flex items-end justify-center">
-              <div className="absolute top-0 animate-bounce">
-                <div className="w-12 h-12 rounded-full bg-terracotta/40 border-2 border-terracotta flex items-center justify-center shadow-md">
-                  <Hand className="h-7 w-7 text-terracotta" />
-                </div>
-              </div>
-              <div className="w-14 h-3 rounded-md bg-amber-800/70 mb-1" />
+            <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-amber-800 border-2 border-amber-800">
+              {/* Wind lines */}
+              <div className="absolute top-2 left-1 text-xs animate-pulse">💨</div>
+              <div className="absolute top-4 left-6 text-xs animate-pulse" style={{ animationDelay: "0.3s" }}>💨</div>
+              {/* Roots gripping */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl" style={{ animation: "grip-shake 0.6s ease-in-out infinite" }}>🌱</div>
+              <div className="absolute bottom-0 left-2 text-2xl">🤝</div>
+              <div className="absolute bottom-0 right-2 text-2xl">🤝</div>
+              <style>{`@keyframes grip-shake { 0%,100%{transform:translateX(-50%) rotate(-3deg)} 50%{transform:translateX(-50%) rotate(3deg)} }`}</style>
             </div>
           ),
         },
@@ -4733,21 +4901,31 @@ function TopicContent({
             "Some weeds grow long, deep taproots — like nature's tiny shovels. They break up hard, packed dirt so water and air can sneak down to help other plants grow strong.",
           examples: "Dandelion, Wild Carrot, Wild Parsnip",
           animation: (
-            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
-              <span className="absolute inline-flex h-16 w-16 rounded-full bg-success/40 animate-ping" />
-              <span className="absolute inline-flex h-12 w-12 rounded-full bg-success/60 animate-ping [animation-delay:0.4s]" />
-              <div className="relative w-14 h-14 rounded-full bg-success flex items-center justify-center shadow-md">
-                <Sparkles className="h-8 w-8 text-white" />
-              </div>
+            <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-amber-900 border-2 border-amber-900 flex items-center justify-center">
+              <span className="absolute inline-flex h-16 w-16 rounded-full bg-yellow-300/60 animate-ping" />
+              <span className="absolute inline-flex h-12 w-12 rounded-full bg-orange-400/70 animate-ping [animation-delay:0.4s]" />
+              <div className="absolute top-1 text-xl">💥</div>
+              <div className="text-4xl relative z-10" style={{ animation: "drill 1.5s ease-in-out infinite" }}>⛏️</div>
+              <style>{`@keyframes drill { 0%,100%{transform:translateY(-6px) rotate(-8deg)} 50%{transform:translateY(6px) rotate(8deg)} }`}</style>
             </div>
           ),
         },
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Weeds Can Be Helpers Too!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(15 75% 60%) 0%, hsl(340 65% 65%) 50%, hsl(200 55% 60%) 100%)",
+          }}
+        >
+          {/* Volunteer-themed header */}
+          <div className="rounded-2xl bg-white/95 p-5 text-center space-y-2 border-4 border-orange-500 shadow-lg">
+            <p className="font-display font-extrabold text-orange-700 text-2xl">🤝 Weeds Are Volunteers Too! 💚</p>
+            <p className="text-sm text-foreground">🌍 🧡 They pitch in and help — just like a volunteer team!</p>
+          </div>
+          <div className="bg-white/90 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-orange-400 shadow">
             <p>
               Not every plant we call a "weed" is a troublemaker. We pull them out of gardens so our crops
               have room to grow — but out in nature, many weeds are actually{" "}
@@ -4756,7 +4934,7 @@ function TopicContent({
           </div>
 
           {/* Meadow illustration */}
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-orange-500 bg-white/90 p-4 shadow">
             <img
               src={goodWeedsImg}
               alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
@@ -4768,19 +4946,22 @@ function TopicContent({
             </p>
           </div>
 
-          {/* Three superpowers */}
+          {/* Three superpowers as volunteer badges */}
+          <p className="font-display font-extrabold text-white text-center text-lg drop-shadow bg-orange-600/80 rounded-full py-2 border-4 border-white">
+            🎖️ Meet the Volunteer Superpowers!
+          </p>
           <div className="space-y-3">
             {POWERS.map((p) => (
-              <div key={p.key} className={`rounded-lg border-2 p-4 ${p.bg} transition-transform hover:scale-[1.01]`}>
+              <div key={p.key} className="rounded-2xl border-4 border-white bg-white/95 p-4 shadow-lg transition-transform hover:scale-[1.01]">
                 <div className="flex items-start gap-4">
                   {p.animation}
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
                       <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                      <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+                      <p className="font-display font-extrabold text-foreground text-base">{p.title}</p>
                     </div>
                     <p className="text-sm text-foreground">{p.detail}</p>
-                    <p className="text-xs text-foreground bg-background/60 rounded px-2 py-1">
+                    <p className="text-xs text-foreground bg-orange-50 border border-orange-300 rounded px-2 py-1">
                       <strong>Weed examples:</strong> {p.examples}
                     </p>
                   </div>
