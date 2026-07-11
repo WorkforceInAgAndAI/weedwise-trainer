@@ -3277,103 +3277,106 @@ function TopicContent({
         {
           key: "roots",
           title: "1. Roots",
-          where: "Underground — the very bottom of the plant.",
+          icon: "🌱",
+          where: "Underground.",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
-          job: "Roots anchor the plant so wind and rain can't knock it over. They also soak up water and nutrients from the soil, like a straw drinking from the dirt.",
-          weedFact: "Some weeds, like Canada Thistle and Field Bindweed, have long creeping roots that spread underground and pop up as brand-new plants far away!",
+          job: "Grab water and hold the plant tight like an anchor.",
+          weedFact: "Canada Thistle roots creep sideways and pop up as new weeds!",
         },
         {
           key: "stem",
           title: "2. Stem",
-          where: "Just above the roots — the trunk or stalk of the plant.",
+          icon: "🌿",
+          where: "The plant's trunk.",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
-          job: "The stem holds the plant up tall so leaves can reach the sunlight. It's also a highway — carrying water up from the roots and food down from the leaves.",
-          weedFact: "Weeds like Giant Ragweed grow super tall, thick stems so they can shade out crops below them.",
+          job: "Holds the plant up and moves water like a straw.",
+          weedFact: "Giant Ragweed grows a HUGE stem to hog the sun!",
         },
         {
           key: "leaves",
           title: "3. Leaves",
-          where: "Along the stem — spreading out to catch sunshine.",
+          icon: "🍃",
+          where: "Sticking out from the stem.",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
-          job: "Leaves are the plant's kitchen. They use sunlight, air, and water to make food in a process called photosynthesis.",
-          weedFact: "Big, flat weed leaves — like on Velvetleaf — grab lots of sunlight and block it from reaching crop leaves underneath.",
+          job: "The kitchen! Leaves catch sunlight to cook food.",
+          weedFact: "Velvetleaf's giant leaves steal sun from corn!",
         },
         {
           key: "flower",
           title: "4. Flowers",
-          where: "Near the top of the plant, usually after leaves have grown.",
+          icon: "🌸",
+          where: "Near the top.",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          job: "Flowers are how plants make new plants. Bees, wind, and other pollinators move pollen between flowers so seeds can start to form.",
-          weedFact: "A Dandelion's yellow flower turns into a fluffy white puffball packed with tiny parachute seeds ready to fly away.",
+          job: "Where seeds are born. Bees help by moving pollen.",
+          weedFact: "A Dandelion flower turns into a fluffy seed puffball!",
         },
         {
           key: "seeds",
           title: "5. Seeds",
-          where: "Inside the flower once it's done blooming — the very top of the plant's life cycle.",
+          icon: "✨",
+          where: "Inside the flower.",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
-          job: "Seeds are baby plants in tiny packages. They travel by wind, water, animals, or people and grow into new plants next season.",
-          weedFact: "One Waterhemp plant can make over a MILLION seeds — that's why one weed today can turn into a whole field of weeds next year!",
+          job: "Tiny baby plants ready to travel and grow!",
+          weedFact: "One Waterhemp plant makes over a MILLION seeds!",
         },
       ];
 
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Parts of a Plant — From the Ground Up</p>
-            <p>
-              Every weed, crop, flower, and tree is built from the same basic parts. Let's take a tour starting
-              deep underground and climbing all the way to the tippy-top of the plant.
-            </p>
-            <p>
-              Each part has its own special job — and when you know the parts, you can spot exactly how a weed
-              grows and where to stop it!
-            </p>
+            <p className="font-display font-bold text-primary text-base">Meet the 5 Parts of a Plant!</p>
+            <p>Every plant — crops AND weeds — is built from 5 super-important parts. Let's meet them!</p>
+          </div>
+
+          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+            <img
+              src={cornVsWeedImg}
+              alt="Side-by-side illustration comparing a corn plant with its parts labeled to a velvetleaf weed with its parts labeled"
+              className="w-full h-auto rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-xs text-muted-foreground mt-2">A crop and a weed share the same parts — but use them very differently!</p>
+          </div>
+
+          <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-3 text-center text-sm font-semibold text-primary">
+            👇 Tap each part to see its secret job! 👇
           </div>
 
           <div className="space-y-4">
             {PARTS.map((p) => (
-              <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
-                <div className="flex items-center gap-2">
+              <details key={p.key} className={`group rounded-xl border-2 p-4 ${p.bg} transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden`}>
+                <summary className="flex items-center gap-3 list-none cursor-pointer select-none">
+                  <span className="text-3xl">{p.icon}</span>
                   <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+                  <p className="font-display font-bold text-foreground text-lg flex-1">{p.title}</p>
+                  <span className="text-xs font-bold text-muted-foreground bg-background/70 rounded-full px-2 py-1 group-open:hidden">Tap!</span>
+                  <span className="text-xl text-primary hidden group-open:inline">−</span>
+                  <span className="text-xl text-primary group-open:hidden">+</span>
+                </summary>
+                <div className="mt-3 space-y-2 pl-1">
+                  <p className="text-sm text-foreground"><strong>📍 Where:</strong> {p.where}</p>
+                  <p className="text-sm text-foreground"><strong>⚙️ Job:</strong> {p.job}</p>
+                  <div className="bg-background/60 border border-primary/20 rounded-md p-2">
+                    <p className="text-sm text-foreground"><strong>🌟 Weed fact:</strong> {p.weedFact}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-foreground">
-                  <strong>Where you'll find it:</strong> {p.where}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>What it does:</strong> {p.job}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Weed fact:</strong> {p.weedFact}
-                </p>
-                {p.key === "seeds" && (
-                  <img
-                    src={partsOfWeedsImg}
-                    alt="Detailed illustration labeling the parts of a weed: roots, stem, leaves, flowers, and seeds"
-                    className="w-full rounded-lg bg-background/60 object-contain mt-2"
-                  />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-                )}
-              </div>
+              </details>
             ))}
           </div>
 
           <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">The Whole Plant Working Together</p>
-            <p className="text-sm text-foreground">
-              Roots drink, stems carry, leaves cook, flowers bloom, and seeds start the whole thing over again.
-              Every part depends on the others — take one away and the plant can't survive.
-            </p>
+            <p className="font-display font-bold text-success text-base">A Plant Is a Team! 🤝</p>
+            <p className="text-sm text-foreground">Roots drink 💧, stems carry 🚚, leaves cook 🍳, flowers bloom 🌸, seeds travel ✈️. Every part needs the others!</p>
           </div>
 
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember (from the ground up):</p>
-            <p>Roots → Stem → Leaves → Flowers → Seeds.</p>
+            <p className="font-semibold text-primary mb-1">Remember the order:</p>
+            <p className="text-base">🌱 Roots → 🌿 Stem → 🍃 Leaves → 🌸 Flowers → ✨ Seeds</p>
           </div>
         </div>
       );
