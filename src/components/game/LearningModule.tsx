@@ -1435,6 +1435,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
 function TopicContent({
   topicId,
   grade,
+  displayGrade,
   topicWeeds,
   onSelectWeed,
   viewMode,
@@ -1442,6 +1443,7 @@ function TopicContent({
 }: {
   topicId: TopicId;
   grade: GradeLevel;
+  displayGrade?: string;
   topicWeeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   viewMode: "list" | "box";
@@ -1452,6 +1454,17 @@ function TopicContent({
        NAMES
     ═══════════════════════════════════════════════════════════ */
     case "names":
+      // Field Scout (6-8) — polished middle-school Names & ID experience.
+      // Uses the 34-species middle-school curriculum + multi-stage viewer +
+      // "Weeds You Nailed" tracker.
+      if (displayGrade === "middle") {
+        return (
+          <MiddleSchoolNamesModule
+            weeds={topicWeeds}
+            onSelectWeed={onSelectWeed}
+          />
+        );
+      }
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
