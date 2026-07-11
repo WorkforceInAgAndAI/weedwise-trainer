@@ -8,7 +8,7 @@ import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { LOOKALIKE_TRIPLES } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
-import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand } from "lucide-react";
+import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
@@ -1209,6 +1209,15 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   })();
   const [selectedGrade, setSelectedGrade] = useState<LearningGradeLevel>(initialGrade);
   const sourceGrade: GradeLevel = displayToSource[selectedGrade] ?? "elementary";
+  // Curriculum-driven weed pool (independent of the content branch).
+  //   Plant Explorer (K-5)   -> 14 species
+  //   Field Scout (6-8)      -> 34 species
+  //   IPM Specialist (9-12)  -> full 86 species
+  //   Collegiate             -> full 86 species
+  const curriculumGrade: GradeLevel =
+    selectedGrade === "elementary" ? "elementary" :
+    selectedGrade === "middle" ? "middle" :
+    "high";
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
@@ -1316,7 +1325,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                       </div>
                       <div className="text-xs text-muted-foreground leading-relaxed">{topic.description}</div>
                       <div className="text-[11px] text-foreground/70 mt-2 font-medium">
-                        {getTopicWeeds(topic.id, sourceGrade).length} species →
+                        {getTopicWeeds(topic.id, curriculumGrade).length} species →
                       </div>
                     </button>
                   ))}
@@ -1372,7 +1381,8 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
               <TopicContent
                 topicId={selectedTopic}
                 grade={sourceGrade}
-                topicWeeds={getTopicWeeds(selectedTopic, sourceGrade)}
+                displayGrade={selectedGrade}
+                topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
                 onSelectWeed={setSelectedWeed}
                 viewMode={viewMode}
                 onOpenPractice={onOpenPractice}
@@ -1421,10 +1431,249 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   );
 }
 
+/* ═══════════════════════════════════════════════════════════
+   6-8 (Field Scout) Names & ID module
+   ─ multi-stage viewer, 34-species pool, "Weeds You Nailed" tracker
+   ═══════════════════════════════════════════════════════════ */
+const NAMES_STAGES: Array<{ key: string; label: string; Icon: typeof Sprout }> = [
+  { key: "seedling", label: "Seedling", Icon: Sprout },
+  { key: "vegetative", label: "Leaves", Icon: Leaf },
+  { key: "flower", label: "Flower / Seedhead", Icon: Flower2 },
+];
+
+function MSStageViewer({ weedId }: { weedId: string }) {
+  const [idx, setIdx] = useState(2);
+  const stage = NAMES_STAGES[idx];
+  const prev = () => setIdx((i) => (i - 1 + NAMES_STAGES.length) % NAMES_STAGES.length);
+  const next = () => setIdx((i) => (i + 1) % NAMES_STAGES.length);
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={prev}
+          aria-label="Previous life stage"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-background/90 border border-border hover:bg-primary hover:text-primary-foreground transition shadow-sm"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <div className="aspect-square w-full rounded-xl overflow-hidden bg-muted border-2 border-primary/30 shadow-sm">
+          <WeedImage weedId={weedId} stage={stage.key} className="w-full h-full object-cover" />
+        </div>
+        <button
+          type="button"
+          onClick={next}
+          aria-label="Next life stage"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-background/90 border border-border hover:bg-primary hover:text-primary-foreground transition shadow-sm"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex items-center gap-1 justify-center bg-secondary rounded-full p-0.5 mx-auto w-fit">
+        {NAMES_STAGES.map((s, i) => {
+          const Icon = s.Icon;
+          const active = i === idx;
+          return (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => setIdx(i)}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${
+                active ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Icon className="w-3 h-3" />
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+type NailStatus = "unseen" | "review" | "confident";
+
+function MiddleSchoolNamesModule({
+  weeds: pool,
+  onSelectWeed,
+}: {
+  weeds: Weed[];
+  onSelectWeed: (w: Weed) => void;
+}) {
+  const [status, setStatus] = useState<Record<string, NailStatus>>({});
+  const mark = (id: string, s: NailStatus) =>
+    setStatus((prev) => ({ ...prev, [id]: prev[id] === s ? "unseen" : s }));
+
+  const confidentCount = Object.values(status).filter((s) => s === "confident").length;
+  const reviewCount = Object.values(status).filter((s) => s === "review").length;
+  const total = pool.length;
+  const pct = total ? Math.round((confidentCount / total) * 100) : 0;
+
+  return (
+    <div className="space-y-5">
+      {/* Intro banner */}
+      <div className="rounded-xl overflow-hidden border border-primary/30 bg-gradient-to-br from-primary/10 via-accent/5 to-background p-5">
+        <div className="flex items-start gap-3">
+          <div className="w-11 h-11 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
+            <Target className="w-6 h-6" />
+          </div>
+          <div className="space-y-2">
+            <p className="font-display font-bold text-foreground text-lg leading-tight">
+              Field Scout: Weed Names & ID
+            </p>
+            <p className="text-sm text-foreground/85">
+              Real weeds don't sit still for a single photo. Use the arrows on each card to flip through the{" "}
+              <strong>seedling</strong>, <strong>leaf</strong>, and <strong>flower/seedhead</strong> stages, then mark whether
+              you nailed the ID or want to review it later. Your progress is tracked on the right.
+            </p>
+            <p className="text-xs text-muted-foreground italic">
+              6-8 curriculum • {total} species • Multi-stage viewer
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Two-column: grid + tracker */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-5 items-start">
+        {/* Grid of weed cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {pool.map((w) => {
+            const st = status[w.id] ?? "unseen";
+            return (
+              <div
+                key={w.id}
+                className={`rounded-xl border-2 bg-card p-3 space-y-3 transition-all ${
+                  st === "confident"
+                    ? "border-success/60 shadow-sm"
+                    : st === "review"
+                    ? "border-accent/60 shadow-sm"
+                    : "border-border hover:border-primary/30 hover:shadow-card-hover"
+                }`}
+              >
+                <MSStageViewer weedId={w.id} />
+                <div className="space-y-1.5">
+                  <ClickableWeedName
+                    weed={w}
+                    onSelect={onSelectWeed}
+                    className="font-display font-bold text-sm block leading-tight"
+                  />
+                  <p className="text-[11px] italic text-primary">{w.scientificName}</p>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
+                  </p>
+                  {w.memoryHook && (
+                    <p className="text-[11px] text-foreground/80 bg-muted/40 rounded px-2 py-1 italic">
+                      <span className="not-italic font-semibold text-foreground">Hook:</span> {w.memoryHook}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-1.5 pt-1 border-t border-border/60">
+                  <button
+                    type="button"
+                    onClick={() => mark(w.id, "confident")}
+                    className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-semibold border transition ${
+                      st === "confident"
+                        ? "bg-success text-success-foreground border-success"
+                        : "bg-background text-foreground/70 border-border hover:border-success hover:text-success"
+                    }`}
+                  >
+                    <Check className="w-3.5 h-3.5" /> Nailed it
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => mark(w.id, "review")}
+                    className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-[11px] font-semibold border transition ${
+                      st === "review"
+                        ? "bg-accent text-accent-foreground border-accent"
+                        : "bg-background text-foreground/70 border-border hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" /> Review
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Tracker sidebar */}
+        <aside className="lg:sticky lg:top-6 self-start bg-card border border-border rounded-xl p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-primary" />
+            <h3 className="font-display font-bold text-foreground text-sm">Weeds You Nailed</h3>
+          </div>
+          <div>
+            <div className="flex items-baseline justify-between mb-1">
+              <span className="text-2xl font-display font-bold text-foreground">
+                {confidentCount}
+                <span className="text-sm text-muted-foreground font-normal"> / {total}</span>
+              </span>
+              <span className="text-xs text-muted-foreground">{pct}%</span>
+            </div>
+            <div className="h-2 rounded-full bg-secondary overflow-hidden">
+              <div
+                className="h-full bg-success transition-all"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {reviewCount} marked for review
+            </p>
+          </div>
+
+          {confidentCount === 0 && reviewCount === 0 ? (
+            <p className="text-xs text-muted-foreground italic">
+              Tap <strong className="text-foreground not-italic">Nailed it</strong> or{" "}
+              <strong className="text-foreground not-italic">Review</strong> on each card to build your list.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {confidentCount > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-success font-bold mb-1.5">Confident</p>
+                  <ul className="space-y-1">
+                    {pool.filter((w) => status[w.id] === "confident").map((w) => (
+                      <li key={w.id} className="flex items-center gap-2 text-xs">
+                        <div className="w-6 h-6 rounded overflow-hidden bg-muted shrink-0">
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                        </div>
+                        <span className="text-foreground truncate">{w.commonName}</span>
+                        <Check className="w-3 h-3 text-success ml-auto shrink-0" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {reviewCount > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-accent font-bold mb-1.5">Needs Review</p>
+                  <ul className="space-y-1">
+                    {pool.filter((w) => status[w.id] === "review").map((w) => (
+                      <li key={w.id} className="flex items-center gap-2 text-xs">
+                        <div className="w-6 h-6 rounded overflow-hidden bg-muted shrink-0">
+                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                        </div>
+                        <span className="text-foreground truncate">{w.commonName}</span>
+                        <HelpCircle className="w-3 h-3 text-accent ml-auto shrink-0" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
 /** All topic content rendering */
 function TopicContent({
   topicId,
   grade,
+  displayGrade,
   topicWeeds,
   onSelectWeed,
   viewMode,
@@ -1432,6 +1681,7 @@ function TopicContent({
 }: {
   topicId: TopicId;
   grade: GradeLevel;
+  displayGrade?: string;
   topicWeeds: Weed[];
   onSelectWeed: (w: Weed) => void;
   viewMode: "list" | "box";
@@ -1442,6 +1692,17 @@ function TopicContent({
        NAMES
     ═══════════════════════════════════════════════════════════ */
     case "names":
+      // Field Scout (6-8) — polished middle-school Names & ID experience.
+      // Uses the 34-species middle-school curriculum + multi-stage viewer +
+      // "Weeds You Nailed" tracker.
+      if (displayGrade === "middle") {
+        return (
+          <MiddleSchoolNamesModule
+            weeds={topicWeeds}
+            onSelectWeed={onSelectWeed}
+          />
+        );
+      }
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
