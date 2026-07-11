@@ -8,7 +8,7 @@ import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { LOOKALIKE_TRIPLES } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
-import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand } from "lucide-react";
+import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
