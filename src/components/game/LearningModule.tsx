@@ -1209,6 +1209,15 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   })();
   const [selectedGrade, setSelectedGrade] = useState<LearningGradeLevel>(initialGrade);
   const sourceGrade: GradeLevel = displayToSource[selectedGrade] ?? "elementary";
+  // Curriculum-driven weed pool (independent of the content branch).
+  //   Plant Explorer (K-5)   -> 14 species
+  //   Field Scout (6-8)      -> 34 species
+  //   IPM Specialist (9-12)  -> full 86 species
+  //   Collegiate             -> full 86 species
+  const curriculumGrade: GradeLevel =
+    selectedGrade === "elementary" ? "elementary" :
+    selectedGrade === "middle" ? "middle" :
+    "high";
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
