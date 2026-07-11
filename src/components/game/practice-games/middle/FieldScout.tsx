@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { DollarSign, Briefcase, Search, Target } from 'lucide-react';
 import WeedImage from '@/components/game/WeedImage';
-import { weeds } from '@/data/weeds';
+import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
 import aerialSoybean from '@/assets/images/aerial_soybean_field.jpg';
 import LevelComplete from '@/components/game/LevelComplete';

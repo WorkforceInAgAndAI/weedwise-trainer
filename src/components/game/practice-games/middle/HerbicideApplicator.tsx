@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { weeds } from '@/data/weeds';
+import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import soybeanBg from '@/assets/images/soybean_field_1.jpg';
 import { Droplets, AlertTriangle, Target } from 'lucide-react';

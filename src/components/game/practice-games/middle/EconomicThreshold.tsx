@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import soybeanBg1 from '@/assets/images/soybean_field_1.jpg';
 import soybeanBg2 from '@/assets/images/soybean_field_2.jpg';
