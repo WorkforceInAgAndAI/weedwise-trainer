@@ -388,9 +388,9 @@ const TOPICS: Topic[] = [
   },
   {
     id: "distinctive-weeds",
-    name: "10 Weeds You Can Spot!",
+    name: "14 Weeds You Can Spot!",
     icon: "leaf",
-    description: "Get to know 10 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
+    description: "Get to know 14 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
     grades: [],
     plantExplorer: true,
     category: "identification",
