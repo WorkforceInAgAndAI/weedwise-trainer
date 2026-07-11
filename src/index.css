@@ -224,3 +224,60 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 14px -4px hsl(200 40% 30% / 0.18);
 }
+
+/* Staggered fade-in on list items so reading feels dynamic */
+.learning-middle ul > li,
+.learning-middle ol > li {
+  animation: ms-pop 0.4s ease-out both;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  border-radius: 0.375rem;
+  padding: 0.1rem 0.35rem;
+}
+.learning-middle ul > li:nth-child(1),
+.learning-middle ol > li:nth-child(1) { animation-delay: 0.02s; }
+.learning-middle ul > li:nth-child(2),
+.learning-middle ol > li:nth-child(2) { animation-delay: 0.08s; }
+.learning-middle ul > li:nth-child(3),
+.learning-middle ol > li:nth-child(3) { animation-delay: 0.14s; }
+.learning-middle ul > li:nth-child(4),
+.learning-middle ol > li:nth-child(4) { animation-delay: 0.20s; }
+.learning-middle ul > li:nth-child(5),
+.learning-middle ol > li:nth-child(5) { animation-delay: 0.26s; }
+.learning-middle ul > li:hover,
+.learning-middle ol > li:hover {
+  background: hsl(150 60% 90% / 0.55);
+  transform: translateX(3px);
+}
+
+/* Native <details> "click to reveal" polish inside the module */
+.learning-middle details {
+  border: 2px dashed hsl(150 45% 55% / 0.55);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.85rem;
+  margin: 0.75rem 0;
+  background: linear-gradient(135deg, hsl(45 85% 96%), hsl(45 85% 92%));
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.learning-middle details[open] {
+  background: linear-gradient(135deg, hsl(150 60% 96%), hsl(200 70% 96%));
+  border-color: hsl(150 55% 40%);
+  border-style: solid;
+}
+.learning-middle details > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: hsl(150 55% 25%);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.learning-middle details > summary::-webkit-details-marker { display: none; }
+.learning-middle details > summary::before {
+  content: '▸';
+  transition: transform 0.2s ease;
+  color: hsl(150 55% 40%);
+}
+.learning-middle details[open] > summary::before {
+  transform: rotate(90deg);
+}
