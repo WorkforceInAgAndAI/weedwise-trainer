@@ -4282,58 +4282,74 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">The Secret Tunnels of Roots</p>
-            <p>
-              Most plants spread by making seeds — but some weeds have another clever trick up their leafy
-              sleeves!
-            </p>
-            <p>
-              Imagine a weed is a <strong>secret explorer building underground tunnels</strong>. Those
-              tunnels are actually long roots growing beneath the soil, hidden from view.
-            </p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(30 40% 92%) 0%, hsl(28 45% 70%) 15%, hsl(25 50% 40%) 30%, hsl(22 55% 25%) 100%)",
+          }}
+        >
+          {/* Header with grass and dirt */}
+          <div className="rounded-xl bg-amber-950/70 p-5 text-center space-y-2 border-2 border-amber-700 shadow-inner">
+            <p className="font-display font-extrabold text-yellow-100 text-xl drop-shadow">⛏️ The Secret Tunnels of Roots</p>
+            <p className="text-sm text-amber-100">Grab your flashlight — we're going UNDERGROUND! 🔦</p>
           </div>
 
-          <div className="space-y-3">
-            {TUNNEL_FACTS.map((f) => (
-              <div key={f.key} className={`rounded-lg border-2 p-4 space-y-2 ${f.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${f.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{f.title}</p>
-                </div>
-                <p className="text-sm text-foreground">{f.detail}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">Tunnel-Building Weeds</p>
-            <p className="text-sm text-foreground">
-              A few famous underground tunnelers you might spot: <strong>Canada Thistle</strong>,{" "}
-              <strong>Field Bindweed</strong>, and <strong>Quackgrass</strong>. Their tunnels can stretch
-              many feet in every direction!
-            </p>
+          {/* Image at the top */}
+          <div className="rounded-xl border-4 border-amber-900 bg-amber-950/40 p-2">
             <img
               src={rootTunnelsImg}
               alt="Cartoon weed digging secret underground tunnels with a lantern and pickaxe"
-              className="w-full rounded-lg bg-background/60 object-contain mt-2"
+              className="w-full rounded-lg object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-amber-100/80 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">Why Farmers Dig Deep</p>
-            <p className="text-sm text-foreground">
-              Farmers and gardeners have to remove as much of the root system as they can. If they only pull
-              the top off, the hidden tunnels keep sending up brand-new weeds. Getting the whole root helps
-              stop the weed for good.
+          <div className="rounded-xl bg-amber-900/60 p-4 text-sm text-amber-50 space-y-2 border border-amber-700">
+            <p>Most weeds spread with seeds. But some are <strong className="text-yellow-200">sneaky diggers</strong>!</p>
+            <p>Their roots stretch out under the dirt like <strong className="text-yellow-200">secret tunnels</strong> — connecting one plant to a whole hidden family!</p>
+          </div>
+
+          {/* Interactive dirt-clod boxes */}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {TUNNEL_FACTS.map((f, i) => (
+              <details
+                key={f.key}
+                className="group rounded-2xl p-4 cursor-pointer transition-transform hover:scale-[1.02] border-4 border-amber-950 shadow-lg"
+                style={{
+                  background:
+                    "radial-gradient(circle at 30% 20%, hsl(30 40% 55%) 0%, hsl(25 45% 35%) 60%, hsl(22 50% 22%) 100%)",
+                }}
+              >
+                <summary className="list-none text-center space-y-1">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-amber-950 flex items-center justify-center text-2xl shadow-inner border-2 border-amber-800">
+                    {["🕳️","🌱","🕸️","⚠️"][i]}
+                  </div>
+                  <p className="font-display font-extrabold text-yellow-100 text-base drop-shadow">{f.title}</p>
+                  <p className="text-[10px] text-amber-200 font-bold group-open:hidden">🔦 tap to dig!</p>
+                </summary>
+                <p className="text-sm text-amber-50 mt-2 bg-amber-950/50 rounded p-2">{f.detail}</p>
+              </details>
+            ))}
+          </div>
+
+          <div className="rounded-xl bg-amber-950/70 p-4 border-2 border-amber-700 space-y-2">
+            <p className="font-display font-extrabold text-yellow-200 text-base">🌿 Famous Tunnel Builders</p>
+            <p className="text-sm text-amber-50">
+              <strong className="text-yellow-100">Canada Thistle</strong>, <strong className="text-yellow-100">Field Bindweed</strong>, and <strong className="text-yellow-100">Quackgrass</strong> can stretch tunnels many feet in every direction!
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>Next time you see a weed, remember — there might be a whole network of secret tunnels hiding right beneath your feet!</p>
+          <div className="rounded-xl bg-amber-900/60 p-4 border border-amber-700">
+            <p className="font-display font-extrabold text-yellow-200 text-base">🚜 Why Farmers Dig Deep</p>
+            <p className="text-sm text-amber-50 mt-1">
+              If you only pull the top, the hidden tunnels sprout NEW weeds! Farmers dig up the whole root to stop them for good.
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-yellow-100 border-4 border-yellow-500 p-4 text-center">
+            <p className="font-display font-extrabold text-amber-900 text-base">✨ Remember ✨</p>
+            <p className="text-sm text-amber-900 mt-1">Every weed you see might have a <strong>whole hidden world</strong> under your feet!</p>
           </div>
         </div>
       );
