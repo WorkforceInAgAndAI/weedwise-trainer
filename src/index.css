@@ -161,3 +161,66 @@
   33% { opacity: 0; }
   100% { opacity: 0; }
 }
+
+/* =====================================================================
+   6-8 (Field Scout) learning module theme
+   Applies a colorful, middle-school-appropriate look to the Learning
+   Module without touching every block individually. Scoped to
+   `.learning-middle` so K-5 and 9-12 tabs are untouched.
+   ===================================================================== */
+@keyframes ms-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+
+.learning-middle {
+  background:
+    radial-gradient(ellipse at top left, hsl(150 55% 92%) 0%, transparent 55%),
+    radial-gradient(ellipse at top right, hsl(200 70% 92%) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom, hsl(45 85% 92%) 0%, transparent 55%),
+    hsl(var(--background));
+}
+
+/* Give every muted content block a friendlier, colorful card look */
+.learning-middle .bg-muted\/30 {
+  background: linear-gradient(135deg, hsl(150 60% 96%), hsl(200 70% 96%)) !important;
+  border-left: 4px solid hsl(150 45% 40%);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px -2px hsl(150 40% 30% / 0.12);
+  animation: ms-pop 0.35s ease-out both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.learning-middle .bg-muted\/30:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -4px hsl(150 40% 30% / 0.2);
+}
+
+.learning-middle .bg-accent\/10 {
+  background: linear-gradient(135deg, hsl(35 95% 94%), hsl(20 85% 94%)) !important;
+  border-left: 4px solid hsl(28 85% 50%);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px -2px hsl(28 60% 30% / 0.12);
+  animation: ms-pop 0.4s ease-out both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.learning-middle .bg-accent\/10:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -4px hsl(28 60% 30% / 0.2);
+}
+
+/* Colored callout for primary/section headers inside content blocks */
+.learning-middle .text-primary {
+  color: hsl(150 55% 28%);
+}
+.learning-middle .text-accent {
+  color: hsl(20 85% 42%);
+}
+
+/* Slight lift + border on flashcard-style child cards */
+.learning-middle [class*="rounded-lg"][class*="border"]:not(button):not(input) {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.learning-middle [class*="rounded-lg"][class*="border"]:not(button):not(input):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -4px hsl(200 40% 30% / 0.18);
+}
