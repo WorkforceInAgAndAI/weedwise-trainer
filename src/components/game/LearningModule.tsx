@@ -4097,7 +4097,7 @@ function TopicContent({
           key: "no-rivals",
           name: "No Rivals",
           Icon: Star,
-          animate: "animate-spin-slow",
+          animate: "animate-pulse",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "They came from far away, so the bugs and diseases that usually slow them down aren't around here.",
