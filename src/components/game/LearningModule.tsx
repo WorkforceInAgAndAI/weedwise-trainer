@@ -3904,7 +3904,7 @@ function TopicContent({
 
           <div className="bg-slate-900 border-4 border-yellow-500 rounded-2xl p-4 text-center font-mono shadow-lg">
             <p className="font-display font-extrabold text-yellow-400 text-base">📋 3 FLIGHT ROUTES</p>
-            <p className="text-sm text-foreground mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
+            <p className="text-sm text-yellow-100 mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
             <p className="text-yellow-200 text-xs mt-1 tracking-wider">HAVE A GREAT FLIGHT, SEEDS!</p>
           </div>
         </div>
@@ -4143,20 +4143,24 @@ function TopicContent({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-2">
-              <p className="font-display font-bold text-success text-base">Many Weeds Are Safe to Look At</p>
-              <p className="text-sm text-foreground">
-                Lots of weeds are perfectly fine to observe from a distance. Watching how they grow is a
-                great way to learn about nature!
-              </p>
-            </div>
-            <div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 space-y-2">
-              <p className="font-display font-bold text-destructive text-base">Some Weeds Can Cause Trouble</p>
-              <p className="text-sm text-foreground">
-                A few weeds can cause itchy skin, rashes, stomach aches, or other health problems if you
-                touch or taste them. That's why we stay careful!
-              </p>
-            </div>
+            <RevealBox
+              title="Many Weeds Are Safe to Look At"
+              titleClass="text-emerald-100"
+              borderClass="border-emerald-400"
+              coverClass="bg-emerald-700"
+              openClass="bg-emerald-50"
+              textClass="text-emerald-950"
+              body="Lots of weeds are perfectly fine to observe from a distance. Watching how they grow is a great way to learn about nature!"
+            />
+            <RevealBox
+              title="Some Weeds Can Cause Trouble"
+              titleClass="text-red-50"
+              borderClass="border-red-400"
+              coverClass="bg-red-700"
+              openClass="bg-red-50"
+              textClass="text-red-950"
+              body="A few weeds can cause itchy skin, rashes, stomach aches, or other health problems if you touch or taste them. That's why we stay careful!"
+            />
           </div>
 
           {/* Image moved above the Detective section per request */}
@@ -4179,13 +4183,15 @@ function TopicContent({
 
           <div className="grid gap-4 md:grid-cols-2 items-start">
             <div className="space-y-3">
-              <div className="bg-destructive/10 border-4 border-destructive/60 rounded-lg p-5 space-y-2">
-                <p className="font-display font-bold text-destructive text-base">🏆 The Golden Safety Rule</p>
-                <p className="text-sm text-foreground">
-                  Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
-                  your <strong>mouth</strong>!
-                </p>
-              </div>
+              <RevealBox
+                title="🏆 The Golden Safety Rule"
+                titleClass="text-yellow-50"
+                borderClass="border-yellow-400"
+                coverClass="bg-gradient-to-br from-amber-600 to-red-700"
+                openClass="bg-amber-50"
+                textClass="text-amber-950"
+                body={<>Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with your <strong>mouth</strong>!</>}
+              />
               <div className="bg-amber-50/95 border-2 border-amber-900 rounded-lg p-4 text-sm text-foreground shadow">
                 <p className="font-semibold text-slate-900 mb-1">Remember:</p>
                 <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
@@ -4643,7 +4649,7 @@ function TopicContent({
           key: "sunlight",
           title: "Sunlight",
           emoji: "☀️",
-          prize: "🥇",
+          prize: "🏆",
           dot: "bg-warning",
           bg: "bg-warning/10 border-warning/40",
           detail: "The energy plants use to cook their own food. Whoever grows tallest first hogs the biggest slice of sunshine!",
@@ -4652,7 +4658,7 @@ function TopicContent({
           key: "water",
           title: "Water",
           emoji: "💧",
-          prize: "🥈",
+          prize: "🏆",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "Every racer needs a drink. Roots race down through the soil to sip up as much water as they can.",
@@ -4661,7 +4667,7 @@ function TopicContent({
           key: "nutrients",
           title: "Nutrients",
           emoji: "🌾",
-          prize: "🥉",
+          prize: "🏆",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           detail: "Plant vitamins pulled from the soil. Big strong roots grab the most and grow the strongest stems.",
@@ -4877,15 +4883,15 @@ function TopicContent({
           className="space-y-5 p-5 rounded-2xl"
           style={{
             background:
-              "linear-gradient(135deg, hsl(15 75% 60%) 0%, hsl(340 65% 65%) 50%, hsl(200 55% 60%) 100%)",
+              "linear-gradient(135deg, hsl(140 55% 55%) 0%, hsl(200 65% 65%) 50%, hsl(330 70% 78%) 100%)",
           }}
         >
           {/* Volunteer-themed header */}
-          <div className="rounded-2xl bg-white/95 p-5 text-center space-y-2 border-4 border-orange-500 shadow-lg">
-            <p className="font-display font-extrabold text-orange-700 text-2xl">🤝 Weeds Are Volunteers Too! 💚</p>
+          <div className="rounded-2xl bg-white/95 p-5 text-center space-y-2 border-4 border-emerald-600 shadow-lg">
+            <p className="font-display font-extrabold text-emerald-700 text-2xl">🌍 Weeds Help the Earth Too! 💚</p>
             <p className="text-sm text-foreground">🌍 🧡 They pitch in and help — just like a volunteer team!</p>
           </div>
-          <div className="bg-white/90 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-orange-400 shadow">
+          <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-emerald-500 shadow">
             <p>
               Not every plant we call a "weed" is a troublemaker. We pull them out of gardens so our crops
               have room to grow — but out in nature, many weeds are actually{" "}
@@ -4894,7 +4900,7 @@ function TopicContent({
           </div>
 
           {/* Meadow illustration */}
-          <div className="rounded-lg border-4 border-orange-500 bg-white/90 p-4 shadow">
+          <div className="rounded-lg border-4 border-emerald-600 bg-white/95 p-4 shadow">
             <img
               src={goodWeedsImg}
               alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
@@ -4907,7 +4913,7 @@ function TopicContent({
           </div>
 
           {/* Three superpowers as volunteer badges */}
-          <p className="font-display font-extrabold text-white text-center text-lg drop-shadow bg-orange-600/80 rounded-full py-2 border-4 border-white">
+          <p className="font-display font-extrabold text-white text-center text-lg drop-shadow bg-emerald-700/90 rounded-full py-2 border-4 border-white">
             🎖️ Meet the Volunteer Superpowers!
           </p>
           <div className="space-y-3">
@@ -4921,7 +4927,7 @@ function TopicContent({
                       <p className="font-display font-extrabold text-foreground text-base">{p.title}</p>
                     </div>
                     <p className="text-sm text-foreground">{p.detail}</p>
-                    <p className="text-xs text-foreground bg-orange-50 border border-orange-300 rounded px-2 py-1">
+                    <p className="text-xs text-foreground bg-emerald-50 border border-emerald-300 rounded px-2 py-1">
                       <strong>Weed examples:</strong> {p.examples}
                     </p>
                   </div>
@@ -4930,16 +4936,16 @@ function TopicContent({
             ))}
           </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">Right Plant, Right Place</p>
-            <div className="bg-background/60 rounded-md p-3 border border-info/30">
-              <p className="font-semibold text-primary text-sm mb-1">Remember:</p>
-              <p className="text-sm text-foreground">
+          <div className="bg-white border-4 border-sky-600 rounded-2xl p-5 space-y-2 shadow-lg">
+            <p className="font-display font-extrabold text-sky-700 text-lg">🌎 Right Plant, Right Place</p>
+            <div className="bg-sky-50 rounded-md p-3 border-2 border-sky-300">
+              <p className="font-extrabold text-sky-800 text-sm mb-1">Remember:</p>
+              <p className="text-sm text-slate-800 font-medium">
                 Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
                 and loosen the dirt — three superpowers that keep nature strong!
               </p>
             </div>
-            <p className="text-sm text-foreground">
+            <p className="text-sm text-slate-800 font-medium">
               A plant is only a "weed" when it's growing somewhere we don't want it. That same plant, out in
               a meadow or on the edge of a forest, might be feeding butterflies and holding the soil
               together! Farmers try to keep weeds out of crop fields — but along ditches, roadsides, and
@@ -4947,9 +4953,9 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">A Team of Tiny Helpers</p>
-            <p className="text-sm text-foreground">
+          <div className="bg-white border-4 border-pink-500 rounded-2xl p-5 space-y-2 shadow-lg">
+            <p className="font-display font-extrabold text-pink-700 text-lg">💗 A Team of Tiny Helpers</p>
+            <p className="text-sm text-slate-800 font-medium">
               Pollinators like bees and butterflies need flowers. Soil needs roots. Ecosystems need lots of
               different plants working together. When weeds do their jobs, they help keep our whole
               <strong> earth healthy</strong>.
@@ -7501,12 +7507,12 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
       {open && (() => {
         const h = heroes.find((x) => x.key === open)!;
         return (
-          <div className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 ${h.bg}`}>
-            <p className="font-display font-extrabold text-foreground text-lg">{h.emoji} {h.hero}</p>
-            <span className="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-900">Power: {h.power}</span>
-            <p className="text-sm text-foreground"><strong>How the power works:</strong> {h.how}</p>
-            <p className="text-sm text-foreground"><strong>Best for:</strong> {h.bestFor}</p>
-            <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
+          <div className="rounded-lg border-4 border-yellow-400 p-4 space-y-2 bg-white shadow-xl">
+            <p className="font-display font-extrabold text-emerald-900 text-lg">{h.emoji} {h.hero}</p>
+            <span className="inline-block text-xs font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-950 border-2 border-emerald-900">Power: {h.power}</span>
+            <p className="text-sm text-slate-900 font-medium"><strong className="text-emerald-800">How the power works:</strong> {h.how}</p>
+            <p className="text-sm text-slate-900 font-medium"><strong className="text-emerald-800">Best for:</strong> {h.bestFor}</p>
+            <p className="text-xs text-slate-700 italic">{h.reallife}</p>
           </div>
         );
       })()}
@@ -7515,6 +7521,44 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
 }
 
 interface DetectiveRule { key: string; rule: string; emoji: string; dot: string; bg: string; detail: string; }
+
+function RevealBox({
+  title,
+  body,
+  titleClass,
+  borderClass,
+  coverClass,
+  openClass,
+  textClass,
+}: {
+  title: string;
+  body: React.ReactNode;
+  titleClass: string;
+  borderClass: string;
+  coverClass: string;
+  openClass: string;
+  textClass: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen((o) => !o)}
+      className={`w-full text-left rounded-lg border-4 ${borderClass} p-4 space-y-2 transition-all duration-300 shadow-lg ${
+        open ? openClass : `${coverClass} hover:scale-[1.02]`
+      }`}
+    >
+      <p className={`font-display font-extrabold text-base ${open ? textClass : titleClass}`}>
+        {title}
+      </p>
+      {open ? (
+        <p className={`text-sm font-medium animate-fade-in ${textClass}`}>{body}</p>
+      ) : (
+        <p className={`text-xs italic ${titleClass} opacity-90`}>👆 Tap to reveal</p>
+      )}
+    </button>
+  );
+}
 
 function DetectiveNotebook({ rules }: { rules: DetectiveRule[] }) {
   const [open, setOpen] = useState<string | null>(null);
