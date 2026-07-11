@@ -3545,12 +3545,14 @@ function TopicContent({
                 </div>
                 <p className="text-sm text-foreground">{s.body}</p>
                 {s.key === "spread" && (
+                  <>
                   <img
                     src={plantLifeCycleImg}
                     alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
                     className="w-full rounded-lg bg-background/60 object-contain mt-2"
                   />
 <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+                  </>
                 )}
               </div>
             ))}
