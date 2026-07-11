@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Leaf, Droplets, Layers, Wind, Swords, Flame, Bug, CloudRain, Sprout } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
-import { weeds } from '@/data/weeds';
+import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 

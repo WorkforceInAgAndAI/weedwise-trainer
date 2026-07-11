@@ -68,7 +68,7 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
  if (done) {
   addBadge({ gameId: 'ligule-lens', gameName: 'Ligule Lens', level: 'MS', score, total: rounds.length });
   return (
-   <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
+   <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-center p-6">
     <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
     <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
     <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
@@ -77,8 +77,8 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
  }
 
  return (
-  <div className="fixed inset-0 bg-background z-50 flex flex-col">
-   <div className="flex items-center gap-3 p-4 border-b border-border">
+  <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+   <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
     <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
     <h1 className="font-bold text-foreground text-lg flex-1">Ligule Lens</h1>
     <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>

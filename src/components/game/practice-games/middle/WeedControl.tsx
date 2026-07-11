@@ -181,8 +181,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   if (showReview) {
     const wrong = history.filter(r => !r.correct);
     return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col">
-        <div className="flex items-center gap-3 p-4 border-b border-border">
+      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-bold text-foreground text-lg flex-1">Round {round} Results</h1>
         </div>
@@ -217,8 +217,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      <div className="flex items-center gap-3 p-4 border-b border-border">
+    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Weed Control</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
@@ -281,7 +281,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
         {/* RIGHT: methods + collection */}
         <div className="bg-card border-l border-border flex flex-col overflow-hidden">
-          <div className="p-3 border-b border-border">
+          <div className="p-3 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">Management Options</p>
             <div className="grid grid-cols-2 gap-1.5">
               {ALL_METHODS.map(m => (
