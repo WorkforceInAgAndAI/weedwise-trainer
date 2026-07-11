@@ -10,6 +10,8 @@ const STAGE_PREFIX_MAP: Record<string, string> = {
  ligule: 'lig',
  male: 'male',
  female: 'female',
+ rosette: 'rosette',
+ shoot: 'shoot',
 };
 
 export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, ext = 'jpg') {
