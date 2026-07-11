@@ -7488,3 +7488,34 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
     </div>
   );
 }
+
+interface DetectiveRule { key: string; rule: string; emoji: string; dot: string; bg: string; detail: string; }
+
+function DetectiveNotebook({ rules }: { rules: DetectiveRule[] }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {rules.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setOpen(open === r.key ? null : r.key)}
+            className={`rounded-lg border-2 border-slate-900 bg-amber-50 hover:bg-amber-100 p-3 text-center transition-transform ${open === r.key ? "scale-105 ring-4 ring-amber-500" : "hover:scale-105"}`}
+          >
+            <div className="text-3xl">{r.emoji}</div>
+            <p className="text-[11px] font-bold text-slate-900 mt-1 leading-tight">{r.rule}</p>
+          </button>
+        ))}
+      </div>
+      {open && (() => {
+        const r = rules.find((x) => x.key === open)!;
+        return (
+          <div className={`rounded-lg border-2 border-slate-900 p-4 ${r.bg}`}>
+            <p className="font-display font-bold text-foreground text-sm mb-1">{r.emoji} {r.rule}</p>
+            <p className="text-sm text-foreground">{r.detail}</p>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
