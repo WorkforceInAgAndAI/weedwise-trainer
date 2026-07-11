@@ -405,6 +405,15 @@ const TOPICS: Topic[] = [
     category: "lifecycle",
   },
   {
+    id: "weed-problem-picnic",
+    name: "Why Are Weeds a Problem?",
+    icon: "control",
+    description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
+    grades: [],
+    plantExplorer: true,
+    category: "control",
+  },
+  {
     id: "intro-control-methods",
     name: "Ways to Control Weeds",
     icon: "control",
@@ -457,15 +466,6 @@ const TOPICS: Topic[] = [
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
-  },
-  {
-    id: "weed-problem-picnic",
-    name: "Why Are Weeds a Problem?",
-    icon: "control",
-    description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
-    grades: [],
-    plantExplorer: true,
-    category: "control",
   },
   {
     id: "safe-vs-toxic-explorer",
@@ -3919,6 +3919,7 @@ function TopicContent({
         {
           key: "sun",
           resource: "Sunlight",
+          emoji: "☀️",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           crop: "Crops soak up sunlight to make their food (like a warm plate at the picnic).",
@@ -3927,6 +3928,7 @@ function TopicContent({
         {
           key: "water",
           resource: "Water",
+          emoji: "🥤",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           crop: "Crops need sips of water from the soil to stay strong (like drinks at the picnic).",
@@ -3935,6 +3937,7 @@ function TopicContent({
         {
           key: "nutrients",
           resource: "Nutrients",
+          emoji: "🍉",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           crop: "Nutrients in the soil are the crop's healthy snacks (the picnic food!).",
@@ -3943,6 +3946,7 @@ function TopicContent({
         {
           key: "space",
           resource: "Space",
+          emoji: "🧺",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           crop: "Crops need room to spread their leaves and roots (like a big picnic blanket).",
@@ -3951,87 +3955,22 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Welcome to the Field Picnic!</p>
-            <p>
-              Imagine all the plants in the field are having a picnic. There is just enough sunlight, water,
-              nutrients, and space for all the crop plants to grow big and healthy.
-            </p>
-            <p>
-              Now imagine some <strong>weeds</strong> show up… uninvited. They start using the sunlight,
-              drinking the water, taking the nutrients, and filling up the space. Suddenly, there isn't
-              enough for everyone!
-            </p>
-          </div>
-
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <img
-              src={plantPicnicImg}
-              alt="Two picnic panels — overcrowded and cramped versus spacious and plentiful"
-              className="w-full h-auto rounded-md bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              When weeds crash the picnic, there's no room to breathe. With space to grow, the picnic is a feast!
-            </p>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-2">
-            {PICNIC_ITEMS.map((p) => (
-              <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{p.resource}</p>
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>At the picnic:</strong> {p.crop}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Uninvited weeds:</strong> {p.weed}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-destructive text-base">What Happens to the Crops?</p>
-            <p className="text-sm text-foreground">
-              When weeds take these important things, crop plants can't grow as big or as healthy. They end
-              up short, thirsty, and hungry — no fun at the picnic!
-            </p>
-          </div>
-
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">Why That Matters for Our Food</p>
-            <p className="text-sm text-foreground">
-              Farmers grow crops to produce the grains, fruits, and vegetables we eat. When weeds crash the
-              picnic, farmers harvest fewer crops — this is called a <strong>lower yield</strong> — so there
-              is less food for everyone.
-            </p>
-            <p className="text-sm text-foreground">
-              That's why farmers work hard to keep weeds out of their fields — so the crops can enjoy the
-              whole picnic and grow into the food on your plate!
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>Weeds steal sunlight, water, nutrients, and space — so crops grow smaller and farmers harvest less food.</p>
-          </div>
-        </div>
+        <PicnicModule items={PICNIC_ITEMS} img={plantPicnicImg} />
       );
     }
+
+    /* placeholder removed */
 
     /* ═══════════════════════════════════════════════════════════
        THE 5 WEED-FIGHTING SUPERHEROES (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "weed-superheroes": {
-      const HEROES = [
+      const HEROES: Hero[] = [
         {
           key: "pull",
           hero: "Pull It!",
           power: "Super Strength",
+          emoji: "💪",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           how: "Remove weeds by hand or with tools like hoes and shovels — before they grow big or drop seeds.",
@@ -4042,6 +3981,7 @@ function TopicContent({
           key: "block",
           hero: "Block It!",
           power: "Force Field",
+          emoji: "🛡️",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           how: "Cover the soil with mulch, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
@@ -4052,6 +3992,7 @@ function TopicContent({
           key: "outsmart",
           hero: "Outsmart It!",
           power: "Brain Power",
+          emoji: "🧠",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
           how: "Plant strong, healthy crops close together so they grow fast and leave no room for weeds to sneak in.",
@@ -4062,6 +4003,7 @@ function TopicContent({
           key: "eat",
           hero: "Eat It!",
           power: "Animal Allies",
+          emoji: "🐐",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           how: "Bring in helpers like goats, sheep, or bugs that love to munch on certain weeds.",
@@ -4072,6 +4014,7 @@ function TopicContent({
           key: "stop",
           hero: "Stop It!",
           power: "Precision Blast",
+          emoji: "💥",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           how: "Farmers carefully use special weed-control products called herbicides to stop weeds in large fields.",
@@ -4081,8 +4024,18 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(100 50% 25%) 0%, hsl(28 45% 30%) 100%)",
+          }}
+        >
+          <div className="rounded-2xl bg-yellow-100 border-4 border-yellow-500 p-5 text-center shadow-lg">
+            <p className="font-display font-extrabold text-emerald-900 text-2xl">🦸 The Weed-Fighting Squad! 🦸‍♀️</p>
+            <p className="text-xs text-emerald-800 mt-1">Five heroes, five superpowers — assemble!</p>
+          </div>
+          <div className="bg-yellow-50/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-amber-700 shadow">
             <p className="font-display font-bold text-primary text-base">The Five Weed-Fighting Superpowers!</p>
             <p>
               Weeds may be tough, but farmers and gardeners have <strong>five weed-fighting superpowers</strong>
@@ -4096,40 +4049,9 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <img
-              src={weedSuperheroesImg}
-              alt="The Weed Control Squad — five weed-fighting heroes: Outsmart It, Pull It, Eat It, Block It, and Stop It"
-              className="w-full h-auto rounded-md bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              Meet the Weed Control Squad — five heroes teaming up to keep crops healthy.
-            </p>
-          </div>
+          <HeroPicker heroes={HEROES} img={weedSuperheroesImg} />
 
-          <div className="space-y-4">
-            {HEROES.map((h) => (
-              <div key={h.key} className={`rounded-lg border-2 p-4 space-y-2 ${h.bg}`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`w-3 h-3 rounded-full ${h.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{h.hero}</p>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background/70 text-muted-foreground">
-                    Power: {h.power}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>How the power works:</strong> {h.how}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Best for:</strong> {h.bestFor}
-                </p>
-                <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+          <div className="bg-yellow-50/95 border-4 border-amber-700 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-success text-base">Assemble the Team!</p>
             <p className="text-sm text-foreground">
               Just like superheroes work together to save the day, farmers combine these five superpowers to
@@ -4138,7 +4060,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+          <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-primary mb-1">Remember the 5 Superpowers:</p>
             <p>Pull It • Block It • Outsmart It • Eat It • Stop It.</p>
           </div>
@@ -4154,6 +4076,7 @@ function TopicContent({
         {
           key: "eyes",
           rule: "Use Your Eyes, Not Your Hands",
+          emoji: "👀",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "Look at the plant from a safe distance. Don't touch, pick, or taste any weed you don't already know.",
@@ -4161,6 +4084,7 @@ function TopicContent({
         {
           key: "observe",
           rule: "Observe the Clues",
+          emoji: "🔍",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
           detail: "Notice the leaves, flowers, colors, and seeds. Those clues help a grown-up identify the plant.",
@@ -4168,6 +4092,7 @@ function TopicContent({
         {
           key: "ask",
           rule: "Ask a Trusted Adult",
+          emoji: "🕵️",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           detail: "Show a parent, teacher, or another trusted adult. They can help figure out if it's safe.",
@@ -4175,6 +4100,7 @@ function TopicContent({
         {
           key: "wash",
           rule: "Wash Up After Playing Outside",
+          emoji: "🧼",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           detail: "Even if you didn't touch a plant on purpose, washing your hands helps keep you safe.",
@@ -4182,8 +4108,19 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(0 0% 12%) 0%, hsl(28 45% 22%) 100%)",
+          }}
+        >
+          <div className="rounded-2xl bg-amber-100 border-4 border-slate-900 p-5 text-center shadow-lg">
+            <p className="font-display font-extrabold text-slate-900 text-2xl">🕵️ Case File: Safe or Toxic?</p>
+            <p className="text-xs text-slate-800 mt-1">🔎 Grab your magnifying glass — every plant is a mystery!</p>
+          </div>
+
+          <div className="bg-amber-50/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-amber-900 shadow">
             <p className="font-display font-bold text-primary text-base">Not All Weeds Are the Same!</p>
             <p>
               Did you know that not all weeds are alike? Some are totally harmless, but others can be
@@ -4192,7 +4129,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
+          <div className="bg-amber-50/95 border-4 border-amber-900 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-info text-base">The Mystery Surprise Box</p>
             <p className="text-sm text-foreground">
               Think of weeds like mystery surprise boxes. Some boxes have fun surprises inside — but others
@@ -4222,57 +4159,55 @@ function TopicContent({
             </div>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-primary text-base">Be a Plant Detective!</p>
-            <p className="text-sm text-foreground">
-              If you spot a plant you don't recognize, put on your Plant Detective hat and follow these
-              rules:
-            </p>
-            <div className="space-y-3">
-              {DETECTIVE_RULES.map((r) => (
-                <div key={r.key} className={`rounded-lg border-2 p-3 ${r.bg}`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`w-3 h-3 rounded-full ${r.dot}`} />
-                    <p className="font-display font-bold text-foreground text-sm">{r.rule}</p>
-                  </div>
-                  <p className="text-sm text-foreground">{r.detail}</p>
-                </div>
-              ))}
-            </div>
+          {/* Image moved above the Detective section per request */}
+          <div className="rounded-xl border-4 border-slate-900 bg-amber-50/95 p-3 shadow-lg">
             <img
               src={plantDetectiveImg}
               alt="Be a Plant Detective poster — use your eyes not your hands, observe clues, ask a trusted adult, and wash up after playing"
-              className="w-full rounded-lg bg-background/60 object-contain mt-3"
+              className="w-full rounded-lg bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
-          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-destructive text-base">The Golden Safety Rule</p>
+          <div className="bg-amber-50/95 border-4 border-slate-900 rounded-lg p-5 space-y-3 shadow">
+            <p className="font-display font-bold text-slate-900 text-lg">🕵️ Be a Plant Detective!</p>
             <p className="text-sm text-foreground">
-              Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
-              your <strong>mouth</strong>!
+              Tap each clue in your Detective's Notebook to uncover the rule:
             </p>
+            <DetectiveNotebook rules={DETECTIVE_RULES} />
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
+          <div className="grid gap-4 md:grid-cols-2 items-start">
+            <div className="space-y-3">
+              <div className="bg-destructive/10 border-4 border-destructive/60 rounded-lg p-5 space-y-2">
+                <p className="font-display font-bold text-destructive text-base">🏆 The Golden Safety Rule</p>
+                <p className="text-sm text-foreground">
+                  Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
+                  your <strong>mouth</strong>!
+                </p>
+              </div>
+              <div className="bg-amber-50/95 border-2 border-amber-900 rounded-lg p-4 text-sm text-foreground shadow">
+                <p className="font-semibold text-slate-900 mb-1">Remember:</p>
+                <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
+              </div>
+            </div>
+            <div className="rounded-xl border-4 border-slate-900 bg-amber-50/95 p-3 shadow-lg">
+              <img
+                src={weedInvestigator2Img}
+                alt="Cartoon weed detective following clues toward an evidence lock-box"
+                className="w-full rounded-lg bg-background/60 object-contain"
+              />
+              <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border-4 border-slate-900 bg-amber-50/95 p-3 shadow-lg">
             <img
               src={weedInvestigatorImg}
               alt="Cartoon weed detective with a magnifying glass investigating clues underground"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <img
-              src={weedInvestigator2Img}
-              alt="Cartoon weed detective following clues toward an evidence lock-box"
-              className="w-full rounded-lg bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
         </div>
       );
@@ -4707,6 +4642,8 @@ function TopicContent({
         {
           key: "sunlight",
           title: "Sunlight",
+          emoji: "☀️",
+          prize: "🥇",
           dot: "bg-warning",
           bg: "bg-warning/10 border-warning/40",
           detail: "The energy plants use to cook their own food. Whoever grows tallest first hogs the biggest slice of sunshine!",
@@ -4714,6 +4651,8 @@ function TopicContent({
         {
           key: "water",
           title: "Water",
+          emoji: "💧",
+          prize: "🥈",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "Every racer needs a drink. Roots race down through the soil to sip up as much water as they can.",
@@ -4721,6 +4660,8 @@ function TopicContent({
         {
           key: "nutrients",
           title: "Nutrients",
+          emoji: "🌾",
+          prize: "🥉",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           detail: "Plant vitamins pulled from the soil. Big strong roots grab the most and grow the strongest stems.",
@@ -4730,6 +4671,7 @@ function TopicContent({
       const RACERS: Array<{
         key: "farmer" | "crop" | "weed";
         label: string;
+        emoji: string;
         color: string;
         chip: string;
         blurb: string;
@@ -4737,6 +4679,7 @@ function TopicContent({
         {
           key: "farmer",
           label: "The Farmer",
+          emoji: "👨‍🌾",
           color: "bg-primary/10 border-primary/40",
           chip: "bg-primary text-primary-foreground",
           blurb: "The coach of the whole race! Farmers plant crops, pull weeds, and cheer the crops on toward a big harvest.",
@@ -4744,6 +4687,7 @@ function TopicContent({
         {
           key: "crop",
           label: "The Crop",
+          emoji: "🌽",
           color: "bg-success/10 border-success/40",
           chip: "bg-success text-white",
           blurb: "Corn, wheat, tomatoes — the plants we grow on purpose. Their prize is turning sunshine and water into the food we eat.",
@@ -4751,6 +4695,7 @@ function TopicContent({
         {
           key: "weed",
           label: "The Weed",
+          emoji: "🌿",
           color: "bg-destructive/10 border-destructive/40",
           chip: "bg-destructive text-white",
           blurb: "The uninvited speed demon. Weeds sprout fast, grab resources, and try to make as many seeds as possible before the season ends.",
@@ -4758,8 +4703,19 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <div
+          className="space-y-5 p-5 rounded-2xl relative overflow-hidden"
+          style={{
+            background:
+              "repeating-linear-gradient(90deg, hsl(0 0% 5%) 0 24px, hsl(0 0% 100%) 24px 48px)",
+          }}
+        >
+          <div className="rounded-2xl bg-white border-4 border-black p-5 text-center shadow-lg">
+            <p className="font-display font-extrabold text-black text-2xl tracking-wider">🏁 THE GREAT GARDEN RACE 🏁</p>
+            <p className="text-xs text-black mt-1">🏃 Ready, set, GROW!</p>
+          </div>
+
+          <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-4 border-black">
             <p className="font-display font-bold text-primary text-base">On Your Mark, Get Set, Grow!</p>
             <p>
               Imagine a garden or farm field isn't just a place for plants to grow — it's the site of a{" "}
@@ -4770,7 +4726,7 @@ function TopicContent({
           </div>
 
           {/* Race track illustration */}
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-black bg-gradient-to-b from-sky-100 to-amber-200 p-4">
             <img
               src={fieldMarathonImg}
               alt="Cartoon of Farmer Frank, Cornelius Cob, and Wally Weed racing in the Field Day Marathon"
@@ -4782,38 +4738,42 @@ function TopicContent({
             </p>
           </div>
 
-          {/* Contenders */}
-          <div className="space-y-3">
-            <p className="font-display font-bold text-primary text-base">Meet the Contenders</p>
-            {RACERS.map((r) => (
-              <div key={r.key} className={`rounded-lg border-2 p-4 space-y-2 ${r.color}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${r.chip}`}>{r.label}</span>
+          {/* Contenders side by side on a tan road */}
+          <div
+            className="rounded-xl p-4 border-4 border-black shadow-lg"
+            style={{ background: "linear-gradient(180deg, hsl(35 45% 75%) 0%, hsl(30 40% 60%) 100%)" }}
+          >
+            <p className="font-display font-extrabold text-black text-center text-lg mb-3">🏟️ Meet the Contenders</p>
+            <div className="grid grid-cols-3 gap-3">
+              {RACERS.map((r) => (
+                <div key={r.key} className={`rounded-lg border-4 border-black p-3 text-center space-y-2 bg-white`}>
+                  <div className="text-5xl">{r.emoji}</div>
+                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${r.chip}`}>{r.label}</span>
+                  <p className="text-xs text-foreground">{r.blurb}</p>
                 </div>
-                <p className="text-sm text-foreground">{r.blurb}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Resources */}
-          <div className="space-y-3">
-            <p className="font-display font-bold text-primary text-base">The Race for Resources</p>
-            <p className="text-sm text-foreground">
-              To win the race, a plant needs fuel. Every racer is scrambling to grab three big prizes from
-              the field:
+          {/* Resources shown as podium-style prizes */}
+          <div className="bg-white/95 rounded-xl p-4 border-4 border-black shadow-lg space-y-3">
+            <p className="font-display font-extrabold text-black text-center text-lg">🏆 The Race for Resources — 3 Big Prizes!</p>
+            <p className="text-sm text-foreground text-center">
+              To win the race, a plant needs fuel. Here are the prizes every racer is scrambling to grab:
             </p>
-            {RESOURCES.map((r) => (
-              <div key={r.key} className={`rounded-lg border-2 p-4 space-y-2 ${r.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${r.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{r.title}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {RESOURCES.map((r) => (
+                <div key={r.key} className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 text-center ${r.bg} relative`}>
+                  <div className="absolute -top-3 -right-2 text-3xl">{r.prize}</div>
+                  <div className="text-5xl">{r.emoji}</div>
+                  <p className="font-display font-extrabold text-foreground text-base">{r.title}</p>
+                  <p className="text-xs text-foreground">{r.detail}</p>
                 </div>
-                <p className="text-sm text-foreground">{r.detail}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <div className="bg-warning/10 border-2 border-warning/40 rounded-lg p-5 space-y-2">
+          <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-warning-foreground text-base">How the Race Plays Out</p>
             <p className="text-sm text-foreground">
               Weeds are the ultimate <strong>race car drivers</strong> of the plant world — built for speed
@@ -4823,7 +4783,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
+          <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Who Cheers the Crops On?</p>
             <p className="text-sm text-foreground">
               That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close
@@ -4832,7 +4792,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+          <div className="bg-white/95 border-4 border-black rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>
               Every field is a race for sunlight, water, and nutrients. With a good coach — the farmer — the
@@ -5007,6 +4967,7 @@ function TopicContent({
         {
           key: "physical",
           title: "Physical Control",
+          emoji: "🔨",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           what: "Using your hands or tools to pull, cut, dig, or till weeds out of the soil.",
@@ -5016,6 +4977,7 @@ function TopicContent({
         {
           key: "cultural",
           title: "Cultural Control",
+          emoji: "🌱",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           what: "Growing crops in smart ways that make it hard for weeds to sneak in.",
@@ -5025,6 +4987,7 @@ function TopicContent({
         {
           key: "chemical",
           title: "Chemical Control",
+          emoji: "🧴",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           what: "Using special sprays called herbicides that stop weeds from growing.",
@@ -5034,6 +4997,7 @@ function TopicContent({
         {
           key: "biological",
           title: "Biological Control",
+          emoji: "🐐",
           dot: "bg-accent",
           bg: "bg-accent/10 border-accent/40",
           what: "Using living helpers — like insects, animals, or tiny germs — to eat or weaken weeds.",
@@ -5043,6 +5007,7 @@ function TopicContent({
         {
           key: "preventative",
           title: "Preventative Control",
+          emoji: "🧼",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           what: "Stopping weeds before they ever get a chance to grow.",
@@ -5053,7 +5018,17 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+          <div
+            className="rounded-2xl p-5 space-y-5 relative overflow-hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, hsl(32 55% 78%) 0%, hsl(28 45% 58%) 100%)",
+              boxShadow: "inset 0 0 60px hsl(40 80% 85% / 0.5)",
+            }}
+          >
+          <div className="absolute top-2 right-4 text-2xl">🔨</div>
+          <div className="absolute top-2 left-4 text-2xl">🔧</div>
+          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
             <p className="font-display font-bold text-primary text-base">Five Ways to Control Weeds</p>
             <p>
               Weeds can steal sunlight, water, air, nutrients, and space from crops. So how do farmers and
@@ -5066,27 +5041,19 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {METHODS.map((m) => (
-              <div key={m.key} className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${m.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{m.title}</p>
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>What it is:</strong> {m.what}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Examples:</strong> {m.examples}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>When it works best:</strong> {m.bestFor}
-                </p>
-              </div>
-            ))}
+          <div className="rounded-xl border-4 border-amber-800 bg-yellow-50/95 p-3 shadow-lg">
+            <img
+              src={weedControlToolsImg}
+              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
+              className="w-full rounded-md bg-background/60 object-contain"
+            />
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-xs text-amber-900 font-semibold mt-1">🏚️ Step into the Weed-Control Shed — pick a tool off the shelf!</p>
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-3">
+          <ToolShelf methods={METHODS} />
+
+          <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-3 shadow">
             <p className="font-display font-bold text-success text-base">Different Tools for Different Jobs</p>
             <p className="text-sm text-foreground">
               No single method can stop every weed on its own. Pulling weeds by hand works in a small garden
@@ -5098,20 +5065,15 @@ function TopicContent({
               and use two or three methods together. Physical, cultural, chemical, biological, and preventative —
               five ways to keep crops winning the race!
             </p>
-            <img
-              src={weedControlToolsImg}
-              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
-              className="w-full rounded-lg bg-background/60 object-contain mt-2"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>
               Physical, cultural, chemical, biological, preventative. Five ways to control weeds — and each one
               shines in a different job.
             </p>
+          </div>
           </div>
         </div>
       );
@@ -7336,6 +7298,249 @@ function FamilyGroupings({
             );
           })}
       </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   K-5 INTERACTIVE SUBCOMPONENTS (picnic / shop / superhero / detective / race)
+═══════════════════════════════════════════════════════════ */
+
+interface PicnicItem {
+  key: string;
+  resource: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  crop: string;
+  weed: string;
+}
+
+function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
+  const [packed, setPacked] = useState<Record<string, boolean>>({});
+  const [open, setOpen] = useState<string | null>(null);
+  const packedCount = Object.values(packed).filter(Boolean).length;
+
+  return (
+    <div
+      className="space-y-5 p-5 rounded-2xl relative overflow-hidden"
+      style={{
+        backgroundImage:
+          "repeating-linear-gradient(45deg, hsl(0 75% 60%) 0 20px, hsl(0 0% 100%) 20px 40px)",
+      }}
+    >
+      <div className="absolute top-2 right-3 text-2xl animate-bounce">🐞</div>
+      <div className="absolute top-8 left-3 text-2xl">🐜</div>
+      <div className="absolute bottom-3 right-8 text-2xl">🦋</div>
+
+      <div className="rounded-2xl bg-white/95 border-4 border-red-600 p-5 text-center shadow-lg relative">
+        <p className="font-display font-extrabold text-red-700 text-2xl">🧺 Welcome to the Field Picnic! 🍓</p>
+        <p className="text-sm text-foreground mt-1">🍎 🥕 🌽 Everyone's invited — well, almost everyone…</p>
+      </div>
+
+      <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-2 border-2 border-red-400">
+        <p>
+          Imagine all the plants in the field are having a picnic. There's just enough sunlight, water,
+          nutrients, and space for every crop to grow big and healthy.
+        </p>
+        <p>
+          Then some <strong>weeds</strong> show up… <em>uninvited</em>! They gobble the food, drink the water,
+          and hog the blanket. Suddenly, there isn't enough for everyone!
+        </p>
+      </div>
+
+      <div className="rounded-lg border-4 border-red-600 bg-white/95 p-3">
+        <img
+          src={img}
+          alt="Two picnic panels — overcrowded and cramped versus spacious and plentiful"
+          className="w-full h-auto rounded-md bg-background/60 object-contain"
+        />
+        <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+      </div>
+
+      {/* Interactive: pack the basket */}
+      <div className="bg-white/95 rounded-lg p-4 border-2 border-red-400 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-display font-bold text-red-700">🧺 Pack It for the Trip!</p>
+          <span className="text-xs font-bold bg-red-600 text-white rounded-full px-3 py-1">{packedCount}/{items.length} packed</span>
+        </div>
+        <p className="text-xs text-foreground">Tap an item to learn about it, then tap "Pack it!" to put it in the basket.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {items.map((p) => {
+            const isOpen = open === p.key;
+            const isPacked = !!packed[p.key];
+            return (
+              <button
+                key={p.key}
+                onClick={() => setOpen(isOpen ? null : p.key)}
+                className={`rounded-xl border-2 p-3 text-center transition-all ${p.bg} ${isPacked ? "opacity-60 scale-95" : "hover:scale-105"}`}
+              >
+                <div className="text-4xl">{p.emoji}</div>
+                <p className="font-bold text-foreground text-sm mt-1">{p.resource}</p>
+                {isPacked && <p className="text-[10px] text-success font-bold">✓ In the basket!</p>}
+              </button>
+            );
+          })}
+        </div>
+        {open && (() => {
+          const p = items.find((i) => i.key === open)!;
+          return (
+            <div className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
+              <p className="font-display font-bold text-foreground text-base">{p.emoji} {p.resource}</p>
+              <p className="text-sm text-foreground"><strong>At the picnic:</strong> {p.crop}</p>
+              <p className="text-sm text-foreground"><strong>Uninvited weeds:</strong> {p.weed}</p>
+              {!packed[p.key] ? (
+                <button
+                  onClick={() => { setPacked({ ...packed, [p.key]: true }); setOpen(null); }}
+                  className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold rounded-md py-2 text-sm"
+                >
+                  🧺 Pack it for the trip!
+                </button>
+              ) : (
+                <p className="text-xs text-success font-bold text-center">Already in the basket!</p>
+              )}
+            </div>
+          );
+        })()}
+        {packedCount === items.length && (
+          <div className="bg-success/20 border-2 border-success rounded-lg p-3 text-center">
+            <p className="font-bold text-success text-sm">🎉 Basket packed! You're ready for the picnic — and you know what weeds are trying to steal!</p>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white/95 rounded-lg p-4 border-2 border-red-400 text-sm text-foreground">
+        <p className="font-semibold text-red-700 mb-1">Remember:</p>
+        <p>Weeds steal sunlight, water, nutrients, and space — so crops grow smaller and farmers harvest less food.</p>
+      </div>
+    </div>
+  );
+}
+
+interface Method {
+  key: string;
+  title: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  what: string;
+  examples: string;
+  bestFor: string;
+}
+
+function ToolShelf({ methods }: { methods: Method[] }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="rounded-xl bg-amber-900/90 border-4 border-amber-950 p-4 shadow-inner space-y-3">
+      <p className="text-center font-display font-extrabold text-yellow-100 text-base">🛠️ The Weed-Control Tool Shelf</p>
+      <p className="text-center text-xs text-yellow-100/90">Click a tool to grab it off the shelf!</p>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-amber-950 rounded-md p-3 border-t-4 border-b-4 border-amber-800">
+        {methods.map((m) => (
+          <button
+            key={m.key}
+            onClick={() => setOpen(open === m.key ? null : m.key)}
+            className={`rounded-lg border-2 p-3 bg-yellow-50 hover:bg-yellow-100 transition-all text-center ${open === m.key ? "ring-4 ring-yellow-400 scale-105" : "hover:scale-105"}`}
+          >
+            <div className="text-3xl">{m.emoji}</div>
+            <p className="text-[11px] font-bold text-foreground mt-1 leading-tight">{m.title}</p>
+          </button>
+        ))}
+      </div>
+      {open && (() => {
+        const m = methods.find((x) => x.key === open)!;
+        return (
+          <div className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
+            <p className="font-display font-bold text-foreground text-base">{m.emoji} {m.title}</p>
+            <p className="text-sm text-foreground"><strong>What it is:</strong> {m.what}</p>
+            <p className="text-sm text-foreground"><strong>Examples:</strong> {m.examples}</p>
+            <p className="text-sm text-foreground"><strong>When it works best:</strong> {m.bestFor}</p>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+interface Hero {
+  key: string;
+  hero: string;
+  power: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  how: string;
+  bestFor: string;
+  reallife: string;
+}
+
+function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="space-y-3">
+      <div className="relative rounded-xl border-4 border-yellow-400 bg-gradient-to-b from-emerald-900 to-amber-800 p-3 shadow-lg">
+        <img
+          src={img}
+          alt="The Weed Control Squad — five weed-fighting heroes"
+          className="w-full h-auto rounded-md bg-background/60 object-contain"
+        />
+        <p className="text-center text-[11px] text-yellow-100 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+        <p className="text-center text-xs text-yellow-100 mt-1">🦸 Click a hero below to reveal their superpower!</p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        {heroes.map((h) => (
+          <button
+            key={h.key}
+            onClick={() => setOpen(open === h.key ? null : h.key)}
+            className={`rounded-lg border-4 border-yellow-500 bg-emerald-800 hover:bg-emerald-700 text-yellow-100 p-3 text-center transition-transform ${open === h.key ? "scale-110 ring-4 ring-amber-400" : "hover:scale-105"}`}
+          >
+            <div className="text-3xl">{h.emoji}</div>
+            <p className="text-[11px] font-extrabold mt-1 leading-tight">{h.hero}</p>
+          </button>
+        ))}
+      </div>
+      {open && (() => {
+        const h = heroes.find((x) => x.key === open)!;
+        return (
+          <div className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 ${h.bg}`}>
+            <p className="font-display font-extrabold text-foreground text-lg">{h.emoji} {h.hero}</p>
+            <span className="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-900">Power: {h.power}</span>
+            <p className="text-sm text-foreground"><strong>How the power works:</strong> {h.how}</p>
+            <p className="text-sm text-foreground"><strong>Best for:</strong> {h.bestFor}</p>
+            <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+interface DetectiveRule { key: string; rule: string; emoji: string; dot: string; bg: string; detail: string; }
+
+function DetectiveNotebook({ rules }: { rules: DetectiveRule[] }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {rules.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setOpen(open === r.key ? null : r.key)}
+            className={`rounded-lg border-2 border-slate-900 bg-amber-50 hover:bg-amber-100 p-3 text-center transition-transform ${open === r.key ? "scale-105 ring-4 ring-amber-500" : "hover:scale-105"}`}
+          >
+            <div className="text-3xl">{r.emoji}</div>
+            <p className="text-[11px] font-bold text-slate-900 mt-1 leading-tight">{r.rule}</p>
+          </button>
+        ))}
+      </div>
+      {open && (() => {
+        const r = rules.find((x) => x.key === open)!;
+        return (
+          <div className={`rounded-lg border-2 border-slate-900 p-4 ${r.bg}`}>
+            <p className="font-display font-bold text-foreground text-sm mb-1">{r.emoji} {r.rule}</p>
+            <p className="text-sm text-foreground">{r.detail}</p>
+          </div>
+        );
+      })()}
     </div>
   );
 }
