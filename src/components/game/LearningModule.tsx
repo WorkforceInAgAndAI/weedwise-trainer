@@ -3236,79 +3236,81 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-gradient-to-br from-yellow-100 via-emerald-50 to-sky-100 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
-            <p className="font-display font-extrabold text-primary text-xl">5 Things Every Plant Needs!</p>
-            <p className="text-sm text-foreground">Say it with me: <strong>Sun, Water, Air, Food, and Space!</strong></p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(215 35% 22%) 0%, hsl(215 30% 30%) 60%, hsl(30 30% 55%) 100%)",
+          }}
+        >
+          {/* Cozy dinner-table header */}
+          <div className="rounded-xl bg-amber-50/95 p-5 text-center space-y-2 border-4 border-amber-700 shadow-lg">
+            <p className="font-display font-extrabold text-amber-900 text-xl">🕯️ Welcome to Plant Dinner!</p>
+            <p className="text-sm text-amber-950">Every plant needs 5 things at the table: <strong>Sun • Water • Air • Food • Space</strong></p>
           </div>
 
-          <img
-            src={plantComparisonImg}
-            alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
-            className="w-full rounded-lg border-2 border-border object-contain bg-background"
-          />
+          <div className="rounded-xl border-4 border-amber-700 bg-amber-100/90 p-3">
+            <img
+              src={plantComparisonImg}
+              alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
+              className="w-full rounded-lg object-contain bg-background"
+            />
+            <p className="text-center text-[11px] text-amber-900 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+          </div>
 
-          {/* Big tappable icon cards */}
+          {/* FLIP CARDS - front shows need, back shows the "weed steals" detail */}
+          <p className="font-display font-extrabold text-amber-100 text-center text-base">🍽️ Tap a plate to flip it!</p>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {NEEDS.map((n) => (
-              <details key={n.key} className={`group rounded-2xl border-2 p-3 cursor-pointer transition-transform hover:scale-105 ${n.bg}`}>
-                <summary className="list-none text-center space-y-1">
-                  <div className={`mx-auto w-12 h-12 rounded-full ${n.dot} flex items-center justify-center shadow-md`}>
-                    {n.key === "sun" && <Sparkles className="h-6 w-6 text-white" />}
-                    {n.key === "water" && <span className="text-2xl">💧</span>}
-                    {n.key === "air" && <span className="text-2xl">🌬️</span>}
-                    {n.key === "nutrients" && <Sprout className="h-6 w-6 text-white" />}
-                    {n.key === "space" && <span className="text-2xl">↔️</span>}
-                  </div>
-                  <p className="font-display font-extrabold text-foreground text-sm">{n.title}</p>
-                  <p className="text-[10px] text-muted-foreground italic">tap to peek!</p>
-                </summary>
-                <div className="mt-2 space-y-2 text-xs text-foreground">
-                  <p><strong>Plants use it to:</strong> {n.plantUses}</p>
-                  <p className="bg-destructive/10 rounded p-1"><strong>Weeds steal it:</strong> {n.weedSteals}</p>
-                </div>
-              </details>
+              <FlipPlateCard key={n.key} n={n} />
             ))}
           </div>
 
-          {/* Weeds stealing from the table — VISUAL */}
-          <div className="rounded-2xl border-2 border-terracotta/50 bg-gradient-to-b from-amber-50 to-terracotta/10 p-5 space-y-4">
-            <p className="font-display font-extrabold text-terracotta text-lg text-center">🍽️ The Lunch Table Problem!</p>
-            <p className="text-sm text-foreground text-center">
-              Imagine the field is a lunch table. Farmer set out food for the crops — but weeds sneak in!
-            </p>
-            <div className="rounded-xl bg-amber-800/80 p-4 shadow-inner">
-              {/* Table with plates */}
-              <div className="grid grid-cols-5 gap-2 mb-2">
-                {["☀️","💧","🌬️","🌱","↔️"].map((emoji, i) => (
-                  <div key={i} className="aspect-square rounded-full bg-white/90 flex items-center justify-center text-2xl shadow">{emoji}</div>
-                ))}
-              </div>
-              <div className="h-2 bg-amber-950 rounded" />
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                <div className="rounded-lg bg-success/90 p-2 text-center">
-                  <p className="text-2xl">🌽</p>
-                  <p className="text-[11px] font-bold text-white">Crop = invited</p>
+          {/* Character conversation replacing the lunch table diagram */}
+          <div className="rounded-2xl border-4 border-amber-700 bg-amber-50/95 p-4 space-y-3">
+            <p className="font-display font-extrabold text-amber-900 text-base text-center">🌽 Dinner-Table Talk</p>
+            <div className="space-y-3">
+              {/* Crop speaks */}
+              <div className="flex items-start gap-2">
+                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌽</div>
+                <div className="relative bg-success/20 border-2 border-success rounded-2xl rounded-tl-none p-3 flex-1">
+                  <p className="text-xs font-bold text-success mb-0.5">Cornelius the Crop</p>
+                  <p className="text-sm text-foreground">"I was really looking forward to my sunshine and water tonight!"</p>
                 </div>
-                <div className="rounded-lg bg-destructive/90 p-2 text-center animate-pulse">
-                  <p className="text-2xl">🌿</p>
-                  <p className="text-[11px] font-bold text-white">Weed = crashing the party!</p>
+              </div>
+              {/* Weed speaks */}
+              <div className="flex items-start gap-2 flex-row-reverse">
+                <div className="w-12 h-12 rounded-full bg-destructive/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌿</div>
+                <div className="relative bg-destructive/20 border-2 border-destructive rounded-2xl rounded-tr-none p-3 flex-1">
+                  <p className="text-xs font-bold text-destructive mb-0.5">Wally the Weed</p>
+                  <p className="text-sm text-foreground">"Too bad! I got here first and I'm eating YOUR share too!"</p>
+                </div>
+              </div>
+              {/* Crop replies */}
+              <div className="flex items-start gap-2">
+                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌽</div>
+                <div className="relative bg-success/20 border-2 border-success rounded-2xl rounded-tl-none p-3 flex-1">
+                  <p className="text-xs font-bold text-success mb-0.5">Cornelius the Crop</p>
+                  <p className="text-sm text-foreground">"But… I need those to grow big! Now I'm going to be tiny and thirsty!"</p>
+                </div>
+              </div>
+              {/* Farmer speaks */}
+              <div className="flex items-start gap-2 flex-row-reverse">
+                <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">👩‍🌾</div>
+                <div className="relative bg-primary/20 border-2 border-primary rounded-2xl rounded-tr-none p-3 flex-1">
+                  <p className="text-xs font-bold text-primary mb-0.5">Farmer Frank</p>
+                  <p className="text-sm text-foreground">"Not on my watch, Wally! I'll clear you out so Cornelius gets his full dinner."</p>
                 </div>
               </div>
             </div>
-            <p className="text-sm text-foreground text-center">
-              Every bite a weed takes = less for the crop. That's why the crop gets small and weak!
-            </p>
           </div>
 
-          <div className="bg-primary/10 border-2 border-primary/40 rounded-2xl p-4 text-center">
-            <p className="font-display font-extrabold text-primary text-base mb-1">🏆 The Farmer's Job</p>
-            <p className="text-sm text-foreground">
-              Kick out the weeds so the crops get ALL 5 things — and grow BIG!
-            </p>
+          <div className="rounded-xl bg-amber-100/90 border-2 border-amber-700 p-4 text-center">
+            <p className="font-display font-extrabold text-amber-900 text-base mb-1">🏆 The Farmer's Job</p>
+            <p className="text-sm text-amber-950">Kick out the weeds so the crops get ALL 5 things — and grow BIG!</p>
           </div>
 
-          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
+          <div className="rounded-xl bg-yellow-100 border-4 border-yellow-500 p-4 text-center">
             <p className="font-display font-extrabold text-foreground text-base">✨ Remember ✨</p>
             <p className="text-sm text-foreground mt-1"><strong>Sun • Water • Air • Food • Space</strong></p>
             <p className="text-xs text-muted-foreground mt-1">Five things every plant needs — and five things weeds try to steal!</p>
