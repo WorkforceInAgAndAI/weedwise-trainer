@@ -76,6 +76,14 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 p-4 overflow-y-auto">
       <div className="flex flex-col items-center justify-center gap-4">
         <p className="text-foreground font-bold text-lg">Which one is <span className="text-primary">{target?.commonName}</span>?</p>
+        {/* Per-pair hint — points to the tell-apart feature without giving away the answer */}
+        {pair && !submitted && (
+          <div className="max-w-md text-center px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+            <p className="text-xs text-amber-900 dark:text-amber-100">
+              <span className="font-bold">Hint:</span> {pair.difference}
+            </p>
+          </div>
+        )}
         <div className="flex gap-4">
           {options.map(w => (
             <button key={w.id} onClick={() => !submitted && setSelected(w.id)}
