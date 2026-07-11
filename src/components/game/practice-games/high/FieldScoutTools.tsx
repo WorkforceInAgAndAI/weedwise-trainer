@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Scan, Radio, Footprints, Satellite } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import WeedImage from '@/components/game/WeedImage';
-import { weeds } from '@/data/weeds';
+import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import soybeanField1 from '@/assets/images/soybean_field_1.jpg';
 import soybeanField2 from '@/assets/images/soybean_field_2.jpg';
 import soybeanField3 from '@/assets/images/soybean_field_3.jpg';
