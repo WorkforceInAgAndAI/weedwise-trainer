@@ -4308,7 +4308,7 @@ function TopicContent({
     }
 
     /* ═══════════════════════════════════════════════════════════
-       10 DISTINCTIVE WEEDS (K-5 Plant Explorer)
+       14 DISTINCTIVE WEEDS (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "distinctive-weeds": {
       const WEEDS_TO_SPOT: Array<{
@@ -4330,42 +4330,24 @@ function TopicContent({
           bg: "bg-yellow-500/10 border-yellow-500/40",
         },
         {
-          id: "common_Cocklebur",
-          name: "2. Common Cocklebur",
-          spotIt: "Prickly, sticky burs that grab onto clothes and animal fur like tiny hitchhikers.",
-          funFact: "Those burs are the weed's way of catching a free ride to a brand-new spot!",
-          dot: "bg-terracotta",
-          bg: "bg-terracotta/10 border-terracotta/40",
-        },
-        {
-          id: "large-crabgrass",
-          name: "3. Large Crabgrass",
-          spotIt: "Wide, flat grass blades that sprawl out sideways — often popping up on lawns and playgrounds.",
-          funFact: "It's still a grass, but it's a weed because it shows up where we don't want it!",
-          dot: "bg-success",
-          bg: "bg-success/10 border-success/40",
-          photo: largeCrabgrassPhoto,
-          photoAlt: "Large Crabgrass sprawling on gravel with wide flat blades",
-        },
-        {
           id: "giant-foxtail",
-          name: "4. Giant Foxtail",
+          name: "2. Giant Foxtail",
           spotIt: "A fuzzy seed head that curves over — just like a fox's bushy tail. Its leaves are covered in tiny short hairs.",
           funFact: "If you gently rub a leaf, you can feel the tiny hairs like soft fuzz.",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
         },
         {
-          id: "yellow-foxtail",
-          name: "5. Yellow Foxtail",
-          spotIt: "Looks like giant foxtail but shorter, with a chubbier yellow seed head. The leaves are smooth — hairs only near the base.",
-          funFact: "Two foxtails, two personalities! Check the leaves to tell them apart.",
-          dot: "bg-yellow-500",
-          bg: "bg-yellow-500/10 border-yellow-500/40",
+          id: "lambsquarters",
+          name: "3. Common Lambsquarters",
+          spotIt: "Green leaves that look like they've been sprinkled with a light dusting of flour.",
+          funFact: "That 'flour' is really a natural waxy powder — try wiping it and it comes right off!",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
         },
         {
           id: "common_Milkweed",
-          name: "6. Common Milkweed",
+          name: "4. Common Milkweed",
           spotIt: "Big broad leaves and clusters of pink-purple flowers. Snap a leaf and you'll see milky white sap!",
           funFact: "In nature, it's a hero — monarch butterflies NEED it! But in a crop field, it's still a weed.",
           dot: "bg-info",
@@ -4374,24 +4356,8 @@ function TopicContent({
           photoAlt: "Cluster of pink-purple Common Milkweed flowers with broad green leaves",
         },
         {
-          id: "lambsquarters",
-          name: "7. Common Lambsquarters",
-          spotIt: "Green leaves that look like they've been sprinkled with a light dusting of flour.",
-          funFact: "That 'flour' is really a natural waxy powder — try wiping it and it comes right off.",
-          dot: "bg-primary",
-          bg: "bg-primary/10 border-primary/40",
-        },
-        {
-          id: "Common_Burdock",
-          name: "8. Common Burdock",
-          spotIt: "HUGE round burs with tiny hooks that stick to clothes, pets, and just about anything else.",
-          funFact: "Burdock burs actually inspired the invention of VELCRO® — nature is a great engineer!",
-          dot: "bg-terracotta",
-          bg: "bg-terracotta/10 border-terracotta/40",
-        },
-        {
           id: "Wild_Carrot",
-          name: "9. Wild Carrot",
+          name: "5. Wild Carrot",
           spotIt: "Flat clusters of tiny white flowers that look like lacy umbrellas — sometimes called 'Queen Anne's Lace.'",
           funFact: "It's a biennial — that means it takes TWO years to finish its whole life cycle.",
           dot: "bg-info",
@@ -4399,20 +4365,84 @@ function TopicContent({
         },
         {
           id: "canada-thistle",
-          name: "10. Canada Thistle",
+          name: "6. Canada Thistle",
           spotIt: "Spiny, prickly lobed leaves and small purple flower puffs.",
           funFact: "It's super tricky to remove because its long roots stretch out underground like secret tunnels!",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
+        },
+        {
+          id: "giant-ragweed",
+          name: "7. Giant Ragweed",
+          spotIt: "HUGE 3-lobed leaves shaped like giant hands — some plants grow taller than you!",
+          funFact: "Its tiny green flowers make so much pollen that they can make people sneeze all summer.",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+        },
+        {
+          id: "pennsylvania-smartweed",
+          name: "8. Pennsylvania Smartweed",
+          spotIt: "Pink flower spikes at the top and leaves that often have a dark smudge shaped like a thumbprint.",
+          funFact: "That thumbprint mark is one of the fastest ways to be a smartweed detective!",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
+        },
+        {
+          id: "kochia",
+          name: "9. Kochia",
+          spotIt: "A bushy, feathery green plant that turns red in fall — sometimes it snaps off and tumbles like a tumbleweed!",
+          funFact: "One kochia plant can roll for miles, scattering seeds the whole way.",
+          dot: "bg-terracotta",
+          bg: "bg-terracotta/10 border-terracotta/40",
+        },
+        {
+          id: "wild-parsnip",
+          name: "10. Wild Parsnip",
+          spotIt: "Tall plant with flat-topped clusters of tiny yellow flowers.",
+          funFact: "⚠️ Never touch it! Its sap plus sunlight can give you a nasty burn — always tell an adult if you see it.",
+          dot: "bg-destructive",
+          bg: "bg-destructive/10 border-destructive/40",
+        },
+        {
+          id: "yellow-nutsedge",
+          name: "11. Yellow Nutsedge",
+          spotIt: "Looks like a shiny yellow-green grass, but the stem is a triangle — you can feel the 3 sides!",
+          funFact: "\"Sedges have edges\" — a rhyme scientists use to remember that trick.",
+          dot: "bg-yellow-500",
+          bg: "bg-yellow-500/10 border-yellow-500/40",
+        },
+        {
+          id: "velvetleaf",
+          name: "12. Velvetleaf",
+          spotIt: "Big heart-shaped leaves that feel soft and fuzzy — just like velvet!",
+          funFact: "The seed pods look like tiny crowns sitting on top of the plant.",
+          dot: "bg-success",
+          bg: "bg-success/10 border-success/40",
+        },
+        {
+          id: "Tall_morningglory",
+          name: "13. Morningglory",
+          spotIt: "Twisty vines that climb up other plants, with trumpet-shaped purple, pink, or blue flowers.",
+          funFact: "The flowers open in the morning and close up when the sun gets hot — that's how it got its name!",
+          dot: "bg-info",
+          bg: "bg-info/10 border-info/40",
+        },
+        {
+          id: "Venice_mallow",
+          name: "14. Venice Mallow",
+          spotIt: "Creamy white or pale-yellow flowers with a dark purple center — like a bullseye!",
+          funFact: "Each flower only stays open for a few hours before it closes forever.",
+          dot: "bg-primary",
+          bg: "bg-primary/10 border-primary/40",
         },
       ] as Array<{ id: string; name: string; spotIt: string; funFact: string; dot: string; bg: string; photo?: string; photoAlt?: string }>;
 
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">10 Weeds You Can Spot!</p>
+            <p className="font-display font-bold text-primary text-base">14 Weeds You Can Spot!</p>
             <p>
-              Ready to become a Weed Spotter? Here are 10 famous weeds that show up in yards, fields, and
+              Ready to become a Weed Spotter? Here are 14 famous weeds that show up in yards, fields, and
               parks. Each one has a special clue — like a shape, color, or texture — that makes it easy to
               recognize once you know what to look for.
             </p>
@@ -4449,7 +4479,7 @@ function TopicContent({
           <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-success text-base">You're a Weed Spotter Now!</p>
             <p className="text-sm text-foreground">
-              Next time you're outside, see how many of these 10 weeds you can spot. Just remember — look
+              Next time you're outside, see how many of these 14 weeds you can spot. Just remember — look
               with your eyes, and if you don't recognize a plant, ask a trusted adult before touching it!
             </p>
           </div>
