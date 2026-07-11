@@ -1325,7 +1325,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                       </div>
                       <div className="text-xs text-muted-foreground leading-relaxed">{topic.description}</div>
                       <div className="text-[11px] text-foreground/70 mt-2 font-medium">
-                        {getTopicWeeds(topic.id, sourceGrade).length} species →
+                        {getTopicWeeds(topic.id, curriculumGrade).length} species →
                       </div>
                     </button>
                   ))}
@@ -1381,7 +1381,8 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
               <TopicContent
                 topicId={selectedTopic}
                 grade={sourceGrade}
-                topicWeeds={getTopicWeeds(selectedTopic, sourceGrade)}
+                displayGrade={selectedGrade}
+                topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
                 onSelectWeed={setSelectedWeed}
                 viewMode={viewMode}
                 onOpenPractice={onOpenPractice}
