@@ -4945,6 +4945,7 @@ function TopicContent({
         {
           key: "physical",
           title: "Physical Control",
+          emoji: "🔨",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           what: "Using your hands or tools to pull, cut, dig, or till weeds out of the soil.",
@@ -4954,6 +4955,7 @@ function TopicContent({
         {
           key: "cultural",
           title: "Cultural Control",
+          emoji: "🌱",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           what: "Growing crops in smart ways that make it hard for weeds to sneak in.",
@@ -4963,6 +4965,7 @@ function TopicContent({
         {
           key: "chemical",
           title: "Chemical Control",
+          emoji: "🧴",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           what: "Using special sprays called herbicides that stop weeds from growing.",
@@ -4972,6 +4975,7 @@ function TopicContent({
         {
           key: "biological",
           title: "Biological Control",
+          emoji: "🐐",
           dot: "bg-accent",
           bg: "bg-accent/10 border-accent/40",
           what: "Using living helpers — like insects, animals, or tiny germs — to eat or weaken weeds.",
@@ -4981,6 +4985,7 @@ function TopicContent({
         {
           key: "preventative",
           title: "Preventative Control",
+          emoji: "🧼",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           what: "Stopping weeds before they ever get a chance to grow.",
