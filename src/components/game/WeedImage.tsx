@@ -61,8 +61,14 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
    return urls;
   }
 
-  const variant = Math.random() < 0.5 ? 1 : 2;
-  const otherVariant = variant === 1 ? 2 : 1;
+  // Deterministic variant per (weedId, stage). Random selection here would
+  // reshuffle whenever the component re-mounts (e.g. a weed card moves between
+  // DOM parents in drag-and-drop games), which read to students as "the
+  // picture changed mid-round". A stable hash keeps the same image for the
+  // life of a round while still varying across weeds.
+  const hash = `${weedId}|${stage}`.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
+  const variant: 1 | 2 = Math.abs(hash) % 2 === 0 ? 1 : 2;
+  const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
   const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
   
   const urls: string[] = [];
