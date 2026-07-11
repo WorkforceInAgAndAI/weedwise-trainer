@@ -3464,28 +3464,6 @@ function TopicContent({
 
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
-            <div className="grid grid-cols-2 gap-3 my-3">
-              <div className="bg-success/10 border-2 border-success/40 rounded-lg p-3 text-center">
-                <div className="flex justify-center gap-1 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-success/30 flex items-center justify-center">
-                    <Sprout className="h-5 w-5 text-success" />
-                  </div>
-                  <div className="w-10 h-10 rounded-md bg-success/20 border-2 border-success/40" />
-                </div>
-                <p className="text-xs font-bold text-success">Right seat!</p>
-                <p className="text-[11px] text-muted-foreground">A crop growing in the farm field.</p>
-              </div>
-              <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-3 text-center">
-                <div className="flex justify-center gap-1 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-destructive/30 flex items-center justify-center">
-                    <Leaf className="h-5 w-5 text-destructive" />
-                  </div>
-                  <div className="w-10 h-10 rounded-md bg-success/20 border-2 border-success/40" />
-                </div>
-                <p className="text-xs font-bold text-destructive">Wrong seat!</p>
-                <p className="text-[11px] text-muted-foreground">A weed sitting where the crop belongs.</p>
-              </div>
-            </div>
             <p className="text-sm text-foreground">
               Imagine your classroom. Every student has an assigned desk. Now imagine someone from another
               class walks in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just
