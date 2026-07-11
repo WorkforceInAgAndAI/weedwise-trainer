@@ -4468,7 +4468,7 @@ function TopicContent({
           bg: "bg-success/10 border-success/40",
         },
         {
-          id: "Tall_morningglory",
+          id: "Field_bindweed",
           name: "13. Morningglory",
           spotIt: "Twisty vines that climb up other plants, with trumpet-shaped purple, pink, or blue flowers.",
           funFact: "The flowers open in the morning and close up when the sun gets hot — that's how it got its name!",
@@ -4502,25 +4502,7 @@ function TopicContent({
 
           <div className="grid gap-4 md:grid-cols-2">
             {WEEDS_TO_SPOT.map((w) => (
-              <div key={w.id} className={`rounded-lg border-2 p-4 space-y-3 ${w.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${w.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{w.name}</p>
-                </div>
-                <div className="w-full aspect-video rounded-md overflow-hidden bg-background/60 border border-border">
-                  {w.photo ? (
-                    <img src={w.photo} alt={w.photoAlt ?? w.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                  )}
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>Spot it:</strong> {w.spotIt}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Fun fact:</strong> {w.funFact}
-                </p>
-              </div>
+              <WeedSpotterCard key={w.id} w={w} />
             ))}
           </div>
 
