@@ -3589,20 +3589,32 @@ function TopicContent({
           />
           <p className="text-center text-[11px] text-muted-foreground italic -mt-3">Image generated with Google Gemini 1.5 Pro.</p>
 
-          {/* Steps arranged as a CYCLE (2x2 grid with arrows) */}
-          <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle! →</p>
-          <div className="relative grid grid-cols-2 gap-3">
-            {STEPS.map((s, i) => (
-              <div key={s.key} className={`rounded-2xl border-2 p-3 ${s.bg} relative`}>
-                <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
-                <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
-                <p className="text-[11px] font-semibold text-muted-foreground mb-1">{s.season}</p>
-                <p className="text-xs text-foreground leading-snug">{s.body}</p>
-              </div>
-            ))}
-            {/* center circular arrow badge */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg animate-spin-slow" style={{ animation: "spin 8s linear infinite" }}>
-              <RotateCcw className="h-7 w-7" />
+          {/* Steps arranged in a real CIRCLE (clockwise: top, right, bottom, left) */}
+          <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle — Clockwise! ↻</p>
+          <div className="relative mx-auto w-full max-w-md aspect-square">
+            {STEPS.map((s, i) => {
+              // Clockwise positions: 0=top, 1=right, 2=bottom, 3=left
+              const positions = [
+                "top-0 left-1/2 -translate-x-1/2",
+                "top-1/2 right-0 -translate-y-1/2",
+                "bottom-0 left-1/2 -translate-x-1/2",
+                "top-1/2 left-0 -translate-y-1/2",
+              ];
+              return (
+                <div
+                  key={s.key}
+                  className={`absolute ${positions[i]} w-[46%] rounded-2xl border-2 p-3 ${s.bg} shadow`}
+                >
+                  <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
+                  <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground mb-1">{s.season}</p>
+                  <p className="text-[11px] text-foreground leading-snug">{s.body}</p>
+                </div>
+              );
+            })}
+            {/* Center clockwise arrow */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+              <RotateCcw className="h-8 w-8 -scale-x-100" />
             </div>
           </div>
           <p className="text-center text-xs text-muted-foreground italic">…and back to step 1! It never stops.</p>
@@ -3623,7 +3635,7 @@ function TopicContent({
                 { stage: "seed", label: "Seed" },
                 { stage: "seedling", label: "Sprout" },
                 { stage: "vegetative", label: "Grow" },
-                { stage: "flower", label: "Seeds!" },
+                { stage: "flower", label: "Mature" },
                 { stage: null as string | null, label: "The End" },
               ].map((s, i) => (
                 <div key={i} className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -3674,7 +3686,6 @@ function TopicContent({
                   {[
                     { stage: "vegetative", label: "Grow", pos: "top-0 left-1/2 -translate-x-1/2" },
                     { stage: "flower", label: "Flowers", pos: "top-1/2 right-0 -translate-y-1/2" },
-                    { stage: "seed", label: "Seeds", pos: "bottom-0 left-1/2 -translate-x-1/2" },
                     { stage: "seedling", label: "Regrow", pos: "top-1/2 left-0 -translate-y-1/2" },
                   ].map((s, i) => (
                     <div key={i} className={`absolute ${s.pos} text-center`}>
@@ -3684,20 +3695,14 @@ function TopicContent({
                       <p className="text-[9px] font-bold text-foreground">{s.label}</p>
                     </div>
                   ))}
-                  <div className="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-info/20 flex items-center justify-center animate-spin" style={{ animation: "spin 6s linear infinite" }}>
-                    <RotateCcw className="h-6 w-6 text-info" />
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-info/20 flex items-center justify-center">
+                    <RotateCcw className="h-6 w-6 text-info -scale-x-100" />
                   </div>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground italic">A line into a circle — it never stops coming back!</p>
+            <p className="text-xs text-muted-foreground italic">A line into a circle — underground roots keep it coming back!</p>
           </div>
-
-          <img
-            src={annualPerennialDiagramImg}
-            alt="Scientific diagram comparing an annual plant's straight-line life cycle to a perennial's cyclical life cycle across seasons"
-            className="w-full rounded-lg bg-background object-contain border-2 border-border"
-          />
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
