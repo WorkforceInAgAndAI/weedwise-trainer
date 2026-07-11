@@ -4643,6 +4643,19 @@ function TopicContent({
           bg: "bg-warning/10 border-warning/40",
           detail:
             "Weed flowers are like tiny snack bars for bees, butterflies, and other pollinators. When they sip the sweet nectar, they carry pollen from flower to flower and help lots of plants make new seeds!",
+          examples: "Common Milkweed (a monarch butterfly favorite!), Wild Carrot, Canada Thistle",
+          animation: (
+            <div className="relative w-20 h-20 shrink-0">
+              <div className="absolute inset-0 rounded-full bg-warning/30 flex items-center justify-center">
+                <Flower2 className="h-10 w-10 text-warning" />
+              </div>
+              <div className="absolute -top-2 -right-2 animate-[slide-in-right_2s_ease-out_infinite]">
+                <div className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-yellow-600 flex items-center justify-center shadow-md">
+                  <Sparkles className="h-4 w-4 text-yellow-900" />
+                </div>
+              </div>
+            </div>
+          ),
         },
         {
           key: "erosion",
@@ -4651,6 +4664,17 @@ function TopicContent({
           bg: "bg-terracotta/10 border-terracotta/40",
           detail:
             "The roots of weeds work like tiny anchors, gripping the dirt tight. When wind blows or rain pours down, those roots keep the soil from washing or blowing away.",
+          examples: "Canada Thistle, Yellow Nutsedge, Giant Foxtail",
+          animation: (
+            <div className="relative w-20 h-20 shrink-0 flex items-end justify-center">
+              <div className="absolute top-0 animate-bounce">
+                <div className="w-12 h-12 rounded-full bg-terracotta/40 border-2 border-terracotta flex items-center justify-center shadow-md">
+                  <Hand className="h-7 w-7 text-terracotta" />
+                </div>
+              </div>
+              <div className="w-14 h-3 rounded-md bg-amber-800/70 mb-1" />
+            </div>
+          ),
         },
         {
           key: "soil",
@@ -4659,6 +4683,16 @@ function TopicContent({
           bg: "bg-success/10 border-success/40",
           detail:
             "Some weeds grow long, deep taproots — like nature's tiny shovels. They break up hard, packed dirt so water and air can sneak down to help other plants grow strong.",
+          examples: "Dandelion, Wild Carrot, Wild Parsnip",
+          animation: (
+            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+              <span className="absolute inline-flex h-16 w-16 rounded-full bg-success/40 animate-ping" />
+              <span className="absolute inline-flex h-12 w-12 rounded-full bg-success/60 animate-ping [animation-delay:0.4s]" />
+              <div className="relative w-14 h-14 rounded-full bg-success flex items-center justify-center shadow-md">
+                <Sparkles className="h-8 w-8 text-white" />
+              </div>
+            </div>
+          ),
         },
       ];
 
@@ -4689,18 +4723,33 @@ function TopicContent({
           {/* Three superpowers */}
           <div className="space-y-3">
             {POWERS.map((p) => (
-              <div key={p.key} className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+              <div key={p.key} className={`rounded-lg border-2 p-4 ${p.bg} transition-transform hover:scale-[1.01]`}>
+                <div className="flex items-start gap-4">
+                  {p.animation}
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-3 h-3 rounded-full ${p.dot}`} />
+                      <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+                    </div>
+                    <p className="text-sm text-foreground">{p.detail}</p>
+                    <p className="text-xs text-foreground bg-background/60 rounded px-2 py-1">
+                      <strong>Weed examples:</strong> {p.examples}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-foreground">{p.detail}</p>
               </div>
             ))}
           </div>
 
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Right Plant, Right Place</p>
+            <div className="bg-background/60 rounded-md p-3 border border-info/30">
+              <p className="font-semibold text-primary text-sm mb-1">Remember:</p>
+              <p className="text-sm text-foreground">
+                Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
+                and loosen the dirt — three superpowers that keep nature strong!
+              </p>
+            </div>
             <p className="text-sm text-foreground">
               A plant is only a "weed" when it's growing somewhere we don't want it. That same plant, out in
               a meadow or on the edge of a forest, might be feeding butterflies and holding the soil
@@ -4715,14 +4764,6 @@ function TopicContent({
               Pollinators like bees and butterflies need flowers. Soil needs roots. Ecosystems need lots of
               different plants working together. When weeds do their jobs, they help keep our whole
               <strong> earth healthy</strong>.
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>
-              Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
-              and loosen the dirt — three superpowers that keep nature strong!
             </p>
           </div>
         </div>
