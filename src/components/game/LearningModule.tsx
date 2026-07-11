@@ -4238,41 +4238,55 @@ function TopicContent({
           animate: "animate-bounce",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
-          detail: "Invasive plants grow really fast — sometimes faster than any of the native plants around them.",
+          detail: "These plants zoom! They grow way faster than the plants that live here.",
+          emoji: "🏃💨",
         },
         {
           key: "no-rivals",
           name: "No Rivals",
           Icon: Star,
-          animate: "animate-pulse",
+          animate: "animate-spin",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          detail: "They came from far away, so the bugs and diseases that usually slow them down aren't around here.",
+          detail: "They came from far away. The bugs that eat them at home don't live here!",
+          emoji: "🌎✈️",
         },
         {
           key: "seeds",
           name: "Tons of Seeds",
           Icon: Sparkles,
-          animate: "animate-pulse",
+          animate: "animate-ping",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
-          detail: "Many invasive plants make loads and loads of seeds, so new plants pop up everywhere.",
+          detail: "They make SO many seeds — like popcorn popping! New baby weeds everywhere.",
+          emoji: "🌰🌰🌰",
         },
         {
           key: "space",
           name: "Space Grabbers",
           Icon: Hand,
-          animate: "animate-pulse",
+          animate: "animate-bounce",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
-          detail: "They gobble up sunlight, water, nutrients, and space — leaving barely any for native plants.",
+          detail: "They hog the sun, water, food, and space. No sharing!",
+          emoji: "🙌",
         },
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Recess Tag… Gone Wild!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(48 95% 85%) 0%, hsl(45 90% 75%) 100%)",
+          }}
+        >
+          {/* School-themed header — chalkboard */}
+          <div className="rounded-xl bg-emerald-900 p-5 text-center space-y-2 border-4 border-amber-800 shadow-lg">
+            <p className="font-display font-extrabold text-yellow-100 text-xl">🏫 Recess Tag… Gone Wild! 🚌</p>
+            <p className="text-sm text-yellow-50">✏️ 🍎 Ring the bell — class is in session! 🔔</p>
+          </div>
+          <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
             <p>
               Imagine you're playing a game of tag on the playground. Everyone is following the rules and
               taking turns. Then one player runs <em>way</em> faster than everyone else, tags everyone, and
@@ -4284,7 +4298,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-amber-700 bg-yellow-50 p-4 shadow">
             <img
               src={weedBulliesImg}
               alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
@@ -4296,26 +4310,27 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">What Is an Invasive Plant?</p>
+          <div className="bg-white/95 border-2 border-amber-700 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-amber-900 text-base">📓 What Is an Invasive Plant?</p>
             <p className="text-sm text-foreground">
-              Invasive plants are plants that spread into new places and grow very quickly. Because they're
-              growing where they have less competition — and where the bugs and diseases that usually keep
-              them in check aren't around — they can spread <strong>much faster</strong> than the native
-              plants that belong there.
+              An invasive plant is a plant that <strong>moved in from far away</strong> and grows SUPER fast.
+              It shoots past the plants that were already living there — like a new kid who takes over the whole recess game!
             </p>
           </div>
 
           <div className="space-y-3">
-            <p className="font-display font-bold text-primary text-base">Invasive Plant "Superpowers"</p>
+            <p className="font-display font-extrabold text-amber-900 text-lg text-center bg-yellow-200 border-4 border-amber-700 rounded-full px-4 py-2 shadow">
+              🦸 Invasive Plant Superpowers 🦸
+            </p>
             <div className="grid gap-3 md:grid-cols-2">
               {SUPERPOWERS.map((s) => (
-                <div key={s.key} className={`rounded-lg border-2 p-4 space-y-2 ${s.bg} transition-transform hover:scale-[1.02]`}>
+                <div key={s.key} className={`rounded-2xl border-4 border-amber-700 p-4 space-y-2 bg-white/95 shadow-lg transition-transform hover:scale-[1.03]`}>
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-full ${s.dot} flex items-center justify-center shadow-md`}>
+                    <div className={`relative w-14 h-14 rounded-full ${s.dot} flex items-center justify-center shadow-md border-2 border-amber-800`}>
                       <s.Icon className={`h-7 w-7 text-white ${s.animate}`} />
+                      <span className="absolute -top-2 -right-2 text-lg">{s.emoji}</span>
                     </div>
-                    <p className="font-display font-bold text-foreground text-lg">{s.name}</p>
+                    <p className="font-display font-extrabold text-amber-900 text-lg">{s.name}</p>
                   </div>
                   <p className="text-sm text-foreground">{s.detail}</p>
                 </div>
@@ -4323,7 +4338,7 @@ function TopicContent({
             </div>
           </div>
 
-          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
+          <div className="bg-red-100 border-4 border-red-600 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-destructive text-base">Who Gets Left Out?</p>
             <p className="text-sm text-foreground">
               As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for
@@ -4332,7 +4347,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-amber-700 bg-yellow-50 p-4 shadow">
             <img
               src={invasivePlantImg}
               alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
@@ -4344,8 +4359,8 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">Team Up to Keep Things Fair</p>
+          <div className="bg-white/95 border-4 border-emerald-700 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-emerald-800 text-base">🍎 Team Up to Keep Things Fair</p>
             <p className="text-sm text-foreground">
               Farmers, gardeners, and scientists work together to stop invasive plants before they take over.
               By protecting native plants and keeping invasive plants under control, we help our forests,
@@ -4353,8 +4368,8 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
+          <div className="bg-yellow-200 border-4 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
+            <p className="font-semibold text-amber-900 mb-1">✏️ Remember:</p>
             <p>Invasive plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong there.</p>
           </div>
         </div>
