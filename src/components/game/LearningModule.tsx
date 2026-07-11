@@ -3178,94 +3178,81 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">The Five Things Every Plant Needs</p>
-            <p>
-              Every plant — whether it's a tiny sprout in your backyard or a huge corn plant on a farm — needs
-              <strong> five special things</strong> to live and grow: <strong>sunlight, water, air, nutrients,</strong>
-              and <strong>space</strong>.
-            </p>
-            <p>
-              When a plant gets all five, it grows tall, green, and healthy. When something is missing, the plant
-              gets weak. That's why farmers work hard to make sure their crops get every single one!
-            </p>
+          <div className="bg-gradient-to-br from-yellow-100 via-emerald-50 to-sky-100 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
+            <p className="font-display font-extrabold text-primary text-xl">5 Things Every Plant Needs!</p>
+            <p className="text-sm text-foreground">Say it with me: <strong>Sun, Water, Air, Food, and Space!</strong></p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <img
+            src={plantComparisonImg}
+            alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
+            className="w-full rounded-lg border-2 border-border object-contain bg-background"
+          />
+
+          {/* Big tappable icon cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {NEEDS.map((n) => (
-              <div key={n.key} className={`rounded-lg border-2 p-4 space-y-2 ${n.bg}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${n.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{n.title}</p>
+              <details key={n.key} className={`group rounded-2xl border-2 p-3 cursor-pointer transition-transform hover:scale-105 ${n.bg}`}>
+                <summary className="list-none text-center space-y-1">
+                  <div className={`mx-auto w-12 h-12 rounded-full ${n.dot} flex items-center justify-center shadow-md`}>
+                    {n.key === "sun" && <Sparkles className="h-6 w-6 text-white" />}
+                    {n.key === "water" && <span className="text-2xl">💧</span>}
+                    {n.key === "air" && <span className="text-2xl">🌬️</span>}
+                    {n.key === "nutrients" && <Sprout className="h-6 w-6 text-white" />}
+                    {n.key === "space" && <span className="text-2xl">↔️</span>}
+                  </div>
+                  <p className="font-display font-extrabold text-foreground text-sm">{n.title}</p>
+                  <p className="text-[10px] text-muted-foreground italic">tap to peek!</p>
+                </summary>
+                <div className="mt-2 space-y-2 text-xs text-foreground">
+                  <p><strong>Plants use it to:</strong> {n.plantUses}</p>
+                  <p className="bg-destructive/10 rounded p-1"><strong>Weeds steal it:</strong> {n.weedSteals}</p>
                 </div>
-                <p className="text-sm text-foreground">
-                  <strong>What plants use it for:</strong> {n.plantUses}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>How weeds steal it:</strong> {n.weedSteals}
-                </p>
-              </div>
+              </details>
             ))}
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <img
-              src={fiveEssentialsImg}
-              alt="Plant comparison — a thriving sunflower with sunlight, water, air, nutrients, and space, next to a struggling plant with weed competition"
-              className="w-full h-auto rounded-md bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              With all five essentials, plants thrive. Take one away — or add weed competition — and they struggle.
+          {/* Weeds stealing from the table — VISUAL */}
+          <div className="rounded-2xl border-2 border-terracotta/50 bg-gradient-to-b from-amber-50 to-terracotta/10 p-5 space-y-4">
+            <p className="font-display font-extrabold text-terracotta text-lg text-center">🍽️ The Lunch Table Problem!</p>
+            <p className="text-sm text-foreground text-center">
+              Imagine the field is a lunch table. Farmer set out food for the crops — but weeds sneak in!
+            </p>
+            <div className="rounded-xl bg-amber-800/80 p-4 shadow-inner">
+              {/* Table with plates */}
+              <div className="grid grid-cols-5 gap-2 mb-2">
+                {["☀️","💧","🌬️","🌱","↔️"].map((emoji, i) => (
+                  <div key={i} className="aspect-square rounded-full bg-white/90 flex items-center justify-center text-2xl shadow">{emoji}</div>
+                ))}
+              </div>
+              <div className="h-2 bg-amber-950 rounded" />
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="rounded-lg bg-success/90 p-2 text-center">
+                  <p className="text-2xl">🌽</p>
+                  <p className="text-[11px] font-bold text-white">Crop = invited</p>
+                </div>
+                <div className="rounded-lg bg-destructive/90 p-2 text-center animate-pulse">
+                  <p className="text-2xl">🌿</p>
+                  <p className="text-[11px] font-bold text-white">Weed = crashing the party!</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-foreground text-center">
+              Every bite a weed takes = less for the crop. That's why the crop gets small and weak!
             </p>
           </div>
 
-          <div className="bg-terracotta/10 border-2 border-terracotta/40 rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-terracotta text-base">Weeds vs. Crops: A Race for Resources</p>
+          <div className="bg-primary/10 border-2 border-primary/40 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-primary text-base mb-1">🏆 The Farmer's Job</p>
             <p className="text-sm text-foreground">
-              A cornfield or soybean field is like a big lunch table. The farmer set the table for the crops so
-              they can eat sunlight, drink water, breathe in air, munch on nutrients, and spread out in their own
-              chairs.
-            </p>
-            <p className="text-sm text-foreground">
-              But <strong>weeds are uninvited guests</strong>. They sneak in and grab food, drinks, and seats meant
-              for the crops. The more weeds there are, the less there is left for the corn or soybeans.
+              Kick out the weeds so the crops get ALL 5 things — and grow BIG!
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">Why This Hurts the Crop</p>
-            <ul className="text-sm text-foreground space-y-2 list-disc list-inside">
-              <li>Crops that don't get enough sunlight grow short and floppy.</li>
-              <li>Crops that don't get enough water wilt and their leaves droop.</li>
-              <li>Crops that don't get enough nutrients turn yellow instead of bright green.</li>
-              <li>Crops that don't have enough space grow skinny stems that snap in the wind.</li>
-            </ul>
-            <p className="text-sm text-foreground">
-              When crops are weak, they make less food for us to eat. Farmers call the amount of food a field
-              produces the <strong>yield</strong>. Weeds lower the yield — sometimes by a lot!
-            </p>
-          </div>
-
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-success text-base">The Farmer's Goal</p>
-            <p className="text-sm text-foreground">
-              A farmer's job is to keep crops <strong>healthy and happy</strong> so they grow lots of food. That
-              means making sure crops always win the race for sunlight, water, air, nutrients, and space.
-            </p>
-            <p className="text-sm text-foreground">
-              Farmers pull weeds, use tools, and plant crops close together so weeds can't sneak in. When crops
-              stay healthy, farmers get a <strong>big yield</strong> — and that means more corn, more soybeans,
-              and more food for everyone!
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>
-              Sunlight, water, air, nutrients, space. Five things every plant needs — and five things weeds try
-              to steal!
-            </p>
+          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-foreground text-base">✨ Remember ✨</p>
+            <p className="text-sm text-foreground mt-1"><strong>Sun • Water • Air • Food • Space</strong></p>
+            <p className="text-xs text-muted-foreground mt-1">Five things every plant needs — and five things weeds try to steal!</p>
           </div>
         </div>
       );
