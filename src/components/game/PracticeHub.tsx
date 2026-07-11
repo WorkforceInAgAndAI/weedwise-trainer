@@ -316,6 +316,13 @@ export default function PracticeHub({
 
  {/* Game Grid */}
  {screen === 'games' && (
+  games.length === 0 ? (
+    <div className="max-w-md mx-auto mt-16 text-center p-8 rounded-lg border border-dashed border-border bg-card/50">
+      <Leaf className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+      <h3 className="font-display font-bold text-foreground text-lg mb-1">Games coming soon</h3>
+      <p className="text-sm text-muted-foreground">New K-5 practice games will be added here.</p>
+    </div>
+  ) : (
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
  {games.map(g => {
  const earned = badges.filter(b => b.gameId.startsWith(`${g.id}-lv`));
@@ -344,6 +351,7 @@ export default function PracticeHub({
  </button>
  );})}
  </div>
+  )
  )}
 
  {/* Game Info / Launcher */}
