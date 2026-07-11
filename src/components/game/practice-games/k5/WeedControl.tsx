@@ -75,7 +75,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   }, [level]);
 
   const [weedState, setWeedState] = useState(fieldWeeds);
-  const [timer, setTimer] = useState(90);
+  const [timer, setTimer] = useState(180);
   const [activeWeed, setActiveWeed] = useState<number | null>(null);
   const [phase, setPhase] = useState<'identify' | 'idFeedback' | 'manage' | 'manageFeedback'>('identify');
   const [done, setDone] = useState(false);
@@ -85,8 +85,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   // Reset weedState when level changes
   useEffect(() => { setWeedState(fieldWeeds); }, [fieldWeeds]);
 
-  const restart = () => { setWeedState(fieldWeeds); setTimer(90); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
-  const nextLevel = () => { setLevel(l => l + 1); setTimer(90); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
+  const restart = () => { setWeedState(fieldWeeds); setTimer(180); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
+  const nextLevel = () => { setLevel(l => l + 1); setTimer(180); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
   const startOver = () => { setLevel(1); restart(); };
 
   useEffect(() => {
@@ -166,8 +166,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-primary font-bold ml-2">{score} pts</span>
       </div>
       <div className="flex-1 flex overflow-hidden">
-      <div className="flex-1 relative">
-        <img src={fieldBgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      <div className="flex-1 relative bg-emerald-800">
+        <img src={fieldBgImage} alt="" loading="eager" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute top-3 left-3 right-3 z-20">
           <FarmerGuide
