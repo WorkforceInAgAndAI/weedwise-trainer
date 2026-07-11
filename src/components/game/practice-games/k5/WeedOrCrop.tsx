@@ -38,12 +38,12 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
 
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(20);
   const [answered, setAnswered] = useState(false);
   const [correct, setCorrect] = useState<boolean | null>(null);
   const [done, setDone] = useState(false);
 
-  const restart = () => { setRound(0); setScore(0); setTimer(10); setAnswered(false); setCorrect(null); setDone(false); };
+  const restart = () => { setRound(0); setScore(0); setTimer(20); setAnswered(false); setCorrect(null); setDone(false); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); setClassified([]); };
   const startOver = () => { setLevel(1); restart(); setClassified([]); };
 
@@ -66,7 +66,7 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
 
   const next = () => {
     if (round + 1 >= rounds.length) { setDone(true); return; }
-    setRound(r => r + 1); setTimer(10); setAnswered(false); setCorrect(null);
+    setRound(r => r + 1); setTimer(20); setAnswered(false); setCorrect(null);
   };
 
   if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;

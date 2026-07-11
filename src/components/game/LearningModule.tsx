@@ -1248,7 +1248,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+    <div className={`fixed inset-0 z-50 bg-background overflow-y-auto ${selectedGrade === "middle" ? "learning-middle" : ""}`}>
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 py-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">

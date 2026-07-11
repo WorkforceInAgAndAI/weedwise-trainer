@@ -12,7 +12,7 @@ const ZONES = [
   { id: 'hot', label: 'Hot & Sunny', Icon: Sun },
   { id: 'cold', label: 'Cool & Temperate', Icon: Thermometer },
   { id: 'wet', label: 'Wet & Moist', Icon: Droplets },
-  { id: 'dry', label: 'Dry & Arid', Icon: Wind },
+  { id: 'dry', label: 'Dry', Icon: Wind },
 ];
 
 function getZone(w: typeof weeds[0]): string {
