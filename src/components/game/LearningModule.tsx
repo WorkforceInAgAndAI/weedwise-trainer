@@ -4877,15 +4877,15 @@ function TopicContent({
           className="space-y-5 p-5 rounded-2xl"
           style={{
             background:
-              "linear-gradient(135deg, hsl(15 75% 60%) 0%, hsl(340 65% 65%) 50%, hsl(200 55% 60%) 100%)",
+              "linear-gradient(135deg, hsl(140 55% 55%) 0%, hsl(200 65% 65%) 50%, hsl(330 70% 78%) 100%)",
           }}
         >
           {/* Volunteer-themed header */}
-          <div className="rounded-2xl bg-white/95 p-5 text-center space-y-2 border-4 border-orange-500 shadow-lg">
-            <p className="font-display font-extrabold text-orange-700 text-2xl">🤝 Weeds Are Volunteers Too! 💚</p>
+          <div className="rounded-2xl bg-white/95 p-5 text-center space-y-2 border-4 border-emerald-600 shadow-lg">
+            <p className="font-display font-extrabold text-emerald-700 text-2xl">🌍 Weeds Help the Earth Too! 💚</p>
             <p className="text-sm text-foreground">🌍 🧡 They pitch in and help — just like a volunteer team!</p>
           </div>
-          <div className="bg-white/90 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-orange-400 shadow">
+          <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-emerald-500 shadow">
             <p>
               Not every plant we call a "weed" is a troublemaker. We pull them out of gardens so our crops
               have room to grow — but out in nature, many weeds are actually{" "}
@@ -4894,7 +4894,7 @@ function TopicContent({
           </div>
 
           {/* Meadow illustration */}
-          <div className="rounded-lg border-4 border-orange-500 bg-white/90 p-4 shadow">
+          <div className="rounded-lg border-4 border-emerald-600 bg-white/95 p-4 shadow">
             <img
               src={goodWeedsImg}
               alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
@@ -4907,7 +4907,7 @@ function TopicContent({
           </div>
 
           {/* Three superpowers as volunteer badges */}
-          <p className="font-display font-extrabold text-white text-center text-lg drop-shadow bg-orange-600/80 rounded-full py-2 border-4 border-white">
+          <p className="font-display font-extrabold text-white text-center text-lg drop-shadow bg-emerald-700/90 rounded-full py-2 border-4 border-white">
             🎖️ Meet the Volunteer Superpowers!
           </p>
           <div className="space-y-3">
@@ -4921,7 +4921,7 @@ function TopicContent({
                       <p className="font-display font-extrabold text-foreground text-base">{p.title}</p>
                     </div>
                     <p className="text-sm text-foreground">{p.detail}</p>
-                    <p className="text-xs text-foreground bg-orange-50 border border-orange-300 rounded px-2 py-1">
+                    <p className="text-xs text-foreground bg-emerald-50 border border-emerald-300 rounded px-2 py-1">
                       <strong>Weed examples:</strong> {p.examples}
                     </p>
                   </div>
@@ -4930,16 +4930,16 @@ function TopicContent({
             ))}
           </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">Right Plant, Right Place</p>
-            <div className="bg-background/60 rounded-md p-3 border border-info/30">
-              <p className="font-semibold text-primary text-sm mb-1">Remember:</p>
-              <p className="text-sm text-foreground">
+          <div className="bg-white border-4 border-sky-600 rounded-2xl p-5 space-y-2 shadow-lg">
+            <p className="font-display font-extrabold text-sky-700 text-lg">🌎 Right Plant, Right Place</p>
+            <div className="bg-sky-50 rounded-md p-3 border-2 border-sky-300">
+              <p className="font-extrabold text-sky-800 text-sm mb-1">Remember:</p>
+              <p className="text-sm text-slate-800 font-medium">
                 Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
                 and loosen the dirt — three superpowers that keep nature strong!
               </p>
             </div>
-            <p className="text-sm text-foreground">
+            <p className="text-sm text-slate-800 font-medium">
               A plant is only a "weed" when it's growing somewhere we don't want it. That same plant, out in
               a meadow or on the edge of a forest, might be feeding butterflies and holding the soil
               together! Farmers try to keep weeds out of crop fields — but along ditches, roadsides, and
@@ -4947,9 +4947,9 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">A Team of Tiny Helpers</p>
-            <p className="text-sm text-foreground">
+          <div className="bg-white border-4 border-pink-500 rounded-2xl p-5 space-y-2 shadow-lg">
+            <p className="font-display font-extrabold text-pink-700 text-lg">💗 A Team of Tiny Helpers</p>
+            <p className="text-sm text-slate-800 font-medium">
               Pollinators like bees and butterflies need flowers. Soil needs roots. Ecosystems need lots of
               different plants working together. When weeds do their jobs, they help keep our whole
               <strong> earth healthy</strong>.
