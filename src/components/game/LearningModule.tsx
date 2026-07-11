@@ -3211,6 +3211,7 @@ function TopicContent({
               alt="Plant comparison — a thriving sunflower with sunlight, water, air, nutrients, and space, next to a struggling plant with weed competition"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               With all five essentials, plants thrive. Take one away — or add weed competition — and they struggle.
             </p>
@@ -3355,6 +3356,7 @@ function TopicContent({
                     alt="Detailed illustration labeling the parts of a weed: roots, stem, leaves, flowers, and seeds"
                     className="w-full rounded-lg bg-background/60 object-contain mt-2"
                   />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
                 )}
               </div>
             ))}
@@ -3448,6 +3450,7 @@ function TopicContent({
             alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
             className="w-full rounded-lg bg-background/60 object-contain"
           />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
 
           <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
@@ -3546,6 +3549,7 @@ function TopicContent({
                     alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
                     className="w-full rounded-lg bg-background/60 object-contain mt-2"
                   />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
                 )}
               </div>
             ))}
@@ -3584,6 +3588,7 @@ function TopicContent({
             alt="Side-by-side diagram comparing an annual plant's one-year life cycle to a perennial plant that regrows for multiple years"
             className="w-full rounded-lg bg-background/60 object-contain"
           />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
@@ -3763,6 +3768,7 @@ function TopicContent({
               alt="Two picnic panels — overcrowded and cramped versus spacious and plentiful"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               When weeds crash the picnic, there's no room to breathe. With space to grow, the picnic is a feast!
             </p>
@@ -3893,6 +3899,7 @@ function TopicContent({
               alt="The Weed Control Squad — five weed-fighting heroes: Outsmart It, Pull It, Eat It, Block It, and Stop It"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               Meet the Weed Control Squad — five heroes teaming up to keep crops healthy.
             </p>
@@ -4034,6 +4041,7 @@ function TopicContent({
               alt="Be a Plant Detective poster — use your eyes not your hands, observe clues, ask a trusted adult, and wash up after playing"
               className="w-full rounded-lg bg-background/60 object-contain mt-3"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
           <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
@@ -4055,11 +4063,13 @@ function TopicContent({
               alt="Cartoon weed detective with a magnifying glass investigating clues underground"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <img
               src={weedInvestigator2Img}
               alt="Cartoon weed detective following clues toward an evidence lock-box"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
         </div>
       );
@@ -4121,6 +4131,7 @@ function TopicContent({
               alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               Invasive plants act like playground bullies — pushing native plants out of their space.
             </p>
@@ -4166,6 +4177,7 @@ function TopicContent({
               alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
             </p>
@@ -4261,6 +4273,7 @@ function TopicContent({
               alt="Cartoon weed digging secret underground tunnels with a lantern and pickaxe"
               className="w-full rounded-lg bg-background/60 object-contain mt-2"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
@@ -4507,6 +4520,7 @@ function TopicContent({
               alt="Cartoon of Farmer Frank, Cornelius Cob, and Wally Weed racing in the Field Day Marathon"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               And they're off! Every plant is racing to make seeds before the season ends.
             </p>
@@ -4622,6 +4636,7 @@ function TopicContent({
               alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               A flower feeds a bee, a butterfly flutters by, and a weed's deep roots hold the soil in place.
             </p>
@@ -4774,6 +4789,7 @@ function TopicContent({
               alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
               className="w-full rounded-lg bg-background/60 object-contain mt-2"
             />
+<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
