@@ -119,8 +119,8 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   }, [msPool]);
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      <div className="flex items-center gap-3 p-4 border-b border-border">
+    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Herbicide Applicator</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>

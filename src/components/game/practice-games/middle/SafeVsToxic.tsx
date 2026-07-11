@@ -222,7 +222,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
 
   if (finished) {
     return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-start p-6 overflow-y-auto">
+      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-start p-6 overflow-y-auto">
         <h2 className="text-2xl font-bold text-foreground mb-2">Round Summary</h2>
         <p className="text-lg text-foreground mb-4">{score}/{rounds.length * 2} points</p>
         <div className="w-full max-w-md space-y-2 mb-6">
@@ -246,8 +246,8 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
   const profile = current ? getProfile(current.toxic.id) : DEFAULT_PROFILE;
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      <div className="flex items-center gap-3 p-4 border-b border-border">
+    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Safe or Toxic?</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>

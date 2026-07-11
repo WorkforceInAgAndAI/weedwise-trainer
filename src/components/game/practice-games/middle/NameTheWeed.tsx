@@ -318,7 +318,7 @@ function GameHeader({
   progressPct: number;
 }) {
   return (
-    <div className="border-b border-border bg-card/80 backdrop-blur">
+    <div className="border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur bg-card/80 backdrop-blur">
       <div className="flex items-center gap-3 p-3 sm:p-4">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl leading-none px-1">←</button>
         <div className="flex-1 min-w-0">
