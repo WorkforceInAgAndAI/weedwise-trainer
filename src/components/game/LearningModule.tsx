@@ -4805,15 +4805,17 @@ function TopicContent({
             "Weed flowers are like tiny snack bars for bees, butterflies, and other pollinators. When they sip the sweet nectar, they carry pollen from flower to flower and help lots of plants make new seeds!",
           examples: "Common Milkweed (a monarch butterfly favorite!), Wild Carrot, Canada Thistle",
           animation: (
-            <div className="relative w-20 h-20 shrink-0">
-              <div className="absolute inset-0 rounded-full bg-warning/30 flex items-center justify-center">
-                <Flower2 className="h-10 w-10 text-warning" />
-              </div>
-              <div className="absolute -top-2 -right-2 animate-[slide-in-right_2s_ease-out_infinite]">
-                <div className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-yellow-600 flex items-center justify-center shadow-md">
-                  <Sparkles className="h-4 w-4 text-yellow-900" />
-                </div>
-              </div>
+            <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-100 to-pink-100 border-2 border-yellow-500">
+              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-4xl animate-bounce">🌸</div>
+              <div
+                className="absolute text-2xl"
+                style={{ animation: "bee-fly 3s ease-in-out infinite" }}
+              >🐝</div>
+              <div
+                className="absolute text-xl"
+                style={{ animation: "bee-fly 3.5s ease-in-out infinite 0.5s", top: "10%" }}
+              >🦋</div>
+              <style>{`@keyframes bee-fly { 0%{left:-15%;top:20%} 50%{left:60%;top:50%} 100%{left:110%;top:15%} }`}</style>
             </div>
           ),
         },
@@ -4826,13 +4828,15 @@ function TopicContent({
             "The roots of weeds work like tiny anchors, gripping the dirt tight. When wind blows or rain pours down, those roots keep the soil from washing or blowing away.",
           examples: "Canada Thistle, Yellow Nutsedge, Giant Foxtail",
           animation: (
-            <div className="relative w-20 h-20 shrink-0 flex items-end justify-center">
-              <div className="absolute top-0 animate-bounce">
-                <div className="w-12 h-12 rounded-full bg-terracotta/40 border-2 border-terracotta flex items-center justify-center shadow-md">
-                  <Hand className="h-7 w-7 text-terracotta" />
-                </div>
-              </div>
-              <div className="w-14 h-3 rounded-md bg-amber-800/70 mb-1" />
+            <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-amber-800 border-2 border-amber-800">
+              {/* Wind lines */}
+              <div className="absolute top-2 left-1 text-xs animate-pulse">💨</div>
+              <div className="absolute top-4 left-6 text-xs animate-pulse" style={{ animationDelay: "0.3s" }}>💨</div>
+              {/* Roots gripping */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl" style={{ animation: "grip-shake 0.6s ease-in-out infinite" }}>🌱</div>
+              <div className="absolute bottom-0 left-2 text-2xl">🤝</div>
+              <div className="absolute bottom-0 right-2 text-2xl">🤝</div>
+              <style>{`@keyframes grip-shake { 0%,100%{transform:translateX(-50%) rotate(-3deg)} 50%{transform:translateX(-50%) rotate(3deg)} }`}</style>
             </div>
           ),
         },
@@ -4845,21 +4849,31 @@ function TopicContent({
             "Some weeds grow long, deep taproots — like nature's tiny shovels. They break up hard, packed dirt so water and air can sneak down to help other plants grow strong.",
           examples: "Dandelion, Wild Carrot, Wild Parsnip",
           animation: (
-            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
-              <span className="absolute inline-flex h-16 w-16 rounded-full bg-success/40 animate-ping" />
-              <span className="absolute inline-flex h-12 w-12 rounded-full bg-success/60 animate-ping [animation-delay:0.4s]" />
-              <div className="relative w-14 h-14 rounded-full bg-success flex items-center justify-center shadow-md">
-                <Sparkles className="h-8 w-8 text-white" />
-              </div>
+            <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-amber-900 border-2 border-amber-900 flex items-center justify-center">
+              <span className="absolute inline-flex h-16 w-16 rounded-full bg-yellow-300/60 animate-ping" />
+              <span className="absolute inline-flex h-12 w-12 rounded-full bg-orange-400/70 animate-ping [animation-delay:0.4s]" />
+              <div className="absolute top-1 text-xl">💥</div>
+              <div className="text-4xl relative z-10" style={{ animation: "drill 1.5s ease-in-out infinite" }}>⛏️</div>
+              <style>{`@keyframes drill { 0%,100%{transform:translateY(-6px) rotate(-8deg)} 50%{transform:translateY(6px) rotate(8deg)} }`}</style>
             </div>
           ),
         },
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Weeds Can Be Helpers Too!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(15 75% 60%) 0%, hsl(340 65% 65%) 50%, hsl(200 55% 60%) 100%)",
+          }}
+        >
+          {/* Volunteer-themed header */}
+          <div className="rounded-2xl bg-white/95 p-5 text-center space-y-2 border-4 border-orange-500 shadow-lg">
+            <p className="font-display font-extrabold text-orange-700 text-2xl">🤝 Weeds Are Volunteers Too! 💚</p>
+            <p className="text-sm text-foreground">🌍 🧡 They pitch in and help — just like a volunteer team!</p>
+          </div>
+          <div className="bg-white/90 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-orange-400 shadow">
             <p>
               Not every plant we call a "weed" is a troublemaker. We pull them out of gardens so our crops
               have room to grow — but out in nature, many weeds are actually{" "}
@@ -4868,7 +4882,7 @@ function TopicContent({
           </div>
 
           {/* Meadow illustration */}
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
+          <div className="rounded-lg border-4 border-orange-500 bg-white/90 p-4 shadow">
             <img
               src={goodWeedsImg}
               alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
@@ -4880,19 +4894,22 @@ function TopicContent({
             </p>
           </div>
 
-          {/* Three superpowers */}
+          {/* Three superpowers as volunteer badges */}
+          <p className="font-display font-extrabold text-white text-center text-lg drop-shadow bg-orange-600/80 rounded-full py-2 border-4 border-white">
+            🎖️ Meet the Volunteer Superpowers!
+          </p>
           <div className="space-y-3">
             {POWERS.map((p) => (
-              <div key={p.key} className={`rounded-lg border-2 p-4 ${p.bg} transition-transform hover:scale-[1.01]`}>
+              <div key={p.key} className="rounded-2xl border-4 border-white bg-white/95 p-4 shadow-lg transition-transform hover:scale-[1.01]">
                 <div className="flex items-start gap-4">
                   {p.animation}
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
                       <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                      <p className="font-display font-bold text-foreground text-base">{p.title}</p>
+                      <p className="font-display font-extrabold text-foreground text-base">{p.title}</p>
                     </div>
                     <p className="text-sm text-foreground">{p.detail}</p>
-                    <p className="text-xs text-foreground bg-background/60 rounded px-2 py-1">
+                    <p className="text-xs text-foreground bg-orange-50 border border-orange-300 rounded px-2 py-1">
                       <strong>Weed examples:</strong> {p.examples}
                     </p>
                   </div>
