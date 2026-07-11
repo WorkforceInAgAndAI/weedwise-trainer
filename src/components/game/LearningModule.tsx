@@ -33,7 +33,6 @@ import weedControlToolsImg from "@/assets/learning/weed_control_tools.jpg";
 import plantDetectiveImg from "@/assets/learning/plant_detective.jpg";
 import cornVsWeedImg from "@/assets/learning/corn_vs_weed.png";
 import plantComparisonImg from "@/assets/learning/plant_comparison.png";
-import annualPerennialDiagramImg from "@/assets/learning/annual_perennial_diagram.png";
 
 type TopicId =
   | "names"
