@@ -3426,10 +3426,22 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Meet the 5 Parts of a Plant!</p>
-            <p>Every plant — crops AND weeds — is built from 5 super-important parts. Let's meet them!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(0 0% 98%) 0%, hsl(200 40% 92%) 100%)",
+          }}
+        >
+          {/* Doctor-themed header */}
+          <div className="rounded-xl bg-white border-4 border-red-500 p-5 text-center space-y-2 shadow-lg">
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">+</div>
+              <p className="font-display font-extrabold text-red-600 text-2xl">Plant Checkup!</p>
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">+</div>
+            </div>
+            <p className="text-sm text-foreground">🩺 Dr. Green here — let's examine the <strong>5 parts</strong> every plant has!</p>
+            <p className="text-xs text-muted-foreground">🍭 Good job! Here's a lollipop after your visit!</p>
           </div>
 
           <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
@@ -3442,19 +3454,20 @@ function TopicContent({
             <p className="text-center text-xs text-muted-foreground mt-2">A crop and a weed share the same parts — but use them very differently!</p>
           </div>
 
-          <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-3 text-center text-sm font-semibold text-primary">
-            <span className="inline-flex items-center gap-2"><Hand className="h-4 w-4" /> Tap each part to see its secret job!</span>
+          <div className="bg-red-50 border-2 border-red-400 rounded-lg p-3 text-center text-sm font-semibold text-red-700 shadow">
+            <span className="inline-flex items-center gap-2">🩺 Tap each part to open its chart!</span>
           </div>
 
           <div className="space-y-4">
             {PARTS.map((p) => (
-              <details key={p.key} className={`group rounded-xl border-2 p-4 ${p.bg} transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden`}>
+              <details key={p.key} className="group rounded-xl border-4 border-red-300 bg-white p-4 transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden shadow">
                 <summary className="flex items-center gap-3 list-none cursor-pointer select-none">
-                  <p.Icon className="h-7 w-7 text-primary shrink-0" />
-                  <span className={`w-3 h-3 rounded-full ${p.dot}`} />
-                  <p className="font-display font-bold text-foreground text-lg flex-1">{p.title}</p>
-                  <span className="text-xs font-bold text-muted-foreground bg-background/70 rounded-full px-2 py-1 group-open:hidden">Tap!</span>
-                  <ChevronDown className="h-5 w-5 text-primary transition-transform group-open:rotate-180" />
+                  <div className={`w-10 h-10 rounded-full ${p.dot} flex items-center justify-center shadow shrink-0`}>
+                    <p.Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="font-display font-extrabold text-foreground text-lg flex-1">{p.title}</p>
+                  <span className="text-xs font-bold text-red-700 bg-red-100 border border-red-400 rounded-full px-2 py-1 group-open:hidden">🩺 Chart</span>
+                  <ChevronDown className="h-5 w-5 text-red-600 transition-transform group-open:rotate-180" />
                 </summary>
                 <div className="mt-3 space-y-2 pl-1">
                   <p className="text-sm text-foreground flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-terracotta shrink-0" /><span><strong>Where:</strong> {p.where}</span></p>
@@ -3467,13 +3480,13 @@ function TopicContent({
             ))}
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">A Plant Is a Team!</p>
+          <div className="bg-white border-4 border-emerald-500 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-emerald-700 text-base">💊 Clean Bill of Health!</p>
             <p className="text-sm text-foreground">Roots drink, stems carry, leaves cook, flowers bloom, seeds travel. Every part needs the others!</p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember the order:</p>
+          <div className="bg-white border-4 border-red-500 rounded-lg p-4 text-sm text-foreground shadow">
+            <p className="font-semibold text-red-700 mb-1">🍭 Doctor's Reminder:</p>
             <p className="text-base flex items-center gap-1 flex-wrap font-semibold">
               <Sprout className="h-4 w-4 text-terracotta" /> Roots →
               <Trees className="h-4 w-4 text-success" /> Stem →
