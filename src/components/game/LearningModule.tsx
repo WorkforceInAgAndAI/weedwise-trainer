@@ -3663,36 +3663,39 @@ function TopicContent({
         {
           key: "wind",
           title: "Wind Riders",
-          nickname: "The Parachute Jumpers",
+          nickname: "Parachute Jumpers",
+          emoji: "🌬️",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          how: "Some seeds have fluffy tops that work just like tiny parachutes. When the wind blows, they float through the air to find a new place to grow.",
-          example: "Dandelion seeds are famous parachute jumpers — one puff of breath and they're off!",
-          extras: "Other wind riders: Milkweed, Canada Thistle, and Horseweed.",
+          how: "Fluffy seeds catch the wind and float like tiny parachutes!",
+          example: "Blow on a dandelion — WHOOSH! Off they go!",
+          extras: "Other flyers: Milkweed, Canada Thistle, Horseweed.",
           image: dandelionHelicopterImg,
           imageAlt: "Cartoon dandelion seed floating with a fluffy parachute",
         },
         {
           key: "water",
           title: "Water Surfers",
-          nickname: "Catch the Wave!",
+          nickname: "Wave Riders",
+          emoji: "🌊",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
-          how: "Some seeds love to surf on water! Rain puddles, streams, and rivers can carry them far away, just like a surfer riding a wave. When the water slows down, the seed lands and can start growing.",
-          example: "Curly Dock seeds float on water and travel down streams to brand-new spots.",
-          extras: "Other water surfers: Smartweed and many wetland weeds.",
+          how: "These seeds float! Rain, puddles, and streams carry them to new spots.",
+          example: "Curly Dock seeds ride streams like little surfboards!",
+          extras: "Other surfers: Smartweed and marsh weeds.",
           image: surfSeedImg,
           imageAlt: "Cartoon seed with a surfboard heading to the beach",
         },
         {
           key: "animal",
           title: "Animal Hitchhikers",
-          nickname: "Can I Catch a Ride?",
+          nickname: "Sneaky Stickers",
+          emoji: "🐾",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
-          how: "Some seeds have tiny hooks, spikes, or sticky parts that cling to an animal's fur — or even your socks! They're like hitchhikers asking for a free ride. When the seed falls off later, it might grow in a brand-new place.",
-          example: "Common Burdock and Cocklebur have prickly seed pods that stick to almost anything.",
-          extras: "Other hitchhikers: Beggarticks and Foxtail bristles.",
+          how: "Sticky, spiky seeds grab onto fur, feathers — even your socks!",
+          example: "Ever pulled a burr off your sock? That was a hitchhiker seed!",
+          extras: "Other stickers: Cocklebur, Beggarticks, Foxtail.",
           image: seedHitchhikerImg,
           imageAlt: "Cartoon corn seed hitchhiking on the back of a skunk",
         },
@@ -3700,58 +3703,42 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">How Do Weed Seeds Travel?</p>
-            <p>
-              Have you ever wondered how tiny seeds move from one place to another? Seeds can't walk, so
-              they've come up with some really clever ways to travel! Let's meet three amazing seed travelers.
-            </p>
+          <div className="bg-gradient-to-br from-sky-100 via-primary/10 to-terracotta/20 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
+            <p className="font-display font-extrabold text-primary text-xl">✈️ How Do Seeds Travel?</p>
+            <p className="text-sm text-foreground">Seeds can't walk… so how do they get around?</p>
+            <p className="text-sm text-foreground font-semibold">Tap each traveler below to find out!</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-3">
             {TRAVELERS.map((t) => (
-              <div key={t.key} className={`rounded-lg border-2 p-4 space-y-2 ${t.bg}`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`w-3 h-3 rounded-full ${t.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{t.title}</p>
-                  <span className="text-xs italic text-muted-foreground">— "{t.nickname}"</span>
+              <details key={t.key} className={`rounded-2xl border-2 p-3 cursor-pointer group transition-transform hover:scale-[1.02] ${t.bg}`}>
+                <summary className="list-none text-center space-y-2">
+                  <div className="text-4xl">{t.emoji}</div>
+                  <p className="font-display font-extrabold text-foreground text-base">{t.title}</p>
+                  <p className="text-xs italic text-muted-foreground">"{t.nickname}"</p>
+                  <p className="text-[10px] text-primary font-bold group-open:hidden">👆 tap me!</p>
+                </summary>
+                <div className="mt-3 space-y-2">
+                  <img src={t.image} alt={t.imageAlt} className="w-full rounded-lg bg-background object-contain" />
+                  <p className="text-center text-[10px] text-muted-foreground italic">Image generated with Google Gemini 1.5 Pro.</p>
+                  <p className="text-sm text-foreground"><strong>How:</strong> {t.how}</p>
+                  <p className="text-sm text-foreground"><strong>Example:</strong> {t.example}</p>
+                  <p className="text-xs text-muted-foreground">{t.extras}</p>
                 </div>
-                <img
-                  src={t.image}
-                  alt={t.imageAlt}
-                  className="w-full max-w-sm mx-auto rounded-lg bg-background/60 object-contain"
-                />
-                <p className="text-sm text-foreground">
-                  <strong>How it works:</strong> {t.how}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Weed example:</strong> {t.example}
-                </p>
-                <p className="text-xs text-muted-foreground">{t.extras}</p>
-              </div>
+              </details>
             ))}
           </div>
 
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">Seeds Are Great Travelers!</p>
-            <p className="text-sm text-foreground">
-              Whether they're parachuting through the sky, surfing on the water, or hitchhiking on an animal,
-              seeds have amazing ways to explore the world and find new places to grow.
+          <div className="bg-warning/10 border-2 border-warning/40 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-warning-foreground text-base">🚜 Why Farmers Care</p>
+            <p className="text-sm text-foreground mt-1">
+              Weeds sneak into fields as free riders! Farmers even wash their boots and tractors so seeds don't hitch a ride.
             </p>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-primary text-base">Why Farmers Care</p>
-            <p className="text-sm text-foreground">
-              Because seeds are such good travelers, weeds can show up in fields where nobody planted them.
-              Farmers even wash off boots, tools, and tractors so they don't accidentally give weed seeds a
-              free ride into a new field!
-            </p>
-          </div>
-
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember (three ways seeds travel):</p>
-            <p>Wind (parachute) • Water (surfing) • Animals (hitchhiking).</p>
+          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
+            <p className="font-display font-extrabold text-foreground text-base">✨ Remember: 3 Ways Seeds Travel ✨</p>
+            <p className="text-sm text-foreground mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
           </div>
         </div>
       );
