@@ -6,16 +6,16 @@ import FloatingCoach from '@/components/game/FloatingCoach';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-const GROUP_SIZE = 6;
+const GROUP_SIZE = 10;
 
 function buildGroup(level: number): typeof weeds {
   const natives = shuffle(weeds.filter(w => w.origin === 'Native'));
   const intros = shuffle(weeds.filter(w => w.origin === 'Introduced'));
-  // Aim for a balanced mix: 3 native + 3 introduced when possible
-  const nCount = Math.min(3, natives.length);
+  // Aim for a balanced mix: 5 native + 5 introduced when possible
+  const nCount = Math.min(GROUP_SIZE / 2, natives.length);
   const iCount = Math.min(GROUP_SIZE - nCount, intros.length);
-  const offsetN = ((level - 1) * 3) % Math.max(1, natives.length);
-  const offsetI = ((level - 1) * 3) % Math.max(1, intros.length);
+  const offsetN = ((level - 1) * (GROUP_SIZE / 2)) % Math.max(1, natives.length);
+  const offsetI = ((level - 1) * (GROUP_SIZE / 2)) % Math.max(1, intros.length);
   const pickN = [...natives.slice(offsetN), ...natives.slice(0, offsetN)].slice(0, nCount);
   const pickI = [...intros.slice(offsetI), ...intros.slice(0, offsetI)].slice(0, iCount);
   return shuffle([...pickN, ...pickI]);

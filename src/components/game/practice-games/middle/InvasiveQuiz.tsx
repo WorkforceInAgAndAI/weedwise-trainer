@@ -41,11 +41,33 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const rounds = useMemo(() => {
-    // Include every weed in the knowledge map — both introduced and native-spread.
+    // Round-robin across all four arrival methods so students see real variety
+    // instead of "accident" seven times in a row.
     const pool = weeds.filter(w => WEED_ARRIVAL_KNOWLEDGE[w.id]);
-    const offset = ((level - 1) * 8) % pool.length;
-    const rotated = [...pool.slice(offset), ...pool.slice(0, offset)];
-    return shuffle(rotated).slice(0, 8).map(w => {
+    const byMethod: Record<ArrivalMethod, typeof weeds> = {
+      accident: [], purpose: [], 'other-species': [], 'native-spread': [],
+    };
+    for (const w of pool) {
+      const m = WEED_ARRIVAL_KNOWLEDGE[w.id].method as ArrivalMethod;
+      byMethod[m].push(w);
+    }
+    (Object.keys(byMethod) as ArrivalMethod[]).forEach(k => {
+      byMethod[k] = shuffle(byMethod[k]);
+    });
+    const methodKeys = (Object.keys(byMethod) as ArrivalMethod[]).filter(k => byMethod[k].length > 0);
+    const cursor: Record<ArrivalMethod, number> = {
+      accident: (level - 1) * 2, purpose: (level - 1) * 2,
+      'other-species': (level - 1) * 2, 'native-spread': (level - 1) * 2,
+    };
+    const picks: typeof weeds = [];
+    let safety = 0;
+    while (picks.length < 8 && safety++ < 200) {
+      const m = methodKeys[picks.length % methodKeys.length];
+      const list = byMethod[m];
+      const w = list[cursor[m]++ % list.length];
+      if (!picks.some(p => p.id === w.id)) picks.push(w);
+    }
+    return shuffle(picks).map(w => {
       const data = getArrivalData(w);
       return { weed: w, method: data.method, story: data.story };
     });

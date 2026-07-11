@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Droplets, TreePine, Link } from 'lucide-react';
+import { Droplets, TreePine, Link, Fish, Waves, Sprout, Sun, CloudRain, Wind, Flower2, Bug, TreeDeciduous, Leaf, Anchor, HeartCrack, Zap, Mountain, Sparkles } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
@@ -8,33 +8,34 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 interface NeedItem { id: string; label: string; category: string; }
 
+interface NeedItem { id: string; label: string; category: string; Icon: typeof Droplets; }
 const ALL_NEEDS: NeedItem[] = [
-  { id: 'standing-water', label: 'Standing water', category: 'aquatic' },
-  { id: 'dissolved-nutrients', label: 'Dissolved nutrients', category: 'aquatic' },
-  { id: 'underwater-light', label: 'Underwater sunlight', category: 'aquatic' },
-  { id: 'pond-surface', label: 'Pond or lake surface to float on', category: 'aquatic' },
-  { id: 'wet-mud', label: 'Wet muddy bottom', category: 'aquatic' },
-  { id: 'slow-current', label: 'Slow-moving water', category: 'aquatic' },
-  { id: 'algae-friends', label: 'Algae and pondweed neighbors', category: 'aquatic' },
-  { id: 'oxygen-water', label: 'Oxygen dissolved in water', category: 'aquatic' },
-  { id: 'soil', label: 'Soil to root in', category: 'terrestrial' },
-  { id: 'rain', label: 'Rainfall', category: 'terrestrial' },
-  { id: 'air-space', label: 'Open air space', category: 'terrestrial' },
-  { id: 'sunlight-direct', label: 'Direct sunlight on leaves', category: 'terrestrial' },
-  { id: 'soil-nutrients', label: 'Nutrients in the soil', category: 'terrestrial' },
-  { id: 'pollinators', label: 'Bees and butterflies to pollinate', category: 'terrestrial' },
-  { id: 'wind-pollination', label: 'Wind to carry pollen', category: 'terrestrial' },
-  { id: 'roots-deep', label: 'Deep roots to find water', category: 'terrestrial' },
-  { id: 'co2-air', label: 'Carbon dioxide from the air', category: 'terrestrial' },
-  { id: 'topsoil', label: 'Loose topsoil to grow in', category: 'terrestrial' },
-  { id: 'host-plant', label: 'Host plant to attach to', category: 'parasitic' },
-  { id: 'steal-nutrients', label: 'Steal nutrients from host', category: 'parasitic' },
-  { id: 'special-roots', label: 'Parasitic suckers that pierce into a host plant', category: 'parasitic' },
-  { id: 'haustoria', label: 'Haustoria to tap into stems', category: 'parasitic' },
-  { id: 'sugars-host', label: 'Sugars made by another plant', category: 'parasitic' },
-  { id: 'tree-branch', label: 'A tree branch to grow on', category: 'parasitic' },
-  { id: 'host-water', label: 'Water pulled from a host plant', category: 'parasitic' },
-  { id: 'no-photosynth', label: 'Little need for its own photosynthesis', category: 'parasitic' },
+  { id: 'standing-water', label: 'Standing water', category: 'aquatic', Icon: Waves },
+  { id: 'dissolved-nutrients', label: 'Dissolved nutrients', category: 'aquatic', Icon: Sparkles },
+  { id: 'underwater-light', label: 'Underwater sunlight', category: 'aquatic', Icon: Sun },
+  { id: 'pond-surface', label: 'Pond or lake surface to float on', category: 'aquatic', Icon: Fish },
+  { id: 'wet-mud', label: 'Wet muddy bottom', category: 'aquatic', Icon: Anchor },
+  { id: 'slow-current', label: 'Slow-moving water', category: 'aquatic', Icon: Droplets },
+  { id: 'algae-friends', label: 'Algae and pondweed neighbors', category: 'aquatic', Icon: Leaf },
+  { id: 'oxygen-water', label: 'Oxygen dissolved in water', category: 'aquatic', Icon: Waves },
+  { id: 'soil', label: 'Soil to root in', category: 'terrestrial', Icon: Mountain },
+  { id: 'rain', label: 'Rainfall', category: 'terrestrial', Icon: CloudRain },
+  { id: 'air-space', label: 'Open air space', category: 'terrestrial', Icon: Wind },
+  { id: 'sunlight-direct', label: 'Direct sunlight on leaves', category: 'terrestrial', Icon: Sun },
+  { id: 'soil-nutrients', label: 'Nutrients in the soil', category: 'terrestrial', Icon: Sprout },
+  { id: 'pollinators', label: 'Bees and butterflies to pollinate', category: 'terrestrial', Icon: Flower2 },
+  { id: 'wind-pollination', label: 'Wind to carry pollen', category: 'terrestrial', Icon: Wind },
+  { id: 'roots-deep', label: 'Deep roots to find water', category: 'terrestrial', Icon: TreeDeciduous },
+  { id: 'co2-air', label: 'Carbon dioxide from the air', category: 'terrestrial', Icon: Wind },
+  { id: 'topsoil', label: 'Loose topsoil to grow in', category: 'terrestrial', Icon: Mountain },
+  { id: 'host-plant', label: 'Host plant to attach to', category: 'parasitic', Icon: TreePine },
+  { id: 'steal-nutrients', label: 'Steal nutrients from host', category: 'parasitic', Icon: HeartCrack },
+  { id: 'special-roots', label: 'Parasitic suckers that pierce into a host plant', category: 'parasitic', Icon: Zap },
+  { id: 'haustoria', label: 'Haustoria to tap into stems', category: 'parasitic', Icon: Bug },
+  { id: 'sugars-host', label: 'Sugars made by another plant', category: 'parasitic', Icon: Sprout },
+  { id: 'tree-branch', label: 'A tree branch to grow on', category: 'parasitic', Icon: TreeDeciduous },
+  { id: 'host-water', label: 'Water pulled from a host plant', category: 'parasitic', Icon: Droplets },
+  { id: 'no-photosynth', label: 'Little need for its own photosynthesis', category: 'parasitic', Icon: Leaf },
 ];
 
 const CATEGORIES = [
@@ -170,10 +171,13 @@ export default function EcologyScramble({ onBack, gradeLabel }: Props) {
           </div>
           <p className="text-sm text-muted-foreground mb-2">{qTimer}s remaining</p>
 
-          {/* Need card */}
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6 text-center w-full">
+          {/* Need card — big icon so pre-readers can play too */}
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6 text-center w-full flex flex-col items-center gap-3">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <round.need.Icon className="w-12 h-12 text-primary" strokeWidth={2} />
+            </div>
             <p className="text-lg font-bold text-foreground">{round.need.label}</p>
-            <p className="text-sm text-muted-foreground mt-1">Is this need aquatic, terrestrial, or parasitic?</p>
+            <p className="text-sm text-muted-foreground">Is this need aquatic, terrestrial, or parasitic?</p>
           </div>
 
           {/* Category buttons */}
