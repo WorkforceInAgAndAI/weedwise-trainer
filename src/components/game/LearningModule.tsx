@@ -3516,9 +3516,26 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Crop or Weed? It's All About Where It Grows</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl relative"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(200 80% 78%) 0%, hsl(90 55% 65%) 40%, hsl(90 45% 45%) 70%, hsl(28 55% 30%) 100%)",
+          }}
+        >
+          {/* Sky birds */}
+          <div className="text-2xl absolute top-2 right-6 animate-bounce">🐦</div>
+          <div className="text-xl absolute top-6 left-10 animate-pulse">🐦</div>
+          <div className="text-lg absolute top-4 right-24">☁️</div>
+
+          {/* Farm barn header */}
+          <div className="rounded-xl bg-red-700 p-5 text-center space-y-2 border-4 border-amber-900 shadow-lg relative">
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-3xl">🌾</div>
+            <p className="font-display font-extrabold text-yellow-100 text-2xl drop-shadow">🚜 Crop or Weed? 🌽</p>
+            <p className="text-sm text-yellow-50">Down on the farm — is it a friend or a sneaker?</p>
+          </div>
+          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
+            <p className="font-display font-bold text-amber-900 text-base">🌱 It's All About WHERE It Grows</p>
             <p>
               At first glance, crops and weeds can look a lot alike — they're both plants! The biggest
               difference isn't <em>what</em> the plant is, it's <em>where</em> it's growing.
@@ -3526,10 +3543,10 @@ function TopicContent({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border-2 border-success/40 bg-success/10 p-4 space-y-3">
+            <div className="rounded-lg border-4 border-amber-800 bg-white/95 p-4 space-y-3 shadow">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-success" />
-                <p className="font-display font-bold text-success text-base">Crops</p>
+                <span className="text-2xl">🌽</span>
+                <p className="font-display font-extrabold text-emerald-700 text-base">Crops (Friends!)</p>
               </div>
               <p className="text-sm text-foreground">
                 Crops are plants that farmers grow <strong>on purpose</strong>. They give us food, feed animals,
@@ -3537,19 +3554,19 @@ function TopicContent({
               </p>
               <div className="space-y-2">
                 {CROP_TRAITS.map((c) => (
-                  <div key={c.label} className="bg-background/60 rounded-md p-2">
+                  <div key={c.label} className="bg-green-50 border border-emerald-500 rounded-md p-2">
                     <p className="font-semibold text-foreground text-sm">{c.label}</p>
                     <p className="text-xs text-muted-foreground">{c.detail}</p>
-                    <p className="text-xs text-success font-semibold mt-1">Examples: {c.examples}</p>
+                    <p className="text-xs text-emerald-700 font-semibold mt-1">Examples: {c.examples}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-lg border-2 border-destructive/40 bg-destructive/10 p-4 space-y-3">
+            <div className="rounded-lg border-4 border-amber-800 bg-white/95 p-4 space-y-3 shadow">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-destructive" />
-                <p className="font-display font-bold text-destructive text-base">Weeds</p>
+                <span className="text-2xl">🌿</span>
+                <p className="font-display font-extrabold text-destructive text-base">Weeds (Sneakers!)</p>
               </div>
               <p className="text-sm text-foreground">
                 Weeds are plants growing <strong>where they aren't wanted</strong>. Nobody planted them, and
@@ -3557,7 +3574,7 @@ function TopicContent({
               </p>
               <div className="space-y-2">
                 {WEED_TRAITS.map((w) => (
-                  <div key={w.label} className="bg-background/60 rounded-md p-2">
+                  <div key={w.label} className="bg-red-50 border border-destructive rounded-md p-2">
                     <p className="font-semibold text-foreground text-sm">{w.label}</p>
                     <p className="text-xs text-muted-foreground">{w.detail}</p>
                     <p className="text-xs text-destructive font-semibold mt-1">Examples: {w.examples}</p>
@@ -3567,15 +3584,17 @@ function TopicContent({
             </div>
           </div>
 
-          <img
-            src={cropsVsWeedsImg}
-            alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
-            className="w-full rounded-lg bg-background/60 object-contain"
-          />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+          <div className="rounded-lg border-4 border-amber-800 bg-white/90 p-3 shadow">
+            <img
+              src={cropsVsWeedsImg}
+              alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
+              className="w-full rounded-lg bg-background/60 object-contain"
+            />
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+          </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-info text-base">Think About It Like This…</p>
+          <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-2 shadow">
+            <p className="font-display font-bold text-amber-900 text-base">🐄 Think About It Like This…</p>
             <p className="text-sm text-foreground">
               Imagine your classroom. Every student has an assigned desk. Now imagine someone from another
               class walks in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just
@@ -3587,8 +3606,8 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
+          <div className="bg-amber-900 border-4 border-yellow-500 rounded-lg p-4 text-yellow-50 shadow">
+            <p className="font-semibold text-yellow-300 mb-1">🌾 Remember:</p>
             <p>A weed isn't a "bad" plant — it's just a plant growing in the wrong place.</p>
           </div>
         </div>
