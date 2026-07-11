@@ -7277,3 +7277,118 @@ function FamilyGroupings({
     </div>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════
+   K-5 INTERACTIVE SUBCOMPONENTS (picnic / shop / superhero / detective / race)
+═══════════════════════════════════════════════════════════ */
+
+interface PicnicItem {
+  key: string;
+  resource: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  crop: string;
+  weed: string;
+}
+
+function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
+  const [packed, setPacked] = useState<Record<string, boolean>>({});
+  const [open, setOpen] = useState<string | null>(null);
+  const packedCount = Object.values(packed).filter(Boolean).length;
+
+  return (
+    <div
+      className="space-y-5 p-5 rounded-2xl relative overflow-hidden"
+      style={{
+        backgroundImage:
+          "repeating-linear-gradient(45deg, hsl(0 75% 60%) 0 20px, hsl(0 0% 100%) 20px 40px)",
+      }}
+    >
+      <div className="absolute top-2 right-3 text-2xl animate-bounce">🐞</div>
+      <div className="absolute top-8 left-3 text-2xl">🐜</div>
+      <div className="absolute bottom-3 right-8 text-2xl">🦋</div>
+
+      <div className="rounded-2xl bg-white/95 border-4 border-red-600 p-5 text-center shadow-lg relative">
+        <p className="font-display font-extrabold text-red-700 text-2xl">🧺 Welcome to the Field Picnic! 🍓</p>
+        <p className="text-sm text-foreground mt-1">🍎 🥕 🌽 Everyone's invited — well, almost everyone…</p>
+      </div>
+
+      <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-2 border-2 border-red-400">
+        <p>
+          Imagine all the plants in the field are having a picnic. There's just enough sunlight, water,
+          nutrients, and space for every crop to grow big and healthy.
+        </p>
+        <p>
+          Then some <strong>weeds</strong> show up… <em>uninvited</em>! They gobble the food, drink the water,
+          and hog the blanket. Suddenly, there isn't enough for everyone!
+        </p>
+      </div>
+
+      <div className="rounded-lg border-4 border-red-600 bg-white/95 p-3">
+        <img
+          src={img}
+          alt="Two picnic panels — overcrowded and cramped versus spacious and plentiful"
+          className="w-full h-auto rounded-md bg-background/60 object-contain"
+        />
+        <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+      </div>
+
+      {/* Interactive: pack the basket */}
+      <div className="bg-white/95 rounded-lg p-4 border-2 border-red-400 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-display font-bold text-red-700">🧺 Pack It for the Trip!</p>
+          <span className="text-xs font-bold bg-red-600 text-white rounded-full px-3 py-1">{packedCount}/{items.length} packed</span>
+        </div>
+        <p className="text-xs text-foreground">Tap an item to learn about it, then tap "Pack it!" to put it in the basket.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {items.map((p) => {
+            const isOpen = open === p.key;
+            const isPacked = !!packed[p.key];
+            return (
+              <button
+                key={p.key}
+                onClick={() => setOpen(isOpen ? null : p.key)}
+                className={`rounded-xl border-2 p-3 text-center transition-all ${p.bg} ${isPacked ? "opacity-60 scale-95" : "hover:scale-105"}`}
+              >
+                <div className="text-4xl">{p.emoji}</div>
+                <p className="font-bold text-foreground text-sm mt-1">{p.resource}</p>
+                {isPacked && <p className="text-[10px] text-success font-bold">✓ In the basket!</p>}
+              </button>
+            );
+          })}
+        </div>
+        {open && (() => {
+          const p = items.find((i) => i.key === open)!;
+          return (
+            <div className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
+              <p className="font-display font-bold text-foreground text-base">{p.emoji} {p.resource}</p>
+              <p className="text-sm text-foreground"><strong>At the picnic:</strong> {p.crop}</p>
+              <p className="text-sm text-foreground"><strong>Uninvited weeds:</strong> {p.weed}</p>
+              {!packed[p.key] ? (
+                <button
+                  onClick={() => { setPacked({ ...packed, [p.key]: true }); setOpen(null); }}
+                  className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold rounded-md py-2 text-sm"
+                >
+                  🧺 Pack it for the trip!
+                </button>
+              ) : (
+                <p className="text-xs text-success font-bold text-center">Already in the basket!</p>
+              )}
+            </div>
+          );
+        })()}
+        {packedCount === items.length && (
+          <div className="bg-success/20 border-2 border-success rounded-lg p-3 text-center">
+            <p className="font-bold text-success text-sm">🎉 Basket packed! You're ready for the picnic — and you know what weeds are trying to steal!</p>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white/95 rounded-lg p-4 border-2 border-red-400 text-sm text-foreground">
+        <p className="font-semibold text-red-700 mb-1">Remember:</p>
+        <p>Weeds steal sunlight, water, nutrients, and space — so crops grow smaller and farmers harvest less food.</p>
+      </div>
+    </div>
+  );
+}
