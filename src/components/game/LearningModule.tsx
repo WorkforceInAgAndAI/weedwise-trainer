@@ -3277,7 +3277,7 @@ function TopicContent({
         {
           key: "roots",
           title: "1. Roots",
-          icon: "🌱",
+          Icon: Sprout,
           where: "Underground.",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
@@ -3287,7 +3287,7 @@ function TopicContent({
         {
           key: "stem",
           title: "2. Stem",
-          icon: "🌿",
+          Icon: Trees,
           where: "The plant's trunk.",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
@@ -3297,7 +3297,7 @@ function TopicContent({
         {
           key: "leaves",
           title: "3. Leaves",
-          icon: "🍃",
+          Icon: Leaf,
           where: "Sticking out from the stem.",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
@@ -3307,7 +3307,7 @@ function TopicContent({
         {
           key: "flower",
           title: "4. Flowers",
-          icon: "🌸",
+          Icon: Flower2,
           where: "Near the top.",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
@@ -3317,7 +3317,7 @@ function TopicContent({
         {
           key: "seeds",
           title: "5. Seeds",
-          icon: "✨",
+          Icon: Sparkles,
           where: "Inside the flower.",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
@@ -3344,25 +3344,24 @@ function TopicContent({
           </div>
 
           <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-3 text-center text-sm font-semibold text-primary">
-            👇 Tap each part to see its secret job! 👇
+            <span className="inline-flex items-center gap-2"><Hand className="h-4 w-4" /> Tap each part to see its secret job!</span>
           </div>
 
           <div className="space-y-4">
             {PARTS.map((p) => (
               <details key={p.key} className={`group rounded-xl border-2 p-4 ${p.bg} transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden`}>
                 <summary className="flex items-center gap-3 list-none cursor-pointer select-none">
-                  <span className="text-3xl">{p.icon}</span>
+                  <p.Icon className="h-7 w-7 text-primary shrink-0" />
                   <span className={`w-3 h-3 rounded-full ${p.dot}`} />
                   <p className="font-display font-bold text-foreground text-lg flex-1">{p.title}</p>
                   <span className="text-xs font-bold text-muted-foreground bg-background/70 rounded-full px-2 py-1 group-open:hidden">Tap!</span>
-                  <span className="text-xl text-primary hidden group-open:inline">−</span>
-                  <span className="text-xl text-primary group-open:hidden">+</span>
+                  <ChevronDown className="h-5 w-5 text-primary transition-transform group-open:rotate-180" />
                 </summary>
                 <div className="mt-3 space-y-2 pl-1">
-                  <p className="text-sm text-foreground"><strong>📍 Where:</strong> {p.where}</p>
-                  <p className="text-sm text-foreground"><strong>⚙️ Job:</strong> {p.job}</p>
+                  <p className="text-sm text-foreground flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-terracotta shrink-0" /><span><strong>Where:</strong> {p.where}</span></p>
+                  <p className="text-sm text-foreground flex items-start gap-2"><Zap className="h-4 w-4 mt-0.5 text-info shrink-0" /><span><strong>Job:</strong> {p.job}</span></p>
                   <div className="bg-background/60 border border-primary/20 rounded-md p-2">
-                    <p className="text-sm text-foreground"><strong>🌟 Weed fact:</strong> {p.weedFact}</p>
+                    <p className="text-sm text-foreground flex items-start gap-2"><Star className="h-4 w-4 mt-0.5 text-yellow-500 shrink-0 fill-yellow-500" /><span><strong>Weed fact:</strong> {p.weedFact}</span></p>
                   </div>
                 </div>
               </details>
@@ -3370,13 +3369,19 @@ function TopicContent({
           </div>
 
           <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-success text-base">A Plant Is a Team! 🤝</p>
-            <p className="text-sm text-foreground">Roots drink 💧, stems carry 🚚, leaves cook 🍳, flowers bloom 🌸, seeds travel ✈️. Every part needs the others!</p>
+            <p className="font-display font-bold text-success text-base">A Plant Is a Team!</p>
+            <p className="text-sm text-foreground">Roots drink, stems carry, leaves cook, flowers bloom, seeds travel. Every part needs the others!</p>
           </div>
 
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember the order:</p>
-            <p className="text-base">🌱 Roots → 🌿 Stem → 🍃 Leaves → 🌸 Flowers → ✨ Seeds</p>
+            <p className="text-base flex items-center gap-1 flex-wrap font-semibold">
+              <Sprout className="h-4 w-4 text-terracotta" /> Roots →
+              <Trees className="h-4 w-4 text-success" /> Stem →
+              <Leaf className="h-4 w-4 text-primary" /> Leaves →
+              <Flower2 className="h-4 w-4 text-info" /> Flowers →
+              <Sparkles className="h-4 w-4 text-yellow-500" /> Seeds
+            </p>
           </div>
         </div>
       );
