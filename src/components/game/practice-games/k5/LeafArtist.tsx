@@ -64,8 +64,10 @@ export default function LeafArtist({ onBack, gameId, gameName, gradeLabel }: Pro
             <p className="text-xs text-muted-foreground">Are they <span className="font-bold text-primary">Parallel</span> (running side-by-side like grass) or <span className="font-bold text-primary">Netted</span> (branching like a net)?</p>
           </div>
 
-          <div className="w-72 h-72 sm:w-96 sm:h-96 rounded-xl overflow-hidden border-2 border-border bg-secondary">
-            <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover" />
+          {/* Cropped-in view so the veins are actually readable at K-5 sizes */}
+          <div className="relative w-72 h-72 sm:w-96 sm:h-96 rounded-xl overflow-hidden border-2 border-border bg-secondary">
+            <WeedImage weedId={r!.weed.id} stage="vegetative" className="w-full h-full object-cover scale-[1.75] origin-center transition-transform" />
+            <span className="absolute bottom-2 right-2 text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-white font-semibold pointer-events-none">Zoomed in</span>
           </div>
           <p className="text-base font-bold text-foreground">{r!.weed.commonName}</p>
 
