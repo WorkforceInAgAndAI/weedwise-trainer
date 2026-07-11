@@ -191,6 +191,55 @@ function WeedSpotterCard({
   );
 }
 
+// Flip card for the "What Plants Need" dinner-themed module.
+function FlipPlateCard({
+  n,
+}: {
+  n: {
+    key: string;
+    title: string;
+    plantUses: string;
+    weedSteals: string;
+    bg: string;
+    dot: string;
+  };
+}) {
+  const [flipped, setFlipped] = useState(false);
+  const icons: Record<string, JSX.Element> = {
+    sun: <span className="text-3xl">☀️</span>,
+    water: <span className="text-3xl">💧</span>,
+    air: <span className="text-3xl">🌬️</span>,
+    nutrients: <span className="text-3xl">🥕</span>,
+    space: <span className="text-3xl">🪑</span>,
+  };
+  return (
+    <button
+      onClick={() => setFlipped((f) => !f)}
+      className="relative w-full aspect-square [perspective:800px] focus:outline-none"
+      aria-label={`Flip ${n.title} card`}
+    >
+      <div
+        className="absolute inset-0 transition-transform duration-500 [transform-style:preserve-3d]"
+        style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+      >
+        {/* Front — the plate */}
+        <div className={`absolute inset-0 rounded-full border-4 border-amber-700 shadow-lg flex flex-col items-center justify-center gap-1 [backface-visibility:hidden] ${n.bg}`}>
+          {icons[n.key]}
+          <p className="font-display font-extrabold text-foreground text-xs sm:text-sm">{n.title}</p>
+          <p className="text-[9px] text-muted-foreground italic">flip me!</p>
+        </div>
+        {/* Back */}
+        <div className="absolute inset-0 rounded-2xl bg-amber-50 border-4 border-amber-700 shadow-lg p-2 flex flex-col justify-center text-left [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <p className="text-[10px] font-bold text-amber-900 mb-1">🌽 Plants use it to:</p>
+          <p className="text-[10px] text-foreground leading-tight mb-1">{n.plantUses}</p>
+          <p className="text-[10px] font-bold text-destructive">🌿 Weeds steal it:</p>
+          <p className="text-[10px] text-foreground leading-tight">{n.weedSteals}</p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 interface CategoryStyle {
   id: CategoryId;
   label: string;
