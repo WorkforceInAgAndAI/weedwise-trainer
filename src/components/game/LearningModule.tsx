@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { weeds } from "@/data/weeds";
+import { weedsForGrade } from "@/data/gradeWeeds";
 import type { GradeLevel, Weed } from "@/types/game";
 import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
@@ -597,14 +598,17 @@ const TOPICS: Topic[] = [
   },
 ];
 
-function getTopicWeeds(topicId: TopicId): Weed[] {
+function getTopicWeeds(topicId: TopicId, sourceGrade: GradeLevel = "high"): Weed[] {
+  // Grade-aware base pool. K-5 uses the 14 "Weeds You Can Spot" species,
+  // 6-8 uses the 34-species middle-school curriculum, 9-12 uses all species.
+  const base = weedsForGrade(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return weeds.filter((w) => weeds.some((x) => x.id === w.lookAlike.id));
+      return base.filter((w) => base.some((x) => x.id === w.lookAlike.id));
     case "safety":
-      return weeds.filter((w) => w.safetyNote);
+      return base.filter((w) => w.safetyNote);
     default:
-      return weeds;
+      return base;
   }
 }
 
@@ -1312,7 +1316,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                       </div>
                       <div className="text-xs text-muted-foreground leading-relaxed">{topic.description}</div>
                       <div className="text-[11px] text-foreground/70 mt-2 font-medium">
-                        {getTopicWeeds(topic.id).length} species →
+                        {getTopicWeeds(topic.id, sourceGrade).length} species →
                       </div>
                     </button>
                   ))}
@@ -1368,7 +1372,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
               <TopicContent
                 topicId={selectedTopic}
                 grade={sourceGrade}
-                topicWeeds={getTopicWeeds(selectedTopic)}
+                topicWeeds={getTopicWeeds(selectedTopic, sourceGrade)}
                 onSelectWeed={setSelectedWeed}
                 viewMode={viewMode}
                 onOpenPractice={onOpenPractice}
