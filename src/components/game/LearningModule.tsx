@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { weeds } from "@/data/weeds";
+import { weedsForGrade } from "@/data/gradeWeeds";
 import type { GradeLevel, Weed } from "@/types/game";
 import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
