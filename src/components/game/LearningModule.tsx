@@ -597,14 +597,17 @@ const TOPICS: Topic[] = [
   },
 ];
 
-function getTopicWeeds(topicId: TopicId): Weed[] {
+function getTopicWeeds(topicId: TopicId, sourceGrade: GradeLevel = "high"): Weed[] {
+  // Grade-aware base pool. K-5 uses the 14 "Weeds You Can Spot" species,
+  // 6-8 uses the 34-species middle-school curriculum, 9-12 uses all species.
+  const base = weedsForGrade(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return weeds.filter((w) => weeds.some((x) => x.id === w.lookAlike.id));
+      return base.filter((w) => base.some((x) => x.id === w.lookAlike.id));
     case "safety":
-      return weeds.filter((w) => w.safetyNote);
+      return base.filter((w) => w.safetyNote);
     default:
-      return weeds;
+      return base;
   }
 }
 
