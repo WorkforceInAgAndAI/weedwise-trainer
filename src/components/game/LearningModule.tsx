@@ -3817,21 +3817,40 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-gradient-to-br from-sky-100 via-primary/10 to-terracotta/20 rounded-2xl p-5 text-center space-y-2 border-2 border-primary/30">
-            <p className="font-display font-extrabold text-primary text-xl">✈️ How Do Seeds Travel?</p>
-            <p className="text-sm text-foreground">Seeds can't walk… so how do they get around?</p>
-            <p className="text-sm text-foreground font-semibold">Tap each traveler below to find out!</p>
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, hsl(210 60% 88%) 0%, hsl(210 45% 78%) 50%, hsl(215 30% 60%) 100%)",
+          }}
+        >
+          {/* Airport departures board header */}
+          <div className="rounded-xl bg-slate-900 p-5 text-center space-y-2 border-4 border-yellow-500 shadow-lg font-mono">
+            <p className="text-yellow-300 text-xs tracking-widest">◆ SEED INTERNATIONAL AIRPORT ◆ DEPARTURES ◆</p>
+            <p className="font-display font-extrabold text-yellow-400 text-2xl">✈️ HOW DO SEEDS TRAVEL?</p>
+            <p className="text-xs text-yellow-200 tracking-wider">🛫  ON TIME  •  NOW BOARDING  •  🛬</p>
+          </div>
+          <div className="rounded-lg bg-white/95 border-2 border-slate-400 p-4 text-sm text-foreground">
+            <p>Seeds can't walk… so how do they get around? Tap each <strong>gate</strong> to see the flight!</p>
+          </div>
+          {/* Runway strip */}
+          <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden">
+            <div className="absolute inset-y-0 left-0 right-0 flex items-center gap-2 px-2">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="h-1 w-6 bg-yellow-300 rounded" />
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             {TRAVELERS.map((t) => (
-              <details key={t.key} className={`rounded-2xl border-2 p-3 cursor-pointer group transition-transform hover:scale-[1.02] ${t.bg}`}>
+              <details key={t.key} className="rounded-2xl border-4 border-slate-400 bg-white/95 p-3 cursor-pointer group transition-transform hover:scale-[1.02] shadow-lg">
                 <summary className="list-none text-center space-y-2">
+                  <div className="text-[10px] font-mono font-bold text-slate-500 tracking-widest bg-slate-100 rounded py-1">GATE {t.key.toUpperCase().slice(0, 3)}-{["01","07","23"][["wind","water","animal"].indexOf(t.key)]}</div>
                   <div className="text-4xl">{t.emoji}</div>
                   <p className="font-display font-extrabold text-foreground text-base">{t.title}</p>
                   <p className="text-xs italic text-muted-foreground">"{t.nickname}"</p>
-                  <p className="text-[10px] text-primary font-bold group-open:hidden">👆 tap me!</p>
+                  <p className="text-[10px] text-primary font-bold group-open:hidden bg-yellow-200 rounded px-2 py-0.5 inline-block">🎫 tap ticket!</p>
                 </summary>
                 <div className="mt-3 space-y-2">
                   <img src={t.image} alt={t.imageAlt} className="w-full rounded-lg bg-background object-contain" />
@@ -3844,16 +3863,17 @@ function TopicContent({
             ))}
           </div>
 
-          <div className="bg-warning/10 border-2 border-warning/40 rounded-2xl p-4 text-center">
-            <p className="font-display font-extrabold text-warning-foreground text-base">🚜 Why Farmers Care</p>
+          <div className="bg-yellow-100 border-4 border-yellow-500 rounded-2xl p-4 text-center shadow">
+            <p className="font-display font-extrabold text-amber-900 text-base">🚜 Why Farmers Care (Airport Security!)</p>
             <p className="text-sm text-foreground mt-1">
-              Weeds sneak into fields as free riders! Farmers even wash their boots and tractors so seeds don't hitch a ride.
+              Weeds sneak into fields as stowaways! Farmers even wash their boots and tractors — like TSA for seeds — so no free rides!
             </p>
           </div>
 
-          <div className="bg-yellow-100 border-2 border-yellow-500 rounded-2xl p-4 text-center">
-            <p className="font-display font-extrabold text-foreground text-base">✨ Remember: 3 Ways Seeds Travel ✨</p>
+          <div className="bg-slate-900 border-4 border-yellow-500 rounded-2xl p-4 text-center font-mono shadow-lg">
+            <p className="font-display font-extrabold text-yellow-400 text-base">📋 3 FLIGHT ROUTES</p>
             <p className="text-sm text-foreground mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
+            <p className="text-yellow-200 text-xs mt-1 tracking-wider">HAVE A GREAT FLIGHT, SEEDS!</p>
           </div>
         </div>
       );
