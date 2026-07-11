@@ -4076,6 +4076,7 @@ function TopicContent({
         {
           key: "eyes",
           rule: "Use Your Eyes, Not Your Hands",
+          emoji: "👀",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           detail: "Look at the plant from a safe distance. Don't touch, pick, or taste any weed you don't already know.",
@@ -4083,6 +4084,7 @@ function TopicContent({
         {
           key: "observe",
           rule: "Observe the Clues",
+          emoji: "🔍",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
           detail: "Notice the leaves, flowers, colors, and seeds. Those clues help a grown-up identify the plant.",
@@ -4090,6 +4092,7 @@ function TopicContent({
         {
           key: "ask",
           rule: "Ask a Trusted Adult",
+          emoji: "🕵️",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           detail: "Show a parent, teacher, or another trusted adult. They can help figure out if it's safe.",
@@ -4097,6 +4100,7 @@ function TopicContent({
         {
           key: "wash",
           rule: "Wash Up After Playing Outside",
+          emoji: "🧼",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           detail: "Even if you didn't touch a plant on purpose, washing your hands helps keep you safe.",
@@ -4104,8 +4108,19 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(0 0% 12%) 0%, hsl(28 45% 22%) 100%)",
+          }}
+        >
+          <div className="rounded-2xl bg-amber-100 border-4 border-slate-900 p-5 text-center shadow-lg">
+            <p className="font-display font-extrabold text-slate-900 text-2xl">🕵️ Case File: Safe or Toxic?</p>
+            <p className="text-xs text-slate-800 mt-1">🔎 Grab your magnifying glass — every plant is a mystery!</p>
+          </div>
+
+          <div className="bg-amber-50/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-amber-900 shadow">
             <p className="font-display font-bold text-primary text-base">Not All Weeds Are the Same!</p>
             <p>
               Did you know that not all weeds are alike? Some are totally harmless, but others can be
@@ -4114,7 +4129,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-info/10 border-2 border-info/40 rounded-lg p-5 space-y-2">
+          <div className="bg-amber-50/95 border-4 border-amber-900 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-info text-base">The Mystery Surprise Box</p>
             <p className="text-sm text-foreground">
               Think of weeds like mystery surprise boxes. Some boxes have fun surprises inside — but others
@@ -4144,57 +4159,55 @@ function TopicContent({
             </div>
           </div>
 
-          <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-primary text-base">Be a Plant Detective!</p>
-            <p className="text-sm text-foreground">
-              If you spot a plant you don't recognize, put on your Plant Detective hat and follow these
-              rules:
-            </p>
-            <div className="space-y-3">
-              {DETECTIVE_RULES.map((r) => (
-                <div key={r.key} className={`rounded-lg border-2 p-3 ${r.bg}`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`w-3 h-3 rounded-full ${r.dot}`} />
-                    <p className="font-display font-bold text-foreground text-sm">{r.rule}</p>
-                  </div>
-                  <p className="text-sm text-foreground">{r.detail}</p>
-                </div>
-              ))}
-            </div>
+          {/* Image moved above the Detective section per request */}
+          <div className="rounded-xl border-4 border-slate-900 bg-amber-50/95 p-3 shadow-lg">
             <img
               src={plantDetectiveImg}
               alt="Be a Plant Detective poster — use your eyes not your hands, observe clues, ask a trusted adult, and wash up after playing"
-              className="w-full rounded-lg bg-background/60 object-contain mt-3"
+              className="w-full rounded-lg bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
 
-          <div className="bg-destructive/10 border-2 border-destructive/40 rounded-lg p-5 space-y-2">
-            <p className="font-display font-bold text-destructive text-base">The Golden Safety Rule</p>
+          <div className="bg-amber-50/95 border-4 border-slate-900 rounded-lg p-5 space-y-3 shadow">
+            <p className="font-display font-bold text-slate-900 text-lg">🕵️ Be a Plant Detective!</p>
             <p className="text-sm text-foreground">
-              Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
-              your <strong>mouth</strong>!
+              Tap each clue in your Detective's Notebook to uncover the rule:
             </p>
+            <DetectiveNotebook rules={DETECTIVE_RULES} />
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
+          <div className="grid gap-4 md:grid-cols-2 items-start">
+            <div className="space-y-3">
+              <div className="bg-destructive/10 border-4 border-destructive/60 rounded-lg p-5 space-y-2">
+                <p className="font-display font-bold text-destructive text-base">🏆 The Golden Safety Rule</p>
+                <p className="text-sm text-foreground">
+                  Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with
+                  your <strong>mouth</strong>!
+                </p>
+              </div>
+              <div className="bg-amber-50/95 border-2 border-amber-900 rounded-lg p-4 text-sm text-foreground shadow">
+                <p className="font-semibold text-slate-900 mb-1">Remember:</p>
+                <p>When in doubt — don't touch it, don't taste it, and ask a grown-up you trust.</p>
+              </div>
+            </div>
+            <div className="rounded-xl border-4 border-slate-900 bg-amber-50/95 p-3 shadow-lg">
+              <img
+                src={weedInvestigator2Img}
+                alt="Cartoon weed detective following clues toward an evidence lock-box"
+                className="w-full rounded-lg bg-background/60 object-contain"
+              />
+              <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border-4 border-slate-900 bg-amber-50/95 p-3 shadow-lg">
             <img
               src={weedInvestigatorImg}
               alt="Cartoon weed detective with a magnifying glass investigating clues underground"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <img
-              src={weedInvestigator2Img}
-              alt="Cartoon weed detective following clues toward an evidence lock-box"
-              className="w-full rounded-lg bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
           </div>
         </div>
       );
