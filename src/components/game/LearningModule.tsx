@@ -3965,11 +3965,12 @@ function TopicContent({
        THE 5 WEED-FIGHTING SUPERHEROES (K-5 Plant Explorer)
     ═══════════════════════════════════════════════════════════ */
     case "weed-superheroes": {
-      const HEROES = [
+      const HEROES: Hero[] = [
         {
           key: "pull",
           hero: "Pull It!",
           power: "Super Strength",
+          emoji: "💪",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
           how: "Remove weeds by hand or with tools like hoes and shovels — before they grow big or drop seeds.",
@@ -3980,6 +3981,7 @@ function TopicContent({
           key: "block",
           hero: "Block It!",
           power: "Force Field",
+          emoji: "🛡️",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
           how: "Cover the soil with mulch, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
@@ -3990,6 +3992,7 @@ function TopicContent({
           key: "outsmart",
           hero: "Outsmart It!",
           power: "Brain Power",
+          emoji: "🧠",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
           how: "Plant strong, healthy crops close together so they grow fast and leave no room for weeds to sneak in.",
@@ -4000,6 +4003,7 @@ function TopicContent({
           key: "eat",
           hero: "Eat It!",
           power: "Animal Allies",
+          emoji: "🐐",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           how: "Bring in helpers like goats, sheep, or bugs that love to munch on certain weeds.",
@@ -4010,6 +4014,7 @@ function TopicContent({
           key: "stop",
           hero: "Stop It!",
           power: "Precision Blast",
+          emoji: "💥",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           how: "Farmers carefully use special weed-control products called herbicides to stop weeds in large fields.",
@@ -4019,8 +4024,18 @@ function TopicContent({
       ];
 
       return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <div
+          className="space-y-5 p-5 rounded-2xl"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(100 50% 25%) 0%, hsl(28 45% 30%) 100%)",
+          }}
+        >
+          <div className="rounded-2xl bg-yellow-100 border-4 border-yellow-500 p-5 text-center shadow-lg">
+            <p className="font-display font-extrabold text-emerald-900 text-2xl">🦸 The Weed-Fighting Squad! 🦸‍♀️</p>
+            <p className="text-xs text-emerald-800 mt-1">Five heroes, five superpowers — assemble!</p>
+          </div>
+          <div className="bg-yellow-50/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-amber-700 shadow">
             <p className="font-display font-bold text-primary text-base">The Five Weed-Fighting Superpowers!</p>
             <p>
               Weeds may be tough, but farmers and gardeners have <strong>five weed-fighting superpowers</strong>
@@ -4034,40 +4049,9 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="rounded-lg border-2 border-primary/30 bg-gradient-to-b from-sky-100 to-emerald-100 p-4">
-            <img
-              src={weedSuperheroesImg}
-              alt="The Weed Control Squad — five weed-fighting heroes: Outsmart It, Pull It, Eat It, Block It, and Stop It"
-              className="w-full h-auto rounded-md bg-background/60 object-contain"
-            />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              Meet the Weed Control Squad — five heroes teaming up to keep crops healthy.
-            </p>
-          </div>
+          <HeroPicker heroes={HEROES} img={weedSuperheroesImg} />
 
-          <div className="space-y-4">
-            {HEROES.map((h) => (
-              <div key={h.key} className={`rounded-lg border-2 p-4 space-y-2 ${h.bg}`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`w-3 h-3 rounded-full ${h.dot}`} />
-                  <p className="font-display font-bold text-foreground text-base">{h.hero}</p>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background/70 text-muted-foreground">
-                    Power: {h.power}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground">
-                  <strong>How the power works:</strong> {h.how}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Best for:</strong> {h.bestFor}
-                </p>
-                <p className="text-xs text-muted-foreground italic">{h.reallife}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
+          <div className="bg-yellow-50/95 border-4 border-amber-700 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-success text-base">Assemble the Team!</p>
             <p className="text-sm text-foreground">
               Just like superheroes work together to save the day, farmers combine these five superpowers to
@@ -4076,7 +4060,7 @@ function TopicContent({
             </p>
           </div>
 
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
+          <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-primary mb-1">Remember the 5 Superpowers:</p>
             <p>Pull It • Block It • Outsmart It • Eat It • Stop It.</p>
           </div>
