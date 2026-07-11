@@ -138,7 +138,12 @@ export default function NameTheWeed({ onBack, gameId, gameName, gradeLabel }: Pr
           ))}
         </div>
         {submitted && (
-          <button onClick={showAnswer} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold mt-2">See Details →</button>
+          <div className="flex gap-3 mt-2">
+            <button onClick={showAnswer} className="px-6 py-3 rounded-lg border-2 border-primary text-primary font-bold hover:bg-primary/10">See Details</button>
+            <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+              {round + 1 < rounds.length ? 'Next →' : 'See Results'}
+            </button>
+          </div>
         )}
       </div>
       {/* History side panel */}
