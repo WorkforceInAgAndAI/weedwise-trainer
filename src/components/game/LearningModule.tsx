@@ -2425,17 +2425,21 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            {/* Intro */}
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Monocots vs. Dicots</p>
-              <p>
+            {/* Intro — Field Detective */}
+            <DetectiveCard title="Case File: Grass or Broadleaf?" badge="Case 02 · Plant Type">
+              <p className="text-sm">
                 These two groups of weeds are called <strong>monocots</strong> (thin, straight leaves) and{" "}
                 <strong>dicots</strong> (broad, wide leaves). Even though all plants might look similar at first, monocots
                 and dicots are different in a few important ways: their <strong>roots</strong>, their{" "}
                 <strong>leaves</strong>, how they <strong>move water and nutrients through their stems</strong>, the way
                 their <strong>flowers are organized</strong>, and their <strong>seed structure</strong>.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Clue: leaf veins" tone="clue" />
+                <EvidenceTag label="Clue: roots" tone="clue" />
+                <EvidenceTag label="Clue: seed leaves" tone="clue" />
+              </div>
+            </DetectiveCard>
 
             {/* Side-by-side example images */}
             <div className="grid grid-cols-2 gap-4">
@@ -2468,9 +2472,8 @@ function TopicContent({
             </div>
 
             {/* What the words mean */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">What do these words mean?</p>
-              <div className="grid grid-cols-2 gap-4 mt-3">
+            <CaseCallout heading="Decode the name">
+              <div className="grid grid-cols-2 gap-4 mt-1">
                 <div className="bg-card border border-border rounded-lg p-4 text-center space-y-1">
                   <p className="font-bold text-foreground text-lg">"Mono" = One</p>
                   <p className="text-xs text-muted-foreground">"Cot" = Cotyledon</p>
@@ -2482,18 +2485,14 @@ function TopicContent({
                   <p className="text-xs font-bold text-foreground mt-2">Dicot = TWO cotyledons</p>
                 </div>
               </div>
-              <div className="bg-secondary rounded-lg p-3 mt-3">
-                <p className="text-xs text-foreground">
+              <p className="text-xs text-foreground mt-3">
                   A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.
                 </p>
-              </div>
-              <div className="bg-secondary rounded-lg p-3">
-                <p className="text-xs text-foreground">
-                  As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
-                  plant looks like.
-                </p>
-              </div>
-            </div>
+              <p className="text-xs text-foreground mt-2">
+                As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
+                plant looks like.
+              </p>
+            </CaseCallout>
 
             {/* Detailed monocot section with scrollbar */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
@@ -2548,19 +2547,18 @@ function TopicContent({
         );
       }
 
-      // 6-8 and 9-12: existing content
+      // IPM Specialist 9-12 — Researcher's Notebook
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">Monocots vs Dicots</p>
-            <p className="text-xs text-foreground">
+          <NotebookSection title="Monocots vs Dicots" subtitle="Entry 02 · Plant Classification">
+            <p className="text-sm text-foreground">
               Plants can be grouped by similar characteristics and physical patterns. Plants are grouped into
               monocots and dicots based on how many <strong>cotyledons</strong> they have as seeds. Cotyledons are
               structures in seeds and seedlings that store nutrients to act as an energy source during germination.
               Cotyledons also become the first leaves of a plant. Differentiating monocots and dicots allow us to
               identify plants and better manage weeds.
             </p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-3">
               <div className="bg-card rounded-lg p-3 border border-border">
                 <p className="font-bold text-foreground">Monocots</p>
                 <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
@@ -2580,7 +2578,15 @@ function TopicContent({
                 </ul>
               </div>
             </div>
-          </div>
+            <FieldNote label="Why it matters">
+              Grass herbicides (ACCase inhibitors, Group 1) target monocots only. Confusing a broadleaf for a grass — or
+              vice versa — wastes a whole application and leaves the real target standing.
+            </FieldNote>
+            <SelfCheck
+              question="You spray a Group 1 grass herbicide on a field full of pigweed. What happens?"
+              answer="Almost nothing to the pigweed — dicots aren't controlled by Group 1. You've spent money and given the pigweed a head start."
+            />
+          </NotebookSection>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
             <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
