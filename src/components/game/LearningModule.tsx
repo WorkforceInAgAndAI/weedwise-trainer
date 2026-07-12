@@ -3657,17 +3657,22 @@ function TopicContent({
       // 6-8
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
-            <p>
-              Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
-              actually steal nutrients from other plants!
-            </p>
-            <p>
-              Weeds can be broadly categorized into three growth types based on where and how they obtain resources:
-              <strong> terrestrial, parasitic, and aquatic</strong>.
-            </p>
-          </div>
+          <NotebookSection title="Growth Types: Terrestrial, Aquatic, Parasitic" subtitle="Research Log · Resource Acquisition">
+            <div className="space-y-2 text-sm">
+              <p>
+                Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
+                actually steal nutrients from other plants!
+              </p>
+              <p>
+                Weeds can be broadly categorized into three growth types based on where and how they obtain resources:
+                <strong> terrestrial, parasitic, and aquatic</strong>.
+              </p>
+            </div>
+            <FieldNote label="Why it matters">
+              Growth type dictates the control tool. A parasitic weed like dodder can't be killed with a soil
+              herbicide targeting its host — you have to break the host connection.
+            </FieldNote>
+          </NotebookSection>
 
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
