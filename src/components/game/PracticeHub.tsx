@@ -121,6 +121,10 @@ const k5Games: GameDef[] = [
  { id: 'invasive-id', name: 'Invasive ID', Icon: MapPin, category: 'Origin', description: 'Is this plant native or invasive?', howToPlay: 'Given a weed, its origin, and where it was found, decide if it is native or invasive.', component: InvasiveID },
  { id: 'safe-vs-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are toxic?', howToPlay: 'A group of weeds appears — identify which one is toxic, learn why it is dangerous, then decide how to safely manage it.', component: SafeVsToxic },
  { id: 'weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'You are the agronomist — manage weeds in the field.', howToPlay: 'Weeds appear in a field. Click each, identify it, then choose the right control method.', component: WeedControl },
+];
+
+// True K-5 ("Explorer") games — this list is what the "Grades K-5" tab shows.
+const newK5Games: GameDef[] = [
  { id: 'great-garden-race', name: 'The Great Garden Race', Icon: Trophy, category: 'Growth & Competition', description: 'Pac-Man style race — grab sun, water, and nutrients before the weed does!', howToPlay: 'Use arrow keys (or the on-screen D-pad) to steer your flower through the maze. Collect Sun, Water, and Nutrient pellets before the weed reaches them. After each day, both plants grow — but the weed grows faster per resource, so out-race it!', component: GreatGardenRace },
 ];
 
@@ -189,7 +193,7 @@ export default function PracticeHub({
     setSelectedGrade(initialGrade);
     if (initialGameId) {
       const list =
-        initialGrade === 'k5' ? k5Games : initialGrade === '68' ? middleGames : initialGrade === '912' ? highGames : [];
+        initialGrade === 'newk5' ? newK5Games : initialGrade === 'k5' ? k5Games : initialGrade === '68' ? middleGames : initialGrade === '912' ? highGames : [];
       const found = list.find((g) => g.id === initialGameId);
       if (found) {
         setSelectedGame(found);
@@ -230,7 +234,7 @@ export default function PracticeHub({
  }
 
  const games =
-   selectedGrade === 'newk5' ? []
+    selectedGrade === 'newk5' ? newK5Games
    : selectedGrade === 'k5' ? k5Games
    : selectedGrade === '68' ? middleGames
    : selectedGrade === '912' ? highGames
@@ -298,7 +302,7 @@ export default function PracticeHub({
  <div className="grid gap-4 max-w-lg mx-auto mt-8">
  <h2 className="text-center text-muted-foreground mb-4 text-sm font-medium uppercase tracking-wider">Choose Your Level</h2>
  {[
- { id: 'newk5', label: 'Grades K-5', sub: 'Explorer', Icon: Leaf, count: 0, accent: 'grade-elementary' },
+  { id: 'newk5', label: 'Grades K-5', sub: 'Explorer', Icon: Leaf, count: newK5Games.length, accent: 'grade-elementary' },
  { id: 'k5', label: 'Grades 6-8', sub: 'Investigator', Icon: Microscope, count: 15, accent: 'grade-middle' },
  { id: '68', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: 17, accent: 'grade-high' },
  { id: '912', label: 'Collegiate', sub: 'Scholar', Icon: GraduationCap, count: 14, accent: 'grade-high' },
