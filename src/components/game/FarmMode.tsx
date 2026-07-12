@@ -381,6 +381,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  const [eventAnswer, setEventAnswer] = useState<string | null>(null);
  const [eventsAnswered, setEventsAnswered] = useState(0);
  const [eventsCorrect, setEventsCorrect] = useState(0);
+ const [envBanner, setEnvBanner] = useState<{ label: string; note: string } | null>(null);
 
  // Multi-step state
  const [selectedWeed, setSelectedWeed] = useState<FieldWeed | null>(null);
@@ -598,9 +599,16 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
  density: w.alive ? Math.min(w.density + Math.floor(Math.random() * 3), 20) : w.density,
  scouted: false, identified: false,
  })));
+ // Roll a seasonal environment event that mutates the field, then add
+ // any additional baseline flushes on top of that.
+ setFieldWeeds(prev => {
+  const rolled = rollEnvEvent(prev, nextSeason);
+  setEnvBanner({ label: rolled.eventLabel, note: rolled.note });
+  return rolled.weeds;
+ });
  if (nextSeason !== 'fall') {
- const extras = generateFieldWeeds(nextSeason, grade === 'elementary' ? 3 : 5);
- setFieldWeeds(prev => [...prev, ...extras]);
+  const extras = generateFieldWeeds(nextSeason, grade === 'elementary' ? 3 : 5);
+  setFieldWeeds(prev => [...prev, ...extras]);
  }
  const gradeEvents = ALL_EVENTS.filter(e => e.grades.includes(grade!) && e.season === nextSeason);
  if (gradeEvents.length > 0) {
