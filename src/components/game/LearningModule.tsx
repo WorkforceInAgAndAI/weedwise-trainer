@@ -5792,14 +5792,18 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Look-Alike Weeds</p>
-              <p>
+            <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
+              <p className="text-sm">
                 Some weeds look very similar to other weeds. It is important to tell them apart so we can manage them
                 the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look
                 alike — see if you can spot what makes each one different!
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Suspects: 2–4" tone="suspect" />
+                <EvidenceTag label="Match the clues" tone="clue" />
+                <EvidenceTag label="Call the verdict" tone="verdict" />
+              </div>
+            </DetectiveCard>
             <ElementaryLookAlikeGroups onSelectWeed={onSelectWeed} />
           </div>
         );
@@ -5807,10 +5811,9 @@ function TopicContent({
 
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">Look-Alike Species</p>
-            {grade === "middle" ? (
-              <>
+          {grade === "middle" ? (
+            <NotebookSection title="Look-Alike Species" subtitle="Entry 03 · Comparative ID">
+              <div className="text-sm space-y-3">
                 <p>
                   Have you ever looked out at a field or a lawn and thought all the weeds looked pretty much the same?
                   You're not alone — even farmers and scientists sometimes have to look twice. Many common weeds are
@@ -5832,9 +5835,20 @@ function TopicContent({
                   milky sap when you break it</strong> — telling these lookalikes apart becomes a lot easier than it
                   sounds.
                 </p>
-              </>
-            ) : (
-              <>
+              </div>
+              <FieldNote label="Hypothesis">
+                A single stage-photo is not enough — compare seedling, vegetative, and reproductive stages before you
+                commit to an ID.
+              </FieldNote>
+              <SelfCheck
+                question="Why is Waterhemp vs. Palmer Amaranth a high-stakes ID call?"
+                answer="Both spread fast and resist multiple herbicide groups, but Palmer is more aggressive and demands zero-tolerance control — the wrong call can cost most of a field's yield."
+              />
+            </NotebookSection>
+          ) : (
+            <>
+              <JournalHeader title="Comparative Morphology of Confused Species" subtitle="Lab Journal · Module 03" />
+              <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
                 <p>
                   In a soybean or corn field, two species that look nearly identical at the seedling stage can demand
                   completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a textbook
@@ -5861,9 +5875,20 @@ function TopicContent({
                   use the side-by-side layout to build a mental key based on the features that actually distinguish
                   them.
                 </p>
-              </>
-            )}
-          </div>
+              </div>
+              <TermSidebar terms={[
+                { term: "Pubescence", def: "The presence, type, and density of hairs (trichomes) on stems and leaves." },
+                { term: "Ocrea", def: "A sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds/knotweeds." },
+                { term: "Ligule / Auricle", def: "Grass features at the leaf-blade / sheath junction; often the most reliable ID character for grasses." },
+                { term: "Inflorescence", def: "The arrangement of flowers on the stem (spike, panicle, umbel, raceme)." },
+                { term: "Dioecious", def: "Male and female flowers on separate plants — key trait separating Amaranthus species." },
+              ]} />
+              <LabCallout heading="Diagnostic Protocol">
+                Compare specimens at <strong>at least two life stages</strong>, verify with a genus-level key before
+                naming to species, and record which character was decisive — future you will need that note.
+              </LabCallout>
+            </>
+          )}
 
           {/* 3-species look-alike groups — primary content for 6-8 and 9-12 */}
           {lookAlikeGroups.length > 0 && (
