@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { DollarSign, Briefcase, Search, Target } from 'lucide-react';
+import { DollarSign, Search, Target, Fingerprint, FileSearch } from 'lucide-react';
 import WeedImage from '@/components/game/WeedImage';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
@@ -173,20 +173,24 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
 
   if (showIntro) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center">
-        <Briefcase className="w-14 h-14 text-primary mb-4" />
-        <h2 className="text-2xl font-bold text-foreground mb-3">Welcome, Field Scout!</h2>
-        <p className="text-muted-foreground max-w-md mb-2">
-          Local farmers have hired you to scout their fields for weeds. Your job is to choose the best scouting pattern for each field so you can find as many weeds as possible.
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 z-50 flex flex-col items-center justify-center p-6 text-center">
+        <div className="relative mb-4">
+          <Fingerprint className="w-16 h-16 text-emerald-400" />
+          <FileSearch className="w-6 h-6 text-amber-300 absolute -bottom-1 -right-1" />
+        </div>
+        <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-amber-300 mb-1">Case File Opened</p>
+        <h2 className="text-2xl font-bold text-white mb-3">Field Detective</h2>
+        <p className="text-emerald-100/80 max-w-md mb-2">
+          A farmer just called: something is stealing yield from their fields. Your job — read the crime scene, pick the right search route, and catch the culprits.
         </p>
-        <p className="text-muted-foreground max-w-md mb-2">
-          You'll earn <span className="font-bold text-primary">${CORRECT_PAY}</span> for choosing the best pattern and <span className="font-bold text-muted-foreground">${WRONG_PAY}</span> for a less effective choice.
+        <p className="text-emerald-100/80 max-w-md mb-2">
+          Solve the case: <span className="font-bold text-amber-300">${CORRECT_PAY}</span> reward for the right route, <span className="font-bold text-white/60">${WRONG_PAY}</span> if you miss suspects.
         </p>
-        <p className="text-muted-foreground max-w-md mb-6">
-          Scout {TOTAL_ROUNDS} fields and earn as much as you can!
+        <p className="text-emerald-100/60 max-w-md mb-6 text-sm">
+          {TOTAL_ROUNDS} case files. Crack them all.
         </p>
-        <button onClick={() => setShowIntro(false)} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-          Start Scouting
+        <button onClick={() => setShowIntro(false)} className="px-8 py-3 rounded-lg bg-amber-400 text-slate-900 font-bold hover:bg-amber-300 transition-colors">
+          Open First Case →
         </button>
       </div>
     );
@@ -195,12 +199,13 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
   if (finished) {
     const maxMoney = TOTAL_ROUNDS * CORRECT_PAY;
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center">
-        <DollarSign className="w-12 h-12 text-primary mb-3" />
-        <h2 className="text-2xl font-bold text-foreground mb-2">Scouting Season Complete!</h2>
-        <p className="text-lg text-foreground mb-1">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
-        <p className="text-2xl font-bold text-primary mb-2">${money} earned</p>
-        <p className="text-sm text-muted-foreground mb-6">Out of a possible ${maxMoney}</p>
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 z-50 flex flex-col items-center justify-center p-6 text-center">
+        <Fingerprint className="w-12 h-12 text-amber-300 mb-3" />
+        <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-amber-300 mb-1">Case Closed</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Detective's Report</h2>
+        <p className="text-lg text-emerald-100 mb-1">{score}/{TOTAL_ROUNDS} cases cracked</p>
+        <p className="text-2xl font-bold text-amber-300 mb-2">${money} reward</p>
+        <p className="text-sm text-emerald-100/60 mb-6">Out of ${maxMoney} possible</p>
         <LevelComplete level={level} score={score} total={TOTAL_ROUNDS} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
@@ -209,23 +214,25 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
   const isCorrect = chosen === field.bestPattern;
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
-      <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
-        <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Field Scout</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
-        <div className="flex items-center gap-1 text-primary font-bold text-sm">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b-2 border-amber-400/30 bg-slate-950/70 backdrop-blur">
+        <button onClick={onBack} className="text-emerald-100/70 hover:text-white text-xl">←</button>
+        <Fingerprint className="w-5 h-5 text-amber-300" />
+        <h1 className="font-bold text-white text-lg flex-1">Field Detective</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-bold ml-auto">Lv.{level}</span>
+        <div className="flex items-center gap-1 text-amber-300 font-bold text-sm">
           <DollarSign className="w-4 h-4" />
           {money}
         </div>
-        <span className="text-sm text-muted-foreground ml-2">Field {round + 1}/{TOTAL_ROUNDS}</span>
+        <span className="text-sm text-emerald-100/70 ml-2">Case {round + 1}/{TOTAL_ROUNDS}</span>
       </div>
       <div className="flex-1 overflow-hidden p-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 h-full">
           {/* LEFT: field image */}
-          <div className="relative rounded-xl border-2 border-border overflow-hidden min-h-[300px]">
+          <div className="relative rounded-xl border-2 border-amber-400/40 overflow-hidden min-h-[300px] shadow-[0_0_40px_-10px] shadow-amber-400/20">
             <img src={cropImg} alt="Aerial field view" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/10" />
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute top-2 left-2 px-2 py-1 rounded bg-slate-950/80 border border-amber-400/40 text-[10px] uppercase tracking-widest font-bold text-amber-300">Crime Scene</div>
             {weedSpots.map((spot, i) => (
               <div key={i} className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-md overflow-hidden" style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%,-50%)' }}>
                 <WeedImage weedId={spot.weedId} stage="flower" className="w-full h-full object-cover" />
@@ -243,60 +250,60 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
 
           {/* RIGHT: side panel — description, methods, results */}
           <div className="overflow-y-auto pr-1 space-y-3">
-            <div className="rounded-xl border-2 border-border bg-card p-3">
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Field Description</p>
-              <p className="text-sm text-foreground font-medium">{field.label}</p>
-              <p className="text-xs text-muted-foreground mt-1">Crop: <span className="font-semibold capitalize">{field.crop}</span></p>
+            <div className="rounded-xl border-2 border-amber-400/40 bg-slate-950/70 p-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-300 mb-1">Case Brief</p>
+              <p className="text-sm text-emerald-50 font-medium">{field.label}</p>
+              <p className="text-xs text-emerald-100/60 mt-1">Crop: <span className="font-semibold capitalize text-emerald-100">{field.crop}</span></p>
             </div>
 
             <div>
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2">Pick a scouting pattern</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-300 mb-2">Choose your search route</p>
               <div className="space-y-2">
                 {PATTERNS.map(p => (
                   <button key={p.id} onClick={() => select(p.id)} disabled={done || scouting}
                     className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
-                      done ? (p.id === field.bestPattern ? 'border-green-500 bg-green-500/10' : p.id === chosen ? 'border-destructive bg-destructive/10' : 'border-border bg-card opacity-60')
-                      : chosen === p.id ? 'border-primary bg-primary/10 ring-2 ring-primary/30' : 'border-border bg-card hover:border-primary/50'
+                      done ? (p.id === field.bestPattern ? 'border-emerald-400 bg-emerald-400/15' : p.id === chosen ? 'border-red-500 bg-red-500/15' : 'border-slate-700 bg-slate-900/60 opacity-50')
+                      : chosen === p.id ? 'border-amber-400 bg-amber-400/10 ring-2 ring-amber-400/30' : 'border-slate-700 bg-slate-900/60 hover:border-amber-400/50'
                     }`}>
-                    <span className="font-bold text-sm text-foreground">{p.name}</span>
-                    <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
+                    <span className="font-bold text-sm text-white">{p.name}</span>
+                    <p className="text-xs text-emerald-100/70 mt-1">{p.desc}</p>
                   </button>
                 ))}
               </div>
             </div>
 
             {!done && chosen && !scouting && (
-              <button onClick={scout} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Scout the Field</button>
+              <button onClick={scout} className="w-full py-3 rounded-lg bg-amber-400 text-slate-900 font-bold hover:bg-amber-300 transition-colors">Investigate →</button>
             )}
-            {scouting && <p className="text-center text-primary font-bold animate-pulse">Scouting in progress...</p>}
+            {scouting && <p className="text-center text-amber-300 font-bold animate-pulse">Investigating scene...</p>}
 
             {done && (
-              <div className={`rounded-xl border-2 p-4 ${isCorrect ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
+              <div className={`rounded-xl border-2 p-4 ${isCorrect ? 'border-emerald-400 bg-emerald-400/10' : 'border-red-500/60 bg-red-500/10'}`}>
                 {/* Money — large and prominent */}
                 <div className="flex items-baseline justify-between mb-2">
-                  <span className="text-xs uppercase tracking-wider font-bold text-muted-foreground">You earned</span>
-                  <span className={`text-3xl font-extrabold ${isCorrect ? 'text-green-600' : 'text-amber-600'}`}>+${isCorrect ? CORRECT_PAY : WRONG_PAY}</span>
+                  <span className="text-xs uppercase tracking-[0.2em] font-bold text-amber-300">Reward</span>
+                  <span className={`text-3xl font-extrabold ${isCorrect ? 'text-emerald-300' : 'text-amber-300'}`}>+${isCorrect ? CORRECT_PAY : WRONG_PAY}</span>
                 </div>
 
                 {/* Weeds found vs optimal */}
-                <div className="bg-background/60 rounded-lg p-2 mb-2">
+                <div className="bg-slate-950/60 rounded-lg p-2 mb-2 border border-slate-700">
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="flex items-center gap-1 text-foreground"><Search className="w-3 h-3" /> Weeds you found</span>
-                    <span className="font-bold text-foreground">{weedsFound}</span>
+                    <span className="flex items-center gap-1 text-emerald-100"><Search className="w-3 h-3" /> Suspects caught</span>
+                    <span className="font-bold text-white">{weedsFound}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1 text-muted-foreground"><Target className="w-3 h-3" /> Optimal pattern would find</span>
-                    <span className="font-bold text-green-600">{field.weedCount}</span>
+                    <span className="flex items-center gap-1 text-emerald-100/60"><Target className="w-3 h-3" /> Total on scene</span>
+                    <span className="font-bold text-emerald-300">{field.weedCount}</span>
                   </div>
                   {!isCorrect && (
-                    <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-2 font-semibold">
-                      You missed {field.weedCount - weedsFound} weeds! Best pattern: {PATTERNS.find(p => p.id === field.bestPattern)?.name}
+                    <p className="text-[11px] text-amber-300 mt-2 font-semibold">
+                      {field.weedCount - weedsFound} suspects escaped. Best route: {PATTERNS.find(p => p.id === field.bestPattern)?.name}
                     </p>
                   )}
                 </div>
 
-                <p className="text-xs text-muted-foreground mb-3">{field.note}</p>
-                <button onClick={next} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">Next Field →</button>
+                <p className="text-xs text-emerald-100/70 mb-3 italic">Detective's note: {field.note}</p>
+                <button onClick={next} className="w-full py-2.5 rounded-lg bg-amber-400 text-slate-900 font-bold text-sm hover:bg-amber-300 transition-colors">Next Case →</button>
               </div>
             )}
           </div>
