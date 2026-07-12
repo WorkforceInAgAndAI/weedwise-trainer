@@ -3583,14 +3583,18 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
-              <p>
+            <DetectiveCard title="Case File: Land, Water, or Freeloader?" badge="Case 06 · Growth Types">
+              <p className="text-sm">
                 Different weeds need different things to live. We sort weeds into three groups based on how and
                 where they get what they need: <strong>terrestrial</strong> (on land), <strong>aquatic</strong>
                 (in water), and <strong>parasitic</strong> (taking food from other plants).
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Terrestrial · Soil" tone="clue" />
+                <EvidenceTag label="Aquatic · Water" tone="clue" />
+                <EvidenceTag label="Parasitic · Steals food" tone="suspect" />
+              </div>
+            </DetectiveCard>
 
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">
