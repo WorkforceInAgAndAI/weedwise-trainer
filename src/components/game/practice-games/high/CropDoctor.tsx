@@ -16,6 +16,17 @@ function injuryTypeForCrop(crop: string): 'br' | 'gr' {
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+/**
+ * Reject option sets where a distractor shares the same WSSA group as the
+ * correct answer — the injury photo is keyed by group, so two same-group
+ * options make the photo evidence ambiguous.
+ */
+function dedupeOptionsByGroup(correct: string, options: string[]): string[] {
+ const correctGroup = extractGroup(correct);
+ if (correctGroup == null) return options;
+ return options.filter(o => o === correct || extractGroup(o) !== correctGroup);
+}
+
 const CORN_CASES = [
  { crop: 'Corn', symptom: 'Onion-leafing, roots wrapped around coleoptile, brace root malformation', correct: '2,4-D (Group 4)', options: ['2,4-D (Group 4)', 'Mesotrione (Group 27)', 'S-metolachlor (Group 15)', 'Pendimethalin (Group 3)'], treatment: 'No treatment available. Avoid Group 4 applications near corn emergence windows.', reward: 500 },
  { crop: 'Corn', symptom: 'Yellowing between veins on newest leaves, white leaf midribs, stunted growth', correct: 'Mesotrione (Group 27)', options: ['Mesotrione (Group 27)', '2,4-D (Group 4)', 'Acetochlor (Group 15)', 'Isoxaflutole (Group 27)'], treatment: 'Irrigate to dilute, apply foliar micronutrients. Plants usually recover within 2 weeks.', reward: 450 },
@@ -48,7 +59,13 @@ const ALL_CASES = [...CORN_CASES, ...SOYBEAN_CASES];
 export default function CropDoctor({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
- const rounds = useMemo(() => shuffle(ALL_CASES).slice(0, 8).map(c => ({ ...c, options: shuffle(c.options) })), [level]);
+ const rounds = useMemo(
+  () => shuffle(ALL_CASES).slice(0, 8).map(c => ({
+   ...c,
+   options: shuffle(dedupeOptionsByGroup(c.correct, c.options)),
+  })),
+  [level]
+ );
  const [idx, setIdx] = useState(0);
  const [picked, setPicked] = useState<string | null>(null);
  const [answered, setAnswered] = useState(false);
@@ -124,6 +141,14 @@ export default function CropDoctor({ onBack }: { onBack: () => void }) {
       ) : null;
      })()}
      <p className="text-sm text-foreground font-medium">Symptom: {c.symptom}</p>
+     {(() => {
+      const g = extractGroup(c.correct);
+      return g ? (
+       <p className="text-[11px] text-muted-foreground mt-1 italic">
+        Photo shows injury typical of WSSA Group {g} on {c.crop.toLowerCase()}.
+       </p>
+      ) : null;
+     })()}
     </div>
     <p className="text-sm text-muted-foreground text-center mb-3">Which herbicide likely caused this injury?</p>
     <div className="grid gap-2">
