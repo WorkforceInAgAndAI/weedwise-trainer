@@ -127,6 +127,59 @@ function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
   );
 }
 
+// Perennial species with underground reproductive structure (rhizome, taproot,
+// tuber, stolon, bulb, corm) photos. Used inside the Life Cycles topic to show
+// how perennials overwinter and spread below the soil surface.
+const PERENNIAL_UNDERGROUND_PHOTOS: { id: string; name: string; structure: string }[] = [
+  { id: "canada-thistle", name: "Canada Thistle", structure: "Creeping roots" },
+  { id: "common_Milkweed", name: "Common Milkweed", structure: "Rhizome" },
+  { id: "commonPokeweed", name: "Common Pokeweed", structure: "Taproot" },
+  { id: "Curly_dock", name: "Curly Dock", structure: "Taproot" },
+  { id: "Dandelion", name: "Dandelion", structure: "Taproot" },
+  { id: "Field_bindweed", name: "Field Bindweed", structure: "Creeping roots" },
+  { id: "Field_Horsetail", name: "Field Horsetail", structure: "Rhizome" },
+  { id: "Foxtail_barley", name: "Foxtail Barley", structure: "Tufted crown" },
+  { id: "golden-alexanders", name: "Golden Alexanders", structure: "Fibrous roots" },
+  { id: "Ground_ivy", name: "Ground Ivy", structure: "Stolons" },
+];
+
+function PerennialUndergroundComparison({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="mt-2 rounded-lg border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 space-y-3">
+      <div className="text-xs font-bold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">
+        Above vs. Below Ground — Real Perennials
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Perennials survive winter by storing energy in <strong>underground structures</strong> — rhizomes, taproots,
+        tubers, stolons, or creeping roots. Cutting the tops doesn't kill the plant; it regrows from these
+        overwintering parts each spring.
+      </p>
+      <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+        {PERENNIAL_UNDERGROUND_PHOTOS.map((w) => (
+          <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
+            <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
+            <div className="grid grid-cols-2">
+              <div className="relative aspect-square bg-muted">
+                <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">
+                  Above ground
+                </span>
+              </div>
+              <div className="relative aspect-square bg-muted">
+                <WeedImage weedId={w.id} stage="underground" className="w-full h-full object-cover" />
+                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white">
+                  Below ground
+                </span>
+              </div>
+            </div>
+            <p className="text-[10px] text-muted-foreground text-center px-2 py-1 italic">{w.structure}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Friendly, K-5 seed descriptions inferred from species traits.
 function getElementarySeedDescription(w: Weed): string {
   const name = w.commonName.toLowerCase();
@@ -2642,6 +2695,7 @@ function TopicContent({
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
               <HorizontalWeedRow weeds={perennials} onSelectWeed={onSelectWeed} stage="flower" />
+              <PerennialUndergroundComparison compact />
             </div>
           </div>
         );
@@ -2756,6 +2810,7 @@ function TopicContent({
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">Examples: Dandelion, curly dock, and Canada thistle.</p>
+            <PerennialUndergroundComparison />
             </div>
 
             {/* Dual lifecycle */}
@@ -2899,6 +2954,7 @@ function TopicContent({
                 </div>
               ))}
             </div>
+            <PerennialUndergroundComparison />
           </div>
         </div>
       );
