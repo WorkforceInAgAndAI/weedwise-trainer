@@ -5483,10 +5483,11 @@ function TopicContent({
       if (viewMode === "box") {
         return (
           <div className="space-y-4">
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-              <p className="font-semibold text-primary mb-2">Plant Families</p>
-              <p>Click a family tile to learn about its characteristics and see its species.</p>
-            </div>
+            <JournalHeader title="Plant Families of the Midwest Weed Flora" subtitle="Comparative Morphology" />
+            <LabCallout heading="Protocol">
+              Click a family tile to review its diagnostic characters (floral formula, inflorescence type,
+              leaf arrangement) and the member species represented in this dataset.
+            </LabCallout>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from(famGroups.entries())
                 .sort()
@@ -5512,13 +5513,20 @@ function TopicContent({
 
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-2">Plant Families</p>
-            <p>
-              Plants in the same family share key characteristics like flower structure, leaf arrangement, and seed
-              type.
-            </p>
-          </div>
+          <JournalHeader title="Plant Families of the Midwest Weed Flora" subtitle="Comparative Morphology" />
+          <LabCallout heading="Concept">
+            Family-level classification is anchored in shared reproductive morphology — floral structure,
+            inflorescence architecture, and fruit type — which typically correlates with predictable
+            herbicide sensitivity within the family.
+          </LabCallout>
+          <TermSidebar
+            terms={[
+              { term: "Inflorescence", def: "The arrangement of flowers on a plant (raceme, umbel, head, spike)." },
+              { term: "Floral formula", def: "Shorthand encoding of sepals, petals, stamens, carpels." },
+              { term: "Ocrea", def: "Papery sheath at nodes — diagnostic for Polygonaceae." },
+              { term: "Involucre", def: "Whorl of bracts subtending a head — diagnostic for Asteraceae." },
+            ]}
+          />
           {Array.from(famGroups.entries())
             .sort()
             .map(([family, members]) => (
@@ -7121,10 +7129,9 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Taxonomy</p>
-            {grade === "middle" ? (
-              <>
+          {grade === "middle" ? (
+            <NotebookSection title="Taxonomy: How Scientists Organize Life" subtitle="Research Log · Classification">
+              <div className="space-y-3 text-sm">
                 <p>
                   Taxonomy is the system scientists use to organize and name every living thing on Earth — like a giant
                   filing system for nature.
@@ -7140,20 +7147,35 @@ function TopicContent({
                   Every weed species is assigned a two-part scientific name, known as a <strong>binomial</strong>,
                   consisting of its genus and species, which remains consistent across all languages and regions.
                 </p>
-                <p>
-                  A working knowledge of plant taxonomy also helps identify{" "}
-                  <strong>patterns among related weed species</strong>, which can inform predictions about shared
-                  biological behaviors, habitat preferences, and herbicide sensitivities.
-                </p>
-              </>
-            ) : (
-              <p>
-                Taxonomy is the scientific discipline of classifying organisms into a hierarchical system.
-                Understanding taxonomy helps predict weed behavior, herbicide response, and management strategies
-                based on evolutionary relationships.
-              </p>
-            )}
-          </div>
+                <FieldNote label="Why it matters">
+                  Knowing a weed's family often predicts <strong>how it will respond to control</strong> — species in
+                  the same family often share herbicide sensitivities, growth habits, and seasonal timing.
+                </FieldNote>
+                <SelfCheck
+                  question="Two weeds share a genus. What can you reasonably predict about them?"
+                  answer="They likely share flower structure, similar growth habits, and often similar herbicide responses — though field ID may still require checking a diagnostic trait like ligule, leaf shape, or ocrea."
+                />
+              </div>
+            </NotebookSection>
+          ) : (
+            <>
+              <JournalHeader title="Systematic Classification" subtitle="Taxonomy & Nomenclature" />
+              <LabCallout heading="Concept">
+                Taxonomy is the hierarchical classification of organisms based on shared morphology and phylogeny.
+                In weed science, taxonomic relationships predict herbicide response, allelopathic potential,
+                pollination biology, and dormancy behavior.
+              </LabCallout>
+              <TermSidebar
+                terms={[
+                  { term: "Binomial", def: "Two-part Latin name (Genus + specific epithet), italicized, with genus capitalized." },
+                  { term: "Authority", def: "Author who first validly published the name (e.g., 'L.' for Linnaeus)." },
+                  { term: "Synonymy", def: "Alternate names for the same taxon resulting from taxonomic revision." },
+                  { term: "Type specimen", def: "The preserved reference specimen that anchors a species name." },
+                ]}
+              />
+              <Citation>Judd WS et al. Plant Systematics: A Phylogenetic Approach. Sinauer Associates.</Citation>
+            </>
+          )}
 
           {/* Taxonomy pyramid with worked example */}
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
@@ -7226,13 +7248,15 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Dioecious Weeds</p>
+          <JournalHeader title="Dioecy in Weed Biology" subtitle="Reproductive Strategy" />
+          <LabCallout heading="Definition">
             <p>
               Dioecious weeds are plants that have distinct <strong>female and male individual plants</strong>. This
               means some plants have female flowers while other plants have male flowers, unlike monoecious plants,
               which have both male and female flowers on the same plant.
             </p>
+          </LabCallout>
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
             <p>
               Reproduction is <strong>impossible without both sexes</strong>. A dioecious weed population requires
               female and male plants in <strong>close proximity</strong> — pollen from a male must reach a female for
@@ -7246,6 +7270,20 @@ function TopicContent({
               herbicides.
             </p>
           </div>
+          <TermSidebar
+            terms={[
+              { term: "Dioecious", def: "Male and female flowers on separate individuals (Greek: 'two houses')." },
+              { term: "Monoecious", def: "Male and female flowers on the same individual." },
+              { term: "Obligate outcrossing", def: "Reproduction requires two individuals — maximizes recombination." },
+              { term: "Effective population", def: "Number of individuals contributing genes to the next generation." },
+            ]}
+          />
+          <LabCallout heading="Management implication">
+            Obligate outcrossing drives rapid herbicide-resistance evolution in Palmer amaranth and waterhemp.
+            Diversify modes of action, use overlapping residuals, and prevent seed production — a single escaped
+            female can reseed a field.
+          </LabCallout>
+          <Citation>Ward SM, Webster TM, Steckel LE. Palmer amaranth (Amaranthus palmeri): a review. Weed Technology.</Citation>
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">In this group of 88 weeds, there are 4 dioecious species:</p>
