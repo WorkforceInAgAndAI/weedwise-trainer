@@ -83,6 +83,10 @@ const BIENNIAL_YEAR_PHOTOS: { id: string; name: string }[] = [
   { id: "Common_teasel", name: "Common Teasel" },
   { id: "Garlic_mustard", name: "Garlic Mustard" },
   { id: "caraway", name: "Caraway" },
+  { id: "poison-hemlock", name: "Poison Hemlock" },
+  { id: "Wild_Carrot", name: "Wild Carrot" },
+  { id: "wild-parsnip", name: "Wild Parsnip" },
+  { id: "yellow_Rocket", name: "Yellow Rocket" },
 ];
 
 function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
