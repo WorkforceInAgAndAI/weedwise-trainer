@@ -3248,14 +3248,23 @@ function TopicContent({
 
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Habitats</p>
-              <p>
+            <DetectiveCard title="Case File: Where Do Weeds Hide?" badge="Case 05 · Habitats">
+              <p className="text-sm">
                 A <strong>habitat</strong> is the kind of place where a plant likes to live. Some weeds love hot
                 sunny spots, others like cool or wet places. Knowing where a weed likes to grow helps us guess where
                 we will find it.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Sun · Warm" tone="clue" />
+                <EvidenceTag label="Cool · Damp" tone="clue" />
+                <EvidenceTag label="Wet · Ditch" tone="suspect" />
+                <EvidenceTag label="Dry · Roadside" tone="suspect" />
+              </div>
+              <CaseCallout heading="Detective Tip">
+                A weed's favorite habitat is its fingerprint. Find <strong>yellow nutsedge</strong> and you've
+                spotted a wet, poorly-drained corner of the field.
+              </CaseCallout>
+            </DetectiveCard>
 
             {/* Climate map */}
             <div className="bg-card border border-border rounded-xl p-5 space-y-3">
