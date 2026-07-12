@@ -1,51 +1,60 @@
-## Goal
+# Batch Update Plan
 
-Rewrite the 6-8, 9-12, and Collegiate learning-module content in `src/components/game/LearningModule.tsx` to be more engaging, easier to read (7th-grade level for middle school), and themed per age group. Practice-game files are NOT touched.
+Splitting your list into **A) Gameplay redesigns** (bigger) and **B) Quick data/image fixes** (small, do first).
 
-## Themes (locked, applied consistently across all topics for that grade)
+---
 
-- **6-8 "Field Detective"** — case-file cards, evidence tags, "clue / suspect / verdict" framing, playful but not childish. Warm accent color, rounded cards, magnifier/fingerprint iconography.
-- **9-12 "Researcher's Notebook"** — annotated field-log look, tabbed sections, ruled-paper accents, hypothesis/finding callouts, quick self-check boxes.
-- **Collegiate "Diagnostic Key / Lab Journal"** — clean scientific layout, dichotomous couplet framing, sidebar terminology definitions, citations/references pulled forward.
+## B. Quick fixes (fast, low risk — do first)
 
-## Batches (one shipped per turn, in this order)
+1. **Rename "Smooth Witchgrass" → "Fall Panicum"** across `src/data/weeds.ts`, `gradeWeeds.ts`, glossary, and any hardcoded string references. Keep the same image folder or rename the folder mapping in `imageMap.ts`.
+2. **Waterhemp habitat fix** — remove "aquatic" classification in weed data; reclassify to disturbed/row-crop habitat.
+3. **Asiatic Dayflower ligule photo** — remove ligule reference/photo (dayflower is a dicot-like monocot without a grass ligule). Fix in image references + LiguleLens game options.
+4. **K-5 LifeStagesSequence arrows** — flip arrow direction (or flip card order) so arrow points from earlier → later stage matching the visual flow.
+5. **Taxonomy Tower reproductive photos** — change `stage="flower"` (already flower in HS version) → force `stage="flower"` or `stage="seed"` reproductive-only in K-5 and Middle versions too; confirm HS is already correct.
 
-### Batch 1 — Shared theme scaffolding
-Add three small reusable presentational components at the top of `LearningModule.tsx` (or a sibling file):
-- `<DetectiveCard>`, `<EvidenceTag>`, `<CaseCallout>` — 6-8
-- `<NotebookSection>`, `<FieldNote>`, `<SelfCheck>` — 9-12
-- `<KeyCouplet>`, `<TermSidebar>`, `<LabCallout>` — Collegiate
+---
 
-Uses only existing semantic tokens + Lucide icons (no emojis, no purple).
+## A. Gameplay redesigns
 
-### Batch 2 — Identification / Names & ID (all three grades)
-Rewrite intro copy + wrap existing photo comparisons (biennial rosette↔shoot, perennial above/below ground — already cleaned) in the themed components. 6-8 copy dropped to ~7th-grade reading level.
+### 1. Farm Mode / Play — realistic weed spread + seasonal events
+- Replace random one-off weed dots with **cluster/patch generation**: pick 2–4 "colonizer" weeds per field, seed 5–15 spots per cluster with jittered positions to look like real patches.
+- Add a **season event system**: on each season tick, roll from `{Heavy Rain, Drought, Seed Bank Flush, Wind Dispersal, Neighboring Field Escape, Cold Snap}`. Each event mutates the field (adds patches, kills seedlings, shifts species mix) and shows a toast/banner.
+- Store spread as `patches: {weedId, centerX, centerY, radius, density}[]` instead of individual dots.
 
-### Batch 3 — Life Cycle (all three grades)
-Rewrite the Life Cycle sections with themed stage cards. 9-12 adds "why it matters for control" self-check. Collegiate adds phenology terminology sidebar.
+### 2. Life Cycle Matching → "Pasture Walk" mode
+- Add **energy meter (100) and step budget** at top.
+- Player clicks/taps weeds across a pasture view; each visit costs energy proportional to distance from current position.
+- Player must decide **spray now vs skip / spray later** based on life stage shown — wrong-stage sprays waste herbicide.
+- Score = (weeds correctly treated) − (wasted herbicide) − (energy overrun penalty).
 
-### Batch 4 — Native vs Introduced (9-12 + Collegiate focus, plus 6-8 polish)
-Add per-species origin context: **where** it came from (region), **when/how** it was introduced (ballast, ornamental trade, contaminated seed, etc.), and **why it spread**. 6-8 gets a lighter "passport" version. Data sourced from existing `weeds.ts` `origin` field, extended with new short origin-story strings pulled from standard invasive-species references.
+### 3. Field Scouting — draw-your-own transect
+- Replace preset pattern picker with a **drag-to-draw path** on a field canvas.
+- Constraints: **max path length** (e.g., 400 units) and **limited herbicide charges** (e.g., 8 sprays).
+- Scoring is **dual-objective**:
+  - **Coverage score**: total weeds intersected by scouting radius
+  - **Diversity score**: unique species discovered / total species in field
+- Final grade combines both, so a straight line through one hotspot loses to a smart W/zigzag hitting multiple patches.
 
-### Batch 5 — Look-Alikes stage cycler
-Add an arrow-through-stages viewer showing **Seedling** and **Flower/Reproductive** side-by-side for each look-alike pair (per your earlier selection). Applies across all three grades with theme-appropriate framing.
+### 4. Herbicide injury photos ↔ game options alignment
+- Audit `src/data/herbicides.ts` and the injury-photo mapping used in `CropDoctor` / `HerbicideApplicator` / `HerbicideResistor`.
+- Photos are currently keyed by WSSA group; game answer options are specific active ingredients. **Fix**: either
+  - (a) change game options to **group names** so they match photo keys, OR
+  - (b) add a chem→group lookup and pick photos via the group of the shown chem.
+- Recommend **(b)** so quiz text stays specific but images resolve correctly.
 
-### Batch 6 — Field Scouting / Control (6-8, 9-12, Collegiate)
-Rewrite scouting-pattern and control content with themes. 6-8 = "detective's route". 9-12 = notebook decision tree. Collegiate = diagnostic key + IPM decision matrix.
-
-## What I will NOT do without asking
-
-- Change any practice-game file
-- Introduce new colors outside the design tokens
-- Add emojis or AI-generated imagery
-- Modify weed data schema (only additive origin-story strings)
+---
 
 ## Technical notes
 
-- Edits are surgical patches to `LearningModule.tsx` sections — not a full rewrite of the file.
-- After each batch I'll verify the build compiles.
-- Reading level for 6-8 copy targeted at Flesch-Kincaid grade ~7 (short sentences, concrete verbs, define jargon in-line).
+- Farm patches: extend `FarmMode.tsx` state shape; add `src/data/seasonalEvents.ts`.
+- Pasture Walk: new file `src/components/game/practice-games/{grade}/PastureWalk.tsx`, replace existing LifeCycleMatching entries in each grade's PracticeHub.
+- Field Scouting draw: use `<canvas>` + pointer events; new file per grade under `practice-games/*/FieldScoutDraw.tsx`, retire old pattern picker.
+- Herbicide alignment: single helper `src/lib/herbicideInjury.ts` exporting `getInjuryImage(chemId | groupId)`.
 
-## Confirm before I start
+---
 
-Reply **"go batch 1"** to begin with the shared theme components, or tell me to reorder / skip batches.
+## Order of execution
+
+I'll do **B (all quick fixes)** in one pass, then tackle **A** in this order: (4) herbicide alignment → (1) Farm spread + events → (3) Field Scouting draw → (2) Pasture Walk.
+
+Reply **"go"** to start, or tell me to reorder / drop items.
