@@ -1316,6 +1316,25 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
    </div>
    </div>
 
+   {/* Environment event banner — dismissable, appears when a seasonal
+       weather/spread event mutates the field. */}
+   {envBanner && (
+    <div className="border-b-2 border-amber-400 bg-amber-50 dark:bg-amber-950/40 px-4 py-2 flex items-start gap-3 shrink-0">
+     <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+     <div className="flex-1 min-w-0">
+      <p className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-200">
+       Environment event: {envBanner.label}
+      </p>
+      <p className="text-sm text-amber-900 dark:text-amber-100">{envBanner.note}</p>
+     </div>
+     <button
+      onClick={() => setEnvBanner(null)}
+      className="text-amber-700 hover:text-amber-900 dark:text-amber-300"
+      aria-label="Dismiss event banner"
+     ><X className="w-4 h-4" /></button>
+    </div>
+   )}
+
   {/* Main content: Left Status + Field + Right Action Panel */}
   <div className="flex-1 flex overflow-hidden">
   {/* Left: Status Panel */}
