@@ -11,7 +11,7 @@ import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/co
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
-import { DetectiveCard, EvidenceTag, CaseCallout } from "./learning/ThemedBlocks";
+import { DetectiveCard, EvidenceTag, CaseCallout, NotebookSection, FieldNote, SelfCheck, JournalHeader, KeyCouplet, TermSidebar, LabCallout, Citation } from "./learning/ThemedBlocks";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
@@ -1847,8 +1847,8 @@ function TopicContent({
       if (grade === "middle") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Common Names</p>
+            <NotebookSection title="Common Names & Why They Fail" subtitle="Entry 01 · Nomenclature">
+              <div className="text-sm space-y-3">
               <p>
                 A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or
                 other plants for <strong>sunlight, water, and nutrients</strong>. Plants are usually grouped as either
@@ -1867,31 +1867,30 @@ function TopicContent({
                 tradition, or historical usage. This inconsistency in naming makes accurate communication about weed
                 identification and management more difficult across different regions and disciplines.
               </p>
-            </div>
-
-            <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-bold text-accent">Why use scientific names?</p>
-              <p>
-                Common names serve as a practical and accessible starting point for learning weed identification, but
-                they have clear <strong>limitations when precision is required</strong>. This is why common names are
-                always best used alongside <strong>scientific naming systems</strong> that provide a consistent,
-                universally recognized identity for every plant species.
-              </p>
-            </div>
+              </div>
+              <FieldNote label="Hypothesis">
+                If two farmers use different common names for the same plant, their control decisions will drift apart —
+                so a shared scientific name is the only reliable reference.
+              </FieldNote>
+              <SelfCheck
+                question="Why can common names be a problem in a research paper?"
+                answer="The same species can have several regional common names, and the same common name can refer to different species — so results can't be reproduced without the scientific name."
+              />
+            </NotebookSection>
 
             <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
 
-      // 9-12 (high) - Scientific Names / Binomial Nomenclature
+      // Collegiate (high) - Scientific Names / Binomial Nomenclature
       {
         const waterhemp = topicWeeds.find(w => w.commonName === "Waterhemp") || topicWeeds[0];
         const foxtails = topicWeeds.filter(w => w.scientificName.startsWith("Setaria"));
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Scientific Names</p>
+            <JournalHeader title="Binomial Nomenclature & Species Identity" subtitle="Lab Journal · Module 01" />
+            <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
               <p>
                 Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
                 and overall farm success. According to the Weed Science Society of America, without weed control in corn,
@@ -1912,17 +1911,24 @@ function TopicContent({
                 At a national and global level, scientists need more precise terms to ensure they are discussing the same
                 plant. Scientific names are written in the form of <strong>binomial nomenclature</strong>.
               </p>
+              <Citation>Bradley, K. et al. Weed Science Society of America — Crop Loss Assessments.</Citation>
             </div>
 
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">What is Binomial Nomenclature?</p>
+            <LabCallout heading="Definition">
               <p>
                 Binomial nomenclature is the formal, two-term scientific system for naming plants, which uses terms
                 in Latin to state the <strong>genus</strong> and <strong>species</strong>. It was developed by
                 <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
                 worldwide.
               </p>
-            </div>
+            </LabCallout>
+
+            <TermSidebar terms={[
+              { term: "Genus", def: "The first (capitalized, italicized) term — a group of closely related species sharing morphological and genetic traits." },
+              { term: "Species", def: "The second (lowercase, italicized) epithet identifying a specific organism within the genus." },
+              { term: "Authority", def: "The abbreviated name of the botanist who first described the species, sometimes appended after the binomial." },
+              { term: "Synonymy", def: "Alternate scientific names historically applied to the same taxon; only one is currently accepted." },
+            ]} />
 
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
@@ -2419,17 +2425,21 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            {/* Intro */}
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Monocots vs. Dicots</p>
-              <p>
+            {/* Intro — Field Detective */}
+            <DetectiveCard title="Case File: Grass or Broadleaf?" badge="Case 02 · Plant Type">
+              <p className="text-sm">
                 These two groups of weeds are called <strong>monocots</strong> (thin, straight leaves) and{" "}
                 <strong>dicots</strong> (broad, wide leaves). Even though all plants might look similar at first, monocots
                 and dicots are different in a few important ways: their <strong>roots</strong>, their{" "}
                 <strong>leaves</strong>, how they <strong>move water and nutrients through their stems</strong>, the way
                 their <strong>flowers are organized</strong>, and their <strong>seed structure</strong>.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Clue: leaf veins" tone="clue" />
+                <EvidenceTag label="Clue: roots" tone="clue" />
+                <EvidenceTag label="Clue: seed leaves" tone="clue" />
+              </div>
+            </DetectiveCard>
 
             {/* Side-by-side example images */}
             <div className="grid grid-cols-2 gap-4">
@@ -2462,9 +2472,8 @@ function TopicContent({
             </div>
 
             {/* What the words mean */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">What do these words mean?</p>
-              <div className="grid grid-cols-2 gap-4 mt-3">
+            <CaseCallout heading="Decode the name">
+              <div className="grid grid-cols-2 gap-4 mt-1">
                 <div className="bg-card border border-border rounded-lg p-4 text-center space-y-1">
                   <p className="font-bold text-foreground text-lg">"Mono" = One</p>
                   <p className="text-xs text-muted-foreground">"Cot" = Cotyledon</p>
@@ -2476,18 +2485,14 @@ function TopicContent({
                   <p className="text-xs font-bold text-foreground mt-2">Dicot = TWO cotyledons</p>
                 </div>
               </div>
-              <div className="bg-secondary rounded-lg p-3 mt-3">
-                <p className="text-xs text-foreground">
+              <p className="text-xs text-foreground mt-3">
                   A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.
                 </p>
-              </div>
-              <div className="bg-secondary rounded-lg p-3">
-                <p className="text-xs text-foreground">
-                  As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
-                  plant looks like.
-                </p>
-              </div>
-            </div>
+              <p className="text-xs text-foreground mt-2">
+                As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
+                plant looks like.
+              </p>
+            </CaseCallout>
 
             {/* Detailed monocot section with scrollbar */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
@@ -2542,19 +2547,18 @@ function TopicContent({
         );
       }
 
-      // 6-8 and 9-12: existing content
+      // IPM Specialist 9-12 — Researcher's Notebook
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">Monocots vs Dicots</p>
-            <p className="text-xs text-foreground">
+          <NotebookSection title="Monocots vs Dicots" subtitle="Entry 02 · Plant Classification">
+            <p className="text-sm text-foreground">
               Plants can be grouped by similar characteristics and physical patterns. Plants are grouped into
               monocots and dicots based on how many <strong>cotyledons</strong> they have as seeds. Cotyledons are
               structures in seeds and seedlings that store nutrients to act as an energy source during germination.
               Cotyledons also become the first leaves of a plant. Differentiating monocots and dicots allow us to
               identify plants and better manage weeds.
             </p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-3">
               <div className="bg-card rounded-lg p-3 border border-border">
                 <p className="font-bold text-foreground">Monocots</p>
                 <ul className="text-xs text-muted-foreground mt-1 space-y-0.5">
@@ -2574,7 +2578,15 @@ function TopicContent({
                 </ul>
               </div>
             </div>
-          </div>
+            <FieldNote label="Why it matters">
+              Grass herbicides (ACCase inhibitors, Group 1) target monocots only. Confusing a broadleaf for a grass — or
+              vice versa — wastes a whole application and leaves the real target standing.
+            </FieldNote>
+            <SelfCheck
+              question="You spray a Group 1 grass herbicide on a field full of pigweed. What happens?"
+              answer="Almost nothing to the pigweed — dicots aren't controlled by Group 1. You've spent money and given the pigweed a head start."
+            />
+          </NotebookSection>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
             <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
