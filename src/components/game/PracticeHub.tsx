@@ -28,6 +28,7 @@ import InvasiveMatch from './practice-games/k5/InvasiveMatch';
 import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import WeedControl from './practice-games/k5/WeedControl';
+import GreatGardenRace from './practice-games/k5/GreatGardenRace';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -119,6 +120,7 @@ const k5Games: GameDef[] = [
  { id: 'invasive-id', name: 'Invasive ID', Icon: MapPin, category: 'Origin', description: 'Is this plant native or invasive?', howToPlay: 'Given a weed, its origin, and where it was found, decide if it is native or invasive.', component: InvasiveID },
  { id: 'safe-vs-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are toxic?', howToPlay: 'A group of weeds appears — identify which one is toxic, learn why it is dangerous, then decide how to safely manage it.', component: SafeVsToxic },
  { id: 'weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'You are the agronomist — manage weeds in the field.', howToPlay: 'Weeds appear in a field. Click each, identify it, then choose the right control method.', component: WeedControl },
+ { id: 'great-garden-race', name: 'The Great Garden Race', Icon: Trophy, category: 'Growth & Competition', description: 'Pac-Man style race — grab sun, water, and nutrients before the weed does!', howToPlay: 'Use arrow keys (or the on-screen D-pad) to steer your flower through the maze. Collect Sun, Water, and Nutrient pellets before the weed reaches them. After each day, both plants grow — but the weed grows faster per resource, so out-race it!', component: GreatGardenRace },
 ];
 
 const middleGames: GameDef[] = [
