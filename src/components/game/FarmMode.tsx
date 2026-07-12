@@ -105,19 +105,180 @@ function shuffle<T>(arr: T[]): T[] {
  const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a;
 }
 
+/**
+ * Realistic weed spread: pick 2–4 "colonizer" species and seed each as a
+ * patch of multiple plants clustered around a center. Small satellite
+ * plants trail off the edge of each patch to hint at spread.
+ * `count` is a target number of plants — actual output may vary ±20%.
+ */
 function generateFieldWeeds(season: Season, count: number): FieldWeed[] {
- const pool = shuffle(weeds).slice(0, count);
- return pool.map((w, i) => ({
- id: `${season}-${i}-${Date.now()}`,
- weed: w,
- x: 5 + Math.random() * 85,
- y: 10 + Math.random() * 75,
- alive: true,
- identified: false,
- scouted: false,
- density: Math.floor(Math.random() * 15) + 1,
- stage: WEED_STAGE_BY_SEASON[season],
- }));
+ const stage = WEED_STAGE_BY_SEASON[season];
+ const colonizerCount = Math.min(4, Math.max(2, Math.round(count / 4)));
+ const colonizers = shuffle(weeds).slice(0, colonizerCount);
+ const out: FieldWeed[] = [];
+ colonizers.forEach((w, ci) => {
+  // Cluster center — biased into the field, not the corners
+  const cx = 15 + Math.random() * 70;
+  const cy = 15 + Math.random() * 65;
+  const patchSize = Math.max(3, Math.round(count / colonizerCount));
+  const radius = 8 + Math.random() * 10;      // cluster radius (% of field)
+  for (let i = 0; i < patchSize; i++) {
+   // 80% inside main patch, 20% satellite drift (2x radius) for spread feel
+   const isSatellite = Math.random() < 0.2;
+   const r = (isSatellite ? radius * 2.2 : radius) * Math.sqrt(Math.random());
+   const theta = Math.random() * Math.PI * 2;
+   const x = Math.max(3, Math.min(97, cx + r * Math.cos(theta)));
+   const y = Math.max(4, Math.min(96, cy + r * Math.sin(theta)));
+   out.push({
+    id: `${season}-${ci}-${i}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    weed: w,
+    x, y,
+    alive: true,
+    identified: false,
+    scouted: false,
+    // Density higher toward patch center to show visual gradient
+    density: Math.max(1, Math.round((1 - r / (radius * 2.2)) * 12) + Math.floor(Math.random() * 4)),
+    stage,
+   });
+  }
+ });
+ return out;
+}
+
+/**
+ * Weather / environment events that mutate the field between seasons.
+ * Returns { updatedWeeds, banner } — banner is a short message shown to
+ * the player so they see what happened.
+ */
+type EnvEvent = {
+ id: string;
+ label: string;
+ apply: (weeds: FieldWeed[], nextSeason: Season) => { weeds: FieldWeed[]; note: string };
+};
+
+const ENV_EVENTS: EnvEvent[] = [
+ {
+  id: 'heavy-rain',
+  label: 'Heavy Rain',
+  apply: (ws, s) => {
+   // Rain flushes seed bank — add 4–7 new seedlings clustered near existing patches
+   const extras = Math.floor(4 + Math.random() * 4);
+   const anchors = ws.length ? ws : [{ x: 50, y: 50, weed: shuffle(weeds)[0], stage: WEED_STAGE_BY_SEASON[s] } as FieldWeed];
+   const newOnes: FieldWeed[] = [];
+   for (let i = 0; i < extras; i++) {
+    const a = anchors[Math.floor(Math.random() * anchors.length)];
+    newOnes.push({
+     id: `rain-${s}-${i}-${Date.now()}`,
+     weed: a.weed,
+     x: Math.max(3, Math.min(97, a.x + (Math.random() * 20 - 10))),
+     y: Math.max(4, Math.min(96, a.y + (Math.random() * 20 - 10))),
+     alive: true, identified: false, scouted: false,
+     density: 3 + Math.floor(Math.random() * 4),
+     stage: 'seedling',
+    });
+   }
+   return { weeds: [...ws, ...newOnes], note: `Heavy rain triggered a seed-bank flush — ${extras} new seedlings emerged near existing patches.` };
+  },
+ },
+ {
+  id: 'drought',
+  label: 'Drought',
+  apply: (ws) => {
+   // Drought kills ~25% of seedlings (weakest life stage)
+   let killed = 0;
+   const next = ws.map(w => {
+    if (w.alive && w.stage === 'seedling' && Math.random() < 0.4) { killed++; return { ...w, alive: false }; }
+    return w;
+   });
+   return { weeds: next, note: `Drought stress killed ${killed} seedlings, but mature weeds toughed it out.` };
+  },
+ },
+ {
+  id: 'wind-dispersal',
+  label: 'Wind Dispersal',
+  apply: (ws, s) => {
+   // Wind spreads new patches from reproductive-stage weeds
+   const parents = ws.filter(w => w.alive && (w.stage === 'reproductive' || w.stage === 'mature'));
+   if (parents.length === 0) return { weeds: ws, note: 'Windstorm blew through, but no seeds were mature enough to disperse.' };
+   const extras = Math.min(6, parents.length + 2);
+   const newOnes: FieldWeed[] = [];
+   for (let i = 0; i < extras; i++) {
+    const p = parents[Math.floor(Math.random() * parents.length)];
+    newOnes.push({
+     id: `wind-${s}-${i}-${Date.now()}`,
+     weed: p.weed,
+     x: Math.max(3, Math.min(97, p.x + (Math.random() * 40 - 20))),
+     y: Math.max(4, Math.min(96, p.y + (Math.random() * 40 - 20))),
+     alive: true, identified: false, scouted: false,
+     density: 2 + Math.floor(Math.random() * 3),
+     stage: 'seedling',
+    });
+   }
+   return { weeds: [...ws, ...newOnes], note: `Wind dispersed seeds from ${parents.length} mature plants — ${extras} new satellite plants established.` };
+  },
+ },
+ {
+  id: 'neighbor-escape',
+  label: 'Neighbor Field Escape',
+  apply: (ws, s) => {
+   // A new species escapes from the neighboring field along one edge
+   const invader = shuffle(weeds.filter(w => !ws.some(x => x.weed.id === w.id)))[0] || shuffle(weeds)[0];
+   const edgeY = Math.random() < 0.5 ? 6 : 94;
+   const newOnes: FieldWeed[] = Array.from({ length: 5 }, (_, i) => ({
+    id: `escape-${s}-${i}-${Date.now()}`,
+    weed: invader,
+    x: 10 + i * 18 + (Math.random() * 8 - 4),
+    y: edgeY + (Math.random() * 6 - 3),
+    alive: true, identified: false, scouted: false,
+    density: 2, stage: 'seedling',
+   }));
+   return { weeds: [...ws, ...newOnes], note: `${invader.commonName} escaped from a neighboring field — a new patch established along the field edge.` };
+  },
+ },
+ {
+  id: 'cold-snap',
+  label: 'Cold Snap',
+  apply: (ws) => {
+   // Cold snap slows growth — sets some vegetative plants back to seedling appearance
+   let stunted = 0;
+   const next = ws.map(w => {
+    if (w.alive && w.stage === 'vegetative' && Math.random() < 0.3) { stunted++; return { ...w, stage: 'seedling' as const }; }
+    return w;
+   });
+   return { weeds: next, note: `Cold snap stunted ${stunted} plants — they're set back to seedling-sized growth.` };
+  },
+ },
+ {
+  id: 'seedbank-flush',
+  label: 'Seed Bank Flush',
+  apply: (ws, s) => {
+   // Warm wet spell wakes up dormant seeds from the seed bank — new species mix
+   const species = shuffle(weeds).slice(0, 2);
+   const newOnes: FieldWeed[] = [];
+   species.forEach((w, si) => {
+    const cx = 20 + Math.random() * 60, cy = 20 + Math.random() * 60;
+    for (let i = 0; i < 4; i++) {
+     newOnes.push({
+      id: `flush-${s}-${si}-${i}-${Date.now()}`,
+      weed: w,
+      x: Math.max(3, Math.min(97, cx + (Math.random() * 14 - 7))),
+      y: Math.max(4, Math.min(96, cy + (Math.random() * 14 - 7))),
+      alive: true, identified: false, scouted: false,
+      density: 2 + Math.floor(Math.random() * 3),
+      stage: 'seedling',
+     });
+    }
+   });
+   return { weeds: [...ws, ...newOnes], note: `The soil seed bank flushed — dormant ${species.map(s => s.commonName).join(' and ')} seeds germinated in new patches.` };
+  },
+ },
+];
+
+/** Pick a random environment event and apply it to the field weeds. */
+function rollEnvEvent(weeds: FieldWeed[], nextSeason: Season) {
+ const ev = ENV_EVENTS[Math.floor(Math.random() * ENV_EVENTS.length)];
+ const result = ev.apply(weeds, nextSeason);
+ return { eventLabel: ev.label, ...result };
 }
 
 // Event Cards 
