@@ -233,7 +233,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   const dPad = (dir: Pos) => () => { dirRef.current = dir; };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto p-4">
       {/* Checker banner header */}
       <div className="max-w-4xl mx-auto rounded-lg overflow-hidden border-2 border-foreground mb-4">
         <div className="h-6" style={{ background: CHECKER }} />
