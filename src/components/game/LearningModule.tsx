@@ -2761,18 +2761,20 @@ function TopicContent({
         // 9-12: Detailed life cycles with summer/winter annuals
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Life Cycles</p>
-              <p>
-                Plants have unique systems to best enable them to reproduce and survive in varying conditions. One such
-                system is how quickly or slowly plants complete a <strong>life cycle</strong>. A complete life cycle
-                moves through five stages:{" "}
-                <strong>seed, seedling, vegetative, reproductive, and mature</strong>. The
-                <strong> reproductive</strong> stage groups flowering, pollination, and fertilization together, since
-                they all happen as the plant prepares to set seed. Refer to the Life Stages topic for the visual cycle
-                diagram.
-              </p>
-            </div>
+            <JournalHeader title="Life-Cycle Strategies in Weed Populations" subtitle="Reproductive Ecology" />
+            <LabCallout heading="Concept">
+              Life-cycle length (annual, biennial, perennial) determines the seed-bank contribution, control-timing
+              window, and vegetative-reproduction risk for each species. It is the single most important trait for
+              designing a multi-year management plan.
+            </LabCallout>
+            <TermSidebar
+              terms={[
+                { term: "Annual", def: "Completes seed → seed in one growing season; obligate seed reproduction." },
+                { term: "Biennial", def: "Two-year cycle: rosette in year 1, bolt/flower/seed in year 2." },
+                { term: "Perennial", def: "Persists >2 years; often reproduces vegetatively via rhizomes, stolons, tubers." },
+                { term: "Facultative", def: "Species that shift between annual and perennial habit based on climate/management." },
+              ]}
+            />
 
             <p className="text-sm text-foreground">Common weeds have three general life cycle lengths.</p>
 
