@@ -7121,10 +7121,9 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Taxonomy</p>
-            {grade === "middle" ? (
-              <>
+          {grade === "middle" ? (
+            <NotebookSection title="Taxonomy: How Scientists Organize Life" subtitle="Research Log · Classification">
+              <div className="space-y-3 text-sm">
                 <p>
                   Taxonomy is the system scientists use to organize and name every living thing on Earth — like a giant
                   filing system for nature.
@@ -7140,20 +7139,35 @@ function TopicContent({
                   Every weed species is assigned a two-part scientific name, known as a <strong>binomial</strong>,
                   consisting of its genus and species, which remains consistent across all languages and regions.
                 </p>
-                <p>
-                  A working knowledge of plant taxonomy also helps identify{" "}
-                  <strong>patterns among related weed species</strong>, which can inform predictions about shared
-                  biological behaviors, habitat preferences, and herbicide sensitivities.
-                </p>
-              </>
-            ) : (
-              <p>
-                Taxonomy is the scientific discipline of classifying organisms into a hierarchical system.
-                Understanding taxonomy helps predict weed behavior, herbicide response, and management strategies
-                based on evolutionary relationships.
-              </p>
-            )}
-          </div>
+                <FieldNote label="Why it matters">
+                  Knowing a weed's family often predicts <strong>how it will respond to control</strong> — species in
+                  the same family often share herbicide sensitivities, growth habits, and seasonal timing.
+                </FieldNote>
+                <SelfCheck
+                  question="Two weeds share a genus. What can you reasonably predict about them?"
+                  answer="They likely share flower structure, similar growth habits, and often similar herbicide responses — though field ID may still require checking a diagnostic trait like ligule, leaf shape, or ocrea."
+                />
+              </div>
+            </NotebookSection>
+          ) : (
+            <>
+              <JournalHeader title="Systematic Classification" subtitle="Taxonomy & Nomenclature" />
+              <LabCallout heading="Concept">
+                Taxonomy is the hierarchical classification of organisms based on shared morphology and phylogeny.
+                In weed science, taxonomic relationships predict herbicide response, allelopathic potential,
+                pollination biology, and dormancy behavior.
+              </LabCallout>
+              <TermSidebar
+                terms={[
+                  { term: "Binomial", def: "Two-part Latin name (Genus + specific epithet), italicized, with genus capitalized." },
+                  { term: "Authority", def: "Author who first validly published the name (e.g., 'L.' for Linnaeus)." },
+                  { term: "Synonymy", def: "Alternate names for the same taxon resulting from taxonomic revision." },
+                  { term: "Type specimen", def: "The preserved reference specimen that anchors a species name." },
+                ]}
+              />
+              <Citation>Judd WS et al. Plant Systematics: A Phylogenetic Approach. Sinauer Associates.</Citation>
+            </>
+          )}
 
           {/* Taxonomy pyramid with worked example */}
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
