@@ -1699,7 +1699,7 @@ function MiddleSchoolNamesModule({
                         : "bg-background text-foreground/70 border-border hover:border-success hover:text-success"
                     }`}
                   >
-                    <Check className="w-3.5 h-3.5" /> Nailed it
+                    <Check className="w-3.5 h-3.5" /> Cracked it
                   </button>
                   <button
                     type="button"
@@ -1710,7 +1710,7 @@ function MiddleSchoolNamesModule({
                         : "bg-background text-foreground/70 border-border hover:border-accent hover:text-accent"
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5" /> Review
+                    <HelpCircle className="w-3.5 h-3.5" /> Reopen
                   </button>
                 </div>
               </div>
@@ -1719,10 +1719,10 @@ function MiddleSchoolNamesModule({
         </div>
 
         {/* Tracker sidebar */}
-        <aside className="lg:sticky lg:top-6 self-start bg-card border border-border rounded-xl p-4 space-y-4">
+        <aside className="lg:sticky lg:top-6 self-start bg-card border-2 border-amber-500/40 rounded-xl p-4 space-y-4">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-primary" />
-            <h3 className="font-display font-bold text-foreground text-sm">Weeds You Nailed</h3>
+            <h3 className="font-display font-bold text-foreground text-sm">Case Log</h3>
           </div>
           <div>
             <div className="flex items-baseline justify-between mb-1">
@@ -1739,20 +1739,20 @@ function MiddleSchoolNamesModule({
               />
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
-              {reviewCount} marked for review
+              {reviewCount} case{reviewCount === 1 ? "" : "s"} reopened
             </p>
           </div>
 
           {confidentCount === 0 && reviewCount === 0 ? (
             <p className="text-xs text-muted-foreground italic">
-              Tap <strong className="text-foreground not-italic">Nailed it</strong> or{" "}
-              <strong className="text-foreground not-italic">Review</strong> on each card to build your list.
+              Tap <strong className="text-foreground not-italic">Cracked it</strong> or{" "}
+              <strong className="text-foreground not-italic">Reopen</strong> on each card to fill your case log.
             </p>
           ) : (
             <div className="space-y-3">
               {confidentCount > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-success font-bold mb-1.5">Confident</p>
+                  <p className="text-[10px] uppercase tracking-wide text-success font-bold mb-1.5">Solved</p>
                   <ul className="space-y-1">
                     {pool.filter((w) => status[w.id] === "confident").map((w) => (
                       <li key={w.id} className="flex items-center gap-2 text-xs">
@@ -1768,7 +1768,7 @@ function MiddleSchoolNamesModule({
               )}
               {reviewCount > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-accent font-bold mb-1.5">Needs Review</p>
+                  <p className="text-[10px] uppercase tracking-wide text-accent font-bold mb-1.5">Reopened</p>
                   <ul className="space-y-1">
                     {pool.filter((w) => status[w.id] === "review").map((w) => (
                       <li key={w.id} className="flex items-center gap-2 text-xs">
