@@ -1635,27 +1635,25 @@ function MiddleSchoolNamesModule({
 
   return (
     <div className="space-y-5">
-      {/* Intro banner */}
-      <div className="rounded-xl overflow-hidden border border-primary/30 bg-gradient-to-br from-primary/10 via-accent/5 to-background p-5">
-        <div className="flex items-start gap-3">
-          <div className="w-11 h-11 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
-            <Target className="w-6 h-6" />
+      {/* Intro — Field Detective case file */}
+      <DetectiveCard title="Case File: Name That Weed" badge="Case 01 · Identification">
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <EvidenceTag label="34 suspects" tone="suspect" />
+            <EvidenceTag label="3 disguises each" tone="clue" />
+            <EvidenceTag label="Grades 6-8" />
           </div>
-          <div className="space-y-2">
-            <p className="font-display font-bold text-foreground text-lg leading-tight">
-              Field Scout: Weed Names & ID
-            </p>
-            <p className="text-sm text-foreground/85">
-              Real weeds don't sit still for a single photo. Use the arrows on each card to flip through the{" "}
-              <strong>seedling</strong>, <strong>leaf</strong>, and <strong>flower/seedhead</strong> stages, then mark whether
-              you nailed the ID or want to review it later. Your progress is tracked on the right.
-            </p>
-            <p className="text-xs text-muted-foreground italic">
-              6-8 curriculum • {total} species • Multi-stage viewer
-            </p>
-          </div>
+          <p className="text-sm text-foreground">
+            Weeds are sneaky. The same plant can look totally different as a <strong>seedling</strong>, a leafy{" "}
+            <strong>teen plant</strong>, and a grown-up with <strong>flowers or seedheads</strong>. Your job:
+            study each suspect's disguises, then decide if you cracked the ID or need another look.
+          </p>
+          <CaseCallout heading="How to work the case">
+            Tap the arrows to flip through each weed's three life stages. Hit{" "}
+            <strong>Cracked it</strong> when you're sure or <strong>Reopen</strong> to come back later. Your case log fills up on the right.
+          </CaseCallout>
         </div>
-      </div>
+      </DetectiveCard>
 
       {/* Two-column: grid + tracker */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-5 items-start">
