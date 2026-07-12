@@ -2953,26 +2953,28 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Native and Introduced Weeds</p>
-              <p>
+            <DetectiveCard title="Case File: Homegrown or Passport?" badge="Case 04 · Origins">
+              <p className="text-sm">
                 Weeds can grow in diverse habitats across different countries and states. Just like people have homes,
                 weeds have locations that they call home. A plant that naturally grows in a region is called{" "}
                 <strong>native</strong>.
               </p>
-              <p>
+              <p className="text-sm mt-2">
                 Just as people travel, weeds can also travel. Weeds that grow in areas where they are not originally
                 found are called <strong>introduced</strong> weeds.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Native = home team" tone="verdict" />
+                <EvidenceTag label="Introduced = visitor" tone="suspect" />
+              </div>
+            </DetectiveCard>
 
-            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-bold text-destructive">Invasive Weeds</p>
+            <CaseCallout heading="Warning: Invasive Suspects">
               <p>
                 Some introduced weeds can be harmful to their surroundings. These weeds are called{" "}
                 <strong>invasive</strong>. Invasive weeds hurt native plants and animals.
               </p>
-            </div>
+            </CaseCallout>
 
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
@@ -3002,9 +3004,9 @@ function TopicContent({
       if (grade === "middle") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Weed Origins by Continent</p>
-              <p>
+            <NotebookSection title="Weed Origins by Continent" subtitle="Entry 04 · Biogeography">
+              <div className="text-sm space-y-3">
+                <p>
                 Many of the most troublesome weeds we deal with in the United States didn't actually start here. They
                 were brought over from other parts of the world, sometimes accidentally and sometimes on purpose.
               </p>
@@ -3018,11 +3020,17 @@ function TopicContent({
                 Without these checks, introduced species can establish rapidly, spread aggressively, and outcompete
                 both native vegetation and cultivated crops.
               </p>
-            </div>
+              </div>
+              <FieldNote label="Finding">
+                Most Midwestern invasives arrived via <strong>Eurasian trade routes</strong> — contaminated crop seed,
+                ship ballast, and 1800s ornamental catalogs. The "enemy release" they left behind is what makes them
+                explode here.
+              </FieldNote>
+            </NotebookSection>
 
-            <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-bold text-accent">How Invasive Weeds Travel</p>
-              <p>
+            <NotebookSection title="How Invasive Weeds Travel" subtitle="Vectors">
+              <div className="text-sm space-y-3">
+                <p>
                 Invasive weeds are like uninvited guests that show up, take over, and refuse to leave — and they
                 usually arrive because of human activity, even when it's completely accidental. Seeds can hitchhike
                 on the muddy tires of a tractor, hide inside a bag of crop seed, cling to an animal's fur, or float
@@ -3033,7 +3041,12 @@ function TopicContent({
                 horticultural, or erosion control purposes, only to escape cultivation and spread beyond intended
                 boundaries.
               </p>
-            </div>
+              </div>
+              <SelfCheck
+                question="If a weed 'escapes' the natural enemies that kept it in check back home, what happens next?"
+                answer="Its population grows unchecked — that's the 'enemy release hypothesis' and it's why so many introduced species become invasive."
+              />
+            </NotebookSection>
 
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
@@ -3047,11 +3060,11 @@ function TopicContent({
         );
       }
 
-      // 9-12 - Detailed invasive species content
+      // Collegiate - Detailed invasive species content
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Invasive Species</p>
+          <JournalHeader title="Invasion Biology & Introduction Pathways" subtitle="Lab Journal · Module 04" />
+          <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
             <p>
               Invasive weeds are non-native plants that spread prolifically and cause significant ecological or economic
               harm to their new environment, often by <strong>crowding out native species, altering ecosystems</strong>,
@@ -3069,7 +3082,20 @@ function TopicContent({
               defense. Some invasive weeds may adapt to better suit their new environments, making it challenging to
               find control solutions.
             </p>
+            <Citation>Pimentel, D. et al. (2005) — Economic and environmental costs of alien invertebrate, vertebrate, and plant species in the United States. <em>Ecological Economics</em>.</Citation>
           </div>
+          <TermSidebar terms={[
+            { term: "Native range", def: "The geographic region where a species evolved and coexists with its natural enemies." },
+            { term: "Enemy release", def: "Hypothesis that non-native species gain a competitive edge when introduced beyond their coevolved pests and pathogens." },
+            { term: "Propagule pressure", def: "The number and frequency of individuals introduced — a strong predictor of successful establishment." },
+            { term: "Introduction pathway", def: "The vector of arrival: ballast water, contaminated seed, ornamental trade, forage crops, erosion planting, etc." },
+            { term: "Naturalized vs. invasive", def: "Naturalized = reproducing without help; invasive = spreading and causing measurable ecological or economic harm." },
+          ]} />
+          <LabCallout heading="Case Analysis">
+            When investigating a new invasion, characterize (1) native range, (2) likely introduction pathway,
+            (3) date of first record, and (4) trait syndrome (seed output, dispersal mode, allelopathy) before selecting
+            a management strategy.
+          </LabCallout>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
             <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
