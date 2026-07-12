@@ -2249,30 +2249,56 @@ function TopicContent({
 
       return (
         <div className="space-y-6">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            {grade === "elementary" ? (
-              <>
-                <p className="font-semibold text-primary">Life Stages</p>
-                <p>
-                  Just like people, weeds grow up. They go through five stages:
-                  <strong> seed, seedling, vegetative, reproductive, and mature</strong>. Knowing what a
-                  weed looks like at each stage helps us spot it and stop it.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="font-semibold text-primary">Why Life Stages Matter</p>
-                <p>
-                  Weeds look very different at each growth stage. Learning to recognize them{" "}
-                  <strong>early (seedling)</strong> is critical because that's when they're easiest to control.
-                </p>
-                <p>
-                  In IPM, <strong>scouting timing</strong> is everything. Knowing what a weed looks like at each stage
-                  lets you catch it early and choose the right control method.
-                </p>
-              </>
-            )}
-          </div>
+          {grade === "elementary" ? (
+            <DetectiveCard title="Case File: Growing Up Weedy" badge="Case 02 · Life Stages">
+              <p className="text-sm">
+                Just like people, weeds grow up. They go through five stages:
+                <strong> seed, seedling, vegetative, reproductive, and mature</strong>. A good detective can spot
+                a suspect at any stage.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="5 stages" tone="clue" />
+                <EvidenceTag label="Spot early" tone="suspect" />
+                <EvidenceTag label="Stop the spread" tone="verdict" />
+              </div>
+              <CaseCallout heading="Detective Tip">
+                Catch a weed at the <strong>seedling</strong> stage and it's easy to pull. Wait until it flowers and
+                it has already made new seeds for next year.
+              </CaseCallout>
+            </DetectiveCard>
+          ) : grade === "middle" ? (
+            <NotebookSection title="Why Life Stages Matter" subtitle="Research Log · Growth Phases">
+              <p className="text-sm">
+                Weeds look very different at each growth stage. Learning to recognize them{" "}
+                <strong>early (seedling)</strong> is critical — that's when herbicides work best and hand-pulling
+                is still practical.
+              </p>
+              <FieldNote label="Scouting rule">
+                In IPM, <strong>scouting timing</strong> is everything. The right control at the wrong stage wastes
+                time and money.
+              </FieldNote>
+              <SelfCheck
+                question="Why is the seedling stage the best window for post-emergent herbicide?"
+                answer="Seedlings have thin cuticles, small leaf area, and shallow roots — herbicide translocates easily and the plant has no seed reserves to fall back on."
+              />
+            </NotebookSection>
+          ) : (
+            <>
+              <JournalHeader title="Ontogeny & Growth Stages" subtitle="Phenology" />
+              <LabCallout heading="Concept">
+                Weed morphology, physiology, and herbicide susceptibility all shift by growth stage. Accurate
+                staging (BBCH or equivalent) drives control-timing decisions and label compliance.
+              </LabCallout>
+              <TermSidebar
+                terms={[
+                  { term: "Cotyledon", def: "Seed leaf — the first photosynthetic organ; number distinguishes monocots from dicots." },
+                  { term: "True leaf", def: "Leaf produced after cotyledons; morphology matches the mature species." },
+                  { term: "Bolting", def: "Rapid stem elongation preceding flowering, especially in rosette biennials." },
+                  { term: "Anthesis", def: "The period of flower opening and receptivity to pollination." },
+                ]}
+              />
+            </>
+          )}
 
           {/* Visual cycle diagram (Elementary + High School) */}
           {(grade === "elementary" || grade === "high") && (
