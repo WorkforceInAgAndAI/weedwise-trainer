@@ -2683,14 +2683,18 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Life Cycles</p>
-              <p>
+            <DetectiveCard title="Case File: How Long Do Weeds Live?" badge="Case 03 · Life Cycles">
+              <p className="text-sm">
                 The life cycle of a weed is how long the weed takes to go through all of its life stages (<strong>seed,
                 seedling, vegetative, reproductive, and mature</strong>). Weeds have different life cycles that last for
                 different lengths of time. Knowing the life cycle of a weed can help us manage them.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Annual · 1 year" tone="clue" />
+                <EvidenceTag label="Biennial · 2 years" tone="suspect" />
+                <EvidenceTag label="Perennial · Many years" tone="verdict" />
+              </div>
+            </DetectiveCard>
 
             {/* Life cycle flow */}
             <div className="bg-card border border-border rounded-lg p-4">
