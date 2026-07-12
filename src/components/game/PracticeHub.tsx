@@ -47,6 +47,7 @@ import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
 import LiguleLens from './practice-games/middle/LiguleLens';
+import PastureWalk from './practice-games/middle/PastureWalk';
 
 import HSNameTheWeed from './practice-games/high/NameTheWeed';
 import HSTaxonomyTower from './practice-games/high/TaxonomyTower';
@@ -61,6 +62,7 @@ import FormYourFarm from './practice-games/high/FormYourFarm';
 import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
+import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 
@@ -139,6 +141,7 @@ const middleGames: GameDef[] = [
  { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
  { id: 'ms-sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
+ { id: 'ms-pasture-walk', name: 'Pasture Walk', Icon: Footprints, category: 'Field Methods', description: 'Walk a pasture on limited energy and herbicide — spray only what pays off.', howToPlay: 'Tap weeds to walk to them (farther = more energy). For each plant, choose spray now, mark to spray later, or skip — match the choice to the plant\u2019s life cycle and growth stage.', component: PastureWalk },
 ];
 
 const highGames: GameDef[] = [
@@ -157,6 +160,7 @@ const highGames: GameDef[] = [
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Review your diagnoses at the end.', component: CropDoctor },
  
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
+ { id: 'hs-field-scout-draw', name: 'Field Scout — Draw Your Transect', Icon: Footprints, category: 'Scouting Tools', description: 'Draw your own scouting path with limited walking distance and herbicide.', howToPlay: 'Drag on the aerial field to draw a transect. You have a limited path length and 8 spot-spray charges. Score combines coverage (weeds found) and diversity (unique species) — a straight line loses to a smart zigzag.', component: FieldScoutDraw },
 ];
 
 type Screen = 'grades' | 'games' | 'info' | 'playing';
