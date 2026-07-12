@@ -370,7 +370,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
         </div>
       )}
 
-      <FarmerGuide />
+      <FarmerGuide message="Race the weed to the sunlight, water, and nutrients — whoever grabs the most grows tallest!" />
     </div>
   );
 }
