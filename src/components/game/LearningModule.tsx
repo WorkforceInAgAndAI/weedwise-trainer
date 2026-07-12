@@ -1847,8 +1847,8 @@ function TopicContent({
       if (grade === "middle") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Common Names</p>
+            <NotebookSection title="Common Names & Why They Fail" subtitle="Entry 01 · Nomenclature">
+              <div className="text-sm space-y-3">
               <p>
                 A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or
                 other plants for <strong>sunlight, water, and nutrients</strong>. Plants are usually grouped as either
@@ -1867,31 +1867,30 @@ function TopicContent({
                 tradition, or historical usage. This inconsistency in naming makes accurate communication about weed
                 identification and management more difficult across different regions and disciplines.
               </p>
-            </div>
-
-            <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-bold text-accent">Why use scientific names?</p>
-              <p>
-                Common names serve as a practical and accessible starting point for learning weed identification, but
-                they have clear <strong>limitations when precision is required</strong>. This is why common names are
-                always best used alongside <strong>scientific naming systems</strong> that provide a consistent,
-                universally recognized identity for every plant species.
-              </p>
-            </div>
+              </div>
+              <FieldNote label="Hypothesis">
+                If two farmers use different common names for the same plant, their control decisions will drift apart —
+                so a shared scientific name is the only reliable reference.
+              </FieldNote>
+              <SelfCheck
+                question="Why can common names be a problem in a research paper?"
+                answer="The same species can have several regional common names, and the same common name can refer to different species — so results can't be reproduced without the scientific name."
+              />
+            </NotebookSection>
 
             <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
 
-      // 9-12 (high) - Scientific Names / Binomial Nomenclature
+      // Collegiate (high) - Scientific Names / Binomial Nomenclature
       {
         const waterhemp = topicWeeds.find(w => w.commonName === "Waterhemp") || topicWeeds[0];
         const foxtails = topicWeeds.filter(w => w.scientificName.startsWith("Setaria"));
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Scientific Names</p>
+            <JournalHeader title="Binomial Nomenclature & Species Identity" subtitle="Lab Journal · Module 01" />
+            <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
               <p>
                 Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
                 and overall farm success. According to the Weed Science Society of America, without weed control in corn,
@@ -1912,17 +1911,24 @@ function TopicContent({
                 At a national and global level, scientists need more precise terms to ensure they are discussing the same
                 plant. Scientific names are written in the form of <strong>binomial nomenclature</strong>.
               </p>
+              <Citation>Bradley, K. et al. Weed Science Society of America — Crop Loss Assessments.</Citation>
             </div>
 
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">What is Binomial Nomenclature?</p>
+            <LabCallout heading="Definition">
               <p>
                 Binomial nomenclature is the formal, two-term scientific system for naming plants, which uses terms
                 in Latin to state the <strong>genus</strong> and <strong>species</strong>. It was developed by
                 <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
                 worldwide.
               </p>
-            </div>
+            </LabCallout>
+
+            <TermSidebar terms={[
+              { term: "Genus", def: "The first (capitalized, italicized) term — a group of closely related species sharing morphological and genetic traits." },
+              { term: "Species", def: "The second (lowercase, italicized) epithet identifying a specific organism within the genus." },
+              { term: "Authority", def: "The abbreviated name of the botanist who first described the species, sometimes appended after the binomial." },
+              { term: "Synonymy", def: "Alternate scientific names historically applied to the same taxon; only one is currently accepted." },
+            ]} />
 
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
