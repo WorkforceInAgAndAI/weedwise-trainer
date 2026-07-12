@@ -85,6 +85,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'life-cycle-match': 'life-cycles', 'ecology-scramble': 'ecology', 'habitat-mapping': 'habitats',
   'seed-banks': 'seeds', 'weed-travel': 'seeds', 'invasive-match': 'native-introduced',
   'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety', 'weed-control': 'control-methods',
+  'great-garden-race': 'life-cycles',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
