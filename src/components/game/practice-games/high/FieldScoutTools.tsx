@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Scan, Radio, Footprints, Satellite, NotebookPen, MapPin } from 'lucide-react';
+import { Scan, Radio, Footprints, Satellite } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import WeedImage from '@/components/game/WeedImage';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
@@ -156,11 +156,10 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
   if (done) {
     addBadge({ gameId: 'hs-field-scout', gameName: 'Field Scout Tools', level: 'HS', score, total: rounds.length });
     return (
-      <div className="fixed inset-0 bg-[#f4ecd8] dark:bg-slate-900 z-50 flex flex-col items-center justify-center p-6 text-center" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(30,58,92,0.08) 28px)' }}>
-        <NotebookPen className="w-10 h-10 text-[#1e3a5c] dark:text-emerald-300 mb-3" />
-        <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#1e3a5c]/70 dark:text-emerald-300/70 mb-1">Field Log — Closed</p>
-        <h2 className="font-display font-bold text-2xl text-[#1e3a5c] dark:text-emerald-100 mb-2">Season Report</h2>
-        <p className="text-slate-800 dark:text-emerald-100 mb-6">{score} / {rounds.length} sites correctly diagnosed</p>
+      <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6 text-center">
+        <Footprints className="w-10 h-10 text-primary mb-3" />
+        <h2 className="font-display font-bold text-2xl text-foreground mb-2">Scouting Complete!</h2>
+        <p className="text-foreground mb-6">Score: {score} / {rounds.length}</p>
         <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
@@ -170,26 +169,19 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
   const PickedIcon = TOOLS.find(t => t.id === picked)?.Icon;
 
   return (
-    <div className="fixed inset-0 bg-[#f4ecd8] dark:bg-slate-900 z-50 overflow-y-auto" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(30,58,92,0.08) 28px)' }}>
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
       <div className="max-w-lg mx-auto p-4">
-        <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-[#1e3a5c]/30 dark:border-emerald-400/30">
-          <button onClick={onBack} className="w-10 h-10 rounded-full bg-[#1e3a5c]/10 dark:bg-emerald-400/10 flex items-center justify-center text-[#1e3a5c] dark:text-emerald-200">←</button>
-          <NotebookPen className="w-5 h-5 text-[#1e3a5c] dark:text-emerald-300" />
-          <div className="flex-1">
-            <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-[#1e3a5c]/60 dark:text-emerald-300/60 leading-none">Researcher's Notebook</p>
-            <h1 className="font-display font-bold text-lg text-[#1e3a5c] dark:text-emerald-100 leading-tight">Field Scouting Tools</h1>
-          </div>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-[#1e3a5c]/10 dark:bg-emerald-400/10 text-[#1e3a5c] dark:text-emerald-300 font-bold">Lv.{level}</span>
-          <span className="text-sm text-[#1e3a5c]/70 dark:text-emerald-100/70 font-mono">#{String(idx + 1).padStart(2,'0')}/{rounds.length}</span>
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+          <h1 className="font-display font-bold text-lg text-foreground">Field Scout Tools</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
+          <span className="ml-auto text-sm text-muted-foreground">{idx + 1}/{rounds.length}</span>
         </div>
 
         {/* Field image with weeds */}
-        <div className="relative w-full aspect-[3/2] rounded-lg border-2 border-[#1e3a5c]/40 dark:border-emerald-400/40 mb-4 overflow-hidden shadow-lg">
+        <div className="relative w-full aspect-[3/2] rounded-xl border-2 border-border mb-4 overflow-hidden">
           <img src={cropImg} alt="Field view" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/10" />
-          <div className="absolute top-2 left-2 px-2 py-1 bg-[#1e3a5c]/85 text-[#f4ecd8] text-[10px] uppercase tracking-wider font-bold rounded flex items-center gap-1">
-            <MapPin className="w-3 h-3" /> Site {String(idx + 1).padStart(2,'0')}
-          </div>
           {weedSpots.map((spot, i) => (
             <div key={i} className="absolute w-7 h-7 sm:w-9 sm:h-9 rounded-full border-2 border-white shadow-md overflow-hidden"
               style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%,-50%)' }}>
@@ -199,46 +191,44 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
           {/* Tool animation overlay */}
           {showToolAnim && PickedIcon && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-[#f4ecd8]/90 rounded-full p-4 animate-pulse border-2 border-[#1e3a5c]">
-                <PickedIcon className="w-12 h-12 text-[#1e3a5c]" />
+              <div className="bg-background/80 rounded-full p-4 animate-pulse">
+                <PickedIcon className="w-12 h-12 text-primary" />
               </div>
             </div>
           )}
-          <div className="absolute bottom-2 left-2 right-2 bg-[#f4ecd8]/95 dark:bg-slate-900/90 rounded p-2 border-l-4 border-[#1e3a5c] dark:border-emerald-400">
-            <p className="text-[9px] uppercase tracking-wider font-bold text-[#1e3a5c]/60 dark:text-emerald-300/60 mb-0.5">Site Notes</p>
-            <p className="text-xs text-slate-800 dark:text-emerald-100 font-medium">{f.desc}</p>
+          <div className="absolute bottom-2 left-2 right-2 bg-background/80 rounded-lg p-2">
+            <p className="text-xs text-foreground font-medium">{f.desc}</p>
           </div>
         </div>
 
-        <p className="text-sm text-[#1e3a5c] dark:text-emerald-200 mb-3 text-center font-semibold">Hypothesis: which instrument fits this site?</p>
+        <p className="text-sm text-muted-foreground mb-3 text-center">Which scouting tool is best for this field?</p>
         <div className="grid grid-cols-2 gap-3 mb-4">
           {TOOLS.map(t => {
             const ToolIcon = t.Icon;
-            let cls = 'border-[#1e3a5c]/30 dark:border-emerald-400/30 bg-[#f4ecd8]/60 dark:bg-slate-800/60';
-            if (scouted && !showToolAnim && t.id === f.bestTool) cls = 'border-emerald-600 bg-emerald-500/20';
-            else if (scouted && !showToolAnim && t.id === picked && t.id !== f.bestTool) cls = 'border-red-600 bg-red-500/20';
-            else if (picked === t.id) cls = 'border-[#1e3a5c] dark:border-emerald-300 bg-[#1e3a5c]/10 dark:bg-emerald-400/10 ring-2 ring-[#1e3a5c]/20';
+            let cls = 'border-border bg-card';
+            if (scouted && !showToolAnim && t.id === f.bestTool) cls = 'border-green-500 bg-green-500/20';
+            else if (scouted && !showToolAnim && t.id === picked && t.id !== f.bestTool) cls = 'border-destructive bg-destructive/20';
+            else if (picked === t.id) cls = 'border-primary bg-primary/10';
             return (
               <button key={t.id} onClick={() => select(t.id)}
-                className={`p-4 rounded-lg border-2 text-center transition-all ${cls}`}>
-                <ToolIcon className="w-8 h-8 mx-auto mb-1 text-[#1e3a5c] dark:text-emerald-200" />
-                <p className="text-sm font-bold text-[#1e3a5c] dark:text-emerald-100">{t.name}</p>
-                <p className="text-[10px] text-slate-700 dark:text-emerald-100/70 mt-1">{t.desc}</p>
+                className={`p-4 rounded-xl border-2 text-center transition-all ${cls}`}>
+                <ToolIcon className="w-8 h-8 mx-auto mb-1 text-foreground" />
+                <p className="text-sm font-bold text-foreground">{t.name}</p>
+                <p className="text-[10px] text-muted-foreground mt-1">{t.desc}</p>
               </button>
             );
           })}
         </div>
-        {!scouted && picked && <button onClick={scout} className="w-full py-3 rounded-lg bg-[#1e3a5c] dark:bg-emerald-500 text-[#f4ecd8] dark:text-slate-900 font-bold hover:opacity-90 transition-opacity">Deploy Instrument</button>}
+        {!scouted && picked && <button onClick={scout} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">Scout!</button>}
         {scouted && !showToolAnim && (
           <div>
-            <div className={`rounded-lg p-3 mb-3 border-l-4 ${picked === f.bestTool ? 'bg-emerald-500/10 border-emerald-600' : 'bg-red-500/10 border-red-600'}`}>
-              <p className={`text-[10px] uppercase tracking-[0.25em] font-bold mb-1 ${picked === f.bestTool ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'}`}>Findings</p>
-              <p className={`text-sm font-bold ${picked === f.bestTool ? 'text-emerald-700 dark:text-emerald-200' : 'text-red-700 dark:text-red-200'}`}>
-                {picked === f.bestTool ? 'Hypothesis supported.' : `Recommended instrument: ${TOOLS.find(t => t.id === f.bestTool)?.name}`}
+            <div className={`rounded-xl p-3 mb-3 ${picked === f.bestTool ? 'bg-green-500/10 border border-green-500' : 'bg-destructive/10 border border-destructive'}`}>
+              <p className={`text-sm font-bold ${picked === f.bestTool ? 'text-green-600' : 'text-destructive'}`}>
+                {picked === f.bestTool ? 'Correct!' : `Better choice: ${TOOLS.find(t => t.id === f.bestTool)?.name}`}
               </p>
-              <p className="text-sm text-slate-800 dark:text-emerald-100 mt-1 italic">{f.note}</p>
+              <p className="text-sm text-foreground mt-1">{f.note}</p>
             </div>
-            <button onClick={next} className="w-full py-3 rounded-lg bg-[#1e3a5c] dark:bg-emerald-500 text-[#f4ecd8] dark:text-slate-900 font-bold hover:opacity-90 transition-opacity">Next Site →</button>
+            <button onClick={next} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">Next Field</button>
           </div>
         )}
       </div>
