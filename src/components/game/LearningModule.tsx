@@ -7248,13 +7248,15 @@ function TopicContent({
 
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Dioecious Weeds</p>
+          <JournalHeader title="Dioecy in Weed Biology" subtitle="Reproductive Strategy" />
+          <LabCallout heading="Definition">
             <p>
               Dioecious weeds are plants that have distinct <strong>female and male individual plants</strong>. This
               means some plants have female flowers while other plants have male flowers, unlike monoecious plants,
               which have both male and female flowers on the same plant.
             </p>
+          </LabCallout>
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
             <p>
               Reproduction is <strong>impossible without both sexes</strong>. A dioecious weed population requires
               female and male plants in <strong>close proximity</strong> — pollen from a male must reach a female for
@@ -7268,6 +7270,20 @@ function TopicContent({
               herbicides.
             </p>
           </div>
+          <TermSidebar
+            terms={[
+              { term: "Dioecious", def: "Male and female flowers on separate individuals (Greek: 'two houses')." },
+              { term: "Monoecious", def: "Male and female flowers on the same individual." },
+              { term: "Obligate outcrossing", def: "Reproduction requires two individuals — maximizes recombination." },
+              { term: "Effective population", def: "Number of individuals contributing genes to the next generation." },
+            ]}
+          />
+          <LabCallout heading="Management implication">
+            Obligate outcrossing drives rapid herbicide-resistance evolution in Palmer amaranth and waterhemp.
+            Diversify modes of action, use overlapping residuals, and prevent seed production — a single escaped
+            female can reseed a field.
+          </LabCallout>
+          <Citation>Ward SM, Webster TM, Steckel LE. Palmer amaranth (Amaranthus palmeri): a review. Weed Technology.</Citation>
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">In this group of 88 weeds, there are 4 dioecious species:</p>
