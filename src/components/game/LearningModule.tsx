@@ -2695,6 +2695,7 @@ function TopicContent({
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
               <HorizontalWeedRow weeds={perennials} onSelectWeed={onSelectWeed} stage="flower" />
+              <PerennialUndergroundComparison compact />
             </div>
           </div>
         );
@@ -2809,6 +2810,7 @@ function TopicContent({
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">Examples: Dandelion, curly dock, and Canada thistle.</p>
+            <PerennialUndergroundComparison />
             </div>
 
             {/* Dual lifecycle */}
@@ -2952,6 +2954,7 @@ function TopicContent({
                 </div>
               ))}
             </div>
+            <PerennialUndergroundComparison />
           </div>
         </div>
       );
