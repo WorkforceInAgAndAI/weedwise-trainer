@@ -3510,15 +3510,13 @@ function TopicContent({
         ];
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Climate &amp; Habitat Adaptation</p>
-              <p>
-                Climate is the single biggest factor that decides which weed species you'll actually see in a field.
-                Temperature controls when a seed germinates, day length tells the plant when to flower, and rainfall
-                decides how much it can grow. Two fields a few hundred miles apart can have completely different weed
-                problems because their growing-season temperatures, frost-free days, and rainfall patterns aren't the
-                same.
-              </p>
+            <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
+            <LabCallout heading="Concept">
+              Climate — thermal regime, photoperiod, precipitation, and edaphic conditions — is the primary filter
+              on weed community composition. Species distribution reflects underlying physiological adaptations
+              (C3/C4 photosynthesis, root architecture, cuticular resistance, dormancy thermal requirements).
+            </LabCallout>
+            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
               <p>
                 Different species are adapted to different climates because of differences in <strong>photosynthesis
                 type (C3 vs. C4)</strong>, <strong>root depth and structure</strong>, <strong>leaf shape and waxy
@@ -3528,10 +3526,17 @@ function TopicContent({
               </p>
               <p>
                 The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
-                for. Scroll through each group to see the species that fit — paying attention to leaf size, root depth,
-                and growth habit will show you the adaptations in action.
+                for.
               </p>
             </div>
+            <TermSidebar
+              terms={[
+                { term: "C3 photosynthesis", def: "Predominant pathway; efficient at cool temperatures and moderate light." },
+                { term: "C4 photosynthesis", def: "CO2-concentrating mechanism; high water-use efficiency at high temperature and light." },
+                { term: "Aerenchyma", def: "Air-conducting parenchyma that oxygenates roots in flooded soils." },
+                { term: "Xerophyte", def: "Species adapted to arid conditions via deep roots, waxy cuticles, or CAM metabolism." },
+              ]}
+            />
 
             {HIGH_HABITATS.map((h) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
