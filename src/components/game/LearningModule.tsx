@@ -138,9 +138,19 @@ const PERENNIAL_UNDERGROUND_PHOTOS: { id: string; name: string; structure: strin
   { id: "Dandelion", name: "Dandelion", structure: "Taproot" },
   { id: "Field_bindweed", name: "Field Bindweed", structure: "Creeping roots" },
   { id: "Field_Horsetail", name: "Field Horsetail", structure: "Rhizome" },
-  { id: "Foxtail_barley", name: "Foxtail Barley", structure: "Tufted crown" },
+  { id: "Foxtail_barley", name: "Foxtail Barley", structure: "Rhizomes" },
   { id: "golden-alexanders", name: "Golden Alexanders", structure: "Fibrous roots" },
   { id: "Ground_ivy", name: "Ground Ivy", structure: "Stolons" },
+  { id: "Hedge_bindweed", name: "Hedge Bindweed", structure: "Rhizomes" },
+  { id: "Hemp_dogbane", name: "Hemp Dogbane", structure: "Creeping roots" },
+  { id: "Honey-vine_climbing_milkweed", name: "Honeyvine Milkweed", structure: "Rhizomes" },
+  { id: "horsenettle", name: "Horsenettle", structure: "Creeping roots" },
+  { id: "johnsongrass", name: "Johnsongrass", structure: "Rhizomes" },
+  { id: "Mouseear_chickweed", name: "Mouseear Chickweed", structure: "Stolons & fibrous roots" },
+  { id: "Nimblewill", name: "Nimblewill", structure: "Stolons" },
+  { id: "Quackgrass", name: "Quackgrass", structure: "Rhizomes" },
+  { id: "Scouringrush", name: "Scouring Rush", structure: "Rhizomes" },
+  { id: "Smooth_Groundcherry", name: "Smooth Groundcherry", structure: "Rhizomes" },
 ];
 
 function PerennialUndergroundComparison({ compact = false }: { compact?: boolean }) {
@@ -150,9 +160,11 @@ function PerennialUndergroundComparison({ compact = false }: { compact?: boolean
         Above vs. Below Ground — Real Perennials
       </div>
       <p className="text-xs text-muted-foreground">
-        Perennials survive winter by storing energy in <strong>underground structures</strong> — rhizomes, taproots,
-        tubers, stolons, or creeping roots. Cutting the tops doesn't kill the plant; it regrows from these
-        overwintering parts each spring.
+        Each pair shows <strong>two reproductive structures of the same plant</strong> — the aboveground shoot on
+        the left and the belowground overwintering structure on the right. Perennials can reproduce both by seed from
+        their flowers and vegetatively from <strong>rhizomes, taproots, tubers, stolons, or creeping roots</strong>.
+        Cutting the tops doesn't kill the plant; it regrows from these underground parts each spring, which is why
+        they're so difficult to control.
       </p>
       <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
         {PERENNIAL_UNDERGROUND_PHOTOS.map((w) => (
