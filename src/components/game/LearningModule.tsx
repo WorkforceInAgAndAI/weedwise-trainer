@@ -2877,14 +2877,21 @@ function TopicContent({
       // 6-8: detailed content with summer/winter annuals
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Life Cycles</p>
-            <p>
+          <NotebookSection title="Life Cycles: Annual, Biennial, Perennial" subtitle="Research Log · Timing">
+            <p className="text-sm">
               Just like people go through different stages of life, every weed has a life cycle that describes how it
               is born, grows, reproduces, and eventually dies. This process has a direct and significant influence on
               how certain weeds should be managed.
             </p>
-          </div>
+            <FieldNote label="Why it matters">
+              Match the tool to the life cycle. Perennials laugh at a mower — they regrow from rhizomes. Annuals
+              are stopped cold if you prevent seed set for one season.
+            </FieldNote>
+            <SelfCheck
+              question="A field is overrun with Canada thistle (perennial). Why won't repeated mowing eradicate it?"
+              answer="Canada thistle spreads by creeping horizontal roots. Cutting only removes shoots; the root system stores enough energy to push up new shoots for years. Systemic herbicides at bud-to-bloom and dense competition are needed."
+            />
+          </NotebookSection>
 
           {/* Life cycle flow */}
           <div className="bg-card border border-border rounded-lg p-4">
