@@ -2032,10 +2032,9 @@ function TopicContent({
     case "seeds":
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">About Weed Seeds</p>
-            {grade === "elementary" && (
-              <>
+          {grade === "elementary" && (
+            <DetectiveCard title="Case File: Tiny Suspects in the Soil" badge="Case 04 · Seeds">
+              <div className="space-y-2 text-sm">
                 <p>
                   Every weed starts as a tiny <strong>seed</strong>. Some seeds are round, some are flat, and some have
                   tiny hooks or wings to help them travel. Seeds can hide in the soil for a long time in something
@@ -2053,10 +2052,17 @@ function TopicContent({
                   find lots of seeds of waterhemp in a seed bank, it is likely you will find many waterhemp plants in
                   the area during the next growing season.
                 </p>
-              </>
-            )}
-            {grade === "middle" && (
-              <>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <EvidenceTag label="Hidden clue" tone="clue" />
+                  <EvidenceTag label="Wind · water · animals" tone="suspect" />
+                  <EvidenceTag label="Years underground" tone="verdict" />
+                </div>
+              </div>
+            </DetectiveCard>
+          )}
+          {grade === "middle" && (
+            <NotebookSection title="Seed Strategy: The Weed's Long Game" subtitle="Research Log · Seed Biology">
+              <div className="space-y-2 text-sm">
                 <p>If competing for light and nutrients is a weed's day job, then seed strategy is its long game.</p>
                 <p>
                   A single weed plant can produce anywhere from a few hundred to hundreds of thousands of seeds in one
@@ -2092,6 +2098,14 @@ function TopicContent({
                   queued up and ready to go. It's the same reason you can spray a field and think you've won, only to
                   see a fresh flush of weeds emerge two weeks later.
                 </p>
+                <FieldNote label="Field observation">
+                  A "clean" field after a single herbicide pass is often a false victory — expect a second flush
+                  from staggered germination within 2–4 weeks.
+                </FieldNote>
+                <SelfCheck
+                  question="Why can lambsquarters reinfest a field 40 years after the last plant went to seed?"
+                  answer="Its seeds have physiological dormancy and hard coats that let them remain viable in the soil seed bank for decades. Tillage or a shift in soil temperature/light can trigger a flush of long-buried seeds."
+                />
                 <div className="bg-card border border-border rounded-lg p-3 mt-2">
                   <p className="font-bold text-foreground text-sm mb-2">Key definitions</p>
                   <dl className="text-xs space-y-1.5">
@@ -2110,16 +2124,21 @@ function TopicContent({
                     ))}
                   </dl>
                 </div>
-              </>
-            )}
-            {grade === "high" && (
-              <>
+              </div>
+            </NotebookSection>
+          )}
+          {grade === "high" && (
+            <>
+              <JournalHeader title="Seed Biology & Seed-Bank Dynamics" subtitle="Population Ecology" />
+              <LabCallout heading="Concept">
                 <p>
                   Seed biology drives nearly every weed management decision a grower makes. Each year a mature weed
                   releases new seeds into the field, called <strong>seed rain</strong>. Those seeds join the
                   <strong> soil seed bank</strong>, the underground reservoir of viable seeds that can germinate now
                   or wait dormant for years. A single field can hold millions of weed seeds per acre.
                 </p>
+              </LabCallout>
+              <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
                 <p>
                   The seed bank shifts over time through <strong>seed bank dynamics</strong>: new inputs from seed
                   rain, losses from germination, predation by insects and rodents, microbial decay, and burial too
@@ -2140,9 +2159,18 @@ function TopicContent({
                   The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
                   replenishment. Allowing even a few plants to set seed can negate years of control efforts.
                 </p>
-              </>
-            )}
-          </div>
+              </div>
+              <TermSidebar
+                terms={[
+                  { term: "Seed rain", def: "Annual input of new seeds from mature weeds to the soil surface." },
+                  { term: "Anemochory", def: "Wind-mediated seed dispersal." },
+                  { term: "Zoochory", def: "Animal-mediated dispersal (endo- and epi-)." },
+                  { term: "Anthropochory", def: "Human/machinery-mediated dispersal — the dominant vector in modern cropping." },
+                ]}
+              />
+              <Citation>Buhler DD, Hartzler RG, Forcella F. Implications of weed seedbank dynamics to weed management. Weed Sci.</Citation>
+            </>
+          )}
 
           {grade === "elementary" && (
             <>
@@ -2249,30 +2277,56 @@ function TopicContent({
 
       return (
         <div className="space-y-6">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            {grade === "elementary" ? (
-              <>
-                <p className="font-semibold text-primary">Life Stages</p>
-                <p>
-                  Just like people, weeds grow up. They go through five stages:
-                  <strong> seed, seedling, vegetative, reproductive, and mature</strong>. Knowing what a
-                  weed looks like at each stage helps us spot it and stop it.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="font-semibold text-primary">Why Life Stages Matter</p>
-                <p>
-                  Weeds look very different at each growth stage. Learning to recognize them{" "}
-                  <strong>early (seedling)</strong> is critical because that's when they're easiest to control.
-                </p>
-                <p>
-                  In IPM, <strong>scouting timing</strong> is everything. Knowing what a weed looks like at each stage
-                  lets you catch it early and choose the right control method.
-                </p>
-              </>
-            )}
-          </div>
+          {grade === "elementary" ? (
+            <DetectiveCard title="Case File: Growing Up Weedy" badge="Case 02 · Life Stages">
+              <p className="text-sm">
+                Just like people, weeds grow up. They go through five stages:
+                <strong> seed, seedling, vegetative, reproductive, and mature</strong>. A good detective can spot
+                a suspect at any stage.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="5 stages" tone="clue" />
+                <EvidenceTag label="Spot early" tone="suspect" />
+                <EvidenceTag label="Stop the spread" tone="verdict" />
+              </div>
+              <CaseCallout heading="Detective Tip">
+                Catch a weed at the <strong>seedling</strong> stage and it's easy to pull. Wait until it flowers and
+                it has already made new seeds for next year.
+              </CaseCallout>
+            </DetectiveCard>
+          ) : grade === "middle" ? (
+            <NotebookSection title="Why Life Stages Matter" subtitle="Research Log · Growth Phases">
+              <p className="text-sm">
+                Weeds look very different at each growth stage. Learning to recognize them{" "}
+                <strong>early (seedling)</strong> is critical — that's when herbicides work best and hand-pulling
+                is still practical.
+              </p>
+              <FieldNote label="Scouting rule">
+                In IPM, <strong>scouting timing</strong> is everything. The right control at the wrong stage wastes
+                time and money.
+              </FieldNote>
+              <SelfCheck
+                question="Why is the seedling stage the best window for post-emergent herbicide?"
+                answer="Seedlings have thin cuticles, small leaf area, and shallow roots — herbicide translocates easily and the plant has no seed reserves to fall back on."
+              />
+            </NotebookSection>
+          ) : (
+            <>
+              <JournalHeader title="Ontogeny & Growth Stages" subtitle="Phenology" />
+              <LabCallout heading="Concept">
+                Weed morphology, physiology, and herbicide susceptibility all shift by growth stage. Accurate
+                staging (BBCH or equivalent) drives control-timing decisions and label compliance.
+              </LabCallout>
+              <TermSidebar
+                terms={[
+                  { term: "Cotyledon", def: "Seed leaf — the first photosynthetic organ; number distinguishes monocots from dicots." },
+                  { term: "True leaf", def: "Leaf produced after cotyledons; morphology matches the mature species." },
+                  { term: "Bolting", def: "Rapid stem elongation preceding flowering, especially in rosette biennials." },
+                  { term: "Anthesis", def: "The period of flower opening and receptivity to pollination." },
+                ]}
+              />
+            </>
+          )}
 
           {/* Visual cycle diagram (Elementary + High School) */}
           {(grade === "elementary" || grade === "high") && (
@@ -2657,14 +2711,18 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Life Cycles</p>
-              <p>
+            <DetectiveCard title="Case File: How Long Do Weeds Live?" badge="Case 03 · Life Cycles">
+              <p className="text-sm">
                 The life cycle of a weed is how long the weed takes to go through all of its life stages (<strong>seed,
                 seedling, vegetative, reproductive, and mature</strong>). Weeds have different life cycles that last for
                 different lengths of time. Knowing the life cycle of a weed can help us manage them.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Annual · 1 year" tone="clue" />
+                <EvidenceTag label="Biennial · 2 years" tone="suspect" />
+                <EvidenceTag label="Perennial · Many years" tone="verdict" />
+              </div>
+            </DetectiveCard>
 
             {/* Life cycle flow */}
             <div className="bg-card border border-border rounded-lg p-4">
@@ -2731,18 +2789,20 @@ function TopicContent({
         // 9-12: Detailed life cycles with summer/winter annuals
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Life Cycles</p>
-              <p>
-                Plants have unique systems to best enable them to reproduce and survive in varying conditions. One such
-                system is how quickly or slowly plants complete a <strong>life cycle</strong>. A complete life cycle
-                moves through five stages:{" "}
-                <strong>seed, seedling, vegetative, reproductive, and mature</strong>. The
-                <strong> reproductive</strong> stage groups flowering, pollination, and fertilization together, since
-                they all happen as the plant prepares to set seed. Refer to the Life Stages topic for the visual cycle
-                diagram.
-              </p>
-            </div>
+            <JournalHeader title="Life-Cycle Strategies in Weed Populations" subtitle="Reproductive Ecology" />
+            <LabCallout heading="Concept">
+              Life-cycle length (annual, biennial, perennial) determines the seed-bank contribution, control-timing
+              window, and vegetative-reproduction risk for each species. It is the single most important trait for
+              designing a multi-year management plan.
+            </LabCallout>
+            <TermSidebar
+              terms={[
+                { term: "Annual", def: "Completes seed → seed in one growing season; obligate seed reproduction." },
+                { term: "Biennial", def: "Two-year cycle: rosette in year 1, bolt/flower/seed in year 2." },
+                { term: "Perennial", def: "Persists >2 years; often reproduces vegetatively via rhizomes, stolons, tubers." },
+                { term: "Facultative", def: "Species that shift between annual and perennial habit based on climate/management." },
+              ]}
+            />
 
             <p className="text-sm text-foreground">Common weeds have three general life cycle lengths.</p>
 
@@ -2845,14 +2905,21 @@ function TopicContent({
       // 6-8: detailed content with summer/winter annuals
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Life Cycles</p>
-            <p>
+          <NotebookSection title="Life Cycles: Annual, Biennial, Perennial" subtitle="Research Log · Timing">
+            <p className="text-sm">
               Just like people go through different stages of life, every weed has a life cycle that describes how it
               is born, grows, reproduces, and eventually dies. This process has a direct and significant influence on
               how certain weeds should be managed.
             </p>
-          </div>
+            <FieldNote label="Why it matters">
+              Match the tool to the life cycle. Perennials laugh at a mower — they regrow from rhizomes. Annuals
+              are stopped cold if you prevent seed set for one season.
+            </FieldNote>
+            <SelfCheck
+              question="A field is overrun with Canada thistle (perennial). Why won't repeated mowing eradicate it?"
+              answer="Canada thistle spreads by creeping horizontal roots. Cutting only removes shoots; the root system stores enough energy to push up new shoots for years. Systemic herbicides at bud-to-bloom and dense competition are needed."
+            />
+          </NotebookSection>
 
           {/* Life cycle flow */}
           <div className="bg-card border border-border rounded-lg p-4">
@@ -3181,14 +3248,23 @@ function TopicContent({
 
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Habitats</p>
-              <p>
+            <DetectiveCard title="Case File: Where Do Weeds Hide?" badge="Case 05 · Habitats">
+              <p className="text-sm">
                 A <strong>habitat</strong> is the kind of place where a plant likes to live. Some weeds love hot
                 sunny spots, others like cool or wet places. Knowing where a weed likes to grow helps us guess where
                 we will find it.
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Sun · Warm" tone="clue" />
+                <EvidenceTag label="Cool · Damp" tone="clue" />
+                <EvidenceTag label="Wet · Ditch" tone="suspect" />
+                <EvidenceTag label="Dry · Roadside" tone="suspect" />
+              </div>
+              <CaseCallout heading="Detective Tip">
+                A weed's favorite habitat is its fingerprint. Find <strong>yellow nutsedge</strong> and you've
+                spotted a wet, poorly-drained corner of the field.
+              </CaseCallout>
+            </DetectiveCard>
 
             {/* Climate map */}
             <div className="bg-card border border-border rounded-xl p-5 space-y-3">
@@ -3367,24 +3443,33 @@ function TopicContent({
 
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Habitats</p>
-              <p>
-                A habitat is the natural home where a plant or animal lives and thrives, and weeds, just like people,
-                have preferences about where they like to hang out.
-              </p>
-              <p>
-                Factors such as <strong>soil texture, moisture availability, light levels, temperature ranges,
-                pH</strong>, and the degree of soil disturbance all influence which weed species are likely to establish
-                and become dominant in a given location.
-              </p>
-              <p>
-                Below, weeds are organized two ways: by the <strong>season</strong> they grow in
-                (cool-season vs. warm-season) and by the <strong>soil-type habitat</strong> they prefer
-                (wet / compact vs. dry / disturbed). The same weed may appear in more than one soil-type
-                group when it tolerates both conditions.
-              </p>
-            </div>
+            <NotebookSection title="Habitats: Reading the Field" subtitle="Research Log · Site Preferences">
+              <div className="space-y-2 text-sm">
+                <p>
+                  A habitat is the natural home where a plant or animal lives and thrives, and weeds, just like people,
+                  have preferences about where they like to hang out.
+                </p>
+                <p>
+                  Factors such as <strong>soil texture, moisture availability, light levels, temperature ranges,
+                  pH</strong>, and the degree of soil disturbance all influence which weed species are likely to establish
+                  and become dominant in a given location.
+                </p>
+                <p>
+                  Below, weeds are organized two ways: by the <strong>season</strong> they grow in
+                  (cool-season vs. warm-season) and by the <strong>soil-type habitat</strong> they prefer
+                  (wet / compact vs. dry / disturbed). The same weed may appear in more than one soil-type
+                  group when it tolerates both conditions.
+                </p>
+              </div>
+              <FieldNote label="Indicator species">
+                Persistent yellow nutsedge = drainage or compaction problem. Kochia on the headland = dry, disturbed
+                margin. The weed is telling you about the site.
+              </FieldNote>
+              <SelfCheck
+                question="A grower reports foxtail barley taking over a low, salty spot in the field. What management step should come before another herbicide pass?"
+                answer="Address the site condition — improve drainage and, if salinity is confirmed by a soil test, plant a salt-tolerant cover. Herbicide alone won't hold if the site keeps favoring the weed."
+              />
+            </NotebookSection>
 
             <div className="space-y-2">
               <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Season</p>
@@ -3425,15 +3510,13 @@ function TopicContent({
         ];
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Climate &amp; Habitat Adaptation</p>
-              <p>
-                Climate is the single biggest factor that decides which weed species you'll actually see in a field.
-                Temperature controls when a seed germinates, day length tells the plant when to flower, and rainfall
-                decides how much it can grow. Two fields a few hundred miles apart can have completely different weed
-                problems because their growing-season temperatures, frost-free days, and rainfall patterns aren't the
-                same.
-              </p>
+            <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
+            <LabCallout heading="Concept">
+              Climate — thermal regime, photoperiod, precipitation, and edaphic conditions — is the primary filter
+              on weed community composition. Species distribution reflects underlying physiological adaptations
+              (C3/C4 photosynthesis, root architecture, cuticular resistance, dormancy thermal requirements).
+            </LabCallout>
+            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
               <p>
                 Different species are adapted to different climates because of differences in <strong>photosynthesis
                 type (C3 vs. C4)</strong>, <strong>root depth and structure</strong>, <strong>leaf shape and waxy
@@ -3443,10 +3526,17 @@ function TopicContent({
               </p>
               <p>
                 The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
-                for. Scroll through each group to see the species that fit — paying attention to leaf size, root depth,
-                and growth habit will show you the adaptations in action.
+                for.
               </p>
             </div>
+            <TermSidebar
+              terms={[
+                { term: "C3 photosynthesis", def: "Predominant pathway; efficient at cool temperatures and moderate light." },
+                { term: "C4 photosynthesis", def: "CO2-concentrating mechanism; high water-use efficiency at high temperature and light." },
+                { term: "Aerenchyma", def: "Air-conducting parenchyma that oxygenates roots in flooded soils." },
+                { term: "Xerophyte", def: "Species adapted to arid conditions via deep roots, waxy cuticles, or CAM metabolism." },
+              ]}
+            />
 
             {HIGH_HABITATS.map((h) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
@@ -3493,14 +3583,18 @@ function TopicContent({
       if (grade === "elementary") {
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
-              <p>
+            <DetectiveCard title="Case File: Land, Water, or Freeloader?" badge="Case 06 · Growth Types">
+              <p className="text-sm">
                 Different weeds need different things to live. We sort weeds into three groups based on how and
                 where they get what they need: <strong>terrestrial</strong> (on land), <strong>aquatic</strong>
                 (in water), and <strong>parasitic</strong> (taking food from other plants).
               </p>
-            </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <EvidenceTag label="Terrestrial · Soil" tone="clue" />
+                <EvidenceTag label="Aquatic · Water" tone="clue" />
+                <EvidenceTag label="Parasitic · Steals food" tone="suspect" />
+              </div>
+            </DetectiveCard>
 
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <p className="font-display font-bold text-foreground text-base">
@@ -3563,17 +3657,22 @@ function TopicContent({
       // 6-8
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Terrestrial, Parasitic, and Aquatic</p>
-            <p>
-              Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
-              actually steal nutrients from other plants!
-            </p>
-            <p>
-              Weeds can be broadly categorized into three growth types based on where and how they obtain resources:
-              <strong> terrestrial, parasitic, and aquatic</strong>.
-            </p>
-          </div>
+          <NotebookSection title="Growth Types: Terrestrial, Aquatic, Parasitic" subtitle="Research Log · Resource Acquisition">
+            <div className="space-y-2 text-sm">
+              <p>
+                Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
+                actually steal nutrients from other plants!
+              </p>
+              <p>
+                Weeds can be broadly categorized into three growth types based on where and how they obtain resources:
+                <strong> terrestrial, parasitic, and aquatic</strong>.
+              </p>
+            </div>
+            <FieldNote label="Why it matters">
+              Growth type dictates the control tool. A parasitic weed like dodder can't be killed with a soil
+              herbicide targeting its host — you have to break the host connection.
+            </FieldNote>
+          </NotebookSection>
 
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
@@ -7373,11 +7472,22 @@ function TopicContent({
       ];
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Seed Dormancy</p>
-            <p>To survive <strong>seasonal changes</strong> and other unfavorable conditions — cold winters, summer drought, waterlogged soils, or simply the wrong time of year — weed seeds have evolved the ability to pause germination until conditions improve.</p>
-            <p><strong>Seed dormancy</strong> is the ability of a viable seed to remain dormant and avoid unfavorable conditions, waiting until favorable conditions (the right temperature, moisture, light, and oxygen) arise before germinating. For weed seeds this is a survival advantage; for agronomists trying to eradicate weeds it makes the seedbank persist for years.</p>
-          </div>
+          <JournalHeader title="Seed Dormancy Mechanisms" subtitle="Reproductive Physiology" />
+          <LabCallout heading="Definition">
+            <strong>Seed dormancy</strong> is the failure of a viable seed to germinate under otherwise favorable
+            conditions. It is the mechanism that maintains the persistent soil seed bank and defeats one-time
+            eradication attempts.
+          </LabCallout>
+          <TermSidebar
+            terms={[
+              { term: "Physical dormancy", def: "Impermeable seed coat blocks water/gas exchange until weathered." },
+              { term: "Physiological dormancy", def: "Embryo-borne chemical inhibitors delay germination; most common type." },
+              { term: "Chemical dormancy", def: "High inhibitor loads in seed coverings; leached by rainfall." },
+              { term: "Morphological dormancy", def: "Embryo underdeveloped at dispersal; requires post-shed maturation." },
+              { term: "Stratification", def: "Prolonged chilling that satisfies physiological dormancy." },
+            ]}
+          />
+          <Citation>Baskin CC, Baskin JM. Seeds: Ecology, Biogeography, and Evolution of Dormancy and Germination.</Citation>
           <div className="space-y-4">
             {DORMANCY_TYPES.map(d => {
               const exampleWeeds = d.examples
