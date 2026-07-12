@@ -47,6 +47,7 @@ import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
 import LiguleLens from './practice-games/middle/LiguleLens';
+import PastureWalk from './practice-games/middle/PastureWalk';
 
 import HSNameTheWeed from './practice-games/high/NameTheWeed';
 import HSTaxonomyTower from './practice-games/high/TaxonomyTower';
@@ -61,6 +62,7 @@ import FormYourFarm from './practice-games/high/FormYourFarm';
 import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
+import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 
