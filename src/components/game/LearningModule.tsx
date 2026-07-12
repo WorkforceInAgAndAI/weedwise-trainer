@@ -151,6 +151,11 @@ const PERENNIAL_UNDERGROUND_PHOTOS: { id: string; name: string; structure: strin
   { id: "Quackgrass", name: "Quackgrass", structure: "Rhizomes" },
   { id: "Scouringrush", name: "Scouring Rush", structure: "Rhizomes" },
   { id: "Smooth_Groundcherry", name: "Smooth Groundcherry", structure: "Rhizomes" },
+  { id: "Star_of_Bethlehem", name: "Star-of-Bethlehem", structure: "Bulbs" },
+  { id: "Water_smartweed", name: "Water Smartweed", structure: "Rhizomes" },
+  { id: "White_campion", name: "White Campion", structure: "Taproot" },
+  { id: "Wild_Four-o'clock", name: "Wild Four-o'clock", structure: "Tuberous taproot" },
+  { id: "yellow-nutsedge", name: "Yellow Nutsedge", structure: "Tubers (nutlets)" },
 ];
 
 function PerennialUndergroundComparison({ compact = false }: { compact?: boolean }) {
