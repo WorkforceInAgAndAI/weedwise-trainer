@@ -7463,11 +7463,22 @@ function TopicContent({
       ];
       return (
         <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Seed Dormancy</p>
-            <p>To survive <strong>seasonal changes</strong> and other unfavorable conditions — cold winters, summer drought, waterlogged soils, or simply the wrong time of year — weed seeds have evolved the ability to pause germination until conditions improve.</p>
-            <p><strong>Seed dormancy</strong> is the ability of a viable seed to remain dormant and avoid unfavorable conditions, waiting until favorable conditions (the right temperature, moisture, light, and oxygen) arise before germinating. For weed seeds this is a survival advantage; for agronomists trying to eradicate weeds it makes the seedbank persist for years.</p>
-          </div>
+          <JournalHeader title="Seed Dormancy Mechanisms" subtitle="Reproductive Physiology" />
+          <LabCallout heading="Definition">
+            <strong>Seed dormancy</strong> is the failure of a viable seed to germinate under otherwise favorable
+            conditions. It is the mechanism that maintains the persistent soil seed bank and defeats one-time
+            eradication attempts.
+          </LabCallout>
+          <TermSidebar
+            terms={[
+              { term: "Physical dormancy", def: "Impermeable seed coat blocks water/gas exchange until weathered." },
+              { term: "Physiological dormancy", def: "Embryo-borne chemical inhibitors delay germination; most common type." },
+              { term: "Chemical dormancy", def: "High inhibitor loads in seed coverings; leached by rainfall." },
+              { term: "Morphological dormancy", def: "Embryo underdeveloped at dispersal; requires post-shed maturation." },
+              { term: "Stratification", def: "Prolonged chilling that satisfies physiological dormancy." },
+            ]}
+          />
+          <Citation>Baskin CC, Baskin JM. Seeds: Ecology, Biogeography, and Evolution of Dormancy and Germination.</Citation>
           <div className="space-y-4">
             {DORMANCY_TYPES.map(d => {
               const exampleWeeds = d.examples
