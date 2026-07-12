@@ -5483,10 +5483,11 @@ function TopicContent({
       if (viewMode === "box") {
         return (
           <div className="space-y-4">
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-              <p className="font-semibold text-primary mb-2">Plant Families</p>
-              <p>Click a family tile to learn about its characteristics and see its species.</p>
-            </div>
+            <JournalHeader title="Plant Families of the Midwest Weed Flora" subtitle="Comparative Morphology" />
+            <LabCallout heading="Protocol">
+              Click a family tile to review its diagnostic characters (floral formula, inflorescence type,
+              leaf arrangement) and the member species represented in this dataset.
+            </LabCallout>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from(famGroups.entries())
                 .sort()
@@ -5512,13 +5513,20 @@ function TopicContent({
 
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary mb-2">Plant Families</p>
-            <p>
-              Plants in the same family share key characteristics like flower structure, leaf arrangement, and seed
-              type.
-            </p>
-          </div>
+          <JournalHeader title="Plant Families of the Midwest Weed Flora" subtitle="Comparative Morphology" />
+          <LabCallout heading="Concept">
+            Family-level classification is anchored in shared reproductive morphology — floral structure,
+            inflorescence architecture, and fruit type — which typically correlates with predictable
+            herbicide sensitivity within the family.
+          </LabCallout>
+          <TermSidebar
+            terms={[
+              { term: "Inflorescence", def: "The arrangement of flowers on a plant (raceme, umbel, head, spike)." },
+              { term: "Floral formula", def: "Shorthand encoding of sepals, petals, stamens, carpels." },
+              { term: "Ocrea", def: "Papery sheath at nodes — diagnostic for Polygonaceae." },
+              { term: "Involucre", def: "Whorl of bracts subtending a head — diagnostic for Asteraceae." },
+            ]}
+          />
           {Array.from(famGroups.entries())
             .sort()
             .map(([family, members]) => (
