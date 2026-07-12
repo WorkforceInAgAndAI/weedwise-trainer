@@ -30,8 +30,10 @@ function getPhaseIndex(grade: GradeLevel, phaseId: string): number {
 function generateQuestion(phase: PhaseConfig, weed: Weed, allWeeds: Weed[]): Question {
  const others = allWeeds.filter(w => w.id !== weed.id);
  
- // For 6-8 and 9-12, use ligule images for grasses instead of vegetative
- const isGrass = weed.plantType === 'Monocot';
+ // For 6-8 and 9-12, use ligule images for TRUE grasses only.
+ // Some monocots (e.g. Asiatic dayflower — Commelinaceae) have no ligule,
+ // so restrict to Poaceae to avoid misleading ID art.
+ const isGrass = weed.plantType === 'Monocot' && weed.family === 'Poaceae';
  const adjustedImageStage = (phase.id === 'm1' || phase.id === 'h1') && isGrass
  ? 'ligule' : phase.imageStage;
  

@@ -3,7 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -38,25 +38,29 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  const swap = (i: number, j: number) => {
-    if (checked || i === j) return;
+  // Insert semantics: move item from index `from` to index `to`, shifting others.
+  // This matches student intuition — cards visually slide in the direction they're moved,
+  // instead of flipping with whatever card happens to sit at the drop target.
+  const move = (from: number, to: number) => {
+    if (checked || from === to || to < 0 || to >= order.length) return;
     const next = [...order];
-    [next[i], next[j]] = [next[j], next[i]];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
     setOrder(next);
   };
 
-  // Click-to-swap: first tap selects a card, second tap swaps them.
+  // Click-to-move: first tap selects a card, second tap moves the selected card to that slot.
   const handleCardClick = (i: number) => {
     if (checked) return;
     if (selectedIdx === null) { setSelectedIdx(i); return; }
     if (selectedIdx === i) { setSelectedIdx(null); return; }
-    swap(selectedIdx, i);
+    move(selectedIdx, i);
     setSelectedIdx(null);
   };
 
   const handleDrop = (i: number) => {
     if (draggedIdx === null || checked) return;
-    swap(draggedIdx, i);
+    move(draggedIdx, i);
     setDraggedIdx(null);
     setSelectedIdx(null);
   };
@@ -99,7 +103,7 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
                 ? isCorrect
                   ? `Yee-haw! You put the ${target.commonName} stages in the right order.`
                   : `Close, partner — every weed starts as a seed, sprouts into a seedling, grows tall (vegetative), then flowers (reproductive).`
-                : `Put the ${target.commonName} stages in order from left to right. Drag a card onto another to swap them — or tap one card, then tap another to switch them.`
+                : `Put the ${target.commonName} stages in order from left to right. Use the ◀ ▶ buttons on a card, drag a card into the spot you want, or tap two cards to move.`
             }
             className="max-w-xl w-full"
           />
@@ -132,6 +136,24 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
                       <WeedImage weedId={target.id} stage={stage} className="w-full h-full object-cover" />
                     </div>
                     <div className="text-xs font-semibold text-foreground">{STAGE_LABELS[stage]}</div>
+                    {!checked && (
+                      <div className="flex gap-1 mt-1" onClick={e => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          disabled={i === 0}
+                          onClick={e => { e.stopPropagation(); move(i, i - 1); setSelectedIdx(null); }}
+                          className="w-7 h-7 rounded-full bg-primary/10 text-primary disabled:opacity-30 flex items-center justify-center hover:bg-primary/20"
+                          aria-label="Move left"
+                        ><ChevronLeft className="w-4 h-4" /></button>
+                        <button
+                          type="button"
+                          disabled={i === order.length - 1}
+                          onClick={e => { e.stopPropagation(); move(i, i + 1); setSelectedIdx(null); }}
+                          className="w-7 h-7 rounded-full bg-primary/10 text-primary disabled:opacity-30 flex items-center justify-center hover:bg-primary/20"
+                          aria-label="Move right"
+                        ><ChevronRight className="w-4 h-4" /></button>
+                      </div>
+                    )}
                   </button>
                   {i < order.length - 1 && <ArrowRight className="w-5 h-5 text-primary/60 shrink-0" />}
                 </div>

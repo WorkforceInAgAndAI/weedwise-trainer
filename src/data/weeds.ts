@@ -3,7 +3,7 @@ import type { Weed } from "@/types/game";
 export const weeds: Weed[] = [
   {
     id: "Smooth_Witchgrass",
-    commonName: "Smooth Witchgrass",
+    commonName: "Fall Panicum",
     scientificName: "Panicum dichotomiflorum",
     family: "Poaceae",
     plantType: "Monocot",
@@ -26,9 +26,9 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Witchgrass",
       species: "Witchgrass (Panicum capillare)",
-      difference: "Witchgrass has hairy sheaths and leaves; Smooth witchgrass is larger and lacks hairs on leaves",
+      difference: "Witchgrass has hairy sheaths and leaves; Fall panicum is larger, has a prominent white midvein, and lacks hairs on the blades",
     },
-    memoryHook: "Smooth witchgrass = smooth hairless leaves + similar growth to hairy type",
+    memoryHook: "Fall panicum = smooth hairless blades + zig-zag stem + prominent white midvein",
   },
 
   {
@@ -693,7 +693,7 @@ export const weeds: Weed[] = [
       "Dioecious with male and female flowers on separate plants",
       "Grows 6–10 feet tall with prolific seed production",
     ],
-    habitat: "Corn and soybean fields, river bottoms, floodplains",
+    habitat: "Corn and soybean fields, disturbed row-crop ground, ditch banks and field edges (upland weed — not aquatic)",
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
     actReason:
@@ -1051,7 +1051,7 @@ export const weeds: Weed[] = [
       "Lanceolate leaves with sheathing base",
       "Trailing/ascending weak stems (1–3 feet)",
       "Succulent, jointed stems with nodes",
-      "Flowers open in morning, close by afternoon",
+      "Flowers open in morning, close by afternoon (no ligule — not a grass)",
     ],
     habitat: "Roadsides, gardens, fields, waste areas",
     primaryHabitat: "Warm-Season / Full Sun",
