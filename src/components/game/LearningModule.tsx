@@ -3443,24 +3443,33 @@ function TopicContent({
 
         return (
           <div className="space-y-5">
-            <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">Habitats</p>
-              <p>
-                A habitat is the natural home where a plant or animal lives and thrives, and weeds, just like people,
-                have preferences about where they like to hang out.
-              </p>
-              <p>
-                Factors such as <strong>soil texture, moisture availability, light levels, temperature ranges,
-                pH</strong>, and the degree of soil disturbance all influence which weed species are likely to establish
-                and become dominant in a given location.
-              </p>
-              <p>
-                Below, weeds are organized two ways: by the <strong>season</strong> they grow in
-                (cool-season vs. warm-season) and by the <strong>soil-type habitat</strong> they prefer
-                (wet / compact vs. dry / disturbed). The same weed may appear in more than one soil-type
-                group when it tolerates both conditions.
-              </p>
-            </div>
+            <NotebookSection title="Habitats: Reading the Field" subtitle="Research Log · Site Preferences">
+              <div className="space-y-2 text-sm">
+                <p>
+                  A habitat is the natural home where a plant or animal lives and thrives, and weeds, just like people,
+                  have preferences about where they like to hang out.
+                </p>
+                <p>
+                  Factors such as <strong>soil texture, moisture availability, light levels, temperature ranges,
+                  pH</strong>, and the degree of soil disturbance all influence which weed species are likely to establish
+                  and become dominant in a given location.
+                </p>
+                <p>
+                  Below, weeds are organized two ways: by the <strong>season</strong> they grow in
+                  (cool-season vs. warm-season) and by the <strong>soil-type habitat</strong> they prefer
+                  (wet / compact vs. dry / disturbed). The same weed may appear in more than one soil-type
+                  group when it tolerates both conditions.
+                </p>
+              </div>
+              <FieldNote label="Indicator species">
+                Persistent yellow nutsedge = drainage or compaction problem. Kochia on the headland = dry, disturbed
+                margin. The weed is telling you about the site.
+              </FieldNote>
+              <SelfCheck
+                question="A grower reports foxtail barley taking over a low, salty spot in the field. What management step should come before another herbicide pass?"
+                answer="Address the site condition — improve drainage and, if salinity is confirmed by a soil test, plant a salt-tolerant cover. Herbicide alone won't hold if the site keeps favoring the weed."
+              />
+            </NotebookSection>
 
             <div className="space-y-2">
               <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Season</p>
