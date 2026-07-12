@@ -2699,7 +2699,6 @@ function TopicContent({
                   energy in its roots during the first year.
                 </p>
               </div>
-              <HorizontalWeedRow weeds={biennials} onSelectWeed={onSelectWeed} stage="flower" />
               <BiennialYearComparison compact />
             </div>
 
@@ -2711,7 +2710,6 @@ function TopicContent({
                 bulbs each year. Perennials spread by seeds or through <strong>underground stems and roots</strong> that
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
-              <HorizontalWeedRow weeds={perennials} onSelectWeed={onSelectWeed} stage="flower" />
               <PerennialUndergroundComparison compact />
             </div>
           </div>
@@ -2791,19 +2789,6 @@ function TopicContent({
                 <strong>vegetative growth</strong>. In the second year, they bolt, flower, produce seeds, and die.
                 Control is most effective during the <strong>rosette stage</strong>.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {biennials.map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Examples: Common burdock, garlic mustard, and wild parsnip.
-              </p>
               <BiennialYearComparison />
             </div>
 
@@ -2816,17 +2801,6 @@ function TopicContent({
                 most difficult weeds to manage because they can regrow from underground structures even after top growth
                 is removed.
               </p>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {perennials.map((w) => (
-                  <div key={w.id} className="text-center">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                      <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                    </div>
-                    <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground">Examples: Dandelion, curly dock, and Canada thistle.</p>
             <PerennialUndergroundComparison />
             </div>
 
@@ -2936,16 +2910,6 @@ function TopicContent({
               producing only vegetative growth in the first year and then flowering, setting seed, and dying in the
               second.
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {biennials.slice(0, 8).map((w) => (
-                <div key={w.id} className="text-center">
-                  <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                  </div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                </div>
-              ))}
-            </div>
             <BiennialYearComparison />
           </div>
 
@@ -2961,16 +2925,6 @@ function TopicContent({
               Matching control strategies to the specific life cycle of a target weed species is fundamental to
               achieving durable suppression rather than temporary or cosmetic results.
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {perennials.slice(0, 8).map((w) => (
-                <div key={w.id} className="text-center">
-                  <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border">
-                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                  </div>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                </div>
-              ))}
-            </div>
             <PerennialUndergroundComparison />
           </div>
         </div>
