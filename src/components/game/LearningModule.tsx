@@ -2032,10 +2032,9 @@ function TopicContent({
     case "seeds":
       return (
         <div className="space-y-4">
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-semibold text-primary">About Weed Seeds</p>
-            {grade === "elementary" && (
-              <>
+          {grade === "elementary" && (
+            <DetectiveCard title="Case File: Tiny Suspects in the Soil" badge="Case 04 · Seeds">
+              <div className="space-y-2 text-sm">
                 <p>
                   Every weed starts as a tiny <strong>seed</strong>. Some seeds are round, some are flat, and some have
                   tiny hooks or wings to help them travel. Seeds can hide in the soil for a long time in something
@@ -2053,10 +2052,17 @@ function TopicContent({
                   find lots of seeds of waterhemp in a seed bank, it is likely you will find many waterhemp plants in
                   the area during the next growing season.
                 </p>
-              </>
-            )}
-            {grade === "middle" && (
-              <>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <EvidenceTag label="Hidden clue" tone="clue" />
+                  <EvidenceTag label="Wind · water · animals" tone="suspect" />
+                  <EvidenceTag label="Years underground" tone="verdict" />
+                </div>
+              </div>
+            </DetectiveCard>
+          )}
+          {grade === "middle" && (
+            <NotebookSection title="Seed Strategy: The Weed's Long Game" subtitle="Research Log · Seed Biology">
+              <div className="space-y-2 text-sm">
                 <p>If competing for light and nutrients is a weed's day job, then seed strategy is its long game.</p>
                 <p>
                   A single weed plant can produce anywhere from a few hundred to hundreds of thousands of seeds in one
@@ -2092,6 +2098,14 @@ function TopicContent({
                   queued up and ready to go. It's the same reason you can spray a field and think you've won, only to
                   see a fresh flush of weeds emerge two weeks later.
                 </p>
+                <FieldNote label="Field observation">
+                  A "clean" field after a single herbicide pass is often a false victory — expect a second flush
+                  from staggered germination within 2–4 weeks.
+                </FieldNote>
+                <SelfCheck
+                  question="Why can lambsquarters reinfest a field 40 years after the last plant went to seed?"
+                  answer="Its seeds have physiological dormancy and hard coats that let them remain viable in the soil seed bank for decades. Tillage or a shift in soil temperature/light can trigger a flush of long-buried seeds."
+                />
                 <div className="bg-card border border-border rounded-lg p-3 mt-2">
                   <p className="font-bold text-foreground text-sm mb-2">Key definitions</p>
                   <dl className="text-xs space-y-1.5">
@@ -2110,16 +2124,21 @@ function TopicContent({
                     ))}
                   </dl>
                 </div>
-              </>
-            )}
-            {grade === "high" && (
-              <>
+              </div>
+            </NotebookSection>
+          )}
+          {grade === "high" && (
+            <>
+              <JournalHeader title="Seed Biology & Seed-Bank Dynamics" subtitle="Population Ecology" />
+              <LabCallout heading="Concept">
                 <p>
                   Seed biology drives nearly every weed management decision a grower makes. Each year a mature weed
                   releases new seeds into the field, called <strong>seed rain</strong>. Those seeds join the
                   <strong> soil seed bank</strong>, the underground reservoir of viable seeds that can germinate now
                   or wait dormant for years. A single field can hold millions of weed seeds per acre.
                 </p>
+              </LabCallout>
+              <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
                 <p>
                   The seed bank shifts over time through <strong>seed bank dynamics</strong>: new inputs from seed
                   rain, losses from germination, predation by insects and rodents, microbial decay, and burial too
@@ -2140,9 +2159,18 @@ function TopicContent({
                   The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
                   replenishment. Allowing even a few plants to set seed can negate years of control efforts.
                 </p>
-              </>
-            )}
-          </div>
+              </div>
+              <TermSidebar
+                terms={[
+                  { term: "Seed rain", def: "Annual input of new seeds from mature weeds to the soil surface." },
+                  { term: "Anemochory", def: "Wind-mediated seed dispersal." },
+                  { term: "Zoochory", def: "Animal-mediated dispersal (endo- and epi-)." },
+                  { term: "Anthropochory", def: "Human/machinery-mediated dispersal — the dominant vector in modern cropping." },
+                ]}
+              />
+              <Citation>Buhler DD, Hartzler RG, Forcella F. Implications of weed seedbank dynamics to weed management. Weed Sci.</Citation>
+            </>
+          )}
 
           {grade === "elementary" && (
             <>
