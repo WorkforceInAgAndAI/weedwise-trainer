@@ -30,6 +30,7 @@ import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import WeedControl from './practice-games/k5/WeedControl';
 import GreatGardenRace from './practice-games/k5/GreatGardenRace';
 import SeedJourney from './practice-games/k5/SeedJourney';
+import WeedHeroSquad from './practice-games/k5/WeedHeroSquad';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -88,6 +89,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety', 'weed-control': 'control-methods',
   'great-garden-race': 'life-cycles',
   'seed-journey': 'seeds',
+  'weed-hero-squad': 'control-methods',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
