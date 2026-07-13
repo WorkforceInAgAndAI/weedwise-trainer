@@ -131,6 +131,7 @@ const k5Games: GameDef[] = [
 const newK5Games: GameDef[] = [
  { id: 'great-garden-race', name: 'The Great Garden Race', Icon: Trophy, category: 'Growth & Competition', description: 'Pac-Man style race — grab sun, water, and nutrients before the weed does!', howToPlay: 'Use arrow keys (or the on-screen D-pad) to steer your flower through the maze. Collect Sun, Water, and Nutrient pellets before the weed reaches them. After each day, both plants grow — but the weed grows faster per resource, so out-race it!', component: GreatGardenRace },
  { id: 'seed-journey', name: 'Seed Journey', Icon: Wind, category: 'Seed Dispersal', description: 'You are a seed! Choose the best way to travel — wind, water, or animal — in each scenario.', howToPlay: 'Read the scenario, then pick one of two travel choices. Match the best dispersal method (wind, water, or animal hitchhiker) to the place your seed is starting from.', component: SeedJourney },
+ { id: 'weed-hero-squad', name: 'Weed Hero Squad', Icon: Swords, category: 'Control Methods', description: 'Suit up as a weed-fighting superhero! Pick Pull, Block, Outsmart, Eat, or Stop to rescue the crops.', howToPlay: 'Each mission shows a crop in danger and a weed villain. Choose the best of the 5 superpowers — Pull It, Block It, Outsmart It, Eat It, or Stop It — to defeat the weed and free the crop.', component: WeedHeroSquad },
 ];
 
 const middleGames: GameDef[] = [
