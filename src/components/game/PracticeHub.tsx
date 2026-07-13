@@ -29,6 +29,7 @@ import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import WeedControl from './practice-games/k5/WeedControl';
 import GreatGardenRace from './practice-games/k5/GreatGardenRace';
+import SeedJourney from './practice-games/k5/SeedJourney';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -86,6 +87,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'seed-banks': 'seeds', 'weed-travel': 'seeds', 'invasive-match': 'native-introduced',
   'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety', 'weed-control': 'control-methods',
   'great-garden-race': 'life-cycles',
+  'seed-journey': 'seeds',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
@@ -126,6 +128,7 @@ const k5Games: GameDef[] = [
 // True K-5 ("Explorer") games — this list is what the "Grades K-5" tab shows.
 const newK5Games: GameDef[] = [
  { id: 'great-garden-race', name: 'The Great Garden Race', Icon: Trophy, category: 'Growth & Competition', description: 'Pac-Man style race — grab sun, water, and nutrients before the weed does!', howToPlay: 'Use arrow keys (or the on-screen D-pad) to steer your flower through the maze. Collect Sun, Water, and Nutrient pellets before the weed reaches them. After each day, both plants grow — but the weed grows faster per resource, so out-race it!', component: GreatGardenRace },
+ { id: 'seed-journey', name: 'Seed Journey', Icon: Wind, category: 'Seed Dispersal', description: 'You are a seed! Choose the best way to travel — wind, water, or animal — in each scenario.', howToPlay: 'Read the scenario, then pick one of two travel choices. Match the best dispersal method (wind, water, or animal hitchhiker) to the place your seed is starting from.', component: SeedJourney },
 ];
 
 const middleGames: GameDef[] = [
