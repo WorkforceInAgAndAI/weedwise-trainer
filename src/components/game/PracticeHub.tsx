@@ -31,6 +31,7 @@ import WeedControl from './practice-games/k5/WeedControl';
 import GreatGardenRace from './practice-games/k5/GreatGardenRace';
 import SeedJourney from './practice-games/k5/SeedJourney';
 import WeedHeroSquad from './practice-games/k5/WeedHeroSquad';
+import PlantDoctor from './practice-games/k5/PlantDoctor';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -90,6 +91,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'great-garden-race': 'life-cycles',
   'seed-journey': 'seeds',
   'weed-hero-squad': 'control-methods',
+  'plant-doctor': 'what-plants-need',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
@@ -132,6 +134,7 @@ const newK5Games: GameDef[] = [
  { id: 'great-garden-race', name: 'The Great Garden Race', Icon: Trophy, category: 'Growth & Competition', description: 'Pac-Man style race — grab sun, water, and nutrients before the weed does!', howToPlay: 'Use arrow keys (or the on-screen D-pad) to steer your flower through the maze. Collect Sun, Water, and Nutrient pellets before the weed reaches them. After each day, both plants grow — but the weed grows faster per resource, so out-race it!', component: GreatGardenRace },
  { id: 'seed-journey', name: 'Seed Journey', Icon: Wind, category: 'Seed Dispersal', description: 'You are a seed! Choose the best way to travel — wind, water, or animal — in each scenario.', howToPlay: 'Read the scenario, then pick one of two travel choices. Match the best dispersal method (wind, water, or animal hitchhiker) to the place your seed is starting from.', component: SeedJourney },
  { id: 'weed-hero-squad', name: 'Weed Hero Squad', Icon: Swords, category: 'Control Methods', description: 'Suit up as a weed-fighting superhero! Pick, Pull, Block, Outsmart, Eat, or Stop to rescue the crops.', howToPlay: 'Each mission shows a crop in danger and a weed villain. Choose the best of the 5 superpowers — Pull It, Block It, Outsmart It, Eat It, or Stop It — to defeat the weed and free the crop.', component: WeedHeroSquad },
+ { id: 'plant-doctor', name: 'Plant Doctor', Icon: Stethoscope, category: 'What Plants Need', description: 'Sick plants walk into your clinic! Diagnose the sick part and prescribe what the plant needs.', howToPlay: 'Read the patient\u2019s symptom and case notes, spot which part is sick, then pick the missing resource — sunlight, water, nutrients, air, soil, or space — to heal the plant.', component: PlantDoctor },
 ];
 
 const middleGames: GameDef[] = [
