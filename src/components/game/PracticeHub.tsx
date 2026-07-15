@@ -33,6 +33,7 @@ import SeedJourney from './practice-games/k5/SeedJourney';
 import WeedHeroSquad from './practice-games/k5/WeedHeroSquad';
 import PlantDoctor from './practice-games/k5/PlantDoctor';
 import FunFactDetective from './practice-games/k5/FunFactDetective';
+import SenseDetective from './practice-games/k5/SenseDetective';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
