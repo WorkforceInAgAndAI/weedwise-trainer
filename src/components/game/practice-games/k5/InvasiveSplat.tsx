@@ -1,174 +1,201 @@
-import { useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Droplet, Sparkles, AlertTriangle, RotateCcw, ChevronRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, Sparkles, AlertTriangle, RotateCcw, ChevronRight, Wind } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
-import { weeds } from '@/data/weeds';
 
-// -------- Invasive Splat! (K-5 Explorer, drag & drop) ---------------------
-// Splatter-art game teaching how invasive weeds out-compete native plants.
-// Kids drag a "runny" invasive paint blob onto a meadow of native plant dots.
-// The invasive splat spreads wide and covers any native it lands on top of.
+// -------- Invasive Splat! (K-5 Explorer, spin-art paint canvas) -----------
+// Kids drop invasive (watery) and native (thick) paint blobs onto a round
+// paper on a spinning wheel. When they hit SPIN, the paints smear outward:
+// the runny invasive paint spreads much further than the thick native paint,
+// showing how invasive weeds out-compete natives for space.
 // -------------------------------------------------------------------------
 
-interface NativeSpot {
-  id: string;
-  name: string;
-  x: number; // px within field
-  y: number;
-  color: string;
-  covered: boolean;
-}
+interface PaintDef { key: 'invasive' | 'native'; name: string; label: string; color: string; funFact: string; }
 
-interface Splat {
-  id: number;
-  x: number;
-  y: number;
-  radius: number;
-  color: string;
-  shape: string; // random border-radius string
-  angle: number;
-}
+interface Round { invasive: PaintDef; native: PaintDef; }
 
-interface InvasiveDef {
-  name: string;
-  color: string;
-  funFact: string;
-}
-
-const FIELD_W = 640;
-const FIELD_H = 380;
-const SPLAT_RADIUS = 150; // "runny" invasive splat radius in px
-const DROPS_PER_ROUND = 2;
-const ROUNDS_PER_LEVEL = 4;
-
-// Curated "playground bully" invasives from the module.
-const INVASIVES: InvasiveDef[] = [
-  { name: 'Garlic Mustard', color: '#7c3aed', funFact: 'Poisons the soil so nothing else can grow near it!' },
-  { name: 'Field Bindweed', color: '#ea580c', funFact: 'Its vines wrap around neighbors and choke them out.' },
-  { name: 'Quackgrass', color: '#0891b2', funFact: 'Underground roots shoot out sideways and pop up everywhere.' },
-  { name: 'Canada Thistle', color: '#be185d', funFact: 'One plant can spread into a whole patch in a single summer.' },
-  { name: 'Downy Brome', color: '#ca8a04', funFact: 'Drops thousands of seeds that sprout before natives wake up.' },
-  { name: 'Tall Morningglory', color: '#6d28d9', funFact: 'Twines up other plants and steals their sunlight.' },
+const INVASIVES: PaintDef[] = [
+  { key: 'invasive', name: 'Garlic Mustard', label: 'Invasive · watery', color: '#7c3aed', funFact: 'Its runny roots poison the soil so nothing else grows nearby.' },
+  { key: 'invasive', name: 'Field Bindweed', label: 'Invasive · watery', color: '#ea580c', funFact: 'Vines slip out and grab neighbors before they can react.' },
+  { key: 'invasive', name: 'Canada Thistle', label: 'Invasive · watery', color: '#be185d', funFact: 'One plant becomes a whole patch in a single summer.' },
+  { key: 'invasive', name: 'Quackgrass',      label: 'Invasive · watery', color: '#0891b2', funFact: 'Sneaky underground stems pop up everywhere.' },
+];
+const NATIVES: PaintDef[] = [
+  { key: 'native', name: 'Milkweed',      label: 'Native · thick', color: '#16a34a', funFact: 'Stays put — feeds monarch caterpillars in one tidy patch.' },
+  { key: 'native', name: 'Purple Coneflower', label: 'Native · thick', color: '#7e22ce', funFact: 'Roots dig down instead of spreading sideways.' },
+  { key: 'native', name: 'Little Bluestem',   label: 'Native · thick', color: '#0f766e', funFact: 'Grows slow and steady, sharing space with neighbors.' },
+  { key: 'native', name: 'Black-eyed Susan',  label: 'Native · thick', color: '#ca8a04', funFact: 'Bright and cheerful — but polite about its space.' },
 ];
 
-const NATIVE_COLORS = ['#16a34a', '#059669', '#65a30d', '#15803d', '#22c55e', '#84cc16'];
+const CANVAS = 480;              // canvas pixel size
+const CENTER = CANVAS / 2;
+const R_MAX = CANVAS / 2 - 8;    // paper radius
+const ROUNDS_PER_LEVEL = 3;
 
-function rand<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
-function shuffle<T>(a: T[]): T[] { return [...a].sort(() => Math.random() - 0.5); }
+// Physics-ish constants
+const INVASIVE_SPREAD = 6.0;     // radial stretch factor when spinning
+const NATIVE_SPREAD   = 1.6;
+const INVASIVE_WIDTH  = 26;      // drop base radius in px
+const NATIVE_WIDTH    = 22;
 
-function randomBlobRadius(): string {
-  const r = () => 40 + Math.floor(Math.random() * 40);
-  return `${r()}% ${r()}% ${r()}% ${r()}% / ${r()}% ${r()}% ${r()}% ${r()}%`;
-}
+interface Drop { id: number; x: number; y: number; type: 'invasive' | 'native'; color: string; }
 
-function pickNatives(): NativeSpot[] {
-  const pool = weeds.filter(w => w.origin === 'Native');
-  const chosen = shuffle(pool).slice(0, 8);
-  // scatter with padding from edges
-  return chosen.map((w, i) => ({
-    id: `${w.id}-${i}`,
-    name: w.commonName,
-    x: 60 + Math.random() * (FIELD_W - 120),
-    y: 50 + Math.random() * (FIELD_H - 100),
-    color: NATIVE_COLORS[i % NATIVE_COLORS.length],
-    covered: false,
-  }));
-}
+function pick<T>(a: T[]): T { return a[Math.floor(Math.random() * a.length)]; }
+
+function newRound(): Round { return { invasive: pick(INVASIVES), native: pick(NATIVES) }; }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
 export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const [round, setRound] = useState(0);
-  const [totalCovered, setTotalCovered] = useState(0);
-  const [totalPossible, setTotalPossible] = useState(0);
+  const [totalInv, setTotalInv] = useState(0);
+  const [totalNat, setTotalNat] = useState(0);
   const [done, setDone] = useState(false);
 
-  const [natives, setNatives] = useState<NativeSpot[]>(() => pickNatives());
-  const [invasive, setInvasive] = useState<InvasiveDef>(() => rand(INVASIVES));
-  const [splats, setSplats] = useState<Splat[]>([]);
-  const [dropsLeft, setDropsLeft] = useState(DROPS_PER_ROUND);
-  const [phase, setPhase] = useState<'play' | 'result'>('play');
-  const fieldRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
+  const [roundData, setRoundData] = useState<Round>(() => newRound());
+  const [drops, setDrops] = useState<Drop[]>([]);
+  const [selected, setSelected] = useState<'invasive' | 'native'>('invasive');
+  const [phase, setPhase] = useState<'setup' | 'spinning' | 'result'>('setup');
+  const [coverage, setCoverage] = useState<{ invasive: number; native: number; blank: number } | null>(null);
 
-  const covered = natives.filter(n => n.covered).length;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dropIdRef = useRef(0);
 
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    if (!dragging.current || dropsLeft <= 0 || phase !== 'play') return;
-    dragging.current = false;
-    const rect = fieldRef.current!.getBoundingClientRect();
-    const scaleX = FIELD_W / rect.width;
-    const scaleY = FIELD_H / rect.height;
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-    dropAt(x, y);
+  // Render dots (setup phase) and streaks (spinning/result phase)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, CANVAS, CANVAS);
+
+    // Paper background (circular clip)
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CENTER, CENTER, R_MAX, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fillStyle = '#fefdf8';
+    ctx.fill();
+    ctx.clip();
+
+    if (phase === 'setup') {
+      // Just render drop dots at their spots
+      for (const d of drops) {
+        const w = d.type === 'invasive' ? INVASIVE_WIDTH : NATIVE_WIDTH;
+        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, w);
+        grad.addColorStop(0, d.color);
+        grad.addColorStop(1, d.color + '00');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(d.x, d.y, w, 0, Math.PI * 2); ctx.fill();
+      }
+    } else {
+      // Streak the drops outward from center — invasive stretches further
+      for (const d of drops) {
+        const dx = d.x - CENTER, dy = d.y - CENTER;
+        const r0 = Math.sqrt(dx * dx + dy * dy) + 4;
+        const angle = Math.atan2(dy, dx);
+        const spread = d.type === 'invasive' ? INVASIVE_SPREAD : NATIVE_SPREAD;
+        const w = d.type === 'invasive' ? INVASIVE_WIDTH : NATIVE_WIDTH;
+        const rEnd = Math.min(R_MAX, r0 * spread);
+
+        // Draw many overlapping circles along the streak for a paint-smear look
+        const steps = 48;
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const r = r0 + (rEnd - r0) * t;
+          // slight tangential curl so it looks spun
+          const curl = (d.type === 'invasive' ? 0.55 : 0.25) * t;
+          const a = angle + curl;
+          const px = CENTER + Math.cos(a) * r;
+          const py = CENTER + Math.sin(a) * r;
+          const width = w * (1 - t * 0.6); // taper outward
+          ctx.globalAlpha = 0.85 - t * 0.15;
+          ctx.fillStyle = d.color;
+          ctx.beginPath(); ctx.arc(px, py, width, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+    ctx.restore();
+
+    // Compute coverage once the spin animation lands
+    if (phase === 'result' && !coverage) {
+      const img = ctx.getImageData(0, 0, CANVAS, CANVAS).data;
+      let inv = 0, nat = 0, blank = 0, total = 0;
+      // Sample every 4th pixel for speed
+      for (let y = 0; y < CANVAS; y += 4) {
+        for (let x = 0; x < CANVAS; x += 4) {
+          const cx = x - CENTER, cy = y - CENTER;
+          if (cx * cx + cy * cy > R_MAX * R_MAX) continue;
+          total++;
+          const i = (y * CANVAS + x) * 4;
+          const r = img[i], g = img[i + 1], b = img[i + 2];
+          // near-white paper?
+          if (r > 240 && g > 240 && b > 220) { blank++; continue; }
+          // classify by nearest paint color
+          const dInv = colorDist(r, g, b, roundData.invasive.color);
+          const dNat = colorDist(r, g, b, roundData.native.color);
+          if (dInv < dNat) inv++; else nat++;
+        }
+      }
+      const pct = (n: number) => total ? Math.round((n / total) * 100) : 0;
+      setCoverage({ invasive: pct(inv), native: pct(nat), blank: pct(blank) });
+    }
+  }, [drops, phase, roundData, coverage]);
+
+  function handleCanvasClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    if (phase !== 'setup') return;
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * CANVAS;
+    const y = ((e.clientY - rect.top) / rect.height) * CANVAS;
+    // clip to paper
+    const dx = x - CENTER, dy = y - CENTER;
+    if (dx * dx + dy * dy > (R_MAX - 10) * (R_MAX - 10)) return;
+    const color = selected === 'invasive' ? roundData.invasive.color : roundData.native.color;
+    setDrops(d => [...d, { id: ++dropIdRef.current, x, y, type: selected, color }]);
   }
 
-  function dropAt(x: number, y: number) {
-    const splat: Splat = {
-      id: Date.now() + Math.random(),
-      x, y,
-      radius: SPLAT_RADIUS,
-      color: invasive.color,
-      shape: randomBlobRadius(),
-      angle: Math.random() * 360,
-    };
-    setSplats(s => [...s, splat]);
-    setNatives(ns => ns.map(n => {
-      if (n.covered) return n;
-      const dx = n.x - x, dy = n.y - y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      return dist <= SPLAT_RADIUS ? { ...n, covered: true } : n;
-    }));
-    setDropsLeft(d => {
-      const next = d - 1;
-      if (next <= 0) {
-        setTimeout(() => setPhase('result'), 900);
-      }
-      return next;
-    });
+  function spin() {
+    if (phase !== 'setup' || drops.length === 0) return;
+    setPhase('spinning');
+    setCoverage(null);
+    // After spin animation, land in result
+    setTimeout(() => setPhase('result'), 1800);
+  }
+
+  function resetCanvas() {
+    setDrops([]); setPhase('setup'); setCoverage(null);
   }
 
   function nextRound() {
-    const roundCovered = natives.filter(n => n.covered).length;
-    const nextTotalCovered = totalCovered + roundCovered;
-    const nextTotalPossible = totalPossible + natives.length;
-    const nextRoundNum = round + 1;
-    if (nextRoundNum >= ROUNDS_PER_LEVEL) {
-      setTotalCovered(nextTotalCovered);
-      setTotalPossible(nextTotalPossible);
-      setDone(true);
-      return;
+    if (!coverage) return;
+    const nextInv = totalInv + coverage.invasive;
+    const nextNat = totalNat + coverage.native;
+    if (round + 1 >= ROUNDS_PER_LEVEL) {
+      setTotalInv(nextInv); setTotalNat(nextNat); setDone(true); return;
     }
-    setTotalCovered(nextTotalCovered);
-    setTotalPossible(nextTotalPossible);
-    setRound(nextRoundNum);
-    setNatives(pickNatives());
-    setInvasive(rand(INVASIVES));
-    setSplats([]);
-    setDropsLeft(DROPS_PER_ROUND);
-    setPhase('play');
+    setTotalInv(nextInv); setTotalNat(nextNat);
+    setRound(r => r + 1);
+    setRoundData(newRound());
+    setDrops([]); setPhase('setup'); setCoverage(null);
   }
 
   function startOver() {
-    setLevel(1); setRound(0); setTotalCovered(0); setTotalPossible(0);
-    setNatives(pickNatives()); setInvasive(rand(INVASIVES));
-    setSplats([]); setDropsLeft(DROPS_PER_ROUND); setPhase('play'); setDone(false);
+    setLevel(1); setRound(0); setTotalInv(0); setTotalNat(0);
+    setRoundData(newRound()); setDrops([]); setPhase('setup'); setCoverage(null); setDone(false);
   }
   function nextLevel() {
-    setLevel(l => l + 1); setRound(0); setTotalCovered(0); setTotalPossible(0);
-    setNatives(pickNatives()); setInvasive(rand(INVASIVES));
-    setSplats([]); setDropsLeft(DROPS_PER_ROUND); setPhase('play'); setDone(false);
+    setLevel(l => l + 1); setRound(0); setTotalInv(0); setTotalNat(0);
+    setRoundData(newRound()); setDrops([]); setPhase('setup'); setCoverage(null); setDone(false);
   }
 
   if (done) {
     return (
       <LevelComplete
         level={level}
-        score={totalCovered}
-        total={totalPossible}
+        score={totalInv}
+        total={totalInv + totalNat || 1}
         onNextLevel={nextLevel}
         onStartOver={startOver}
         onBack={onBack}
@@ -179,6 +206,9 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
       />
     );
   }
+
+  const invCount = drops.filter(d => d.type === 'invasive').length;
+  const natCount = drops.filter(d => d.type === 'native').length;
 
   return (
     <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
@@ -194,94 +224,54 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1 flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-primary" /> Invasive Splat!
+          <Sparkles className="w-6 h-6 text-primary" /> Invasive Splat! · Spin-Art Lab
         </h1>
-        <p className="text-muted-foreground mb-3">Drag the runny invasive paint onto the meadow. Watch it spread and cover the native plants — that's how invasive "playground bullies" take over!</p>
+        <p className="text-muted-foreground mb-3">
+          Drop paint on the paper, then hit <strong>SPIN</strong>! The runny invasive paint smears way out — just like an invasive weed spreading fast — while the thick native paint stays close to home.
+        </p>
 
         <div className="mb-3 rounded-lg border-2 border-red-300 bg-red-50 p-3 flex items-start gap-2">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800"><strong>Real-life rule:</strong> Never touch or pull weeds unless a trusted adult tells you it's safe. Some invasive weeds can sting, prickle, or make you itchy.</p>
+          <p className="text-sm text-red-800"><strong>Real-life rule:</strong> Never touch or pull weeds unless a trusted adult tells you it's safe.</p>
         </div>
 
-        <div className="grid md:grid-cols-[1fr,220px] gap-4">
-          {/* Field */}
-          <div
-            ref={fieldRef}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-            className="relative rounded-xl overflow-hidden shadow-lg border-4 border-green-800/40 select-none"
-            style={{
-              aspectRatio: `${FIELD_W} / ${FIELD_H}`,
-              background: 'radial-gradient(ellipse at top, #d9f99d 0%, #a7f3d0 40%, #86efac 100%)',
-            }}
-          >
-            <svg viewBox={`0 0 ${FIELD_W} ${FIELD_H}`} className="absolute inset-0 w-full h-full pointer-events-none">
-              {/* Native plant spots */}
-              {natives.map(n => (
-                <g key={n.id} transform={`translate(${n.x}, ${n.y})`}>
-                  <circle
-                    r={26}
-                    fill={n.covered ? '#374151' : n.color}
-                    opacity={n.covered ? 0.35 : 1}
-                    stroke="#166534"
-                    strokeWidth={2}
-                  />
-                  <text
-                    y={44}
-                    textAnchor="middle"
-                    fontSize={11}
-                    fontWeight={700}
-                    fill={n.covered ? '#6b7280' : '#14532d'}
-                    style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 3 }}
-                  >
-                    {n.name}
-                  </text>
-                  {n.covered && (
-                    <text y={4} textAnchor="middle" fontSize={14} fontWeight={900} fill="#fff">×</text>
-                  )}
-                </g>
-              ))}
-            </svg>
-
-            {/* Invasive splats layer (HTML for animation) */}
-            <div className="absolute inset-0 pointer-events-none" style={{ containerType: 'inline-size' }}>
-              {splats.map(s => {
-                const leftPct = (s.x / FIELD_W) * 100;
-                const topPct = (s.y / FIELD_H) * 100;
-                const sizePct = (s.radius * 2 / FIELD_W) * 100;
-                return (
-                  <div
-                    key={s.id}
-                    className="absolute animate-splat"
-                    style={{
-                      left: `${leftPct}%`,
-                      top: `${topPct}%`,
-                      width: `${sizePct}%`,
-                      aspectRatio: '1 / 1',
-                      transform: `translate(-50%, -50%) rotate(${s.angle}deg)`,
-                      background: `radial-gradient(circle at 40% 40%, ${s.color}, ${s.color}dd 60%, ${s.color}88 100%)`,
-                      borderRadius: s.shape,
-                      boxShadow: `0 4px 12px ${s.color}55`,
-                      mixBlendMode: 'multiply',
-                    }}
-                  >
-                    {/* Drippy little satellite blobs */}
-                    <span className="absolute -top-3 left-1/3 w-4 h-4 rounded-full" style={{ background: s.color }} />
-                    <span className="absolute top-1/2 -right-4 w-6 h-3 rounded-full" style={{ background: s.color }} />
-                    <span className="absolute -bottom-4 right-1/4 w-5 h-5 rounded-full" style={{ background: s.color }} />
-                    <span className="absolute bottom-1/4 -left-3 w-3 h-3 rounded-full" style={{ background: s.color }} />
-                  </div>
-                );
-              })}
+        <div className="grid md:grid-cols-[1fr,260px] gap-4">
+          {/* Spinning wheel + canvas */}
+          <div className="relative rounded-xl border-4 border-amber-700/60 bg-gradient-to-b from-amber-800 to-amber-950 shadow-lg overflow-hidden" style={{ aspectRatio: '1 / 1' }}>
+            {/* Wooden wheel base texture */}
+            <div className="absolute inset-6 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-400 shadow-inner" />
+            {/* Spinning paper */}
+            <div
+              className={`absolute inset-8 rounded-full overflow-hidden shadow-xl ${phase === 'spinning' ? 'animate-spin-paper' : ''}`}
+              style={{ transformOrigin: 'center center' }}
+            >
+              <canvas
+                ref={canvasRef}
+                width={CANVAS}
+                height={CANVAS}
+                onClick={handleCanvasClick}
+                className={`w-full h-full rounded-full ${phase === 'setup' ? 'cursor-crosshair' : 'cursor-default'}`}
+                style={{ background: '#fefdf8' }}
+              />
+              {/* center hub */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-neutral-800 border-2 border-neutral-500 pointer-events-none" />
             </div>
 
-            {phase === 'result' && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center animate-fade-in">
-                <div className="bg-card rounded-xl p-6 max-w-sm text-center shadow-2xl border-2 border-primary">
-                  <h3 className="text-xl font-bold text-foreground mb-2">Splat Results!</h3>
-                  <p className="text-4xl font-bold text-red-600 mb-1">{covered} / {natives.length}</p>
-                  <p className="text-sm text-muted-foreground mb-4">native plants out-competed by <span className="font-semibold" style={{ color: invasive.color }}>{invasive.name}</span></p>
-                  <button onClick={nextRound} className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg font-semibold hover:opacity-90">
+            {phase === 'result' && coverage && (
+              <div className="absolute inset-0 flex items-end justify-center p-4 pointer-events-none">
+                <div className="pointer-events-auto bg-card/95 backdrop-blur rounded-xl p-4 border-2 border-primary shadow-2xl max-w-xs w-full text-center animate-fade-in">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Spin Results</h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                    <div className="rounded-lg p-2 border-2" style={{ borderColor: roundData.invasive.color }}>
+                      <p className="text-[10px] uppercase font-bold" style={{ color: roundData.invasive.color }}>Invasive</p>
+                      <p className="text-2xl font-black" style={{ color: roundData.invasive.color }}>{coverage.invasive}%</p>
+                    </div>
+                    <div className="rounded-lg p-2 border-2" style={{ borderColor: roundData.native.color }}>
+                      <p className="text-[10px] uppercase font-bold" style={{ color: roundData.native.color }}>Native</p>
+                      <p className="text-2xl font-black" style={{ color: roundData.native.color }}>{coverage.native}%</p>
+                    </div>
+                  </div>
+                  <button onClick={nextRound} className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-semibold hover:opacity-90">
                     Next Round <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -292,70 +282,90 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
           {/* Paint palette */}
           <div className="space-y-3">
             <div className="rounded-lg border-2 border-border bg-card p-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Today's Invader</p>
-              <p className="text-lg font-bold" style={{ color: invasive.color }}>{invasive.name}</p>
-              <p className="text-xs text-muted-foreground mt-1 italic">"{invasive.funFact}"</p>
-            </div>
-
-            <div className="rounded-lg border-2 border-dashed border-border bg-card p-3 text-center">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Paint Blobs Left</p>
-              <div className="flex justify-center gap-2 mb-3">
-                {Array.from({ length: DROPS_PER_ROUND }).map((_, i) => (
-                  <Droplet key={i} className="w-6 h-6" style={{
-                    color: i < dropsLeft ? invasive.color : '#d1d5db',
-                    fill: i < dropsLeft ? invasive.color : 'none',
-                  }} />
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Pick your paint</p>
+              <div className="space-y-2">
+                {[roundData.invasive, roundData.native].map(paint => (
+                  <button
+                    key={paint.key}
+                    onClick={() => setSelected(paint.key)}
+                    disabled={phase !== 'setup'}
+                    className={`w-full text-left rounded-lg border-2 p-2 flex items-center gap-3 transition-all ${
+                      selected === paint.key ? 'border-primary bg-primary/5 scale-[1.02]' : 'border-border hover:border-primary/60'
+                    } ${phase !== 'setup' ? 'opacity-60' : ''}`}
+                  >
+                    <div
+                      className="shrink-0 w-10 h-10 rounded-full shadow"
+                      style={{
+                        background: `radial-gradient(circle at 35% 35%, ${paint.color}, ${paint.color}cc)`,
+                        filter: paint.key === 'invasive' ? 'blur(0.5px)' : 'none',
+                      }}
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate">{paint.name}</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: paint.color }}>{paint.label}</p>
+                    </div>
+                  </button>
                 ))}
               </div>
-              {dropsLeft > 0 && phase === 'play' ? (
-                <>
-                  <div
-                    draggable
-                    onDragStart={() => { dragging.current = true; }}
-                    onDragEnd={() => { dragging.current = false; }}
-                    className="mx-auto w-24 h-24 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform"
-                    style={{
-                      background: `radial-gradient(circle at 35% 35%, ${invasive.color}, ${invasive.color}cc)`,
-                      borderRadius: '58% 42% 63% 37% / 45% 60% 40% 55%',
-                      boxShadow: `0 6px 16px ${invasive.color}66`,
-                    }}
-                    title="Drag me onto the meadow!"
-                    aria-label={`Drag ${invasive.name} paint blob`}
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">Drag onto the meadow →</p>
-                </>
-              ) : (
-                <p className="text-xs text-muted-foreground py-2">All blobs used!</p>
-              )}
+              <p className="text-[11px] text-muted-foreground mt-2 italic">"{(selected === 'invasive' ? roundData.invasive : roundData.native).funFact}"</p>
             </div>
 
-            <button
-              onClick={() => { setSplats([]); setNatives(natives.map(n => ({ ...n, covered: false }))); setDropsLeft(DROPS_PER_ROUND); setPhase('play'); }}
-              className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground py-2 rounded border border-border"
-            >
-              <RotateCcw className="w-4 h-4" /> Try Again
-            </button>
-
-            <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 text-xs text-foreground">
-              <p className="font-semibold mb-1">Score so far</p>
-              <p>{totalCovered + covered} natives covered by invasives</p>
+            <div className="rounded-lg border-2 border-dashed border-border bg-card p-3 text-xs space-y-1">
+              <p className="font-bold text-foreground mb-1">Drops on paper</p>
+              <p><span className="inline-block w-3 h-3 rounded-full align-middle mr-1" style={{ background: roundData.invasive.color }} /> Invasive: <strong>{invCount}</strong></p>
+              <p><span className="inline-block w-3 h-3 rounded-full align-middle mr-1" style={{ background: roundData.native.color }} /> Native: <strong>{natCount}</strong></p>
             </div>
+
+            {phase === 'setup' && (
+              <>
+                <button
+                  onClick={spin}
+                  disabled={drops.length === 0}
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                  <Wind className="w-5 h-5" /> SPIN!
+                </button>
+                <button
+                  onClick={resetCanvas}
+                  disabled={drops.length === 0}
+                  className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground py-2 rounded border border-border disabled:opacity-40"
+                >
+                  <RotateCcw className="w-4 h-4" /> Clear paper
+                </button>
+              </>
+            )}
+
+            {phase === 'spinning' && (
+              <div className="text-center text-primary font-bold animate-pulse">Spinning…</div>
+            )}
           </div>
         </div>
 
         <div className="mt-4">
-          <FarmerGuide tone="intro" message={`Whoa! ${invasive.name} paint is extra runny — that's like a real invasive weed that spreads super fast. Drop it and watch it out-compete the native plants!`} />
+          <FarmerGuide
+            tone="intro"
+            message={`Drop paint anywhere on the paper, then hit SPIN. Watch how the watery invasive paint takes over — that's the same trick real invasive weeds use in a real field!`}
+          />
         </div>
       </div>
 
       <style>{`
-        @keyframes splat-pop {
-          0% { transform: translate(-50%, -50%) rotate(var(--r,0deg)) scale(0.1); opacity: 0.6; }
-          60% { transform: translate(-50%, -50%) rotate(var(--r,0deg)) scale(1.15); opacity: 1; }
-          100% { transform: translate(-50%, -50%) rotate(var(--r,0deg)) scale(1); opacity: 1; }
+        @keyframes spin-paper {
+          0%   { transform: rotate(0deg); }
+          100% { transform: rotate(720deg); }
         }
-        .animate-splat { animation: splat-pop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        .animate-spin-paper { animation: spin-paper 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
       `}</style>
     </div>
   );
+}
+
+// Distance in RGB space between a sampled pixel and a target hex color
+function colorDist(r: number, g: number, b: number, hex: string): number {
+  const h = hex.replace('#', '');
+  const R = parseInt(h.slice(0, 2), 16);
+  const G = parseInt(h.slice(2, 4), 16);
+  const B = parseInt(h.slice(4, 6), 16);
+  const dr = r - R, dg = g - G, db = b - B;
+  return dr * dr + dg * dg + db * db;
 }
