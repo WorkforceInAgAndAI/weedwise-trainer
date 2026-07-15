@@ -190,12 +190,9 @@ interface Placement { kind: PartKind; correct: boolean; color: string; }
 
 function buildRound(caseIdx: number) {
   const c = CASES[caseIdx];
-  // 5 correct parts + 2 distractor "wrong" parts (fake flowers/leaves) to make it harder
-  const decoys = shuffle(CASES.filter((_, i) => i !== caseIdx))
-    .slice(0, 2)
-    .map((d, i) => ({ id: `decoy-${i}`, kind: (i === 0 ? 'flower' : 'leaves') as PartKind, color: d.parts[i === 0 ? 'flower' : 'leaves'].color, isDecoy: true }));
+  // Exactly one part for each slot — no decoys so young students can focus on anatomy
   const real = PART_ORDER.map((k) => ({ id: `real-${k}`, kind: k, color: c.parts[k].color, isDecoy: false }));
-  return { case: c, palette: shuffle([...real, ...decoys]) };
+  return { case: c, palette: shuffle(real) };
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
@@ -318,7 +315,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
           <Sparkles className="w-6 h-6 text-primary" /> Mr. Plant Head!
         </h1>
         <p className="text-muted-foreground mb-3">
-          Drag each cartoon plant part onto the correct spot on <span className="font-bold text-foreground">{c.name}</span>. Watch out — some fake parts belong to other weeds!
+          Drag each cartoon plant part onto the matching spot on <span className="font-bold text-foreground">{c.name}</span>. Each part has only one correct home!
         </p>
 
         <div className="mb-3 rounded-lg border-2 border-red-300 bg-red-50 p-3 flex items-start gap-2">
@@ -461,7 +458,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
         <div className="mt-4">
           <FarmerGuide
             tone="intro"
-            message={`Build ${c.name}! Tip: click a placed part to send it back to the bin. Some parts in the bin are decoys from other weeds — pick carefully!`}
+            message={`Build ${c.name}! Tip: click a placed part to send it back to the bin if you want to move it.`}
           />
         </div>
       </div>
