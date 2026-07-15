@@ -563,7 +563,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                       >
                         {placed ? (
                           <div className="relative">
-                            <PartCartoon kind={placed.kind} color={placed.color} size={90} />
+                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={90} />
                             {showResult && (
                               <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center shadow" style={{ background: placed.correct ? '#16a34a' : '#dc2626' }}>
                                 {placed.correct ? <Check className="w-4 h-4 text-white" /> : <X className="w-4 h-4 text-white" />}
@@ -596,21 +596,32 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
               {availablePalette.length === 0 ? (
                 <p className="text-xs text-muted-foreground py-4 text-center">All parts used!</p>
               ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {availablePalette.map(p => (
-                    <div
-                      key={p.id}
-                      draggable={!showResult}
-                      onDragStart={() => setDragItem(p)}
-                      onDragEnd={() => setDragItem(null)}
-                      className={`aspect-square rounded-lg border-2 border-border bg-white flex items-center justify-center ${
-                        showResult ? 'opacity-50' : 'cursor-grab active:cursor-grabbing hover:scale-105 hover:border-primary'
-                      } transition-all`}
-                      title="Drag me onto the plant!"
-                    >
-                      <PartCartoon kind={p.kind} color={p.color} size={60} />
-                    </div>
-                  ))}
+                <div className="space-y-3">
+                  {PART_ORDER.map(k => {
+                    const options = availablePalette.filter(p => p.kind === k);
+                    if (options.length === 0) return null;
+                    return (
+                      <div key={k}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">{SLOT_POS[k].label}</p>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {options.map(p => (
+                            <div
+                              key={p.id}
+                              draggable={!showResult}
+                              onDragStart={() => setDragItem(p)}
+                              onDragEnd={() => setDragItem(null)}
+                              className={`aspect-square rounded-lg border-2 border-border bg-white flex items-center justify-center ${
+                                showResult ? 'opacity-50' : 'cursor-grab active:cursor-grabbing hover:scale-105 hover:border-primary'
+                              } transition-all`}
+                              title={`Drag ${p.label} onto the plant`}
+                            >
+                              <PartCartoon kind={p.kind} color={p.color} variant={p.variant} size={44} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -635,14 +646,28 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
             {showResult && (
               <div className="rounded-lg bg-primary/5 border-2 border-primary/30 p-3 space-y-2">
-                <p className="font-bold text-foreground">{correctCount} / {PART_ORDER.length} correct!</p>
+                <p className="font-bold text-foreground">Your {c.name} is built!</p>
+                <p className="text-[11px] text-muted-foreground">Here's what the real {c.name} looks like:</p>
                 <div className="text-xs space-y-1">
-                  {PART_ORDER.map(k => (
-                    <div key={k} className="flex gap-1">
-                      <span className="font-semibold text-foreground">{SLOT_POS[k].label}:</span>
-                      <span className="text-muted-foreground">{c.parts[k].hint}</span>
-                    </div>
-                  ))}
+                  {PART_ORDER.map(k => {
+                    const placed = placements[k];
+                    const actualId = c.actual?.[k];
+                    const actualStyle = actualId ? PART_STYLES[k].find(s => s.id === actualId) : null;
+                    const matched = placed && actualStyle && placed.variant === actualStyle.variant;
+                    return (
+                      <div key={k} className="flex gap-1 items-start">
+                        <span className="font-semibold text-foreground shrink-0">{SLOT_POS[k].label}:</span>
+                        <span className="text-muted-foreground">
+                          {c.parts[k].hint}
+                          {actualStyle && (
+                            <span className={`ml-1 font-semibold ${matched ? 'text-green-700' : 'text-amber-700'}`}>
+                              ({matched ? '★ you matched it!' : `real: ${actualStyle.label}`})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
                 <button
                   onClick={nextRound}
