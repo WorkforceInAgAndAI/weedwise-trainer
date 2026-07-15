@@ -31,7 +31,7 @@ export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, e
  return resolveImageUrl(weedId, filename) || `/images/${weedId}/${filename}`;
 }
 
-export default function WeedImage({ weedId, stage, className }: { weedId: string; stage: string; className?: string }) {
+export default function WeedImage({ weedId, stage, className, preferredVariant }: { weedId: string; stage: string; className?: string; preferredVariant?: 1 | 2 }) {
  const [errorCount, setErrorCount] = useState(0);
 
  // Build ordered list of resolved image URLs synchronously
@@ -69,8 +69,13 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
   // DOM parents in drag-and-drop games), which read to students as "the
   // picture changed mid-round". A stable hash keeps the same image for the
   // life of a round while still varying across weeds.
-  const hash = `${weedId}|${stage}`.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
-  const variant: 1 | 2 = Math.abs(hash) % 2 === 0 ? 1 : 2;
+  let variant: 1 | 2;
+  if (preferredVariant) {
+   variant = preferredVariant;
+  } else {
+   const hash = `${weedId}|${stage}`.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
+   variant = Math.abs(hash) % 2 === 0 ? 1 : 2;
+  }
   const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
   const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
   
@@ -95,7 +100,7 @@ export default function WeedImage({ weedId, stage, className }: { weedId: string
    }
   }
   return urls;
- }, [weedId, stage]);
+ }, [weedId, stage, preferredVariant]);
 
  if (resolvedAttempts.length === 0 || errorCount >= resolvedAttempts.length) {
   return (
