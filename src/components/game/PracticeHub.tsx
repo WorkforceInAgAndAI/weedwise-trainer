@@ -94,6 +94,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'seed-journey': 'seeds',
   'weed-hero-squad': 'control-methods',
   'plant-doctor': 'what-plants-need',
+  'sense-detective': 'safety',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
