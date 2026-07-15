@@ -315,7 +315,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
           <Sparkles className="w-6 h-6 text-primary" /> Mr. Plant Head!
         </h1>
         <p className="text-muted-foreground mb-3">
-          Drag each cartoon plant part onto the correct spot on <span className="font-bold text-foreground">{c.name}</span>. Watch out — some fake parts belong to other weeds!
+          Drag each cartoon plant part onto the matching spot on <span className="font-bold text-foreground">{c.name}</span>. Each part has only one correct home!
         </p>
 
         <div className="mb-3 rounded-lg border-2 border-red-300 bg-red-50 p-3 flex items-start gap-2">
