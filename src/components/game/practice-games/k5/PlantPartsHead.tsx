@@ -458,7 +458,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
         <div className="mt-4">
           <FarmerGuide
             tone="intro"
-            message={`Build ${c.name}! Tip: click a placed part to send it back to the bin. Some parts in the bin are decoys from other weeds — pick carefully!`}
+            message={`Build ${c.name}! Tip: click a placed part to send it back to the bin if you want to move it.`}
           />
         </div>
       </div>
