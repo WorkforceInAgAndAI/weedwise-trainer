@@ -175,10 +175,10 @@ export default function WeedLineUp({ onBack, gameId, gameName, gradeLabel }: Pro
       {/* Suspect sketch */}
       <div className="rounded-xl border-4 border-dashed border-foreground/70 bg-neutral-100 dark:bg-neutral-900 p-3">
        <p className="text-[10px] font-black uppercase tracking-widest text-center text-foreground mb-2">Suspect Sketch</p>
-       <div className="aspect-square rounded-md overflow-hidden bg-neutral-200 dark:bg-neutral-800">
+        <div className="aspect-square rounded-md overflow-hidden bg-neutral-200 dark:bg-neutral-800">
         {criminal && (
          <div className="w-full h-full" style={{ filter: 'grayscale(1) contrast(1.6) brightness(0.95)' }}>
-          <WeedImage weedId={criminal.id} stage="flower" className="w-full h-full object-cover mix-blend-multiply" />
+          <WeedImage weedId={criminal.id} stage="flower" preferredVariant={1} className="w-full h-full object-cover mix-blend-multiply" />
          </div>
         )}
        </div>
@@ -206,7 +206,7 @@ export default function WeedLineUp({ onBack, gameId, gameName, gradeLabel }: Pro
            }`}
           >
            <div className="relative aspect-square bg-neutral-800">
-            <WeedImage weedId={id} stage="flower" className="w-full h-full object-cover" />
+            <WeedImage weedId={id} stage="flower" preferredVariant={2} className="w-full h-full object-cover" />
             {/* mugshot height chart */}
             <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-b from-white/90 via-white/60 to-white/90 flex flex-col justify-between py-1">
              {[0,1,2,3,4].map(n => <div key={n} className="h-px bg-black/70" />)}
