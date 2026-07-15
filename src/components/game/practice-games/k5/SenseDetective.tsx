@@ -170,6 +170,8 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
   const [picked, setPicked] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  // Rebuild rounds each level so students get a fresh set of sense clues.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const rounds = useMemo(() => buildRounds(), [level]);
   const round = rounds[step];
   const answered = picked !== null;
