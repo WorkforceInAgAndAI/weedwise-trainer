@@ -189,7 +189,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
                   ${answered && isAnswer ? 'bg-emerald-500 text-white' :
                     answered && isPick    ? 'bg-red-500 text-white' :
                                             'bg-card text-foreground'}`}>
-                  {answered ? w.name : '?'}
+                  {w.name}
                 </div>
                 {answered && isAnswer && (
                   <div className="absolute top-2 right-2 bg-emerald-500 rounded-full p-1.5 shadow">
