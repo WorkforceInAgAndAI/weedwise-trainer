@@ -344,7 +344,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         </div>
 
         <div className="mt-4">
-          <FarmerGuide tone="intro" text={`Whoa! ${invasive.name} paint is extra runny — that's like a real invasive weed that spreads super fast. Drop it and watch it out-compete the native plants!`} />
+          <FarmerGuide tone="intro" message={`Whoa! ${invasive.name} paint is extra runny — that's like a real invasive weed that spreads super fast. Drop it and watch it out-compete the native plants!`} />
         </div>
       </div>
 
