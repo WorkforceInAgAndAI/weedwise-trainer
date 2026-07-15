@@ -32,6 +32,7 @@ import GreatGardenRace from './practice-games/k5/GreatGardenRace';
 import SeedJourney from './practice-games/k5/SeedJourney';
 import WeedHeroSquad from './practice-games/k5/WeedHeroSquad';
 import PlantDoctor from './practice-games/k5/PlantDoctor';
+import FunFactDetective from './practice-games/k5/FunFactDetective';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -135,6 +136,7 @@ const newK5Games: GameDef[] = [
  { id: 'seed-journey', name: 'Seed Journey', Icon: Wind, category: 'Seed Dispersal', description: 'You are a seed! Choose the best way to travel — wind, water, or animal — in each scenario.', howToPlay: 'Read the scenario, then pick one of two travel choices. Match the best dispersal method (wind, water, or animal hitchhiker) to the place your seed is starting from.', component: SeedJourney },
  { id: 'weed-hero-squad', name: 'Weed Hero Squad', Icon: Swords, category: 'Control Methods', description: 'Suit up as a weed-fighting superhero! Pick, Pull, Block, Outsmart, Eat, or Stop to rescue the crops.', howToPlay: 'Each mission shows a crop in danger and a weed villain. Choose the best of the 5 superpowers — Pull It, Block It, Outsmart It, Eat It, or Stop It — to defeat the weed and free the crop.', component: WeedHeroSquad },
  { id: 'plant-doctor', name: 'Plant Doctor', Icon: Stethoscope, category: 'What Plants Need', description: 'Sick plants walk into your clinic! Diagnose the sick part and prescribe what the plant needs.', howToPlay: 'Read the patient\u2019s symptom and case notes, spot which part is sick, then pick the missing resource — sunlight, water, nutrients, air, soil, or space — to heal the plant.', component: PlantDoctor },
+ { id: 'fun-fact-detective', name: 'Fun Fact Detective', Icon: Search, category: 'Weed ID', description: 'Match each weed photo to its Fun Fact clue card from the 14 Weeds You Can Spot module!', howToPlay: 'Tap a clue card and then tap the weed photo you think it matches. Use the fun-fact hint (and the spot-it clue) to solve every case in the round.', component: FunFactDetective },
 ];
 
 const middleGames: GameDef[] = [
