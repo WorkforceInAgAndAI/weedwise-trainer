@@ -138,21 +138,34 @@ function shuffle<T>(arr: T[]): T[] {
 const ROUNDS_PER_LEVEL = 8;
 const CHOICES_PER_ROUND = 3;
 
+interface Observation {
+  text: string;
+  correct: boolean;
+}
+
 interface Round {
-  answer: Weed;
-  choices: Weed[];
+  weed: Weed;
   clue: Clue;
+  observations: Observation[];
 }
 
 function buildRounds(): Round[] {
   const questionOrder = shuffle(weeds).slice(0, ROUNDS_PER_LEVEL);
-  return questionOrder.map(answer => {
-    const distractors = shuffle(weeds.filter(w => w.id !== answer.id)).slice(0, CHOICES_PER_ROUND - 1);
-    return {
-      answer,
-      choices: shuffle([answer, ...distractors]),
-      clue: getClue(answer),
-    };
+  return questionOrder.map(weed => {
+    const clue = getClue(weed);
+    // Pull distractor observations from other weeds' clues.
+    const distractorPool = shuffle(
+      weeds
+        .filter(w => w.id !== weed.id)
+        .map(w => getClue(w).text)
+        .filter(t => t !== clue.text)
+    ).slice(0, CHOICES_PER_ROUND - 1);
+
+    const observations: Observation[] = shuffle([
+      { text: clue.text, correct: true },
+      ...distractorPool.map(text => ({ text, correct: false })),
+    ]);
+    return { weed, clue, observations };
   });
 }
 
@@ -167,7 +180,7 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
   const [level, setLevel] = useState(1);
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
-  const [picked, setPicked] = useState<string | null>(null);
+  const [picked, setPicked] = useState<number | null>(null);
   const [done, setDone] = useState(false);
 
   // Rebuild rounds each level so students get a fresh set of sense clues.
@@ -175,12 +188,12 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
   const rounds = useMemo(() => buildRounds(), [level]);
   const round = rounds[step];
   const answered = picked !== null;
-  const isCorrect = answered && picked === round.answer.id;
+  const isCorrect = answered && round.observations[picked!]?.correct === true;
 
-  const choose = (id: string) => {
+  const choose = (idx: number) => {
     if (answered) return;
-    setPicked(id);
-    if (id === round.answer.id) setScore(s => s + 1);
+    setPicked(idx);
+    if (round.observations[idx].correct) setScore(s => s + 1);
   };
 
   const next = () => {
@@ -222,7 +235,7 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
   }
 
   const SenseIcon = round.clue.sense === 'smell' ? Wind : round.clue.sense === 'caution' ? AlertTriangle : Eye;
-  const isToxic = !!round.answer.safetyNote;
+  const isToxic = !!round.weed.safetyNote;
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto p-4">
@@ -262,66 +275,56 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
           ))}
         </div>
 
-        {/* Big clue card */}
-        <div className="bg-card border-4 border-primary/30 rounded-2xl p-5 mb-5 shadow-md">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center">
-              <SenseIcon className="w-7 h-7 text-primary" />
+        {/* Big plant photo */}
+        <div className="bg-card border-4 border-primary/30 rounded-2xl overflow-hidden mb-5 shadow-md">
+          <div className="aspect-[4/3] sm:aspect-[16/9] bg-muted">
+            <WeedImage weedId={round.weed.id} stage="flower" className="w-full h-full" />
+          </div>
+          <div className="px-4 py-3 flex items-center gap-3 bg-primary/5">
+            <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+              <SenseIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="text-xs font-extrabold uppercase tracking-wide text-primary">
-                {round.clue.sense === 'smell' ? 'Nose clue' : round.clue.sense === 'caution' ? 'Warning clue' : 'Eye clue'}
+                Look closely at this plant
               </p>
-              <p className="text-sm text-muted-foreground">Which weed matches this clue?</p>
+              <p className="text-sm text-muted-foreground">Use your eyes from a safe distance.</p>
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-foreground leading-snug">
-            {round.clue.text}
-          </p>
         </div>
 
-        {/* Large photo choices */}
+        {/* Observation choices */}
         <div className="text-center text-lg font-bold text-foreground mb-3">
-          Tap the picture that matches the clue.
+          Which observation matches this plant?
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {round.choices.map(w => {
-            const isPick = picked === w.id;
-            const isAnswer = w.id === round.answer.id;
+        <div className="grid grid-cols-1 gap-3">
+          {round.observations.map((obs, idx) => {
+            const isPick = picked === idx;
             const state = !answered
-              ? 'border-border hover:border-primary hover:scale-[1.02]'
-              : isAnswer
-                ? 'border-success ring-4 ring-success/50'
+              ? 'border-border hover:border-primary hover:bg-primary/5'
+              : obs.correct
+                ? 'border-success bg-success/10 ring-2 ring-success/40'
                 : isPick
-                  ? 'border-destructive ring-4 ring-destructive/50'
-                  : 'border-border opacity-50';
+                  ? 'border-destructive bg-destructive/10 ring-2 ring-destructive/40'
+                  : 'border-border opacity-60';
             return (
               <button
-                key={w.id}
-                onClick={() => choose(w.id)}
+                key={idx}
+                onClick={() => choose(idx)}
                 disabled={answered}
-                className={`relative rounded-2xl overflow-hidden border-4 transition-all bg-card shadow-md ${state}`}
-                aria-label={`Choose ${w.commonName}`}
+                className={`text-left rounded-2xl border-4 p-4 transition-all bg-card shadow-sm flex items-start gap-3 ${state}`}
               >
-                <div className="aspect-square">
-                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                <div className={`shrink-0 mt-0.5 w-7 h-7 rounded-full flex items-center justify-center border-2
+                  ${answered && obs.correct ? 'bg-success border-success text-success-foreground' :
+                    answered && isPick      ? 'bg-destructive border-destructive text-destructive-foreground' :
+                                              'border-primary/40 text-primary'}`}>
+                  {answered && obs.correct ? <Check className="w-4 h-4" /> :
+                   answered && isPick      ? <X className="w-4 h-4" /> :
+                                             <span className="text-sm font-extrabold">{String.fromCharCode(65 + idx)}</span>}
                 </div>
-                <div className={`py-3 px-2 text-center font-display font-extrabold text-lg
-                  ${answered && isAnswer ? 'bg-success text-success-foreground' :
-                    answered && isPick    ? 'bg-destructive text-destructive-foreground' :
-                                            'bg-card text-foreground'}`}>
-                  {w.commonName}
-                </div>
-                {answered && isAnswer && (
-                  <div className="absolute top-2 right-2 bg-success rounded-full p-1.5 shadow">
-                    <Check className="w-6 h-6 text-success-foreground" />
-                  </div>
-                )}
-                {answered && isPick && !isAnswer && (
-                  <div className="absolute top-2 right-2 bg-destructive rounded-full p-1.5 shadow">
-                    <X className="w-6 h-6 text-destructive-foreground" />
-                  </div>
-                )}
+                <p className="text-base sm:text-lg font-bold text-foreground leading-snug">
+                  {obs.text}
+                </p>
               </button>
             );
           })}
@@ -339,8 +342,8 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
             </div>
             <p className="text-base text-foreground leading-snug mb-3">
               {isCorrect
-                ? <>Nice observing! That is <strong>{round.answer.commonName}</strong>.</>
-                : <>The answer was <strong>{round.answer.commonName}</strong>. {round.clue.text}</>
+                ? <>Nice observing! This is <strong>{round.weed.commonName}</strong>. {round.clue.text}</>
+                : <>This plant is <strong>{round.weed.commonName}</strong>. The matching observation was: <em>{round.clue.text}</em></>
               }
             </p>
             <div className={`rounded-xl p-4 border-2 ${isToxic ? 'bg-destructive/10 border-destructive' : 'bg-success/10 border-success'}`}>
@@ -352,8 +355,8 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
               </div>
               <p className="text-sm text-foreground leading-snug">
                 {isToxic
-                  ? `${round.answer.commonName} can be harmful. Always tell a trusted adult and never touch it unless they say it is safe.`
-                  : `${round.answer.commonName} is usually safe to look at from a distance, but always ask a trusted adult before touching any plant.`
+                  ? `${round.weed.commonName} can be harmful. Always tell a trusted adult and never touch it unless they say it is safe.`
+                  : `${round.weed.commonName} is usually safe to look at from a distance, but always ask a trusted adult before touching any plant.`
                 }
               </p>
             </div>
@@ -361,13 +364,13 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
               onClick={next}
               className="mt-4 w-full py-4 rounded-xl bg-primary text-primary-foreground font-extrabold text-lg hover:opacity-90"
             >
-              {step + 1 >= rounds.length ? 'Finish the Mission!' : 'Next Clue →'}
+              {step + 1 >= rounds.length ? 'Finish the Mission!' : 'Next Plant →'}
             </button>
           </div>
         )}
 
         <div className="mt-5 text-center text-base text-muted-foreground">
-          Clues solved: <span className="font-extrabold text-foreground">{score}</span> / {step + (answered ? 1 : 0)}
+          Plants observed: <span className="font-extrabold text-foreground">{score}</span> / {step + (answered ? 1 : 0)}
         </div>
 
         <FarmerGuide
