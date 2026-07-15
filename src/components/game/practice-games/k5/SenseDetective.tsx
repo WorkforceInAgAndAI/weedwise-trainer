@@ -138,21 +138,34 @@ function shuffle<T>(arr: T[]): T[] {
 const ROUNDS_PER_LEVEL = 8;
 const CHOICES_PER_ROUND = 3;
 
+interface Observation {
+  text: string;
+  correct: boolean;
+}
+
 interface Round {
-  answer: Weed;
-  choices: Weed[];
+  weed: Weed;
   clue: Clue;
+  observations: Observation[];
 }
 
 function buildRounds(): Round[] {
   const questionOrder = shuffle(weeds).slice(0, ROUNDS_PER_LEVEL);
-  return questionOrder.map(answer => {
-    const distractors = shuffle(weeds.filter(w => w.id !== answer.id)).slice(0, CHOICES_PER_ROUND - 1);
-    return {
-      answer,
-      choices: shuffle([answer, ...distractors]),
-      clue: getClue(answer),
-    };
+  return questionOrder.map(weed => {
+    const clue = getClue(weed);
+    // Pull distractor observations from other weeds' clues.
+    const distractorPool = shuffle(
+      weeds
+        .filter(w => w.id !== weed.id)
+        .map(w => getClue(w).text)
+        .filter(t => t !== clue.text)
+    ).slice(0, CHOICES_PER_ROUND - 1);
+
+    const observations: Observation[] = shuffle([
+      { text: clue.text, correct: true },
+      ...distractorPool.map(text => ({ text, correct: false })),
+    ]);
+    return { weed, clue, observations };
   });
 }
 
