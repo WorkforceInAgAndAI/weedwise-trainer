@@ -35,6 +35,7 @@ import PlantDoctor from './practice-games/k5/PlantDoctor';
 import FunFactDetective from './practice-games/k5/FunFactDetective';
 import SenseDetective from './practice-games/k5/SenseDetective';
 import InvasiveSplat from './practice-games/k5/InvasiveSplat';
+import WeedLineUp from './practice-games/k5/WeedLineUp';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -97,6 +98,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'plant-doctor': 'what-plants-need',
   'sense-detective': 'safety',
   'invasive-splat': 'native-introduced',
+  'weed-lineup': 'look-alikes',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
