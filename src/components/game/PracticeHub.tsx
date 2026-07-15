@@ -35,6 +35,7 @@ import PlantDoctor from './practice-games/k5/PlantDoctor';
 import FunFactDetective from './practice-games/k5/FunFactDetective';
 import SenseDetective from './practice-games/k5/SenseDetective';
 import InvasiveSplat from './practice-games/k5/InvasiveSplat';
+import WeedLineUp from './practice-games/k5/WeedLineUp';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -97,6 +98,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'plant-doctor': 'what-plants-need',
   'sense-detective': 'safety',
   'invasive-splat': 'native-introduced',
+  'weed-lineup': 'look-alikes',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
@@ -143,6 +145,7 @@ const newK5Games: GameDef[] = [
  { id: 'fun-fact-detective', name: 'Fun Fact Detective', Icon: Search, category: 'Weed ID', description: 'Match each weed photo to its Fun Fact clue card from the 14 Weeds You Can Spot module!', howToPlay: 'Tap a clue card and then tap the weed photo you think it matches. Use the fun-fact hint (and the spot-it clue) to solve every case in the round.', component: FunFactDetective },
     { id: 'sense-detective', name: 'Weed Scout Report', Icon: Eye, category: 'Safety', description: 'A farmer radios in a mystery weed in their crop field. Ask simple questions, gather clues, and name the invader!', howToPlay: 'You have 3 questions. Ask about where the weed is, how many there are, what the leaves look like, or if it has flowers. Use the clues in your notebook to pick the right weed. Never touch a weed unless a trusted adult says it is safe.', component: SenseDetective },
     { id: 'invasive-splat', name: 'Invasive Splat!', Icon: Droplets, category: 'Invasive Weeds', description: 'Splatter-art style! Drop the runny invasive paint blob and watch it spread across the meadow — just like a real invasive weed out-competes native plants.', howToPlay: 'Drag the invasive paint blob from the palette onto the meadow. The invasive "paint" is extra runny, so it spreads WAY farther than the native plants and covers whatever it lands on. Use your 2 blobs each round to see how fast an invasive can take over.', component: InvasiveSplat },
+    { id: 'weed-lineup', name: 'Weed Line-Up', Icon: Scan, category: 'Look-Alikes', description: 'Police line-up! Study the suspect sketch, read the eyewitness clue, and pick the bad weed hiding among its innocent look-alikes.', howToPlay: 'Read the Case File to see what the bad weed is wanted for. Look at the black-and-white Suspect Sketch, then compare it with the three mugshots in the Line-Up. Pick the suspect that matches the clue to make the arrest! Never touch a real mystery weed unless a trusted adult says it is safe.', component: WeedLineUp },
 ];
 
 const middleGames: GameDef[] = [
