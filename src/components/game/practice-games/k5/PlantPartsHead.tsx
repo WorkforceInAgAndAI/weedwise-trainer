@@ -190,12 +190,9 @@ interface Placement { kind: PartKind; correct: boolean; color: string; }
 
 function buildRound(caseIdx: number) {
   const c = CASES[caseIdx];
-  // 5 correct parts + 2 distractor "wrong" parts (fake flowers/leaves) to make it harder
-  const decoys = shuffle(CASES.filter((_, i) => i !== caseIdx))
-    .slice(0, 2)
-    .map((d, i) => ({ id: `decoy-${i}`, kind: (i === 0 ? 'flower' : 'leaves') as PartKind, color: d.parts[i === 0 ? 'flower' : 'leaves'].color, isDecoy: true }));
+  // Exactly one part for each slot — no decoys so young students can focus on anatomy
   const real = PART_ORDER.map((k) => ({ id: `real-${k}`, kind: k, color: c.parts[k].color, isDecoy: false }));
-  return { case: c, palette: shuffle([...real, ...decoys]) };
+  return { case: c, palette: shuffle(real) };
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
