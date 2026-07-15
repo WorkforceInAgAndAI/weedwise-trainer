@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Search, Check, X, Lightbulb, Camera, FileText } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
@@ -68,7 +68,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
   const [wrong, setWrong] = useState<{ photo: string; card: string } | null>(null);
 
   // Reset per-round selection state whenever round or level changes
-  useMemo(() => {
+  useEffect(() => {
     setMatched(new Set());
     setSelPhoto(null);
     setSelCard(null);
