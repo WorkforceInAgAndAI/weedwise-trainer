@@ -11,6 +11,10 @@ import {
   Check,
   X,
   Radio,
+  Ruler,
+  Palette,
+  Hand,
+  Sprout,
 } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
@@ -23,7 +27,15 @@ import type { Weed } from '@/types/game';
 // and their listening skills, just like a real scout talking on a walkie-talkie.
 // --------------------------------------------------------------------------
 
-type QuestionId = 'location' | 'quantity' | 'leaves' | 'flowers';
+type QuestionId =
+  | 'location'
+  | 'quantity'
+  | 'leaves'
+  | 'flowers'
+  | 'height'
+  | 'color'
+  | 'stem'
+  | 'seeds';
 
 interface ScoutQuestion {
   id: QuestionId;
@@ -32,7 +44,7 @@ interface ScoutQuestion {
   Icon: typeof MapPin;
 }
 
-const QUESTIONS: ScoutQuestion[] = [
+const ALL_QUESTIONS: ScoutQuestion[] = [
   {
     id: 'location',
     label: 'Where is it?',
@@ -57,10 +69,36 @@ const QUESTIONS: ScoutQuestion[] = [
     helper: 'What color or shape are they?',
     Icon: Flower2,
   },
+  {
+    id: 'height',
+    label: 'How tall is it?',
+    helper: 'Ankle-high, knee-high, or taller than you?',
+    Icon: Ruler,
+  },
+  {
+    id: 'color',
+    label: 'What color is the plant?',
+    helper: 'Bright green, dusty, or reddish?',
+    Icon: Palette,
+  },
+  {
+    id: 'stem',
+    label: 'What is the stem like?',
+    helper: 'Smooth, hairy, spiny, or hollow?',
+    Icon: Hand,
+  },
+  {
+    id: 'seeds',
+    label: 'What about the seeds?',
+    helper: 'Fluffy, sticky, or in a pod?',
+    Icon: Sprout,
+  },
 ];
 
 const QUESTION_BUDGET = 3;
 const ROUNDS_PER_LEVEL = 3;
+// How many question choices the scout sees each round (rotates through the pool)
+const QUESTIONS_PER_ROUND = 4;
 
 const CROPS = ['soybean', 'corn', 'wheat', 'alfalfa'] as const;
 const FIELD_SPOTS = [
@@ -70,6 +108,19 @@ const FIELD_SPOTS = [
   'the middle of the crop rows',
   'right next to the driveway',
   'the corner by the woods',
+];
+
+const HEIGHTS = [
+  'about ankle-high',
+  'about knee-high',
+  'up to my waist',
+  'taller than a grown-up',
+];
+const PLANT_COLORS = [
+  'a bright grass-green',
+  'a dusty gray-green',
+  'a dark blue-green',
+  'green with reddish streaks',
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -100,9 +151,10 @@ interface Round {
   quantity: string;
   choices: Weed[];
   clues: Record<QuestionId, string>;
+  questions: ScoutQuestion[];
 }
 
-function buildRound(weed: Weed, allWeeds: Weed[]): Round {
+function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[]): Round {
   const crop = pick([...CROPS]);
   const spot = pick(FIELD_SPOTS);
   const quantity = pick([
@@ -118,6 +170,14 @@ function buildRound(weed: Weed, allWeeds: Weed[]): Round {
   const flowerTrait =
     traitLike(weed, ['flower', 'seed', 'panicle', 'head', 'bloom', 'spike']) ||
     'small flowers with tiny seeds';
+  const stemTrait =
+    traitLike(weed, ['stem', 'stalk', 'hollow', 'spine', 'prickle', 'ridged', 'grooved']) ||
+    'a plain green stem';
+  const seedTrait =
+    traitLike(weed, ['seed', 'pod', 'bur', 'fluff', 'silky', 'parachute', 'cluster']) ||
+    'tiny seeds you can barely see';
+  const height = pick(HEIGHTS);
+  const plantColor = pick(PLANT_COLORS);
 
   const distractors = shuffle(allWeeds.filter(w => w.id !== weed.id)).slice(0, 3);
   const choices = shuffle([weed, ...distractors]);
@@ -127,14 +187,25 @@ function buildRound(weed: Weed, allWeeds: Weed[]): Round {
     quantity: `The farmer saw ${quantity}.`,
     leaves: `The leaves are ${leafTrait.toLowerCase()}.`,
     flowers: `The flowers or seeds look like ${flowerTrait.toLowerCase()}.`,
+    height: `The plant is ${height}.`,
+    color: `Overall the plant looks ${plantColor}.`,
+    stem: `The stem is ${stemTrait.toLowerCase()}.`,
+    seeds: `Its seeds are ${seedTrait.toLowerCase()}.`,
   };
 
-  return { weed, crop, spot, quantity, choices, clues };
+  return { weed, crop, spot, quantity, choices, clues, questions };
 }
 
-function buildRounds(): Round[] {
+function buildRounds(level: number): Round[] {
   const pool = shuffle(weeds).slice(0, ROUNDS_PER_LEVEL);
-  return pool.map(w => buildRound(w, weeds));
+  return pool.map((w, i) => {
+    // Rotate the question window based on level + round index so students
+    // encounter a different mix of questions each case.
+    const offset = ((level - 1) * ROUNDS_PER_LEVEL + i) % ALL_QUESTIONS.length;
+    const rotated = [...ALL_QUESTIONS.slice(offset), ...ALL_QUESTIONS.slice(0, offset)];
+    const questions = rotated.slice(0, QUESTIONS_PER_ROUND);
+    return buildRound(w, weeds, questions);
+  });
 }
 
 interface Props {
@@ -152,11 +223,10 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
   const [guess, setGuess] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const rounds = useMemo(() => buildRounds(), [level]);
+  const rounds = useMemo(() => buildRounds(level), [level]);
   const round = rounds[step];
 
-  const askedList = QUESTIONS.filter(q => asked.has(q.id));
+  const askedList = round.questions.filter(q => asked.has(q.id));
   const remaining = QUESTION_BUDGET - asked.size;
   const readyToGuess = asked.size >= 2;
 
@@ -278,7 +348,7 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
               You can ask <strong>{QUESTION_BUDGET}</strong> questions. Pick the ones that help the most!
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {QUESTIONS.map(q => {
+              {round.questions.map(q => {
                 const used = asked.has(q.id);
                 const disabled = used || remaining <= 0;
                 return (
