@@ -429,3 +429,6 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
           className="mt-5"
         />
       </div>
+    </div>
+  );
+}
