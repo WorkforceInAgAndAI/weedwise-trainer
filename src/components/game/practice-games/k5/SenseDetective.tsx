@@ -241,12 +241,12 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
         </div>
 
         {/* Safety rule banner */}
-        <div className="bg-amber-50 border-4 border-amber-400 rounded-2xl p-4 mb-4 flex items-start gap-3 shadow-md">
-          <div className="shrink-0 w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 text-white" />
+        <div className="bg-warning/10 border-4 border-warning rounded-2xl p-4 mb-4 flex items-start gap-3 shadow-md">
+          <div className="shrink-0 w-10 h-10 rounded-full bg-warning flex items-center justify-center">
+            <ShieldCheck className="w-6 h-6 text-warning-foreground" />
           </div>
           <div>
-            <p className="text-sm font-extrabold uppercase tracking-wide text-amber-800 mb-1">Safety Rule</p>
+            <p className="text-sm font-extrabold uppercase tracking-wide text-warning-foreground mb-1">Safety Rule</p>
             <p className="text-base font-bold text-foreground leading-snug">
               Look with your eyes and smell with your nose from far away. Never touch a weed unless a trusted adult tells you it is safe.
             </p>
@@ -289,9 +289,9 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
             const state = !answered
               ? 'border-border hover:border-primary hover:scale-[1.02]'
               : isAnswer
-                ? 'border-emerald-500 ring-4 ring-emerald-300'
+                ? 'border-success ring-4 ring-success/50'
                 : isPick
-                  ? 'border-red-500 ring-4 ring-red-300'
+                  ? 'border-destructive ring-4 ring-destructive/50'
                   : 'border-border opacity-50';
             return (
               <button
@@ -305,19 +305,19 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
                   <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
                 </div>
                 <div className={`py-3 px-2 text-center font-display font-extrabold text-lg
-                  ${answered && isAnswer ? 'bg-emerald-500 text-white' :
-                    answered && isPick    ? 'bg-red-500 text-white' :
+                  ${answered && isAnswer ? 'bg-success text-success-foreground' :
+                    answered && isPick    ? 'bg-destructive text-destructive-foreground' :
                                             'bg-card text-foreground'}`}>
                   {w.commonName}
                 </div>
                 {answered && isAnswer && (
-                  <div className="absolute top-2 right-2 bg-emerald-500 rounded-full p-1.5 shadow">
-                    <Check className="w-6 h-6 text-white" />
+                  <div className="absolute top-2 right-2 bg-success rounded-full p-1.5 shadow">
+                    <Check className="w-6 h-6 text-success-foreground" />
                   </div>
                 )}
                 {answered && isPick && !isAnswer && (
-                  <div className="absolute top-2 right-2 bg-red-500 rounded-full p-1.5 shadow">
-                    <X className="w-6 h-6 text-white" />
+                  <div className="absolute top-2 right-2 bg-destructive rounded-full p-1.5 shadow">
+                    <X className="w-6 h-6 text-destructive-foreground" />
                   </div>
                 )}
               </button>
@@ -328,11 +328,11 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
         {/* Feedback + next button */}
         {answered && (
           <div className={`mt-5 rounded-2xl p-5 border-4 animate-scale-in
-            ${isCorrect ? 'bg-emerald-50 border-emerald-400' : 'bg-amber-50 border-amber-400'}`}>
+            ${isCorrect ? 'bg-success/10 border-success' : 'bg-warning/10 border-warning'}`}>
             <div className="text-2xl font-extrabold text-foreground mb-2 flex items-center gap-2">
               {isCorrect
-                ? <><Check className="w-7 h-7 text-emerald-600" /> Great spotting!</>
-                : <><X className="w-7 h-7 text-red-600" /> Keep looking!</>
+                ? <><Check className="w-7 h-7 text-success" /> Great spotting!</>
+                : <><X className="w-7 h-7 text-destructive" /> Keep looking!</>
               }
             </div>
             <p className="text-base text-foreground leading-snug mb-3">
@@ -341,11 +341,11 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
                 : <>The answer was <strong>{round.answer.commonName}</strong>. {round.clue.text}</>
               }
             </p>
-            <div className={`rounded-xl p-4 border-2 ${isToxic ? 'bg-red-50 border-red-400' : 'bg-green-50 border-green-500'}`}>
+            <div className={`rounded-xl p-4 border-2 ${isToxic ? 'bg-destructive/10 border-destructive' : 'bg-success/10 border-success'}`}>
               <div className="flex items-center gap-2 mb-1">
                 {isToxic
-                  ? <><AlertTriangle className="w-5 h-5 text-red-600" /><span className="font-extrabold text-red-700">Do not touch!</span></>
-                  : <><ShieldCheck className="w-5 h-5 text-green-700" /><span className="font-extrabold text-green-700">Looks safe to observe</span></>
+                  ? <><AlertTriangle className="w-5 h-5 text-destructive" /><span className="font-extrabold text-destructive">Do not touch!</span></>
+                  : <><ShieldCheck className="w-5 h-5 text-success" /><span className="font-extrabold text-success">Looks safe to observe</span></>
                 }
               </div>
               <p className="text-sm text-foreground leading-snug">
