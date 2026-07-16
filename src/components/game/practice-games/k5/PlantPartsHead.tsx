@@ -418,7 +418,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
   const [caseIdx, setCaseIdx] = useState(() => Math.floor(Math.random() * CASES.length));
   const [roundData, setRoundData] = useState(() => buildRound(Math.floor(Math.random() * CASES.length)));
-  const [placements, setPlacements] = useState<Partial<Record<PartKind, Placement>>>({});
+  const [placements, setPlacements] = useState<Record<string, Placement>>({});
   const [usedIds, setUsedIds] = useState<Set<string>>(new Set());
   const [showResult, setShowResult] = useState(false);
   const [dragItem, setDragItem] = useState<PaletteItem | null>(null);
@@ -426,20 +426,20 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
   const availablePalette = roundData.palette.filter(p => !usedIds.has(p.id));
   const slotsFilled = Object.keys(placements).length;
 
-  function handleDrop(slot: PartKind) {
-    if (!dragItem || placements[slot] || showResult) return;
-    const correct = dragItem.kind === slot;
-    setPlacements(p => ({ ...p, [slot]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label } }));
+  function handleDrop(slot: SlotDef) {
+    if (!dragItem || placements[slot.id] || showResult) return;
+    const correct = dragItem.kind === slot.kind;
+    setPlacements(p => ({ ...p, [slot.id]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label } }));
     setUsedIds(s => new Set([...s, dragItem.id]));
     setDragItem(null);
   }
 
-  function removePlacement(slot: PartKind) {
+  function removePlacement(slotId: string) {
     if (showResult) return;
-    const placed = placements[slot];
+    const placed = placements[slotId];
     if (!placed) return;
     const paletteEntry = roundData.palette.find(p => p.kind === placed.kind && p.variant === placed.variant && usedIds.has(p.id));
-    setPlacements(p => { const n = { ...p }; delete n[slot]; return n; });
+    setPlacements(p => { const n = { ...p }; delete n[slotId]; return n; });
     if (paletteEntry) setUsedIds(s => { const n = new Set(s); n.delete(paletteEntry.id); return n; });
   }
 
@@ -451,7 +451,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
   function nextRound() {
     const nextTotalScore = totalScore + correctCount;
-    const nextTotalPossible = totalPossible + PART_ORDER.length;
+    const nextTotalPossible = totalPossible + SLOTS.length;
     const nextRoundNum = round + 1;
     if (nextRoundNum >= ROUNDS_PER_LEVEL) {
       setTotalScore(nextTotalScore);
