@@ -51,12 +51,23 @@ const PART_STYLES: Record<PartKind, PartStyle[]> = {
 
 const PART_ORDER: PartKind[] = ['roots', 'stem', 'leaves', 'flower', 'seeds'];
 
-const SLOT_POS: Record<PartKind, { x: number; y: number; label: string }> = {
-  roots:  { x: 200, y: 380, label: 'Roots' },
-  stem:   { x: 200, y: 260, label: 'Stem' },
-  leaves: { x: 200, y: 190, label: 'Leaves' },
-  flower: { x: 200, y: 100, label: 'Flower' },
-  seeds:  { x: 320, y: 100, label: 'Seeds' },
+// Each slot is a landing spot on the plant body. There can be more than one
+// slot per PartKind (e.g. three leaves) — the drop is correct as long as the
+// dragged item's `kind` matches the slot's `kind`.
+interface SlotDef { id: string; kind: PartKind; x: number; y: number; w: number; h: number; label: string; oval?: boolean; }
+
+const SLOTS: SlotDef[] = [
+  { id: 'roots',        kind: 'roots',  x: 200, y: 400, w: 130, h: 110, label: 'Roots' },
+  { id: 'stem',         kind: 'stem',   x: 200, y: 275, w: 70,  h: 160, label: 'Stem', oval: true },
+  { id: 'leaves-left',  kind: 'leaves', x: 105, y: 240, w: 100, h: 100, label: 'Leaf' },
+  { id: 'leaves-mid',   kind: 'leaves', x: 200, y: 200, w: 100, h: 100, label: 'Leaf' },
+  { id: 'leaves-right', kind: 'leaves', x: 295, y: 240, w: 100, h: 100, label: 'Leaf' },
+  { id: 'flower',       kind: 'flower', x: 200, y: 95,  w: 120, h: 120, label: 'Flower' },
+  { id: 'seeds',        kind: 'seeds',  x: 325, y: 95,  w: 110, h: 110, label: 'Seeds' },
+];
+
+const PART_LABELS: Record<PartKind, string> = {
+  roots: 'Roots', stem: 'Stem', leaves: 'Leaves', flower: 'Flower', seeds: 'Seeds',
 };
 
 interface WeedCase {
