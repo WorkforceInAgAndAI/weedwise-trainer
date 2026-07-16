@@ -298,29 +298,62 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
     case 'flower': {
       if (variant === 'trumpet') return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          <path d="M20 20 L 80 20 L 60 80 L 40 80 Z" fill={color} stroke="#78350f" strokeWidth={2} />
-          <ellipse cx={50} cy={22} rx={30} ry={8} fill={color} stroke="#78350f" strokeWidth={2} />
-          <circle cx={50} cy={60} r={5} fill="#fbbf24" />
+          {/* funnel body */}
+          <path d="M12 22 Q 50 -6, 88 22 L 62 88 Q 50 92, 38 88 Z" fill={color} stroke="#78350f" strokeWidth={2} strokeLinejoin="round" />
+          {/* front lip */}
+          <ellipse cx={50} cy={22} rx={38} ry={10} fill={color} stroke="#78350f" strokeWidth={2} />
+          <ellipse cx={50} cy={20} rx={30} ry={5} fill="white" opacity={0.35} />
+          {/* throat shading */}
+          <ellipse cx={50} cy={25} rx={22} ry={5} fill="#78350f" opacity={0.25} />
+          {/* pistil */}
+          <circle cx={50} cy={30} r={4} fill="#fbbf24" stroke="#78350f" strokeWidth={1} />
+          <line x1={50} y1={30} x2={50} y2={70} stroke="#fbbf24" strokeWidth={2} />
         </svg>
       );
       if (variant === 'pompom') return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          {Array.from({ length: 20 }).map((_, i) => {
-            const a = (i / 20) * Math.PI * 2;
-            const r = 30;
-            return <circle key={i} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={9} fill={color} />;
+          {/* outer fluff */}
+          {Array.from({ length: 26 }).map((_, i) => {
+            const a = (i / 26) * Math.PI * 2;
+            const r = 32 + (i % 3) * 2;
+            return <circle key={`o${i}`} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={7} fill={color} opacity={0.85} />;
           })}
-          <circle cx={50} cy={50} r={20} fill={color} />
+          {/* mid ring */}
+          {Array.from({ length: 14 }).map((_, i) => {
+            const a = (i / 14) * Math.PI * 2 + 0.2;
+            const r = 22;
+            return <circle key={`m${i}`} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={7} fill={color} />;
+          })}
+          {/* dense core */}
+          <circle cx={50} cy={50} r={18} fill={color} />
+          <circle cx={44} cy={44} r={5} fill="white" opacity={0.35} />
         </svg>
       );
       if (variant === 'lace') return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          {Array.from({ length: 18 }).map((_, i) => {
-            const a = (i / 18) * Math.PI * 2;
-            const r = 22 + (i % 3) * 6;
-            return <circle key={i} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />;
+          {/* radiating stems */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            const rx = 50 + Math.cos(a) * 34;
+            const ry = 50 + Math.sin(a) * 34;
+            return <line key={`s${i}`} x1={50} y1={50} x2={rx} y2={ry} stroke="#365314" strokeWidth={1} opacity={0.6} />;
           })}
-          <circle cx={50} cy={50} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />
+          {/* umbels — one 5-flower cluster at each ray tip */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            const cx = 50 + Math.cos(a) * 34;
+            const cy = 50 + Math.sin(a) * 34;
+            return (
+              <g key={`u${i}`}>
+                <circle cx={cx} cy={cy} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />
+                {Array.from({ length: 5 }).map((_, j) => {
+                  const b = (j / 5) * Math.PI * 2;
+                  return <circle key={j} cx={cx + Math.cos(b) * 4} cy={cy + Math.sin(b) * 4} r={2} fill={color} stroke="#78350f" strokeWidth={0.3} />;
+                })}
+              </g>
+            );
+          })}
+          <circle cx={50} cy={50} r={3} fill="#7c2d12" />
         </svg>
       );
       // daisy default — layered petals with a fluffy center
