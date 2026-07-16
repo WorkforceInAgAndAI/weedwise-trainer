@@ -544,24 +544,25 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
               <text x={10} y={355} fontSize={12} fill="#3f6212" fontWeight={700}>SOIL LINE</text>
 
               {/* Slot markers */}
-              {PART_ORDER.map(kind => {
-                const pos = SLOT_POS[kind];
-                const placed = placements[kind];
+              {SLOTS.map(slot => {
+                const placed = placements[slot.id];
+                const isOval = !!slot.oval;
+                const partSize = Math.min(slot.w, slot.h) - 20;
                 return (
-                  <g key={kind}>
+                  <g key={slot.id}>
                     <foreignObject
-                      x={pos.x - 55}
-                      y={pos.y - 55}
-                      width={110}
-                      height={110}
+                      x={slot.x - slot.w / 2}
+                      y={slot.y - slot.h / 2}
+                      width={slot.w}
+                      height={slot.h}
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(kind)}
+                      onDrop={() => handleDrop(slot)}
                     >
                       <div
                         onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => { e.preventDefault(); handleDrop(kind); }}
-                        onClick={() => placed && removePlacement(kind)}
-                        className={`w-full h-full flex items-center justify-center rounded-full border-4 transition-all ${
+                        onDrop={(e) => { e.preventDefault(); handleDrop(slot); }}
+                        onClick={() => placed && removePlacement(slot.id)}
+                        className={`w-full h-full flex items-center justify-center border-4 transition-all ${isOval ? '' : 'rounded-full'} ${
                           placed
                             ? showResult
                               ? placed.correct
@@ -570,11 +571,11 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                               : 'border-primary/60 bg-white/70 cursor-pointer'
                             : 'border-dashed border-slate-400 bg-white/40 hover:bg-white/70'
                         }`}
-                        style={{ boxShadow: placed ? '0 4px 12px rgba(0,0,0,0.15)' : 'none' }}
+                        style={{ boxShadow: placed ? '0 4px 12px rgba(0,0,0,0.15)' : 'none', borderRadius: isOval ? '50%' : undefined }}
                       >
                         {placed ? (
                           <div className="relative">
-                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={90} />
+                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={partSize} />
                             {showResult && (
                               <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center shadow" style={{ background: placed.correct ? '#16a34a' : '#dc2626' }}>
                                 {placed.correct ? <Check className="w-4 h-4 text-white" /> : <X className="w-4 h-4 text-white" />}
@@ -582,8 +583,8 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                             )}
                           </div>
                         ) : (
-                          <span className="text-xs font-bold text-slate-600 text-center px-2">
-                            {pos.label}<br /><span className="text-[10px] font-normal opacity-70">drop here</span>
+                          <span className="text-xs font-bold text-slate-600 text-center px-1 leading-tight">
+                            {slot.label}<br /><span className="text-[10px] font-normal opacity-70">drop here</span>
                           </span>
                         )}
                       </div>
@@ -613,7 +614,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                     if (options.length === 0) return null;
                     return (
                       <div key={k}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">{SLOT_POS[k].label}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">{PART_LABELS[k]}</p>
                         <div className="grid grid-cols-4 gap-1.5">
                           {options.map(p => (
                             <div
@@ -637,7 +638,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
               )}
             </div>
 
-            {!showResult && slotsFilled === PART_ORDER.length && (
+            {!showResult && slotsFilled === SLOTS.length && (
               <button
                 onClick={checkRound}
                 className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90"
@@ -661,13 +662,15 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                 <p className="text-[11px] text-muted-foreground">Here's what the real {c.name} looks like:</p>
                 <div className="text-xs space-y-1">
                   {PART_ORDER.map(k => {
-                    const placed = placements[k];
+                    // Find first placement of this kind (leaves may be in multiple slots)
+                    const slotForKind = SLOTS.find(s => s.kind === k && placements[s.id]);
+                    const placed = slotForKind ? placements[slotForKind.id] : undefined;
                     const actualId = c.actual?.[k];
                     const actualStyle = actualId ? PART_STYLES[k].find(s => s.id === actualId) : null;
                     const matched = placed && actualStyle && placed.variant === actualStyle.variant;
                     return (
                       <div key={k} className="flex gap-1 items-start">
-                        <span className="font-semibold text-foreground shrink-0">{SLOT_POS[k].label}:</span>
+                        <span className="font-semibold text-foreground shrink-0">{PART_LABELS[k]}:</span>
                         <span className="text-muted-foreground">
                           {c.parts[k].hint}
                           {actualStyle && (
