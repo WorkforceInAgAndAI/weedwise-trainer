@@ -250,12 +250,12 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
           ))}
         </svg>
       );
-      // thick default
+      // thick default — smooth oval column with soft highlight
       return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          <rect x={44} y={8} width={12} height={84} rx={6} fill={color} />
-          <ellipse cx={38} cy={40} rx={10} ry={5} fill={color} opacity={0.7} />
-          <ellipse cx={62} cy={60} rx={10} ry={5} fill={color} opacity={0.7} />
+          <ellipse cx={50} cy={50} rx={14} ry={44} fill={color} />
+          <ellipse cx={46} cy={40} rx={4} ry={30} fill="white" opacity={0.28} />
+          <ellipse cx={50} cy={92} rx={12} ry={4} fill={color} opacity={0.5} />
         </svg>
       );
     }
@@ -323,13 +323,30 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
           <circle cx={50} cy={50} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />
         </svg>
       );
-      // daisy default
+      // daisy default — layered petals with a fluffy center
       return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          {[0, 72, 144, 216, 288].map((deg, i) => (
-            <ellipse key={i} cx={50} cy={28} rx={14} ry={22} fill={color} transform={`rotate(${deg} 50 50)`} />
-          ))}
-          <circle cx={50} cy={50} r={12} fill="#fbbf24" stroke="#78350f" strokeWidth={2} />
+          {/* back petal ring */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const deg = (i * 360) / 8 + 22;
+            return <ellipse key={`b${i}`} cx={50} cy={22} rx={10} ry={20} fill={color} opacity={0.75} transform={`rotate(${deg} 50 50)`} />;
+          })}
+          {/* front petal ring */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const deg = (i * 360) / 8;
+            return (
+              <g key={`f${i}`} transform={`rotate(${deg} 50 50)`}>
+                <ellipse cx={50} cy={26} rx={12} ry={22} fill={color} />
+                <ellipse cx={47} cy={20} rx={2.5} ry={10} fill="white" opacity={0.35} />
+              </g>
+            );
+          })}
+          {/* center */}
+          <circle cx={50} cy={50} r={13} fill="#fbbf24" stroke="#78350f" strokeWidth={2} />
+          {Array.from({ length: 10 }).map((_, i) => {
+            const a = (i / 10) * Math.PI * 2;
+            return <circle key={i} cx={50 + Math.cos(a) * 8} cy={50 + Math.sin(a) * 8} r={1.5} fill="#78350f" />;
+          })}
         </svg>
       );
     }
