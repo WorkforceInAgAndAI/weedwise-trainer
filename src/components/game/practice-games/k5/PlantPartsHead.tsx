@@ -51,12 +51,23 @@ const PART_STYLES: Record<PartKind, PartStyle[]> = {
 
 const PART_ORDER: PartKind[] = ['roots', 'stem', 'leaves', 'flower', 'seeds'];
 
-const SLOT_POS: Record<PartKind, { x: number; y: number; label: string }> = {
-  roots:  { x: 200, y: 380, label: 'Roots' },
-  stem:   { x: 200, y: 260, label: 'Stem' },
-  leaves: { x: 200, y: 190, label: 'Leaves' },
-  flower: { x: 200, y: 100, label: 'Flower' },
-  seeds:  { x: 320, y: 100, label: 'Seeds' },
+// Each slot is a landing spot on the plant body. There can be more than one
+// slot per PartKind (e.g. three leaves) — the drop is correct as long as the
+// dragged item's `kind` matches the slot's `kind`.
+interface SlotDef { id: string; kind: PartKind; x: number; y: number; w: number; h: number; label: string; oval?: boolean; }
+
+const SLOTS: SlotDef[] = [
+  { id: 'roots',        kind: 'roots',  x: 200, y: 400, w: 130, h: 110, label: 'Roots' },
+  { id: 'stem',         kind: 'stem',   x: 200, y: 275, w: 70,  h: 160, label: 'Stem', oval: true },
+  { id: 'leaves-left',  kind: 'leaves', x: 105, y: 240, w: 100, h: 100, label: 'Leaf' },
+  { id: 'leaves-mid',   kind: 'leaves', x: 200, y: 200, w: 100, h: 100, label: 'Leaf' },
+  { id: 'leaves-right', kind: 'leaves', x: 295, y: 240, w: 100, h: 100, label: 'Leaf' },
+  { id: 'flower',       kind: 'flower', x: 200, y: 95,  w: 120, h: 120, label: 'Flower' },
+  { id: 'seeds',        kind: 'seeds',  x: 325, y: 95,  w: 110, h: 110, label: 'Seeds' },
+];
+
+const PART_LABELS: Record<PartKind, string> = {
+  roots: 'Roots', stem: 'Stem', leaves: 'Leaves', flower: 'Flower', seeds: 'Seeds',
 };
 
 interface WeedCase {
@@ -239,12 +250,12 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
           ))}
         </svg>
       );
-      // thick default
+      // thick default — smooth oval column with soft highlight
       return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          <rect x={44} y={8} width={12} height={84} rx={6} fill={color} />
-          <ellipse cx={38} cy={40} rx={10} ry={5} fill={color} opacity={0.7} />
-          <ellipse cx={62} cy={60} rx={10} ry={5} fill={color} opacity={0.7} />
+          <ellipse cx={50} cy={50} rx={14} ry={44} fill={color} />
+          <ellipse cx={46} cy={40} rx={4} ry={30} fill="white" opacity={0.28} />
+          <ellipse cx={50} cy={92} rx={12} ry={4} fill={color} opacity={0.5} />
         </svg>
       );
     }
@@ -287,38 +298,88 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
     case 'flower': {
       if (variant === 'trumpet') return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          <path d="M20 20 L 80 20 L 60 80 L 40 80 Z" fill={color} stroke="#78350f" strokeWidth={2} />
-          <ellipse cx={50} cy={22} rx={30} ry={8} fill={color} stroke="#78350f" strokeWidth={2} />
-          <circle cx={50} cy={60} r={5} fill="#fbbf24" />
+          {/* funnel body */}
+          <path d="M12 22 Q 50 -6, 88 22 L 62 88 Q 50 92, 38 88 Z" fill={color} stroke="#78350f" strokeWidth={2} strokeLinejoin="round" />
+          {/* front lip */}
+          <ellipse cx={50} cy={22} rx={38} ry={10} fill={color} stroke="#78350f" strokeWidth={2} />
+          <ellipse cx={50} cy={20} rx={30} ry={5} fill="white" opacity={0.35} />
+          {/* throat shading */}
+          <ellipse cx={50} cy={25} rx={22} ry={5} fill="#78350f" opacity={0.25} />
+          {/* pistil */}
+          <circle cx={50} cy={30} r={4} fill="#fbbf24" stroke="#78350f" strokeWidth={1} />
+          <line x1={50} y1={30} x2={50} y2={70} stroke="#fbbf24" strokeWidth={2} />
         </svg>
       );
       if (variant === 'pompom') return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          {Array.from({ length: 20 }).map((_, i) => {
-            const a = (i / 20) * Math.PI * 2;
-            const r = 30;
-            return <circle key={i} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={9} fill={color} />;
+          {/* outer fluff */}
+          {Array.from({ length: 26 }).map((_, i) => {
+            const a = (i / 26) * Math.PI * 2;
+            const r = 32 + (i % 3) * 2;
+            return <circle key={`o${i}`} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={7} fill={color} opacity={0.85} />;
           })}
-          <circle cx={50} cy={50} r={20} fill={color} />
+          {/* mid ring */}
+          {Array.from({ length: 14 }).map((_, i) => {
+            const a = (i / 14) * Math.PI * 2 + 0.2;
+            const r = 22;
+            return <circle key={`m${i}`} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={7} fill={color} />;
+          })}
+          {/* dense core */}
+          <circle cx={50} cy={50} r={18} fill={color} />
+          <circle cx={44} cy={44} r={5} fill="white" opacity={0.35} />
         </svg>
       );
       if (variant === 'lace') return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          {Array.from({ length: 18 }).map((_, i) => {
-            const a = (i / 18) * Math.PI * 2;
-            const r = 22 + (i % 3) * 6;
-            return <circle key={i} cx={50 + Math.cos(a) * r} cy={50 + Math.sin(a) * r} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />;
+          {/* radiating stems */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            const rx = 50 + Math.cos(a) * 34;
+            const ry = 50 + Math.sin(a) * 34;
+            return <line key={`s${i}`} x1={50} y1={50} x2={rx} y2={ry} stroke="#365314" strokeWidth={1} opacity={0.6} />;
           })}
-          <circle cx={50} cy={50} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />
+          {/* umbels — one 5-flower cluster at each ray tip */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            const cx = 50 + Math.cos(a) * 34;
+            const cy = 50 + Math.sin(a) * 34;
+            return (
+              <g key={`u${i}`}>
+                <circle cx={cx} cy={cy} r={4} fill={color} stroke="#78350f" strokeWidth={0.5} />
+                {Array.from({ length: 5 }).map((_, j) => {
+                  const b = (j / 5) * Math.PI * 2;
+                  return <circle key={j} cx={cx + Math.cos(b) * 4} cy={cy + Math.sin(b) * 4} r={2} fill={color} stroke="#78350f" strokeWidth={0.3} />;
+                })}
+              </g>
+            );
+          })}
+          <circle cx={50} cy={50} r={3} fill="#7c2d12" />
         </svg>
       );
-      // daisy default
+      // daisy default — layered petals with a fluffy center
       return (
         <svg width={s} height={s} viewBox="0 0 100 100">
-          {[0, 72, 144, 216, 288].map((deg, i) => (
-            <ellipse key={i} cx={50} cy={28} rx={14} ry={22} fill={color} transform={`rotate(${deg} 50 50)`} />
-          ))}
-          <circle cx={50} cy={50} r={12} fill="#fbbf24" stroke="#78350f" strokeWidth={2} />
+          {/* back petal ring */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const deg = (i * 360) / 8 + 22;
+            return <ellipse key={`b${i}`} cx={50} cy={22} rx={10} ry={20} fill={color} opacity={0.75} transform={`rotate(${deg} 50 50)`} />;
+          })}
+          {/* front petal ring */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const deg = (i * 360) / 8;
+            return (
+              <g key={`f${i}`} transform={`rotate(${deg} 50 50)`}>
+                <ellipse cx={50} cy={26} rx={12} ry={22} fill={color} />
+                <ellipse cx={47} cy={20} rx={2.5} ry={10} fill="white" opacity={0.35} />
+              </g>
+            );
+          })}
+          {/* center */}
+          <circle cx={50} cy={50} r={13} fill="#fbbf24" stroke="#78350f" strokeWidth={2} />
+          {Array.from({ length: 10 }).map((_, i) => {
+            const a = (i / 10) * Math.PI * 2;
+            return <circle key={i} cx={50 + Math.cos(a) * 8} cy={50 + Math.sin(a) * 8} r={1.5} fill="#78350f" />;
+          })}
         </svg>
       );
     }
@@ -407,7 +468,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
   const [caseIdx, setCaseIdx] = useState(() => Math.floor(Math.random() * CASES.length));
   const [roundData, setRoundData] = useState(() => buildRound(Math.floor(Math.random() * CASES.length)));
-  const [placements, setPlacements] = useState<Partial<Record<PartKind, Placement>>>({});
+  const [placements, setPlacements] = useState<Record<string, Placement>>({});
   const [usedIds, setUsedIds] = useState<Set<string>>(new Set());
   const [showResult, setShowResult] = useState(false);
   const [dragItem, setDragItem] = useState<PaletteItem | null>(null);
@@ -415,20 +476,20 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
   const availablePalette = roundData.palette.filter(p => !usedIds.has(p.id));
   const slotsFilled = Object.keys(placements).length;
 
-  function handleDrop(slot: PartKind) {
-    if (!dragItem || placements[slot] || showResult) return;
-    const correct = dragItem.kind === slot;
-    setPlacements(p => ({ ...p, [slot]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label } }));
+  function handleDrop(slot: SlotDef) {
+    if (!dragItem || placements[slot.id] || showResult) return;
+    const correct = dragItem.kind === slot.kind;
+    setPlacements(p => ({ ...p, [slot.id]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label } }));
     setUsedIds(s => new Set([...s, dragItem.id]));
     setDragItem(null);
   }
 
-  function removePlacement(slot: PartKind) {
+  function removePlacement(slotId: string) {
     if (showResult) return;
-    const placed = placements[slot];
+    const placed = placements[slotId];
     if (!placed) return;
     const paletteEntry = roundData.palette.find(p => p.kind === placed.kind && p.variant === placed.variant && usedIds.has(p.id));
-    setPlacements(p => { const n = { ...p }; delete n[slot]; return n; });
+    setPlacements(p => { const n = { ...p }; delete n[slotId]; return n; });
     if (paletteEntry) setUsedIds(s => { const n = new Set(s); n.delete(paletteEntry.id); return n; });
   }
 
@@ -440,7 +501,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
   function nextRound() {
     const nextTotalScore = totalScore + correctCount;
-    const nextTotalPossible = totalPossible + PART_ORDER.length;
+    const nextTotalPossible = totalPossible + SLOTS.length;
     const nextRoundNum = round + 1;
     if (nextRoundNum >= ROUNDS_PER_LEVEL) {
       setTotalScore(nextTotalScore);
@@ -533,24 +594,25 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
               <text x={10} y={355} fontSize={12} fill="#3f6212" fontWeight={700}>SOIL LINE</text>
 
               {/* Slot markers */}
-              {PART_ORDER.map(kind => {
-                const pos = SLOT_POS[kind];
-                const placed = placements[kind];
+              {SLOTS.map(slot => {
+                const placed = placements[slot.id];
+                const isOval = !!slot.oval;
+                const partSize = Math.min(slot.w, slot.h) - 20;
                 return (
-                  <g key={kind}>
+                  <g key={slot.id}>
                     <foreignObject
-                      x={pos.x - 55}
-                      y={pos.y - 55}
-                      width={110}
-                      height={110}
+                      x={slot.x - slot.w / 2}
+                      y={slot.y - slot.h / 2}
+                      width={slot.w}
+                      height={slot.h}
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => handleDrop(kind)}
+                      onDrop={() => handleDrop(slot)}
                     >
                       <div
                         onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => { e.preventDefault(); handleDrop(kind); }}
-                        onClick={() => placed && removePlacement(kind)}
-                        className={`w-full h-full flex items-center justify-center rounded-full border-4 transition-all ${
+                        onDrop={(e) => { e.preventDefault(); handleDrop(slot); }}
+                        onClick={() => placed && removePlacement(slot.id)}
+                        className={`w-full h-full flex items-center justify-center border-4 transition-all ${isOval ? '' : 'rounded-full'} ${
                           placed
                             ? showResult
                               ? placed.correct
@@ -559,11 +621,11 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                               : 'border-primary/60 bg-white/70 cursor-pointer'
                             : 'border-dashed border-slate-400 bg-white/40 hover:bg-white/70'
                         }`}
-                        style={{ boxShadow: placed ? '0 4px 12px rgba(0,0,0,0.15)' : 'none' }}
+                        style={{ boxShadow: placed ? '0 4px 12px rgba(0,0,0,0.15)' : 'none', borderRadius: isOval ? '50%' : undefined }}
                       >
                         {placed ? (
                           <div className="relative">
-                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={90} />
+                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={partSize} />
                             {showResult && (
                               <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center shadow" style={{ background: placed.correct ? '#16a34a' : '#dc2626' }}>
                                 {placed.correct ? <Check className="w-4 h-4 text-white" /> : <X className="w-4 h-4 text-white" />}
@@ -571,8 +633,8 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                             )}
                           </div>
                         ) : (
-                          <span className="text-xs font-bold text-slate-600 text-center px-2">
-                            {pos.label}<br /><span className="text-[10px] font-normal opacity-70">drop here</span>
+                          <span className="text-xs font-bold text-slate-600 text-center px-1 leading-tight">
+                            {slot.label}<br /><span className="text-[10px] font-normal opacity-70">drop here</span>
                           </span>
                         )}
                       </div>
@@ -602,7 +664,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                     if (options.length === 0) return null;
                     return (
                       <div key={k}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">{SLOT_POS[k].label}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">{PART_LABELS[k]}</p>
                         <div className="grid grid-cols-4 gap-1.5">
                           {options.map(p => (
                             <div
@@ -626,7 +688,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
               )}
             </div>
 
-            {!showResult && slotsFilled === PART_ORDER.length && (
+            {!showResult && slotsFilled === SLOTS.length && (
               <button
                 onClick={checkRound}
                 className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90"
@@ -650,13 +712,15 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                 <p className="text-[11px] text-muted-foreground">Here's what the real {c.name} looks like:</p>
                 <div className="text-xs space-y-1">
                   {PART_ORDER.map(k => {
-                    const placed = placements[k];
+                    // Find first placement of this kind (leaves may be in multiple slots)
+                    const slotForKind = SLOTS.find(s => s.kind === k && placements[s.id]);
+                    const placed = slotForKind ? placements[slotForKind.id] : undefined;
                     const actualId = c.actual?.[k];
                     const actualStyle = actualId ? PART_STYLES[k].find(s => s.id === actualId) : null;
                     const matched = placed && actualStyle && placed.variant === actualStyle.variant;
                     return (
                       <div key={k} className="flex gap-1 items-start">
-                        <span className="font-semibold text-foreground shrink-0">{SLOT_POS[k].label}:</span>
+                        <span className="font-semibold text-foreground shrink-0">{PART_LABELS[k]}:</span>
                         <span className="text-muted-foreground">
                           {c.parts[k].hint}
                           {actualStyle && (

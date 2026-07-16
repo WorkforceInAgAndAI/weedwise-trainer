@@ -37,6 +37,7 @@ import SenseDetective from './practice-games/k5/SenseDetective';
 import InvasiveSplat from './practice-games/k5/InvasiveSplat';
 import WeedLineUp from './practice-games/k5/WeedLineUp';
 import PlantPartsHead from './practice-games/k5/PlantPartsHead';
+import PlantNinja from './practice-games/k5/PlantNinja';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -101,6 +102,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'invasive-splat': 'native-introduced',
   'weed-lineup': 'look-alikes',
   'plant-parts-head': 'monocot-dicot',
+  'plant-ninja': 'life-stages',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
@@ -149,6 +151,7 @@ const newK5Games: GameDef[] = [
     { id: 'invasive-splat', name: 'Invasive Splat!', Icon: Droplets, category: 'Invasive Weeds', description: 'Splatter-art style! Drop the runny invasive paint blob and watch it spread across the meadow — just like a real invasive weed out-competes native plants.', howToPlay: 'Drag the invasive paint blob from the palette onto the meadow. The invasive "paint" is extra runny, so it spreads WAY farther than the native plants and covers whatever it lands on. Use your 2 blobs each round to see how fast an invasive can take over.', component: InvasiveSplat },
     { id: 'weed-lineup', name: 'Weed Line-Up', Icon: Scan, category: 'Look-Alikes', description: 'Police line-up! Study the suspect sketch, read the eyewitness clue, and pick the bad weed hiding among its innocent look-alikes.', howToPlay: 'Read the Case File to see what the bad weed is wanted for. Look at the black-and-white Suspect Sketch, then compare it with the three mugshots in the Line-Up. Pick the suspect that matches the clue to make the arrest! Never touch a real mystery weed unless a trusted adult says it is safe.', component: WeedLineUp },
     { id: 'plant-parts-head', name: 'Mr. Plant Head!', Icon: Sprout, category: 'Plant Parts', description: 'Mr. Potato Head style! Drag cartoon plant parts — roots, stem, leaves, flower, seeds — onto the correct spots to build a real weed.', howToPlay: 'Each round names a weed. Drag the 5 correct cartoon parts from the Parts Bin onto the matching spots on the plant body. Some parts in the bin are decoys from other weeds, so pick carefully! Click a placed part to send it back to the bin. Hit "Check My Plant!" when all spots are filled.', component: PlantPartsHead },
+    { id: 'plant-ninja', name: 'Plant Ninja', Icon: Swords, category: 'Life Stages', description: 'Fruit Ninja style! Slice the flowering weeds before they land — but spare the baby seedlings. Miss a flower and it EXPLODES into a shower of seeds.', howToPlay: 'Weeds fall from the sky. Click-and-drag (or swipe) through the FLOWER weeds to slice them for +10. Do NOT slice the BABY seedlings — you\'ll lose 5. If a flower reaches the ground it re-seeds the field and you lose points. Never touch a real weed unless a trusted adult says it is safe.', component: PlantNinja },
 ];
 
 const middleGames: GameDef[] = [

@@ -82,11 +82,55 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
       // Just render drop dots at their spots
       for (const d of drops) {
         const w = d.type === 'invasive' ? INVASIVE_WIDTH : NATIVE_WIDTH;
-        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, w);
-        grad.addColorStop(0, d.color);
-        grad.addColorStop(1, d.color + '00');
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(d.x, d.y, w, 0, Math.PI * 2); ctx.fill();
+        if (d.type === 'invasive') {
+          // Watery halo — wide, translucent puddle around the main drop
+          const halo = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, w * 1.9);
+          halo.addColorStop(0, d.color + 'aa');
+          halo.addColorStop(0.55, d.color + '55');
+          halo.addColorStop(1, d.color + '00');
+          ctx.fillStyle = halo;
+          ctx.beginPath(); ctx.arc(d.x, d.y, w * 1.9, 0, Math.PI * 2); ctx.fill();
+          // Main wet blob — slightly darker, glossy
+          const grad = ctx.createRadialGradient(d.x - w * 0.25, d.y - w * 0.25, w * 0.05, d.x, d.y, w);
+          grad.addColorStop(0, '#ffffffaa');
+          grad.addColorStop(0.25, d.color + 'ee');
+          grad.addColorStop(1, d.color + 'cc');
+          ctx.fillStyle = grad;
+          ctx.beginPath(); ctx.arc(d.x, d.y, w, 0, Math.PI * 2); ctx.fill();
+          // Scattered droplet spray around the drop
+          for (let i = 0; i < 7; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const r = w * (1.1 + Math.random() * 1.4);
+            const dr = 1.5 + Math.random() * 4;
+            ctx.fillStyle = d.color + 'aa';
+            ctx.beginPath(); ctx.arc(d.x + Math.cos(a) * r, d.y + Math.sin(a) * r, dr, 0, Math.PI * 2); ctx.fill();
+          }
+          // A drip trail running downward — screams "watery"
+          const dripLen = w * (1.4 + Math.random() * 0.8);
+          const dripGrad = ctx.createLinearGradient(d.x, d.y, d.x, d.y + dripLen);
+          dripGrad.addColorStop(0, d.color + 'cc');
+          dripGrad.addColorStop(1, d.color + '00');
+          ctx.fillStyle = dripGrad;
+          ctx.beginPath();
+          ctx.moveTo(d.x - w * 0.35, d.y);
+          ctx.quadraticCurveTo(d.x, d.y + dripLen * 0.7, d.x - 2, d.y + dripLen);
+          ctx.quadraticCurveTo(d.x + 4, d.y + dripLen * 0.7, d.x + w * 0.35, d.y);
+          ctx.closePath(); ctx.fill();
+          // Little pooled bead at the drip tip
+          ctx.fillStyle = d.color + 'cc';
+          ctx.beginPath(); ctx.arc(d.x + 1, d.y + dripLen, 3, 0, Math.PI * 2); ctx.fill();
+          // Glossy highlight
+          ctx.fillStyle = '#ffffff66';
+          ctx.beginPath(); ctx.ellipse(d.x - w * 0.3, d.y - w * 0.35, w * 0.35, w * 0.15, -0.5, 0, Math.PI * 2); ctx.fill();
+        } else {
+          // Thick native paint — solid, matte, minimal spread
+          const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, w);
+          grad.addColorStop(0, d.color);
+          grad.addColorStop(0.85, d.color);
+          grad.addColorStop(1, d.color + 'ee');
+          ctx.fillStyle = grad;
+          ctx.beginPath(); ctx.arc(d.x, d.y, w, 0, Math.PI * 2); ctx.fill();
+        }
       }
     } else {
       // Streak the drops outward from center — invasive stretches further
