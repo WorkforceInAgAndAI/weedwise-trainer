@@ -37,6 +37,7 @@ import SenseDetective from './practice-games/k5/SenseDetective';
 import InvasiveSplat from './practice-games/k5/InvasiveSplat';
 import WeedLineUp from './practice-games/k5/WeedLineUp';
 import PlantPartsHead from './practice-games/k5/PlantPartsHead';
+import PlantNinja from './practice-games/k5/PlantNinja';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -101,6 +102,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'invasive-splat': 'native-introduced',
   'weed-lineup': 'look-alikes',
   'plant-parts-head': 'monocot-dicot',
+  'plant-ninja': 'life-stages',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
