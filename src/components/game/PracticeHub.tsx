@@ -40,6 +40,7 @@ import PlantPartsHead from './practice-games/k5/PlantPartsHead';
 import PlantNinja from './practice-games/k5/PlantNinja';
 import RowRunner from './practice-games/k5/RowRunner';
 import WhackAWeed from './practice-games/k5/WhackAWeed';
+import CropCare from './practice-games/k5/CropCare';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -107,6 +108,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'plant-ninja': 'life-stages',
   'row-runner': 'field-scouting',
   'whack-a-weed': 'control-methods',
+  'crop-care': 'what-plants-need',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
