@@ -323,77 +323,156 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
   const energyPct = Math.max(0, Math.min(100, (energy / maxEnergy) * 100));
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-amber-100 via-amber-200 to-amber-800 z-40 overflow-y-auto">
-      <div className="max-w-3xl mx-auto p-3 sm:p-4">
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={onBack} className="flex items-center gap-1 text-amber-900 hover:text-amber-950 text-sm font-medium">
+    <div className="fixed inset-0 z-40 overflow-y-auto" style={{
+      background: 'radial-gradient(ellipse at top, #6b3410 0%, #3a1c08 40%, #1a0d04 100%)'
+    }}>
+      {/* Cartoon rocky cave ceiling silhouette */}
+      <svg className="absolute top-0 left-0 w-full h-16 pointer-events-none" viewBox="0 0 100 16" preserveAspectRatio="none">
+        <path d="M0,0 L0,6 Q5,10 10,5 T22,7 T35,4 T50,9 T65,3 T80,8 T95,5 L100,6 L100,0 Z" fill="#1a0d04" />
+        <path d="M0,0 L0,4 Q8,7 16,3 T32,5 T48,2 T64,6 T82,3 T100,4 L100,0 Z" fill="#2a1508" opacity="0.7" />
+      </svg>
+
+      <div className="max-w-3xl mx-auto p-3 sm:p-4 relative">
+        <div className="flex items-center justify-between mb-3 relative z-10">
+          <button onClick={onBack} className="flex items-center gap-1 text-amber-100 hover:text-yellow-300 text-sm font-medium bg-stone-900/70 px-3 py-1 rounded-full border border-amber-700">
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
-          <div className="text-xs sm:text-sm font-bold text-amber-900">
-            Level {levelIdx + 1} · {cfg.weed}
+          <div className="text-xs sm:text-sm font-bold text-amber-100 bg-stone-900/70 px-3 py-1 rounded-full border border-amber-700 flex items-center gap-1">
+            <span className="text-yellow-400">⛏</span> Tunnel {levelIdx + 1} · {cfg.weed}
           </div>
-          <div className="text-sm font-bold text-amber-900">Score: {score}</div>
+          <div className="text-sm font-bold text-yellow-300 bg-stone-900/70 px-3 py-1 rounded-full border border-amber-700">Score: {score}</div>
         </div>
 
-        {/* Status bar */}
-        <div className="bg-white/90 rounded-lg p-2 mb-2 shadow flex items-center gap-3 text-xs sm:text-sm">
-          <div className="flex items-center gap-1 text-amber-900 font-bold">
+        {/* Status bar - looks like wooden mine sign */}
+        <div className="rounded-lg p-2 mb-2 shadow-lg flex items-center gap-3 text-xs sm:text-sm border-y-4 border-amber-900" style={{
+          background: 'repeating-linear-gradient(90deg, #8b5a2b 0px, #a0693a 6px, #8b5a2b 12px)'
+        }}>
+          <div className="flex items-center gap-1 text-amber-50 font-bold drop-shadow">
             <Sparkles className="w-4 h-4 text-emerald-600" />
             {sproutsClaimed}/{cfg.goal} sprouts
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-yellow-600" />
-            <div className="flex-1 h-3 bg-amber-100 rounded-full overflow-hidden border border-amber-300">
+            <Zap className="w-4 h-4 text-yellow-300" />
+            <div className="flex-1 h-3 bg-stone-900 rounded-full overflow-hidden border-2 border-amber-950">
               <div
                 className={`h-full transition-all ${energyPct > 40 ? 'bg-emerald-500' : energyPct > 20 ? 'bg-yellow-500' : 'bg-rose-500'}`}
                 style={{ width: `${energyPct}%` }}
               />
             </div>
-            <span className="text-xs font-bold text-amber-900 w-10 text-right">{Math.max(0, energy)}</span>
+            <span className="text-xs font-bold text-amber-50 w-10 text-right drop-shadow">{Math.max(0, energy)}</span>
           </div>
         </div>
 
         {/* Message */}
-        <div className="h-8 mb-2 text-center text-sm font-bold text-amber-900">
+        <div className="h-8 mb-2 text-center text-sm font-bold text-yellow-100 drop-shadow-[0_0_6px_rgba(255,200,50,0.5)]">
           {message || 'Click a soil square next to your root tip to grow!'}
         </div>
 
-        {/* Grid */}
-        <div className="bg-amber-950 p-2 rounded-lg shadow-inner mx-auto" style={{ maxWidth: 560 }}>
+        {/* Cartoon coal-mine tunnel frame */}
+        <div className="relative mx-auto rounded-xl shadow-[inset_0_0_60px_rgba(0,0,0,0.9)] p-3 border-8 border-amber-900" style={{
+          maxWidth: 560,
+          background: 'radial-gradient(circle at 50% 40%, #5a2f10 0%, #2a1408 60%, #0f0602 100%)',
+          boxShadow: 'inset 0 0 80px rgba(0,0,0,0.85), 0 8px 24px rgba(0,0,0,0.6)'
+        }}>
+          {/* Wooden support beams at corners */}
+          <div className="absolute top-0 left-0 w-6 h-full bg-gradient-to-r from-amber-950 to-amber-800 rounded-l" />
+          <div className="absolute top-0 right-0 w-6 h-full bg-gradient-to-l from-amber-950 to-amber-800 rounded-r" />
+          <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-amber-950 to-amber-800" />
+          <div className="absolute bottom-0 left-0 w-full h-4 bg-gradient-to-t from-amber-950 to-amber-800" />
+
           <div
-            className="grid gap-1"
-            style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
+            className="grid gap-[3px] relative"
+            style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`, padding: '8px' }}
           >
             {grid.map((cell, i) => {
               const isTip = i === tip;
               const inPath = path.includes(i);
               const isNeighbor = neighbors.has(i);
-              const revealed = inPath || (cell.kind === 'rock' && isNeighbor);
 
-              let bg = 'bg-amber-700';   // unexplored soil
+              // Distance from tip for lantern glow effect
+              const dRow = Math.abs(Math.floor(i / COLS) - tipRow);
+              const dCol = Math.abs((i % COLS) - tipCol);
+              const dist = Math.max(dRow, dCol);
+              const glow = Math.max(0, 1 - dist / 5);
+
+              let bg = 'bg-stone-900';   // unexplored dark rock
               let content: React.ReactNode = null;
+              let extraStyle: React.CSSProperties = {
+                filter: inPath ? 'none' : `brightness(${0.35 + glow * 0.65})`,
+              };
 
               if (inPath) {
-                bg = 'bg-emerald-700';
+                // Dug-out tunnel with warm lantern light
+                bg = '';
+                extraStyle.background = 'radial-gradient(circle at 50% 40%, #d4a574 0%, #8b5a2b 60%, #4a2c10 100%)';
+                extraStyle.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -2px 3px rgba(255,220,150,0.3)';
                 if (cell.kind === 'water' && cell.taken) content = <Droplet className="w-full h-full p-1 text-blue-200" />;
-                else if (cell.kind === 'nutrient' && cell.taken) content = <Sparkles className="w-full h-full p-1 text-yellow-200" />;
+                else if (cell.kind === 'nutrient' && cell.taken) content = <Sparkles className="w-full h-full p-1 text-yellow-300" />;
                 else if (cell.kind === 'herbicide') content = <Skull className="w-full h-full p-1 text-rose-200" />;
                 else if (cell.kind === 'sprout' && cell.claimed) {
-                  bg = 'bg-emerald-400';
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle, #86efac 0%, #22c55e 70%)';
+                  extraStyle.boxShadow = '0 0 12px rgba(134,239,172,0.8)';
                   content = <Sprout className="w-full h-full p-0.5 text-emerald-900" />;
                 }
                 if (isTip) {
-                  bg = 'bg-lime-300';
-                  content = <Sprout className="w-full h-full p-0.5 text-emerald-900" />;
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle, #fef08a 0%, #facc15 50%, #a16207 100%)';
+                  extraStyle.boxShadow = '0 0 20px rgba(250,204,21,0.9), 0 0 40px rgba(250,204,21,0.5)';
+                  // Cartoon worm-root with headlamp
+                  content = (
+                    <svg viewBox="0 0 24 24" className="w-full h-full">
+                      <ellipse cx="12" cy="14" rx="7" ry="6" fill="#f0abfc" stroke="#701a75" strokeWidth="1.2" />
+                      <circle cx="9.5" cy="12" r="1.2" fill="#701a75" />
+                      <circle cx="14.5" cy="12" r="1.2" fill="#701a75" />
+                      <circle cx="9.8" cy="11.7" r="0.4" fill="#fff" />
+                      <circle cx="14.8" cy="11.7" r="0.4" fill="#fff" />
+                      <path d="M9 16 Q12 18 15 16" stroke="#701a75" strokeWidth="1" fill="none" strokeLinecap="round" />
+                      <circle cx="12" cy="6" r="2.2" fill="#fef08a" stroke="#a16207" strokeWidth="0.8" />
+                      <path d="M12 8 L12 10" stroke="#4a2c10" strokeWidth="1" />
+                    </svg>
+                  );
                 }
               } else if (isNeighbor) {
-                // Peek what's next to the tip so player can strategize
-                if (cell.kind === 'rock') { bg = 'bg-stone-500'; content = <Mountain className="w-full h-full p-1 text-stone-200" />; }
-                else if (cell.kind === 'water') { bg = 'bg-blue-500'; content = <Droplet className="w-full h-full p-1 text-white" />; }
-                else if (cell.kind === 'nutrient') { bg = 'bg-yellow-500'; content = <Sparkles className="w-full h-full p-1 text-white" />; }
-                else if (cell.kind === 'herbicide') { bg = 'bg-rose-500'; content = <Skull className="w-full h-full p-1 text-white" />; }
-                else if (cell.kind === 'sprout') { bg = 'bg-emerald-500'; content = <Sprout className="w-full h-full p-0.5 text-white" />; }
-                else { bg = 'bg-amber-500'; }
+                // Faintly lit by lantern - shows what's next
+                extraStyle.filter = 'brightness(0.95)';
+                if (cell.kind === 'rock') {
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle at 30% 30%, #78716c 0%, #44403c 70%, #1c1917 100%)';
+                  content = <Mountain className="w-full h-full p-1 text-stone-300" />;
+                }
+                else if (cell.kind === 'water') {
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle, #60a5fa 0%, #1e40af 100%)';
+                  extraStyle.boxShadow = '0 0 10px rgba(96,165,250,0.7)';
+                  content = <Droplet className="w-full h-full p-1 text-white" />;
+                }
+                else if (cell.kind === 'nutrient') {
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle, #fde047 0%, #a16207 100%)';
+                  extraStyle.boxShadow = '0 0 10px rgba(253,224,71,0.7)';
+                  content = <Sparkles className="w-full h-full p-1 text-white" />;
+                }
+                else if (cell.kind === 'herbicide') {
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle, #f87171 0%, #7f1d1d 100%)';
+                  extraStyle.boxShadow = '0 0 10px rgba(248,113,113,0.7)';
+                  content = <Skull className="w-full h-full p-1 text-white" />;
+                }
+                else if (cell.kind === 'sprout') {
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle, #4ade80 0%, #14532d 100%)';
+                  extraStyle.boxShadow = '0 0 12px rgba(74,222,128,0.8)';
+                  content = <Sprout className="w-full h-full p-0.5 text-white" />;
+                }
+                else {
+                  bg = '';
+                  extraStyle.background = 'radial-gradient(circle at 40% 40%, #92400e 0%, #451a03 100%)';
+                }
+              } else {
+                // Deep dark rock with subtle texture
+                bg = '';
+                extraStyle.background = 'radial-gradient(circle at 30% 30%, #292524 0%, #0c0a09 100%)';
               }
 
               return (
@@ -402,7 +481,8 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
                   onClick={() => grow(i)}
                   disabled={!isNeighbor || cell.kind === 'rock'}
                   aria-label={`cell ${i}`}
-                  className={`aspect-square rounded ${bg} ${isNeighbor && cell.kind !== 'rock' ? 'ring-2 ring-white cursor-pointer hover:brightness-110' : ''} ${pulseIdx === i ? 'animate-scale-in' : ''} transition-all`}
+                  style={extraStyle}
+                  className={`aspect-square rounded ${bg} ${isNeighbor && cell.kind !== 'rock' ? 'ring-2 ring-yellow-300/80 cursor-pointer hover:brightness-125' : ''} ${pulseIdx === i ? 'animate-scale-in' : ''} transition-all`}
                 >
                   {content}
                 </button>
@@ -411,18 +491,22 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
           </div>
         </div>
 
-        {/* Fun fact */}
-        <div className="mt-3 bg-white/90 rounded-lg p-3 text-xs sm:text-sm text-amber-900 shadow border border-amber-200">
-          <b>Did you know?</b> {cfg.fact}
+        {/* Fun fact - looks like a mine notice board */}
+        <div className="mt-3 rounded-lg p-3 text-xs sm:text-sm text-amber-50 shadow-lg border-4 border-amber-900 relative" style={{
+          background: 'linear-gradient(180deg, #78350f 0%, #451a03 100%)'
+        }}>
+          <span className="absolute -top-2 left-3 w-2 h-2 rounded-full bg-stone-800 shadow" />
+          <span className="absolute -top-2 right-3 w-2 h-2 rounded-full bg-stone-800 shadow" />
+          <b className="text-yellow-300">Miner's Notebook:</b> {cfg.fact}
         </div>
 
         {/* Legend */}
-        <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-1 text-[10px] sm:text-xs text-amber-900">
-          <div className="flex items-center gap-1 bg-white/70 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-blue-500 inline-block" /> Water +5</div>
-          <div className="flex items-center gap-1 bg-white/70 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-yellow-500 inline-block" /> Food +5</div>
-          <div className="flex items-center gap-1 bg-white/70 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> Sprout +20</div>
-          <div className="flex items-center gap-1 bg-white/70 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-stone-500 inline-block" /> Rock</div>
-          <div className="flex items-center gap-1 bg-white/70 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-rose-500 inline-block" /> Herbicide</div>
+        <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-1 text-[10px] sm:text-xs text-amber-100">
+          <div className="flex items-center gap-1 bg-stone-900/70 border border-amber-800 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-blue-500 inline-block" /> Water +5</div>
+          <div className="flex items-center gap-1 bg-stone-900/70 border border-amber-800 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-yellow-500 inline-block" /> Food +5</div>
+          <div className="flex items-center gap-1 bg-stone-900/70 border border-amber-800 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> Sprout +20</div>
+          <div className="flex items-center gap-1 bg-stone-900/70 border border-amber-800 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-stone-500 inline-block" /> Rock</div>
+          <div className="flex items-center gap-1 bg-stone-900/70 border border-amber-800 rounded px-1 py-0.5"><span className="w-3 h-3 rounded bg-rose-500 inline-block" /> Herbicide</div>
         </div>
       </div>
     </div>
