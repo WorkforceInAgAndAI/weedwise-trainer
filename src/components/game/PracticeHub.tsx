@@ -41,6 +41,7 @@ import PlantNinja from './practice-games/k5/PlantNinja';
 import RowRunner from './practice-games/k5/RowRunner';
 import WhackAWeed from './practice-games/k5/WhackAWeed';
 import CropCare from './practice-games/k5/CropCare';
+import RootRush from './practice-games/k5/RootRush';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
@@ -109,6 +110,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'row-runner': 'field-scouting',
   'whack-a-weed': 'control-methods',
   'crop-care': 'what-plants-need',
+  'root-rush': 'what-plants-need',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
   'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
@@ -161,6 +163,7 @@ const newK5Games: GameDef[] = [
     { id: 'row-runner', name: 'Row Runner', Icon: Scissors, category: 'Field Scouting', description: 'Drone-view scouting! The crop rows scroll past below you — click every weed hiding in the field and drag it to the Weed Bin before it disappears off the bottom.', howToPlay: 'You\'re piloting a scouting drone over a field. Crop rows scroll DOWN the screen. Click a WEED (red-ringed) and drag it to the amber Weed Bin on the right for +10. Let a weed scroll off = -2. Grab a CROP (green tuft) by mistake = -5. Clear the field before time runs out!', component: RowRunner },
     { id: 'whack-a-weed', name: 'Whack-A-Weed', Icon: Target, category: 'Control Methods', description: 'Whack-A-Mole style! Weeds and crops pop up out of soil mounds. Snip the weeds — but spare the crops or you lose points!', howToPlay: 'Plants pop up from 9 soil mounds. Tap a WEED (red ring) for +10. Do NOT tap a CROP (green ring) — snipping a crop costs you 15. They only stay up for a moment, so look fast! Never touch a real weed unless a trusted adult says it\'s safe.', component: WhackAWeed },
     { id: 'crop-care', name: 'Crop Care Crew', Icon: Droplets, category: 'What Plants Need', description: 'Give water, sunlight, and plant food to hungry crops — but don\'t feed the weeds, or they\'ll choke the crops around them!', howToPlay: 'Pick a resource (Water, Sunlight, or Plant Food), then tap the crop that is asking for that resource in its bubble. Match right = +5 growth. Fill the growth bar to harvest for +15! WEEDS pop up in the plots — do NOT feed them (that grows the weed and it will choke nearby crops). Instead, tap the little scissors on a weed to PULL it for +3. Never touch a real weed unless a trusted adult says it\'s safe.', component: CropCare },
+    { id: 'root-rush', name: 'Root Rush', Icon: Sprout, category: 'What Plants Need', description: 'You ARE a weed root! Tunnel through the soil, drink water, and pop up in new patches of the field to spread — just like real perennial weeds do.', howToPlay: 'Click a soil square next to your root tip to grow into it. Every move costs 1 energy. Grab WATER and NUTRIENTS to refill energy (+5 points each). Reach SPROUT points to pop up in a new patch and spread (+20 points). ROCKS block you. HERBICIDE zones drain your energy — that\'s how farmers stop invasive roots! Colonize enough patches to win the level.', component: RootRush },
 ];
 
 const middleGames: GameDef[] = [
