@@ -172,7 +172,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
 
     // spawn
     const spawnInterval = Math.max(500, BASE_SPAWN_MS - (level - 1) * 120);
-    if (now - spawnRef.current > spawnInterval) {
+    if (now - spawnRef.current > spawnInterval && now < endRef.current) {
       spawnRef.current = now;
       const weed = elementaryWeeds[Math.floor(Math.random() * elementaryWeeds.length)];
       // ~65% reproductive so there are plenty to slice
@@ -195,7 +195,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
     setTimeLeft(remaining);
     forceTick(x => (x + 1) % 1000000);
 
-    if (remaining <= 0 && seedsRef.current.length === 0 && weedsRef.current.every(w => w.sliced || w.exploded)) {
+    if (remaining <= 0) {
       phaseRef.current = 'roundEnd';
       setPhase('roundEnd');
       return;
