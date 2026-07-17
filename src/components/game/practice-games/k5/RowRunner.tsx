@@ -74,10 +74,34 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
   // Dragging
   const dragIdRef = useRef<number | null>(null);
   const dragPosRef = useRef<{ x: number; y: number } | null>(null);
+  const dragPointerIdRef = useRef<number | null>(null);
 
   const [, forceTick] = useState(0);
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+  // Global pointer listeners while dragging so we can drop OUTSIDE the play area (over the Weed Bin).
+  useEffect(() => {
+    function onMove(e: PointerEvent) {
+      if (dragIdRef.current == null) return;
+      if (dragPointerIdRef.current != null && e.pointerId !== dragPointerIdRef.current) return;
+      dragPosRef.current = { x: e.clientX, y: e.clientY };
+      forceTick(x => (x + 1) % 1000000);
+    }
+    function onUp(e: PointerEvent) {
+      if (dragIdRef.current == null) return;
+      if (dragPointerIdRef.current != null && e.pointerId !== dragPointerIdRef.current) return;
+      releaseDrag(e.clientX, e.clientY);
+    }
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, []);
 
   const scrollSpeed = 70 + (level - 1) * 22; // px/sec — how fast the field scrolls DOWN past the drone
   const spawnInterval = Math.max(520, 1050 - (level - 1) * 130);
@@ -203,23 +227,18 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
         s.picked = true;
         dragIdRef.current = s.id;
         dragPosRef.current = { x: clientX, y: clientY };
-        try { (areaRef.current as any)?.setPointerCapture?.(pointerId); } catch { /* noop */ }
+        dragPointerIdRef.current = pointerId;
         return;
       }
     }
   }
 
-  function moveDrag(clientX: number, clientY: number) {
-    if (dragIdRef.current == null) return;
-    dragPosRef.current = { x: clientX, y: clientY };
-  }
-
-  function releaseDrag(clientX: number, clientY: number, pointerId: number) {
-    try { (areaRef.current as any)?.releasePointerCapture?.(pointerId); } catch { /* noop */ }
+  function releaseDrag(clientX: number, clientY: number) {
     if (dragIdRef.current == null) return;
     const s = spritesRef.current.find(z => z.id === dragIdRef.current);
     dragIdRef.current = null;
     dragPosRef.current = null;
+    dragPointerIdRef.current = null;
     if (!s) return;
 
     // Check drop over bin
@@ -231,8 +250,7 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
       setPulled(pulledRef.current);
       scoreRef.current += 10;
       setScore(scoreRef.current);
-      const { x, y } = toAreaCoords(clientX, clientY);
-      floatsRef.current.push({ id: ++idRef.current, x: Math.min(AREA_W - 30, x), y, text: '+10 SNIP!', color: '#16a34a', life: 1.0 });
+      floatsRef.current.push({ id: ++idRef.current, x: AREA_W - 40, y: 40, text: '+10 SNIP!', color: '#16a34a', life: 1.0 });
     } else {
       // Drop back into field
       s.picked = false;
@@ -316,9 +334,6 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
           <div
             ref={areaRef}
             onPointerDown={(e) => phase === 'playing' && pickAt(e.clientX, e.clientY, e.pointerId)}
-            onPointerMove={(e) => moveDrag(e.clientX, e.clientY)}
-            onPointerUp={(e) => releaseDrag(e.clientX, e.clientY, e.pointerId)}
-            onPointerCancel={(e) => releaseDrag(e.clientX, e.clientY, e.pointerId)}
             className="relative rounded-xl border-4 border-green-900/60 shadow-lg overflow-hidden select-none touch-none"
             style={{
               aspectRatio: `${AREA_W} / ${AREA_H}`,
