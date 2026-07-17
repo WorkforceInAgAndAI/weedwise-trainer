@@ -42,6 +42,7 @@ import RowRunner from './practice-games/k5/RowRunner';
 import WhackAWeed from './practice-games/k5/WhackAWeed';
 import CropCare from './practice-games/k5/CropCare';
 import RootRush from './practice-games/k5/RootRush';
+import SquadDefense from './practice-games/k5/SquadDefense';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
