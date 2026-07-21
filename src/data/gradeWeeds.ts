@@ -21,6 +21,7 @@ export const ELEMENTARY_WEED_IDS: string[] = [
   "velvetleaf",
   "Field_bindweed",   // labeled "Morningglory" in K-5 module
   "Venice_mallow",
+  "Common_mullein",
 ];
 
 /**
@@ -63,6 +64,7 @@ export const MIDDLE_SCHOOL_WEED_IDS: string[] = [
   "Ground_ivy",
   "Common_Burdock",           // replaces Common mullein
   "Musk_thistle",             // replaces Bull thistle
+  "Common_mullein",
   "Horseweed",
   "Field_Horsetail",          // replaces Yellow woodsorrel
   "large-crabgrass",
@@ -111,6 +113,7 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "Common_teasel",
   "Common_Burdock",
   "Musk_thistle",
+  "Common_mullein",
   "Field_Horsetail",
   "Garlic_mustard",
   "Poison_Hemlock",
