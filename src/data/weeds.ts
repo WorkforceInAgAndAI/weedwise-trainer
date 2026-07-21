@@ -1410,6 +1410,36 @@ export const weeds: Weed[] = [
   },
 
   {
+    id: "Common_mullein",
+    commonName: "Common Mullein",
+    scientificName: "Verbascum thapsus",
+    family: "Scrophulariaceae",
+    plantType: "Dicot",
+    lifeCycle: "Biennial",
+    origin: "Introduced",
+    image: "/images/Common_mullein/rosette_1.jpg",
+    traits: [
+      "Large, thick, fuzzy gray-green leaves covered in soft woolly hairs",
+      "Low-growing rosette the first year",
+      "Tall single flowering stalk (up to 6 feet) the second year",
+      "Small bright yellow five-petaled flowers packed on a dense spike",
+      "Deep taproot; each plant can produce hundreds of thousands of tiny seeds",
+    ],
+    habitat: "Roadsides, pastures, gravelly disturbed soils, field edges, meadows",
+    primaryHabitat: "Warm-Season / Full Sun",
+    actImmediately: false,
+    actReason: "Biennial; hairy foliage sheds contact herbicides; best controlled in rosette stage before bolting",
+    management: "Hand pulling of rosettes, mowing before seed set, POST herbicides with surfactant on rosette stage",
+    controlTiming: "First-year rosette stage in fall or spring before bolting",
+    lookAlike: {
+      id: "Common_Burdock",
+      species: "Common Burdock",
+      difference: "Burdock leaves are large but smooth and heart-shaped; Mullein leaves are thick and covered in soft woolly hairs",
+    },
+    memoryHook: "Mullein = fuzzy 'flannel' leaves + tall yellow flower spike + biennial",
+  },
+
+  {
     id: "Common_teasel",
     commonName: "Common Teasel",
     scientificName: "Dipsacus fullonum",
