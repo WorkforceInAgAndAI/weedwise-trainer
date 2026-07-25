@@ -159,11 +159,11 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-foreground">{current!.weed.commonName}</p>
                 <p className="text-[11px] text-muted-foreground italic">{current!.weed.scientificName}</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Origin: {current!.weed.origin}</p>
-                <p className="text-[11px] text-muted-foreground">Family: {current!.weed.family}</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Family: {current!.weed.family}</p>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground line-clamp-3">{current!.weed.habitat}</p>
+            {/* Habitat hidden — students shouldn't be able to just read "native to N. America"
+                or a continent name straight from the description. */}
 
             {answered && (
               <div className={`rounded-xl border-2 p-3 ${selected === current!.continent ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
