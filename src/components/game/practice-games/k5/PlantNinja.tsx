@@ -242,10 +242,29 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
         w.vr = (Math.random() - 0.5) * 600;
         if (w.kind === 'repro') {
           scoreRef.current += 10;
-          floatsRef.current.push({ id: ++idRef.current, x: w.x, y: w.y, text: '+10', color: '#16a34a', life: 0.9 });
+          // splatter of +10s away from the weed so it's actually visible
+          for (let i = 0; i < 6; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const d = 40 + Math.random() * 60;
+            floatsRef.current.push({
+              id: ++idRef.current,
+              x: w.x + Math.cos(a) * d,
+              y: w.y + Math.sin(a) * d,
+              text: '+10', color: '#16a34a', life: 0.9 + Math.random() * 0.4,
+            });
+          }
         } else {
           scoreRef.current -= 5;
-          floatsRef.current.push({ id: ++idRef.current, x: w.x, y: w.y, text: '-5 BABY!', color: '#dc2626', life: 1.0 });
+          for (let i = 0; i < 6; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const d = 40 + Math.random() * 60;
+            floatsRef.current.push({
+              id: ++idRef.current,
+              x: w.x + Math.cos(a) * d,
+              y: w.y + Math.sin(a) * d,
+              text: '-5 BABY!', color: '#dc2626', life: 0.9 + Math.random() * 0.4,
+            });
+          }
         }
         setScore(scoreRef.current);
       }
@@ -288,6 +307,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
+        hideAccuracy
       />
     );
   }
