@@ -299,7 +299,7 @@ export default function PracticeHub({
       </div>
       {/* Spacer to push game content below the fixed top bar */}
       <style>{`
-        .fixed.inset-0.z-50 { padding-top: 56px; }
+        [data-practice-game-active="true"] .fixed.inset-0.z-50 { top: 56px !important; }
       `}</style>
    </>
  );
