@@ -12,23 +12,24 @@ interface WeedEntry {
   name: string;
   hint: string;      // Kid-friendly "spot it" hint (short + simple)
   funFact: string;   // Fun fact from the module (shortened where possible)
+  mnemonic: string;  // Little rhyme / saying to remember it out in the field
 }
 
 const ALL_WEEDS: WeedEntry[] = [
-  { id: 'Dandelion',              name: 'Dandelion',              hint: 'Yellow flower that turns into a fluffy white puffball.', funFact: 'Blow on it and the tiny parachute seeds fly far, far away!' },
-  { id: 'giant-foxtail',          name: 'Giant Foxtail',          hint: 'A fuzzy seed head shaped like a fox\u2019s bushy tail.', funFact: 'Rub a leaf and you can feel soft, fuzzy hairs!' },
-  { id: 'lambsquarters',          name: 'Common Lambsquarters',   hint: 'Green leaves that look sprinkled with white flour.',    funFact: 'The "flour" is really a waxy powder \u2014 it wipes right off!' },
-  { id: 'common_Milkweed',        name: 'Common Milkweed',        hint: 'Broad leaves with milky white sap inside.',              funFact: 'Monarch butterflies NEED this plant to grow up!' },
-  { id: 'Wild_Carrot',            name: 'Wild Carrot',            hint: 'Tiny white flowers in a flat, lacy umbrella shape.',    funFact: 'People call it "Queen Anne\u2019s Lace" because it looks like lace!' },
-  { id: 'canada-thistle',         name: 'Canada Thistle',         hint: 'Prickly, spiny leaves and small purple flower puffs.',   funFact: 'Its roots stretch underground like secret tunnels!' },
-  { id: 'giant-ragweed',          name: 'Giant Ragweed',          hint: 'HUGE leaves shaped like giant 3-fingered hands.',        funFact: 'It can grow taller than YOU \u2014 sometimes 10 feet tall!' },
-  { id: 'pennsylvania-smartweed', name: 'Pennsylvania Smartweed', hint: 'Pink flower spikes and leaves with a dark thumbprint mark.', funFact: 'That thumbprint is like a secret detective clue!' },
-  { id: 'kochia',                 name: 'Kochia',                 hint: 'A bushy feathery plant that turns red in the fall.',    funFact: 'It snaps off and rolls like a tumbleweed for miles!' },
-  { id: 'wild-parsnip',           name: 'Wild Parsnip',           hint: 'Tall plant with flat clusters of tiny yellow flowers.', funFact: 'DO NOT TOUCH! Its sap plus sunlight can burn your skin.' },
-  { id: 'yellow-nutsedge',        name: 'Yellow Nutsedge',        hint: 'Shiny yellow-green grass with a triangle-shaped stem.', funFact: '"Sedges have edges" \u2014 you can feel 3 sides on the stem!' },
-  { id: 'velvetleaf',             name: 'Velvetleaf',             hint: 'Big heart-shaped leaves that feel soft and fuzzy.',      funFact: 'The leaves feel just like velvet \u2014 super soft!' },
-  { id: 'Field_bindweed',         name: 'Morningglory',           hint: 'Twisty vines with trumpet-shaped pink or purple flowers.', funFact: 'Its flowers open in the morning and shut when it gets hot!' },
-  { id: 'Venice_mallow',          name: 'Venice Mallow',          hint: 'White flower with a dark purple bullseye in the middle.', funFact: 'Each flower only stays open for a few hours \u2014 then closes forever!' },
+  { id: 'Dandelion',              name: 'Dandelion',              hint: 'Yellow flower that turns into a fluffy white puffball.', funFact: 'Blow on it and the tiny parachute seeds fly far, far away!', mnemonic: '"Dan-dee-LION roars YELLOW, then floats away white."' },
+  { id: 'giant-foxtail',          name: 'Giant Foxtail',          hint: 'A fuzzy seed head shaped like a fox\u2019s bushy tail.', funFact: 'Rub a leaf and you can feel soft, fuzzy hairs!', mnemonic: '"Fluffy tail? A fox on a stalk = Foxtail."' },
+  { id: 'lambsquarters',          name: 'Common Lambsquarters',   hint: 'Green leaves that look sprinkled with white flour.',    funFact: 'The "flour" is really a waxy powder \u2014 it wipes right off!', mnemonic: '"Sprinkled with FLOUR? A LAMB in the field."' },
+  { id: 'common_Milkweed',        name: 'Common Milkweed',        hint: 'Broad leaves with milky white sap inside.',              funFact: 'Monarch butterflies NEED this plant to grow up!', mnemonic: '"Snap the stem \u2014 MILK is the CLUE for Milkweed."' },
+  { id: 'Wild_Carrot',            name: 'Wild Carrot',            hint: 'Tiny white flowers in a flat, lacy umbrella shape.',    funFact: 'People call it "Queen Anne\u2019s Lace" because it looks like lace!', mnemonic: '"Queen\u2019s LACE on a flat white plate = Wild Carrot."' },
+  { id: 'canada-thistle',         name: 'Canada Thistle',         hint: 'Prickly, spiny leaves and small purple flower puffs.',   funFact: 'Its roots stretch underground like secret tunnels!', mnemonic: '"PURPLE puff with a PRICKLY hug \u2014 Thistle."' },
+  { id: 'giant-ragweed',          name: 'Giant Ragweed',          hint: 'HUGE leaves shaped like giant 3-fingered hands.',        funFact: 'It can grow taller than YOU \u2014 sometimes 10 feet tall!', mnemonic: '"Three-finger HIGH-FIVE = Giant Ragweed."' },
+  { id: 'pennsylvania-smartweed', name: 'Pennsylvania Smartweed', hint: 'Pink flower spikes and leaves with a dark thumbprint mark.', funFact: 'That thumbprint is like a secret detective clue!', mnemonic: '"Thumbprint on a leaf? A SMART detective spots Smartweed."' },
+  { id: 'kochia',                 name: 'Kochia',                 hint: 'A bushy feathery plant that turns red in the fall.',    funFact: 'It snaps off and rolls like a tumbleweed for miles!', mnemonic: '"Fluffy bush, tumble in a rush \u2014 Kochia!"' },
+  { id: 'wild-parsnip',           name: 'Wild Parsnip',           hint: 'Tall plant with flat clusters of tiny yellow flowers.', funFact: 'DO NOT TOUCH! Its sap plus sunlight can burn your skin.', mnemonic: '"Yellow umbrella, TALL and mean \u2014 leaves ouchies, stay clean!"' },
+  { id: 'yellow-nutsedge',        name: 'Yellow Nutsedge',        hint: 'Shiny yellow-green grass with a triangle-shaped stem.', funFact: '"Sedges have edges" \u2014 you can feel 3 sides on the stem!', mnemonic: '"Sedges have EDGES, grasses are round \u2014 roll the stem, feel three sides!"' },
+  { id: 'velvetleaf',             name: 'Velvetleaf',             hint: 'Big heart-shaped leaves that feel soft and fuzzy.',      funFact: 'The leaves feel just like velvet \u2014 super soft!', mnemonic: '"HEART so SOFT you\u2019d pet it \u2014 Velvetleaf."' },
+  { id: 'Field_bindweed',         name: 'Morningglory',           hint: 'Twisty vines with trumpet-shaped pink or purple flowers.', funFact: 'Its flowers open in the morning and shut when it gets hot!', mnemonic: '"Trumpet says GOOD MORNING, then hides \u2014 Morningglory."' },
+  { id: 'Venice_mallow',          name: 'Venice Mallow',          hint: 'White flower with a dark purple bullseye in the middle.', funFact: 'Each flower only stays open for a few hours \u2014 then closes forever!', mnemonic: '"White flower, PURPLE BULLSEYE \u2014 Venice Mallow says hi!"' },
 ];
 
 // Kids answer one clue at a time from a big grid of 3 photos (1 correct + 2 distractors).
@@ -222,6 +223,10 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
                 : <>The answer was <strong>{round.answer.name}</strong>. Look for: {round.answer.hint}</>
               }
             </p>
+            <div className="mt-3 rounded-lg bg-yellow-50 border-2 border-yellow-400 p-3">
+              <div className="text-[11px] font-extrabold uppercase tracking-wide text-yellow-800 mb-1">Remember it in the field</div>
+              <p className="text-base font-bold text-foreground leading-snug">{round.answer.mnemonic}</p>
+            </div>
             <button
               onClick={next}
               className="mt-4 w-full py-4 rounded-xl bg-primary text-primary-foreground font-extrabold text-lg hover:opacity-90"
