@@ -118,11 +118,16 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   if (done) {
     const maxScore = items.length * 3;
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-center p-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
-        <p className="text-lg text-foreground mb-6">{score}/{maxScore} points</p>
-        <LevelComplete level={level} score={score} total={maxScore} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
-      </div>
+      <LifeStageShop
+        money={money}
+        level={level}
+        score={score}
+        maxScore={maxScore}
+        onSpend={(amount) => setMoney(m => m - amount)}
+        onNextLevel={nextLevel}
+        onStartOver={startOver}
+        onBack={onBack}
+      />
     );
   }
 
