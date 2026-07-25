@@ -21,6 +21,8 @@ export default function LevelComplete({ level, score, total, onNextLevel, onStar
   const passed = pct >= 60;
   const tier = pct >= 85 ? 'gold' : pct >= 70 ? 'silver' : pct >= 50 ? 'bronze' : null;
   const { addBadge } = useGameProgress();
+  // Auto-hide accuracy for K-5 unless explicitly overridden
+  const hideAcc = hideAccuracy ?? (gradeLabel ? /k.?5|elementary/i.test(gradeLabel) : false);
 
   useEffect(() => {
     if (gameId && gameName && tier) {
@@ -57,7 +59,7 @@ export default function LevelComplete({ level, score, total, onNextLevel, onStar
         <h2 className="text-2xl font-display font-bold text-foreground mb-1">
           Level {level} {passed ? 'Complete!' : 'Finished'}
         </h2>
-        {hideAccuracy ? (
+        {hideAcc ? (
           <p className="text-lg text-foreground mb-6">Score: <span className="font-black text-primary">{score}</span></p>
         ) : (
           <>
