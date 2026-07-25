@@ -2,11 +2,15 @@ import { useState, useEffect, useMemo } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
-import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import BetweenLevelShop from '@/components/game/BetweenLevelShop';
+import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
+import { Lock, DollarSign } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
-const ROUNDS_PER_LEVEL = 3;
+const ROUNDS_PER_LEVEL = 2;
+const REWARD_CORRECT = 60;
+const REWARD_WRONG = 10;
 
 interface Method { id: string; label: string }
 const ALL_METHODS: Method[] = [
@@ -20,6 +24,19 @@ const ALL_METHODS: Method[] = [
   { id: 'post',       label: 'Post-emergent Herbicide' },
   { id: 'spot-spray', label: 'Spot-spray Herbicide' },
   { id: 'rotate',     label: 'Crop Rotation' },
+];
+
+// Start with only the two simplest tools — buy the rest between levels.
+const STARTER_OWNED = ['hoe', 'pull'];
+const SHOP_CATALOG: ShopItem[] = [
+  { id: 'cultivate',  name: 'Cultivator',              cost: 200, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
+  { id: 'tillage',    name: 'Tillage Equipment',        cost: 250, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
+  { id: 'mow',        name: 'Mower',                    cost: 200, tag: 'Mechanical', desc: 'Unlocks Mowing.' },
+  { id: 'cover',      name: 'Cover-Crop Seed',          cost: 300, tag: 'Cultural',   desc: 'Unlocks Cover Crop.' },
+  { id: 'rotate',     name: 'Rotation Planning',        cost: 250, tag: 'Cultural',   desc: 'Unlocks Crop Rotation.' },
+  { id: 'pre',        name: 'Pre-emergent Herbicide',   cost: 300, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
+  { id: 'post',       name: 'Post-emergent Herbicide',  cost: 350, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
+  { id: 'spot-spray', name: 'Precision Spot Sprayer',   cost: 450, tag: 'Chemical',   desc: 'Unlocks Spot-spray Herbicide.' },
 ];
 
 // Diversified per-species best methods. Different species → different recommended controls.
@@ -95,6 +112,9 @@ function buildRound(level: number, round: number): FieldWeed[] {
 export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const [round, setRound] = useState(1);
+  const shop = usePracticeShop('ms-weed-control', STARTER_OWNED, 0);
+  const [earnedThisLevel, setEarnedThisLevel] = useState(0);
+  const [showShop, setShowShop] = useState(false);
 
   const [fieldWeeds, setFieldWeeds] = useState<FieldWeed[]>(() => buildRound(1, 1));
   useEffect(() => { setFieldWeeds(buildRound(level, round)); }, [level, round]);
@@ -143,10 +163,14 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
   const pickMethod = (mId: string) => {
     if (!fw) return;
+    if (!shop.owns(mId)) return;
     setMethodPick(mId);
     const best = getBestMethod(fw.weed);
     const correct = mId === best;
     if (correct) setScore(s => s + 1);
+    const reward = correct ? REWARD_CORRECT : REWARD_WRONG;
+    shop.earn(reward);
+    setEarnedThisLevel(v => v + reward);
     setHistory(h => [...h, { weedId: fw.id, weedName: fw.weed.commonName, method: mId, correct }]);
     setDone(d => [...d, fw.id]);
     // If failed: add 1-2 more of same species nearby
@@ -175,8 +199,28 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     if (round < ROUNDS_PER_LEVEL) { setRound(r => r + 1); resetRound(); }
   };
   const isLevelDone = round === ROUNDS_PER_LEVEL && showReview;
-  const nextLevel = () => { setLevel(l => l + 1); setRound(1); setScore(0); resetRound(); };
-  const startOver = () => { setLevel(1); setRound(1); setScore(0); resetRound(); };
+  const nextLevel = () => { setLevel(l => l + 1); setRound(1); setScore(0); setEarnedThisLevel(0); setShowShop(false); resetRound(); };
+  const startOver = () => { setLevel(1); setRound(1); setScore(0); shop.reset(); setEarnedThisLevel(0); setShowShop(false); resetRound(); };
+
+  if (showShop) {
+    return (
+      <BetweenLevelShop
+        title="Weed-Control Shed"
+        level={level}
+        score={score}
+        total={fieldWeeds.length * ROUNDS_PER_LEVEL}
+        money={shop.money}
+        owned={shop.owned}
+        earnedThisLevel={earnedThisLevel}
+        catalog={SHOP_CATALOG}
+        onBuy={shop.buy}
+        onContinue={nextLevel}
+        onStartOver={startOver}
+        onBack={onBack}
+        gradeLabel="6-8"
+      />
+    );
+  }
 
   if (showReview) {
     const wrong = history.filter(r => !r.correct);
@@ -207,7 +251,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             </div>
           )}
           {isLevelDone ? (
-            <LevelComplete level={level} score={score} total={fieldWeeds.length * ROUNDS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+            <button onClick={() => setShowShop(true)} className="w-full max-w-md mx-auto py-3 rounded-lg bg-primary text-primary-foreground font-bold block">
+              Visit Shop →
+            </button>
           ) : (
             <button onClick={nextRound} className="w-full max-w-md mx-auto py-3 rounded-lg bg-primary text-primary-foreground font-bold block">Next Round</button>
           )}
@@ -221,6 +267,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Weed Control</h1>
+        <span className="text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+          <DollarSign className="w-3 h-3" />{shop.money}
+        </span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">R{round}/{ROUNDS_PER_LEVEL}</span>
         <span className="text-sm font-bold text-foreground">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
@@ -284,14 +333,23 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
           <div className="p-3 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">Management Options</p>
             <div className="grid grid-cols-2 gap-1.5">
-              {ALL_METHODS.map(m => (
-                <button key={m.id} onClick={() => identified && !methodPick && pickMethod(m.id)}
-                  disabled={!identified || !!methodPick}
-                  className="p-2 rounded-lg border-2 border-border bg-background text-[11px] font-bold text-foreground hover:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left">
-                  {m.label}
-                </button>
-              ))}
+              {ALL_METHODS.map(m => {
+                const owned = shop.owns(m.id);
+                const shopEntry = SHOP_CATALOG.find(s => s.id === m.id);
+                return (
+                  <button key={m.id} onClick={() => identified && !methodPick && owned && pickMethod(m.id)}
+                    disabled={!identified || !!methodPick || !owned}
+                    className={`p-2 rounded-lg border-2 text-[11px] font-bold transition-all text-left flex items-center justify-between gap-1 ${
+                      owned ? 'border-border bg-background text-foreground hover:border-primary'
+                            : 'border-dashed border-border bg-background/50 text-muted-foreground'
+                    } disabled:cursor-not-allowed`}>
+                    <span>{m.label}</span>
+                    {!owned && <span className="text-[9px] inline-flex items-center gap-0.5"><Lock className="w-2.5 h-2.5" />{shopEntry ? `$${shopEntry.cost}` : ''}</span>}
+                  </button>
+                );
+              })}
             </div>
+            <p className="mt-2 text-[10px] text-muted-foreground italic">Locked tools unlock in the shop between levels.</p>
           </div>
 
           <div className="p-3 flex-1 overflow-y-auto">
