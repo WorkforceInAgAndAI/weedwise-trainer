@@ -56,6 +56,14 @@ const DISTRACTOR_NEEDS: NeedItem[] = [
   { id: 'freezing', label: 'Freezing temperatures' },
   { id: 'concrete', label: 'Concrete surface to grow on' },
   { id: 'darkness', label: 'Complete darkness' },
+  // Cross-category distractors so terrestrial answers aren't just the same
+  // list of "correct" items every round. Some of these are correct for OTHER
+  // categories but wrong here, forcing students to actually read.
+  { id: 'standing-water-d', label: 'Standing or slow-moving water' },
+  { id: 'host-plant-d', label: 'A host plant to attach to' },
+  { id: 'dissolved-nutrients-d', label: 'Dissolved nutrients in water' },
+  { id: 'haustoria-d', label: 'Special attachment roots (haustoria)' },
+  { id: 'saturated-d', label: 'Waterlogged soil year-round' },
 ];
 
 function getNeedsForCategory(cat: string): { correct: NeedItem[]; prompt: string } {
@@ -67,7 +75,11 @@ function getNeedsForCategory(cat: string): { correct: NeedItem[]; prompt: string
 }
 
 function buildWordBank(correctItems: NeedItem[]): NeedItem[] {
-  const distractors = shuffle([...DISTRACTOR_NEEDS]).slice(0, 2);
+  // Rotate correct items so the SAME needs don't appear in the SAME order
+  // for every terrestrial (or every aquatic) round — plus pick 3 distractors
+  // that are plausible-but-wrong (often correct for a different category).
+  const correctLabels = new Set(correctItems.map(c => c.label));
+  const distractors = shuffle(DISTRACTOR_NEEDS.filter(d => !correctLabels.has(d.label))).slice(0, 3);
   return shuffle([...correctItems, ...distractors]);
 }
 

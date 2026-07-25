@@ -120,7 +120,13 @@ const TOTAL_ROUNDS = 10;
 export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
-  const rounds = useMemo(() => shuffle([...FIELDS]).slice(0, TOTAL_ROUNDS), []);
+  // Rotate the field pool by level so every level shows a different order
+  // and different fields when there are more fields than TOTAL_ROUNDS.
+  const rounds = useMemo(() => {
+    const offset = ((level - 1) * TOTAL_ROUNDS) % FIELDS.length;
+    const rotated = [...FIELDS.slice(offset), ...FIELDS.slice(0, offset)];
+    return shuffle(rotated.slice(0, TOTAL_ROUNDS));
+  }, [level]);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [scouted, setScouted] = useState(false);

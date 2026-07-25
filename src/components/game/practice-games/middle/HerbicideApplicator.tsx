@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import soybeanBg from '@/assets/images/soybean_field_1.jpg';
-import { Droplets, AlertTriangle, Target } from 'lucide-react';
+import { Droplets, AlertTriangle, Target, DollarSign } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import {
@@ -17,6 +17,27 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 interface FieldWeed { id: string; weed: typeof weeds[0]; x: number; y: number; killed: boolean }
 
 const TOTAL_ROUNDS = 3;
+
+// Each herbicide has a real-world cost. Students must budget: spraying more
+// or spraying pricey MOAs eats into their money. Kills award crop revenue,
+// but wasted sprays sink the P&L. This forces intentional choices instead of
+// "just try one and see."
+const STARTING_BUDGET = 500;
+const REVENUE_PER_KILL = 40;
+const MOA_COST: Record<string, number> = {
+  glyphosate: 20,      // cheap, broad
+  atrazine: 25,
+  '2,4-D': 25,
+  dicamba: 55,         // premium
+  glufosinate: 60,
+  mesotrione: 45,
+  metolachlor: 40,
+  paraquat: 50,
+  clethodim: 45,
+  fomesafen: 50,
+};
+const DEFAULT_COST = 40;
+const costFor = (moaId: string) => MOA_COST[moaId] ?? DEFAULT_COST;
 
 function buildField(level: number, round: number): FieldWeed[] {
   const pool = shuffle(weeds);
@@ -50,6 +71,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const [appliedMOA, setAppliedMOA] = useState<string | null>(null);
   const [phase, setPhase] = useState<'select' | 'choose' | 'result'>('select');
   const [score, setScore] = useState(0);
+  const [budget, setBudget] = useState(STARTING_BUDGET);
   const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number }[]>([]);
 
   useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
@@ -73,6 +95,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const apply = (moaId: string) => {
     const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
     let killed = 0;
+    const cost = costFor(moaId);
     // Broadcast effect: herbicide doesn't discriminate. Any LIVING plant in the
     // field whose best MOA matches the chosen herbicide also dies, even if the
     // student didn't individually select it. This models how a sprayed broadleaf
@@ -85,6 +108,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
     }));
     setAppliedMOA(moaId);
     setScore(s => s + killed);
+    setBudget(b => b - cost + killed * REVENUE_PER_KILL);
     setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length }]);
     setPhase('result');
   };
@@ -105,7 +129,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const isLevelDone = round === TOTAL_ROUNDS && phase === 'result' && appliedMOA && livingCount === 0;
   const finished = isLevelDone;
 
-  const restart = () => { setRound(1); setScore(0); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); };
+  const restart = () => { setRound(1); setScore(0); setBudget(STARTING_BUDGET); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); };
   const nextLevelFn = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
@@ -123,6 +147,9 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Herbicide Applicator</h1>
+        <span className={`text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 ${budget >= 0 ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' : 'bg-destructive/15 text-destructive'}`}>
+          <DollarSign className="w-3 h-3" />{budget}
+        </span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">Round {round}/{TOTAL_ROUNDS}</span>
       </div>
@@ -186,12 +213,17 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
               <div className="space-y-2">
                 {moaOptions.map(m => (
                   <button key={m.id} onClick={() => apply(m.id)}
-                    className="w-full p-2.5 rounded-lg border-2 border-border bg-background hover:border-primary text-left">
-                    <span className="text-xs font-bold text-foreground">{m.moa} (Group {m.group})</span>
+                    disabled={budget < costFor(m.id)}
+                    className="w-full p-2.5 rounded-lg border-2 border-border bg-background hover:border-primary text-left disabled:opacity-40 disabled:cursor-not-allowed">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-bold text-foreground">{m.moa} (Group {m.group})</span>
+                      <span className="text-[11px] font-bold text-amber-700 dark:text-amber-300 inline-flex items-center"><DollarSign className="w-3 h-3" />{costFor(m.id)}</span>
+                    </div>
                     <span className="text-[10px] text-muted-foreground block">Chemical: {m.brands[0]}</span>
                   </button>
                 ))}
               </div>
+              <p className="text-[10px] text-muted-foreground italic">Each kill earns ${REVENUE_PER_KILL}. Choose carefully — you pay whether it works or not.</p>
               <button onClick={() => setPhase('select')} className="w-full py-2 rounded-lg bg-secondary text-foreground font-bold text-xs">← Change Selection</button>
             </>
           )}

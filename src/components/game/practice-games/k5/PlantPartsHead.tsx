@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Sparkles, AlertTriangle, RotateCcw, ChevronRight, Check, X } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import WeedImage from '@/components/game/WeedImage';
 
 // -------- Mr. Plant Head! (K-5 Explorer, drag & drop) ---------------------
 // Kids drag cartoon plant parts (roots, stem, leaves, flower, seeds) onto
@@ -168,6 +169,18 @@ const CASES: WeedCase[] = [
 ];
 
 function shuffle<T>(a: T[]): T[] { return [...a].sort(() => Math.random() - 0.5); }
+
+// Map each case's common name to a weedId so we can show a real reference
+// photo of the plant before students start assembling parts.
+const NAME_TO_WEED_ID: Record<string, string> = {
+  'Dandelion': 'Dandelion',
+  'Giant Foxtail': 'Giant_foxtail',
+  'Canada Thistle': 'Canada_thistle',
+  'Common Milkweed': 'Common_milkweed',
+  'Lambsquarters': 'Common_lambsquarters',
+  'Wild Carrot': 'Wild_carrot',
+  'Field Bindweed': 'Field_bindweed',
+};
 
 const ROUNDS_PER_LEVEL = 3;
 
@@ -472,6 +485,8 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
   const [usedIds, setUsedIds] = useState<Set<string>>(new Set());
   const [showResult, setShowResult] = useState(false);
   const [dragItem, setDragItem] = useState<PaletteItem | null>(null);
+  // Show a real reference photo of the weed before students start building.
+  const [showPreview, setShowPreview] = useState(true);
 
   const availablePalette = roundData.palette.filter(p => !usedIds.has(p.id));
   const slotsFilled = Object.keys(placements).length;
@@ -518,6 +533,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
     setPlacements({});
     setUsedIds(new Set());
     setShowResult(false);
+    setShowPreview(true);
   }
 
   function resetRound() {
@@ -560,6 +576,27 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
   return (
     <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
+      {/* Reference photo modal — shows the real weed BEFORE assembly. */}
+      {showPreview && NAME_TO_WEED_ID[c.name] && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
+          <div className="bg-background rounded-2xl shadow-2xl max-w-md w-full p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Meet Your Plant</p>
+              <h2 className="text-2xl font-bold text-foreground">{c.name}</h2>
+            </div>
+            <div className="rounded-xl overflow-hidden border-4 border-primary/30 mb-3 aspect-square bg-muted">
+              <WeedImage weedId={NAME_TO_WEED_ID[c.name]!} stage="Reproductive" className="w-full h-full object-cover" />
+            </div>
+            <p className="text-sm text-foreground mb-3"><span className="font-bold">Fun fact:</span> {c.funFact}</p>
+            <button
+              onClick={() => setShowPreview(false)}
+              className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-lg font-bold hover:opacity-90"
+            >
+              Start Building! <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-5xl mx-auto p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <button onClick={onBack} className="flex items-center gap-2 text-primary hover:underline">
