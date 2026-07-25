@@ -22,6 +22,7 @@ const CELL = 40; // px
 
 type Pos = { x: number; y: number };
 type PelletKind = 'sun' | 'water' | 'nutrient' | 'boost';
+type ScoreKind = 'sun' | 'water' | 'nutrient';
 interface Pellet { x: number; y: number; kind: PelletKind }
 
 const isWall = (x: number, y: number) =>
@@ -118,8 +119,8 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   const [pellets, setPellets] = useState<Pellet[]>(() => buildPellets());
   const [flower, setFlower] = useState<Pos>({ x: 1, y: 7 });
   const [weed, setWeed] = useState<Pos>({ x: COLS - 2, y: 1 });
-  const [flowerScore, setFlowerScore] = useState<Record<PelletKind, number>>({ sun: 0, water: 0, nutrient: 0 });
-  const [weedScore, setWeedScore] = useState<Record<PelletKind, number>>({ sun: 0, water: 0, nutrient: 0 });
+  const [flowerScore, setFlowerScore] = useState<Record<ScoreKind, number>>({ sun: 0, water: 0, nutrient: 0 });
+  const [weedScore, setWeedScore] = useState<Record<ScoreKind, number>>({ sun: 0, water: 0, nutrient: 0 });
   const [flowerHeight, setFlowerHeight] = useState(2); // cm
   const [weedHeight, setWeedHeight] = useState(2);
   const [showTally, setShowTally] = useState(false);
@@ -186,12 +187,14 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
           if (collected.kind === 'boost') {
             setBoostMs(2500); // 2.5s of super-speed
           } else {
-            setFlowerScore(s => ({ ...s, [collected!.kind]: s[collected!.kind] + 1 }));
+            const k = collected.kind as ScoreKind;
+            setFlowerScore(s => ({ ...s, [k]: s[k] + 1 }));
           }
         } else {
           // Weed can't use the Sunburst power-up — it just fizzles.
           if (collected.kind !== 'boost') {
-            setWeedScore(s => ({ ...s, [collected!.kind]: s[collected!.kind] + 1 }));
+            const k = collected.kind as ScoreKind;
+            setWeedScore(s => ({ ...s, [k]: s[k] + 1 }));
           }
         }
       }
