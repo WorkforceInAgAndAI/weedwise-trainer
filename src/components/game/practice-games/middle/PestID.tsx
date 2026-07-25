@@ -80,12 +80,7 @@ function buildWordBank(correctItems: NeedItem[]): NeedItem[] {
   // that are plausible-but-wrong (often correct for a different category).
   const correctLabels = new Set(correctItems.map(c => c.label));
   const distractors = shuffle(DISTRACTOR_NEEDS.filter(d => !correctLabels.has(d.label))).slice(0, 3);
-  // Randomly drop one correct item ~25% of the time so students can't
-  // memorize "always pick all 4" — teaches them to actually evaluate.
-  const trimmed = Math.random() < 0.25 && correctItems.length > 3
-    ? shuffle(correctItems).slice(0, correctItems.length - 1)
-    : correctItems;
-  return shuffle([...trimmed, ...distractors]);
+  return shuffle([...correctItems, ...distractors]);
 }
 
 function getRoundsForLevel(level: number) {
