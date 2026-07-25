@@ -37,8 +37,11 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
 
  const rounds = useMemo(() => {
   const pool = shuffle(allGrasses);
-  const offset = ((level - 1) * 8) % pool.length;
-  const selected = pool.slice(offset).concat(pool).slice(0, Math.min(8, pool.length));
+  // Cycle through ALL grasses each level starting at a new offset so students
+  // don't see the same 4-8 species repeated across levels.
+  const perLevel = Math.min(10, pool.length);
+  const offset = ((level - 1) * perLevel) % pool.length;
+  const selected = pool.slice(offset).concat(pool).slice(0, perLevel);
   return selected.map(w => {
    const wrong = shuffle(allGrasses.filter(g => g.id !== w.id)).slice(0, 3).map(g => g.commonName);
    return { weed: w, options: shuffle([w.commonName, ...wrong]) };
