@@ -77,6 +77,12 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
 
+  useEffect(() => {
+    if (showShop) {
+      addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: items.length * TOTAL_ROUNDS });
+    }
+  }, [showShop]);
+
   const toggle = (id: string) => {
     if (phase !== 'select') return;
     setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
