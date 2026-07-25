@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Sun, Droplet, Sprout, Trophy, Flag, ArrowLeft } from 'lucide-react';
+import { Sun, Droplet, Sprout, Trophy, Flag, ArrowLeft, Zap } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 
@@ -21,7 +21,8 @@ const ROWS = MAZE_ROWS.length;
 const CELL = 40; // px
 
 type Pos = { x: number; y: number };
-type PelletKind = 'sun' | 'water' | 'nutrient';
+type PelletKind = 'sun' | 'water' | 'nutrient' | 'boost';
+type ScoreKind = 'sun' | 'water' | 'nutrient';
 interface Pellet { x: number; y: number; kind: PelletKind }
 
 const isWall = (x: number, y: number) =>
@@ -40,6 +41,15 @@ function buildPellets(): Pellet[] {
         i++;
       }
     }
+  }
+  // Sprinkle in 3 rare "Sunburst" power-up pellets that give the flower a
+  // temporary speed boost so kids feel a payoff for grabbing them first.
+  const boostSpots: Pos[] = [
+    { x: 6, y: 1 }, { x: 1, y: 3 }, { x: COLS - 2, y: 7 },
+  ];
+  for (const spot of boostSpots) {
+    const p = out.find(p => p.x === spot.x && p.y === spot.y);
+    if (p) p.kind = 'boost';
   }
   return out;
 }
@@ -95,6 +105,7 @@ function WeedSprite({ size = 32 }: { size?: number }) {
 function PelletIcon({ kind }: { kind: PelletKind }) {
   if (kind === 'sun') return <Sun className="w-4 h-4 text-yellow-500" />;
   if (kind === 'water') return <Droplet className="w-4 h-4 text-blue-500" />;
+  if (kind === 'boost') return <Zap className="w-5 h-5 text-fuchsia-500 drop-shadow" />;
   return <Sprout className="w-4 h-4 text-emerald-600" />;
 }
 
@@ -108,14 +119,15 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   const [pellets, setPellets] = useState<Pellet[]>(() => buildPellets());
   const [flower, setFlower] = useState<Pos>({ x: 1, y: 7 });
   const [weed, setWeed] = useState<Pos>({ x: COLS - 2, y: 1 });
-  const [flowerScore, setFlowerScore] = useState<Record<PelletKind, number>>({ sun: 0, water: 0, nutrient: 0 });
-  const [weedScore, setWeedScore] = useState<Record<PelletKind, number>>({ sun: 0, water: 0, nutrient: 0 });
+  const [flowerScore, setFlowerScore] = useState<Record<ScoreKind, number>>({ sun: 0, water: 0, nutrient: 0 });
+  const [weedScore, setWeedScore] = useState<Record<ScoreKind, number>>({ sun: 0, water: 0, nutrient: 0 });
   const [flowerHeight, setFlowerHeight] = useState(2); // cm
   const [weedHeight, setWeedHeight] = useState(2);
   const [showTally, setShowTally] = useState(false);
   const [done, setDone] = useState(false);
   const dirRef = useRef<Pos>({ x: 0, y: 0 });
   const [paused, setPaused] = useState(false);
+  const [boostMs, setBoostMs] = useState(0); // flower speed boost time remaining
 
   const totalPellets = useMemo(() => buildPellets().length, []);
 
@@ -137,6 +149,8 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   // Game tick
   useEffect(() => {
     if (paused || showTally || done) return;
+    const boosted = boostMs > 0;
+    const tickMs = boosted ? 130 : 220;
     const tick = setInterval(() => {
       // Move flower in requested direction if not into a wall
       setFlower(prev => {
@@ -153,9 +167,10 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
         if (isWall(nx, ny)) return prev;
         return { x: nx, y: ny };
       });
-    }, 220);
+      setBoostMs(b => Math.max(0, b - tickMs));
+    }, tickMs);
     return () => clearInterval(tick);
-  }, [paused, showTally, done, pellets]);
+  }, [paused, showTally, done, pellets, boostMs > 0]);
 
   // Pellet collection
   useEffect(() => {
@@ -169,9 +184,18 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
       }
       if (collected) {
         if (collected.by === 'flower') {
-          setFlowerScore(s => ({ ...s, [collected!.kind]: s[collected!.kind] + 1 }));
+          if (collected.kind === 'boost') {
+            setBoostMs(2500); // 2.5s of super-speed
+          } else {
+            const k = collected.kind as ScoreKind;
+            setFlowerScore(s => ({ ...s, [k]: s[k] + 1 }));
+          }
         } else {
-          setWeedScore(s => ({ ...s, [collected!.kind]: s[collected!.kind] + 1 }));
+          // Weed can't use the Sunburst power-up — it just fizzles.
+          if (collected.kind !== 'boost') {
+            const k = collected.kind as ScoreKind;
+            setWeedScore(s => ({ ...s, [k]: s[k] + 1 }));
+          }
         }
       }
       return remaining;
@@ -251,6 +275,14 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
         </div>
         <div className="h-6" style={{ background: CHECKER }} />
       </div>
+
+      {boostMs > 0 && (
+        <div className="max-w-4xl mx-auto -mt-2 mb-3 text-center">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-fuchsia-100 border border-fuchsia-300 text-fuchsia-700 text-xs font-bold animate-pulse">
+            <Zap className="w-3 h-3" /> Sunburst Boost! {(boostMs / 1000).toFixed(1)}s
+          </span>
+        </div>
+      )}
 
       <div className="max-w-4xl mx-auto grid gap-4 lg:grid-cols-[auto_1fr]">
         {/* Maze */}
