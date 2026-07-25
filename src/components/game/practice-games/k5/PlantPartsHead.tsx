@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Sparkles, AlertTriangle, RotateCcw, ChevronRight, Check, X } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import WeedImage from '@/components/game/WeedImage';
 
 // -------- Mr. Plant Head! (K-5 Explorer, drag & drop) ---------------------
 // Kids drag cartoon plant parts (roots, stem, leaves, flower, seeds) onto
