@@ -247,6 +247,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
+        hideAccuracy
       />
     );
   }

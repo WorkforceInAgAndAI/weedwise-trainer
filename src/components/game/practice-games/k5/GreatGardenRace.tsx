@@ -226,6 +226,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
+        hideAccuracy
       />
     );
   }

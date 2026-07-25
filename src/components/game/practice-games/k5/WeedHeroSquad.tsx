@@ -51,7 +51,7 @@ const MISSIONS: Mission[] = [
   {
     crop: 'Corn Field',
     villain: 'Weeds sneaking into gaps between crop rows',
-    scene: 'A big field has open spaces where weeds keep sneaking in. Which hero plans the crops so weeds cannot fit?',
+    scene: 'A big field has open spaces where weeds keep sneaking in. Which hero plants the crops close together so weeds cannot fit?',
     best: 'outsmart',
     win: 'Outsmart It plants strong crops close together — no room, no sunlight, no chance for weeds!',
     wrongHint: 'Planting healthy crops close together beats weeds with brain power. That is Outsmart It!',
@@ -91,9 +91,9 @@ const MISSIONS: Mission[] = [
   {
     crop: 'Wheat Field',
     villain: 'Empty patches where the crop grew thin',
-    scene: 'Bare spots between the wheat plants let weeds sneak in. Which hero plans a thicker crop next time?',
+    scene: 'Bare spots between the wheat plants let weeds sneak in. Which hero plants a thicker crop next time?',
     best: 'outsmart',
-    win: 'Outsmart It plants crops closer together — no gaps means no weeds!',
+    win: 'Outsmart It plants the crops closer together — no gaps means no weeds!',
     wrongHint: 'Fixing the plan and planting thicker crops is Outsmart It using Brain Power!',
   },
 ];

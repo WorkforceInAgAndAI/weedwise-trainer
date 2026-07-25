@@ -263,6 +263,13 @@ export default function PracticeHub({
  return (
    <>
      <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
+     <button
+       onClick={backToGames}
+       className="fixed bottom-4 left-4 z-[70] inline-flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-destructive/60 bg-card text-destructive text-sm font-bold shadow-card hover:bg-destructive/10 transition-colors"
+       title="Exit this game"
+     >
+       ← Exit Game
+     </button>
      {onOpenLearning && topicId && (
        <button
          onClick={() => onOpenLearning(topicId, selectedGrade, selectedGame.id)}

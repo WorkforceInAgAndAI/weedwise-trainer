@@ -13,9 +13,10 @@ interface Props {
   gameId?: string;
   gameName?: string;
   gradeLabel?: string;
+  hideAccuracy?: boolean;
 }
 
-export default function LevelComplete({ level, score, total, onNextLevel, onStartOver, onBack, title, gameId, gameName, gradeLabel }: Props) {
+export default function LevelComplete({ level, score, total, onNextLevel, onStartOver, onBack, title, gameId, gameName, gradeLabel, hideAccuracy }: Props) {
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
   const passed = pct >= 60;
   const tier = pct >= 85 ? 'gold' : pct >= 70 ? 'silver' : pct >= 50 ? 'bronze' : null;
@@ -56,8 +57,14 @@ export default function LevelComplete({ level, score, total, onNextLevel, onStar
         <h2 className="text-2xl font-display font-bold text-foreground mb-1">
           Level {level} {passed ? 'Complete!' : 'Finished'}
         </h2>
-        <p className="text-lg text-foreground mb-1">{score} / {total} correct</p>
-        <p className="text-sm text-muted-foreground mb-6">{pct}% accuracy</p>
+        {hideAccuracy ? (
+          <p className="text-lg text-foreground mb-6">Score: <span className="font-black text-primary">{score}</span></p>
+        ) : (
+          <>
+            <p className="text-lg text-foreground mb-1">{score} / {total} correct</p>
+            <p className="text-sm text-muted-foreground mb-6">{pct}% accuracy</p>
+          </>
+        )}
 
         <div className="flex flex-col gap-2">
           <button
