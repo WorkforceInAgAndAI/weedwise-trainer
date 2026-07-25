@@ -1,81 +1,10 @@
 import { useState, useMemo } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
-import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
-import { DollarSign, ShoppingBag, Check } from 'lucide-react';
-
-// End-of-level shop: turn hard-earned $ into real IPM tools. Each purchase
-// is an unlockable badge / trophy so students actually WANT to score high.
-interface ShopItem { id: string; name: string; cost: number; desc: string; }
-const SHOP_ITEMS: ShopItem[] = [
-  { id: 'hand-tool', name: 'Hoe & Hand-Pull Kit', cost: 75, desc: 'Basic mechanical control for seedlings.' },
-  { id: 'preemerge', name: 'Pre-Emergence Herbicide', cost: 150, desc: 'Stops seedlings before they sprout.' },
-  { id: 'postemerge', name: 'Post-Emergence Herbicide', cost: 200, desc: 'Kills weeds already growing.' },
-  { id: 'mower', name: 'Mower', cost: 275, desc: 'Cuts vegetative & reproductive weeds fast.' },
-  { id: 'cover-crop', name: 'Cover-Crop Seed', cost: 325, desc: 'Out-competes weeds all season.' },
-  { id: 'sprayer', name: 'Precision Spot Sprayer', cost: 450, desc: 'Targets weeds without hurting crops.' },
-];
-
-function LifeStageShop({ money, level, score, maxScore, onSpend, onNextLevel, onStartOver, onBack }: {
-  money: number; level: number; score: number; maxScore: number;
-  onSpend: (amount: number) => void;
-  onNextLevel: () => void; onStartOver: () => void; onBack: () => void;
-}) {
-  const [owned, setOwned] = useState<Set<string>>(new Set());
-  const [showComplete, setShowComplete] = useState(false);
-  const buy = (it: ShopItem) => {
-    if (money < it.cost || owned.has(it.id)) return;
-    onSpend(it.cost);
-    setOwned(s => new Set([...s, it.id]));
-  };
-  if (showComplete) {
-    return <LevelComplete level={level} score={score} total={maxScore} onNextLevel={onNextLevel} onStartOver={onStartOver} onBack={onBack} gradeLabel="6-8" />;
-  }
-  return (
-    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 overflow-y-auto p-6">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-4">
-          <ShoppingBag className="w-10 h-10 mx-auto text-primary mb-1" />
-          <h2 className="text-2xl font-bold text-foreground">IPM Supply Shop</h2>
-          <p className="text-sm text-muted-foreground">Spend the money you earned on real weed-control tools.</p>
-          <p className="mt-2 inline-flex items-center gap-1 text-lg font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-full">
-            <DollarSign className="w-5 h-5" />{money}
-          </p>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-3 mb-5">
-          {SHOP_ITEMS.map(it => {
-            const has = owned.has(it.id);
-            const afford = money >= it.cost;
-            return (
-              <button
-                key={it.id}
-                onClick={() => buy(it)}
-                disabled={has || !afford}
-                className={`p-3 rounded-lg border-2 text-left transition-all ${
-                  has ? 'border-green-500 bg-green-500/10'
-                    : afford ? 'border-border bg-card hover:border-primary'
-                    : 'border-border bg-card opacity-40 cursor-not-allowed'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="font-bold text-foreground text-sm">{it.name}</span>
-                  {has ? <Check className="w-4 h-4 text-green-600" />
-                    : <span className="text-xs font-bold text-amber-700 dark:text-amber-300 inline-flex items-center"><DollarSign className="w-3 h-3" />{it.cost}</span>}
-                </div>
-                <p className="text-xs text-muted-foreground">{it.desc}</p>
-              </button>
-            );
-          })}
-        </div>
-        <button onClick={() => setShowComplete(true)}
-          className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-          Finish Level →
-        </button>
-      </div>
-    </div>
-  );
-}
+import { DollarSign, Lock } from 'lucide-react';
+import BetweenLevelShop from '@/components/game/BetweenLevelShop';
+import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -95,7 +24,24 @@ const CONTROLS = [
   { id: 'biocontrol', label: 'Biological Control', stages: ['vegetative', 'reproductive'] },
 ];
 
-const QUESTIONS_PER_ROUND = 10;
+// SHORTER levels + persistent shop = students BUILD up their toolkit
+// across levels instead of grinding a long round.
+const QUESTIONS_PER_ROUND = 5;
+
+// Only Hand Pull + Cultivation are free to start. Everything else must be
+// bought between levels. Prices are tuned so a student earning full marks
+// on 5 questions ($100 × 5 = $500) can afford one mid-tier tool per level.
+const SHOP_CATALOG: ShopItem[] = [
+  { id: 'hoe',        name: 'Hoe & Hand-Pull Kit',   cost: 100, tag: 'Mechanical', desc: 'Unlocks Hand Pull for any weed. (Starter)' },
+  { id: 'pre-herb',   name: 'Pre-Emergence Herbicide', cost: 250, tag: 'Chemical',   desc: 'Unlocks Pre-emergence Herbicide.' },
+  { id: 'post-herb',  name: 'Post-Emergence Herbicide', cost: 300, tag: 'Chemical',   desc: 'Unlocks Post-emergence Herbicide.' },
+  { id: 'mow',        name: 'Mower',                 cost: 275, tag: 'Mechanical', desc: 'Unlocks Mow / Cut.' },
+  { id: 'cover-crop', name: 'Cover-Crop Seed',       cost: 325, tag: 'Cultural',   desc: 'Unlocks Cover Crops / Competition.' },
+  { id: 'spot-spray', name: 'Precision Spot Sprayer', cost: 450, tag: 'Chemical',   desc: 'Unlocks Spot Spray Treatment.' },
+  { id: 'biocontrol', name: 'Biocontrol Release',    cost: 400, tag: 'Biological', desc: 'Unlocks Biological Control.' },
+];
+
+const STARTER_OWNED = ['hand-pull', 'cultivate'];
 
 function buildRounds(level: number) {
   const offset = ((level - 1) * QUESTIONS_PER_ROUND) % weeds.length;
@@ -118,6 +64,8 @@ function buildRounds(level: number) {
 export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const items = useMemo(() => buildRounds(level), [level]);
+  const shop = usePracticeShop('life-stage-control', STARTER_OWNED, 0);
+  const [earnedThisLevel, setEarnedThisLevel] = useState(0);
 
   const [idx, setIdx] = useState(0);
   const [step, setStep] = useState<'stage' | 'weed' | 'control' | 'feedback'>('stage');
@@ -125,7 +73,6 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [weedAnswer, setWeedAnswer] = useState<string | null>(null);
   const [controlAnswer, setControlAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
-  const [money, setMoney] = useState(0);
 
   const done = idx >= items.length;
   const current = !done ? items[idx] : null;
@@ -161,15 +108,18 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   };
 
   const handleControl = (cId: string) => {
+    if (!shop.owns(cId)) return; // locked tool — must buy in shop
     setControlAnswer(cId);
     const stageOk = stageAnswer === current!.stage;
     const weedOk = weedAnswer === current!.weed.id;
     const controlOk = validControlIds.includes(cId);
     if (controlOk) setScore(sc => sc + 1);
     // Money rewards mastery of all THREE — only full payout when all correct.
-    if (stageOk && weedOk && controlOk) setMoney(m => m + 100);
-    else if ([stageOk, weedOk, controlOk].filter(Boolean).length === 2) setMoney(m => m + 25);
-    else setMoney(m => m + 5);
+    let award = 5;
+    if (stageOk && weedOk && controlOk) award = 100;
+    else if ([stageOk, weedOk, controlOk].filter(Boolean).length === 2) award = 25;
+    shop.earn(award);
+    setEarnedThisLevel(m => m + award);
     setStep('feedback');
   };
 
@@ -182,24 +132,29 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   };
 
   const restart = () => {
-    setIdx(0); setScore(0); setStep('stage');
+    setIdx(0); setScore(0); setStep('stage'); setEarnedThisLevel(0);
     setStageAnswer(null); setWeedAnswer(null); setControlAnswer(null);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); restart(); };
+  const startOver = () => { setLevel(1); shop.reset(); restart(); };
 
   if (done) {
     const maxScore = items.length * 3;
     return (
-      <LifeStageShop
-        money={money}
+      <BetweenLevelShop
+        title="IPM Supply Shop"
         level={level}
         score={score}
-        maxScore={maxScore}
-        onSpend={(amount) => setMoney(m => m - amount)}
-        onNextLevel={nextLevel}
+        total={maxScore}
+        money={shop.money}
+        owned={shop.owned}
+        earnedThisLevel={earnedThisLevel}
+        catalog={SHOP_CATALOG}
+        onBuy={shop.buy}
+        onContinue={nextLevel}
         onStartOver={startOver}
         onBack={onBack}
+        gradeLabel="6-8"
       />
     );
   }
@@ -214,7 +169,7 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Life Stage Control</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm font-bold text-green-600">${money}</span>
+        <span className="text-sm font-bold text-green-600 inline-flex items-center"><DollarSign className="w-3 h-3" />{shop.money}</span>
         <span className="text-sm text-muted-foreground">{idx + 1}/{items.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
@@ -289,13 +244,29 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
               How should you manage {current!.weed.commonName} at the {STAGE_LABELS[current!.stage].toLowerCase()} stage?
             </p>
             <div className="flex flex-col gap-2 w-full max-w-sm">
-              {controlOptions.map(c => (
-                <button key={c.id} onClick={() => handleControl(c.id)}
-                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all">
-                  {c.label}
-                </button>
-              ))}
+              {controlOptions.map(c => {
+                const owned = shop.owns(c.id);
+                const shopEntry = SHOP_CATALOG.find(s => s.id === c.id);
+                return (
+                  <button key={c.id} onClick={() => handleControl(c.id)}
+                    disabled={!owned}
+                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all text-left flex items-center justify-between gap-2 ${
+                      owned ? 'border-border bg-card hover:border-primary text-foreground'
+                            : 'border-dashed border-border bg-card/50 text-muted-foreground cursor-not-allowed'
+                    }`}>
+                    <span>{c.label}</span>
+                    {!owned && (
+                      <span className="text-[10px] inline-flex items-center gap-1"><Lock className="w-3 h-3" />
+                        {shopEntry ? `$${shopEntry.cost}` : 'Locked'}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
+            <p className="mt-3 text-[11px] text-muted-foreground italic max-w-sm text-center">
+              Locked tools can be bought in the shop between levels.
+            </p>
           </>
         )}
 
