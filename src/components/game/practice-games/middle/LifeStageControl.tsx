@@ -84,14 +84,19 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
     return shuffle([current.weed, ...others]);
   }, [idx, current?.weed.id]);
 
-  // Pick 4-5 control options shuffled, including valid ones for current stage
+  // Pick 5 control options. GUARANTEE every owned tool is included so
+  // students always have at least one clickable answer (progression must
+  // never be blocked by an all-locked option set). Then fill with valid
+  // options for the current stage, then invalid distractors.
   const controlOptions = useMemo(() => {
     if (!current) return [];
-    const valid = CONTROLS.filter(c => c.stages.includes(current.stage));
-    const invalid = CONTROLS.filter(c => !c.stages.includes(current.stage));
-    const picked = [...valid, ...shuffle(invalid).slice(0, Math.max(0, 5 - valid.length))];
+    const ownedSet = new Set(shop.owned);
+    const owned = CONTROLS.filter(c => ownedSet.has(c.id));
+    const valid = CONTROLS.filter(c => c.stages.includes(current.stage) && !ownedSet.has(c.id));
+    const rest  = CONTROLS.filter(c => !c.stages.includes(current.stage) && !ownedSet.has(c.id));
+    const picked = [...owned, ...valid, ...shuffle(rest)].slice(0, Math.max(5, owned.length + 1));
     return shuffle(picked);
-  }, [idx, current?.stage]);
+  }, [idx, current?.stage, shop.owned]);
 
   const validControlIds = current ? CONTROLS.filter(c => c.stages.includes(current.stage)).map(c => c.id) : [];
 
@@ -108,7 +113,8 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   };
 
   const handleControl = (cId: string) => {
-    if (!shop.owns(cId)) return; // locked tool — must buy in shop
+    // Locked tools are visible for awareness but not selectable.
+    if (!shop.owns(cId)) return;
     setControlAnswer(cId);
     const stageOk = stageAnswer === current!.stage;
     const weedOk = weedAnswer === current!.weed.id;
