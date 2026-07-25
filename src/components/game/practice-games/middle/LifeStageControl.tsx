@@ -31,14 +31,16 @@ const QUESTIONS_PER_ROUND = 5;
 // Only Hand Pull + Cultivation are free to start. Everything else must be
 // bought between levels. Prices are tuned so a student earning full marks
 // on 5 questions ($100 × 5 = $500) can afford one mid-tier tool per level.
+// Prices tuned so any student who earns partial credit ($25 avg × 5 = $125)
+// can afford at least one tool between levels. A perfect run ($500) can buy
+// two or three, keeping progression brisk.
 const SHOP_CATALOG: ShopItem[] = [
-  { id: 'hoe',        name: 'Hoe & Hand-Pull Kit',   cost: 100, tag: 'Mechanical', desc: 'Unlocks Hand Pull for any weed. (Starter)' },
-  { id: 'pre-herb',   name: 'Pre-Emergence Herbicide', cost: 250, tag: 'Chemical',   desc: 'Unlocks Pre-emergence Herbicide.' },
-  { id: 'post-herb',  name: 'Post-Emergence Herbicide', cost: 300, tag: 'Chemical',   desc: 'Unlocks Post-emergence Herbicide.' },
-  { id: 'mow',        name: 'Mower',                 cost: 275, tag: 'Mechanical', desc: 'Unlocks Mow / Cut.' },
-  { id: 'cover-crop', name: 'Cover-Crop Seed',       cost: 325, tag: 'Cultural',   desc: 'Unlocks Cover Crops / Competition.' },
-  { id: 'spot-spray', name: 'Precision Spot Sprayer', cost: 450, tag: 'Chemical',   desc: 'Unlocks Spot Spray Treatment.' },
-  { id: 'biocontrol', name: 'Biocontrol Release',    cost: 400, tag: 'Biological', desc: 'Unlocks Biological Control.' },
+  { id: 'pre-herb',   name: 'Pre-Emergence Herbicide',  cost: 125, tag: 'Chemical',   desc: 'Unlocks Pre-emergence Herbicide.' },
+  { id: 'post-herb',  name: 'Post-Emergence Herbicide', cost: 150, tag: 'Chemical',   desc: 'Unlocks Post-emergence Herbicide.' },
+  { id: 'mow',        name: 'Mower',                    cost: 125, tag: 'Mechanical', desc: 'Unlocks Mow / Cut.' },
+  { id: 'cover-crop', name: 'Cover-Crop Seed',          cost: 175, tag: 'Cultural',   desc: 'Unlocks Cover Crops / Competition.' },
+  { id: 'spot-spray', name: 'Precision Spot Sprayer',   cost: 225, tag: 'Chemical',   desc: 'Unlocks Spot Spray Treatment.' },
+  { id: 'biocontrol', name: 'Biocontrol Release',       cost: 200, tag: 'Biological', desc: 'Unlocks Biological Control.' },
 ];
 
 const STARTER_OWNED = ['hand-pull', 'cultivate'];
