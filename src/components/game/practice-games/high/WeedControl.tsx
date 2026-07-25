@@ -134,6 +134,16 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
  const isLevelDone = round === ROUNDS_PER_LEVEL - 1 && showReview;
 
+ // Guaranteed level-completion stipend so no student is stuck at $0.
+ useEffect(() => {
+  if (isLevelDone) {
+   const BONUS = 100;
+   shop.earn(BONUS);
+   setEarnedThisLevel(v => v + BONUS);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [isLevelDone]);
+
  const nextLevel = () => { setLevel(l => l + 1); setRound(0); setTotalScore(0); setEarnedThisLevel(0); setShowShop(false); };
  const startOver = () => { setLevel(1); setRound(0); setTotalScore(0); shop.reset(); setEarnedThisLevel(0); setShowShop(false); };
 
