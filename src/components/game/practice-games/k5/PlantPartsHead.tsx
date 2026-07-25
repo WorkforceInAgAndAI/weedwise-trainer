@@ -169,6 +169,18 @@ const CASES: WeedCase[] = [
 
 function shuffle<T>(a: T[]): T[] { return [...a].sort(() => Math.random() - 0.5); }
 
+// Map each case's common name to a weedId so we can show a real reference
+// photo of the plant before students start assembling parts.
+const NAME_TO_WEED_ID: Record<string, string> = {
+  'Dandelion': 'Dandelion',
+  'Giant Foxtail': 'Giant_foxtail',
+  'Canada Thistle': 'Canada_thistle',
+  'Common Milkweed': 'Common_milkweed',
+  'Lambsquarters': 'Common_lambsquarters',
+  'Wild Carrot': 'Wild_carrot',
+  'Field Bindweed': 'Field_bindweed',
+};
+
 const ROUNDS_PER_LEVEL = 3;
 
 // ---------- Cartoon part renderers -----------------------------------------
