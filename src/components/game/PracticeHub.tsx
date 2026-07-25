@@ -254,6 +254,10 @@ export default function PracticeHub({
 
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
+  // Toggle a body class so global CSS can offset fixed game overlays below the top nav.
+  if (typeof document !== 'undefined') {
+    document.body.classList.add('practice-game-active');
+  }
  const gradeLabel =
    selectedGrade === 'newk5' ? 'K-5'
    : selectedGrade === 'k5' ? '6-8'
@@ -299,7 +303,7 @@ export default function PracticeHub({
       </div>
       {/* Spacer to push game content below the fixed top bar */}
       <style>{`
-        [data-practice-game-active="true"] .fixed.inset-0.z-50 { top: 56px !important; }
+        body.practice-game-active .fixed.inset-0.z-50 { top: 56px !important; }
       `}</style>
    </>
  );
