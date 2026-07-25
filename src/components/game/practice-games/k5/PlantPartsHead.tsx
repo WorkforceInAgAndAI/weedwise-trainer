@@ -576,6 +576,27 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
 
   return (
     <div className="fixed inset-0 bg-background z-40 overflow-y-auto">
+      {/* Reference photo modal — shows the real weed BEFORE assembly. */}
+      {showPreview && NAME_TO_WEED_ID[c.name] && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
+          <div className="bg-background rounded-2xl shadow-2xl max-w-md w-full p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Meet Your Plant</p>
+              <h2 className="text-2xl font-bold text-foreground">{c.name}</h2>
+            </div>
+            <div className="rounded-xl overflow-hidden border-4 border-primary/30 mb-3 aspect-square bg-muted">
+              <WeedImage weedId={NAME_TO_WEED_ID[c.name]!} stage="Reproductive" className="w-full h-full object-cover" />
+            </div>
+            <p className="text-sm text-foreground mb-3"><span className="font-bold">Fun fact:</span> {c.funFact}</p>
+            <button
+              onClick={() => setShowPreview(false)}
+              className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-lg font-bold hover:opacity-90"
+            >
+              Start Building! <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-5xl mx-auto p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <button onClick={onBack} className="flex items-center gap-2 text-primary hover:underline">
