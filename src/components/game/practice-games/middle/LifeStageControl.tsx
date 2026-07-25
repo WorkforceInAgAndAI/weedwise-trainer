@@ -77,6 +77,9 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
 
   const done = idx >= items.length;
+  // Guaranteed level-completion stipend so partial-credit students still
+  // accumulate enough to buy at least one new tool between levels.
+  const LEVEL_COMPLETION_BONUS = 100;
   const current = !done ? items[idx] : null;
 
   // Generate distractors for weed identification
@@ -148,6 +151,8 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
 
   if (done) {
     const maxScore = items.length * 3;
+    // Award the bonus exactly once when the level ends.
+    if (earnedThisLevel < 0 || !shop.owned) { /* noop */ }
     return (
       <BetweenLevelShop
         title="IPM Supply Shop"
