@@ -247,6 +247,14 @@ export default function PracticeHub({
     setScreen('games');
   }, [initialGrade, initialGameId]);
 
+  // Ensure body class is cleared whenever we leave the playing screen or unmount.
+  useEffect(() => {
+    if (screen !== 'playing') {
+      document.body.classList.remove('practice-game-active');
+    }
+    return () => document.body.classList.remove('practice-game-active');
+  }, [screen]);
+
  const selectGrade = (g: string) => { setSelectedGrade(g); setScreen('games'); };
  const selectGame = (g: GameDef) => { setSelectedGame(g); setScreen('info'); };
  const backToGames = () => { setSelectedGame(null); setScreen('games'); };
