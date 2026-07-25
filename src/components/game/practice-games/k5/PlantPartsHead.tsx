@@ -485,6 +485,8 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
   const [usedIds, setUsedIds] = useState<Set<string>>(new Set());
   const [showResult, setShowResult] = useState(false);
   const [dragItem, setDragItem] = useState<PaletteItem | null>(null);
+  // Show a real reference photo of the weed before students start building.
+  const [showPreview, setShowPreview] = useState(true);
 
   const availablePalette = roundData.palette.filter(p => !usedIds.has(p.id));
   const slotsFilled = Object.keys(placements).length;
@@ -531,6 +533,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
     setPlacements({});
     setUsedIds(new Set());
     setShowResult(false);
+    setShowPreview(true);
   }
 
   function resetRound() {
