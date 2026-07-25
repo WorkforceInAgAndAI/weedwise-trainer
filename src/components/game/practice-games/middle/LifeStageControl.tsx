@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import FloatingCoach from '@/components/game/FloatingCoach';
@@ -31,14 +31,16 @@ const QUESTIONS_PER_ROUND = 5;
 // Only Hand Pull + Cultivation are free to start. Everything else must be
 // bought between levels. Prices are tuned so a student earning full marks
 // on 5 questions ($100 × 5 = $500) can afford one mid-tier tool per level.
+// Prices tuned so any student who earns partial credit ($25 avg × 5 = $125)
+// can afford at least one tool between levels. A perfect run ($500) can buy
+// two or three, keeping progression brisk.
 const SHOP_CATALOG: ShopItem[] = [
-  { id: 'hoe',        name: 'Hoe & Hand-Pull Kit',   cost: 100, tag: 'Mechanical', desc: 'Unlocks Hand Pull for any weed. (Starter)' },
-  { id: 'pre-herb',   name: 'Pre-Emergence Herbicide', cost: 250, tag: 'Chemical',   desc: 'Unlocks Pre-emergence Herbicide.' },
-  { id: 'post-herb',  name: 'Post-Emergence Herbicide', cost: 300, tag: 'Chemical',   desc: 'Unlocks Post-emergence Herbicide.' },
-  { id: 'mow',        name: 'Mower',                 cost: 275, tag: 'Mechanical', desc: 'Unlocks Mow / Cut.' },
-  { id: 'cover-crop', name: 'Cover-Crop Seed',       cost: 325, tag: 'Cultural',   desc: 'Unlocks Cover Crops / Competition.' },
-  { id: 'spot-spray', name: 'Precision Spot Sprayer', cost: 450, tag: 'Chemical',   desc: 'Unlocks Spot Spray Treatment.' },
-  { id: 'biocontrol', name: 'Biocontrol Release',    cost: 400, tag: 'Biological', desc: 'Unlocks Biological Control.' },
+  { id: 'pre-herb',   name: 'Pre-Emergence Herbicide',  cost: 125, tag: 'Chemical',   desc: 'Unlocks Pre-emergence Herbicide.' },
+  { id: 'post-herb',  name: 'Post-Emergence Herbicide', cost: 150, tag: 'Chemical',   desc: 'Unlocks Post-emergence Herbicide.' },
+  { id: 'mow',        name: 'Mower',                    cost: 125, tag: 'Mechanical', desc: 'Unlocks Mow / Cut.' },
+  { id: 'cover-crop', name: 'Cover-Crop Seed',          cost: 175, tag: 'Cultural',   desc: 'Unlocks Cover Crops / Competition.' },
+  { id: 'spot-spray', name: 'Precision Spot Sprayer',   cost: 225, tag: 'Chemical',   desc: 'Unlocks Spot Spray Treatment.' },
+  { id: 'biocontrol', name: 'Biocontrol Release',       cost: 200, tag: 'Biological', desc: 'Unlocks Biological Control.' },
 ];
 
 const STARTER_OWNED = ['hand-pull', 'cultivate'];
@@ -75,6 +77,16 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
 
   const done = idx >= items.length;
+  // Guaranteed level-completion stipend so partial-credit students still
+  // accumulate enough to buy at least one new tool between levels.
+  const LEVEL_COMPLETION_BONUS = 100;
+  useEffect(() => {
+    if (done) {
+      shop.earn(LEVEL_COMPLETION_BONUS);
+      setEarnedThisLevel(v => v + LEVEL_COMPLETION_BONUS);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
   const current = !done ? items[idx] : null;
 
   // Generate distractors for weed identification
@@ -84,14 +96,19 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
     return shuffle([current.weed, ...others]);
   }, [idx, current?.weed.id]);
 
-  // Pick 4-5 control options shuffled, including valid ones for current stage
+  // Pick 5 control options. GUARANTEE every owned tool is included so
+  // students always have at least one clickable answer (progression must
+  // never be blocked by an all-locked option set). Then fill with valid
+  // options for the current stage, then invalid distractors.
   const controlOptions = useMemo(() => {
     if (!current) return [];
-    const valid = CONTROLS.filter(c => c.stages.includes(current.stage));
-    const invalid = CONTROLS.filter(c => !c.stages.includes(current.stage));
-    const picked = [...valid, ...shuffle(invalid).slice(0, Math.max(0, 5 - valid.length))];
+    const ownedSet = new Set(shop.owned);
+    const owned = CONTROLS.filter(c => ownedSet.has(c.id));
+    const valid = CONTROLS.filter(c => c.stages.includes(current.stage) && !ownedSet.has(c.id));
+    const rest  = CONTROLS.filter(c => !c.stages.includes(current.stage) && !ownedSet.has(c.id));
+    const picked = [...owned, ...valid, ...shuffle(rest)].slice(0, Math.max(5, owned.length + 1));
     return shuffle(picked);
-  }, [idx, current?.stage]);
+  }, [idx, current?.stage, shop.owned]);
 
   const validControlIds = current ? CONTROLS.filter(c => c.stages.includes(current.stage)).map(c => c.id) : [];
 
@@ -108,7 +125,8 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   };
 
   const handleControl = (cId: string) => {
-    if (!shop.owns(cId)) return; // locked tool — must buy in shop
+    // Locked tools are visible for awareness but not selectable.
+    if (!shop.owns(cId)) return;
     setControlAnswer(cId);
     const stageOk = stageAnswer === current!.stage;
     const weedOk = weedAnswer === current!.weed.id;

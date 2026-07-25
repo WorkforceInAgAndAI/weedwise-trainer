@@ -29,14 +29,14 @@ const ALL_METHODS: Method[] = [
 // Start with only the two simplest tools — buy the rest between levels.
 const STARTER_OWNED = ['hoe', 'pull'];
 const SHOP_CATALOG: ShopItem[] = [
-  { id: 'cultivate',  name: 'Cultivator',              cost: 200, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
-  { id: 'tillage',    name: 'Tillage Equipment',        cost: 250, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
-  { id: 'mow',        name: 'Mower',                    cost: 200, tag: 'Mechanical', desc: 'Unlocks Mowing.' },
-  { id: 'cover',      name: 'Cover-Crop Seed',          cost: 300, tag: 'Cultural',   desc: 'Unlocks Cover Crop.' },
-  { id: 'rotate',     name: 'Rotation Planning',        cost: 250, tag: 'Cultural',   desc: 'Unlocks Crop Rotation.' },
-  { id: 'pre',        name: 'Pre-emergent Herbicide',   cost: 300, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
-  { id: 'post',       name: 'Post-emergent Herbicide',  cost: 350, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
-  { id: 'spot-spray', name: 'Precision Spot Sprayer',   cost: 450, tag: 'Chemical',   desc: 'Unlocks Spot-spray Herbicide.' },
+  { id: 'cultivate',  name: 'Cultivator',              cost: 120, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
+  { id: 'tillage',    name: 'Tillage Equipment',       cost: 150, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
+  { id: 'mow',        name: 'Mower',                   cost: 120, tag: 'Mechanical', desc: 'Unlocks Mowing.' },
+  { id: 'cover',      name: 'Cover-Crop Seed',         cost: 175, tag: 'Cultural',   desc: 'Unlocks Cover Crop.' },
+  { id: 'rotate',     name: 'Rotation Planning',       cost: 150, tag: 'Cultural',   desc: 'Unlocks Crop Rotation.' },
+  { id: 'pre',        name: 'Pre-emergent Herbicide',  cost: 175, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
+  { id: 'post',       name: 'Post-emergent Herbicide', cost: 200, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
+  { id: 'spot-spray', name: 'Precision Spot Sprayer',  cost: 250, tag: 'Chemical',   desc: 'Unlocks Spot-spray Herbicide.' },
 ];
 
 // Diversified per-species best methods. Different species → different recommended controls.
@@ -199,6 +199,15 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     if (round < ROUNDS_PER_LEVEL) { setRound(r => r + 1); resetRound(); }
   };
   const isLevelDone = round === ROUNDS_PER_LEVEL && showReview;
+  // Guaranteed level-completion stipend so no student can be stuck at $0.
+  useEffect(() => {
+    if (isLevelDone) {
+      const BONUS = 100;
+      shop.earn(BONUS);
+      setEarnedThisLevel(v => v + BONUS);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLevelDone]);
   const nextLevel = () => { setLevel(l => l + 1); setRound(1); setScore(0); setEarnedThisLevel(0); setShowShop(false); resetRound(); };
   const startOver = () => { setLevel(1); setRound(1); setScore(0); shop.reset(); setEarnedThisLevel(0); setShowShop(false); resetRound(); };
 

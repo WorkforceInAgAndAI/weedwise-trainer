@@ -22,18 +22,21 @@ const TOTAL_ROUNDS = 2;
 
 // Kills award crop revenue that flows into the persistent shop wallet.
 const REVENUE_PER_KILL = 40;
+// Guaranteed end-of-level scouting stipend so a student who mismatches every
+// spray still accumulates enough to unlock a new chemical and progress.
+const LEVEL_COMPLETION_BONUS = 150;
 
 // Students START with only 2 basic MOAs. New herbicides must be UNLOCKED
 // between levels using earnings. This maps MOA ids -> shop items.
 const STARTER_MOAS = ['glyphosate', 'atrazine'];
 const SHOP_CATALOG: ShopItem[] = [
-  { id: '2,4-D',        name: '2,4-D (Auxin)',                cost: 200, tag: 'Broadleaf', desc: 'Cheap, effective on many broadleaves.' },
-  { id: 'dicamba',      name: 'Dicamba (Auxin)',              cost: 350, tag: 'Broadleaf', desc: 'Premium auxin for tough broadleaves.' },
-  { id: 'glufosinate',  name: 'Glufosinate (GS)',             cost: 400, tag: 'Contact',   desc: 'Non-selective contact burndown.' },
-  { id: 'mesotrione',   name: 'Mesotrione (HPPD)',            cost: 300, tag: 'Bleacher',  desc: 'Bleaches broadleaves & some grasses.' },
-  { id: 'metolachlor',  name: 'S-Metolachlor (VLCFA)',        cost: 250, tag: 'Pre-plant', desc: 'Pre-emerge for grasses & small-seeded broadleaves.' },
-  { id: 'clethodim',    name: 'Clethodim (ACCase)',           cost: 300, tag: 'Grass',     desc: 'Selective grass killer.' },
-  { id: 'fomesafen',    name: 'Fomesafen (PPO)',              cost: 350, tag: 'Broadleaf', desc: 'PPO for resistant broadleaves.' },
+  { id: '2,4-D',        name: '2,4-D (Auxin)',         cost: 125, tag: 'Broadleaf', desc: 'Cheap, effective on many broadleaves.' },
+  { id: 'dicamba',      name: 'Dicamba (Auxin)',       cost: 200, tag: 'Broadleaf', desc: 'Premium auxin for tough broadleaves.' },
+  { id: 'glufosinate',  name: 'Glufosinate (GS)',      cost: 225, tag: 'Contact',   desc: 'Non-selective contact burndown.' },
+  { id: 'mesotrione',   name: 'Mesotrione (HPPD)',     cost: 175, tag: 'Bleacher',  desc: 'Bleaches broadleaves & some grasses.' },
+  { id: 'metolachlor',  name: 'S-Metolachlor (VLCFA)', cost: 150, tag: 'Pre-plant', desc: 'Pre-emerge for grasses & small-seeded broadleaves.' },
+  { id: 'clethodim',    name: 'Clethodim (ACCase)',    cost: 175, tag: 'Grass',     desc: 'Selective grass killer.' },
+  { id: 'fomesafen',    name: 'Fomesafen (PPO)',       cost: 200, tag: 'Broadleaf', desc: 'PPO for resistant broadleaves.' },
 ];
 
 function buildField(level: number, round: number): FieldWeed[] {
@@ -74,6 +77,12 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
 
+  useEffect(() => {
+    if (showShop) {
+      addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: items.length * TOTAL_ROUNDS });
+    }
+  }, [showShop]);
+
   const toggle = (id: string) => {
     if (phase !== 'select') return;
     setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
@@ -112,7 +121,11 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   const nextRound = () => {
     if (round < TOTAL_ROUNDS) setRound(r => r + 1);
-    else setShowShop(true); // end of level -> shop
+    else {
+      shop.earn(LEVEL_COMPLETION_BONUS);
+      setEarnedThisLevel(v => v + LEVEL_COMPLETION_BONUS);
+      setShowShop(true); // end of level -> shop
+    }
   };
 
   const sprayAgain = () => {
@@ -128,7 +141,6 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const startOver = () => { setLevel(1); shop.reset(); restart(); };
 
   if (showShop) {
-    addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: items.length * TOTAL_ROUNDS });
     return (
       <BetweenLevelShop
         title="Herbicide Locker"
