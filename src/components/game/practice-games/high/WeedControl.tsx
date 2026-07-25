@@ -22,10 +22,10 @@ const METHODS = [
 
 const STARTER_OWNED = ['hoe', 'pull'];
 const SHOP_CATALOG: ShopItem[] = [
-  { id: 'cultivate', name: 'Cultivator',              cost: 200, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
-  { id: 'tillage',   name: 'Tillage Equipment',        cost: 275, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
-  { id: 'pre',       name: 'Pre-emergent Herbicide',   cost: 350, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
-  { id: 'post',      name: 'Post-emergent Herbicide',  cost: 400, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
+  { id: 'cultivate', name: 'Cultivator',              cost: 150, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
+  { id: 'tillage',   name: 'Tillage Equipment',       cost: 200, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
+  { id: 'pre',       name: 'Pre-emergent Herbicide',  cost: 225, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
+  { id: 'post',      name: 'Post-emergent Herbicide', cost: 275, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
 ];
 
 function getBestMethod(w: typeof weeds[0]): string {
