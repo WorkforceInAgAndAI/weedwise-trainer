@@ -2,47 +2,43 @@ import { useState, useMemo, useEffect } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import soybeanBg from '@/assets/images/soybean_field_1.jpg';
-import { Droplets, AlertTriangle, Target, DollarSign } from 'lucide-react';
+import { Target, DollarSign, Lock } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
-import LevelComplete from '@/components/game/LevelComplete';
 import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
   getBestMOAForWeed,
 } from '@/data/herbicides';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import BetweenLevelShop from '@/components/game/BetweenLevelShop';
+import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 interface FieldWeed { id: string; weed: typeof weeds[0]; x: number; y: number; killed: boolean }
 
-const TOTAL_ROUNDS = 3;
+// Fewer rounds per level so students earn faster and reach the shop sooner.
+const TOTAL_ROUNDS = 2;
 
-// Each herbicide has a real-world cost. Students must budget: spraying more
-// or spraying pricey MOAs eats into their money. Kills award crop revenue,
-// but wasted sprays sink the P&L. This forces intentional choices instead of
-// "just try one and see."
-const STARTING_BUDGET = 500;
+// Kills award crop revenue that flows into the persistent shop wallet.
 const REVENUE_PER_KILL = 40;
-const MOA_COST: Record<string, number> = {
-  glyphosate: 20,      // cheap, broad
-  atrazine: 25,
-  '2,4-D': 25,
-  dicamba: 55,         // premium
-  glufosinate: 60,
-  mesotrione: 45,
-  metolachlor: 40,
-  paraquat: 50,
-  clethodim: 45,
-  fomesafen: 50,
-};
-const DEFAULT_COST = 40;
-const costFor = (moaId: string) => MOA_COST[moaId] ?? DEFAULT_COST;
+
+// Students START with only 2 basic MOAs. New herbicides must be UNLOCKED
+// between levels using earnings. This maps MOA ids -> shop items.
+const STARTER_MOAS = ['glyphosate', 'atrazine'];
+const SHOP_CATALOG: ShopItem[] = [
+  { id: '2,4-D',        name: '2,4-D (Auxin)',                cost: 200, tag: 'Broadleaf', desc: 'Cheap, effective on many broadleaves.' },
+  { id: 'dicamba',      name: 'Dicamba (Auxin)',              cost: 350, tag: 'Broadleaf', desc: 'Premium auxin for tough broadleaves.' },
+  { id: 'glufosinate',  name: 'Glufosinate (GS)',             cost: 400, tag: 'Contact',   desc: 'Non-selective contact burndown.' },
+  { id: 'mesotrione',   name: 'Mesotrione (HPPD)',            cost: 300, tag: 'Bleacher',  desc: 'Bleaches broadleaves & some grasses.' },
+  { id: 'metolachlor',  name: 'S-Metolachlor (VLCFA)',        cost: 250, tag: 'Pre-plant', desc: 'Pre-emerge for grasses & small-seeded broadleaves.' },
+  { id: 'clethodim',    name: 'Clethodim (ACCase)',           cost: 300, tag: 'Grass',     desc: 'Selective grass killer.' },
+  { id: 'fomesafen',    name: 'Fomesafen (PPO)',              cost: 350, tag: 'Broadleaf', desc: 'PPO for resistant broadleaves.' },
+];
 
 function buildField(level: number, round: number): FieldWeed[] {
   const pool = shuffle(weeds);
   const offset = ((level - 1) * TOTAL_ROUNDS + round) * 5;
-  // 12 weeds, 4-5 distinct species — encourages MOA tradeoffs
   const speciesCount = 4 + Math.floor(Math.random() * 2);
   const species = pool.slice(offset % pool.length, (offset % pool.length) + speciesCount);
   const items: FieldWeed[] = [];
@@ -65,13 +61,15 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const msPool = useMemo(() => getMiddleSchoolMOAs(), []);
+  const shop = usePracticeShop('herbicide-applicator', STARTER_MOAS, 0);
+  const [earnedThisLevel, setEarnedThisLevel] = useState(0);
+  const [showShop, setShowShop] = useState(false);
   const [round, setRound] = useState(1);
   const [items, setItems] = useState<FieldWeed[]>(() => buildField(1, 1));
   const [selected, setSelected] = useState<string[]>([]);
   const [appliedMOA, setAppliedMOA] = useState<string | null>(null);
   const [phase, setPhase] = useState<'select' | 'choose' | 'result'>('select');
   const [score, setScore] = useState(0);
-  const [budget, setBudget] = useState(STARTING_BUDGET);
   const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number }[]>([]);
 
   useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
@@ -93,13 +91,10 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   };
 
   const apply = (moaId: string) => {
+    if (!shop.owns(moaId)) return;
     const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
     let killed = 0;
-    const cost = costFor(moaId);
-    // Broadcast effect: herbicide doesn't discriminate. Any LIVING plant in the
-    // field whose best MOA matches the chosen herbicide also dies, even if the
-    // student didn't individually select it. This models how a sprayed broadleaf
-    // herbicide takes out every susceptible broadleaf it contacts.
+    // Broadcast effect: herbicide kills every susceptible plant it contacts.
     setItems(prev => prev.map(it => {
       if (it.killed) return it;
       const best = getBestMOAForWeed(it.weed);
@@ -108,17 +103,18 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
     }));
     setAppliedMOA(moaId);
     setScore(s => s + killed);
-    setBudget(b => b - cost + killed * REVENUE_PER_KILL);
+    const revenue = killed * REVENUE_PER_KILL;
+    shop.earn(revenue);
+    setEarnedThisLevel(v => v + revenue);
     setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length }]);
     setPhase('result');
   };
 
   const nextRound = () => {
     if (round < TOTAL_ROUNDS) setRound(r => r + 1);
-    else setPhase('result'); // last round end
+    else setShowShop(true); // end of level -> shop
   };
 
-  // Continue selecting more weeds in the SAME round (after an application).
   const sprayAgain = () => {
     setSelected([]);
     setAppliedMOA(null);
@@ -126,29 +122,44 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   };
 
   const livingCount = items.filter(i => !i.killed).length;
-  const isLevelDone = round === TOTAL_ROUNDS && phase === 'result' && appliedMOA && livingCount === 0;
-  const finished = isLevelDone;
 
-  const restart = () => { setRound(1); setScore(0); setBudget(STARTING_BUDGET); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); };
+  const restart = () => { setRound(1); setScore(0); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); setEarnedThisLevel(0); setShowShop(false); };
   const nextLevelFn = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); restart(); };
+  const startOver = () => { setLevel(1); shop.reset(); restart(); };
 
-  if (finished) {
+  if (showShop) {
     addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: items.length * TOTAL_ROUNDS });
+    return (
+      <BetweenLevelShop
+        title="Herbicide Locker"
+        level={level}
+        score={score}
+        total={items.length * TOTAL_ROUNDS}
+        money={shop.money}
+        owned={shop.owned}
+        earnedThisLevel={earnedThisLevel}
+        catalog={SHOP_CATALOG}
+        onBuy={shop.buy}
+        onContinue={nextLevelFn}
+        onStartOver={startOver}
+        onBack={onBack}
+        gradeLabel="6-8"
+      />
+    );
   }
 
-  // Top MOA candidates from MS pool — show 4 options
+  // Show only MOAs the student has unlocked (plus starter set).
   const moaOptions = useMemo(() => {
-    return msPool.slice(0, 5);
-  }, [msPool]);
+    return msPool.filter(m => shop.owns(m.id));
+  }, [msPool, shop.owned]);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Herbicide Applicator</h1>
-        <span className={`text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 ${budget >= 0 ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' : 'bg-destructive/15 text-destructive'}`}>
-          <DollarSign className="w-3 h-3" />{budget}
+        <span className="text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+          <DollarSign className="w-3 h-3" />{shop.money}
         </span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">Round {round}/{TOTAL_ROUNDS}</span>
@@ -209,21 +220,28 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
           {phase === 'choose' && (
             <>
               <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Step 2: Pick a mode of action</p>
-              <p className="text-xs text-muted-foreground">Which herbicide will control the most of your selected weeds?</p>
+              <p className="text-xs text-muted-foreground">Which of YOUR unlocked herbicides matches these weeds best?</p>
               <div className="space-y-2">
+                {moaOptions.length === 0 && (
+                  <p className="text-xs text-destructive font-bold">No herbicides unlocked yet — save up between levels!</p>
+                )}
                 {moaOptions.map(m => (
                   <button key={m.id} onClick={() => apply(m.id)}
-                    disabled={budget < costFor(m.id)}
-                    className="w-full p-2.5 rounded-lg border-2 border-border bg-background hover:border-primary text-left disabled:opacity-40 disabled:cursor-not-allowed">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-bold text-foreground">{m.moa} (Group {m.group})</span>
-                      <span className="text-[11px] font-bold text-amber-700 dark:text-amber-300 inline-flex items-center"><DollarSign className="w-3 h-3" />{costFor(m.id)}</span>
-                    </div>
+                    className="w-full p-2.5 rounded-lg border-2 border-border bg-background hover:border-primary text-left">
+                    <span className="text-xs font-bold text-foreground">{m.moa} (Group {m.group})</span>
                     <span className="text-[10px] text-muted-foreground block">Chemical: {m.brands[0]}</span>
                   </button>
                 ))}
               </div>
-              <p className="text-[10px] text-muted-foreground italic">Each kill earns ${REVENUE_PER_KILL}. Choose carefully — you pay whether it works or not.</p>
+              <p className="text-[10px] text-muted-foreground italic">Each kill earns ${REVENUE_PER_KILL} for your locker. Unlock more chemicals between levels.</p>
+              {msPool.some(m => !shop.owns(m.id)) && (
+                <div className="mt-2 border-t border-border pt-2">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1 inline-flex items-center gap-1"><Lock className="w-3 h-3" />Locked</p>
+                  {msPool.filter(m => !shop.owns(m.id)).slice(0,4).map(m => (
+                    <p key={m.id} className="text-[10px] text-muted-foreground">{m.moa} (Group {m.group})</p>
+                  ))}
+                </div>
+              )}
               <button onClick={() => setPhase('select')} className="w-full py-2 rounded-lg bg-secondary text-foreground font-bold text-xs">← Change Selection</button>
             </>
           )}
@@ -243,28 +261,15 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                   </div>
                 );
               })()}
-              {round < TOTAL_ROUNDS ? (
-                <>
-                  {livingCount > 0 && (
-                    <button onClick={sprayAgain} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                      Spray Again ({livingCount} weeds left) →
-                    </button>
-                  )}
-                  <button onClick={nextRound}
-                    className={`w-full py-2.5 rounded-lg font-bold text-sm ${livingCount > 0 ? 'bg-secondary text-foreground' : 'bg-primary text-primary-foreground'}`}>
-                    {livingCount > 0 ? 'End Round Early →' : 'Next Round →'}
-                  </button>
-                </>
-              ) : (
-                <>
-                  {livingCount > 0 && (
-                    <button onClick={sprayAgain} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                      Spray Again ({livingCount} weeds left) →
-                    </button>
-                  )}
-                  <LevelComplete level={level} score={score} total={items.length * TOTAL_ROUNDS} onNextLevel={nextLevelFn} onStartOver={startOver} onBack={onBack} />
-                </>
+              {livingCount > 0 && (
+                <button onClick={sprayAgain} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+                  Spray Again ({livingCount} weeds left) →
+                </button>
               )}
+              <button onClick={nextRound}
+                className={`w-full py-2.5 rounded-lg font-bold text-sm ${livingCount > 0 ? 'bg-secondary text-foreground' : 'bg-primary text-primary-foreground'}`}>
+                {round < TOTAL_ROUNDS ? (livingCount > 0 ? 'End Round Early →' : 'Next Round →') : 'Finish Level →'}
+              </button>
             </>
           )}
 
