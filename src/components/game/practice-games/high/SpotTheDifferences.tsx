@@ -9,11 +9,12 @@ import { hasImage } from '@/lib/imageMap';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const DIOECIOUS_CANDIDATES = [
- { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Seed head is loose, soft, and feathery — tassels open up to shed pollen into the wind', femaleDesc: 'Seed head is short, dense, and compact — packed tightly with seeds along the stem' },
- { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Seed head is soft and drooping, with smooth flowers that release pollen', femaleDesc: 'Seed head is long, stiff, and bristly — covered in sharp bracts that feel prickly to touch' },
- { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Reproductive stem has clusters of small white-pink bell-shaped flowers — no long pods', femaleDesc: 'Reproductive stem develops paired slender seed pods (follicles) that split open to release silky-haired seeds' },
- { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Seed head is loose with hanging clusters of small pollen-producing flowers on thin stalks', femaleDesc: 'Seed head is dense and resinous, with protruding white pistils (hairs) at the stem nodes' },
- { id: 'Shattercane_Sorghums', name: 'Shattercane', maleDesc: 'Seed head is open and loose with feathery anthers shedding pollen — seeds shatter and drop easily at maturity', femaleDesc: 'Seed head is compact with tightly clustered, plump seeds that ripen reddish-brown before shattering off the stalk' },
+ // Descriptions never use giveaway words (pollen, pistil, anther, male, female).
+ { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Seed head is loose, soft, and feathery — tassels open up in the wind and dry quickly after shedding.', femaleDesc: 'Seed head is short, dense, and compact — packed tightly along the stem and heavy at maturity.' },
+ { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Seed head is soft and drooping, with smooth flowers and no sharp bracts.', femaleDesc: 'Seed head is long, stiff, and bristly — covered in sharp bracts that feel prickly to touch.' },
+ { id: 'Hemp_dogbane', name: 'Hemp Dogbane', maleDesc: 'Reproductive stem has clusters of small white-pink bell-shaped flowers — no long pods.', femaleDesc: 'Reproductive stem develops paired slender pods (follicles) that split open to release silky-haired seeds.' },
+ { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Seed head is loose with hanging clusters of small greenish flowers on thin stalks.', femaleDesc: 'Seed head is dense and resinous, with tight bracts and small white threads at the stem nodes.' },
+ { id: 'Shattercane_Sorghums', name: 'Shattercane', maleDesc: 'Seed head is open and loose with feathery, wispy tips that dry and drop quickly at maturity.', femaleDesc: 'Seed head is compact with tightly clustered, plump seeds that ripen reddish-brown before shattering off the stalk.' },
 ];
 
 interface Round {
@@ -37,18 +38,14 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   const rounds = useMemo(() => {
     if (availableSpecies.length === 0) return [];
     const pool = [...availableSpecies];
-    // Build 4 rounds per level using rotation
-    const result: Round[] = [];
-    for (let i = 0; i < 4; i++) {
-      const idx = ((level - 1) * 4 + i) % pool.length;
-      const sp = pool[idx];
-      const descIsForMale = Math.random() < 0.5;
-      result.push({
-        ...sp,
-        descriptionIsForMale: descIsForMale,
-      });
-    }
-    return result;
+    // Show every species each level, but flip which sex is described based
+    // on the level so students see genuinely new questions each time.
+    const startOffset = (level - 1) % pool.length;
+    const rotated = [...pool.slice(startOffset), ...pool.slice(0, startOffset)];
+    return rotated.map((sp, i) => ({
+      ...sp,
+      descriptionIsForMale: ((level + i) % 2) === 0,
+    }));
   }, [level, availableSpecies]);
 
   const [rIdx, setRIdx] = useState(0);
