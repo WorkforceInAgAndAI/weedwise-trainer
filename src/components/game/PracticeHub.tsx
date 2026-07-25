@@ -247,6 +247,14 @@ export default function PracticeHub({
     setScreen('games');
   }, [initialGrade, initialGameId]);
 
+  // Ensure body class is cleared whenever we leave the playing screen or unmount.
+  useEffect(() => {
+    if (screen !== 'playing') {
+      document.body.classList.remove('practice-game-active');
+    }
+    return () => document.body.classList.remove('practice-game-active');
+  }, [screen]);
+
  const selectGrade = (g: string) => { setSelectedGrade(g); setScreen('games'); };
  const selectGame = (g: GameDef) => { setSelectedGame(g); setScreen('info'); };
  const backToGames = () => { setSelectedGame(null); setScreen('games'); };
@@ -254,6 +262,10 @@ export default function PracticeHub({
 
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
+  // Toggle a body class so global CSS can offset fixed game overlays below the top nav.
+  if (typeof document !== 'undefined') {
+    document.body.classList.add('practice-game-active');
+  }
  const gradeLabel =
    selectedGrade === 'newk5' ? 'K-5'
    : selectedGrade === 'k5' ? '6-8'
@@ -263,22 +275,44 @@ export default function PracticeHub({
  return (
    <>
      <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
-     <button
-       onClick={backToGames}
-       className="fixed bottom-4 left-4 z-[70] inline-flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-destructive/60 bg-card text-destructive text-sm font-bold shadow-card hover:bg-destructive/10 transition-colors"
-       title="Exit this game"
-     >
-       ← Exit Game
-     </button>
-     {onOpenLearning && topicId && (
-       <button
-         onClick={() => onOpenLearning(topicId, selectedGrade, selectedGame.id)}
-         className="fixed bottom-4 right-4 z-[60] inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-primary/40 bg-card text-primary text-sm font-semibold shadow-card hover:bg-primary/10 transition-colors"
-         title="Open the related learning module"
-       >
-         <Leaf className="w-4 h-4" /> Learn more
-       </button>
-     )}
+      {/* Standardized top nav bar for every practice game */}
+      <div className="fixed top-0 left-0 right-0 z-[70] bg-card/95 backdrop-blur border-b-2 border-border shadow-card">
+        <div className="max-w-[1400px] mx-auto px-3 sm:px-5 py-2 flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={backToGames}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border-2 border-destructive/60 bg-background text-destructive text-xs sm:text-sm font-bold hover:bg-destructive/10 transition-colors"
+            title="Exit this game"
+          >
+            ← Exit
+          </button>
+          <button
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-border bg-background text-foreground text-xs sm:text-sm font-semibold hover:bg-secondary transition-colors"
+            title="Back to home"
+          >
+            <Leaf className="w-4 h-4 text-primary" /> Home
+          </button>
+          <div className="flex-1 min-w-0 text-center">
+            <p className="text-xs sm:text-sm font-bold text-foreground truncate">{selectedGame.name}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{gradeLabel}</p>
+          </div>
+          {onOpenLearning && topicId ? (
+            <button
+              onClick={() => onOpenLearning(topicId, selectedGrade, selectedGame.id)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-primary/40 bg-background text-primary text-xs sm:text-sm font-semibold hover:bg-primary/10 transition-colors"
+              title="Open the related learning module"
+            >
+              <Leaf className="w-4 h-4" /> <span className="hidden sm:inline">Learn more</span>
+            </button>
+          ) : (
+            <span className="w-[76px]" />
+          )}
+        </div>
+      </div>
+      {/* Spacer to push game content below the fixed top bar */}
+      <style>{`
+        body.practice-game-active .fixed.inset-0.z-50 { top: 56px !important; }
+      `}</style>
    </>
  );
  }
