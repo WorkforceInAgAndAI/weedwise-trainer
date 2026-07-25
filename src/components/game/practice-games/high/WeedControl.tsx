@@ -2,10 +2,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
-import LevelComplete from '@/components/game/LevelComplete';
+import BetweenLevelShop from '@/components/game/BetweenLevelShop';
+import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
+import { Lock, DollarSign } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
-const ROUNDS_PER_LEVEL = 3;
+const ROUNDS_PER_LEVEL = 2;
+const REWARD_CORRECT = 75;
+const REWARD_WRONG = 10;
 
 const METHODS = [
  { id: 'cultivate', label: 'Cultivation' },
@@ -14,6 +18,14 @@ const METHODS = [
  { id: 'pull', label: 'Hand Pull' },
  { id: 'pre', label: 'Pre-emergent Herbicide' },
  { id: 'post', label: 'Post-emergent Herbicide' },
+];
+
+const STARTER_OWNED = ['hoe', 'pull'];
+const SHOP_CATALOG: ShopItem[] = [
+  { id: 'cultivate', name: 'Cultivator',              cost: 200, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
+  { id: 'tillage',   name: 'Tillage Equipment',        cost: 275, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
+  { id: 'pre',       name: 'Pre-emergent Herbicide',   cost: 350, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
+  { id: 'post',      name: 'Post-emergent Herbicide',  cost: 400, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
 ];
 
 function getBestMethod(w: typeof weeds[0]): string {
@@ -47,6 +59,9 @@ function buildRound(level: number, round: number) {
 export default function WeedControl({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const [round, setRound] = useState(0);
+ const shop = usePracticeShop('hs-weed-control', STARTER_OWNED, 0);
+ const [earnedThisLevel, setEarnedThisLevel] = useState(0);
+ const [showShop, setShowShop] = useState(false);
 
  const fieldWeeds = useMemo(() => buildRound(level, round), [level, round]);
 
@@ -92,8 +107,12 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
  const manage = (mId: string) => {
   if (active === null) return;
+  if (!shop.owns(mId)) return;
   const correct = mId === items[active].best;
   if (correct) setScore(s => s + 1);
+  const reward = correct ? REWARD_CORRECT : REWARD_WRONG;
+  shop.earn(reward);
+  setEarnedThisLevel(v => v + reward);
   setMethodPick(mId);
   setExplanation(getMethodExplanation(items[active].weed, mId, items[active].best));
   setRoundResults(prev => [...prev, { weed: items[active].weed, correct, method: mId, best: items[active].best }]);
@@ -115,8 +134,28 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
  const isLevelDone = round === ROUNDS_PER_LEVEL - 1 && showReview;
 
- const nextLevel = () => { setLevel(l => l + 1); setRound(0); setTotalScore(0); };
- const startOver = () => { setLevel(1); setRound(0); setTotalScore(0); };
+ const nextLevel = () => { setLevel(l => l + 1); setRound(0); setTotalScore(0); setEarnedThisLevel(0); setShowShop(false); };
+ const startOver = () => { setLevel(1); setRound(0); setTotalScore(0); shop.reset(); setEarnedThisLevel(0); setShowShop(false); };
+
+ if (showShop) {
+  return (
+   <BetweenLevelShop
+    title="Weed-Control Shed"
+    level={level}
+    score={totalScore}
+    total={items.length * ROUNDS_PER_LEVEL}
+    money={shop.money}
+    owned={shop.owned}
+    earnedThisLevel={earnedThisLevel}
+    catalog={SHOP_CATALOG}
+    onBuy={shop.buy}
+    onContinue={nextLevel}
+    onStartOver={startOver}
+    onBack={onBack}
+    gradeLabel="9-12"
+   />
+  );
+ }
 
  // Round review
  if (showReview) {
@@ -149,7 +188,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
       </div>
      )}
      {isLevelDone ? (
-      <LevelComplete level={level} score={totalScore} total={items.length * ROUNDS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+      <button onClick={() => setShowShop(true)} className="w-full max-w-md mx-auto py-3 rounded-lg bg-primary text-primary-foreground font-bold block">
+       Visit Shop →
+      </button>
      ) : (
       <button onClick={nextRound} className="w-full max-w-md mx-auto py-3 rounded-lg bg-primary text-primary-foreground font-bold block">Next Round</button>
      )}
@@ -163,6 +204,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
    <div className="flex items-center gap-3 p-4 border-b border-border">
     <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
     <h1 className="font-display font-bold text-lg text-foreground">Weed Control</h1>
+    <span className="text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+     <DollarSign className="w-3 h-3" />{shop.money}
+    </span>
     <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
     <span className="text-sm text-muted-foreground">R{round + 1}/{ROUNDS_PER_LEVEL}</span>
     <span className="text-sm font-mono text-foreground">{Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}</span>
@@ -193,9 +237,20 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
      </div>
      {!methodPick ? (
       <div className="grid grid-cols-3 gap-2">
-       {METHODS.map(m => (
-        <button key={m.id} onClick={() => manage(m.id)} className="px-3 py-2 rounded-lg bg-secondary text-foreground text-xs font-medium hover:bg-primary hover:text-primary-foreground transition-colors">{m.label}</button>
-       ))}
+       {METHODS.map(m => {
+        const owned = shop.owns(m.id);
+        const shopEntry = SHOP_CATALOG.find(s => s.id === m.id);
+        return (
+         <button key={m.id} onClick={() => owned && manage(m.id)} disabled={!owned}
+          className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between gap-1 ${
+           owned ? 'bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground'
+                 : 'bg-secondary/50 text-muted-foreground cursor-not-allowed'
+          }`}>
+          <span>{m.label}</span>
+          {!owned && <span className="inline-flex items-center gap-0.5 text-[9px]"><Lock className="w-2.5 h-2.5" />{shopEntry ? `$${shopEntry.cost}` : ''}</span>}
+         </button>
+        );
+       })}
       </div>
      ) : (
       <div>
