@@ -103,8 +103,8 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
     };
   }, []);
 
-  const scrollSpeed = 70 + (level - 1) * 22; // px/sec — how fast the field scrolls DOWN past the drone
-  const spawnInterval = Math.max(520, 1050 - (level - 1) * 130);
+  const scrollSpeed = 60 + (level - 1) * 14; // px/sec — gentler ramp for young players
+  const spawnInterval = Math.max(650, 1150 - (level - 1) * 90);
 
   function beginRound() {
     spritesRef.current = [];
