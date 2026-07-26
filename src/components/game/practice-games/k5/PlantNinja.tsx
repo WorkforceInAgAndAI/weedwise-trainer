@@ -127,10 +127,10 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
         if (w.kind === 'repro') {
           missRef.current += 1;
           setMisses(missRef.current);
-          // explode into seed particles
-          for (let i = 0; i < 14; i++) {
+          // explode into a big, visible seed splatter
+          for (let i = 0; i < 26; i++) {
             const a = (Math.random() * Math.PI) - Math.PI; // upward hemisphere
-            const spd = 220 + Math.random() * 260;
+            const spd = 260 + Math.random() * 320;
             seedsRef.current.push({
               id: ++idRef.current,
               weedId: w.weedId,
@@ -139,7 +139,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
               vy: Math.sin(a) * spd,
               rot: Math.random() * 360,
               vr: (Math.random() - 0.5) * 400,
-              life: 1.6, born: now,
+              life: 2.0, born: now,
             });
           }
           floatsRef.current.push({
