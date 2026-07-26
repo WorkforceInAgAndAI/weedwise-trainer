@@ -429,7 +429,14 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
                     disabled={!!guess}
                     className={`text-left rounded-2xl border-4 p-4 flex items-center justify-between gap-3 transition-all ${state}`}
                   >
-                    <span className="font-extrabold text-xl leading-snug">{c.commonName}</span>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {guess && (
+                        <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-border shrink-0 bg-secondary">
+                          <WeedImage weedId={c.id} stage="flower" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <span className="font-extrabold text-xl leading-snug truncate">{c.commonName}</span>
+                    </div>
                     {guess && isAnswer && <Check className="w-7 h-7 text-success shrink-0" />}
                     {guess && chosen && !isAnswer && <X className="w-7 h-7 text-destructive shrink-0" />}
                   </button>
