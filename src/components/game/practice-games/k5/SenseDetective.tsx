@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import WeedImage from '@/components/game/WeedImage';
 import { weeds } from '@/data/weeds';
 import type { Weed } from '@/types/game';
 
