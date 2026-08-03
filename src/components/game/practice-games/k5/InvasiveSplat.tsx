@@ -147,8 +147,8 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         for (let i = 0; i <= steps; i++) {
           const t = i / steps;
           const r = r0 + (rEnd - r0) * t;
-          // slight tangential curl so it looks spun
-          const curl = (d.type === 'invasive' ? 0.55 : 0.25) * t;
+          // Tangential curl follows the clockwise spin of the wheel
+          const curl = (d.type === 'invasive' ? -0.55 : -0.25) * t;
           const a = angle + curl;
           const px = CENTER + Math.cos(a) * r;
           const py = CENTER + Math.sin(a) * r;
