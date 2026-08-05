@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, MessageCircle } from 'lucide-react';
 import { usePracticeStore, type StoreBand } from '@/lib/practiceStore';
 
@@ -109,24 +110,22 @@ export default function HeroBuddy({ band = 'k5', name = 'Your Weed Hero' }: { ba
     setTimeout(() => setCheering(false), 1400);
   };
 
-  if (!open) {
-    return (
+  if (typeof document === 'undefined') return null;
+
+  const node = !open ? (
       <button
         onClick={() => setOpen(true)}
         aria-label="Show your weed hero"
-        className="fixed bottom-3 left-3 z-[65] w-14 h-14 rounded-full bg-emerald-100 border-2 border-emerald-600 shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+        className="fixed bottom-4 left-4 z-[2147483000] w-16 h-16 rounded-full bg-emerald-100 border-4 border-emerald-600 shadow-2xl flex items-center justify-center hover:scale-105 transition-transform"
       >
-        <HeroCharacter ownedIds={owned} className="w-9 h-9" />
+        <HeroCharacter ownedIds={owned} className="w-11 h-11" />
       </button>
-    );
-  }
-
-  return (
-    <div className="fixed bottom-3 left-3 z-[65] flex items-end gap-2 pointer-events-none print:hidden">
+  ) : (
+    <div className="fixed bottom-4 left-4 z-[2147483000] flex items-end gap-2 pointer-events-none print:hidden">
       <button
         onClick={cheer}
         aria-label="Cheer with your weed hero"
-        className="pointer-events-auto w-[74px] h-[96px] drop-shadow-xl hover:scale-105 transition-transform"
+        className="pointer-events-auto w-[92px] h-[120px] drop-shadow-xl hover:scale-105 transition-transform"
       >
         <HeroCharacter ownedIds={owned} cheering={cheering} className="w-full h-full" />
       </button>
@@ -146,4 +145,6 @@ export default function HeroBuddy({ band = 'k5', name = 'Your Weed Hero' }: { ba
       </div>
     </div>
   );
+
+  return createPortal(node, document.body);
 }
