@@ -5,8 +5,16 @@ const STAGE_PREFIX_MAP: Record<string, string> = {
  seed: 'seed',
  seedling: 'seedling',
  vegetative: 'leaf',
- flower: 'repro',
- whole: 'repro',
+ leaf: 'leaf',
+ flower: 'reprof',
+ whole: 'reprof',
+ mature: 'reprof',
+ plant: 'reprof',
+ reproductive: 'reprof',
+ repro: 'reprof',
+ seedhead: 'repros',
+ fruit: 'repros',
+ repros: 'repros',
  ligule: 'lig',
  male: 'male',
  female: 'female',
@@ -15,13 +23,20 @@ const STAGE_PREFIX_MAP: Record<string, string> = {
  underground: 'underground',
 };
 
+/** Reproductive images have no variant number: reprof_.jpg / repros_.jpg */
+const NO_VARIANT_PREFIXES = ['reprof', 'repros'];
+
 export function getImageSrc(weedId: string, stage: string, variant: 1 | 2 = 1, ext = 'jpg') {
  // Handle herbicide injury images like "g_01"
  if (stage.startsWith('g_')) {
   const filename = `Herbicide_Injury_Images/${stage}.${ext}`;
   return resolveImageUrl(weedId, filename) || `/images/${weedId}/Herbicide_Injury_Images/${filename}`;
  }
- const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
+ const prefix = STAGE_PREFIX_MAP[stage.toLowerCase()] || 'leaf';
+ if (NO_VARIANT_PREFIXES.includes(prefix)) {
+  const filename = `${prefix}_.${ext}`;
+  return resolveImageUrl(weedId, filename) || `/images/${weedId}/${filename}`;
+ }
  // male/female images don't have variant numbers
  if (stage === 'male' || stage === 'female') {
   const filename = `${prefix}.${ext}`;
@@ -37,6 +52,7 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
  // Build ordered list of resolved image URLs synchronously
  const resolvedAttempts = useMemo(() => {
   const exts = ['jpg', 'jpeg', 'png', 'webp'];
+  const key = stage.toLowerCase();
 
   // Handle herbicide injury images
   if (stage.startsWith('g_')) {
@@ -49,8 +65,8 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
   }
 
   // Male/female images (no variant number)
-  if (stage === 'male' || stage === 'female') {
-   const prefix = stage;
+  if (key === 'male' || key === 'female') {
+   const prefix = key;
    const urls: string[] = [];
    // Prefer seed-head variants when available — they're the clearest way to tell male vs. female apart
    for (const ext of exts) {
@@ -64,20 +80,30 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
    return urls;
   }
 
-  // Deterministic variant per (weedId, stage). Random selection here would
-  // reshuffle whenever the component re-mounts (e.g. a weed card moves between
-  // DOM parents in drag-and-drop games), which read to students as "the
-  // picture changed mid-round". A stable hash keeps the same image for the
-  // life of a round while still varying across weeds.
-  let variant: 1 | 2;
-  if (preferredVariant) {
-   variant = preferredVariant;
-  } else {
-   const hash = `${weedId}|${stage}`.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
-   variant = Math.abs(hash) % 2 === 0 ? 1 : 2;
+  const prefixForStage = STAGE_PREFIX_MAP[key] || 'leaf';
+
+  // Reproductive images: single file per type (reprof_ = flower, repros_ = seed head).
+  if (NO_VARIANT_PREFIXES.includes(prefixForStage)) {
+   const urls: string[] = [];
+   for (const ext of exts) {
+    const url = resolveImageUrl(weedId, `${prefixForStage}_.${ext}`);
+    if (url) urls.push(url);
+   }
+   // Legacy numbered reproductive files, then the other reproductive type.
+   for (const name of ['repro_1', 'repro_2', 'repror_', prefixForStage === 'reprof' ? 'repros_' : 'reprof_']) {
+    for (const ext of exts) {
+     const url = resolveImageUrl(weedId, `${name}.${ext}`);
+     if (url) urls.push(url);
+    }
+   }
+   return urls;
   }
+
+  // Same variant for every weed at a given stage, so side-by-side comparisons
+  // (look-alikes, sorting games) always show the same kind of photo.
+  const variant: 1 | 2 = preferredVariant ?? 1;
   const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
-  const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
+  const prefix = prefixForStage;
   
   const urls: string[] = [];
   // Primary variant first, all extensions
@@ -91,10 +117,10 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
    if (url) urls.push(url);
   }
   // Fallback: try 'repro' stage if original stage had no images
-  if (urls.length === 0 && prefix !== 'repro') {
-   for (const v of [variant, otherVariant]) {
+  if (urls.length === 0) {
+   for (const name of ['reprof_', 'repros_']) {
     for (const ext of exts) {
-     const url = resolveImageUrl(weedId, `repro_${v}.${ext}`);
+     const url = resolveImageUrl(weedId, `${name}.${ext}`);
      if (url) urls.push(url);
     }
    }
