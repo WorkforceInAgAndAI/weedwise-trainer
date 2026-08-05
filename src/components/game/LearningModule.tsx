@@ -7316,12 +7316,6 @@ function TopicContent({
     case "dioecious": {
       const DIOECIOUS_SPECIES = [
         {
-          id: "Hemp_dogbane",
-          name: "Hemp Dogbane",
-          maleDesc: "Has clusters of small white-pink bell-shaped flowers that attract pollinators",
-          femaleDesc: "Has paired slender seed pods (follicles) that split open to release seeds with silky hairs",
-        },
-        {
           id: "Marijuana",
           name: "Marijuana",
           maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
@@ -7341,13 +7335,105 @@ function TopicContent({
         },
       ];
 
+      const MONOECIOUS_SPECIES = [
+        {
+          id: "common-ragweed",
+          name: "Common Ragweed",
+          maleDesc: "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
+          femaleDesc: "Inconspicuous clusters tucked into the leaf axils below, each maturing into a small woody bur",
+        },
+        {
+          id: "giant-ragweed",
+          name: "Giant Ragweed",
+          maleDesc: "Long, wand-like terminal racemes of tiny nodding pollen cups at the top of the stem",
+          femaleDesc: "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
+        },
+        {
+          id: "common_Cocklebur",
+          name: "Common Cocklebur",
+          maleDesc: "Rounded heads of tiny flowers at the branch tips that wither and drop soon after shedding pollen",
+          femaleDesc: "Axillary clusters lower on the stem that swell into hooked, spiny two-seeded burs",
+        },
+        {
+          id: "Burcucumber",
+          name: "Burcucumber",
+          maleDesc: "Long-stalked branched clusters of small greenish-white staminate flowers held out from the vine",
+          femaleDesc: "Short-stalked tight heads of a few flowers that develop into clustered spiny, bristly pods",
+        },
+        {
+          id: "Redroot_pigweed",
+          name: "Redroot Pigweed",
+          maleDesc: "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
+          femaleDesc: "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
+        },
+        {
+          id: "Spotted_spurge",
+          name: "Spotted Spurge",
+          maleDesc: "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
+          femaleDesc: "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
+        },
+        {
+          id: "Toothed_spurge",
+          name: "Toothed Spurge",
+          maleDesc: "Clustered tiny staminate flowers inside the cyathium, each reduced to a single stamen",
+          femaleDesc: "One pistillate flower per cyathium, exserted on a stalk, forming a smooth three-parted capsule",
+        },
+      ];
+
       const availableDioecious = DIOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
       );
+      const availableMonoecious = MONOECIOUS_SPECIES.filter(
+        (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
+      );
+
+      const renderSpeciesCard = (
+        sp: { id: string; name: string; maleDesc: string; femaleDesc: string },
+        maleLabel: string,
+        femaleLabel: string,
+      ) => {
+        const weedData = weeds.find((w) => w.id === sp.id);
+        return (
+          <div key={sp.id} className="bg-card border border-border rounded-lg p-5 space-y-4">
+            <div className="text-center">
+              <p className="font-display font-bold text-foreground text-lg">{sp.name}</p>
+              {weedData && (
+                <button
+                  onClick={() => onSelectWeed(weedData)}
+                  className="text-xs text-primary italic hover:underline cursor-pointer"
+                >
+                  {weedData.scientificName}
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-primary/30 mx-auto max-w-[12rem]">
+                  <WeedImage weedId={sp.id} stage="male" className="w-full h-full" />
+                </div>
+                <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
+                  <p className="font-bold text-foreground text-sm">{maleLabel}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{sp.maleDesc}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-accent/30 mx-auto max-w-[12rem]">
+                  <WeedImage weedId={sp.id} stage="female" className="w-full h-full" />
+                </div>
+                <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
+                  <p className="font-bold text-foreground text-sm">{femaleLabel}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{sp.femaleDesc}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
 
       return (
         <div className="space-y-5">
-          <JournalHeader title="Dioecy in Weed Biology" subtitle="Reproductive Strategy" />
+          <JournalHeader title="Dioecy & Monoecy in Weed Biology" subtitle="Reproductive Strategy" />
           <LabCallout heading="Definition">
             <p>
               Dioecious weeds are plants that have distinct <strong>female and male individual plants</strong>. This
@@ -7385,58 +7471,59 @@ function TopicContent({
           <Citation>Ward SM, Webster TM, Steckel LE. Palmer amaranth (Amaranthus palmeri): a review. Weed Technology.</Citation>
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-bold text-accent">In this group of 88 weeds, there are 4 dioecious species:</p>
-            <p className="mt-1">Hemp Dogbane, Marijuana, Palmer Amaranth, and Waterhemp.</p>
+            <p className="font-bold text-accent">In this group of weeds, there are 3 dioecious species:</p>
+            <p className="mt-1">Marijuana, Palmer Amaranth, and Waterhemp.</p>
             <p className="mt-2 text-xs text-muted-foreground">
               Look at each species profile below to learn the key differences between the male and female plants.
             </p>
           </div>
 
           {/* Species profiles with male/female images */}
-          {availableDioecious.map((sp) => {
-            const weedData = weeds.find((w) => w.id === sp.id);
-            return (
-              <div key={sp.id} className="bg-card border border-border rounded-lg p-5 space-y-4">
-                <div className="text-center">
-                  <p className="font-display font-bold text-foreground text-lg">{sp.name}</p>
-                  {weedData && (
-                    <button
-                      onClick={() => onSelectWeed(weedData)}
-                      className="text-xs text-primary italic hover:underline cursor-pointer"
-                    >
-                      {weedData.scientificName}
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-primary/30 mx-auto max-w-[12rem]">
-                      <WeedImage weedId={sp.id} stage="male" className="w-full h-full" />
-                    </div>
-                    <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 text-center">
-                      <p className="font-bold text-foreground text-sm">Male Plant</p>
-                      <p className="text-xs text-muted-foreground mt-1">{sp.maleDesc}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-32 sm:h-40 rounded-xl overflow-hidden bg-muted border-2 border-accent/30 mx-auto max-w-[12rem]">
-                      <WeedImage weedId={sp.id} stage="female" className="w-full h-full" />
-                    </div>
-                    <div className="bg-accent/10 border border-accent/30 rounded-lg p-3 text-center">
-                      <p className="font-bold text-foreground text-sm">Female Plant</p>
-                      <p className="text-xs text-muted-foreground mt-1">{sp.femaleDesc}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {availableDioecious.map((sp) => renderSpeciesCard(sp, "Male Plant", "Female Plant"))}
 
           {availableDioecious.length === 0 && (
             <div className="bg-secondary rounded-lg p-6 text-center">
               <p className="text-muted-foreground">
                 Male and female images (male.jpg, female.jpg) need to be uploaded to weed image folders to display here.
+              </p>
+            </div>
+          )}
+
+          {/* ── Monoecious section ── */}
+          <JournalHeader title="Monoecious Weeds" subtitle="Both Sexes, One Plant" />
+          <LabCallout heading="Definition">
+            <p>
+              Monoecious weeds carry <strong>separate male (staminate) and female (pistillate) flowers on the same
+              individual plant</strong>, usually in different positions — one near the stem tips and the other lower
+              down or tucked into the leaf axils.
+            </p>
+          </LabCallout>
+          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
+            <p>
+              Because every plant can set seed on its own, a <strong>single escaped individual can reinfest a
+              field</strong> — there is no requirement for a mate nearby. Many monoecious weeds are still largely
+              wind-pollinated and outcrossing, so genetic diversity remains high.
+            </p>
+            <p>
+              Scouting means knowing <strong>where each flower type sits</strong>: terminal spikes shedding pollen
+              above, and the seed-producing structures — burs, capsules, or bristly clusters — below or within the
+              leaf axils. Timing control before those lower structures mature is what prevents seed return.
+            </p>
+          </div>
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
+            <p className="font-bold text-accent">Monoecious species in this collection:</p>
+            <p className="mt-1">
+              Common Ragweed, Giant Ragweed, Common Cocklebur, Burcucumber, Redroot Pigweed, Spotted Spurge, and
+              Toothed Spurge.
+            </p>
+          </div>
+
+          {availableMonoecious.map((sp) => renderSpeciesCard(sp, "Male Flowers", "Female Flowers"))}
+
+          {availableMonoecious.length === 0 && (
+            <div className="bg-secondary rounded-lg p-6 text-center">
+              <p className="text-muted-foreground">
+                Male and female flower images need to be uploaded to these weed image folders to display here.
               </p>
             </div>
           )}
