@@ -258,7 +258,6 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
     );
   }
 
-  const StageIcon = stage.Icon;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto"
