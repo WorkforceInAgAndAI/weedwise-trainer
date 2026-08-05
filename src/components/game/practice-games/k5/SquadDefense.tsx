@@ -138,6 +138,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
             weakness: spec.weakness,
             name: spec.name,
             hint: spec.hint,
+            weedId: spec.weedId,
             flash: null,
           }];
         });
