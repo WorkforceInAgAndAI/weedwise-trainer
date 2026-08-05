@@ -208,6 +208,47 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
           <span className="text-xs px-2 py-0.5 rounded-full bg-white/80 text-foreground font-bold">Rolls: {rolls}</span>
         </div>
 
+        {/* Race scoreboard */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="rounded-2xl bg-white/85 border-2 border-primary p-3 shadow">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                <Sprout className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">You</p>
+                <p className="font-bold text-sm text-foreground leading-tight">Tile {tile} / {BOARD_SIZE}</p>
+              </div>
+              {dice && <span className="text-lg font-black text-primary">{dice}</span>}
+            </div>
+            <div className="h-2 rounded-full bg-secondary overflow-hidden mt-2">
+              <div className="h-full bg-primary transition-all" style={{ width: `${(tile / BOARD_SIZE) * 100}%` }} />
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white/85 border-2 border-rose-400 p-3 shadow">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center text-base">
+                {rival.emoji}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                  <Bot className="w-3 h-3" /> {rival.name}
+                </p>
+                <p className="font-bold text-sm text-foreground leading-tight">Tile {cpuTile} / {BOARD_SIZE}</p>
+              </div>
+              {cpuDice && <span className="text-lg font-black text-rose-500">{cpuDice}</span>}
+            </div>
+            <div className="h-2 rounded-full bg-secondary overflow-hidden mt-2">
+              <div className="h-full bg-rose-500 transition-all" style={{ width: `${(cpuTile / BOARD_SIZE) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-rose-50 border-2 border-rose-300 px-3 py-2 mb-3 text-xs text-rose-900 flex items-center gap-2">
+          <Trophy className="w-4 h-4 shrink-0" />
+          <span><b>{rival.name} says:</b> “{rival.taunt}” Beat the weed to seed set to win the race!</span>
+        </div>
+
         {/* Life stage banner */}
         <div className={`${stage.color} text-white rounded-2xl p-3 mb-3 flex items-center gap-3 shadow-lg`}>
           <div className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center">
