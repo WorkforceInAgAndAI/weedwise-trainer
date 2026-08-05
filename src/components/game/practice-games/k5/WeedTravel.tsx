@@ -5,6 +5,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -37,7 +38,7 @@ const ALL_SEED_CANDIDATES: Omit<SeedCharacter, 'weedId'>[] = [
 
 const WEED_IDS_FOR_SEEDS = ['marestail', 'morningglory', 'giant-ragweed', 'green-foxtail', 'kochia', 'waterhemp', 'palmer-amaranth', 'canada-thistle'];
 
-function buildSeedCharacters(count: number = 5): SeedCharacter[] {
+function buildSeedCharacters(count = 5): SeedCharacter[] {
   const available: SeedCharacter[] = [];
   WEED_IDS_FOR_SEEDS.forEach((weedId, i) => {
     if (weeds.some(w => w.id === weedId) && ALL_SEED_CANDIDATES[i]) {
@@ -47,12 +48,14 @@ function buildSeedCharacters(count: number = 5): SeedCharacter[] {
   return shuffle(available).slice(0, count);
 }
 
-// Vary the "need" thresholds each level so the same need stars don't repeat
-function getThresholdForLevel(baseThreshold: number, level: number, nodeId: string, methodIdx: number): number {
+// Vary the "need" thresholds each level so the same need stars don't repeat,
+// and skew harder as level rises so higher levels need stronger traits.
+function getThresholdForLevel(baseThreshold: number, level: number, nodeId: string, methodIdx: number, hardDistractors: boolean): number {
   // Pseudo-random seeded by level + node + option position. Thresholds 1, 2, or 3.
   const seed = level * 31 + nodeId.length * 7 + methodIdx * 3;
   const variation = (seed % 3) - 1; // -1, 0, +1
-  return Math.max(1, Math.min(3, baseThreshold + variation));
+  const bump = hardDistractors ? 1 : 0;
+  return Math.max(1, Math.min(3, baseThreshold + variation + bump));
 }
 
 interface AdventureNode {
@@ -179,13 +182,14 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 export default function WeedTravel({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
-  const seedCharacters = useMemo(() => buildSeedCharacters(5), [level]);
+  const diff = getDifficulty(level, 'k5');
+  const seedCharacters = useMemo(() => buildSeedCharacters(diff.options + 2), [level, diff.options]);
   const baseObstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
   // Apply per-level threshold variation so star requirements are not identical each round
   const obstacleSet = useMemo<AdventureNode[]>(() => baseObstacleSet.map(node => ({
     ...node,
-    options: node.options.map((opt, idx) => ({ ...opt, threshold: getThresholdForLevel(opt.threshold, level, node.id, idx) })),
-  })), [baseObstacleSet, level]);
+    options: node.options.map((opt, idx) => ({ ...opt, threshold: getThresholdForLevel(opt.threshold, level, node.id, idx, diff.hardDistractors) })),
+  })), [baseObstacleSet, level, diff.hardDistractors]);
 
   const [chosenSeed, setChosenSeed] = useState<SeedCharacter | null>(null);
   const [currentNodeId, setCurrentNodeId] = useState('start_hill');

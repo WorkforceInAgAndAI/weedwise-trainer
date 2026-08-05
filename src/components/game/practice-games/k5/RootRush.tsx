@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, AlertTriangle, Play, Droplet, Sprout, Sparkles, Mountain, Skull, Zap } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty } from '@/lib/difficulty';
 
 // -------- Root Rush (K-5 Explorer) --------------------------------------
 // You ARE a weed root growing underground. Tunnel through the soil to
@@ -102,9 +103,23 @@ function buildGrid(cfg: LevelCfg): { grid: Cell[]; start: number } {
   return { grid: cells, start };
 }
 
+function buildCfg(levelIdx: number): LevelCfg {
+  const base = LEVELS[levelIdx % LEVELS.length];
+  const diff = getDifficulty(levelIdx + 1, 'k5');
+  const bump = diff.level - 1;
+  return {
+    ...base,
+    rocks: base.rocks + bump * 2,
+    herbicide: base.herbicide + Math.floor(bump * 1.2),
+    sprouts: base.sprouts + Math.floor(bump / 2),
+    goal: base.goal + Math.floor(bump / 2),
+    startEnergy: Math.max(18, base.startEnergy - bump * 2),
+  };
+}
+
 export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [levelIdx, setLevelIdx] = useState(0);
-  const cfg = LEVELS[levelIdx];
+  const cfg = useMemo(() => buildCfg(levelIdx), [levelIdx]);
 
   const [phase, setPhase] = useState<'ready' | 'playing' | 'roundEnd'>('ready');
   const [grid, setGrid] = useState<Cell[]>([]);
@@ -122,7 +137,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
   const flashTimer = useRef<number | null>(null);
 
   const startRound = (idx: number) => {
-    const c = LEVELS[idx];
+    const c = buildCfg(idx);
     const { grid: g, start } = buildGrid(c);
     setGrid(g);
     setPath([start]);
@@ -232,16 +247,9 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
 
   const onNextLevel = () => {
     setDone(false);
-    if (levelIdx + 1 >= LEVELS.length) {
-      setLevelIdx(0);
-      setTotalScore(0);
-      setTotalPossible(0);
-      startRound(0);
-    } else {
-      const next = levelIdx + 1;
-      setLevelIdx(next);
-      startRound(next);
-    }
+    const next = levelIdx + 1;
+    setLevelIdx(next);
+    startRound(next);
   };
   const onStartOver = () => {
     setDone(false);

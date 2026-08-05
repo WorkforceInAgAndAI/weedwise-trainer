@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { ShieldAlert, Fingerprint, Gavel } from 'lucide-react';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -94,21 +95,21 @@ const CASES: Case[] = [
  },
 ];
 
-const CASES_PER_LEVEL = 4;
-
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }
 
 export default function WeedLineUp({ onBack, gameId, gameName, gradeLabel }: Props) {
  const [level, setLevel] = useState(1);
+ const diff = getDifficulty(level, 'k5');
+ const casesPerLevel = Math.min(diff.rounds, CASES.length);
  const [round, setRound] = useState(0);
  const [score, setScore] = useState(0);
  const [picked, setPicked] = useState<string | null>(null);
 
  const roundCases = useMemo(() => {
-  const offset = ((level - 1) * CASES_PER_LEVEL) % CASES.length;
+  const offset = ((level - 1) * casesPerLevel) % CASES.length;
   const rotated = [...CASES.slice(offset), ...CASES.slice(0, offset)];
-  return shuffle(rotated).slice(0, CASES_PER_LEVEL);
- }, [level]);
+  return shuffle(rotated).slice(0, casesPerLevel);
+ }, [level, casesPerLevel]);
 
  const c = roundCases[round];
  const lineup = useMemo(() => (c ? shuffle(c.lineupIds) : []), [c]);
