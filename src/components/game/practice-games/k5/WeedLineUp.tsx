@@ -179,11 +179,13 @@ export default function WeedLineUp({ onBack, gameId, gameName, gradeLabel }: Pro
         <div className="aspect-square rounded-md overflow-hidden bg-neutral-200 dark:bg-neutral-800">
         {criminal && (
          <div className="w-full h-full" style={{ filter: 'grayscale(1) contrast(1.6) brightness(0.95)' }}>
-          <WeedImage weedId={criminal.id} stage="flower" preferredVariant={1} className="w-full h-full object-cover mix-blend-multiply" />
+          {/* Sketch uses a DIFFERENT photo (leaf/vegetative) than the line-up
+              mugshots (flower) so the answer is never a pixel-match. */}
+          <WeedImage weedId={criminal.id} stage="vegetative" preferredVariant={1} className="w-full h-full object-cover mix-blend-multiply" />
          </div>
         )}
        </div>
-       <p className="text-[10px] text-center text-muted-foreground mt-2 italic">Rough sketch — no colors, no name</p>
+       <p className="text-[10px] text-center text-muted-foreground mt-2 italic">Rough leaf sketch — no colors, no name</p>
       </div>
 
       {/* Line-Up */}
