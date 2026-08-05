@@ -463,9 +463,9 @@ const TOPICS: Topic[] = [
   },
   {
     id: "dioecious",
-    name: "Dioecious Weeds",
+    name: "Dioecious & Monoecious Weeds",
     icon: "dioecious",
-    description: "Examine weeds that produce separate male and female plants and explain how this affects reproduction and control.",
+    description: "Compare weeds with separate male and female plants (dioecious) to those carrying both flower types on one plant (monoecious), and explain how this affects reproduction and control.",
     grades: ["high"],
     category: "identification",
   },
