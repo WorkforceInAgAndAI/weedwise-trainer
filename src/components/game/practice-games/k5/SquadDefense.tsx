@@ -3,6 +3,7 @@ import { ArrowLeft, Hand, Shield, Brain, Bug, Zap, Sprout, Heart, Shrub, Pause, 
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import { getDifficulty } from '@/lib/difficulty';
+import WeedImage from '@/components/game/WeedImage';
 
 type PowerKey = 'pull' | 'block' | 'outsmart' | 'eat' | 'stop';
 
