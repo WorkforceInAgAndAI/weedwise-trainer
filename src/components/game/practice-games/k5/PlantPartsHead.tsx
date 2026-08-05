@@ -680,7 +680,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                       >
                         {placed ? (
                           <div className="relative">
-                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={partSize} />
+                            <PartVisual kind={placed.kind} color={placed.color} variant={placed.variant} size={partSize} weedId={placed.weedId} stage={placed.stage} />
                             {showResult && (
                               <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center shadow" style={{ background: placed.correct ? '#16a34a' : '#dc2626' }}>
                                 {placed.correct ? <Check className="w-4 h-4 text-white" /> : <X className="w-4 h-4 text-white" />}
@@ -709,10 +709,8 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
             </div>
 
             <div className="rounded-lg border-2 border-dashed border-border bg-card p-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Parts Bin ({availablePalette.length})</p>
-              {availablePalette.length === 0 ? (
-                <p className="text-xs text-muted-foreground py-4 text-center">All parts used!</p>
-              ) : (
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Parts Bin — use each part as many times as you like</p>
+              {availablePalette.length > 0 && (
                 <div className="space-y-3">
                   {PART_ORDER.map(k => {
                     const options = availablePalette.filter(p => p.kind === k);
@@ -732,7 +730,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                               } transition-all`}
                               title={`Drag ${p.label} onto the plant`}
                             >
-                              <PartCartoon kind={p.kind} color={p.color} variant={p.variant} size={44} />
+                              <PartVisual kind={p.kind} color={p.color} variant={p.variant} size={44} weedId={p.weedId} stage={p.stage} />
                             </div>
                           ))}
                         </div>
