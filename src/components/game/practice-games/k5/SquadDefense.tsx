@@ -34,6 +34,8 @@ interface WeedVillain {
   weakness: PowerKey;
   name: string;
   hint: string;
+  /** Real species photo shown on the advancing villain. */
+  weedId: string;
   hp: number;
   maxHp: number;
   flash?: 'hit' | 'miss' | null;
@@ -42,18 +44,18 @@ interface WeedVillain {
 // Weeds pulled from the K-5 "14 Weeds You Can Spot" curriculum with the
 // weakness that matches the module's "5 ways to fight weeds" lesson.
 const WEED_POOL: Omit<WeedVillain, 'id' | 'lane' | 'pos' | 'speed' | 'hp' | 'maxHp' | 'flash'>[] = [
-  { name: 'Baby Dandelion',       weakness: 'pull',     hint: 'Just a few young weeds — YANK them out!' },
-  { name: 'Sleeping Lambsquarter Seeds', weakness: 'block', hint: 'Weed seeds waiting for sunlight — mulch stops them!' },
-  { name: 'Giant Foxtail Patch',  weakness: 'outsmart', hint: 'Sneaking into row gaps — plant thicker crops!' },
-  { name: 'Prickly Canada Thistle Hill', weakness: 'eat', hint: 'Too steep for tractors — send in the goats!' },
-  { name: 'Field-Wide Waterhemp', weakness: 'stop',     hint: 'Millions of weeds across acres — precision spray!' },
-  { name: 'One Big Bur-Cucumber', weakness: 'pull',     hint: 'A single grabby weed — pull it before it seeds!' },
-  { name: 'Bindweed Seed Storm',  weakness: 'block',    hint: 'Seeds on the wind — cover the soil!' },
-  { name: 'Weeds in Bare Spots',  weakness: 'outsmart', hint: 'Thin crop rows let weeds in — outsmart the layout!' },
-  { name: 'Pasture Ragweed',      weakness: 'eat',      hint: 'Big pasture — hungry animals to the rescue!' },
-  { name: 'Kochia Invasion',      weakness: 'stop',     hint: 'Huge fields, tough weed — call the sprayer!' },
-  { name: 'Young Velvetleaf',     weakness: 'pull',     hint: 'Small and young — pull by hand!' },
-  { name: 'Nutsedge Seed Layer',  weakness: 'block',    hint: 'Block the sun so seeds cannot wake up!' },
+  { name: 'Baby Dandelion',              weedId: 'Dandelion',       weakness: 'pull',     hint: 'Just a few young weeds — YANK them out!' },
+  { name: 'Sleeping Lambsquarters Seeds',weedId: 'lambsquarters',   weakness: 'block',    hint: 'Weed seeds waiting for sunlight — mulch stops them!' },
+  { name: 'Giant Foxtail Patch',         weedId: 'giant-foxtail',   weakness: 'outsmart', hint: 'Sneaking into row gaps — plant thicker crops!' },
+  { name: 'Prickly Canada Thistle Hill', weedId: 'canada-thistle',  weakness: 'eat',      hint: 'Too steep for tractors — send in the goats!' },
+  { name: 'Field-Wide Waterhemp',        weedId: 'waterhemp',       weakness: 'stop',     hint: 'Millions of weeds across acres — precision spray!' },
+  { name: 'One Big Burcucumber',         weedId: 'Burcucumber',     weakness: 'pull',     hint: 'A single grabby weed — pull it before it seeds!' },
+  { name: 'Field Bindweed Seed Storm',   weedId: 'Field_bindweed',  weakness: 'block',    hint: 'Seeds on the wind — cover the soil!' },
+  { name: 'Green Foxtail in Bare Spots', weedId: 'green-foxtail',   weakness: 'outsmart', hint: 'Thin crop rows let weeds in — outsmart the layout!' },
+  { name: 'Pasture Common Ragweed',      weedId: 'common-ragweed',  weakness: 'eat',      hint: 'Big pasture — hungry animals to the rescue!' },
+  { name: 'Kochia Invasion',             weedId: 'kochia',          weakness: 'stop',     hint: 'Huge fields, tough weed — call the sprayer!' },
+  { name: 'Young Velvetleaf',            weedId: 'velvetleaf',      weakness: 'pull',     hint: 'Small and young — pull by hand!' },
+  { name: 'Yellow Nutsedge Seed Layer',  weedId: 'yellow-nutsedge', weakness: 'block',    hint: 'Block the sun so seeds cannot wake up!' },
 ];
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
