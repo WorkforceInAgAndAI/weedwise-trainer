@@ -280,6 +280,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                 const v = VINES[tileNum];
                 const w = WEEDS[tileNum];
                 const isPawn = tile === tileNum;
+                const isCpu = cpuTile === tileNum;
                 const isFinish = tileNum === BOARD_SIZE;
                 return (
                   <div key={`${r}-${c}`}
@@ -296,9 +297,16 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                     {w && <span className="text-lg leading-none">🌾</span>}
                     {isFinish && <span className="text-lg leading-none">🌻</span>}
                     {isPawn && (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center justify-start pl-0.5">
                         <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg animate-bounce">
                           <Sprout className="w-4 h-4" />
+                        </div>
+                      </div>
+                    )}
+                    {isCpu && (
+                      <div className="absolute inset-0 flex items-center justify-end pr-0.5">
+                        <div className="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg text-sm">
+                          {rival.emoji}
                         </div>
                       </div>
                     )}
