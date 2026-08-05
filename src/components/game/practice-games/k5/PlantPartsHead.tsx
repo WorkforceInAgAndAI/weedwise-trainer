@@ -16,7 +16,9 @@ type PartKind = 'roots' | 'stem' | 'leaves' | 'flower' | 'seeds';
 // Each part has 3-4 visual styles so kids can build a custom plant every round.
 // Any style dropped in the matching slot counts as correct — this is a
 // creative anatomy game, not an identification quiz.
-interface PartStyle { id: string; label: string; color: string; variant: string; }
+// `weedId` + `stage` point at a real photo of that plant part. Roots have no
+// photographs in the library, so those styles fall back to the drawn art.
+interface PartStyle { id: string; label: string; color: string; variant: string; weedId?: string; stage?: string; }
 
 const PART_STYLES: Record<PartKind, PartStyle[]> = {
   roots: [
@@ -26,28 +28,28 @@ const PART_STYLES: Record<PartKind, PartStyle[]> = {
     { id: 'tuber',    label: 'Tuber (bulb)',   color: '#d97706', variant: 'tuber' },
   ],
   stem: [
-    { id: 'thick',   label: 'Thick stem',     color: '#65a30d', variant: 'thick' },
-    { id: 'grass',   label: 'Grass stalk',    color: '#84cc16', variant: 'grass' },
-    { id: 'vine',    label: 'Twisty vine',    color: '#4ade80', variant: 'vine' },
-    { id: 'prickly', label: 'Prickly stem',   color: '#4d7c0f', variant: 'prickly' },
+    { id: 'thick',   label: 'Thick stem',     color: '#65a30d', variant: 'thick',   weedId: 'common_Milkweed', stage: 'seedling' },
+    { id: 'grass',   label: 'Grass stalk',    color: '#84cc16', variant: 'grass',   weedId: 'giant-foxtail',   stage: 'seedling' },
+    { id: 'vine',    label: 'Twisty vine',    color: '#4ade80', variant: 'vine',    weedId: 'Field_bindweed',  stage: 'seedling' },
+    { id: 'prickly', label: 'Prickly stem',   color: '#4d7c0f', variant: 'prickly', weedId: 'canada-thistle',  stage: 'seedling' },
   ],
   leaves: [
-    { id: 'oval',     label: 'Oval leaf',      color: '#166534', variant: 'oval' },
-    { id: 'jagged',   label: 'Jagged leaf',    color: '#15803d', variant: 'jagged' },
-    { id: 'feathery', label: 'Feathery leaf',  color: '#14532d', variant: 'feathery' },
-    { id: 'blade',    label: 'Grass blade',    color: '#4d7c0f', variant: 'blade' },
+    { id: 'oval',     label: 'Oval leaf',      color: '#166534', variant: 'oval',     weedId: 'common_Milkweed', stage: 'vegetative' },
+    { id: 'jagged',   label: 'Jagged leaf',    color: '#15803d', variant: 'jagged',   weedId: 'Dandelion',       stage: 'vegetative' },
+    { id: 'feathery', label: 'Feathery leaf',  color: '#14532d', variant: 'feathery', weedId: 'Wild_Carrot',     stage: 'vegetative' },
+    { id: 'blade',    label: 'Grass blade',    color: '#4d7c0f', variant: 'blade',    weedId: 'giant-foxtail',   stage: 'vegetative' },
   ],
   flower: [
-    { id: 'daisy',   label: 'Daisy',          color: '#facc15', variant: 'daisy' },
-    { id: 'trumpet', label: 'Trumpet',        color: '#fce7f3', variant: 'trumpet' },
-    { id: 'pompom',  label: 'Pom-pom',        color: '#c026d3', variant: 'pompom' },
-    { id: 'lace',    label: 'Lace cluster',   color: '#f9fafb', variant: 'lace' },
+    { id: 'daisy',   label: 'Yellow flower',  color: '#facc15', variant: 'daisy',   weedId: 'Dandelion',        stage: 'flower' },
+    { id: 'trumpet', label: 'Trumpet',        color: '#fce7f3', variant: 'trumpet', weedId: 'Field_bindweed',   stage: 'flower' },
+    { id: 'pompom',  label: 'Pom-pom',        color: '#c026d3', variant: 'pompom',  weedId: 'canada-thistle',   stage: 'flower' },
+    { id: 'lace',    label: 'Lace cluster',   color: '#f9fafb', variant: 'lace',    weedId: 'Wild_Carrot',      stage: 'flower' },
   ],
   seeds: [
-    { id: 'puff',   label: 'Puffball',        color: '#e5e7eb', variant: 'puff' },
-    { id: 'pod',    label: 'Seed pod',        color: '#fde68a', variant: 'pod' },
-    { id: 'silky',  label: 'Silky seeds',     color: '#f5f5f4', variant: 'silky' },
-    { id: 'burry',  label: 'Sticky burs',     color: '#78350f', variant: 'burry' },
+    { id: 'puff',   label: 'Puffball',        color: '#e5e7eb', variant: 'puff',  weedId: 'Dandelion',        stage: 'seedhead' },
+    { id: 'pod',    label: 'Seed pod',        color: '#fde68a', variant: 'pod',   weedId: 'common_Milkweed',  stage: 'seedhead' },
+    { id: 'silky',  label: 'Silky seeds',     color: '#f5f5f4', variant: 'silky', weedId: 'canada-thistle',   stage: 'seedhead' },
+    { id: 'burry',  label: 'Bumpy seeds',     color: '#78350f', variant: 'burry', weedId: 'velvetleaf',       stage: 'seedhead' },
   ],
 };
 
