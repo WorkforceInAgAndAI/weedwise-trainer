@@ -82,7 +82,7 @@ import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 import PracticeStore from './PracticeStore';
-import HeroBuddy from './HeroBuddy-shim';
+import HeroBuddy from './HeroCharacter';
 import type { StoreBand } from '@/lib/practiceStore';
 
 interface GameDef {
@@ -278,6 +278,8 @@ export default function PracticeHub({
  return (
    <>
      <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
+      {/* Animated hero buddy keeps students company inside every game */}
+      <HeroBuddy />
       {/* Standardized top nav bar for every practice game */}
       <div className="fixed top-0 left-0 right-0 z-[70] bg-card/95 backdrop-blur border-b-2 border-border shadow-card">
         <div className="max-w-[1400px] mx-auto px-3 sm:px-5 py-2 flex items-center gap-2 sm:gap-3">
