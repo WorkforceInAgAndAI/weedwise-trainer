@@ -456,8 +456,23 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
 }
 
 // ---------- Round setup ----------------------------------------------------
-interface PaletteItem { id: string; kind: PartKind; color: string; variant: string; label: string; }
-interface Placement { kind: PartKind; color: string; variant: string; label: string; correct: boolean; }
+interface PaletteItem { id: string; kind: PartKind; color: string; variant: string; label: string; weedId?: string; stage?: string; }
+interface Placement { kind: PartKind; color: string; variant: string; label: string; correct: boolean; weedId?: string; stage?: string; }
+
+/**
+ * Renders a real photograph of the plant part when the library has one,
+ * falling back to the drawn art for roots (no root photos exist yet).
+ */
+function PartVisual({ kind, color, variant, size, weedId, stage }: { kind: PartKind; color: string; variant: string; size: number; weedId?: string; stage?: string }) {
+  if (weedId && stage) {
+    return (
+      <div className="rounded-full overflow-hidden border-2 border-white shadow-sm" style={{ width: size, height: size }}>
+        <WeedImage weedId={weedId} stage={stage} className="w-full h-full" />
+      </div>
+    );
+  }
+  return <PartCartoon kind={kind} color={color} variant={variant} size={size} />;
+}
 
 function buildRound(caseIdx: number) {
   const c = CASES[caseIdx];
@@ -466,7 +481,7 @@ function buildRound(caseIdx: number) {
   const palette: PaletteItem[] = [];
   PART_ORDER.forEach((k) => {
     PART_STYLES[k].forEach((s) => {
-      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label });
+      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label, weedId: s.weedId, stage: s.stage });
     });
   });
   return { case: c, palette: shuffle(palette) };
