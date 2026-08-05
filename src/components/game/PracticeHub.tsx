@@ -10,7 +10,7 @@ import {
  MapPin, ShieldAlert, Wrench, Target, TrendingUp,
  Droplets, ZoomIn, GraduationCap, Scan, Moon,
  Swords, ClipboardList, Footprints, Stethoscope,
- FlaskRound, Scissors
+ FlaskRound, Scissors, ShoppingBag
 } from 'lucide-react';
 
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
@@ -81,6 +81,8 @@ import CropDoctor from './practice-games/high/CropDoctor';
 import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
+import PracticeStore from './PracticeStore';
+import type { StoreBand } from '@/lib/practiceStore';
 
 interface GameDef {
  id: string;
@@ -213,7 +215,7 @@ const highGames: GameDef[] = [
  { id: 'hs-field-scout-draw', name: 'Field Scout — Draw Your Transect', Icon: Footprints, category: 'Scouting Tools', description: 'Draw your own scouting path with limited walking distance and herbicide.', howToPlay: 'Drag on the aerial field to draw a transect. You have a limited path length and 8 spot-spray charges. Score combines coverage (weeds found) and diversity (unique species) — a straight line loses to a smart zigzag.', component: FieldScoutDraw },
 ];
 
-type Screen = 'grades' | 'games' | 'info' | 'playing';
+type Screen = 'grades' | 'games' | 'info' | 'playing' | 'store';
 
 export default function PracticeHub({
   onClose,
@@ -324,6 +326,13 @@ export default function PracticeHub({
    : selectedGrade === '912' ? highGames
    : [];
 
+ // Grade ids map onto the three store bands. Collegiate has no store.
+ const storeBand: StoreBand | null =
+    selectedGrade === 'newk5' ? 'k5'
+   : selectedGrade === 'k5' ? 'ms'
+   : selectedGrade === '68' ? 'hs'
+   : null;
+
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
@@ -411,7 +420,31 @@ export default function PracticeHub({
 
  {/* Game Grid */}
  {screen === 'games' && (
-  games.length === 0 ? (
+  <>
+  {storeBand && (
+    <button
+      onClick={() => setScreen('store')}
+      className="w-full mb-5 flex items-center gap-4 p-4 rounded-lg border-2 border-amber-500/40 bg-amber-500/5 hover:bg-amber-500/10 hover:border-amber-500/70 transition-colors text-left"
+    >
+      <div className="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+        <ShoppingBag className="w-6 h-6 text-amber-600" />
+      </div>
+      <div className="flex-1">
+        <h3 className="font-display font-bold text-foreground">
+          {storeBand === 'k5' ? 'Weed Hero Store' : storeBand === 'ms' ? 'Field Tool Shop' : 'Farm Equipment Dealer'}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {storeBand === 'k5'
+            ? 'Spend your badge coins to build your own Weed Control Superhero — outfits and powers you can use in the Play farm.'
+            : storeBand === 'ms'
+            ? 'Trade badge coins for real IPM tools and equipment that unlock new actions in the Play farm.'
+            : 'Invest your badge coins in farm equipment that gives you extra management options in the Play farm.'}
+        </p>
+      </div>
+      <span className="text-sm font-bold text-amber-700 dark:text-amber-300">Open →</span>
+    </button>
+  )}
+  {games.length === 0 ? (
     <div className="max-w-md mx-auto mt-16 text-center p-8 rounded-lg border border-dashed border-border bg-card/50">
       <Leaf className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
       <h3 className="font-display font-bold text-foreground text-lg mb-1">Games coming soon</h3>
@@ -446,8 +479,12 @@ export default function PracticeHub({
  </button>
  );})}
  </div>
-  )
  )}
+  </>
+ )}
+
+ {/* Store */}
+ {screen === 'store' && storeBand && <PracticeStore band={storeBand} />}
 
  {/* Game Info / Launcher */}
  {screen === 'info' && selectedGame && (

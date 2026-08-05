@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { weeds } from '@/data/weeds';
 import type { GradeLevel, Weed } from '@/types/game';
+import { ownedItems, type StoreBand } from '@/lib/practiceStore';
 import WeedImage from './WeedImage';
-import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler } from 'lucide-react';
+import { ArrowLeft, X, Eye, Droplets, Hand, Tractor, Clock, ChevronRight, Wheat, AlertTriangle, CheckCircle2, XCircle, Camera, Plane, Bot, Crosshair, Settings2, Sprout, Ruler, Wrench } from 'lucide-react';
 import HomeButton from './HomeButton';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 
@@ -368,6 +369,39 @@ const ALL_EVENTS: EventCard[] = [
 ];
 
 // Main Component 
+/**
+ * Shows the tools/equipment the student bought in the Practice store for the
+ * grade band matching this farm. Purchases carry over from Practice to Play.
+ */
+function StoreGearPanel({ grade }: { grade: GradeLevel | null }) {
+  if (!grade) return null;
+  const band: StoreBand = grade === 'elementary' ? 'ms' : 'hs';
+  const items = ownedItems(band);
+  return (
+    <div className="border-t border-border p-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Wrench className="w-4 h-4 text-primary" />
+        <h3 className="font-display font-bold text-foreground text-sm">Your Gear</h3>
+      </div>
+      {items.length === 0 ? (
+        <p className="text-xs text-muted-foreground">
+          No gear yet. Earn badges in Practice games, then spend your coins in the
+          {band === 'ms' ? ' Field Tool Shop' : ' Farm Equipment Dealer'} to bring extra tools onto this farm.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {items.map(it => (
+            <div key={it.id} className="p-2 rounded-md border border-success/30 bg-success/5">
+              <p className="text-xs font-bold text-foreground">{it.name}</p>
+              <p className="text-[11px] text-muted-foreground">{it.farmPerk}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function FarmMode({ onClose }: { onClose: () => void }) {
  const [phase, setPhase] = useState<GamePhase>('setup');
  const [grade, setGrade] = useState<GradeLevel | null>(null);
@@ -1449,6 +1483,7 @@ export default function FarmMode({ onClose }: { onClose: () => void }) {
   {/* Right: Side Panel — content changes by phase */}
   <div className="flex-[3] border-l border-border bg-card overflow-y-auto hidden sm:flex flex-col">
   {renderSidePanel()}
+  <StoreGearPanel grade={grade} />
   </div>
   </div>
 

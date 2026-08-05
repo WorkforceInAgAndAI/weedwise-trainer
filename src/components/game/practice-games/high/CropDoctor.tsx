@@ -17,15 +17,56 @@ function injuryTypeForCrop(crop: string): 'br' | 'gr' {
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+/** One representative herbicide per WSSA group, used to backfill answer sets. */
+const FALLBACK_OPTIONS: string[] = [
+ '2,4-D (Group 4)',
+ 'Atrazine (Group 5)',
+ 'Glyphosate (Group 9)',
+ 'Glufosinate (Group 10)',
+ 'Clomazone (Group 13)',
+ 'Fomesafen (Group 14)',
+ 'S-metolachlor (Group 15)',
+ 'Diflufenzopyr (Group 19)',
+ 'Paraquat (Group 22)',
+ 'Endothall (Group 26)',
+ 'Mesotrione (Group 27)',
+ 'Pendimethalin (Group 3)',
+ 'Imazethapyr (Group 2)',
+ 'Clethodim (Group 1)',
+];
+
 /**
- * Reject option sets where a distractor shares the same WSSA group as the
- * correct answer — the injury photo is keyed by group, so two same-group
- * options make the photo evidence ambiguous.
+ * Every answer choice must come from a DIFFERENT WSSA group. The injury photo
+ * is keyed by mode of action, so two options sharing a group make the photo
+ * evidence ambiguous and the question unanswerable. If dropping same-group
+ * duplicates leaves too few choices, we top the list back up with herbicides
+ * from groups that are not yet represented.
  */
 function dedupeOptionsByGroup(correct: string, options: string[]): string[] {
- const correctGroup = extractGroup(correct);
- if (correctGroup == null) return options;
- return options.filter(o => o === correct || extractGroup(o) !== correctGroup);
+ const usedGroups = new Set<number>();
+ const kept: string[] = [];
+
+ const take = (label: string) => {
+  if (kept.includes(label)) return false;
+  const g = extractGroup(label);
+  if (g == null || usedGroups.has(g)) return false;
+  usedGroups.add(g);
+  kept.push(label);
+  return true;
+ };
+
+ // The correct answer always claims its group first.
+ take(correct);
+ options.forEach(take);
+
+ // Backfill so students still get a full set of choices.
+ if (kept.length < 4) {
+  for (const label of shuffle(FALLBACK_OPTIONS)) {
+   if (kept.length >= 4) break;
+   take(label);
+  }
+ }
+ return kept;
 }
 
 const CORN_CASES = [
