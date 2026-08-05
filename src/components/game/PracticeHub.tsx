@@ -387,9 +387,9 @@ export default function PracticeHub({
  <h2 className="text-center text-muted-foreground mb-4 text-sm font-medium uppercase tracking-wider">Choose Your Level</h2>
  {[
   { id: 'newk5', label: 'Grades K-5', sub: 'Explorer', Icon: Leaf, count: newK5Games.length, accent: 'grade-elementary' },
- { id: 'k5', label: 'Grades 6-8', sub: 'Investigator', Icon: Microscope, count: 15, accent: 'grade-middle' },
- { id: '68', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: 17, accent: 'grade-high' },
- { id: '912', label: 'Collegiate', sub: 'Scholar', Icon: GraduationCap, count: 14, accent: 'grade-high' },
+ { id: 'k5', label: 'Grades 6-8', sub: 'Investigator', Icon: Microscope, count: k5Games.length, accent: 'grade-middle' },
+ { id: '68', label: 'Grades 9-12', sub: 'Specialist', Icon: FlaskConical, count: middleGames.length, accent: 'grade-high' },
+ { id: '912', label: 'Collegiate', sub: 'Scholar', Icon: GraduationCap, count: highGames.length, accent: 'grade-high' },
  ].map(g => (
  <button
  key={g.id}
