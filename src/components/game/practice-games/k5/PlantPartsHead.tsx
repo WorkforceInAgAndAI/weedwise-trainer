@@ -507,14 +507,15 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
   // Show a real reference photo of the weed before students start building.
   const [showPreview, setShowPreview] = useState(true);
 
-  const availablePalette = roundData.palette.filter(p => !usedIds.has(p.id));
+  // Parts are reusable: the same leaf can fill all three leaf slots, and any
+  // style stays in the bin after being placed.
+  const availablePalette = roundData.palette;
   const slotsFilled = Object.keys(placements).length;
 
   function handleDrop(slot: SlotDef) {
     if (!dragItem || placements[slot.id] || showResult) return;
     const correct = dragItem.kind === slot.kind;
-    setPlacements(p => ({ ...p, [slot.id]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label } }));
-    setUsedIds(s => new Set([...s, dragItem.id]));
+    setPlacements(p => ({ ...p, [slot.id]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label, weedId: dragItem.weedId, stage: dragItem.stage } }));
     setDragItem(null);
   }
 
@@ -522,9 +523,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
     if (showResult) return;
     const placed = placements[slotId];
     if (!placed) return;
-    const paletteEntry = roundData.palette.find(p => p.kind === placed.kind && p.variant === placed.variant && usedIds.has(p.id));
     setPlacements(p => { const n = { ...p }; delete n[slotId]; return n; });
-    if (paletteEntry) setUsedIds(s => { const n = new Set(s); n.delete(paletteEntry.id); return n; });
   }
 
   function checkRound() {
