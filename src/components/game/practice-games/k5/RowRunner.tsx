@@ -373,7 +373,7 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
               {CROP_IMGS.length > 0 && Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
                 const cx = laneCenterX(laneIdx);
                 const plants: JSX.Element[] = [];
-                const STEP = 26;              // tight vertical spacing = dense canopy
+                const STEP = 19;              // tight vertical spacing = dense canopy
                 const PLANT = 78;             // plants overlap each other
                 for (let y = -PLANT; y < AREA_H + PLANT; y += STEP) {
                   const yy = ((y + scrollRef.current) % (AREA_H + PLANT * 2)) - PLANT;
@@ -466,18 +466,21 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                         </div>
                       </>
                     ) : (
-                      <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden"
-                        style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }}>
-                        {CROP_IMGS[0] ? (
-                          <img src={CROP_IMGS[s.id % CROP_IMGS.length]} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                        ) : (
-                          <div className="absolute inset-2 rounded-full opacity-70"
-                            style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
-                        )}
-                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
+                      <>
+                        <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden"
+                          style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }}>
+                          {CROP_IMGS[0] ? (
+                            <img src={CROP_IMGS[s.id % CROP_IMGS.length]} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                          ) : (
+                            <div className="absolute inset-2 rounded-full opacity-70"
+                              style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
+                          )}
+                        </div>
+                        {/* Label sits OUTSIDE the clipped circle so it reads on top */}
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
                           Crop
                         </div>
-                      </div>
+                      </>
                     )}
                   </div>
                 </div>

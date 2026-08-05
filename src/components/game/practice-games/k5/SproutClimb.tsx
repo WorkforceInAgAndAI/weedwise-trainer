@@ -46,13 +46,78 @@ const WEEDS: Record<number, { to: number; reason: string; weed: string }> = {
 };
 
 // Life stage banner based on tile position
+/**
+ * Your pawn IS the plant. It literally grows as you climb the board:
+ * seed in the soil -> seedling -> vegetative (leafy) -> reproductive (flower
+ * then seed head at the top).
+ */
+function GrowingPlant({ tile, className = '' }: { tile: number; className?: string }) {
+  const p = Math.min(1, Math.max(0, tile / 30));            // 0..1 growth
+  const stemTop = 92 - p * 62;                              // stem grows upward
+  const showSeedling = tile > 3;
+  const showLeaves = tile > 11;
+  const showBigLeaves = tile > 17;
+  const showBud = tile > 17 && tile <= 23;
+  const showFlower = tile > 23 && tile <= 28;
+  const showSeedHead = tile > 28;
+  return (
+    <svg viewBox="0 0 60 100" className={className} role="img" aria-label={`Your plant at growth stage ${tile} of 30`}>
+      {/* soil */}
+      <rect x="0" y="88" width="60" height="12" rx="3" fill="#6b4423" />
+      {/* seed */}
+      {!showSeedling && <ellipse cx="30" cy="90" rx="7" ry="5" fill="#d9a441" stroke="#8a5a1b" strokeWidth="1.5" />}
+      {/* root */}
+      {showSeedling && <path d="M30 92 L30 99 M30 95 L25 99 M30 95 L35 99" stroke="#c68642" strokeWidth="2" fill="none" strokeLinecap="round" />}
+      {/* stem */}
+      {showSeedling && <line x1="30" y1="92" x2="30" y2={stemTop} stroke="#3f8f29" strokeWidth="4" strokeLinecap="round" />}
+      {/* cotyledons / first leaves */}
+      {showSeedling && (
+        <>
+          <ellipse cx="22" cy={stemTop + 12} rx="8" ry="4.5" fill="#7cc243" transform={`rotate(-18 22 ${stemTop + 12})`} />
+          <ellipse cx="38" cy={stemTop + 12} rx="8" ry="4.5" fill="#7cc243" transform={`rotate(18 38 ${stemTop + 12})`} />
+        </>
+      )}
+      {showLeaves && (
+        <>
+          <ellipse cx="17" cy={stemTop + 26} rx="12" ry="6" fill="#2f7d1f" transform={`rotate(-22 17 ${stemTop + 26})`} />
+          <ellipse cx="43" cy={stemTop + 26} rx="12" ry="6" fill="#2f7d1f" transform={`rotate(22 43 ${stemTop + 26})`} />
+        </>
+      )}
+      {showBigLeaves && (
+        <>
+          <ellipse cx="14" cy={stemTop + 40} rx="14" ry="7" fill="#256b19" transform={`rotate(-25 14 ${stemTop + 40})`} />
+          <ellipse cx="46" cy={stemTop + 40} rx="14" ry="7" fill="#256b19" transform={`rotate(25 46 ${stemTop + 40})`} />
+        </>
+      )}
+      {showBud && <ellipse cx="30" cy={stemTop - 4} rx="6" ry="9" fill="#4ba32c" stroke="#2f7d1f" strokeWidth="1.5" />}
+      {showFlower && (
+        <g>
+          {[0, 60, 120, 180, 240, 300].map(a => (
+            <ellipse key={a} cx="30" cy={stemTop - 10} rx="5" ry="9" fill="#f7c948" transform={`rotate(${a} 30 ${stemTop - 10})`} />
+          ))}
+          <circle cx="30" cy={stemTop - 10} r="4.5" fill="#b45309" />
+        </g>
+      )}
+      {showSeedHead && (
+        <g>
+          <circle cx="30" cy={stemTop - 10} r="5" fill="#e7e5e4" />
+          {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (
+            <line key={a} x1="30" y1={stemTop - 10} x2={30 + 12 * Math.cos((a * Math.PI) / 180)} y2={stemTop - 10 + 12 * Math.sin((a * Math.PI) / 180)}
+              stroke="#d6d3d1" strokeWidth="2" strokeLinecap="round" />
+          ))}
+        </g>
+      )}
+    </svg>
+  );
+}
+
 function stageFor(tile: number): { name: string; Icon: React.ComponentType<{ className?: string }>; fact: string; color: string } {
   if (tile <= 5)  return { name: 'Seed', Icon: Sprout, color: 'bg-amber-500', fact: 'A SEED sleeps in the soil, waiting for water and warmth to wake up.' };
-  if (tile <= 11) return { name: 'Sprout', Icon: Sprout, color: 'bg-lime-500', fact: 'A SPROUT sends a tiny root down and a shoot up toward the light.' };
-  if (tile <= 17) return { name: 'Leafy Plant', Icon: Leaf, color: 'bg-green-500', fact: 'LEAVES make food from sunlight, water, and air. This is photosynthesis!' };
+  if (tile <= 11) return { name: 'Seedling', Icon: Sprout, color: 'bg-lime-500', fact: 'A SEEDLING sends a tiny root down and a shoot up toward the light.' };
+  if (tile <= 17) return { name: 'Vegetative', Icon: Leaf, color: 'bg-green-500', fact: 'LEAVES make food from sunlight, water, and air. This is photosynthesis!' };
   if (tile <= 23) return { name: 'Bud', Icon: Sprout, color: 'bg-emerald-500', fact: 'A BUD forms — the plant is getting ready to bloom.' };
-  if (tile <= 28) return { name: 'Flower', Icon: Flower2, color: 'bg-pink-500', fact: 'FLOWERS attract pollinators like bees so the plant can make seeds.' };
-  return { name: 'Seeds! 🎉', Icon: Sparkles, color: 'bg-yellow-500', fact: 'The plant makes NEW SEEDS. The life cycle starts all over again!' };
+  if (tile <= 28) return { name: 'Reproductive: Flower', Icon: Flower2, color: 'bg-pink-500', fact: 'FLOWERS attract pollinators like bees so the plant can make seeds.' };
+  return { name: 'Reproductive: Seeds!', Icon: Sparkles, color: 'bg-yellow-500', fact: 'The plant makes NEW SEEDS. The life cycle starts all over again!' };
 }
 
 // Convert 1..30 to grid row/col (snake order, tile 1 bottom-left)
@@ -193,7 +258,6 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
     );
   }
 
-  const StageIcon = stage.Icon;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto"
@@ -251,8 +315,8 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
 
         {/* Life stage banner */}
         <div className={`${stage.color} text-white rounded-2xl p-3 mb-3 flex items-center gap-3 shadow-lg`}>
-          <div className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center">
-            <StageIcon className="w-7 h-7" />
+          <div className="w-16 h-24 rounded-xl bg-white/25 flex items-center justify-center p-1 shrink-0">
+            <GrowingPlant tile={tile} className="w-full h-full" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase tracking-wider opacity-80">Current life stage</p>
