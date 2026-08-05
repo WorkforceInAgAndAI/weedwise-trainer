@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Hand, Shield, Brain, Bug, Zap, Sprout, Heart, Shrub, Pause, Play as PlayIcon, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Hand, Shield, Brain, Bug, Zap, Sprout, Heart, Pause, Play as PlayIcon, ShieldAlert } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import { getDifficulty } from '@/lib/difficulty';
