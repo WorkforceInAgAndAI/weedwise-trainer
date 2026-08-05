@@ -198,10 +198,9 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
           window.setTimeout(() => setWeeds(l => l.filter(x => x.id !== weed.id)), 220);
           return { ...w, hp: 0, flash: 'miss' };
         }
-        return { ...w, hp: nextHp, speed: Math.max(3, w.speed * 0.75), flash: 'miss' };
+        return { ...w, hp: nextHp, speed: Math.max(2, w.speed * 0.6), flash: 'miss' };
       }));
-      setScore(s => Math.max(0, s - 2));
-      showFeedback(`Wrong power for ${weed.name}!`, 'bad');
+      showFeedback(`Not quite — ${weed.name} needs a different hero. Try again!`, 'bad');
     }
     // clear flash
     window.setTimeout(() => setWeeds(list => list.map(w => w.id === weed.id ? { ...w, flash: null } : w)), 300);
@@ -209,7 +208,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
 
   const restart = () => {
     nextId.current = 1; spawnTimer.current = 0;
-    setScore(0); setCropHp(CROP_HP_START); setEnergy(6); setWeeds([]);
+    setScore(0); setCropHp(CROP_HP_START); setEnergy(ENERGY_MAX); setWeeds([]);
     setSelected(null); setCooldowns({ pull: 0, block: 0, outsmart: 0, eat: 0, stop: 0 });
     setDefeated(0); setEscaped(0); setRunning(true); setDone(false); setFeedback(null);
   };
