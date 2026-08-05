@@ -176,10 +176,13 @@ export const elementaryWeeds = weeds.filter((w) => ELEM_ID_SET.has(w.id));
  * The master weeds list filtered to the 6-8 curriculum.
  * Use this in place of `weeds` for any grades-6-8 practice game.
  */
-export const middleSchoolWeeds = weeds.filter((w) => MIDDLE_ID_SET.has(w.id));
+export const middleSchoolWeeds = applyRegionPriority(weeds.filter((w) => MIDDLE_ID_SET.has(w.id)));
 
 /** The master weeds list filtered to the 9-12 (high school) curriculum. */
-export const highSchoolWeeds = weeds.filter((w) => HIGH_ID_SET.has(w.id));
+export const highSchoolWeeds = applyRegionPriority(weeds.filter((w) => HIGH_ID_SET.has(w.id)));
+
+/** Full 87-species collegiate pool, region-prioritized. */
+export const collegiateWeeds = applyRegionPriority(weeds);
 
 /** Convenience predicate for one-off checks. */
 export const isMiddleSchoolWeed = (id: string): boolean => MIDDLE_ID_SET.has(id);
