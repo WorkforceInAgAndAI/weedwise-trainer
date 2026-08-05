@@ -501,7 +501,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
                     onClick={commitRoundAndAdvance}
                     className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-bold hover:opacity-90"
                   >
-                    {round + 1 >= ROUNDS_PER_LEVEL ? 'Finish Level' : 'Next Round'}
+                    {round + 1 >= roundsPerLevel ? 'Finish Level' : 'Next Round'}
                   </button>
                 </div>
               </div>
