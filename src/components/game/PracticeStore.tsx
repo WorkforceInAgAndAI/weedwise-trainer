@@ -4,6 +4,7 @@ import {
   usePracticeStore, BAND_TITLE,
   type StoreBand, type StoreItem, type StoreCategory,
 } from '@/lib/practiceStore';
+import { HeroCharacter } from './HeroCharacter';
 
 const CATEGORY_META: Record<StoreCategory, { label: string; Icon: React.ComponentType<{ className?: string }> }> = {
   outfit:    { label: 'Hero Gear',  Icon: Shirt },
@@ -21,50 +22,10 @@ const BAND_BLURB: Record<StoreBand, string> = {
 /* --------------------------- K-5 hero preview --------------------------- */
 
 function HeroPreview({ ownedIds }: { ownedIds: string[] }) {
-  const has = (id: string) => ownedIds.includes(id);
-  const helmet = has('k5-helmet');
-  const cap = has('k5-hat') && !helmet;
-  const suit = has('k5-suit');
-  const vest = has('k5-vest');
-  const gloves = has('k5-gloves');
-  const boots = has('k5-boots');
-  const cape = has('k5-cape');
-
   return (
     <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-sky-50 to-emerald-50 dark:from-sky-950 dark:to-emerald-950 p-4">
       <p className="text-center text-sm font-bold text-foreground mb-2">Your Weed Control Superhero</p>
-      <svg viewBox="0 0 200 260" className="w-full max-w-[200px] mx-auto" role="img" aria-label="Your customized weed control superhero character">
-        {cape && <path d="M65 95 L40 215 L100 200 L160 215 L135 95 Z" fill="#fbbf24" opacity="0.9" />}
-        {/* legs */}
-        <rect x="83" y="175" width="14" height="52" rx="6" fill="#3f6212" />
-        <rect x="103" y="175" width="14" height="52" rx="6" fill="#3f6212" />
-        {/* boots */}
-        <rect x="78" y={boots ? 214 : 222} width="24" height={boots ? 22 : 14} rx="6" fill={boots ? '#78350f' : '#1f2937'} />
-        <rect x="98" y={boots ? 214 : 222} width="24" height={boots ? 22 : 14} rx="6" fill={boots ? '#78350f' : '#1f2937'} />
-        {/* body */}
-        <rect x="70" y="100" width="60" height="82" rx="20" fill={suit ? '#16a34a' : '#64748b'} />
-        {vest && <rect x="72" y="104" width="56" height="60" rx="16" fill="#f59e0b" opacity="0.92" />}
-        {vest && <rect x="72" y="126" width="56" height="8" fill="#e5e7eb" opacity="0.9" />}
-        {suit && <circle cx="100" cy="128" r="13" fill="#ecfdf5" />}
-        {suit && <path d="M100 121 c7 3 8 12 0 14 c-8 -2 -7 -11 0 -14 z" fill="#15803d" />}
-        {/* arms */}
-        <rect x="48" y="106" width="20" height="62" rx="10" fill={suit ? '#16a34a' : '#64748b'} />
-        <rect x="132" y="106" width="20" height="62" rx="10" fill={suit ? '#16a34a' : '#64748b'} />
-        {/* hands / gloves */}
-        <circle cx="58" cy="174" r="11" fill={gloves ? '#0ea5e9' : '#fcd9b6'} />
-        <circle cx="142" cy="174" r="11" fill={gloves ? '#0ea5e9' : '#fcd9b6'} />
-        {/* head */}
-        <circle cx="100" cy="72" r="28" fill="#fcd9b6" />
-        <circle cx="91" cy="70" r="3.4" fill="#1f2937" />
-        <circle cx="109" cy="70" r="3.4" fill="#1f2937" />
-        <path d="M90 82 q10 9 20 0" stroke="#1f2937" strokeWidth="3" fill="none" strokeLinecap="round" />
-        {cap && <><path d="M70 60 a30 30 0 0 1 60 0 z" fill="#0ea5e9" /><rect x="98" y="54" width="46" height="8" rx="4" fill="#0284c7" /></>}
-        {helmet && <>
-          <path d="M68 62 a32 32 0 0 1 64 0 z" fill="#22c55e" />
-          <rect x="66" y="60" width="68" height="9" rx="4" fill="#15803d" />
-          <path d="M100 20 c9 6 10 18 0 24 c-10 -6 -9 -18 0 -24 z" fill="#84cc16" />
-        </>}
-      </svg>
+      <HeroCharacter ownedIds={ownedIds} className="w-full max-w-[200px] mx-auto" />
       <p className="text-center text-xs text-muted-foreground mt-2">
         Buy gear below and watch your hero change!
       </p>
