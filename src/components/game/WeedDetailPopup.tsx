@@ -10,7 +10,8 @@ interface Props {
 }
 
 export default function WeedDetailPopup({ weed, onClose }: Props) {
- const isGrass = weed.plantType === 'Monocot';
+ // Ligule exists only in true grasses (Poaceae) — sedges like nutsedge have none.
+ const isGrass = weed.plantType === 'Monocot' && weed.family === 'Poaceae';
 
  return (
  <div className="fixed inset-0 z-[60] bg-background/60 backdrop-blur-sm flex items-center justify-center p-5" onClick={onClose}>

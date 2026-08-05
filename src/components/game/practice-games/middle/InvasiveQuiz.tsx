@@ -6,6 +6,7 @@ import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { WEED_ARRIVAL_KNOWLEDGE } from '@/data/weedKnowledge';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -40,6 +41,7 @@ function getArrivalData(w: typeof weeds[0]): { method: ArrivalMethod; story: str
 export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
   const rounds = useMemo(() => {
     // Round-robin across all four arrival methods so students see real variety
     // instead of "accident" seven times in a row.
@@ -61,7 +63,8 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
     };
     const picks: typeof weeds = [];
     let safety = 0;
-    while (picks.length < 8 && safety++ < 200) {
+    const targetCount = d.rounds;
+    while (picks.length < targetCount && safety++ < 200) {
       const m = methodKeys[picks.length % methodKeys.length];
       const list = byMethod[m];
       const w = list[cursor[m]++ % list.length];
@@ -71,7 +74,7 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
       const data = getArrivalData(w);
       return { weed: w, method: data.method, story: data.story };
     });
-  }, [level]);
+  }, [level, d.rounds]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<ArrivalMethod | null>(null);

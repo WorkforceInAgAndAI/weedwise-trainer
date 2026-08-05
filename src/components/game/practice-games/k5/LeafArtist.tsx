@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -13,14 +14,16 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 export default function LeafArtist({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
 
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const rounds = useMemo<Round[]>(() => {
-    const monocots = shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, 3);
-    const dicots = shuffle(weeds.filter(w => w.plantType === 'Dicot')).slice(0, 3);
+    const half = Math.max(2, Math.ceil(d.rounds / 2));
+    const monocots = shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, half);
+    const dicots = shuffle(weeds.filter(w => w.plantType === 'Dicot')).slice(0, half);
     return shuffle([
       ...monocots.map(w => ({ weed: w, correct: 'Parallel' as const })),
       ...dicots.map(w => ({ weed: w, correct: 'Netted' as const })),
     ]);
-  }, [level]);
+  }, [level, d.rounds]);
 
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);

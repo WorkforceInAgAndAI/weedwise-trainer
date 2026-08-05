@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -15,31 +16,32 @@ const THEMES = [
   { label: 'Mixed', filter: () => true },
 ];
 
-function getWeedsForLevel(level: number): typeof weeds {
+function getWeedsForLevel(level: number, count: number): typeof weeds {
   const themeIdx = (level - 1) % THEMES.length;
   const theme = THEMES[themeIdx];
   const pool = weeds.filter(theme.filter);
   // If not enough, supplement with all weeds
-  if (pool.length < 10) {
+  if (pool.length < count) {
     const extra = weeds.filter(w => !pool.find(p => p.id === w.id));
-    return shuffle([...pool, ...shuffle(extra)]).slice(0, 10);
+    return shuffle([...pool, ...shuffle(extra)]).slice(0, count);
   }
   // Offset within pool to vary across levels using same theme
   const offset = Math.floor((level - 1) / THEMES.length) * 5;
   const shifted = [...pool.slice(offset % pool.length), ...pool.slice(0, offset % pool.length)];
-  return shuffle(shifted).slice(0, 10);
+  return shuffle(shifted).slice(0, count);
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 export default function NameTheWeed({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const rounds = useMemo(() => {
-    const levelWeeds = getWeedsForLevel(level);
+    const levelWeeds = getWeedsForLevel(level, d.rounds);
     return levelWeeds.map(w => {
-      const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, 3).map(x => x.commonName);
+      const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, d.options - 1).map(x => x.commonName);
       return { weed: w, options: shuffle([w.commonName, ...wrongs]) };
     });
-  }, [level]);
+  }, [level, d.rounds, d.options]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

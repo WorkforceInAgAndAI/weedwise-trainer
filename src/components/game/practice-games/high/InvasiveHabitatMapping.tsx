@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import worldMapImg from '@/assets/images/world.jpg';
 import { WEED_ARRIVAL_KNOWLEDGE } from '@/data/weedKnowledge';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -72,11 +73,11 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
  const [idx, setIdx] = useState(0);
  const [score, setScore] = useState(0);
 
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
  const items = useMemo(() => {
   const pool = shuffle(weeds.filter(w => w.origin === 'Introduced' || w.origin === 'Native'));
-  const offset = ((level - 1) * 8) % pool.length;
-  return pool.slice(offset).concat(pool).slice(0, 8);
- }, [level]);
+  return levelSlice(pool, level, d.rounds);
+ }, [level, d.rounds]);
 
  const QUESTIONS_PER_LEVEL = items.length;
  const current = items[idx];
@@ -90,13 +91,13 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
 
  useMemo(() => {
   if (!current) return;
-  const wrong = shuffle(weeds.filter(w => w.id !== current.id)).slice(0, 3).map(w => w.commonName);
+  const wrong = shuffle(weeds.filter(w => w.id !== current.id)).slice(0, Math.max(1, d.options - 1)).map(w => w.commonName);
   setIdOptions(shuffle([current.commonName, ...wrong]));
   setIdAnswer(null);
   setContinentAnswer(null);
   setArrivalAnswer(null);
   setPhase('id');
- }, [idx, current]);
+ }, [idx, current, d.options]);
 
  const submitId = (name: string) => {
   setIdAnswer(name);

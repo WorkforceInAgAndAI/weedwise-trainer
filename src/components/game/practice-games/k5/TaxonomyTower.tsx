@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -23,14 +24,14 @@ const FOLLOW_UP_POOL: FollowUp[] = [
   { question: 'What does the prefix "di-" mean?', options: ['2', '1'], correctIdx: 0 },
 ];
 
-const ROUND_SIZE = 6;
-
-interface RoundData { items: typeof weeds; followUp: FollowUp; }
+interface RoundData { items: typeof weeds; followUp: FollowUp; roundSize: number; }
 
 function buildRound(level: number): RoundData {
-  const monocots = shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, 3);
-  const dicots = shuffle(weeds.filter(w => w.plantType === 'Dicot')).slice(0, 3);
-  return { items: shuffle([...monocots, ...dicots]), followUp: FOLLOW_UP_POOL[(level - 1) % FOLLOW_UP_POOL.length] };
+  const d = getDifficulty(level, 'k5');
+  const half = Math.max(2, Math.ceil(d.rounds / 2));
+  const monocots = shuffle(weeds.filter(w => w.plantType === 'Monocot')).slice(0, half);
+  const dicots = shuffle(weeds.filter(w => w.plantType === 'Dicot')).slice(0, half);
+  return { items: shuffle([...monocots, ...dicots]), followUp: FOLLOW_UP_POOL[(level - 1) % FOLLOW_UP_POOL.length], roundSize: half * 2 };
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
@@ -68,7 +69,7 @@ export default function TaxonomyTower({ onBack, gameId, gameName, gradeLabel }: 
     if (i === round.followUp.correctIdx) setScore(s => s + 1);
   };
 
-  if (doneAll) return <LevelComplete level={level} score={score} total={ROUND_SIZE + 1} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
+  if (doneAll) return <LevelComplete level={level} score={score} total={round.roundSize + 1} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
   const monocotBucket = round.items.filter(w => placements[w.id] === 'Monocot');
   const dicotBucket = round.items.filter(w => placements[w.id] === 'Dicot');

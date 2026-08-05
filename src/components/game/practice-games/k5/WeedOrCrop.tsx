@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getCropImages } from '@/lib/imageMap';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const CROP_FOLDERS = ['Alfalfa', 'Barley', 'Canola', 'Corn', 'Cotton', 'Field Peas', 'Millet', 'Mungbean', 'Oats', 'Potatoes', 'Pumpkin', 'Rice', 'Sorghum', 'Soybean', 'Sugarcane', 'Wheat'];
 
@@ -14,10 +15,12 @@ interface RoundItem { type: 'weed' | 'crop'; name: string; weedId?: string; crop
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const [classified, setClassified] = useState<{ name: string; type: 'weed' | 'crop'; correct: boolean; weedId?: string; cropImage?: string }[]>([]);
   const rounds = useMemo(() => {
+    const half = Math.max(2, Math.ceil(d.rounds / 2));
     const weedPool = shuffle([...weeds]);
-    const selectedWeeds = weedPool.slice(0, 5);
+    const selectedWeeds = weedPool.slice(0, half);
     const weedItems: RoundItem[] = selectedWeeds.map(w => ({ type: 'weed', name: w.commonName, weedId: w.id }));
 
     // Use local crop images from folder names
@@ -29,21 +32,21 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
         cropItems.push({ type: 'crop', name, cropImage: randomImg });
       }
     });
-    const selectedCrops = cropItems.slice(0, 5);
+    const selectedCrops = cropItems.slice(0, half);
 
     // Combine and randomly shuffle for a natural mix
     const combined = shuffle([...weedItems, ...selectedCrops]);
     return combined;
-  }, [level]);
+  }, [level, d.rounds]);
 
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
-  const [timer, setTimer] = useState(20);
+  const [timer, setTimer] = useState(Math.min(20, d.seconds));
   const [answered, setAnswered] = useState(false);
   const [correct, setCorrect] = useState<boolean | null>(null);
   const [done, setDone] = useState(false);
 
-  const restart = () => { setRound(0); setScore(0); setTimer(20); setAnswered(false); setCorrect(null); setDone(false); };
+  const restart = () => { setRound(0); setScore(0); setTimer(Math.min(20, d.seconds)); setAnswered(false); setCorrect(null); setDone(false); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); setClassified([]); };
   const startOver = () => { setLevel(1); restart(); setClassified([]); };
 
@@ -66,7 +69,7 @@ export default function WeedOrCrop({ onBack, gameId, gameName, gradeLabel }: Pro
 
   const next = () => {
     if (round + 1 >= rounds.length) { setDone(true); return; }
-    setRound(r => r + 1); setTimer(20); setAnswered(false); setCorrect(null);
+    setRound(r => r + 1); setTimer(Math.min(20, d.seconds)); setAnswered(false); setCorrect(null);
   };
 
   if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;

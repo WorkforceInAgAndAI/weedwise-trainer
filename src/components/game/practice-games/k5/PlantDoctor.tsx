@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Stethoscope, Sun, Droplets, Sprout, Wind, Mountain, Ruler, ArrowLeft, MapPin, Check, X, Leaf } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
+
+const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 // The six things plants need — mapped to friendly kid-doctor "prescriptions".
 type Resource = 'sunlight' | 'water' | 'nutrients' | 'air' | 'soil' | 'space';
@@ -145,12 +148,17 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function PlantDoctor({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const roundCases = useMemo(
+    () => shuffle(levelSlice(CASES, level, Math.min(CASES.length, diff.rounds))),
+    [level, diff.rounds]
+  );
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [done, setDone] = useState(false);
 
-  const caseData = CASES[step];
+  const caseData = roundCases[step];
   const answered = picked !== null;
   const isCorrect = answered && caseData.choices[picked!].resource === caseData.best;
 
@@ -161,7 +169,7 @@ export default function PlantDoctor({ onBack, gameId, gameName, gradeLabel }: Pr
   };
 
   const next = () => {
-    if (step + 1 >= CASES.length) {
+    if (step + 1 >= roundCases.length) {
       setDone(true);
     } else {
       setStep(s => s + 1);
@@ -183,11 +191,11 @@ export default function PlantDoctor({ onBack, gameId, gameName, gradeLabel }: Pr
       <LevelComplete
         level={level}
         score={score}
-        total={CASES.length}
+        total={roundCases.length}
         onNextLevel={nextLevel}
         onStartOver={restart}
         onBack={onBack}
-        title={score === CASES.length ? 'Chief Plant Doctor! Every patient healed!' : 'Nice work, Doctor — every patient thanks you!'}
+        title={score === roundCases.length ? 'Chief Plant Doctor! Every patient healed!' : 'Nice work, Doctor — every patient thanks you!'}
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
@@ -209,13 +217,13 @@ export default function PlantDoctor({ onBack, gameId, gameName, gradeLabel }: Pr
             <p className="text-xs text-muted-foreground">Diagnose the sick plant and prescribe what it needs!</p>
           </div>
           <div className="text-sm font-semibold text-foreground bg-muted px-3 py-1 rounded-full">
-            Patient {step + 1} / {CASES.length}
+            Patient {step + 1} / {roundCases.length}
           </div>
         </div>
 
         {/* Progress dots */}
         <div className="flex gap-1 mb-4">
-          {CASES.map((_, i) => (
+          {roundCases.map((_, i) => (
             <div key={i} className={`h-2 flex-1 rounded-full ${i < step ? 'bg-primary' : i === step ? 'bg-primary/60' : 'bg-muted'}`} />
           ))}
         </div>
@@ -300,7 +308,7 @@ export default function PlantDoctor({ onBack, gameId, gameName, gradeLabel }: Pr
                 onClick={next}
                 className="mt-3 w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90"
               >
-                {step + 1 >= CASES.length ? 'Finish Shift' : 'Next Patient →'}
+                {step + 1 >= roundCases.length ? 'Finish Shift' : 'Next Patient →'}
               </button>
             </div>
           )}

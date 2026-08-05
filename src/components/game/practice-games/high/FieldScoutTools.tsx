@@ -11,6 +11,7 @@ const cornField2 = soybeanField2;
 const pastureField1 = soybeanField3;
 const pastureField2 = soybeanField1;
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -116,17 +117,18 @@ const CROP_IMAGES: Record<string, string[]> = {
 };
 
 const TOTAL_ROUNDS = 10;
+// TOTAL_ROUNDS is the base; getDifficulty(level).rounds scales this up per level.
 
 export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
+  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
   // Rotate the field pool by level so every level shows a different order
-  // and different fields when there are more fields than TOTAL_ROUNDS.
+  // and different fields when there are more fields than the round count.
   const rounds = useMemo(() => {
-    const offset = ((level - 1) * TOTAL_ROUNDS) % FIELDS.length;
-    const rotated = [...FIELDS.slice(offset), ...FIELDS.slice(0, offset)];
-    return shuffle(rotated.slice(0, TOTAL_ROUNDS));
-  }, [level]);
+    const count = Math.min(FIELDS.length, d.rounds);
+    return shuffle(levelSlice(FIELDS, level, count));
+  }, [level, d.rounds]);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [scouted, setScouted] = useState(false);

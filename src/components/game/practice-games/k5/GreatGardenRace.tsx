@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Sun, Droplet, Sprout, Trophy, Flag, ArrowLeft, Zap } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 // Maze layout: '#' wall, '.' pellet path.
 // The flower (player) starts bottom-left, the weed (AI) starts top-right.
@@ -114,7 +115,9 @@ const CHECKER = 'repeating-linear-gradient(45deg,#000 0 10px,#fff 10px 20px)';
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }
 
 export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }: Props) {
-  const TOTAL_ROUNDS = 3;
+  const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const TOTAL_ROUNDS = Math.max(2, Math.min(4, Math.round(diff.rounds / 2)));
   const [round, setRound] = useState(1);
   const [pellets, setPellets] = useState<Pellet[]>(() => buildPellets());
   const [flower, setFlower] = useState<Pos>({ x: 1, y: 7 });
@@ -150,7 +153,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   useEffect(() => {
     if (paused || showTally || done) return;
     const boosted = boostMs > 0;
-    const tickMs = boosted ? 130 : 220;
+    const tickMs = boosted ? 130 : Math.max(120, Math.round(220 / diff.speed));
     const tick = setInterval(() => {
       // Move flower in requested direction if not into a wall
       setFlower(prev => {
@@ -210,7 +213,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
       const fGain = flowerScore.sun + flowerScore.water + flowerScore.nutrient;
       const wGain = weedScore.sun + weedScore.water + weedScore.nutrient;
       setFlowerHeight(h => h + fGain * 1);
-      setWeedHeight(h => h + wGain * 1.5);
+      setWeedHeight(h => h + wGain * (1.5 + (diff.level - 1) * 0.1));
       setShowTally(true);
     }
   }, [pellets, showTally, done, flowerScore, weedScore]);
@@ -240,11 +243,11 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
     const flowerWon = flowerHeight >= weedHeight;
     return (
       <LevelComplete
-        level={1}
+        level={level}
         score={flowerWon ? 3 : 1}
         total={3}
-        onNextLevel={restart}
-        onStartOver={restart}
+        onNextLevel={() => { setLevel(l => l + 1); restart(); }}
+        onStartOver={() => { setLevel(1); restart(); }}
         onBack={onBack}
         title={flowerWon ? 'Flower wins the Great Garden Race!' : 'The weed outgrew the flower — try again!'}
         gameId={gameId}

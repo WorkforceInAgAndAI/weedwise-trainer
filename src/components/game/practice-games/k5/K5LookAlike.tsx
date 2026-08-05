@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -24,10 +25,12 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
 
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+
   // Build a large pool and rotate based on level
   const pairs = useMemo(() => {
     const allPairs = buildAllPairs();
-    const pairsPerLevel = 5;
+    const pairsPerLevel = d.rounds;
     // Offset by level so different pairs each time, with wrap-around allowing some repeats
     const offset = ((level - 1) * pairsPerLevel) % Math.max(allPairs.length, 1);
     const selected: typeof allPairs = [];
@@ -35,7 +38,7 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
       selected.push(allPairs[(offset + i) % allPairs.length]);
     }
     return shuffle(selected);
-  }, [level]);
+  }, [level, d.rounds]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -77,7 +80,7 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
       <div className="flex flex-col items-center justify-center gap-4">
         <p className="text-foreground font-bold text-lg">Which one is <span className="text-primary">{target?.commonName}</span>?</p>
         {/* Per-pair hint — points to the tell-apart feature without giving away the answer */}
-        {pair && !submitted && (
+        {pair && !submitted && d.showHints && (
           <div className="max-w-md text-center px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
             <p className="text-xs text-amber-900 dark:text-amber-100">
               <span className="font-bold">Hint:</span> {pair.difference}

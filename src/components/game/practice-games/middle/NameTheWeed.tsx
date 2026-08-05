@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { Sprout, Leaf, Flower2, Check, X, Trophy, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 /** Stages we cycle through so students see multiple looks of the same species. */
 const STAGES: Array<{ key: string; label: string; icon: typeof Sprout }> = [
@@ -22,17 +23,17 @@ const THEMES = [
   { label: 'Mixed', filter: () => true },
 ];
 
-function getWeedsForLevel(level: number): typeof weeds {
+function getWeedsForLevel(level: number, count = 10): typeof weeds {
   const themeIdx = (level - 1) % THEMES.length;
   const theme = THEMES[themeIdx];
   const pool = weeds.filter(theme.filter);
-  if (pool.length < 10) {
+  if (pool.length < count) {
     const extra = weeds.filter(w => !pool.find(p => p.id === w.id));
-    return shuffle([...pool, ...shuffle(extra)]).slice(0, 10);
+    return shuffle([...pool, ...shuffle(extra)]).slice(0, count);
   }
   const offset = Math.floor((level - 1) / THEMES.length) * 5;
   const shifted = [...pool.slice(offset % pool.length), ...pool.slice(0, offset % pool.length)];
-  return shuffle(shifted).slice(0, 10);
+  return shuffle(shifted).slice(0, count);
 }
 
 /** Small multi-stage viewer used both in the round and in the review sidebar. */
@@ -109,13 +110,14 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function NameTheWeed({ onBack }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
   const rounds = useMemo(() => {
-    const levelWeeds = getWeedsForLevel(level);
+    const levelWeeds = getWeedsForLevel(level, d.rounds);
     return levelWeeds.map(w => {
-      const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, 3).map(x => x.commonName);
+      const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, Math.max(2, d.options - 1)).map(x => x.commonName);
       return { weed: w, options: shuffle([w.commonName, ...wrongs]) };
     });
-  }, [level]);
+  }, [level, d.rounds, d.options]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

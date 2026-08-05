@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { Leaf } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -58,21 +59,23 @@ export default function FormYourFarm({ onBack }: { onBack: () => void }) {
  const [threshold, setThreshold] = useState(10);
  const [decisions, setDecisions] = useState<Record<string, 'treat' | 'wait'>>({});
  const [manageDecisions, setManageDecisions] = useState<Record<string, string>>({});
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
 
  const attackWeeds = useMemo(() => {
-  const pool = shuffle(weeds);
-  const offset = ((level - 1) * 12) % pool.length;
-  const selected = pool.slice(offset).concat(pool).slice(0, 12);
+  const count = d.rounds;
+  const selected = levelSlice(shuffle(weeds), level, count);
+  // Higher levels put more weeds right on the borderline of the threshold, forcing sharper judgment.
+  const borderlineCount = Math.max(4, Math.round(count * (0.3 + (d.level - 1) * 0.05)));
   return selected.map((w, i) => {
    let severity: number;
-   if (i < 4) {
+   if (i < borderlineCount) {
     severity = threshold + Math.floor(Math.random() * 10) + 1;
    } else {
     severity = Math.floor(Math.random() * 20) + 1;
    }
    return { weed: w, severity };
   });
- }, [level, threshold]);
+ }, [level, threshold, d.rounds, d.level]);
 
  const startAttack = () => setPhase('attack');
  const decide = (wId: string, d: 'treat' | 'wait') => setDecisions(prev => ({ ...prev, [wId]: d }));

@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { ArrowUpDown, Snowflake, Sun, RefreshCw, Calendar } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -26,10 +27,14 @@ function getCategory(w: typeof weeds[0]): string {
 
 const ROUNDS_PER_LEVEL = 2;
 
+function itemsPerRound(level: number) {
+ return Math.min(14, 10 + Math.floor((level - 1) / 2));
+}
+
 function buildRound(level: number, round: number) {
- const pool = shuffle(weeds);
- const offset = ((level - 1) * ROUNDS_PER_LEVEL + round) * 10;
- return pool.slice(offset % pool.length).concat(pool).slice(0, 10).map(w => ({ weed: w, correct: getCategory(w) }));
+ const count = itemsPerRound(level);
+ const pool = levelSlice(shuffle(weeds), level * 100 + round, count);
+ return pool.map(w => ({ weed: w, correct: getCategory(w) }));
 }
 
 export default function LifeCycleSort({ onBack }: { onBack: () => void }) {

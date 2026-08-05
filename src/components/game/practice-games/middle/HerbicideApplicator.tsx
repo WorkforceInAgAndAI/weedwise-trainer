@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import soybeanBg from '@/assets/images/soybean_field_1.jpg';
 import { Target, DollarSign, Lock } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
@@ -40,9 +41,10 @@ const SHOP_CATALOG: ShopItem[] = [
 ];
 
 function buildField(level: number, round: number): FieldWeed[] {
+  const d = getDifficulty(level, 'ms');
   const pool = shuffle(weeds);
   const offset = ((level - 1) * TOTAL_ROUNDS + round) * 5;
-  const speciesCount = 4 + Math.floor(Math.random() * 2);
+  const speciesCount = Math.min(pool.length, 4 + Math.floor(Math.random() * 2) + Math.max(0, d.options - 4));
   const species = pool.slice(offset % pool.length, (offset % pool.length) + speciesCount);
   const items: FieldWeed[] = [];
   species.forEach(s => {

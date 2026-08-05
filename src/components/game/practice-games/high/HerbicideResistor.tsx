@@ -8,6 +8,7 @@ import soyBg from '@/assets/images/soybean_field_1.jpg';
 import cornBg from '@/assets/images/soybean_field_2.jpg';
 import wheatBg from '@/assets/images/soybean_field_3.jpg';
 import { HERBICIDE_MOA, type HerbicideMOA } from '@/data/herbicides';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -31,11 +32,16 @@ const CROP_LEVELS = [
   { id: 'wheat', name: 'Winter Wheat', compatible: ['als', 'auxin', 'ppo', 'multi'], rotationValue: 0.8, bg: wheatBg },
 ];
 
-const SEASONS_DATA = [
+const SEASONS_POOL = [
   { year: 1, pressure: 'Low weed pressure. Seedlings appearing in the field.' },
   { year: 2, pressure: 'Moderate pressure. Some surviving weeds from Year 1.' },
   { year: 3, pressure: 'High pressure! Resistant biotypes detected.' },
+  { year: 4, pressure: 'Sustained pressure. Populations are adapting to repeated tactics.' },
+  { year: 5, pressure: 'Severe pressure! Multiple resistant biotypes confirmed across the field.' },
 ];
+function seasonsForLevel(level: number) {
+  return SEASONS_POOL.slice(0, Math.min(SEASONS_POOL.length, 3 + Math.floor((level - 1) / 2)));
+}
 
 function getYearExplanation(crop: string, herbId: string, yearIdx: number, allChoices: { crop: string; herb: string }[]): string {
   const cropDef = CROP_LEVELS.find(c => c.id === crop);
@@ -62,12 +68,10 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
   const { addBadge } = useGameProgress();
 
   const currentCrop = CROP_LEVELS[(level - 1) % CROP_LEVELS.length];
+  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
+  const SEASONS_DATA = useMemo(() => seasonsForLevel(level), [level]);
 
-  const fieldWeeds = useMemo(() => {
-    const pool = shuffle(weeds);
-    const offset = ((level - 1) * 6) % pool.length;
-    return pool.slice(offset).concat(pool).slice(0, 6);
-  }, [level]);
+  const fieldWeeds = useMemo(() => levelSlice(shuffle(weeds), level, d.options + 2), [level, d.options]);
 
   const [year, setYear] = useState(0);
   const [choices, setChoices] = useState<{ crop: string; herb: string }[]>([]);
@@ -109,12 +113,12 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    addBadge({ gameId: 'herbicide-resistor', gameName: 'Herbicide Resistor', level: 'HS', score, total: 15 });
+    addBadge({ gameId: 'herbicide-resistor', gameName: 'Herbicide Resistor', level: 'HS', score, total: SEASONS_DATA.length * 5 });
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
         <div className="max-w-lg mx-auto p-4 flex flex-col items-center justify-center min-h-full text-center">
           <Dna className="w-10 h-10 text-primary mb-3" />
-          <h2 className="font-display font-bold text-2xl text-foreground mb-2">3-Year Plan Complete!</h2>
+          <h2 className="font-display font-bold text-2xl text-foreground mb-2">{SEASONS_DATA.length}-Year Plan Complete!</h2>
           <p className="text-foreground mb-1">Crop: {currentCrop.name}</p>
           <p className="text-foreground mb-2">Resistance Prevention Score: {score}</p>
           <div className="text-left bg-secondary/50 rounded-xl p-4 mb-4 max-w-sm w-full space-y-3">
@@ -130,7 +134,7 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
               );
             })}
           </div>
-          <LevelComplete level={level} score={score} total={10} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+          <LevelComplete level={level} score={score} total={SEASONS_DATA.length * 5} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
         </div>
       </div>
     );
@@ -174,7 +178,7 @@ export default function HerbicideResistor({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-display font-bold text-lg text-foreground">Herbicide Resistor</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">Year {year + 1}/3</span>
+        <span className="text-sm text-muted-foreground">Year {year + 1}/{SEASONS_DATA.length}</span>
       </div>
       <div className="relative h-48 overflow-hidden">
         <img src={currentCrop.bg} alt={currentCrop.name} className="absolute inset-0 w-full h-full object-cover" />

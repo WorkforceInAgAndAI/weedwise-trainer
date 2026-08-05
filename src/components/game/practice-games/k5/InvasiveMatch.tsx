@@ -3,6 +3,7 @@ import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -61,11 +62,11 @@ const EFFECTS_BY_WEED: Record<string, string[]> = {
   ],
 };
 
-const ITEMS_PER_ROUND = 5;
 const ROUNDS_PER_LEVEL = 3;
 
 export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const [roundNum, setRoundNum] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
 
@@ -73,16 +74,18 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
     return weeds.filter(w => w.origin === 'Introduced' && EFFECTS_BY_WEED[w.id]);
   }, []);
 
+  const itemsPerRound = Math.max(3, Math.min(d.rounds, allInvasive.length));
+
   const items = useMemo(() => {
-    const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * ITEMS_PER_ROUND;
+    const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * itemsPerRound;
     const rotated = [...allInvasive.slice(offset % allInvasive.length), ...allInvasive.slice(0, offset % allInvasive.length)];
-    return shuffle(rotated).slice(0, ITEMS_PER_ROUND).map(w => {
+    return shuffle(rotated).slice(0, itemsPerRound).map(w => {
       const effects = EFFECTS_BY_WEED[w.id];
       // Rotate which effect is shown per (level, roundNum) so it varies each playthrough
       const idx = (level + roundNum + w.id.length) % effects.length;
       return { weed: w, effect: effects[idx] };
     });
-  }, [level, roundNum, allInvasive]);
+  }, [level, roundNum, allInvasive, itemsPerRound]);
 
   const shuffledEffects = useMemo(() => shuffle(items.map(i => ({ weedId: i.weed.id, effect: i.effect }))), [items]);
   const [matches, setMatches] = useState<Record<string, string>>({});
@@ -106,7 +109,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
   const done = roundNum >= ROUNDS_PER_LEVEL;
 
   if (done) {
-    const total = ROUNDS_PER_LEVEL * ITEMS_PER_ROUND;
+    const total = ROUNDS_PER_LEVEL * itemsPerRound;
     return <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 

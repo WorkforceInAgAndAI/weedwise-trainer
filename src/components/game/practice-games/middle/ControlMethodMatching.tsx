@@ -6,6 +6,7 @@ import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getBestMOAForWeed } from '@/data/herbicides';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 /**
  * Curriculum-aligned MOA pool for 6-8 control matching.
@@ -21,6 +22,7 @@ type Phase = 'moa' | 'feedback';
 export default function ControlMethodMatching({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
 
   const msPool = useMemo(
     () => MS_MOA_IDS.map(id => HERBICIDE_MOA.find(h => h.id === id)).filter(Boolean) as typeof HERBICIDE_MOA,
@@ -36,15 +38,16 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
     }
     for (const k of Object.keys(byMoa)) byMoa[k] = shuffle(byMoa[k]);
 
-    // Build a balanced 10-question set: cycle through every represented MOA and rotate
+    // Build a balanced question set: cycle through every represented MOA and rotate
     // by level so consecutive sessions show different species.
+    const targetCount = d.rounds;
     const moaKeys = shuffle(Object.keys(byMoa));
     const offsetByMoa: Record<string, number> = {};
     for (const k of moaKeys) offsetByMoa[k] = (level - 1) % Math.max(byMoa[k].length, 1);
 
     const selected: typeof weeds = [];
     let i = 0;
-    while (selected.length < 10) {
+    while (selected.length < targetCount) {
       const k = moaKeys[i % moaKeys.length];
       const list = byMoa[k];
       if (list.length > 0) {
@@ -62,16 +65,17 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
       const distractorPool = msPool.filter(h => h.group !== bestMOA.group);
       const usedGroups = new Set<number>([bestMOA.group]);
       const distractors: typeof msPool = [];
+      const distractorTarget = Math.max(1, d.options - 1);
       for (const h of shuffle(distractorPool)) {
         if (usedGroups.has(h.group)) continue;
         usedGroups.add(h.group);
         distractors.push(h);
-        if (distractors.length >= 2) break;
+        if (distractors.length >= distractorTarget) break;
       }
       const options = shuffle([bestMOA, ...distractors]);
       return { weed: w, bestId, bestMOA, options };
     });
-  }, [level, msPool]);
+  }, [level, msPool, d.rounds]);
 
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<Phase>('moa');

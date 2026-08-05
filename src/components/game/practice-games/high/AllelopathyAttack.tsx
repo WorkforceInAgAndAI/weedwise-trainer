@@ -4,6 +4,7 @@ import { useGameProgress } from '@/contexts/GameProgressContext';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -46,9 +47,9 @@ const SCENARIOS = [
 
 const TOTAL_ROUNDS = 10;
 
-function pickStrategies(bestId: string): typeof ALL_STRATEGIES {
+function pickStrategies(bestId: string, optionCount: number): typeof ALL_STRATEGIES {
  const best = ALL_STRATEGIES.find(s => s.id === bestId)!;
- const others = shuffle(ALL_STRATEGIES.filter(s => s.id !== bestId)).slice(0, 3);
+ const others = shuffle(ALL_STRATEGIES.filter(s => s.id !== bestId)).slice(0, Math.max(1, optionCount - 1));
  return shuffle([best, ...others]);
 }
 
@@ -57,23 +58,20 @@ export default function AllelopathyAttack({ onBack }: { onBack: () => void }) {
  const { addBadge } = useGameProgress();
  const [phase, setPhase] = useState<'select' | 'bio' | 'play' | 'done'>('select');
  const [playerWeed, setPlayerWeed] = useState(ALL_PLAYER_WEEDS[0]);
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
 
- const availablePlayers = useMemo(() => {
-  const pool = shuffle(ALL_PLAYER_WEEDS);
-  const offset = ((level - 1) * 5) % pool.length;
-  return pool.slice(offset).concat(pool).slice(0, 5);
- }, [level]);
+ const availablePlayers = useMemo(() => levelSlice(shuffle(ALL_PLAYER_WEEDS), level, 5), [level]);
 
- const rounds = useMemo(() => shuffle([...SCENARIOS]).slice(0, TOTAL_ROUNDS), [level]);
+ const rounds = useMemo(() => levelSlice(shuffle([...SCENARIOS]), level, d.rounds), [level, d.rounds]);
  const [idx, setIdx] = useState(0);
  const [picked, setPicked] = useState<string | null>(null);
  const [answered, setAnswered] = useState(false);
  const [score, setScore] = useState(0);
 
  const currentStrategies = useMemo(() => {
-  if (phase !== 'play' || idx >= rounds.length) return ALL_STRATEGIES.slice(0, 4);
-  return pickStrategies(rounds[idx].best);
- }, [idx, phase, rounds]);
+  if (phase !== 'play' || idx >= rounds.length) return ALL_STRATEGIES.slice(0, d.options);
+  return pickStrategies(rounds[idx].best, d.options);
+ }, [idx, phase, rounds, d.options]);
 
  const submit = (sId: string) => { if (answered) return; setPicked(sId); setAnswered(true); if (sId === rounds[idx].best) setScore(s => s + 1); };
  const next = () => { setIdx(i => i + 1); setPicked(null); setAnswered(false); };

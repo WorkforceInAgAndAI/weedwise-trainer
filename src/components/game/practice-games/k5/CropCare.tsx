@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Droplets, Sun, Sprout, Play, AlertTriangle, Trophy } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
 import { resolveCropImageUrl } from '@/lib/imageMap';
+import { getDifficulty } from '@/lib/difficulty';
 
 // -------- Crop Care Crew (K-5 Explorer) --------------------------------
 // Kids give Water, Sunlight, and Plant Food to CROPS so they grow tall
@@ -15,7 +16,6 @@ const ROWS = 2;
 const COLS = 3;
 const PLOTS = ROWS * COLS;
 const ROUND_SECONDS = 60;
-const ROUNDS_PER_LEVEL = 3;
 const CROP_MAX = 4;   // 0..4 growth stages -> harvest at 4
 const WEED_MAX = 3;   // weed chokes when it hits 3
 
@@ -55,6 +55,8 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const roundsPerLevel = Math.max(2, Math.min(4, Math.round(diff.rounds / 2)));
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [totalPossible, setTotalPossible] = useState(0);
@@ -111,7 +113,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
 
   function weedSpawnInterval() {
     // gets faster with level
-    return Math.max(2500, 5500 - (level - 1) * 700);
+    return Math.max(1800, 5500 / diff.speed);
   }
 
   function spawnWeedInRandomPlot() {
@@ -264,7 +266,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
     const possible = 120; // soft ceiling per round
     const nextScore = totalScore + gained;
     const nextPossible = totalPossible + possible;
-    if (round + 1 >= ROUNDS_PER_LEVEL) {
+    if (round + 1 >= roundsPerLevel) {
       setTotalScore(nextScore); setTotalPossible(nextPossible);
       setDone(true); return;
     }
@@ -310,7 +312,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
           </button>
           <div className="flex items-center gap-2 text-sm flex-wrap justify-end">
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">Level {level}</span>
-            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {ROUNDS_PER_LEVEL}</span>
+            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {roundsPerLevel}</span>
             <span className="px-3 py-1 rounded-full bg-accent/20 text-accent-foreground font-semibold">Score {score}</span>
           </div>
         </div>
@@ -408,7 +410,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
                   <p className="text-lg font-bold text-foreground mb-4">Round score: {Math.max(0, scoreRef.current)}</p>
                   <button onClick={commitRoundAndAdvance}
                     className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90">
-                    {round + 1 >= ROUNDS_PER_LEVEL ? 'Finish Level' : 'Next Round'}
+                    {round + 1 >= roundsPerLevel ? 'Finish Level' : 'Next Round'}
                   </button>
                 </div>
               </div>

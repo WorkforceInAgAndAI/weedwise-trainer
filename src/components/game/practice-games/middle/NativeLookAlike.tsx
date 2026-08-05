@@ -3,19 +3,20 @@ import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const GROUP_SIZE = 10;
 
-function buildGroup(level: number): typeof weeds {
+function buildGroup(level: number, groupSize = GROUP_SIZE): typeof weeds {
   const natives = shuffle(weeds.filter(w => w.origin === 'Native'));
   const intros = shuffle(weeds.filter(w => w.origin === 'Introduced'));
-  // Aim for a balanced mix: 5 native + 5 introduced when possible
-  const nCount = Math.min(GROUP_SIZE / 2, natives.length);
-  const iCount = Math.min(GROUP_SIZE - nCount, intros.length);
-  const offsetN = ((level - 1) * (GROUP_SIZE / 2)) % Math.max(1, natives.length);
-  const offsetI = ((level - 1) * (GROUP_SIZE / 2)) % Math.max(1, intros.length);
+  // Aim for a balanced mix: half native + half introduced when possible
+  const nCount = Math.min(Math.round(groupSize / 2), natives.length);
+  const iCount = Math.min(groupSize - nCount, intros.length);
+  const offsetN = ((level - 1) * Math.round(groupSize / 2)) % Math.max(1, natives.length);
+  const offsetI = ((level - 1) * Math.round(groupSize / 2)) % Math.max(1, intros.length);
   const pickN = [...natives.slice(offsetN), ...natives.slice(0, offsetN)].slice(0, nCount);
   const pickI = [...intros.slice(offsetI), ...intros.slice(0, offsetI)].slice(0, iCount);
   return shuffle([...pickN, ...pickI]);
@@ -23,7 +24,9 @@ function buildGroup(level: number): typeof weeds {
 
 export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const group = useMemo(() => buildGroup(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const groupSize = Math.max(GROUP_SIZE, d.rounds);
+  const group = useMemo(() => buildGroup(level, groupSize), [level, groupSize]);
   const [placements, setPlacements] = useState<Record<string, 'native' | 'introduced'>>({});
   const [selectedWeed, setSelectedWeed] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -78,7 +81,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    return <LevelComplete level={level} score={score} total={GROUP_SIZE} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title={`Native or Introduced? Lv.${level}`} />;
+    return <LevelComplete level={level} score={score} total={groupSize} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title={`Native or Introduced? Lv.${level}`} />;
   }
 
   return (
@@ -87,7 +90,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Native or Introduced?</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">{Object.keys(placements).length}/{GROUP_SIZE}</span>
+        <span className="text-sm text-muted-foreground">{Object.keys(placements).length}/{groupSize}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <p className="text-sm text-muted-foreground text-center">Tap a weed, then drop it into Native or Introduced.</p>

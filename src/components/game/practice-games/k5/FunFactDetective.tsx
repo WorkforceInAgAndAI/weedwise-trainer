@@ -3,6 +3,7 @@ import { ArrowLeft, Search, Check, X, Lightbulb } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
+import { getDifficulty } from '@/lib/difficulty';
 
 // The 14 weeds featured in the K-5 "14 Weeds You Can Spot!" learning module.
 // Each entry mirrors the module's name, spot-it hint, and fun fact so students
@@ -32,9 +33,7 @@ const ALL_WEEDS: WeedEntry[] = [
   { id: 'Venice_mallow',          name: 'Venice Mallow',          hint: 'White flower with a dark purple bullseye in the middle.', funFact: 'Each flower only stays open for a few hours \u2014 then closes forever!', mnemonic: '"White flower, PURPLE BULLSEYE \u2014 Venice Mallow says hi!"' },
 ];
 
-// Kids answer one clue at a time from a big grid of 3 photos (1 correct + 2 distractors).
-const CHOICES_PER_ROUND = 3;
-const ROUNDS_PER_LEVEL = 8;
+// Kids answer one clue at a time from a big grid of photos (1 correct + distractors).
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -50,10 +49,10 @@ interface Round {
   choices: WeedEntry[]; // includes the answer, shuffled
 }
 
-function buildRounds(): Round[] {
-  const questionOrder = shuffle(ALL_WEEDS).slice(0, ROUNDS_PER_LEVEL);
+function buildRounds(roundsCount: number, choicesPerRound: number): Round[] {
+  const questionOrder = shuffle(ALL_WEEDS).slice(0, roundsCount);
   return questionOrder.map(answer => {
-    const distractors = shuffle(ALL_WEEDS.filter(w => w.id !== answer.id)).slice(0, CHOICES_PER_ROUND - 1);
+    const distractors = shuffle(ALL_WEEDS.filter(w => w.id !== answer.id)).slice(0, choicesPerRound - 1);
     return { answer, choices: shuffle([answer, ...distractors]) };
   });
 }
@@ -67,8 +66,9 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
   const [picked, setPicked] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
   // Rebuild the round set each level so kids see fresh cases.
-  const rounds = useMemo(() => buildRounds(), [level]);
+  const rounds = useMemo(() => buildRounds(Math.min(d.rounds, ALL_WEEDS.length), Math.min(d.options, ALL_WEEDS.length)), [level, d.rounds, d.options]);
   const round = rounds[step];
   const answered = picked !== null;
   const isCorrect = answered && picked === round.answer.id;

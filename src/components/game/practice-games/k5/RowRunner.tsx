@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Scissors, AlertTriangle, Play, Trash2 } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
+import { getDifficulty } from '@/lib/difficulty';
 
 // -------- Row Runner (K-5 Explorer) --------------------------------------
 // Aerial "drone" view of a crop field scrolling vertically. Weeds pop up
@@ -17,7 +18,6 @@ const AREA_W = 640;
 const AREA_H = 560;
 const ROW_COUNT = 5;
 const ROUND_SECONDS = 45;
-const ROUNDS_PER_LEVEL = 3;
 const WEED_SIZE = 74;
 const CROP_SIZE = 60;
 
@@ -45,6 +45,8 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const roundsPerLevel = Math.max(2, Math.min(4, Math.round(diff.rounds / 2)));
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [totalPossible, setTotalPossible] = useState(0);
@@ -103,8 +105,8 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
     };
   }, []);
 
-  const scrollSpeed = 60 + (level - 1) * 14; // px/sec — gentler ramp for young players
-  const spawnInterval = Math.max(650, 1150 - (level - 1) * 90);
+  const scrollSpeed = 60 * diff.speed; // px/sec — gentler ramp for young players
+  const spawnInterval = Math.max(650, 1150 / diff.speed);
 
   function beginRound() {
     spritesRef.current = [];
@@ -262,7 +264,7 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
     const possible = 60 + (level - 1) * 15;
     const nextTotalScore = totalScore + gained;
     const nextTotalPossible = totalPossible + possible;
-    if (round + 1 >= ROUNDS_PER_LEVEL) {
+    if (round + 1 >= roundsPerLevel) {
       setTotalScore(nextTotalScore); setTotalPossible(nextTotalPossible);
       setDone(true); return;
     }
@@ -312,7 +314,7 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
           </button>
           <div className="flex items-center gap-3 text-sm">
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">Level {level}</span>
-            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {ROUNDS_PER_LEVEL}</span>
+            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {roundsPerLevel}</span>
             <span className="px-3 py-1 rounded-full bg-accent/20 text-accent-foreground font-semibold">Score {score}</span>
           </div>
         </div>
@@ -510,7 +512,7 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                     onClick={commitRoundAndAdvance}
                     className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-bold hover:opacity-90"
                   >
-                    {round + 1 >= ROUNDS_PER_LEVEL ? 'Finish Level' : 'Next Round'}
+                    {round + 1 >= roundsPerLevel ? 'Finish Level' : 'Next Round'}
                   </button>
                 </div>
               </div>

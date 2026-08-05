@@ -3,6 +3,7 @@ import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Sun, Snowflake, Droplets, Wind } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -23,12 +24,16 @@ function getZone(w: typeof weeds[0]) {
 }
 
 const ROUNDS_PER_LEVEL = 2;
-const WEEDS_PER_ROUND = 4;
+
+function weedsPerRound(level: number) {
+ // More species to sort per round as the level increases.
+ return Math.min(8, 4 + Math.floor((level - 1) / 2));
+}
 
 function buildRound(level: number, round: number) {
- const pool = shuffle(weeds);
- const offset = ((level - 1) * ROUNDS_PER_LEVEL + round) * WEEDS_PER_ROUND;
- return pool.slice(offset % pool.length).concat(pool).slice(0, WEEDS_PER_ROUND).map(w => ({ weed: w, correct: getZone(w) }));
+ const count = weedsPerRound(level);
+ const pool = levelSlice(shuffle(weeds), level * 100 + round, count);
+ return pool.map(w => ({ weed: w, correct: getZone(w) }));
 }
 
 export default function HabitatMapping({ onBack }: { onBack: () => void }) {
@@ -38,6 +43,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
  const [reviewing, setReviewing] = useState(false);
  const [reviewIdx, setReviewIdx] = useState(0);
 
+ const WEEDS_PER_ROUND = weedsPerRound(level);
  const items = useMemo(() => buildRound(level, round), [level, round]);
  const [placements, setPlacements] = useState<Record<string, string>>({});
  const [selected, setSelected] = useState<string | null>(null);
@@ -101,8 +107,8 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   return (
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
     <h2 className="text-2xl font-bold text-foreground mb-2">Level {level} Complete</h2>
-    <p className="text-lg text-foreground mb-6">{totalScore}/{WEEDS_PER_ROUND * ROUNDS_PER_LEVEL} correct</p>
-    <LevelComplete level={level} score={totalScore} total={WEEDS_PER_ROUND * ROUNDS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+    <p className="text-lg text-foreground mb-6">{totalScore}/{items.length * ROUNDS_PER_LEVEL} correct</p>
+    <LevelComplete level={level} score={totalScore} total={items.length * ROUNDS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
    </div>
   );
  }

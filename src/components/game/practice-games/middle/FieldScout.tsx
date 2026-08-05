@@ -6,6 +6,7 @@ import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
 import aerialSoybean from '@/assets/images/aerial_soybean_field.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -105,14 +106,16 @@ const WRONG_PAY = 10;
 
 export default function FieldScout({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const totalRounds = d.rounds;
   const fieldOrder = useMemo(() => {
     const shuffled = shuffle([...FIELDS]);
     const result: FieldDef[] = [];
-    for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    for (let i = 0; i < totalRounds; i++) {
       result.push(shuffled[i % shuffled.length]);
     }
     return result;
-  }, []);
+  }, [totalRounds]);
 
   const [showIntro, setShowIntro] = useState(true);
   const [round, setRound] = useState(0);
@@ -122,7 +125,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
   const [money, setMoney] = useState(0);
 
-  const finished = round >= TOTAL_ROUNDS;
+  const finished = round >= totalRounds;
   const field = !finished ? fieldOrder[round] : fieldOrder[0];
 
   const weedSpots = useMemo(() => {
@@ -183,7 +186,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
           You'll earn <span className="font-bold text-primary">${CORRECT_PAY}</span> for choosing the best pattern and <span className="font-bold text-muted-foreground">${WRONG_PAY}</span> for a less effective choice.
         </p>
         <p className="text-muted-foreground max-w-md mb-6">
-          Scout {TOTAL_ROUNDS} fields and earn as much as you can!
+          Scout {totalRounds} fields and earn as much as you can!
         </p>
         <button onClick={() => setShowIntro(false)} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
           Start Scouting
@@ -193,15 +196,15 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
   }
 
   if (finished) {
-    const maxMoney = TOTAL_ROUNDS * CORRECT_PAY;
+    const maxMoney = totalRounds * CORRECT_PAY;
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center">
         <DollarSign className="w-12 h-12 text-primary mb-3" />
         <h2 className="text-2xl font-bold text-foreground mb-2">Scouting Season Complete!</h2>
-        <p className="text-lg text-foreground mb-1">{score}/{TOTAL_ROUNDS} best patterns chosen</p>
+        <p className="text-lg text-foreground mb-1">{score}/{totalRounds} best patterns chosen</p>
         <p className="text-2xl font-bold text-primary mb-2">${money} earned</p>
         <p className="text-sm text-muted-foreground mb-6">Out of a possible ${maxMoney}</p>
-        <LevelComplete level={level} score={score} total={TOTAL_ROUNDS} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+        <LevelComplete level={level} score={score} total={totalRounds} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
       </div>
     );
   }
@@ -218,7 +221,7 @@ export default function FieldScout({ onBack }: { onBack: () => void }) {
           <DollarSign className="w-4 h-4" />
           {money}
         </div>
-        <span className="text-sm text-muted-foreground ml-2">Field {round + 1}/{TOTAL_ROUNDS}</span>
+        <span className="text-sm text-muted-foreground ml-2">Field {round + 1}/{totalRounds}</span>
       </div>
       <div className="flex-1 overflow-hidden p-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 h-full">

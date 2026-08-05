@@ -2,20 +2,20 @@ import { useState, useMemo } from 'react';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
  const rounds = useMemo(() => {
-  const pool = shuffle(weeds);
-  const offset = ((level - 1) * 10) % pool.length;
-  const selected = pool.slice(offset).concat(pool).slice(0, 10);
+  const selected = levelSlice(shuffle(weeds), level, d.rounds);
   return selected.map(w => {
-   const wrong = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, 3).map(x => x.scientificName);
+   const wrong = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, Math.max(1, d.options - 1)).map(x => x.scientificName);
    return { weed: w, options: shuffle([w.scientificName, ...wrong]) };
   });
- }, [level]);
+ }, [level, d.rounds, d.options]);
 
  const [idx, setIdx] = useState(0);
  const [picked, setPicked] = useState<string | null>(null);
@@ -53,9 +53,9 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
       <WeedImage weedId={current.weed.id} stage="flower" className="w-full h-full object-cover" />
      </div>
     </div>
-    <p className="text-sm text-muted-foreground text-center mb-1 italic">{current.weed.traits[0]}</p>
-    <p className="text-xs text-muted-foreground text-center mb-4">Common: {current.weed.commonName} -- Family: {current.weed.family}</p>
-    <div className="grid gap-2">
+    {d.showHints && <p className="text-sm text-muted-foreground text-center mb-1 italic">{current.weed.traits[0]}</p>}
+    {d.showHints && <p className="text-xs text-muted-foreground text-center mb-4">Common: {current.weed.commonName} -- Family: {current.weed.family}</p>}
+    <div className="grid gap-2 sm:grid-cols-2">
      {current.options.map(opt => {
       let cls = 'border-border bg-card hover:border-primary';
       if (submitted) {

@@ -5,6 +5,7 @@ import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -39,20 +40,18 @@ function reasonFor(w: typeof weeds[0], zone: string): string {
 }
 
 const ROUNDS_PER_LEVEL = 3;
-const WEEDS_PER_ROUND = 8;
 
-function getItemsForRound(level: number, roundNum: number) {
+function getItemsForRound(level: number, roundNum: number, perZone: number) {
   const byZone: Record<string, typeof weeds> = { hot: [], cold: [], wet: [], dry: [] };
   weeds.forEach(w => byZone[getZone(w)].push(w));
-  const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * 2;
+  const offset = ((level - 1) * ROUNDS_PER_LEVEL + roundNum) * perZone;
   const picks: { weed: typeof weeds[0]; zone: string }[] = [];
-  // 2 from each zone => 8 species per round
   for (const z of ZONES) {
     const pool = byZone[z.id];
     if (pool.length === 0) continue;
     const idx = offset % pool.length;
     const rotated = shuffle([...pool.slice(idx), ...pool.slice(0, idx)]);
-    rotated.slice(0, 2).forEach(w => picks.push({ weed: w, zone: z.id }));
+    rotated.slice(0, perZone).forEach(w => picks.push({ weed: w, zone: z.id }));
   }
   return shuffle(picks);
 }
@@ -62,10 +61,12 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 export default function HabitatMapping({ onBack, gradeLabel }: Props) {
   const { addBadge } = useGameProgress();
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const perZone = Math.max(1, Math.round(d.rounds / 4));
   const [roundNum, setRoundNum] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
 
-  const items = useMemo(() => getItemsForRound(level, roundNum), [level, roundNum]);
+  const items = useMemo(() => getItemsForRound(level, roundNum, perZone), [level, roundNum, perZone]);
 
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -136,7 +137,7 @@ export default function HabitatMapping({ onBack, gradeLabel }: Props) {
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    const total = ROUNDS_PER_LEVEL * WEEDS_PER_ROUND;
+    const total = ROUNDS_PER_LEVEL * items.length;
     addBadge({ gameId: 'habitat-mapping-k5', gameName: 'Habitat Mapping', level: 'K-5', score: totalScore, total });
     return <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
