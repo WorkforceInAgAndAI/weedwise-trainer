@@ -1,5 +1,34 @@
 import { weeds } from "./weeds";
 import type { GradeLevel, Weed } from "@/types/game";
+import { getRegion } from "./regions";
+
+/**
+ * Region-aware weed pool.
+ *
+ * When a user has picked a geographic region on the home page, the species
+ * that are most prevalent in that region are pushed to the front of the pool
+ * and the remaining species are thinned (every other one) so regional weeds
+ * come up noticeably more often. Non-regional weeds are still present.
+ */
+function storedRegionId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem("weednet-region");
+  } catch {
+    return null;
+  }
+}
+
+export function applyRegionPriority(list: Weed[]): Weed[] {
+  const region = getRegion(storedRegionId());
+  if (!region) return list;
+  const priority = new Set(region.priorityWeedIds);
+  const regional = list.filter((w) => priority.has(w.id));
+  if (regional.length < 6) return list;
+  const others = list.filter((w) => !priority.has(w.id));
+  const thinned = others.filter((_, i) => i % 2 === 0);
+  return [...regional, ...(thinned.length >= 6 ? thinned : others)];
+}
 
 /**
  * K-5 (Plant Explorer) curriculum weeds — the 14 species featured in the
@@ -147,10 +176,13 @@ export const elementaryWeeds = weeds.filter((w) => ELEM_ID_SET.has(w.id));
  * The master weeds list filtered to the 6-8 curriculum.
  * Use this in place of `weeds` for any grades-6-8 practice game.
  */
-export const middleSchoolWeeds = weeds.filter((w) => MIDDLE_ID_SET.has(w.id));
+export const middleSchoolWeeds = applyRegionPriority(weeds.filter((w) => MIDDLE_ID_SET.has(w.id)));
 
 /** The master weeds list filtered to the 9-12 (high school) curriculum. */
-export const highSchoolWeeds = weeds.filter((w) => HIGH_ID_SET.has(w.id));
+export const highSchoolWeeds = applyRegionPriority(weeds.filter((w) => HIGH_ID_SET.has(w.id)));
+
+/** Full 87-species collegiate pool, region-prioritized. */
+export const collegiateWeeds = applyRegionPriority(weeds);
 
 /** Convenience predicate for one-off checks. */
 export const isMiddleSchoolWeed = (id: string): boolean => MIDDLE_ID_SET.has(id);

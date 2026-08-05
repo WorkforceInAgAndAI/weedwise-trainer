@@ -16,7 +16,9 @@ type PartKind = 'roots' | 'stem' | 'leaves' | 'flower' | 'seeds';
 // Each part has 3-4 visual styles so kids can build a custom plant every round.
 // Any style dropped in the matching slot counts as correct — this is a
 // creative anatomy game, not an identification quiz.
-interface PartStyle { id: string; label: string; color: string; variant: string; }
+// `weedId` + `stage` point at a real photo of that plant part. Roots have no
+// photographs in the library, so those styles fall back to the drawn art.
+interface PartStyle { id: string; label: string; color: string; variant: string; weedId?: string; stage?: string; }
 
 const PART_STYLES: Record<PartKind, PartStyle[]> = {
   roots: [
@@ -26,28 +28,28 @@ const PART_STYLES: Record<PartKind, PartStyle[]> = {
     { id: 'tuber',    label: 'Tuber (bulb)',   color: '#d97706', variant: 'tuber' },
   ],
   stem: [
-    { id: 'thick',   label: 'Thick stem',     color: '#65a30d', variant: 'thick' },
-    { id: 'grass',   label: 'Grass stalk',    color: '#84cc16', variant: 'grass' },
-    { id: 'vine',    label: 'Twisty vine',    color: '#4ade80', variant: 'vine' },
-    { id: 'prickly', label: 'Prickly stem',   color: '#4d7c0f', variant: 'prickly' },
+    { id: 'thick',   label: 'Thick stem',     color: '#65a30d', variant: 'thick',   weedId: 'common_Milkweed', stage: 'seedling' },
+    { id: 'grass',   label: 'Grass stalk',    color: '#84cc16', variant: 'grass',   weedId: 'giant-foxtail',   stage: 'seedling' },
+    { id: 'vine',    label: 'Twisty vine',    color: '#4ade80', variant: 'vine',    weedId: 'Field_bindweed',  stage: 'seedling' },
+    { id: 'prickly', label: 'Prickly stem',   color: '#4d7c0f', variant: 'prickly', weedId: 'canada-thistle',  stage: 'seedling' },
   ],
   leaves: [
-    { id: 'oval',     label: 'Oval leaf',      color: '#166534', variant: 'oval' },
-    { id: 'jagged',   label: 'Jagged leaf',    color: '#15803d', variant: 'jagged' },
-    { id: 'feathery', label: 'Feathery leaf',  color: '#14532d', variant: 'feathery' },
-    { id: 'blade',    label: 'Grass blade',    color: '#4d7c0f', variant: 'blade' },
+    { id: 'oval',     label: 'Oval leaf',      color: '#166534', variant: 'oval',     weedId: 'common_Milkweed', stage: 'vegetative' },
+    { id: 'jagged',   label: 'Jagged leaf',    color: '#15803d', variant: 'jagged',   weedId: 'Dandelion',       stage: 'vegetative' },
+    { id: 'feathery', label: 'Feathery leaf',  color: '#14532d', variant: 'feathery', weedId: 'Wild_Carrot',     stage: 'vegetative' },
+    { id: 'blade',    label: 'Grass blade',    color: '#4d7c0f', variant: 'blade',    weedId: 'giant-foxtail',   stage: 'vegetative' },
   ],
   flower: [
-    { id: 'daisy',   label: 'Daisy',          color: '#facc15', variant: 'daisy' },
-    { id: 'trumpet', label: 'Trumpet',        color: '#fce7f3', variant: 'trumpet' },
-    { id: 'pompom',  label: 'Pom-pom',        color: '#c026d3', variant: 'pompom' },
-    { id: 'lace',    label: 'Lace cluster',   color: '#f9fafb', variant: 'lace' },
+    { id: 'daisy',   label: 'Yellow flower',  color: '#facc15', variant: 'daisy',   weedId: 'Dandelion',        stage: 'flower' },
+    { id: 'trumpet', label: 'Trumpet',        color: '#fce7f3', variant: 'trumpet', weedId: 'Field_bindweed',   stage: 'flower' },
+    { id: 'pompom',  label: 'Pom-pom',        color: '#c026d3', variant: 'pompom',  weedId: 'canada-thistle',   stage: 'flower' },
+    { id: 'lace',    label: 'Lace cluster',   color: '#f9fafb', variant: 'lace',    weedId: 'Wild_Carrot',      stage: 'flower' },
   ],
   seeds: [
-    { id: 'puff',   label: 'Puffball',        color: '#e5e7eb', variant: 'puff' },
-    { id: 'pod',    label: 'Seed pod',        color: '#fde68a', variant: 'pod' },
-    { id: 'silky',  label: 'Silky seeds',     color: '#f5f5f4', variant: 'silky' },
-    { id: 'burry',  label: 'Sticky burs',     color: '#78350f', variant: 'burry' },
+    { id: 'puff',   label: 'Puffball',        color: '#e5e7eb', variant: 'puff',  weedId: 'Dandelion',        stage: 'seedhead' },
+    { id: 'pod',    label: 'Seed pod',        color: '#fde68a', variant: 'pod',   weedId: 'common_Milkweed',  stage: 'seedhead' },
+    { id: 'silky',  label: 'Silky seeds',     color: '#f5f5f4', variant: 'silky', weedId: 'canada-thistle',   stage: 'seedhead' },
+    { id: 'burry',  label: 'Bumpy seeds',     color: '#78350f', variant: 'burry', weedId: 'velvetleaf',       stage: 'seedhead' },
   ],
 };
 
@@ -454,8 +456,23 @@ function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: Pa
 }
 
 // ---------- Round setup ----------------------------------------------------
-interface PaletteItem { id: string; kind: PartKind; color: string; variant: string; label: string; }
-interface Placement { kind: PartKind; color: string; variant: string; label: string; correct: boolean; }
+interface PaletteItem { id: string; kind: PartKind; color: string; variant: string; label: string; weedId?: string; stage?: string; }
+interface Placement { kind: PartKind; color: string; variant: string; label: string; correct: boolean; weedId?: string; stage?: string; }
+
+/**
+ * Renders a real photograph of the plant part when the library has one,
+ * falling back to the drawn art for roots (no root photos exist yet).
+ */
+function PartVisual({ kind, color, variant, size, weedId, stage }: { kind: PartKind; color: string; variant: string; size: number; weedId?: string; stage?: string }) {
+  if (weedId && stage) {
+    return (
+      <div className="rounded-full overflow-hidden border-2 border-white shadow-sm" style={{ width: size, height: size }}>
+        <WeedImage weedId={weedId} stage={stage} className="w-full h-full" />
+      </div>
+    );
+  }
+  return <PartCartoon kind={kind} color={color} variant={variant} size={size} />;
+}
 
 function buildRound(caseIdx: number) {
   const c = CASES[caseIdx];
@@ -464,7 +481,7 @@ function buildRound(caseIdx: number) {
   const palette: PaletteItem[] = [];
   PART_ORDER.forEach((k) => {
     PART_STYLES[k].forEach((s) => {
-      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label });
+      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label, weedId: s.weedId, stage: s.stage });
     });
   });
   return { case: c, palette: shuffle(palette) };
@@ -490,14 +507,15 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
   // Show a real reference photo of the weed before students start building.
   const [showPreview, setShowPreview] = useState(true);
 
-  const availablePalette = roundData.palette.filter(p => !usedIds.has(p.id));
+  // Parts are reusable: the same leaf can fill all three leaf slots, and any
+  // style stays in the bin after being placed.
+  const availablePalette = roundData.palette;
   const slotsFilled = Object.keys(placements).length;
 
   function handleDrop(slot: SlotDef) {
     if (!dragItem || placements[slot.id] || showResult) return;
     const correct = dragItem.kind === slot.kind;
-    setPlacements(p => ({ ...p, [slot.id]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label } }));
-    setUsedIds(s => new Set([...s, dragItem.id]));
+    setPlacements(p => ({ ...p, [slot.id]: { kind: dragItem.kind, correct, color: dragItem.color, variant: dragItem.variant, label: dragItem.label, weedId: dragItem.weedId, stage: dragItem.stage } }));
     setDragItem(null);
   }
 
@@ -505,9 +523,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
     if (showResult) return;
     const placed = placements[slotId];
     if (!placed) return;
-    const paletteEntry = roundData.palette.find(p => p.kind === placed.kind && p.variant === placed.variant && usedIds.has(p.id));
     setPlacements(p => { const n = { ...p }; delete n[slotId]; return n; });
-    if (paletteEntry) setUsedIds(s => { const n = new Set(s); n.delete(paletteEntry.id); return n; });
   }
 
   function checkRound() {
@@ -664,7 +680,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                       >
                         {placed ? (
                           <div className="relative">
-                            <PartCartoon kind={placed.kind} color={placed.color} variant={placed.variant} size={partSize} />
+                            <PartVisual kind={placed.kind} color={placed.color} variant={placed.variant} size={partSize} weedId={placed.weedId} stage={placed.stage} />
                             {showResult && (
                               <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center shadow" style={{ background: placed.correct ? '#16a34a' : '#dc2626' }}>
                                 {placed.correct ? <Check className="w-4 h-4 text-white" /> : <X className="w-4 h-4 text-white" />}
@@ -693,10 +709,8 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
             </div>
 
             <div className="rounded-lg border-2 border-dashed border-border bg-card p-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Parts Bin ({availablePalette.length})</p>
-              {availablePalette.length === 0 ? (
-                <p className="text-xs text-muted-foreground py-4 text-center">All parts used!</p>
-              ) : (
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Parts Bin — use each part as many times as you like</p>
+              {availablePalette.length > 0 && (
                 <div className="space-y-3">
                   {PART_ORDER.map(k => {
                     const options = availablePalette.filter(p => p.kind === k);
@@ -716,7 +730,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
                               } transition-all`}
                               title={`Drag ${p.label} onto the plant`}
                             >
-                              <PartCartoon kind={p.kind} color={p.color} variant={p.variant} size={44} />
+                              <PartVisual kind={p.kind} color={p.color} variant={p.variant} size={44} weedId={p.weedId} stage={p.stage} />
                             </div>
                           ))}
                         </div>

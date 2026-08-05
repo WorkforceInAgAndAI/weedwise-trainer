@@ -18,11 +18,11 @@ interface Hero {
 }
 
 const HEROES: Hero[] = [
-  { key: 'pull',     name: 'Pull It',     power: 'Super Strength',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 2, cooldownMs: 1200 },
-  { key: 'block',    name: 'Block It',    power: 'Force Field',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 3, cooldownMs: 1800 },
-  { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 3, cooldownMs: 1600 },
-  { key: 'eat',      name: 'Eat It',      power: 'Animal Allies',   Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 4, cooldownMs: 2200 },
-  { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 5, cooldownMs: 2800 },
+  { key: 'pull',     name: 'Pull It',     power: 'Super Strength',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 1, cooldownMs: 500 },
+  { key: 'block',    name: 'Block It',    power: 'Force Field',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 1, cooldownMs: 700 },
+  { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 1, cooldownMs: 700 },
+  { key: 'eat',      name: 'Eat It',      power: 'Animal Allies',   Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
+  { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 2, cooldownMs: 1100 },
 ];
 
 interface WeedVillain {
@@ -58,15 +58,15 @@ const WEED_POOL: Omit<WeedVillain, 'id' | 'lane' | 'pos' | 'speed' | 'hp' | 'max
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
 const LANES = 3;
-const CROP_HP_START = 5;
-const ENERGY_MAX = 10;
-const ENERGY_REGEN = 1.2;   // per second
+const CROP_HP_START = 10;
+const ENERGY_MAX = 12;
+const ENERGY_REGEN = 2.6;   // per second
 
 export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
   const [cropHp, setCropHp] = useState(CROP_HP_START);
-  const [energy, setEnergy] = useState(6);
+  const [energy, setEnergy] = useState(ENERGY_MAX);
   const [weeds, setWeeds] = useState<WeedVillain[]>([]);
   const [selected, setSelected] = useState<PowerKey | null>(null);
   const [cooldowns, setCooldowns] = useState<Record<PowerKey, number>>({ pull: 0, block: 0, outsmart: 0, eat: 0, stop: 0 });
@@ -82,10 +82,12 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   // Level tuning
   const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const config = useMemo(() => {
-    const spawnEverySec = Math.max(1.4, 3.2 - level * 0.35) / diff.speed;
-    const speedMin = (6 + level * 1.4) * diff.speed;       // % per second
-    const speedMax = (10 + level * 2.0) * diff.speed;
-    const targetDefeated = diff.rounds * 3 + level * 2;  // needed to win the level
+    // Gentle K-5 pacing: weeds march slowly and spawn far apart so students
+    // have time to read each weakness badge before choosing a hero.
+    const spawnEverySec = Math.max(2.6, 4.6 - level * 0.25) / diff.speed;
+    const speedMin = (2.6 + level * 0.5) * diff.speed;      // % per second
+    const speedMax = (4.2 + level * 0.7) * diff.speed;
+    const targetDefeated = 6 + level * 2;  // needed to win the level
     return { spawnEverySec, speedMin, speedMax, targetDefeated };
   }, [level, diff]);
 
@@ -196,10 +198,9 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
           window.setTimeout(() => setWeeds(l => l.filter(x => x.id !== weed.id)), 220);
           return { ...w, hp: 0, flash: 'miss' };
         }
-        return { ...w, hp: nextHp, speed: Math.max(3, w.speed * 0.75), flash: 'miss' };
+        return { ...w, hp: nextHp, speed: Math.max(2, w.speed * 0.6), flash: 'miss' };
       }));
-      setScore(s => Math.max(0, s - 2));
-      showFeedback(`Wrong power for ${weed.name}!`, 'bad');
+      showFeedback(`Not quite — ${weed.name} needs a different hero. Try again!`, 'bad');
     }
     // clear flash
     window.setTimeout(() => setWeeds(list => list.map(w => w.id === weed.id ? { ...w, flash: null } : w)), 300);
@@ -207,7 +208,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
 
   const restart = () => {
     nextId.current = 1; spawnTimer.current = 0;
-    setScore(0); setCropHp(CROP_HP_START); setEnergy(6); setWeeds([]);
+    setScore(0); setCropHp(CROP_HP_START); setEnergy(ENERGY_MAX); setWeeds([]);
     setSelected(null); setCooldowns({ pull: 0, block: 0, outsmart: 0, eat: 0, stop: 0 });
     setDefeated(0); setEscaped(0); setRunning(true); setDone(false); setFeedback(null);
   };

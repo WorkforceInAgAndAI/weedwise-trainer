@@ -4,6 +4,7 @@ import type { useAuth } from '@/hooks/useAuth';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
 import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
+import RegionPicker from './RegionPicker';
 
 const CAROUSEL_WEEDS = ['waterhemp', 'palmer-amaranth', 'giant-ragweed', 'lambsquarters', 'velvetleaf', 'marestail', 'kochia', 'morningglory'];
 
@@ -85,6 +86,8 @@ export default function LandingPage({
  </section>
 
  {/* Content Cards */}
+ <RegionPicker />
+
  <section className="max-w-[1200px] mx-auto px-5 sm:px-10 py-16">
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
  {[

@@ -5,6 +5,13 @@ import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
 import { getDifficulty } from '@/lib/difficulty';
+import { resolveCropImageUrl } from '@/lib/imageMap';
+
+// Real soybean crop photos used for the dense canopy the scout looks through.
+const CROP_IMGS = [
+  resolveCropImageUrl('Soybean', 'crop_1.jpg'),
+  resolveCropImageUrl('Soybean', 'crop_2.jpg'),
+].filter(Boolean) as string[];
 
 // -------- Row Runner (K-5 Explorer) --------------------------------------
 // Aerial "drone" view of a crop field scrolling vertically. Weeds pop up
@@ -361,25 +368,37 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                   />
                 );
               })}
-              {/* Scrolling crop plants (green tufts) */}
-              <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${AREA_W} ${AREA_H}`} preserveAspectRatio="none">
-                {Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
-                  const cx = laneCenterX(laneIdx);
-                  const tufts: JSX.Element[] = [];
-                  for (let y = -80; y < AREA_H + 80; y += 80) {
-                    const yy = y + scrollRef.current;
-                    tufts.push(
-                      <g key={`${laneIdx}-${y}`} transform={`translate(${cx} ${yy})`}>
-                        <ellipse cx="0" cy="0" rx="22" ry="16" fill="#2f5111" opacity="0.85" />
-                        <ellipse cx="-10" cy="-6" rx="10" ry="8" fill="#3d6a17" />
-                        <ellipse cx="10" cy="-6" rx="10" ry="8" fill="#3d6a17" />
-                        <ellipse cx="0" cy="-10" rx="10" ry="8" fill="#4b8020" />
-                      </g>
-                    );
-                  }
-                  return <g key={laneIdx}>{tufts}</g>;
-                })}
-              </svg>
+              {/* Scrolling soybean canopy — real crop photos packed tightly so
+                  scouts have to look *through* the rows to spot the weeds. */}
+              {CROP_IMGS.length > 0 && Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
+                const cx = laneCenterX(laneIdx);
+                const plants: JSX.Element[] = [];
+                const STEP = 26;              // tight vertical spacing = dense canopy
+                const PLANT = 78;             // plants overlap each other
+                for (let y = -PLANT; y < AREA_H + PLANT; y += STEP) {
+                  const yy = ((y + scrollRef.current) % (AREA_H + PLANT * 2)) - PLANT;
+                  const seed = (laneIdx * 31 + y) % 7;
+                  const jitterX = (seed - 3) * 9;
+                  const img = CROP_IMGS[(laneIdx + seed) % CROP_IMGS.length];
+                  plants.push(
+                    <img
+                      key={`${laneIdx}-${y}`}
+                      src={img}
+                      alt=""
+                      className="absolute rounded-full object-cover"
+                      style={{
+                        left: `${((cx + jitterX) / AREA_W) * 100}%`,
+                        top: `${(yy / AREA_H) * 100}%`,
+                        width: `${(PLANT / AREA_W) * 100}%`,
+                        height: `${(PLANT / AREA_H) * 100}%`,
+                        transform: `translate(-50%, -50%) rotate(${seed * 17}deg)`,
+                        filter: 'brightness(0.92) saturate(1.1)',
+                      }}
+                    />
+                  );
+                }
+                return <div key={laneIdx} className="absolute inset-0">{plants}</div>;
+              })}
             </div>
 
             {/* HUD bar */}
@@ -449,8 +468,12 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                     ) : (
                       <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden"
                         style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }}>
-                        <div className="absolute inset-2 rounded-full opacity-70"
-                          style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
+                        {CROP_IMGS[0] ? (
+                          <img src={CROP_IMGS[s.id % CROP_IMGS.length]} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        ) : (
+                          <div className="absolute inset-2 rounded-full opacity-70"
+                            style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
+                        )}
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
                           Crop
                         </div>

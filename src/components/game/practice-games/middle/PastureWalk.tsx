@@ -194,7 +194,7 @@ export default function PastureWalk({ onBack, gameId, gameName, gradeLabel }: Pr
        <button key={pl.id}
         onClick={() => walkTo(pl)}
        disabled={!affordable && !dec}
-        className={`absolute w-7 h-7 rounded-full border-2 shadow-md overflow-hidden transition-all ${
+        className={`absolute w-14 h-14 sm:w-16 sm:h-16 rounded-full border-[3px] shadow-lg overflow-hidden transition-all ${
          dec ? (dec.correct ? 'border-emerald-500 opacity-60' : 'border-destructive opacity-60') :
          isSelected ? 'border-primary ring-2 ring-primary scale-110' :
          affordable ? 'border-white/80 hover:scale-110' : 'border-white/40 opacity-50'
@@ -205,7 +205,7 @@ export default function PastureWalk({ onBack, gameId, gameName, gradeLabel }: Pr
         <WeedImage weedId={pl.weedId} stage={pl.stage === 'reproductive' ? 'flower' : pl.stage} className="w-full h-full object-cover pointer-events-none" />
         {dec && (
          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          {dec.correct ? <Check className="w-3 h-3 text-white" /> : <X className="w-3 h-3 text-white" />}
+          {dec.correct ? <Check className="w-6 h-6 text-white" /> : <X className="w-6 h-6 text-white" />}
          </div>
         )}
        </button>
@@ -218,7 +218,7 @@ export default function PastureWalk({ onBack, gameId, gameName, gradeLabel }: Pr
      {selected ? (
       <div className="rounded-xl border-2 border-primary bg-card p-3 space-y-2">
        <div className="flex gap-2 items-center">
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
+        <div className="w-28 h-28 rounded-lg overflow-hidden bg-muted shrink-0">
          <WeedImage weedId={selected.weedId} stage={selected.stage === 'reproductive' ? 'flower' : selected.stage} className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
