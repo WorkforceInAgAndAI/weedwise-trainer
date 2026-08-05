@@ -316,8 +316,8 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
 
         {/* Life stage banner */}
         <div className={`${stage.color} text-white rounded-2xl p-3 mb-3 flex items-center gap-3 shadow-lg`}>
-          <div className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center">
-            <StageIcon className="w-7 h-7" />
+          <div className="w-16 h-24 rounded-xl bg-white/25 flex items-center justify-center p-1 shrink-0">
+            <GrowingPlant tile={tile} className="w-full h-full" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase tracking-wider opacity-80">Current life stage</p>
