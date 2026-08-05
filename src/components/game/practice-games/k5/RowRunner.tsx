@@ -360,17 +360,17 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                   />
                 );
               })}
-              {/* Scrolling soybean canopy — simple drawn crop tufts, packed
-                  tightly so scouts look *through* the rows to spot the weeds. */}
+              {/* Scrolling soybean canopy — simple, sparse drawn crop tufts so the
+                  field stays clean and easy to read for young scouts. */}
               {Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
                 const cx = laneCenterX(laneIdx);
                 const plants: JSX.Element[] = [];
-                const STEP = 22;              // tight vertical spacing = dense canopy
-                const PLANT = 64;             // plants overlap each other
+                const STEP = 70;              // roomy spacing = calm, simple canopy
+                const PLANT = 40;             // small tufts, no overlap
                 for (let y = -PLANT; y < AREA_H + PLANT; y += STEP) {
                   const yy = ((y + scrollRef.current) % (AREA_H + PLANT * 2)) - PLANT;
                   const seed = (laneIdx * 31 + y) % 7;
-                  const jitterX = (seed - 3) * 7;
+                  const jitterX = (seed - 3) * 4;
                   plants.push(
                     <div
                       key={`${laneIdx}-${y}`}
@@ -384,7 +384,7 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                         background: seed % 2 === 0
                           ? 'radial-gradient(circle at 35% 30%, #7cb342 0%, #4c8c2b 55%, #33691e 100%)'
                           : 'radial-gradient(circle at 60% 40%, #8bc34a 0%, #558b2f 55%, #2e5d16 100%)',
-                        opacity: 0.95,
+                        opacity: 0.7,
                       }}
                     />
                   );
