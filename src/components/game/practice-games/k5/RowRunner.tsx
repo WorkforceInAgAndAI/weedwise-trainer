@@ -469,12 +469,8 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                       <>
                         <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden"
                           style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }}>
-                          {CROP_IMGS[0] ? (
-                            <img src={CROP_IMGS[s.id % CROP_IMGS.length]} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                          ) : (
-                            <div className="absolute inset-2 rounded-full opacity-70"
-                              style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
-                          )}
+                          <div className="absolute inset-2 rounded-full opacity-70"
+                            style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
                         </div>
                         {/* Label sits OUTSIDE the clipped circle so it reads on top */}
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
