@@ -307,8 +307,8 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
                       className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 transition-all duration-200 ${badgeState}`}
                       style={{ top: `calc(24px + ${w.pos}% * 0.78)` }}
                     >
-                      <div className="w-14 h-14 rounded-full bg-red-900/85 border-2 border-red-300 shadow-lg flex items-center justify-center relative">
-                        <Shrub className="w-8 h-8 text-red-100" />
+                      <div className="w-16 h-16 rounded-full bg-red-900/85 border-4 border-red-400 shadow-lg overflow-hidden relative">
+                        <WeedImage weedId={w.weedId} stage="vegetative" className="w-full h-full object-cover" />
                         {w.maxHp > 1 && (
                           <div className="absolute -top-1 -right-1 text-[10px] font-bold text-red-900 bg-white rounded-full w-4 h-4 flex items-center justify-center border border-red-400">{w.hp}</div>
                         )}
