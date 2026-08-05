@@ -68,6 +68,7 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
  const [selected, setSelected] = useState('');
  const [answered, setAnswered] = useState(false);
  const [score, setScore] = useState(0);
+ const [zoom, setZoom] = useState(1.75);
 
  const done = round >= rounds.length;
  const current = !done ? rounds[round] : null;
@@ -79,8 +80,8 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
   if (opt === current!.weed.commonName) setScore(s => s + 1);
  };
 
- const next = () => { setRound(r => r + 1); setSelected(''); setAnswered(false); };
- const restart = () => { setRound(0); setScore(0); setSelected(''); setAnswered(false); };
+ const next = () => { setRound(r => r + 1); setSelected(''); setAnswered(false); setZoom(1.75); };
+ const restart = () => { setRound(0); setScore(0); setSelected(''); setAnswered(false); setZoom(1.75); };
  const nextLevel = () => { setLevel(l => l + 1); restart(); };
  const startOver = () => { setLevel(1); restart(); };
 
@@ -105,9 +106,31 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
    </div>
    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
     <p className="text-sm text-muted-foreground mb-2">Zoom in on the ligule — identify the grass!</p>
-     <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden bg-secondary mb-4 border-4 border-primary">
-      <WeedImage weedId={current!.weed.id} stage="ligule" className="w-full h-full object-cover scale-[1.75]" />
-      <div className="absolute inset-0 rounded-full border-4 border-primary/30" />
+     <div className="relative w-72 h-72 sm:w-96 sm:h-96 rounded-full overflow-hidden bg-secondary mb-3 border-4 border-primary">
+      <div className="w-full h-full transition-transform duration-200" style={{ transform: `scale(${zoom})` }}>
+       <WeedImage weedId={current!.weed.id} stage="ligule" className="w-full h-full object-cover" />
+      </div>
+      <div className="absolute inset-0 rounded-full border-4 border-primary/30 pointer-events-none" />
+      {/* Crosshair to help students centre on the leaf collar */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+       <div className="w-10 h-px bg-primary/40" />
+       <div className="h-10 w-px bg-primary/40 absolute" />
+      </div>
+     </div>
+     <div className="flex items-center gap-2 mb-4">
+      <button onClick={() => setZoom(z => Math.max(1, +(z - 0.25).toFixed(2)))}
+       className="w-10 h-10 rounded-full border-2 border-border bg-card flex items-center justify-center text-foreground hover:border-primary"
+       aria-label="Zoom out"><ZoomOut className="w-4 h-4" /></button>
+      <input type="range" min={1} max={5} step={0.25} value={zoom}
+       onChange={e => setZoom(Number(e.target.value))}
+       className="w-40 accent-primary" aria-label="Zoom level" />
+      <button onClick={() => setZoom(z => Math.min(5, +(z + 0.25).toFixed(2)))}
+       className="w-10 h-10 rounded-full border-2 border-border bg-card flex items-center justify-center text-foreground hover:border-primary"
+       aria-label="Zoom in"><ZoomIn className="w-4 h-4" /></button>
+      <button onClick={() => setZoom(1.75)}
+       className="w-10 h-10 rounded-full border-2 border-border bg-card flex items-center justify-center text-foreground hover:border-primary"
+       aria-label="Reset zoom"><RotateCcw className="w-4 h-4" /></button>
+      <span className="text-xs font-mono text-muted-foreground w-12 text-right">{zoom.toFixed(2)}x</span>
      </div>
     <p className="text-xs text-muted-foreground mb-4 max-w-md text-center"><span className="font-semibold text-foreground">Ligule:</span> {getLiguleText(current!.weed)}</p>
     <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
