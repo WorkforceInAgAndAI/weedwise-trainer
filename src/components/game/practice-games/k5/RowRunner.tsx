@@ -5,6 +5,13 @@ import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
 import { getDifficulty } from '@/lib/difficulty';
+import { resolveCropImageUrl } from '@/lib/imageMap';
+
+// Real soybean crop photos used for the dense canopy the scout looks through.
+const CROP_IMGS = [
+  resolveCropImageUrl('Soybean', 'crop_1.jpg'),
+  resolveCropImageUrl('Soybean', 'crop_2.jpg'),
+].filter(Boolean) as string[];
 
 // -------- Row Runner (K-5 Explorer) --------------------------------------
 // Aerial "drone" view of a crop field scrolling vertically. Weeds pop up
