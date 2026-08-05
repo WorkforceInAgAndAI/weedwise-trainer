@@ -486,17 +486,34 @@ export function getSessionCitations(weedIds: string[], stages: string[]): string
     seed: 'seed',
     seedling: 'seedling',
     vegetative: 'leaf',
-    flower: 'repro',
-    whole: 'repro',
+    leaf: 'leaf',
+    flower: 'reprof',
+    whole: 'reprof',
+    mature: 'reprof',
+    plant: 'reprof',
+    reproductive: 'reprof',
+    seedhead: 'repros',
+    fruit: 'repros',
     ligule: 'lig',
+    male: 'male',
+    female: 'female',
+    rosette: 'rosette',
+    shoot: 'shoot',
   };
 
   const citations = new Set<string>();
 
   for (const weedId of weedIds) {
     for (const stage of stages) {
-      const prefix = STAGE_PREFIX_MAP[stage] || 'leaf';
-      // Check variants 1 and 2, common extensions
+      const prefix = STAGE_PREFIX_MAP[stage.toLowerCase()] || 'leaf';
+      // Unnumbered files (reprof_.jpg, repros_.jpg, male.jpg, female.jpg)
+      for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
+        for (const base of [`${prefix}_`, prefix]) {
+          const key = `${weedId}/${base}.${ext}`;
+          if (refs[key]) citations.add(refs[key]);
+        }
+      }
+      // Numbered variants
       for (const variant of [1, 2, 3]) {
         for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
           const key = `${weedId}/${prefix}_${variant}.${ext}`;
