@@ -5,14 +5,6 @@ import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
 import { getDifficulty } from '@/lib/difficulty';
-import { resolveCropImageUrl } from '@/lib/imageMap';
-
-// Real soybean crop photos used for the dense canopy the scout looks through.
-const CROP_IMGS = [
-  resolveCropImageUrl('Soybean', 'crop_1.jpg'),
-  resolveCropImageUrl('Soybean', 'crop_2.jpg'),
-].filter(Boolean) as string[];
-
 // -------- Row Runner (K-5 Explorer) --------------------------------------
 // Aerial "drone" view of a crop field scrolling vertically. Weeds pop up
 // between the crop rows. Kids click a weed to "snip" it, then drag it to
@@ -368,31 +360,31 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                   />
                 );
               })}
-              {/* Scrolling soybean canopy — real crop photos packed tightly so
-                  scouts have to look *through* the rows to spot the weeds. */}
-              {CROP_IMGS.length > 0 && Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
+              {/* Scrolling soybean canopy — simple drawn crop tufts, packed
+                  tightly so scouts look *through* the rows to spot the weeds. */}
+              {Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
                 const cx = laneCenterX(laneIdx);
                 const plants: JSX.Element[] = [];
-                const STEP = 19;              // tight vertical spacing = dense canopy
-                const PLANT = 78;             // plants overlap each other
+                const STEP = 22;              // tight vertical spacing = dense canopy
+                const PLANT = 64;             // plants overlap each other
                 for (let y = -PLANT; y < AREA_H + PLANT; y += STEP) {
                   const yy = ((y + scrollRef.current) % (AREA_H + PLANT * 2)) - PLANT;
                   const seed = (laneIdx * 31 + y) % 7;
-                  const jitterX = (seed - 3) * 9;
-                  const img = CROP_IMGS[(laneIdx + seed) % CROP_IMGS.length];
+                  const jitterX = (seed - 3) * 7;
                   plants.push(
-                    <img
+                    <div
                       key={`${laneIdx}-${y}`}
-                      src={img}
-                      alt=""
-                      className="absolute rounded-full object-cover"
+                      className="absolute rounded-full"
                       style={{
                         left: `${((cx + jitterX) / AREA_W) * 100}%`,
                         top: `${(yy / AREA_H) * 100}%`,
                         width: `${(PLANT / AREA_W) * 100}%`,
                         height: `${(PLANT / AREA_H) * 100}%`,
                         transform: `translate(-50%, -50%) rotate(${seed * 17}deg)`,
-                        filter: 'brightness(0.92) saturate(1.1)',
+                        background: seed % 2 === 0
+                          ? 'radial-gradient(circle at 35% 30%, #7cb342 0%, #4c8c2b 55%, #33691e 100%)'
+                          : 'radial-gradient(circle at 60% 40%, #8bc34a 0%, #558b2f 55%, #2e5d16 100%)',
+                        opacity: 0.95,
                       }}
                     />
                   );
@@ -469,12 +461,8 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                       <>
                         <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden"
                           style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }}>
-                          {CROP_IMGS[0] ? (
-                            <img src={CROP_IMGS[s.id % CROP_IMGS.length]} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                          ) : (
-                            <div className="absolute inset-2 rounded-full opacity-70"
-                              style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
-                          )}
+                          <div className="absolute inset-2 rounded-full opacity-70"
+                            style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
                         </div>
                         {/* Label sits OUTSIDE the clipped circle so it reads on top */}
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
