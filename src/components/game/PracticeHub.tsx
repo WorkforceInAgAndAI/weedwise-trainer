@@ -338,6 +338,8 @@ export default function PracticeHub({
 
  return (
  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
+ {/* Animated hero buddy is present across the K-5 practice hub too */}
+ {selectedGrade === 'newk5' && <HeroBuddy />}
  <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-6">
   {/* Header */}
   <div className="flex items-center gap-3 mb-8">
