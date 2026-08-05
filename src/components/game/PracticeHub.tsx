@@ -82,6 +82,7 @@ import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 import PracticeStore from './PracticeStore';
+import HeroBuddy from './HeroBuddy-shim';
 import type { StoreBand } from '@/lib/practiceStore';
 
 interface GameDef {
