@@ -1,7 +1,16 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Dice5, ArrowLeft, Sprout, Flower2, Leaf, AlertTriangle, Sparkles } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Dice5, ArrowLeft, Sprout, Flower2, Leaf, AlertTriangle, Sparkles, Bot, Trophy } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty } from '@/lib/difficulty';
+
+/** Computer rivals — a different weed racer each level. */
+const RIVALS = [
+  { name: 'Rowdy Ragweed', emoji: '🌾', taunt: 'Ragweed grows fast — I make a BILLION pollen grains!' },
+  { name: 'Speedy Foxtail', emoji: '🌱', taunt: 'Foxtail sprints up in just a few weeks. Keep up!' },
+  { name: 'Tricky Bindweed', emoji: '🌀', taunt: 'I twist around anything to climb higher!' },
+  { name: 'Wicked Waterhemp', emoji: '💧', taunt: 'I drink your water and grow an inch a day!' },
+  { name: 'Prickly Thistle', emoji: '🪻', taunt: 'My roots creep under the whole field!' },
+];
 
 /**
  * Sprout Climb — a Chutes & Ladders inspired K-5 game that walks the player
@@ -59,6 +68,9 @@ function tileToRC(tile: number): { row: number; col: number } {
 export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const [tile, setTile] = useState(1);
+  const [cpuTile, setCpuTile] = useState(1);
+  const [cpuDice, setCpuDice] = useState<number | null>(null);
+  const [winner, setWinner] = useState<'you' | 'cpu' | null>(null);
   const [dice, setDice] = useState<number | null>(null);
   const [rolling, setRolling] = useState(false);
   const [message, setMessage] = useState<{ text: string; kind: 'vine' | 'weed' | 'move' | 'stage' } | null>(null);
@@ -68,6 +80,11 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
 
   const diff = getDifficulty(level, 'k5');
   const stage = useMemo(() => stageFor(tile), [tile]);
+  const rival = RIVALS[(level - 1) % RIVALS.length];
+  const cpuRef = useRef(1);
+
+  // The rival gets stronger each level (bigger chance of a bonus step).
+  const cpuBoost = Math.min(0.45, 0.1 + level * 0.06);
 
   useEffect(() => {
     if (stage.name !== prevStage) {
@@ -77,13 +94,42 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
   }, [stage, prevStage]);
 
   useEffect(() => {
-    if (tile >= BOARD_SIZE && !done) {
+    if (winner && !done) {
       setTimeout(() => setDone(true), 900);
     }
-  }, [tile, done]);
+  }, [winner, done]);
+
+  useEffect(() => {
+    if (winner) return;
+    if (tile >= BOARD_SIZE) setWinner('you');
+    else if (cpuTile >= BOARD_SIZE) setWinner('cpu');
+  }, [tile, cpuTile, winner]);
+
+  /** The computer rival takes its turn after the player finishes theirs. */
+  const cpuTurn = () => {
+    const roll = 1 + Math.floor(Math.random() * 6) + (Math.random() < cpuBoost ? 2 : 0);
+    setCpuDice(Math.min(6, roll));
+    const start = cpuRef.current;
+    let step = 0;
+    const move = setInterval(() => {
+      step++;
+      const next = Math.min(BOARD_SIZE, start + step);
+      cpuRef.current = next;
+      setCpuTile(next);
+      if (step >= roll || next >= BOARD_SIZE) {
+        clearInterval(move);
+        const landed = Math.min(BOARD_SIZE, start + roll);
+        const v = VINES[landed];
+        const w = WEEDS[landed];
+        if (v) { cpuRef.current = v.to; setTimeout(() => setCpuTile(v.to), 350); }
+        else if (w) { cpuRef.current = w.to; setTimeout(() => setCpuTile(w.to), 350); }
+        setRolling(false);
+      }
+    }, 130);
+  };
 
   const roll = () => {
-    if (rolling || done) return;
+    if (rolling || done || winner) return;
     setRolling(true);
     setMessage(null);
     let count = 0;
@@ -115,7 +161,11 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                 setMessage({ text: `${w.weed} — ${w.reason}`, kind: 'weed' });
                 setTimeout(() => setTile(w.to), 500);
               }
-              setRolling(false);
+              if (Math.min(BOARD_SIZE, startTile + final) >= BOARD_SIZE) {
+                setRolling(false);
+              } else {
+                setTimeout(cpuTurn, 500);
+              }
             }, 300);
           }
         }, Math.max(90, Math.round(220 / diff.speed)));
@@ -125,14 +175,16 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
 
   const reset = () => {
     setTile(1); setDice(null); setMessage(null); setRolls(0); setDone(false); setPrevStage('Seed');
+    setCpuTile(1); setCpuDice(null); setWinner(null); cpuRef.current = 1; setRolling(false);
   };
 
   if (done) {
-    // Score: fewer rolls = higher score. Best case ~5 rolls with big vines.
-    const score = Math.max(20, 120 - rolls * 5);
+    // Winning the race is worth the most; finishing quickly adds a bonus.
+    const score = winner === 'you' ? Math.min(100, 60 + Math.max(0, 40 - rolls * 3)) : Math.max(10, 40 - rolls);
     return (
       <LevelComplete
         level={level} score={score} total={100}
+        title={winner === 'you' ? `You beat ${rival.name}!` : `${rival.name} set seed first — race again!`}
         onNextLevel={() => { setLevel(l => l + 1); reset(); }}
         onStartOver={() => { setLevel(1); reset(); }}
         onBack={onBack}
