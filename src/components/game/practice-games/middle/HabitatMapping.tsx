@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { Sun, Snowflake, Droplets, Wind } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -56,6 +57,8 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const [roundNum, setRoundNum] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const roundsPerLevel = Math.max(ROUNDS_PER_LEVEL, Math.round(d.rounds / 4));
 
   const items = useMemo(() => getItemsForRound(level, roundNum), [level, roundNum]);
 
@@ -69,7 +72,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   const unplaced = items.filter(i => !placements[i.weed.id]);
   const allPlaced = Object.keys(placements).length === items.length;
   const correctCount = items.filter(i => placements[i.weed.id] === i.zone).length;
-  const done = roundNum >= ROUNDS_PER_LEVEL;
+  const done = roundNum >= roundsPerLevel;
 
   const handleDrop = (zoneId: string) => {
     const id = draggedId || selected;
@@ -113,7 +116,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    const total = ROUNDS_PER_LEVEL * WEEDS_PER_ROUND;
+    const total = roundsPerLevel * WEEDS_PER_ROUND;
     return <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 
@@ -144,7 +147,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
             })}
           </div>
           <button onClick={nextRound} className="w-full mt-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-            {roundNum + 1 < ROUNDS_PER_LEVEL ? `Round ${roundNum + 2} →` : 'See Results'}
+            {roundNum + 1 < roundsPerLevel ? `Round ${roundNum + 2} →` : 'See Results'}
           </button>
         </div>
       </div>
@@ -159,7 +162,7 @@ export default function HabitatMapping({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Habitat Mapping</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">Round {roundNum + 1}/{ROUNDS_PER_LEVEL}</span>
+        <span className="text-sm text-muted-foreground">Round {roundNum + 1}/{roundsPerLevel}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
         <p className="text-sm text-muted-foreground mb-3 text-center">Drag each weed into the habitat it dominates. Wrong placements pop back out.</p>

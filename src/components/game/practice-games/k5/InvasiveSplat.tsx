@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Sparkles, AlertTriangle, RotateCcw, ChevronRight, Wind } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 // -------- Invasive Splat! (K-5 Explorer, spin-art paint canvas) -----------
 // Kids drop invasive (watery) and native (thick) paint blobs onto a round
@@ -30,7 +31,6 @@ const NATIVES: PaintDef[] = [
 const CANVAS = 480;              // canvas pixel size
 const CENTER = CANVAS / 2;
 const R_MAX = CANVAS / 2 - 8;    // paper radius
-const ROUNDS_PER_LEVEL = 3;
 
 // Physics-ish constants
 const INVASIVE_SPREAD = 6.0;     // radial stretch factor when spinning
@@ -48,6 +48,8 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const ROUNDS_PER_LEVEL = Math.max(2, Math.round(d.rounds / 2));
   const [round, setRound] = useState(0);
   const [totalInv, setTotalInv] = useState(0);
   const [totalNat, setTotalNat] = useState(0);

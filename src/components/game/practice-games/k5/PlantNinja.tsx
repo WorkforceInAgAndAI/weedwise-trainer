@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Swords, AlertTriangle, Play, Zap } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
+import { getDifficulty } from '@/lib/difficulty';
 
 // -------- Plant Ninja (K-5 Explorer) --------------------------------------
 // Fruit-Ninja style: weeds fall from the top. Slice REPRODUCTIVE (flowering)
@@ -19,7 +20,6 @@ const AREA_H = 520;
 const WEED_SIZE = 96;
 const HIT_RADIUS = 52;
 const ROUND_SECONDS = 35;
-const ROUNDS_PER_LEVEL = 3;
 const BASE_SPAWN_MS = 950;
 const BASE_FALL = 90; // px/sec
 
@@ -56,6 +56,8 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const roundsPerLevel = Math.max(2, Math.min(4, Math.round(diff.rounds / 2)));
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [totalPossible, setTotalPossible] = useState(0);
@@ -171,13 +173,13 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
     trailRef.current = trailRef.current.filter(t => now - t.born < 220);
 
     // spawn
-    const spawnInterval = Math.max(500, BASE_SPAWN_MS - (level - 1) * 120);
+    const spawnInterval = Math.max(450, BASE_SPAWN_MS / diff.speed);
     if (now - spawnRef.current > spawnInterval && now < endRef.current) {
       spawnRef.current = now;
       const weed = elementaryWeeds[Math.floor(Math.random() * elementaryWeeds.length)];
       // ~65% reproductive so there are plenty to slice
       const kind: 'seedling' | 'repro' = Math.random() < 0.65 ? 'repro' : 'seedling';
-      const speedMult = 1 + (level - 1) * 0.18;
+      const speedMult = diff.speed;
       weedsRef.current.push({
         id: ++idRef.current,
         weedId: weed.id,
@@ -276,7 +278,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
     const possible = ROUND_SECONDS * 2; // rough max target (kids won't hit ceiling)
     const nextTotalScore = totalScore + gained;
     const nextTotalPossible = totalPossible + possible;
-    if (round + 1 >= ROUNDS_PER_LEVEL) {
+    if (round + 1 >= roundsPerLevel) {
       setTotalScore(nextTotalScore); setTotalPossible(nextTotalPossible);
       setDone(true); return;
     }
@@ -326,7 +328,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
           </button>
           <div className="flex items-center gap-3 text-sm">
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">Level {level}</span>
-            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {ROUNDS_PER_LEVEL}</span>
+            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {roundsPerLevel}</span>
             <span className="px-3 py-1 rounded-full bg-accent/20 text-accent-foreground font-semibold">Score {score}</span>
           </div>
         </div>
@@ -499,7 +501,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
                     onClick={commitRoundAndAdvance}
                     className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-bold hover:opacity-90"
                   >
-                    {round + 1 >= ROUNDS_PER_LEVEL ? 'Finish Level' : 'Next Round'}
+                    {round + 1 >= roundsPerLevel ? 'Finish Level' : 'Next Round'}
                   </button>
                 </div>
               </div>

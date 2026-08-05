@@ -3,6 +3,7 @@ import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -27,17 +28,19 @@ function buildPyramid(target: typeof weeds[0] | undefined): PyramidLevel[] {
 
 const ROUNDS_PER_LEVEL = 5;
 
-function getTargetsForLevel(level: number): typeof weeds {
-  const offset = (level - 1) * ROUNDS_PER_LEVEL;
+function getTargetsForLevel(level: number, count = ROUNDS_PER_LEVEL): typeof weeds {
+  const offset = (level - 1) * count;
   const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
-  return shuffle(rotated).slice(0, ROUNDS_PER_LEVEL);
+  return shuffle(rotated).slice(0, count);
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }
 
 export default function TaxonomyTower({ onBack }: Props) {
   const [level, setLevel] = useState(1);
-  const targets = useMemo(() => getTargetsForLevel(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const roundsCount = Math.max(ROUNDS_PER_LEVEL, Math.round(d.rounds / 2));
+  const targets = useMemo(() => getTargetsForLevel(level, roundsCount), [level, roundsCount]);
   const [targetIdx, setTargetIdx] = useState(0);
   const [pyramidLevel, setPyramidLevel] = useState(0);
   const [wrong, setWrong] = useState(false);
@@ -74,7 +77,7 @@ export default function TaxonomyTower({ onBack }: Props) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  if (done) return <LevelComplete level={level} score={score} total={ROUNDS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  if (done) return <LevelComplete level={level} score={score} total={roundsCount} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">

@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { AlertTriangle, Stethoscope, ShieldCheck, MapPin, Beaker } from 'lucide-react';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -159,16 +160,18 @@ const QUESTIONS_PER_LEVEL = 6;
 
 export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
   const rounds = useMemo(() => {
     const toxic = weeds.filter(w => w.safetyNote);
     const safe = weeds.filter(w => !w.safetyNote);
-    const offset = ((level - 1) * QUESTIONS_PER_LEVEL) % Math.max(toxic.length, 1);
+    const questionsPerLevel = Math.min(toxic.length, Math.max(QUESTIONS_PER_LEVEL, Math.round(d.rounds / 2)));
+    const offset = ((level - 1) * questionsPerLevel) % Math.max(toxic.length, 1);
     const rotated = [...toxic.slice(offset), ...toxic.slice(0, offset)];
-    return shuffle(rotated).slice(0, QUESTIONS_PER_LEVEL).map(t => {
-      const others = shuffle(safe).slice(0, 3);
+    return shuffle(rotated).slice(0, questionsPerLevel).map(t => {
+      const others = shuffle(safe).slice(0, Math.max(2, d.options - 1));
       return { toxic: t, options: shuffle([t, ...others]) };
     });
-  }, [level]);
+  }, [level, d.rounds, d.options]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

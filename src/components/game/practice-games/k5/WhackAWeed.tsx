@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Scissors, AlertTriangle, Play } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
+import { getDifficulty } from '@/lib/difficulty';
 import { resolveCropImageUrl } from '@/lib/imageMap';
 
 // -------- Whack-A-Weed (K-5 Explorer) -----------------------------------
@@ -14,7 +15,6 @@ const ROWS = 3;
 const COLS = 3;
 const HOLES = ROWS * COLS;
 const ROUND_SECONDS = 35;
-const ROUNDS_PER_LEVEL = 3;
 
 type Kind = 'weed' | 'crop';
 
@@ -50,6 +50,8 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function WhackAWeed({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const roundsPerLevel = Math.max(2, Math.min(4, Math.round(diff.rounds / 2)));
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [totalPossible, setTotalPossible] = useState(0);
@@ -101,7 +103,7 @@ export default function WhackAWeed({ onBack, gameId, gameName, gradeLabel }: Pro
     // ~65% weeds, 35% crops. Weed share climbs slightly with level.
     const weedChance = Math.min(0.8, 0.6 + (level - 1) * 0.06);
     const kind: Kind = Math.random() < weedChance ? 'weed' : 'crop';
-    const life = Math.max(900, 1700 - (level - 1) * 180);
+    const life = Math.max(700, 1700 / diff.speed);
     const name = kind === 'weed'
       ? elementaryWeeds[Math.floor(Math.random() * elementaryWeeds.length)].id
       : CROP_POOL[Math.floor(Math.random() * CROP_POOL.length)].name;
@@ -116,7 +118,7 @@ export default function WhackAWeed({ onBack, gameId, gameName, gradeLabel }: Pro
     const now = performance.now();
 
     // spawn
-    const spawnInterval = Math.max(450, 900 - (level - 1) * 100);
+    const spawnInterval = Math.max(400, 900 / diff.speed);
     if (now - spawnRef.current > spawnInterval && now < endRef.current) {
       spawnRef.current = now;
       spawnOne(now);
@@ -173,7 +175,7 @@ export default function WhackAWeed({ onBack, gameId, gameName, gradeLabel }: Pro
     const possible = ROUND_SECONDS * 3; // soft ceiling
     const nextScore = totalScore + gained;
     const nextPossible = totalPossible + possible;
-    if (round + 1 >= ROUNDS_PER_LEVEL) {
+    if (round + 1 >= roundsPerLevel) {
       setTotalScore(nextScore); setTotalPossible(nextPossible);
       setDone(true); return;
     }
@@ -227,7 +229,7 @@ export default function WhackAWeed({ onBack, gameId, gameName, gradeLabel }: Pro
           </button>
           <div className="flex items-center gap-2 text-sm flex-wrap justify-end">
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">Level {level}</span>
-            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {ROUNDS_PER_LEVEL}</span>
+            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {roundsPerLevel}</span>
             <span className="px-3 py-1 rounded-full bg-accent/20 text-accent-foreground font-semibold">Score {score}</span>
           </div>
         </div>
@@ -328,7 +330,7 @@ export default function WhackAWeed({ onBack, gameId, gameName, gradeLabel }: Pro
                   <p className="text-lg font-bold text-foreground mb-4">Round score: {Math.max(0, scoreRef.current)}</p>
                   <button onClick={commitRoundAndAdvance}
                     className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90">
-                    {round + 1 >= ROUNDS_PER_LEVEL ? 'Finish Level' : 'Next Round'}
+                    {round + 1 >= roundsPerLevel ? 'Finish Level' : 'Next Round'}
                   </button>
                 </div>
               </div>

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, Sparkles, AlertTriangle, RotateCcw, ChevronRight, Check, X } from 'lucide-react';
+import { getDifficulty } from '@/lib/difficulty';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
@@ -182,7 +183,6 @@ const NAME_TO_WEED_ID: Record<string, string> = {
   'Field Bindweed': 'Field_bindweed',
 };
 
-const ROUNDS_PER_LEVEL = 3;
 
 // ---------- Cartoon part renderers -----------------------------------------
 function PartCartoon({ kind, color, size = 90, variant = 'default' }: { kind: PartKind; color: string; size?: number; variant?: string }) {
@@ -474,6 +474,8 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const roundsPerLevel = Math.max(2, Math.min(CASES.length, Math.round(diff.rounds / 2)));
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [totalPossible, setTotalPossible] = useState(0);
@@ -518,7 +520,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
     const nextTotalScore = totalScore + correctCount;
     const nextTotalPossible = totalPossible + SLOTS.length;
     const nextRoundNum = round + 1;
-    if (nextRoundNum >= ROUNDS_PER_LEVEL) {
+    if (nextRoundNum >= roundsPerLevel) {
       setTotalScore(nextTotalScore);
       setTotalPossible(nextTotalPossible);
       setDone(true);
@@ -604,7 +606,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
           </button>
           <div className="flex items-center gap-3 text-sm">
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">Level {level}</span>
-            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {ROUNDS_PER_LEVEL}</span>
+            <span className="px-3 py-1 rounded-full bg-muted text-foreground font-semibold">Round {round + 1} / {roundsPerLevel}</span>
             <span className="px-3 py-1 rounded-full bg-accent/20 text-accent-foreground font-semibold">Score {totalScore + (showResult ? correctCount : 0)}</span>
           </div>
         </div>
@@ -784,7 +786,7 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
         <div className="mt-4">
           <FarmerGuide
             tone="intro"
-            message={`Build ${c.name}! Tip: click a placed part to send it back to the bin if you want to move it.`}
+            message={diff.showHints ? `Build ${c.name}! Tip: click a placed part to send it back to the bin if you want to move it.` : `Build ${c.name}! You know the ropes now — assemble it from memory.`}
           />
         </div>
       </div>

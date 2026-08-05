@@ -6,6 +6,7 @@ import LevelComplete from '@/components/game/LevelComplete';
 import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
 import aerialSoybean from '@/assets/images/aerial_soybean_field.jpg';
 import aerialPasture from '@/assets/images/aerial_pasture_field.jpg';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 /**
  * Field Scout Draw — the student draws their own scouting transect on top
@@ -87,11 +88,18 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function FieldScoutDraw({ onBack, gameId, gameName, gradeLabel }: Props) {
  const [level, setLevel] = useState(1);
- const rounds = useMemo(() => shuffle([...FIELDS]).slice(0, 5), [level]);
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
+ // Harder levels give a tighter path budget and more species per field.
+ const maxPathUnits = Math.max(220, MAX_PATH_UNITS - (d.level - 1) * 12);
+ const rounds = useMemo(() => levelSlice(shuffle([...FIELDS]), level, Math.min(FIELDS.length, Math.max(3, Math.round(d.rounds / 2)))).map(f => ({
+  ...f,
+  speciesCount: Math.min(6, f.speciesCount + Math.floor((d.level - 1) / 2)),
+ })), [level, d.rounds, d.level]);
  const [idx, setIdx] = useState(0);
  const finished = idx >= rounds.length;
  const spec = !finished ? rounds[idx] : rounds[0];
  const field = useMemo(() => buildField(spec, spec.id * 7 + idx * 31 + level * 11), [idx, level, spec]);
+ // eslint-disable-next-line react-hooks/exhaustive-deps
  const [plants, setPlants] = useState<Plant[]>([]);
  const [path, setPath] = useState<{ x: number; y: number }[]>([]);
  const [drawing, setDrawing] = useState(false);
@@ -111,7 +119,7 @@ export default function FieldScoutDraw({ onBack, gameId, gameName, gradeLabel }:
  }, [idx, level]);
 
  const currentLen = pathLength(path);
- const remaining = Math.max(0, MAX_PATH_UNITS - currentLen);
+ const remaining = Math.max(0, maxPathUnits - currentLen);
 
  const pointerToPct = (e: React.PointerEvent) => {
   const el = containerRef.current;
@@ -135,7 +143,7 @@ export default function FieldScoutDraw({ onBack, gameId, gameName, gradeLabel }:
    const last = prev[prev.length - 1];
    if (!last || dist(last, p) < 1) return prev; // downsample
    const nextLen = pathLength([...prev, p]);
-   if (nextLen > MAX_PATH_UNITS) { setDrawing(false); return prev; }
+   if (nextLen > maxPathUnits) { setDrawing(false); return prev; }
    return [...prev, p];
   });
  };
@@ -272,10 +280,10 @@ export default function FieldScoutDraw({ onBack, gameId, gameName, gradeLabel }:
       <div>
        <div className="flex justify-between text-xs mb-1">
         <span className="flex items-center gap-1 text-foreground"><Footprints className="w-3 h-3" /> Path used</span>
-        <span className="font-bold">{Math.round(currentLen)} / {MAX_PATH_UNITS}</span>
+        <span className="font-bold">{Math.round(currentLen)} / {maxPathUnits}</span>
        </div>
        <div className="h-2 rounded-full bg-secondary overflow-hidden">
-        <div className="h-full bg-primary" style={{ width: `${Math.min(100, (currentLen / MAX_PATH_UNITS) * 100)}%` }} />
+        <div className="h-full bg-primary" style={{ width: `${Math.min(100, (currentLen / maxPathUnits) * 100)}%` }} />
        </div>
        <p className="text-[10px] text-muted-foreground mt-1">
         Remaining: {Math.round(remaining)} — drag on the field to draw your route.

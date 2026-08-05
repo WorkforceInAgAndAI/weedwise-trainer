@@ -6,6 +6,7 @@ import FloatingCoach from '@/components/game/FloatingCoach';
 import BetweenLevelShop from '@/components/game/BetweenLevelShop';
 import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
 import { Lock, DollarSign } from 'lucide-react';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const ROUNDS_PER_LEVEL = 2;
@@ -112,6 +113,7 @@ function buildRound(level: number, round: number): FieldWeed[] {
 export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const [round, setRound] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
   const shop = usePracticeShop('ms-weed-control', STARTER_OWNED, 0);
   const [earnedThisLevel, setEarnedThisLevel] = useState(0);
   const [showShop, setShowShop] = useState(false);
@@ -127,6 +129,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<{ weedId: string; weedName: string; method: string; correct: boolean }[]>([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(180);
+
+  useEffect(() => { setTimeLeft(d.seconds); }, [level, round]);
 
   const fw = current ? fieldWeeds.find(f => f.id === current) : null;
   const roundDone = done.length >= fieldWeeds.length || timeLeft <= 0;
@@ -192,7 +196,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const resetRound = () => {
     setCurrent(null); setIdentified(false); setIdChoice(null);
     setMethodPick(null); setDone([]); setHistory([]);
-    setTimeLeft(180); setShowReview(false);
+    setTimeLeft(d.seconds); setShowReview(false);
   };
 
   const nextRound = () => {

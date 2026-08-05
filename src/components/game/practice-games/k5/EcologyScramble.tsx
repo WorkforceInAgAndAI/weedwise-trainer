@@ -3,6 +3,7 @@ import { Droplets, TreePine, Link, Fish, Waves, Sprout, Sun, CloudRain, Wind, Fl
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -44,19 +45,21 @@ const CATEGORIES = [
   { id: 'parasitic', label: 'Parasitic Plants', Icon: Link, borderColor: 'border-accent/50' },
 ];
 
-const TIMER_SECONDS = 15;
+const TIMER_SECONDS_BASE = 15;
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
 export default function EcologyScramble({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const TIMER_SECONDS = Math.min(TIMER_SECONDS_BASE, d.seconds);
   const { addBadge } = useGameProgress();
   const [phase, setPhase] = useState<'quickID' | 'done'>('quickID');
 
   // Quick ID — show a need, user picks terrestrial/aquatic/parasitic in 10 seconds
   const quickIDRounds = useMemo(() => {
-    // Pick a varied subset per level so students see new needs each round.
-    // Aim for balanced categories: 4 from each = 12 questions.
+    // Pick a varied subset per level so students see new needs each round; more per category as levels climb.
+    const perCat = Math.max(2, Math.round(d.rounds / 3));
     const byCat = { aquatic: [] as NeedItem[], terrestrial: [] as NeedItem[], parasitic: [] as NeedItem[] };
     ALL_NEEDS.forEach(n => byCat[n.category as keyof typeof byCat].push(n));
     const pickFrom = (arr: NeedItem[], n: number) => {
@@ -65,12 +68,12 @@ export default function EcologyScramble({ onBack, gradeLabel }: Props) {
       return shuffle(rotated).slice(0, n);
     };
     const pool = [
-      ...pickFrom(byCat.aquatic, 4),
-      ...pickFrom(byCat.terrestrial, 4),
-      ...pickFrom(byCat.parasitic, 4),
+      ...pickFrom(byCat.aquatic, perCat),
+      ...pickFrom(byCat.terrestrial, perCat),
+      ...pickFrom(byCat.parasitic, perCat),
     ];
     return shuffle(pool).map(need => ({ need, correctCategory: need.category }));
-  }, [level]);
+  }, [level, d.rounds]);
 
   const [qIdx, setQIdx] = useState(0);
   const [qAnswer, setQAnswer] = useState<string | null>(null);

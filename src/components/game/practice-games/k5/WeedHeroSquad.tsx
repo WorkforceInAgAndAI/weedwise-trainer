@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, Sprout, Hand, Shield, Brain, Bug, Zap, Check, X, Shrub } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 type HeroKey = 'pull' | 'block' | 'outsmart' | 'eat' | 'stop';
 
@@ -102,13 +103,18 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = getDifficulty(level, 'k5');
+  const missions = useMemo(
+    () => levelSlice(MISSIONS, level, Math.min(diff.rounds, MISSIONS.length)),
+    [level, diff.rounds]
+  );
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<HeroKey | null>(null);
   const [done, setDone] = useState(false);
   const [rescued, setRescued] = useState(0);
 
-  const mission = MISSIONS[step];
+  const mission = missions[step];
   const answered = picked !== null;
   const isCorrect = answered && picked === mission.best;
 
@@ -122,7 +128,7 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
   };
 
   const next = () => {
-    if (step + 1 >= MISSIONS.length) {
+    if (step + 1 >= missions.length) {
       setDone(true);
     } else {
       setStep(s => s + 1);
@@ -141,11 +147,11 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
       <LevelComplete
         level={level}
         score={score}
-        total={MISSIONS.length}
+        total={missions.length}
         onNextLevel={nextLevel}
         onStartOver={restart}
         onBack={onBack}
-        title={score === MISSIONS.length ? 'Weed-Fighting Hero of the Year!' : 'Crops rescued — assemble the squad again!'}
+        title={score === missions.length ? 'Weed-Fighting Hero of the Year!' : 'Crops rescued — assemble the squad again!'}
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
@@ -169,14 +175,14 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
             <p className="text-xs text-muted-foreground">Pick the right superpower to rescue the crops!</p>
           </div>
           <div className="text-sm font-semibold text-foreground bg-muted px-3 py-1 rounded-full">
-            Mission {step + 1} / {MISSIONS.length}
+            Mission {step + 1} / {missions.length}
           </div>
         </div>
 
         {/* Progress + rescued crops */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex gap-1 flex-1">
-            {MISSIONS.map((_, i) => (
+            {missions.map((_, i) => (
               <div key={i} className={`h-2 flex-1 rounded-full ${i < step ? 'bg-primary' : i === step ? 'bg-primary/60' : 'bg-muted'}`} />
             ))}
           </div>
@@ -254,7 +260,7 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
                 onClick={next}
                 className="mt-3 w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90"
               >
-                {step + 1 >= MISSIONS.length ? 'Finish Squad Day' : 'Next Mission →'}
+                {step + 1 >= missions.length ? 'Finish Squad Day' : 'Next Mission →'}
               </button>
             </div>
           )}

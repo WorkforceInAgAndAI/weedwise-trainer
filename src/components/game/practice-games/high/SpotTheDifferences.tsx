@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import { hasImage } from '@/lib/imageMap';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -43,6 +44,7 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const [section, setSection] = useState<Section | null>(null);
   const { addBadge } = useGameProgress();
+  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
 
   const withImages = (list: typeof DIOECIOUS_CANDIDATES) =>
     list.filter(sp => hasImage(sp.id, 'male.jpg') && hasImage(sp.id, 'female.jpg'));
@@ -148,11 +150,13 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
         </div>
 
         <p className="text-center font-bold text-foreground text-lg mb-1">{current!.name}</p>
+        {d.showHints && (
         <p className="text-center text-xs text-muted-foreground mb-2 max-w-md mx-auto">
           {section === 'monoecious'
             ? <>Some weed species are <span className="font-semibold text-foreground">monoecious</span> — both flower types occur on the same individual plant, usually in different positions (one near the stem tips, the other lower or in the leaf axils). Learning where each type sits is key to scouting seed production.</>
             : <>Some weed species are <span className="font-semibold text-foreground">dioecious</span> — meaning male and female flowers grow on separate plants. Because each sex is built for a different reproductive job (males release pollen, females catch pollen and develop seeds), the two plants can look noticeably different even though they're the same species.</>}
         </p>
+        )}
         <p className="text-center text-sm text-foreground font-medium mb-4">Read the trait clue below — does it describe the male or the female {section === 'monoecious' ? 'flowers' : 'plant'}?</p>
 
         {/* Description card */}

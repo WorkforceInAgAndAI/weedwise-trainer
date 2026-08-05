@@ -4,6 +4,7 @@ import { useGameProgress } from '@/contexts/GameProgressContext';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -33,17 +34,10 @@ export default function SleepySeeds({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
 
- const rounds = useMemo(() => {
-  const pool = shuffle(SCENARIOS);
-  const offset = ((level - 1) * 10) % pool.length;
-  return pool.slice(offset).concat(pool).slice(0, 10);
- }, [level]);
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
+ const rounds = useMemo(() => levelSlice(shuffle(SCENARIOS), level, d.rounds), [level, d.rounds]);
 
-  const seedWeeds = useMemo(() => {
-   const pool = shuffle([...weeds].filter(w => w.id !== 'Field_Horsetail'));
-   const offset = ((level - 1) * 10) % pool.length;
-   return pool.slice(offset).concat(pool).slice(0, 10);
-  }, [level]);
+  const seedWeeds = useMemo(() => levelSlice(shuffle([...weeds].filter(w => w.id !== 'Field_Horsetail')), level, d.rounds), [level, d.rounds]);
 
  const [idx, setIdx] = useState(0);
  const [phase, setPhase] = useState<'seedId' | 'dormancy'>('seedId');
@@ -58,7 +52,7 @@ export default function SleepySeeds({ onBack }: { onBack: () => void }) {
  useMemo(() => {
   if (idx < seedWeeds.length) {
    const correct = seedWeeds[idx];
-   const others = shuffle(weeds.filter(w => w.id !== correct.id)).slice(0, 3);
+   const others = shuffle(weeds.filter(w => w.id !== correct.id)).slice(0, Math.max(1, d.options - 1));
    setSeedIdOptions(shuffle([correct, ...others]).map(w => w.id));
    setSeedIdAnswer(null);
    setSeedIdChecked(false);

@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import fieldBgImage from '@/assets/images/field-background.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -46,13 +47,13 @@ function bestMethodFor(w: typeof weeds[0]): ControlMethod {
   return METHOD_LIBRARY[keys[hash % keys.length]];
 }
 
-function methodOptionsFor(w: typeof weeds[0]): ControlMethod[] {
+function methodOptionsFor(w: typeof weeds[0], numDistractors = 3): ControlMethod[] {
   const correct = bestMethodFor(w);
   const distractors = Object.values(METHOD_LIBRARY).filter(m => m.id !== correct.id);
-  // Stable seed-based pick of 3 distractors per weed so options vary by species
+  // Stable seed-based pick of distractors per weed so options vary by species
   const hash = w.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
   const picked: ControlMethod[] = [];
-  for (let i = 0; i < 3; i++) picked.push(distractors[(hash + i * 5) % distractors.length]);
+  for (let i = 0; i < numDistractors; i++) picked.push(distractors[(hash + i * 5) % distractors.length]);
   return shuffle([correct, ...picked]);
 }
 
@@ -64,18 +65,21 @@ interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; identified: b
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const diff = getDifficulty(level, 'k5');
+  const weedCount = diff.rounds + 3;
+  const startTimer = Math.round(diff.seconds * 2.4);
 
   const fieldWeeds = useMemo<FieldWeed[]>(() => {
-    const offset = (level - 1) * 8;
+    const offset = (level - 1) * weedCount;
     const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
-    return shuffle(rotated).slice(0, 8).map(w => ({
+    return shuffle(rotated).slice(0, weedCount).map(w => ({
       weed: w, x: 10 + Math.random() * 75, y: 10 + Math.random() * 55,
       identified: false, managed: false, correct: false,
     }));
-  }, [level]);
+  }, [level, weedCount]);
 
   const [weedState, setWeedState] = useState(fieldWeeds);
-  const [timer, setTimer] = useState(180);
+  const [timer, setTimer] = useState(startTimer);
   const [activeWeed, setActiveWeed] = useState<number | null>(null);
   const [phase, setPhase] = useState<'identify' | 'idFeedback' | 'manage' | 'manageFeedback'>('identify');
   const [done, setDone] = useState(false);
@@ -85,8 +89,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   // Reset weedState when level changes
   useEffect(() => { setWeedState(fieldWeeds); }, [fieldWeeds]);
 
-  const restart = () => { setWeedState(fieldWeeds); setTimer(180); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
-  const nextLevel = () => { setLevel(l => l + 1); setTimer(180); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
+  const restart = () => { setWeedState(fieldWeeds); setTimer(startTimer); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
+  const nextLevel = () => { setLevel(l => l + 1); setTimer(startTimer); setActiveWeed(null); setPhase('identify'); setDone(false); setIdChoice(null); setMethodChoice(null); };
   const startOver = () => { setLevel(1); restart(); };
 
   useEffect(() => {
@@ -144,14 +148,14 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const idOptions = useMemo(() => {
     if (activeWeed === null) return [];
     const correct = weedState[activeWeed].weed.commonName;
-    const wrongs = shuffle(weeds.filter(w => w.commonName !== correct)).slice(0, 3).map(w => w.commonName);
+    const wrongs = shuffle(weeds.filter(w => w.commonName !== correct)).slice(0, diff.options - 1).map(w => w.commonName);
     return shuffle([correct, ...wrongs]);
   }, [activeWeed, weedState]);
 
   // Memoize control method options per active weed so they don't reshuffle on every render.
   const methodOptions = useMemo(() => {
     if (activeWeed === null) return [];
-    return methodOptionsFor(weedState[activeWeed].weed);
+    return methodOptionsFor(weedState[activeWeed].weed, diff.options - 1);
   }, [activeWeed, weedState]);
 
   if (done) return <LevelComplete level={level} score={score} total={fieldWeeds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;

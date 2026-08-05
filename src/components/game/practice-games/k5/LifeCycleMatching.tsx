@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -15,7 +16,7 @@ function getCycleType(w: typeof weeds[0]): string {
   return 'Annual';
 }
 
-function pickRoundWeeds(level: number, roundNum: number): { weed: typeof weeds[0]; correct: string }[] {
+function pickRoundWeeds(level: number, roundNum: number, perType: number): { weed: typeof weeds[0]; correct: string }[] {
   const byType: Record<string, typeof weeds[0][]> = { Annual: [], Biennial: [], Perennial: [] };
   weeds.forEach(w => byType[getCycleType(w)].push(w));
   const offset = ((level - 1) * 24 + roundNum * 6);
@@ -24,9 +25,9 @@ function pickRoundWeeds(level: number, roundNum: number): { weed: typeof weeds[0
     const pool = byType[type];
     const start = offset % Math.max(pool.length, 1);
     const rotated = [...pool.slice(start), ...pool.slice(0, start)];
-    shuffle(rotated).slice(0, 2).forEach(w => picks.push({ weed: w, correct: type }));
+    shuffle(rotated).slice(0, perType).forEach(w => picks.push({ weed: w, correct: type }));
   }
-  return shuffle(picks).slice(0, 6);
+  return shuffle(picks);
 }
 
 const TOTAL_ROUNDS = 4;
@@ -35,11 +36,13 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const perType = Math.max(1, Math.round(d.rounds / 3));
   const { addBadge } = useGameProgress();
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
 
-  const items = useMemo(() => pickRoundWeeds(level, round), [level, round]);
+  const items = useMemo(() => pickRoundWeeds(level, round, perType), [level, round, perType]);
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -115,7 +118,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
   };
 
   if (done) {
-    const total = TOTAL_ROUNDS * 6;
+    const total = TOTAL_ROUNDS * items.length;
     addBadge({ gameId: 'lifecycle-matching-k5', gameName: 'Life Cycle Matching', level: 'K-5', score: totalScore, total });
     return (
       <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">

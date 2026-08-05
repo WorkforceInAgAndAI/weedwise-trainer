@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { Layers } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -30,11 +31,8 @@ function buildTower(target: typeof weeds[0]): TowerLevel[] {
 export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
  const [gameLevel, setGameLevel] = useState(1);
  const { addBadge } = useGameProgress();
- const targets = useMemo(() => {
-  const pool = shuffle(weeds);
-  const offset = ((gameLevel - 1) * 5) % pool.length;
-  return pool.slice(offset).concat(pool).slice(0, 5);
- }, [gameLevel]);
+ const d = useMemo(() => getDifficulty(gameLevel, 'hs'), [gameLevel]);
+ const targets = useMemo(() => levelSlice(shuffle(weeds), gameLevel, d.rounds), [gameLevel, d.rounds]);
  const [tIdx, setTIdx] = useState(0);
  const tower = useMemo(() => buildTower(targets[tIdx % targets.length]), [tIdx, targets]);
  const [towerLevel, setTowerLevel] = useState(0);

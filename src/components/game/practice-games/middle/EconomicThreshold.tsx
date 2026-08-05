@@ -7,6 +7,7 @@ import soybeanBg3 from '@/assets/images/soybean_field_3.jpg';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const FIELDS_PER_LEVEL = 3;
@@ -55,11 +56,12 @@ interface FieldData {
   bg: string;
 }
 
-function buildField(level: number, fieldNum: number): FieldData {
-  // 3-5 distinct species, with multiple plants per species (overlap)
+function buildField(level: number, fieldNum: number, maxOptions = 4): FieldData {
+  // Species count grows with difficulty — harder levels crowd more species
+  // into a field and lean on closer-to-threshold counts.
   const pool = shuffle(weeds);
   const offset = ((level - 1) * FIELDS_PER_LEVEL + fieldNum) * 4;
-  const speciesCount = 3 + Math.floor(Math.random() * 3); // 3-5
+  const speciesCount = Math.min(pool.length, 3 + Math.floor(Math.random() * 3) + Math.max(0, maxOptions - 4)); // grows with level
   const species = pool.slice(offset % pool.length, (offset % pool.length) + speciesCount).concat(pool).slice(0, speciesCount);
 
   const fieldWeeds: { weed: typeof weeds[0]; x: number; y: number }[] = [];
@@ -79,8 +81,9 @@ export default function EconomicThreshold({ onBack }: { onBack: () => void }) {
   const { addBadge } = useGameProgress();
   const [fieldNum, setFieldNum] = useState(0);
   const [score, setScore] = useState(0);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
 
-  const field = useMemo(() => buildField(level, fieldNum), [level, fieldNum]);
+  const field = useMemo(() => buildField(level, fieldNum, d.options), [level, fieldNum, d.options]);
 
   // Counts per species in this field
   const countsBySpecies = useMemo(() => {

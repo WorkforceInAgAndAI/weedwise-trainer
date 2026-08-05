@@ -5,6 +5,7 @@ import FloatingCoach from '@/components/game/FloatingCoach';
 import { DollarSign, Lock } from 'lucide-react';
 import BetweenLevelShop from '@/components/game/BetweenLevelShop';
 import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -45,15 +46,15 @@ const SHOP_CATALOG: ShopItem[] = [
 
 const STARTER_OWNED = ['hand-pull', 'cultivate'];
 
-function buildRounds(level: number) {
-  const offset = ((level - 1) * QUESTIONS_PER_ROUND) % weeds.length;
+function buildRounds(level: number, questionsPerRound = QUESTIONS_PER_ROUND) {
+  const offset = ((level - 1) * questionsPerRound) % weeds.length;
   const rotated = [...weeds.slice(offset), ...weeds.slice(0, offset)];
-  const pool = shuffle(rotated).slice(0, QUESTIONS_PER_ROUND * 2);
+  const pool = shuffle(rotated).slice(0, questionsPerRound * 2);
 
   const items: { weed: typeof weeds[0]; stage: Stage }[] = [];
   let lastStage: Stage | null = null;
 
-  for (let i = 0; i < QUESTIONS_PER_ROUND && pool.length > 0; i++) {
+  for (let i = 0; i < questionsPerRound && pool.length > 0; i++) {
     // Pick a stage different from the last one
     const availableStages = STAGES.filter(s => s !== lastStage);
     const stage = shuffle([...availableStages])[0];
@@ -65,7 +66,8 @@ function buildRounds(level: number) {
 
 export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const items = useMemo(() => buildRounds(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const items = useMemo(() => buildRounds(level, d.rounds), [level, d.rounds]);
   const shop = usePracticeShop('life-stage-control', STARTER_OWNED, 0);
   const [earnedThisLevel, setEarnedThisLevel] = useState(0);
 
@@ -92,9 +94,9 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   // Generate distractors for weed identification
   const weedOptions = useMemo(() => {
     if (!current) return [];
-    const others = shuffle(weeds.filter(w => w.id !== current.weed.id)).slice(0, 3);
+    const others = shuffle(weeds.filter(w => w.id !== current.weed.id)).slice(0, Math.max(2, d.options - 1));
     return shuffle([current.weed, ...others]);
-  }, [idx, current?.weed.id]);
+  }, [idx, current?.weed.id, d.options]);
 
   // Pick 5 control options. GUARANTEE every owned tool is included so
   // students always have at least one clickable answer (progression must

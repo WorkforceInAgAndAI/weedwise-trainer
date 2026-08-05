@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -41,6 +42,8 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   const { addBadge } = useGameProgress();
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const totalRounds = Math.max(TOTAL_ROUNDS, Math.round(d.rounds / 3));
 
   const items = useMemo(() => pickRoundWeeds(level, round), [level, round]);
   const [placements, setPlacements] = useState<Record<string, string>>({});
@@ -55,7 +58,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   const unplaced = items.filter(i => !placements[i.weed.id]);
   const allPlaced = Object.keys(placements).length === items.length;
   const correctCount = items.filter(i => placements[i.weed.id] === i.correct).length;
-  const done = round >= TOTAL_ROUNDS;
+  const done = round >= totalRounds;
 
   const handleDrop = (cycle: string) => {
     const id = draggedId || selected;
@@ -109,13 +112,13 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   };
 
   if (done) {
-    const total = TOTAL_ROUNDS * PER_ROUND;
+    const total = totalRounds * PER_ROUND;
     addBadge({ gameId: 'lifecycle-matching-68', gameName: 'Life Cycle Sort', level: '6-8', score: totalScore, total });
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex items-center justify-center p-4">
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
-          <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {TOTAL_ROUNDS} rounds!</p>
+          <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {totalRounds} rounds!</p>
           <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
         </div>
       </div>
@@ -130,7 +133,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Life Cycle Sort</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
+        <span className="text-sm text-muted-foreground">Round {round + 1}/{totalRounds}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
@@ -192,7 +195,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
             )}
             {allCorrect && (
               <button onClick={nextRound} className="w-full py-3 rounded-lg bg-success text-success-foreground font-bold">
-                {round + 1 < TOTAL_ROUNDS ? `Round ${round + 2} →` : 'See Results'}
+                {round + 1 < totalRounds ? `Round ${round + 2} →` : 'See Results'}
               </button>
             )}
           </div>

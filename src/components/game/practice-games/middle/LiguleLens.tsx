@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -22,8 +23,6 @@ const LIGULE_DESC: Record<string, string> = {
   johnsongrass: 'Membranous ligule, tall (~2-5 mm) with a finely-toothed margin.',
   quackgrass: 'Short membranous ligule with clasping auricles at the collar.',
   wirestem_muhly: 'Short membranous ligule, less than 1 mm tall.',
-  yellow_nutsedge: 'No true ligule — sedge has a triangular stem (sedges have edges).',
-  purple_nutsedge: 'No true ligule — sedge with triangular stem (not a true grass).',
 };
 
 function getLiguleText(weed: { id: string; traits?: string[] }) {
@@ -33,20 +32,23 @@ function getLiguleText(weed: { id: string; traits?: string[] }) {
 export default function LiguleLens({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
- const allGrasses = useMemo(() => weeds.filter(w => w.plantType === 'Monocot'), []);
+ const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+ // True grasses only — sedges (Cyperaceae, e.g. nutsedge) have no ligule.
+ const allGrasses = useMemo(() => weeds.filter(w => w.plantType === 'Monocot' && w.family === 'Poaceae'), []);
 
  const rounds = useMemo(() => {
   const pool = shuffle(allGrasses);
   // Cycle through ALL grasses each level starting at a new offset so students
-  // don't see the same 4-8 species repeated across levels.
-  const perLevel = Math.min(10, pool.length);
+  // don't see the same species repeated across levels.
+  const perLevel = Math.min(d.rounds, pool.length);
   const offset = ((level - 1) * perLevel) % pool.length;
   const selected = pool.slice(offset).concat(pool).slice(0, perLevel);
   return selected.map(w => {
-   const wrong = shuffle(allGrasses.filter(g => g.id !== w.id)).slice(0, 3).map(g => g.commonName);
+   const wrongCount = Math.max(2, d.options - 1);
+   const wrong = shuffle(allGrasses.filter(g => g.id !== w.id)).slice(0, wrongCount).map(g => g.commonName);
    return { weed: w, options: shuffle([w.commonName, ...wrong]) };
   });
- }, [level, allGrasses]);
+ }, [level, allGrasses, d.rounds, d.options]);
 
  const [round, setRound] = useState(0);
  const [selected, setSelected] = useState('');

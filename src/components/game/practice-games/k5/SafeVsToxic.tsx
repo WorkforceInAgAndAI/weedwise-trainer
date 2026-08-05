@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import { AlertTriangle, Stethoscope, ShieldCheck, MapPin } from 'lucide-react';
+import { getDifficulty } from '@/lib/difficulty';
 
 // Deeper, kid-friendly safety profile per toxic weed.
 interface SafetyProfile {
@@ -135,21 +136,24 @@ function getRemovalOptions(weedId: string): RemovalOption[] {
   return SAFE_HANDLING_BY_WEED[weedId] || DEFAULT_REMOVAL_METHODS;
 }
 
-const QUESTIONS_PER_LEVEL = 5;
-
 export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const diff = getDifficulty(level, 'k5');
   const rounds = useMemo(() => {
     const toxic = weeds.filter(w => w.safetyNote);
     const safe = weeds.filter(w => !w.safetyNote);
-    const offset = (level - 1) * QUESTIONS_PER_LEVEL;
+    const offset = (level - 1) * diff.rounds;
     const rotatedToxic = [...toxic.slice(offset % toxic.length), ...toxic.slice(0, offset % toxic.length)];
-    return shuffle(rotatedToxic).slice(0, QUESTIONS_PER_LEVEL).map(tw => {
-      const decoys = shuffle(safe.filter(s => s.family === tw.family || Math.random() > 0.5)).slice(0, 3);
+    return shuffle(rotatedToxic).slice(0, diff.rounds).map(tw => {
+      const decoyPool = diff.hardDistractors
+        ? safe.filter(s => s.family === tw.family)
+        : safe.filter(s => s.family === tw.family || Math.random() > 0.5);
+      const usablePool = decoyPool.length >= diff.options - 1 ? decoyPool : safe;
+      const decoys = shuffle(usablePool).slice(0, diff.options - 1);
       const group = shuffle([tw, ...decoys]);
       return { toxicWeed: tw, group };
     });
-  }, [level]);
+  }, [level, diff.rounds, diff.options, diff.hardDistractors]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

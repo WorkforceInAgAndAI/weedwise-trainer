@@ -21,6 +21,7 @@ import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { weeds } from '@/data/weeds';
 import type { Weed } from '@/types/game';
+import { getDifficulty } from '@/lib/difficulty';
 
 // ---- Weed Scout Report (K-5 Easy Mode) ------------------------------------
 // A farmer radios in a mystery weed. Young scouts ask simple questions to
@@ -97,7 +98,6 @@ const ALL_QUESTIONS: ScoutQuestion[] = [
 ];
 
 const QUESTION_BUDGET = 3;
-const ROUNDS_PER_LEVEL = 3;
 // How many question choices the scout sees each round (rotates through the pool)
 const QUESTIONS_PER_ROUND = 4;
 
@@ -155,7 +155,7 @@ interface Round {
   questions: ScoutQuestion[];
 }
 
-function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[]): Round {
+function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[], numChoices: number): Round {
   const crop = pick([...CROPS]);
   const spot = pick(FIELD_SPOTS);
   const quantity = pick([
@@ -180,7 +180,7 @@ function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[]): R
   const height = pick(HEIGHTS);
   const plantColor = pick(PLANT_COLORS);
 
-  const distractors = shuffle(allWeeds.filter(w => w.id !== weed.id)).slice(0, 3);
+  const distractors = shuffle(allWeeds.filter(w => w.id !== weed.id)).slice(0, numChoices - 1);
   const choices = shuffle([weed, ...distractors]);
 
   const clues: Record<QuestionId, string> = {
@@ -198,14 +198,15 @@ function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[]): R
 }
 
 function buildRounds(level: number): Round[] {
-  const pool = shuffle(weeds).slice(0, ROUNDS_PER_LEVEL);
+  const diff = getDifficulty(level, 'k5');
+  const pool = shuffle(weeds).slice(0, diff.rounds);
   return pool.map((w, i) => {
     // Rotate the question window based on level + round index so students
     // encounter a different mix of questions each case.
-    const offset = ((level - 1) * ROUNDS_PER_LEVEL + i) % ALL_QUESTIONS.length;
+    const offset = ((level - 1) * diff.rounds + i) % ALL_QUESTIONS.length;
     const rotated = [...ALL_QUESTIONS.slice(offset), ...ALL_QUESTIONS.slice(0, offset)];
     const questions = rotated.slice(0, QUESTIONS_PER_ROUND);
-    return buildRound(w, weeds, questions);
+    return buildRound(w, weeds, questions, diff.options);
   });
 }
 
@@ -224,11 +225,13 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
   const [guess, setGuess] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  const diff = getDifficulty(level, 'k5');
   const rounds = useMemo(() => buildRounds(level), [level]);
+  const remainingBudget = diff.level >= 4 ? QUESTION_BUDGET - 1 : QUESTION_BUDGET;
   const round = rounds[step];
 
   const askedList = round.questions.filter(q => asked.has(q.id));
-  const remaining = QUESTION_BUDGET - asked.size;
+  const remaining = remainingBudget - asked.size;
   const readyToGuess = asked.size >= 2;
 
   const ask = (id: QuestionId) => {
@@ -346,7 +349,7 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
           <div className="bg-card border-4 border-primary/30 rounded-2xl p-4 mb-4 shadow-md">
             <h2 className="font-display font-extrabold text-xl text-foreground mb-1">Ask a question</h2>
             <p className="text-base text-muted-foreground mb-4">
-              You can ask <strong>{QUESTION_BUDGET}</strong> questions. Pick the ones that help the most!
+              You can ask <strong>{remainingBudget}</strong> questions. Pick the ones that help the most!
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {round.questions.map(q => {

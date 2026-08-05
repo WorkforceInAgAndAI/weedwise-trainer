@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -83,7 +84,7 @@ function buildWordBank(correctItems: NeedItem[]): NeedItem[] {
   return shuffle([...correctItems, ...distractors]);
 }
 
-function getRoundsForLevel(level: number) {
+function getRoundsForLevel(level: number, targetCount = 10) {
   const byCategory: Record<string, typeof weeds[0][]> = { Terrestrial: [], Aquatic: [], Parasitic: [] };
   weeds.forEach(w => byCategory[getCategory(w)].push(w));
 
@@ -105,18 +106,19 @@ function getRoundsForLevel(level: number) {
   const remOffset = offset % Math.max(remaining.length, 1);
   const remRotated = [...remaining.slice(remOffset), ...remaining.slice(0, remOffset)];
   let ri = 0;
-  while (picks.length < 10 && ri < remRotated.length) {
+  while (picks.length < targetCount && ri < remRotated.length) {
     const w = remRotated[ri++];
     const cat = getCategory(w);
     picks.push({ weed: w, answer: cat, explanation: getExplanation(w, cat) });
   }
-  return shuffle(picks).slice(0, 10);
+  return shuffle(picks).slice(0, targetCount);
 }
 
 export default function PestID({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
-  const rounds = useMemo(() => getRoundsForLevel(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const rounds = useMemo(() => getRoundsForLevel(level, d.rounds), [level, d.rounds]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState('');

@@ -3,6 +3,7 @@ import { Stethoscope } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import { resolveInjuryImage } from '@/lib/imageMap';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 /** Extract WSSA group number from a herbicide label like "2,4-D (Group 4)". */
 function extractGroup(label: string): number | null {
@@ -59,12 +60,13 @@ const ALL_CASES = [...CORN_CASES, ...SOYBEAN_CASES];
 export default function CropDoctor({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
  const rounds = useMemo(
-  () => shuffle(ALL_CASES).slice(0, 8).map(c => ({
+  () => levelSlice(shuffle(ALL_CASES), level, d.rounds).map(c => ({
    ...c,
    options: shuffle(dedupeOptionsByGroup(c.correct, c.options)),
   })),
-  [level]
+  [level, d.rounds]
  );
  const [idx, setIdx] = useState(0);
  const [picked, setPicked] = useState<string | null>(null);

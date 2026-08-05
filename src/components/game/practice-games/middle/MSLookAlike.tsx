@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { LOOKALIKE_TRIPLES } from '@/data/lookAlikeGroups';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -27,17 +28,18 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
 
   const trios = useMemo(() => {
     const all = buildTrios();
-    const perLevel = 5;
+    const perLevel = Math.max(3, Math.round(d.rounds / 2));
     const offset = ((level - 1) * perLevel) % Math.max(all.length, 1);
     const picked: Trio[] = [];
     for (let i = 0; i < perLevel && all.length > 0; i++) {
       picked.push(all[(offset + i) % all.length]);
     }
     return shuffle(picked);
-  }, [level]);
+  }, [level, d.rounds]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

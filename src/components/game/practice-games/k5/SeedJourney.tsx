@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Wind, Droplets, PawPrint, Sprout, ArrowLeft, MapPin, Check, X } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 type Method = 'wind' | 'water' | 'animal';
 
@@ -100,12 +101,17 @@ interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeL
 
 export default function SeedJourney({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
+  const diff = getDifficulty(level, 'k5');
+  const scenarios = useMemo(
+    () => levelSlice(SCENARIOS, level, Math.min(diff.rounds, SCENARIOS.length)),
+    [level, diff.rounds]
+  );
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [done, setDone] = useState(false);
 
-  const scenario = SCENARIOS[step];
+  const scenario = scenarios[step];
   const answered = picked !== null;
   const isCorrect = answered && scenario.choices[picked!].method === scenario.best;
 
@@ -116,7 +122,7 @@ export default function SeedJourney({ onBack, gameId, gameName, gradeLabel }: Pr
   };
 
   const next = () => {
-    if (step + 1 >= SCENARIOS.length) {
+    if (step + 1 >= scenarios.length) {
       setDone(true);
     } else {
       setStep(s => s + 1);
@@ -138,11 +144,11 @@ export default function SeedJourney({ onBack, gameId, gameName, gradeLabel }: Pr
       <LevelComplete
         level={level}
         score={score}
-        total={SCENARIOS.length}
+        total={scenarios.length}
         onNextLevel={nextLevel}
         onStartOver={restart}
         onBack={onBack}
-        title={score === SCENARIOS.length ? 'Perfect journey! Your seed found a new home!' : 'Your seed traveled far — try again for a perfect trip!'}
+        title={score === scenarios.length ? 'Perfect journey! Your seed found a new home!' : 'Your seed traveled far — try again for a perfect trip!'}
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
@@ -164,13 +170,13 @@ export default function SeedJourney({ onBack, gameId, gameName, gradeLabel }: Pr
             <p className="text-xs text-muted-foreground">Choose the best way for your seed to travel!</p>
           </div>
           <div className="text-sm font-semibold text-foreground bg-muted px-3 py-1 rounded-full">
-            {step + 1} / {SCENARIOS.length}
+            {step + 1} / {scenarios.length}
           </div>
         </div>
 
         {/* Progress dots */}
         <div className="flex gap-1 mb-4">
-          {SCENARIOS.map((_, i) => (
+          {scenarios.map((_, i) => (
             <div key={i} className={`h-2 flex-1 rounded-full ${i < step ? 'bg-primary' : i === step ? 'bg-primary/60' : 'bg-muted'}`} />
           ))}
         </div>
@@ -235,7 +241,7 @@ export default function SeedJourney({ onBack, gameId, gameName, gradeLabel }: Pr
                 onClick={next}
                 className="mt-3 w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90"
               >
-                {step + 1 >= SCENARIOS.length ? 'Finish Journey' : 'Next Scenario →'}
+                {step + 1 >= scenarios.length ? 'Finish Journey' : 'Next Scenario →'}
               </button>
             </div>
           )}

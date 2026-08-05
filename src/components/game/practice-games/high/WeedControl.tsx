@@ -5,6 +5,7 @@ import fieldBg from '@/assets/images/field-background.jpg';
 import BetweenLevelShop from '@/components/game/BetweenLevelShop';
 import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
 import { Lock, DollarSign } from 'lucide-react';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const ROUNDS_PER_LEVEL = 2;
@@ -45,10 +46,9 @@ function getMethodExplanation(weed: typeof weeds[0], chosen: string, best: strin
  return `${chosenLabel} isn't ideal here. ${bestLabel} works best for ${weed.commonName} because: ${weed.management}`;
 }
 
-function buildRound(level: number, round: number) {
- const pool = shuffle(weeds);
- const offset = ((level - 1) * ROUNDS_PER_LEVEL + round) * 8;
- return pool.slice(offset % pool.length).concat(pool).slice(0, 8).map((w, i) => ({
+function buildRound(level: number, round: number, count: number) {
+ const pool = levelSlice(shuffle(weeds), level * 100 + round, count);
+ return pool.map((w, i) => ({
   weed: w,
   x: 15 + (i % 4) * 20 + Math.random() * 10,
   y: 20 + Math.floor(i / 4) * 35 + Math.random() * 15,
@@ -62,14 +62,15 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
  const shop = usePracticeShop('hs-weed-control', STARTER_OWNED, 0);
  const [earnedThisLevel, setEarnedThisLevel] = useState(0);
  const [showShop, setShowShop] = useState(false);
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
 
- const fieldWeeds = useMemo(() => buildRound(level, round), [level, round]);
+ const fieldWeeds = useMemo(() => buildRound(level, round, d.rounds), [level, round, d.rounds]);
 
  const [items, setItems] = useState(fieldWeeds.map(w => ({ ...w, found: false, managed: false })));
  const [active, setActive] = useState<number | null>(null);
  const [methodPick, setMethodPick] = useState<string | null>(null);
  const [explanation, setExplanation] = useState('');
- const [time, setTime] = useState(120);
+ const [time, setTime] = useState(d.seconds * 2);
  const [score, setScore] = useState(0);
  const [totalScore, setTotalScore] = useState(0);
  const [roundResults, setRoundResults] = useState<{ weed: typeof weeds[0]; correct: boolean; method: string; best: string }[]>([]);
@@ -81,7 +82,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   setActive(null);
   setMethodPick(null);
   setExplanation('');
-  setTime(120);
+  setTime(d.seconds * 2);
   setScore(0);
   setRoundResults([]);
   setShowReview(false);

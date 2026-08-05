@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Hand, Shield, Brain, Bug, Zap, Sprout, Heart, Shrub, Pause, Play as PlayIcon, ShieldAlert } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
+import { getDifficulty } from '@/lib/difficulty';
 
 type PowerKey = 'pull' | 'block' | 'outsmart' | 'eat' | 'stop';
 
@@ -79,13 +80,14 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   const spawnTimer = useRef(0);
 
   // Level tuning
+  const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const config = useMemo(() => {
-    const spawnEverySec = Math.max(1.4, 3.2 - level * 0.35);
-    const speedMin = 6 + level * 1.4;       // % per second
-    const speedMax = 10 + level * 2.0;
-    const targetDefeated = 12 + level * 3;  // needed to win the level
+    const spawnEverySec = Math.max(1.4, 3.2 - level * 0.35) / diff.speed;
+    const speedMin = (6 + level * 1.4) * diff.speed;       // % per second
+    const speedMax = (10 + level * 2.0) * diff.speed;
+    const targetDefeated = diff.rounds * 3 + level * 2;  // needed to win the level
     return { spawnEverySec, speedMin, speedMax, targetDefeated };
-  }, [level]);
+  }, [level, diff]);
 
   const fbTimeout = useRef<number | null>(null);
   const showFeedback = (text: string, kind: 'good' | 'bad') => {

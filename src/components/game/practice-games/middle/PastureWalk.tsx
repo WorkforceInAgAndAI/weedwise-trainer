@@ -4,6 +4,7 @@ import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import aerialPasture from '@/assets/images/aerial_pasture_field.jpg';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 /**
  * Pasture Walk — the student walks across a pasture with a limited energy
@@ -42,8 +43,8 @@ const HERBICIDE_MAX = 6;
 const PLANTS_PER_ROUND = 12;
 const ROUNDS = 3;
 
-function buildPlants(seed: number): Plant[] {
- const pool = shuffle(weeds).slice(0, PLANTS_PER_ROUND);
+function buildPlants(seed: number, count = PLANTS_PER_ROUND): Plant[] {
+ const pool = shuffle(weeds).slice(0, count);
  return pool.map((w, i) => ({
   id: i,
   x: 6 + ((i * 83 + seed * 7) % 88) + Math.random() * 4,
@@ -60,9 +61,10 @@ export default function PastureWalk({ onBack, gameId, gameName, gradeLabel }: Pr
  const [level, setLevel] = useState(1);
  const [round, setRound] = useState(0);
  const [totalScore, setTotalScore] = useState(0);
+ const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
 
  const seed = level * 13 + round * 41;
- const plants = useMemo(() => buildPlants(seed), [seed]);
+ const plants = useMemo(() => buildPlants(seed, Math.min(20, PLANTS_PER_ROUND + Math.floor((level - 1) * 1.5))), [seed, level]);
 
  // Scout position (%)
  const [pos, setPos] = useState<{ x: number; y: number }>({ x: 50, y: 95 });
@@ -85,8 +87,8 @@ export default function PastureWalk({ onBack, gameId, gameName, gradeLabel }: Pr
  const walkTo = (pl: Plant) => {
   if (roundDone) return;
   if (decisions[pl.id]) return;
-  const d = Math.hypot(pl.x - pos.x, pl.y - pos.y);
-  const cost = Math.max(2, Math.round(d * 0.25));
+  const dist = Math.hypot(pl.x - pos.x, pl.y - pos.y);
+  const cost = Math.max(2, Math.round(dist * 0.25 * d.speed));
   if (energy - cost < 0) return;
   setEnergy(e => e - cost);
   setPos({ x: pl.x, y: pl.y });
@@ -184,26 +186,26 @@ export default function PastureWalk({ onBack, gameId, gameName, gradeLabel }: Pr
 
      {/* Plants */}
      {plants.map(pl => {
-      const d = decisions[pl.id];
+      const dec = decisions[pl.id];
       const isSelected = selected?.id === pl.id;
-      const cost = Math.max(2, Math.round(Math.hypot(pl.x - pos.x, pl.y - pos.y) * 0.25));
-      const affordable = energy >= cost && !d;
+      const cost = Math.max(2, Math.round(Math.hypot(pl.x - pos.x, pl.y - pos.y) * 0.25 * d.speed));
+      const affordable = energy >= cost && !dec;
       return (
        <button key={pl.id}
         onClick={() => walkTo(pl)}
-        disabled={!affordable && !d}
+       disabled={!affordable && !dec}
         className={`absolute w-7 h-7 rounded-full border-2 shadow-md overflow-hidden transition-all ${
-         d ? (d.correct ? 'border-emerald-500 opacity-60' : 'border-destructive opacity-60') :
+         dec ? (dec.correct ? 'border-emerald-500 opacity-60' : 'border-destructive opacity-60') :
          isSelected ? 'border-primary ring-2 ring-primary scale-110' :
          affordable ? 'border-white/80 hover:scale-110' : 'border-white/40 opacity-50'
         }`}
         style={{ left: `${pl.x}%`, top: `${pl.y}%`, transform: 'translate(-50%,-50%)' }}
-        title={d ? '' : `Walk here (-${cost} energy)`}
+        title={dec ? '' : `Walk here (-${cost} energy)`}
        >
         <WeedImage weedId={pl.weedId} stage={pl.stage === 'reproductive' ? 'flower' : pl.stage} className="w-full h-full object-cover pointer-events-none" />
-        {d && (
+        {dec && (
          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          {d.correct ? <Check className="w-3 h-3 text-white" /> : <X className="w-3 h-3 text-white" />}
+          {dec.correct ? <Check className="w-3 h-3 text-white" /> : <X className="w-3 h-3 text-white" />}
          </div>
         )}
        </button>

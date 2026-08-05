@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import worldMap from '@/assets/images/world-map.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -29,7 +30,7 @@ function getOriginContinent(w: typeof weeds[0]): string {
 
 const QUESTIONS_PER_LEVEL = 10;
 
-function getRoundsForLevel(level: number) {
+function getRoundsForLevel(level: number, questionsPerLevel = QUESTIONS_PER_LEVEL) {
   // Build a pool with continent info
   const all = weeds.map(w => ({ weed: w, continent: getOriginContinent(w) }));
   const byCont: Record<string, typeof all> = {};
@@ -41,9 +42,9 @@ function getRoundsForLevel(level: number) {
   // Pick from each continent to ensure mix
   const picks: typeof all = [];
   const contKeys = Object.keys(byCont);
-  const offset = (level - 1) * QUESTIONS_PER_LEVEL;
+  const offset = (level - 1) * questionsPerLevel;
 
-  for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
+  for (let i = 0; i < questionsPerLevel; i++) {
     const contKey = contKeys[i % contKeys.length];
     const pool = byCont[contKey];
     const idx = (offset + Math.floor(i / contKeys.length)) % pool.length;
@@ -53,7 +54,7 @@ function getRoundsForLevel(level: number) {
   }
 
   // Fill remaining if needed
-  while (picks.length < QUESTIONS_PER_LEVEL) {
+  while (picks.length < questionsPerLevel) {
     const remaining = all.filter(a => !picks.some(p => p.weed.id === a.weed.id));
     if (remaining.length === 0) break;
     picks.push(shuffle(remaining)[0]);
@@ -64,7 +65,8 @@ function getRoundsForLevel(level: number) {
 
 export default function WeedOrigins({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const rounds = useMemo(() => getRoundsForLevel(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const rounds = useMemo(() => getRoundsForLevel(level, d.rounds), [level, d.rounds]);
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);

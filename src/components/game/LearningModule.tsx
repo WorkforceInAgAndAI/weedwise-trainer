@@ -2391,7 +2391,7 @@ function TopicContent({
           {/* Weeds: HS groups by control timing; others list straight */}
           {(() => {
             const renderCard = (w: Weed) => {
-              const isGrass = w.plantType === "Monocot";
+              const isGrass = w.plantType === "Monocot" && w.family === "Poaceae";
               return (
                 <div key={w.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
                   <div className="flex items-center gap-3 flex-wrap">
@@ -5691,8 +5691,8 @@ function TopicContent({
         .filter((g): g is { weeds: Weed[]; difference: string } => g !== null);
 
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
-        const aIsGrass = a.plantType === "Monocot";
-        const bIsGrass = b.plantType === "Monocot";
+        const aIsGrass = a.plantType === "Monocot" && a.family === "Poaceae";
+        const bIsGrass = b.plantType === "Monocot" && b.family === "Poaceae";
         const showLigule = aIsGrass || bIsGrass;
         return (
           <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
@@ -5779,7 +5779,7 @@ function TopicContent({
           { stage: "vegetative", label: "Vegetative" },
           { stage: "flower", label: "Reproductive" },
         ];
-        const anyGrass = group.some((w) => w.plantType === "Monocot");
+        const anyGrass = group.some((w) => w.plantType === "Monocot" && w.family === "Poaceae");
 
         // High school layout: each species is its own ROW, stages laid out as
         // COLUMNS the user scrolls horizontally. Images are smaller for density.
@@ -5833,7 +5833,7 @@ function TopicContent({
                           key={s.stage}
                           className="aspect-square rounded-md overflow-hidden bg-muted"
                         >
-                          {s.stage === "ligule" && w.plantType !== "Monocot" ? (
+                          {s.stage === "ligule" && !(w.plantType === "Monocot" && w.family === "Poaceae") ? (
                             <div className="flex items-center justify-center h-full text-[9px] text-muted-foreground text-center px-1">
                               Not a grass
                             </div>
@@ -5900,7 +5900,7 @@ function TopicContent({
                 <div className="grid grid-cols-3 gap-2">
                   {group.map((w) => (
                     <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      {w.plantType === "Monocot" ? (
+                      {w.plantType === "Monocot" && w.family === "Poaceae" ? (
                         <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
                       ) : (
                         <div className="flex items-center justify-center h-full text-[10px] text-muted-foreground text-center px-1">

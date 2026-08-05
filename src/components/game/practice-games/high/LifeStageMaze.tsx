@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -23,17 +24,14 @@ const CONTROLS = [
   { id: 'harvest-weed-seed', label: 'Harvest Weed Seed Control', stages: ['reproductive'] },
 ];
 
-const QUESTIONS_PER_ROUND = 10;
-
-function buildRounds(level: number) {
-  const offset = ((level - 1) * QUESTIONS_PER_ROUND) % weeds.length;
-  const rotated = [...weeds.slice(offset), ...weeds.slice(0, offset)];
-  const pool = shuffle(rotated.filter(w => w.id !== 'Field_Horsetail')).slice(0, QUESTIONS_PER_ROUND * 2);
+function buildRounds(level: number, questionsPerRound: number) {
+  const rotated = levelSlice(weeds.filter(w => w.id !== 'Field_Horsetail'), level, weeds.length);
+  const pool = shuffle(rotated).slice(0, questionsPerRound * 2);
 
   const items: { weed: typeof weeds[0]; stage: Stage }[] = [];
   let lastStage: Stage | null = null;
 
-  for (let i = 0; i < QUESTIONS_PER_ROUND && pool.length > 0; i++) {
+  for (let i = 0; i < questionsPerRound && pool.length > 0; i++) {
     const availableStages = STAGES.filter(s => s !== lastStage);
     const stage = shuffle([...availableStages])[0];
     lastStage = stage;
@@ -44,7 +42,8 @@ function buildRounds(level: number) {
 
 export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const items = useMemo(() => buildRounds(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
+  const items = useMemo(() => buildRounds(level, d.rounds), [level, d.rounds]);
 
   const [idx, setIdx] = useState(0);
   const [step, setStep] = useState<'stage' | 'weed' | 'control' | 'feedback'>('stage');
@@ -58,17 +57,17 @@ export default function LifeStageMaze({ onBack }: { onBack: () => void }) {
 
   const weedOptions = useMemo(() => {
     if (!current) return [];
-    const others = shuffle(weeds.filter(w => w.id !== current.weed.id)).slice(0, 3);
+    const others = shuffle(weeds.filter(w => w.id !== current.weed.id)).slice(0, Math.max(1, d.options - 1));
     return shuffle([current.weed, ...others]);
-  }, [idx, current?.weed.id]);
+  }, [idx, current?.weed.id, d.options]);
 
   const controlOptions = useMemo(() => {
     if (!current) return [];
     const valid = CONTROLS.filter(c => c.stages.includes(current.stage));
     const invalid = CONTROLS.filter(c => !c.stages.includes(current.stage));
-    const picked = [...valid, ...shuffle(invalid).slice(0, Math.max(0, 5 - valid.length))];
+    const picked = [...valid, ...shuffle(invalid).slice(0, Math.max(0, d.options + 1 - valid.length))];
     return shuffle(picked);
-  }, [idx, current?.stage]);
+  }, [idx, current?.stage, d.options]);
 
   const validControlIds = current ? CONTROLS.filter(c => c.stages.includes(current.stage)).map(c => c.id) : [];
 

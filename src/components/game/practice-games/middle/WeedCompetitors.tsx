@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from '@/data/competitionTraits';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -55,7 +56,7 @@ function buildRound(you: Weed, opponent: Weed): Round | null {
   };
 }
 
-function getMatchupsForLevel(level: number) {
+function getMatchupsForLevel(level: number, targetCount = 4) {
   // Only weeds that have trait data
   const pool = weeds.filter(w => (COMPETITION_TRAITS[w.id] || []).length > 0);
   const offset = (level - 1) * 8;
@@ -63,7 +64,7 @@ function getMatchupsForLevel(level: number) {
   const shuffled = shuffle(rotated);
   const result: { you: Weed; opponent: Weed }[] = [];
   // Only include matchups where 'you' has at least one trait the opponent doesn't
-  for (let i = 0; i < shuffled.length && result.length < 4; i++) {
+  for (let i = 0; i < shuffled.length && result.length < targetCount; i++) {
     const you = shuffled[i];
     const yourTraits = traitsOf(you);
     const opponent = shuffled.find(o => {
@@ -93,7 +94,8 @@ function TraitBadgeList({ traits }: { traits: CompetitionTrait[] }) {
 
 export default function WeedCompetitors({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const matchups = useMemo(() => getMatchupsForLevel(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const matchups = useMemo(() => getMatchupsForLevel(level, Math.max(4, Math.round(d.rounds / 2))), [level, d.rounds]);
 
   const [matchIdx, setMatchIdx] = useState(0);
   const [showIntro, setShowIntro] = useState(true);

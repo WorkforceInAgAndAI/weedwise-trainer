@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import midwestMap from '@/assets/images/midwest-map.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -30,18 +31,19 @@ weeds.forEach(w => {
   }
 });
 
-const QUESTIONS_PER_ROUND = 8;
 const ROUNDS_PER_LEVEL = 3;
 
 export default function InvasiveID({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const questionsPerRound = d.rounds;
 
   const allRounds = useMemo(() => {
     const result: Array<Array<{ weed: typeof weeds[0]; state: typeof MIDWEST_STATES[0]; originRegion: string }>> = [];
     for (let r = 0; r < ROUNDS_PER_LEVEL; r++) {
-      const offset = ((level - 1) * ROUNDS_PER_LEVEL + r) * QUESTIONS_PER_ROUND;
+      const offset = ((level - 1) * ROUNDS_PER_LEVEL + r) * questionsPerRound;
       const rotated = [...weeds.slice(offset % weeds.length), ...weeds.slice(0, offset % weeds.length)];
-      const roundWeeds = shuffle(rotated).slice(0, QUESTIONS_PER_ROUND).map((w, i) => ({
+      const roundWeeds = shuffle(rotated).slice(0, questionsPerRound).map((w, i) => ({
         weed: w,
         state: MIDWEST_STATES[i % MIDWEST_STATES.length],
         originRegion: w.origin === 'Introduced' ? (ORIGINS[w.id] || 'Europe') : 'North America',
@@ -49,7 +51,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
       result.push(roundWeeds);
     }
     return result;
-  }, [level]);
+  }, [level, questionsPerRound]);
 
   const [roundIdx, setRoundIdx] = useState(0);
   const [questionIdx, setQuestionIdx] = useState(0);
@@ -96,7 +98,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
   };
 
   if (done) {
-    const total = ROUNDS_PER_LEVEL * QUESTIONS_PER_ROUND;
+    const total = ROUNDS_PER_LEVEL * questionsPerRound;
     return <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 

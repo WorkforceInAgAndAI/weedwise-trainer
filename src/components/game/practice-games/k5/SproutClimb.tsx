@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Dice5, ArrowLeft, Sprout, Flower2, Leaf, AlertTriangle, Sparkles } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
+import { getDifficulty } from '@/lib/difficulty';
 
 /**
  * Sprout Climb — a Chutes & Ladders inspired K-5 game that walks the player
@@ -65,6 +66,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
   const [done, setDone] = useState(false);
   const [prevStage, setPrevStage] = useState('Seed');
 
+  const diff = getDifficulty(level, 'k5');
   const stage = useMemo(() => stageFor(tile), [tile]);
 
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
     const spin = setInterval(() => {
       setDice(1 + Math.floor(Math.random() * 6));
       count++;
-      if (count > 8) {
+      if (count > Math.max(4, Math.round(8 / diff.speed))) {
         clearInterval(spin);
         const final = 1 + Math.floor(Math.random() * 6);
         setDice(final);
@@ -116,9 +118,9 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
               setRolling(false);
             }, 300);
           }
-        }, 220);
+        }, Math.max(90, Math.round(220 / diff.speed)));
       }
-    }, 80);
+    }, Math.max(35, Math.round(80 / diff.speed)));
   };
 
   const reset = () => {

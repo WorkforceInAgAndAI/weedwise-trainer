@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -12,17 +13,18 @@ const STAGE_LABELS: Record<string, string> = { seed: 'Seed', seedling: 'Seedling
 
 const seedWeeds = weeds.filter(w => w.id !== 'Field_Horsetail');
 
-function getWeedsForLevel(level: number): typeof weeds {
-  const offset = ((level - 1) * 4) % seedWeeds.length;
+function getWeedsForLevel(level: number, count: number): typeof weeds {
+  const offset = ((level - 1) * count) % seedWeeds.length;
   const rotated = [...seedWeeds.slice(offset), ...seedWeeds.slice(0, offset)];
-  return shuffle(rotated).slice(0, 4);
+  return shuffle(rotated).slice(0, count);
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
 export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
-  const targets = useMemo(() => getWeedsForLevel(level), [level]);
+  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
+  const targets = useMemo(() => getWeedsForLevel(level, Math.min(d.rounds, seedWeeds.length)), [level, d.rounds]);
   const [targetIdx, setTargetIdx] = useState(0);
   const [order, setOrder] = useState<string[]>(() => shuffle([...STAGES]));
   const [checked, setChecked] = useState(false);

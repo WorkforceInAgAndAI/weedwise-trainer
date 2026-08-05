@@ -9,28 +9,29 @@ import {
   getBestMOAForWeed,
   type HerbicideMOA,
 } from '@/data/herbicides';
+import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 /** High school gets the full MOA table; pick 5 random options per question */
-function buildOptions(correct: HerbicideMOA): HerbicideMOA[] {
-  const others = shuffle(HERBICIDE_MOA.filter(h => h.id !== correct.id)).slice(0, 4);
+function buildOptions(correct: HerbicideMOA, optionCount: number): HerbicideMOA[] {
+  const others = shuffle(HERBICIDE_MOA.filter(h => h.id !== correct.id)).slice(0, Math.max(1, optionCount - 1));
   return shuffle([correct, ...others]);
 }
 
 export default function ControlMethodMatching({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
 
+  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
   const items = useMemo(() => {
-    const pool = shuffle(weeds);
-    const offset = ((level - 1) * 8) % pool.length;
-    return pool.slice(offset).concat(pool).slice(0, 8).map(w => {
+    const pool = levelSlice(shuffle(weeds), level, d.rounds);
+    return pool.map(w => {
       const bestId = getBestMOAForWeed(w);
       const bestMOA = HERBICIDE_MOA.find(h => h.id === bestId)!;
-      const options = buildOptions(bestMOA);
+      const options = buildOptions(bestMOA, d.options);
       return { weed: w, bestId, bestMOA, options };
     });
-  }, [level]);
+  }, [level, d.rounds, d.options]);
 
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
