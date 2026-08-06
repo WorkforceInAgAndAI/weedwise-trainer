@@ -470,6 +470,14 @@ const TOPICS: Topic[] = [
     grades: ["high"],
     category: "identification",
   },
+  {
+    id: "grass-id",
+    name: "Grass Identification",
+    icon: "families",
+    description: "Identify weedy grasses species-by-species using the ligule, auricles, collar, sheath, blade, and seed head — the characters that work before and after heading.",
+    grades: ["high"],
+    category: "identification",
+  },
 
   // Life Stages, Cycles, Seeds & Habitat
   {
