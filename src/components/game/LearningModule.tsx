@@ -7324,9 +7324,10 @@ function TopicContent({
     /* ═══════════════════════════════════════════════════════════
        DIOECIOUS
     ═══════════════════════════════════════════════════════════ */
+    case "grass-id":
+      return <GrassIdentificationModule onOpenPractice={onOpenPractice} />;
+
     case "dioecious": {
-      // (grass-id handled below)
-      // fallthrough marker
       const DIOECIOUS_SPECIES = [
         {
           id: "Marijuana",
