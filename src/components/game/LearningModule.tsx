@@ -28,6 +28,7 @@ import weedSuperheroesImg from "@/assets/learning/weed_fighting_superheroes.jpg"
 import invasivePlantImg from "@/assets/learning/invasive_plant.jpg";
 import goodWeedsImg from "@/assets/learning/good_weeds.jpg";
 import weedBulliesImg from "@/assets/learning/weed_bullies.jpg";
+import { GRASS_FEATURES } from "@/data/grassFeatures";
 import largeCrabgrassPhoto from "@/assets/learning/large_crabgrass_photo.jpg";
 import commonMilkweedPhoto from "@/assets/learning/common_milkweed_photo.jpg";
 import plantLifeCycleImg from "@/assets/learning/plant_life_cycle.jpg";
@@ -7324,6 +7325,7 @@ function TopicContent({
        DIOECIOUS
     ═══════════════════════════════════════════════════════════ */
     case "dioecious": {
+      // (grass-id handled below)
       const DIOECIOUS_SPECIES = [
         {
           id: "Marijuana",
