@@ -1265,6 +1265,7 @@ const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, stri
   "native-introduced": { elementary: "invasive-id", middle: "weed-origins", high: "invasive-habitat" },
   taxonomy: { middle: "ms-taxonomy", high: "hs-taxonomy" },
   dioecious: { high: "spot-differences" },
+  "grass-id": { high: "grass-id-lab" },
   "life-stages": { elementary: "life-stages", middle: "life-stage-control", high: "life-stage-maze" },
   "life-cycles": { elementary: "life-cycle-match", middle: "ms-lifecycle", high: "hs-lifecycle" },
   seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
