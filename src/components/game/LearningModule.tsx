@@ -7326,6 +7326,7 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "dioecious": {
       // (grass-id handled below)
+      // fallthrough marker
       const DIOECIOUS_SPECIES = [
         {
           id: "Marijuana",
