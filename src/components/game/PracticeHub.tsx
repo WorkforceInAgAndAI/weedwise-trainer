@@ -78,6 +78,7 @@ import FormYourFarm from './practice-games/high/FormYourFarm';
 import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
+import GrassID from './practice-games/high/GrassID';
 import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
@@ -133,6 +134,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'sleepy-seeds': 'seed-dormancy', 'allelopathy': 'allelopathy',
   'form-farm': 'economic-threshold', 'hs-weed-control': 'control-methods',
   'hs-control-match': 'herbicide-moa', 'crop-doctor': 'crop-injury',
+  'grass-id-lab': 'grass-id',
   'life-stage-maze': 'life-stage-control',
 };
 
@@ -211,6 +213,7 @@ const highGames: GameDef[] = [
  { id: 'hs-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field as an agronomist.', howToPlay: 'Click weeds in the field, identify them, choose the right control method. Review your answers after each round.', component: HSWeedControl },
  { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action. Review your answers at the end of each round.', component: HSControlMethodMatching },
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Review your diagnoses at the end.', component: CropDoctor },
+ { id: 'grass-id-lab', name: 'Grass ID Lab', Icon: Microscope, category: 'Grass ID', description: 'Identify grasses from ligule, collar, blade, and seed head characters.', howToPlay: 'Study the zoomable ligule and seed head images, unlock written characters only if you need them (each costs a point), then name the species.', component: GrassID },
  
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
  { id: 'hs-field-scout-draw', name: 'Field Scout — Draw Your Transect', Icon: Footprints, category: 'Scouting Tools', description: 'Draw your own scouting path with limited walking distance and herbicide.', howToPlay: 'Drag on the aerial field to draw a transect. You have a limited path length and 8 spot-spray charges. Score combines coverage (weeds found) and diversity (unique species) — a straight line loses to a smart zigzag.', component: FieldScoutDraw },
