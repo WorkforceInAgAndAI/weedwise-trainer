@@ -8242,3 +8242,154 @@ function DetectiveNotebook({ rules }: { rules: DetectiveRule[] }) {
     </div>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════
+   GRASS IDENTIFICATION (Collegiate)
+   Species-by-species vegetative + reproductive key. Ligule and the
+   reproductive seed head are shown large; vegetative and seed images
+   are shown smaller as supporting evidence.
+═══════════════════════════════════════════════════════════ */
+const LIGULE_TYPE_STYLE: Record<string, string> = {
+  Membranous: "bg-emerald-100 text-emerald-900 border-emerald-400 dark:bg-emerald-950/50 dark:text-emerald-200",
+  "Hairy fringe": "bg-amber-100 text-amber-900 border-amber-400 dark:bg-amber-950/50 dark:text-amber-200",
+  "Membrane + hairs": "bg-sky-100 text-sky-900 border-sky-400 dark:bg-sky-950/50 dark:text-sky-200",
+  Absent: "bg-rose-100 text-rose-900 border-rose-400 dark:bg-rose-950/50 dark:text-rose-200",
+};
+
+function GrassIdentificationModule({
+  onOpenPractice,
+}: {
+  onOpenPractice?: (gradeHub: string, gameId?: string) => void;
+}) {
+  const [filter, setFilter] = useState<string>("All");
+  const types = ["All", "Membranous", "Hairy fringe", "Membrane + hairs", "Absent"];
+  const list = filter === "All" ? GRASS_FEATURES : GRASS_FEATURES.filter((g) => g.liguleType === filter);
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
+        <p className="font-display font-bold text-primary text-base">Identifying Grasses (Poaceae)</p>
+        <p>
+          Grasses cannot be keyed by leaf shape the way broadleaves can. Identification rests on the{" "}
+          <strong>collar region</strong> — the junction of the leaf blade and sheath — and on the{" "}
+          <strong>inflorescence</strong> once the plant heads. Work through four questions on every specimen:
+        </p>
+        <ol className="list-decimal pl-5 space-y-1">
+          <li><strong>Ligule</strong> — membranous, a fringe of hairs, both, or absent? Note its height and whether the top is smooth, toothed, or pointed.</li>
+          <li><strong>Auricles</strong> — are there claw-like appendages clasping the stem at the collar?</li>
+          <li><strong>Sheath &amp; blade</strong> — round or flattened, hairy or smooth, rolled or folded in the bud (vernation)?</li>
+          <li><strong>Seed head</strong> — spike, raceme, or panicle; bristles, awns, or burs?</li>
+        </ol>
+        <p className="text-muted-foreground">
+          The ligule is the single most reliable vegetative character, which is why every card below leads with a
+          close-up of the collar. Reproductive structures confirm the call once the grass has headed.
+        </p>
+        {onOpenPractice && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              onClick={() => onOpenPractice("68", "ligule-lens")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90"
+            >
+              Practice ligules in Ligule Lens →
+            </button>
+            <button
+              onClick={() => onOpenPractice("912", "grass-id-lab")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md border-2 border-primary text-primary text-sm font-semibold hover:bg-primary/5"
+            >
+              Full workup in Grass ID Lab →
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {types.map((t) => (
+          <button
+            key={t}
+            onClick={() => setFilter(t)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-colors ${
+              filter === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary"
+            }`}
+          >
+            {t === "All" ? `All grasses (${GRASS_FEATURES.length})` : `${t} ligule`}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-5">
+        {list.map((g) => (
+          <article key={g.id} className="bg-card border border-border rounded-xl p-4 space-y-4">
+            <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 className="font-display font-bold text-foreground text-lg">{g.commonName}</h3>
+              <p className="italic text-sm text-muted-foreground">{g.scientificName}</p>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${LIGULE_TYPE_STYLE[g.liguleType]}`}>
+                {g.liguleType === "Absent" ? "No ligule" : `${g.liguleType} ligule`}
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+                {g.lifeCycle}
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+                {g.vernation} in bud
+              </span>
+            </header>
+
+            {/* Highlighted characters — ligule + reproductive */}
+            <div className="grid md:grid-cols-2 gap-3">
+              <figure className="rounded-lg border-2 border-primary/50 overflow-hidden bg-muted">
+                <figcaption className="text-[11px] font-bold uppercase tracking-wide text-primary px-2 py-1 bg-primary/10">
+                  Ligule &amp; collar
+                </figcaption>
+                <div className="h-56 sm:h-64">
+                  <WeedImage weedId={g.id} stage="ligule" className="w-full h-full" />
+                </div>
+              </figure>
+              <figure className="rounded-lg border-2 border-accent/50 overflow-hidden bg-muted">
+                <figcaption className="text-[11px] font-bold uppercase tracking-wide text-accent px-2 py-1 bg-accent/10">
+                  Reproductive — seed head
+                </figcaption>
+                <div className="h-56 sm:h-64">
+                  <WeedImage weedId={g.id} stage="repros" className="w-full h-full" />
+                </div>
+              </figure>
+            </div>
+
+            {/* Supporting imagery — smaller */}
+            <div className="grid grid-cols-3 gap-2">
+              {([["vegetative", "Vegetative"], ["seedling", "Seedling"], ["seed", "Seed"]] as const).map(([stage, label]) => (
+                <figure key={stage} className="rounded-md border border-border overflow-hidden bg-muted">
+                  <figcaption className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground px-1.5 py-0.5 bg-muted/70">
+                    {label}
+                  </figcaption>
+                  <div className="h-20 sm:h-24">
+                    <WeedImage weedId={g.id} stage={stage} className="w-full h-full" />
+                  </div>
+                </figure>
+              ))}
+            </div>
+
+            {/* Distinguishing features */}
+            <dl className="grid sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              {[
+                ["Ligule", g.ligule],
+                ["Auricles", g.auricles],
+                ["Sheath & collar", g.sheath],
+                ["Leaf blade", g.blade],
+                ["Seed head", g.seedHead],
+                ["Seed", g.seed],
+              ].map(([label, value]) => (
+                <div key={label} className="border-l-2 border-border pl-3">
+                  <dt className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">{label}</dt>
+                  <dd className="text-foreground leading-snug">{value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <p className="text-sm bg-primary/5 border border-primary/20 rounded-md px-3 py-2 text-foreground">
+              <strong>Field tip:</strong> {g.quickTip}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
