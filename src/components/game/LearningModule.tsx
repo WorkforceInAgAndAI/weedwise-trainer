@@ -476,7 +476,7 @@ const TOPICS: Topic[] = [
     name: "Grass Identification",
     icon: "families",
     description: "Identify weedy grasses species-by-species using the ligule, auricles, collar, sheath, blade, and seed head — the characters that work before and after heading.",
-    grades: ["high"],
+    grades: ["middle", "high"],
     category: "identification",
   },
 
@@ -1266,7 +1266,7 @@ const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, stri
   "native-introduced": { elementary: "invasive-id", middle: "weed-origins", high: "invasive-habitat" },
   taxonomy: { middle: "ms-taxonomy", high: "hs-taxonomy" },
   dioecious: { high: "spot-differences" },
-  "grass-id": { high: "grass-id-lab" },
+  "grass-id": { middle: "grass-id-lab", high: "ligule-lens" },
   "life-stages": { elementary: "life-stages", middle: "life-stage-control", high: "life-stage-maze" },
   "life-cycles": { elementary: "life-cycle-match", middle: "ms-lifecycle", high: "hs-lifecycle" },
   seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
@@ -8291,13 +8291,13 @@ function GrassIdentificationModule({
         {onOpenPractice && (
           <div className="flex flex-wrap gap-2 pt-1">
             <button
-              onClick={() => onOpenPractice("68", "ligule-lens")}
+              onClick={() => onOpenPractice("912", "ligule-lens")}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90"
             >
               Practice ligules in Ligule Lens →
             </button>
             <button
-              onClick={() => onOpenPractice("912", "grass-id-lab")}
+              onClick={() => onOpenPractice("68", "grass-id-lab")}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md border-2 border-primary text-primary text-sm font-semibold hover:bg-primary/5"
             >
               Full workup in Grass ID Lab →
