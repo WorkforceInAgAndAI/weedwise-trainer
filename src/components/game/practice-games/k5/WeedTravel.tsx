@@ -185,13 +185,32 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
   const diff = getDifficulty(level, 'k5');
   const seedCharacters = useMemo(() => buildSeedCharacters(diff.options + 2), [level, diff.options]);
   const baseObstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
-  // Apply per-level threshold variation so star requirements are not identical each round
-  const obstacleSet = useMemo<AdventureNode[]>(() => baseObstacleSet.map(node => ({
-    ...node,
-    options: node.options.map((opt, idx) => ({ ...opt, threshold: getThresholdForLevel(opt.threshold, level, node.id, idx, diff.hardDistractors) })),
-  })), [baseObstacleSet, level, diff.hardDistractors]);
-
   const [chosenSeed, setChosenSeed] = useState<SeedCharacter | null>(null);
+  // Apply per-level threshold variation so star requirements are not identical each round.
+  // Guarantee at least one option at every obstacle is beatable by the chosen seed so the
+  // journey can never dead-end with two impossible choices.
+  const obstacleSet = useMemo<AdventureNode[]>(() => baseObstacleSet.map(node => {
+    const options = node.options.map((opt, idx) => ({
+      ...opt,
+      threshold: getThresholdForLevel(opt.threshold, level, node.id, idx, diff.hardDistractors),
+    }));
+    if (chosenSeed) {
+      const passable = options.some(o => chosenSeed.traits[o.traitKey] >= o.threshold);
+      if (!passable) {
+        // Lower the requirement on the option where this seed is strongest.
+        let bestIdx = 0;
+        options.forEach((o, i) => {
+          if (chosenSeed.traits[o.traitKey] > chosenSeed.traits[options[bestIdx].traitKey]) bestIdx = i;
+        });
+        options[bestIdx] = {
+          ...options[bestIdx],
+          threshold: Math.max(1, chosenSeed.traits[options[bestIdx].traitKey]),
+        };
+      }
+    }
+    return { ...node, options };
+  }), [baseObstacleSet, level, diff.hardDistractors, chosenSeed]);
+
   const [currentNodeId, setCurrentNodeId] = useState('start_hill');
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
@@ -358,14 +377,20 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
           {!answered ? (
             <button onClick={handleChoose} disabled={selectedOption === null} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-50">Go!</button>
           ) : (
-            <div className="w-full text-center bg-card border border-border rounded-xl p-4">
+            <div className="w-full text-center bg-card border-2 border-border rounded-xl p-4">
               <p className={`text-lg font-bold mb-2 ${succeeded ? 'text-green-500' : 'text-destructive'}`}>
                 {succeeded ? 'You made it!' : 'Blocked!'}
               </p>
               <p className="text-sm text-muted-foreground mb-3">
                 {node.options[selectedOption!][succeeded ? 'successText' : 'failText']}
               </p>
-              <button onClick={handleContinue} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Continue Journey</button>
+              <button
+                onClick={handleContinue}
+                autoFocus
+                className="w-full py-5 rounded-2xl bg-primary text-primary-foreground font-extrabold text-xl shadow-lg ring-4 ring-primary/30 animate-pulse hover:animate-none hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                {succeeded ? 'Keep Going' : 'See Results'} <span aria-hidden="true">→</span>
+              </button>
             </div>
           )}
         </div>
