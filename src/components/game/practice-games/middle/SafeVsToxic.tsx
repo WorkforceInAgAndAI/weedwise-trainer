@@ -168,7 +168,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
     const offset = ((level - 1) * questionsPerLevel) % Math.max(toxic.length, 1);
     const rotated = [...toxic.slice(offset), ...toxic.slice(0, offset)];
     return shuffle(rotated).slice(0, questionsPerLevel).map(t => {
-      const others = shuffle(safe).slice(0, Math.max(2, d.options - 1));
+      const others = shuffle(safe).slice(0, Math.max(3, d.options - 1));
       return { toxic: t, options: shuffle([t, ...others]) };
     });
   }, [level, d.rounds, d.options]);
@@ -259,7 +259,9 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto p-4">
         {phase === 'identify' && (
           <>
-            <p className="text-sm text-muted-foreground mb-3 text-center">Find the toxic weed!</p>
+            <p className="text-sm text-muted-foreground mb-3 text-center">
+              One of these {current!.options.length} weeds is toxic. Can you spot it?
+            </p>
             <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto">
               {current!.options.map(w => (
                 <button key={w.id} onClick={() => identify(w.id)}

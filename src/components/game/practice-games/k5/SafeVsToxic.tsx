@@ -319,7 +319,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
           gradeLabel="K-5"
           tone="intro"
           className="max-w-md mx-auto mb-3"
-          message="One of these four weeds is toxic. Look at leaves, stems, and flowers — then tap your guess!"
+          message={`One of these ${r!.group.length} weeds is toxic. Look at leaves, stems, and flowers — then tap your guess!`}
         />
         <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-4">
           {r!.group.map(w => (
