@@ -235,7 +235,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       </div>
-          <FloatingCoach grade="K-5" tip={`Invasive species don't belong here naturally — they crowd out native plants. Look for the ones that came from far away!`} />
+          <FloatingCoach grade="K-5" position="bottom-right" tip={`Invasive species don't belong here naturally — they crowd out native plants. Look for the ones that came from far away!`} />
 </div>
   );
 }
