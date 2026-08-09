@@ -323,7 +323,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
           <span className="text-sm text-primary font-bold">{score} pts</span>
         </div>
       </div>
-      <div className="flex-1 flex flex-col p-4 gap-4">
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-4 gap-4 pb-28">
         <FarmerGuide
           gradeLabel={gradeLabel}
           tone={answered ? (succeeded ? 'correct' : 'wrong') : 'hint'}
@@ -346,7 +346,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
             <span className="text-primary text-xs font-bold">→</span>
           </div>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 max-w-md mx-auto w-full">
+        <div className="flex flex-col items-center justify-center gap-4 max-w-md mx-auto w-full">
           <div className="bg-card border-2 border-border rounded-2xl p-6 w-full text-center">
             <ObstIcon className="w-12 h-12 mx-auto mb-3 text-primary" />
             <h2 className="font-display font-bold text-foreground text-lg mb-1">{node.obstacle}</h2>
