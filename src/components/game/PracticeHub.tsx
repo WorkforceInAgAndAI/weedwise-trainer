@@ -1,8 +1,8 @@
-import { Landmark, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import FarmerGuide from './FarmerGuide';
-import { Medal, Trophy, Award, Star } from 'lucide-react';
+import { Landmark, Medal, Trophy, Award, Star } from 'lucide-react';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
