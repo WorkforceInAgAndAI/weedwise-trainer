@@ -293,7 +293,6 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
     const success = traitVal >= opt.threshold;
     setAnswered(true);
     setSucceeded(success);
-    if (success) setScore(s => s + 1);
     setHistory(h => [...h, { node: currentNodeId, success }]);
   };
 
