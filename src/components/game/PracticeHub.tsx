@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import FarmerGuide from './FarmerGuide';
-import { Medal, Trophy, Award, Star } from 'lucide-react';
+import { Landmark, Medal, Trophy, Award, Star } from 'lucide-react';
 import {
  ArrowLeft, Play, Leaf, Microscope, FlaskConical,
  Tag, Palette, Layers, Eye, Sprout, ArrowUpDown,
@@ -59,6 +59,7 @@ import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
 import LifeStageControl from './practice-games/middle/LifeStageControl';
 import MSLifeCycleMatching from './practice-games/middle/LifeCycleMatching';
 import EconomicThreshold from './practice-games/middle/EconomicThreshold';
+import WeedBank from './practice-games/middle/WeedBank';
 import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
@@ -125,6 +126,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'invasive-quiz': 'native-introduced', 'ms-safe-toxic': 'safety',
   'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
   'economic-threshold': 'economic-threshold', 'ms-weed-control': 'control-methods',
+  'weed-bank': 'seeds',
   'control-matching': 'herbicide-moa', 'herbicide-applicator': 'herbicide-moa',
   'ligule-lens': 'monocot-dicot', 'ms-sleepy-seeds': 'seeds',
   // 9-12
@@ -195,6 +197,7 @@ const middleGames: GameDef[] = [
  { id: 'control-matching', name: 'Control Method Matching', Icon: FlaskConical, category: 'Chemical Control', description: 'Match herbicide groups to the weeds they target.', howToPlay: 'Identify grass vs broadleaf, then pick the correct herbicide group.', component: ControlMethodMatching },
  { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
  { id: 'grass-id-lab', name: 'Grass ID Lab', Icon: Microscope, category: 'Grass ID', description: 'Identify grasses from ligule, collar, blade, and seed head characters.', howToPlay: 'Study the zoomable ligule and seed head images, unlock written characters only if you need them (each costs a point), then name the species.', component: GrassID },
+ { id: 'weed-bank', name: 'Weed Bank', Icon: Landmark, category: 'Seed Banks', description: 'Manage the weed seed bank under the field like a bank account over 5 seasons.', howToPlay: 'Read each year\u2019s Farm Conditions card, spend your Farm Dollars on management, then watch the bank statement. Germination and seed death are withdrawals; weeds that set seed are deposits. Shrink the balance over 5 seasons.', component: WeedBank },
  { id: 'ms-sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
  { id: 'ms-pasture-walk', name: 'Pasture Walk', Icon: Footprints, category: 'Field Methods', description: 'Walk a pasture on limited energy and herbicide — spray only what pays off.', howToPlay: 'Tap weeds to walk to them (farther = more energy). For each plant, choose spray now, mark to spray later, or skip — match the choice to the plant\u2019s life cycle and growth stage.', component: PastureWalk },
 ];
