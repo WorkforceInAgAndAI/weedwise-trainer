@@ -293,6 +293,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
     const success = traitVal >= opt.threshold;
     setAnswered(true);
     setSucceeded(success);
+    if (success) setScore(s => s + 1);
     setHistory(h => [...h, { node: currentNodeId, success }]);
   };
 
@@ -377,7 +378,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
           {!answered ? (
             <button onClick={handleChoose} disabled={selectedOption === null} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-50">Go!</button>
           ) : (
-            <div className="w-full text-center bg-card border-2 border-border rounded-xl p-4">
+            <div className="w-full text-center bg-card border-2 border-border rounded-xl p-4 sticky bottom-2 z-10 shadow-xl">
               <p className={`text-lg font-bold mb-2 ${succeeded ? 'text-green-500' : 'text-destructive'}`}>
                 {succeeded ? 'You made it!' : 'Blocked!'}
               </p>
