@@ -282,7 +282,7 @@ export default function PracticeHub({
    <>
      <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
       {/* Animated hero buddy keeps students company inside every game */}
-      <HeroBuddy />
+      <HeroBuddy defaultOpen={selectedGrade === 'newk5'} />
       {/* Standardized top nav bar for every practice game */}
       <div className="fixed top-0 left-0 right-0 z-[70] bg-card/95 backdrop-blur border-b-2 border-border shadow-card">
         <div className="max-w-[1400px] mx-auto px-3 sm:px-5 py-2 flex items-center gap-2 sm:gap-3">
