@@ -72,6 +72,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
   const [last, setLast] = useState<Statement | null>(null);
   const [history, setHistory] = useState<Statement[]>([]);
   const [featured, setFeatured] = useState(() => pick(weeds));
+  const [runId, setRunId] = useState(0);
 
   useEffect(() => {
     setBalance(startBalance);
@@ -83,7 +84,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
     setCondition(pick(CONDITIONS));
     setFeatured(pick(weeds));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level]);
+  }, [level, runId]);
 
   const spent = selected.reduce((s, id) => s + (PRACTICES.find(p => p.id === id)?.cost ?? 0), 0);
   const remaining = budget - spent;
@@ -301,7 +302,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
               gameName="Weed Bank"
               gradeLabel="6-8"
               onNextLevel={() => setLevel(l => l + 1)}
-              onStartOver={() => setLevel(l => l)}
+              onStartOver={() => setRunId(r => r + 1)}
               onBack={onBack}
             />
           </div>
