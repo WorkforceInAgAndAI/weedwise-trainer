@@ -91,9 +91,11 @@ const CHEERS = [
  * Floating animated hero buddy that follows students through every practice
  * game. Collapsible so it never blocks gameplay.
  */
-export default function HeroBuddy({ band = 'k5', name = 'Your Weed Hero' }: { band?: StoreBand; name?: string }) {
+export default function HeroBuddy({
+  band = 'k5', name = 'Your Weed Hero', defaultOpen = true,
+}: { band?: StoreBand; name?: string; defaultOpen?: boolean }) {
   const store = usePracticeStore('k5');
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
   const [idx, setIdx] = useState(0);
   const [cheering, setCheering] = useState(false);
 
@@ -102,9 +104,18 @@ export default function HeroBuddy({ band = 'k5', name = 'Your Weed Hero' }: { ba
     return () => clearInterval(t);
   }, []);
 
+  // Auto-tuck the speech bubble away so it can never sit on top of game
+  // controls for long. Students can tap the hero to bring it back.
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(() => setOpen(false), 9000);
+    return () => clearTimeout(t);
+  }, [open, idx]);
+
   const owned = useMemo(() => store.ownedIds, [store.ownedIds]);
 
   const cheer = () => {
+    setOpen(true);
     setCheering(true);
     setIdx(i => (i + 1) % CHEERS.length);
     setTimeout(() => setCheering(false), 1400);
@@ -112,26 +123,11 @@ export default function HeroBuddy({ band = 'k5', name = 'Your Weed Hero' }: { ba
 
   if (typeof document === 'undefined') return null;
 
-  const node = !open ? (
-      <button
-        onClick={() => setOpen(true)}
-        aria-label="Show your weed hero"
-        className="fixed bottom-4 left-4 z-[2147483000] w-16 h-16 rounded-full bg-emerald-100 border-4 border-emerald-600 shadow-2xl flex items-center justify-center hover:scale-105 transition-transform"
-      >
-        <HeroCharacter ownedIds={owned} className="w-11 h-11" />
-      </button>
-  ) : (
-    <div className="fixed bottom-4 left-4 z-[2147483000] flex items-end gap-2 pointer-events-none print:hidden">
-      <button
-        onClick={cheer}
-        aria-label="Cheer with your weed hero"
-        className="pointer-events-auto w-[92px] h-[120px] drop-shadow-xl hover:scale-105 transition-transform"
-      >
-        <HeroCharacter ownedIds={owned} cheering={cheering} className="w-full h-full" />
-      </button>
-      <div className="pointer-events-auto relative max-w-[220px] rounded-2xl border-2 border-emerald-600 bg-emerald-50 dark:bg-emerald-950/80 backdrop-blur px-3 py-2 shadow-lg mb-3">
-        <div className="absolute -left-2 bottom-4 w-3 h-3 rotate-45 border-l-2 border-b-2 border-emerald-600 bg-emerald-50 dark:bg-emerald-950" />
-        <div className="flex items-start gap-2">
+  const node = (
+    <div className="fixed bottom-3 left-3 z-[2147483000] flex flex-col items-start gap-2 pointer-events-none print:hidden">
+      {open && (
+        <div className="pointer-events-auto relative max-w-[220px] rounded-2xl border-2 border-emerald-600 bg-emerald-50 dark:bg-emerald-950/90 backdrop-blur px-3 py-2 shadow-lg">
+          <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
               <MessageCircle className="w-3 h-3" /> {name}
@@ -141,8 +137,16 @@ export default function HeroBuddy({ band = 'k5', name = 'Your Weed Hero' }: { ba
           <button onClick={() => setOpen(false)} aria-label="Hide your weed hero" className="shrink-0 text-emerald-700 hover:text-emerald-900 dark:text-emerald-400">
             <X className="w-4 h-4" />
           </button>
+          </div>
         </div>
-      </div>
+      )}
+      <button
+        onClick={open ? () => setOpen(false) : cheer}
+        aria-label={open ? 'Hide your weed hero' : 'Show your weed hero'}
+        className="pointer-events-auto w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950 border-2 border-emerald-600 shadow-lg flex items-center justify-center opacity-80 hover:opacity-100 hover:scale-105 transition-all"
+      >
+        <HeroCharacter ownedIds={owned} cheering={cheering} className="w-10 h-10" />
+      </button>
     </div>
   );
 
