@@ -130,7 +130,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
   const maxBar = Math.max(startBalance, ...history.map(h => h.end), balance, 1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-3 sm:p-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-3 sm:p-6">
       <div className="max-w-4xl mx-auto space-y-3">
         {/* Bank header */}
         <div className="rounded-xl border-2 border-amber-400/60 bg-card shadow-lg overflow-hidden">
