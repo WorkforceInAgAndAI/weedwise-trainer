@@ -259,7 +259,9 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto p-4">
         {phase === 'identify' && (
           <>
-            <p className="text-sm text-muted-foreground mb-3 text-center">Find the toxic weed!</p>
+            <p className="text-sm text-muted-foreground mb-3 text-center">
+              One of these {current!.options.length} weeds is toxic. Can you spot it?
+            </p>
             <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto">
               {current!.options.map(w => (
                 <button key={w.id} onClick={() => identify(w.id)}
