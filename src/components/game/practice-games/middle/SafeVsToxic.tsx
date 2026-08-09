@@ -168,7 +168,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
     const offset = ((level - 1) * questionsPerLevel) % Math.max(toxic.length, 1);
     const rotated = [...toxic.slice(offset), ...toxic.slice(0, offset)];
     return shuffle(rotated).slice(0, questionsPerLevel).map(t => {
-      const others = shuffle(safe).slice(0, Math.max(2, d.options - 1));
+      const others = shuffle(safe).slice(0, Math.max(3, d.options - 1));
       return { toxic: t, options: shuffle([t, ...others]) };
     });
   }, [level, d.rounds, d.options]);
