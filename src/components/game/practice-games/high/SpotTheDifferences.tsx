@@ -95,7 +95,7 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
         <div className="max-w-lg mx-auto p-4">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-            <h1 className="font-display font-bold text-lg text-foreground">Flower Sex Detective</h1>
+            <h1 className="font-display font-bold text-lg text-foreground">Flower Reproductive Jobs</h1>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
             Weeds carry their male and female flowers in different ways. Choose a section to practice.
@@ -135,7 +135,7 @@ export default function SpotTheDifferences({ onBack }: { onBack: () => void }) {
   }
 
   if (done) {
-    addBadge({ gameId: 'spot-differences', gameName: 'Flower Sex Detective', level: 'HS', score, total: rounds.length });
+    addBadge({ gameId: 'spot-differences', gameName: 'Flower Reproductive Jobs', level: 'HS', score, total: rounds.length });
     return <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
   }
 
