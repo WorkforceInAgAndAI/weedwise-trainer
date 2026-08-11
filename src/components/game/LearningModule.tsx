@@ -2759,7 +2759,12 @@ function TopicContent({
        LIFE CYCLES
     ═══════════════════════════════════════════════════════════ */
     case "life-cycles": {
-      const lifeCyclePoolIds = new Set(topicWeeds.map((w) => w.id));
+      const lifeCyclePoolIds = new Set([
+        ...topicWeeds.map((w) => w.id),
+        // Caraway is a classic teaching biennial that isn't in the ID pool;
+        // include it in the collegiate Year 1 / Year 2 comparison.
+        ...(grade === "high" ? ["caraway"] : []),
+      ]);
       const annuals = topicWeeds.filter(
         (w) =>
           w.lifeCycle.includes("Annual") && !w.lifeCycle.includes("Perennial") && !w.lifeCycle.includes("Biennial"),
