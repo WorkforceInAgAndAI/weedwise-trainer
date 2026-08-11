@@ -504,6 +504,14 @@ interface Topic {
 const TOPICS: Topic[] = [
   // Identification & Morphology
   {
+    id: "botany-terms",
+    name: "Plant Parts & Botany Terms",
+    icon: "leaf",
+    description: "Build the vocabulary every weed scout needs — petiole, sheath, ligule, bract, lobe, ocrea, raceme, umbel, tuber, nutlet, and more.",
+    grades: ["middle", "high"],
+    category: "identification",
+  },
+  {
     id: "names",
     name: "Weed Names & ID",
     icon: "names",
