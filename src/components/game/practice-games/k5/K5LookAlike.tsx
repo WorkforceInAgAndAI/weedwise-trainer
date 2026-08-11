@@ -4,19 +4,20 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty } from '@/lib/difficulty';
+import { lookAlikeStage } from '@/data/lookAlikeGroups';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 function buildAllPairs() {
   const valid = weeds.filter(w => w.lookAlike && weeds.find(x => x.id === w.lookAlike.id));
   const used = new Set<string>();
-  const result: { weed: typeof weeds[0]; alike: typeof weeds[0]; difference: string }[] = [];
+  const result: { weed: typeof weeds[0]; alike: typeof weeds[0]; difference: string; stage: 'flower' | 'vegetative' }[] = [];
   for (const w of shuffle(valid)) {
     if (used.has(w.id)) continue;
     const alike = weeds.find(x => x.id === w.lookAlike.id);
     if (!alike || used.has(alike.id)) continue;
     used.add(w.id); used.add(alike.id);
-    result.push({ weed: w, alike, difference: w.lookAlike.difference });
+    result.push({ weed: w, alike, difference: w.lookAlike.difference, stage: lookAlikeStage([w.id, alike.id]) });
   }
   return result;
 }
@@ -44,7 +45,7 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  const [history, setHistory] = useState<{ targetName: string; correct: boolean; weedId: string; alikeId: string }[]>([]);
+  const [history, setHistory] = useState<{ targetName: string; correct: boolean; weedId: string; alikeId: string; stage: 'flower' | 'vegetative' }[]>([]);
 
   const done = round >= pairs.length;
   const pair = !done ? pairs[round] : null;
@@ -61,7 +62,7 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
     setSubmitted(true);
     const ok = selected === target.id;
     if (ok) setScore(s => s + 1);
-    if (pair) setHistory(h => [...h, { targetName: target.commonName, correct: ok, weedId: pair.weed.id, alikeId: pair.alike.id }]);
+    if (pair) setHistory(h => [...h, { targetName: target.commonName, correct: ok, weedId: pair.weed.id, alikeId: pair.alike.id, stage: pair.stage }]);
   };
 
   const next = () => { setRound(r => r + 1); setSelected(null); setSubmitted(false); };
@@ -94,7 +95,7 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
                 selected === w.id ? 'border-primary scale-105 shadow-lg' : 'border-border'
               } ${submitted && w.id === target?.id ? 'ring-2 ring-green-500' : ''} ${submitted && selected === w.id && w.id !== target?.id ? 'ring-2 ring-destructive' : ''}`}>
               <div className="aspect-square bg-secondary">
-                <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                <WeedImage weedId={w.id} stage={pair?.stage ?? 'flower'} className="w-full h-full object-cover" />
               </div>
               {submitted && (
                 <p className={`text-xs font-medium p-2 text-center ${w.id === target?.id ? 'text-green-500 font-bold' : 'text-foreground'}`}>{w.commonName}</p>
@@ -124,10 +125,10 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
               <p className="text-[10px] font-bold text-foreground mb-1 truncate">{h.targetName}</p>
               <div className="grid grid-cols-2 gap-1">
                 <div className="aspect-square rounded overflow-hidden">
-                  <WeedImage weedId={h.weedId} stage="flower" className="w-full h-full object-cover" />
+                  <WeedImage weedId={h.weedId} stage={h.stage} className="w-full h-full object-cover" />
                 </div>
                 <div className="aspect-square rounded overflow-hidden">
-                  <WeedImage weedId={h.alikeId} stage="flower" className="w-full h-full object-cover" />
+                  <WeedImage weedId={h.alikeId} stage={h.stage} className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>

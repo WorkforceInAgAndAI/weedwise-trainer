@@ -3,7 +3,7 @@ import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
-import { LOOKALIKE_TRIPLES } from '@/data/lookAlikeGroups';
+import { LOOKALIKE_TRIPLES, lookAlikeStage } from '@/data/lookAlikeGroups';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
@@ -12,6 +12,7 @@ type Weed = typeof weeds[0];
 interface Trio {
   weeds: Weed[];
   difference: string;
+  stage: 'flower' | 'vegetative';
 }
 
 function buildTrios(): Trio[] {
@@ -19,7 +20,7 @@ function buildTrios(): Trio[] {
     .map(t => {
       const ws = t.ids.map(id => weeds.find(w => w.id === id));
       if (ws.some(w => !w)) return null;
-      return { weeds: ws as Weed[], difference: t.difference };
+      return { weeds: ws as Weed[], difference: t.difference, stage: lookAlikeStage(t.ids) };
     })
     .filter((g): g is Trio => g !== null);
 }
@@ -45,7 +46,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  const [history, setHistory] = useState<{ targetName: string; correct: boolean; ids: string[] }[]>([]);
+  const [history, setHistory] = useState<{ targetName: string; correct: boolean; ids: string[]; stage: 'flower' | 'vegetative' }[]>([]);
 
   const done = round >= trios.length;
   const trio = !done ? trios[round] : null;
@@ -67,7 +68,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
     setSubmitted(true);
     const ok = selected === target.id;
     if (ok) setScore(s => s + 1);
-    if (trio) setHistory(h => [...h, { targetName: target.commonName, correct: ok, ids: trio.weeds.map(w => w.id) }]);
+    if (trio) setHistory(h => [...h, { targetName: target.commonName, correct: ok, ids: trio.weeds.map(w => w.id), stage: trio.stage }]);
   };
 
   const next = () => { setRound(r => r + 1); setSelected(null); setSubmitted(false); };
@@ -100,7 +101,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
                 }`}
               >
                 <div className="aspect-square bg-secondary">
-                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                  <WeedImage weedId={w.id} stage={trio?.stage ?? 'flower'} className="w-full h-full object-cover" />
                 </div>
                 {submitted && (
                   <div className="p-2 text-center">
@@ -135,7 +136,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
                 <div className="grid grid-cols-3 gap-1">
                   {h.ids.map(id => (
                     <div key={id} className="aspect-square rounded overflow-hidden">
-                      <WeedImage weedId={id} stage="flower" className="w-full h-full object-cover" />
+                      <WeedImage weedId={id} stage={h.stage} className="w-full h-full object-cover" />
                     </div>
                   ))}
                 </div>
