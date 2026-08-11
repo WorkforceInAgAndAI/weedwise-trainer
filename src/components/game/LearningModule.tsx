@@ -1017,7 +1017,7 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
     title: "Foxtail Grasses",
     weedIds: ["giant-foxtail", "green-foxtail", "yellow-foxtail"],
     difference:
-      "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a droopy, nodding head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
+      "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a drooping head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
   },
   {
     title: "Ragweeds",
@@ -5209,7 +5209,7 @@ function TopicContent({
         {
           id: "Field_bindweed",
           name: "13. Morningglory",
-          spotIt: "Twisty vines that climb up other plants, with trumpet-shaped purple, pink, or blue flowers.",
+          spotIt: "Twisty vines that climb up other plants, with bell-shaped purple, pink, or blue flowers.",
           funFact: "The flowers open in the morning and close up when the sun gets hot — that's how it got its name!",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
