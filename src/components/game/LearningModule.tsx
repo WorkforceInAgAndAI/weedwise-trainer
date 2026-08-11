@@ -3146,6 +3146,36 @@ function TopicContent({
               </p>
             </CaseCallout>
 
+            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+              <p className="font-display font-bold text-foreground text-sm">Word Bank</p>
+              <ul className="text-xs text-muted-foreground space-y-1.5">
+                <li>
+                  <strong className="text-foreground">Tuber</strong> — a swollen underground storage stem (like a
+                  small potato) that stores food and can sprout a brand-new plant.
+                </li>
+                <li>
+                  <strong className="text-foreground">Nutlet</strong> — a tiny, hard, nut-like structure. In Yellow
+                  Nutsedge the underground tubers are often called nutlets.
+                </li>
+                <li>
+                  <strong className="text-foreground">Umbel</strong> — a flower cluster where all the little flower
+                  stalks start from one point and spread out flat, like the ribs of an umbrella.
+                </li>
+                <li>
+                  <strong className="text-foreground">Whorled</strong> — 3 or more leaves attached at the same node
+                  (the same spot on the stem).
+                </li>
+                <li>
+                  <strong className="text-foreground">Pappus bristles</strong> — the fine feathery hairs on a seed
+                  that let it float away on the wind.
+                </li>
+                <li>
+                  <strong className="text-foreground">Bolting</strong> — when a low rosette suddenly sends up a tall
+                  flowering stem.
+                </li>
+              </ul>
+            </div>
+
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <p className="font-display font-bold text-foreground text-sm">
