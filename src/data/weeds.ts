@@ -255,7 +255,7 @@ export const weeds: Weed[] = [
     image: "/images/Curly_dock/plant_1.jpeg",
     traits: [
       "Wavy and curled leaf margins",
-      "Large basal rosette with narrow, lance shaped leaves",
+      "Large basal rosette with narrow, spear-shaped leaves",
       "Tall flower stalk with reddish seed wings (valves)",
       "Deep taproot system",
       "Paper-like sheath (ocrea) that wraps around the stem at each node",
@@ -410,7 +410,7 @@ export const weeds: Weed[] = [
     image: "/images/Tall_morningglory/plant_1.jpeg",
     traits: [
       "Heart-shaped leaves",
-      "Purple, blue, pink, or white trumpet-shaped flowers",
+      "Purple, blue, pink, or white bell-shaped flowers",
       "Climbing vines up to 8-10 feet",
       "Extensive root system",
       "Round seed capsules covered by hairy surface",
@@ -532,10 +532,10 @@ export const weeds: Weed[] = [
     image: "/images/Dandelion/plant_1.jpg",
     traits: [
       "Yellow flowers closing into seedhead at maturity",
-      "Basal rosette of lance-shaped leaves",
+      "Basal rosette of spear-shaped leaves",
       "Hollow stems with milky sap",
       "Deep taproot system",
-      "Seedhead with numerous pappus bristles for wind dispersal",
+      "Seedhead with numerous pappus bristles (fine feathery hairs) for wind dispersal",
     ],
     habitat: "Lawns, gardens, pastures, roadsides, disturbed areas",
     primaryHabitat: "Cool-Season / Early Spring",
@@ -638,9 +638,9 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Eastern_black_nightshade",
       species: "Eastern Black Nightshade",
-      difference: "Nightshade is smaller (1–2 ft) with smaller flowers; Jimsonweed is 2–5 ft with large trumpets",
+      difference: "Nightshade is smaller (1–2 ft) with smaller flowers; Jimsonweed is 2–5 ft with large bell-shaped flowers",
     },
-    memoryHook: "Jimsonweed = spiny pod + large trumpet flowers + musty smell + toxic",
+    memoryHook: "Jimsonweed = spiny pod + large bell-shaped flowers + musty smell + toxic",
     safetyNote:
       "HIGHLY POISONOUS — tropane alkaloids (atropine, scopolamine) can cause hallucinations, rapid heartbeat, seizures, and death in humans and animals if ingested.",
   },
@@ -670,7 +670,7 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Jimsonweed",
       species: "Jimsonweed",
-      difference: "Jimsonweed has large trumpet flowers and spiny pods; Nightshade has small flowers and berries",
+      difference: "Jimsonweed has large bell-shaped flowers and spiny pods; Nightshade has small flowers and berries",
     },
     memoryHook: "Black nightshade = toxic black berries + small white flowers + bushy compact form",
     safetyNote:
@@ -780,7 +780,7 @@ export const weeds: Weed[] = [
     origin: "Introduced",
     image: "/images/yellow_Rocket/plant_1.jpg",
     traits: [
-      "Basal rosette of deeply lobed leaves in first year",
+      "Low-lying circle of deeply lobed leaves in the first year",
       "Bright yellow four-petaled flowers in clusters",
       "Long narrow upright seed pods (siliques)",
       "Erect growth (1–2 feet) in spring",
@@ -841,7 +841,7 @@ export const weeds: Weed[] = [
     image: "/images/Shepherds_Purse/plant_1.jpeg",
     traits: [
       "Distinctive heart-shaped seed pods (silicles)",
-      "Basal rosette of deeply lobed leaves",
+      "Low-lying circle of deeply lobed leaves",
       "Small white four-petaled flowers",
       "Slender, slightly hairy stems grow up to 20 inches tall",
     ],
@@ -1018,7 +1018,7 @@ export const weeds: Weed[] = [
     origin: "Introduced",
     image: "/images/Asian_copperleaf/plant_1.jpg",
     traits: [
-      "Slender, erect stems thinly covered with hairs",
+      "Slender, upright stems thinly covered with hairs",
       "Oval leaves with blunt teeth",
       "Small green flowers in axillary spike inflorescence",
       "Upright branching growth (1–2 feet)",
@@ -1126,7 +1126,7 @@ export const weeds: Weed[] = [
       difference:
         "Ground Ivy is perennial with round scalloped leaves; Catchweed Bedstraw is annual with narrow leaves",
     },
-    memoryHook: "Catchweed = hooked hairs that stick to clothes + whorled narrow leaves",
+    memoryHook: "Catchweed = hooked hairs that stick to clothes + whorled narrow leaves (3 or more leaves attached at the same node)",
     safetyNote:
       "Can cause low-level poisoning if eaten in quantity by livestock and may inflame the digestive tract; bristly stems can irritate sensitive skin.",
   },
@@ -1202,7 +1202,7 @@ export const weeds: Weed[] = [
     origin: "Native",
     image: "/images/Hemp_dogbane/plant_1.jpg",
     traits: [
-      "Opposite lance-shaped leaves",
+      "Opposite spear-shaped leaves",
       "Small, white, bell-shaped flowers in clusters",
       "Slender, cylindrical seed pods",
       "Rhizomatous spreading",
@@ -1218,7 +1218,7 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "common_Milkweed",
       species: "Common Milkweed",
-      difference: "Milkweed has opposite broader leaves; Dogbane has narrow lanceolate leaves",
+      difference: "Milkweed has opposite broader leaves; Dogbane has narrow spear-shaped leaves",
     },
     memoryHook: "Hemp dogbane = bell-shaped flowers+ slender stems + narrow leaves + cylindrical seed pods",
     safetyNote:
@@ -1239,7 +1239,7 @@ export const weeds: Weed[] = [
       "Fragrant, purple flower umbels",
       "Large warty seed pods with silky seeds",
       "Milky latex in stems and leaves",
-      "Unbranched erect stems grow up to 6 feet tall",
+      "Unbranched upright stems grow up to 6 feet tall",
     ],
     habitat: "Open fields, prairies, roadsides, and waste areas",
     primaryHabitat: "Warm-Season / Full Sun",
@@ -1250,7 +1250,7 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Hemp_dogbane",
       species: "Hemp Dogbane",
-      difference: "Hemp Dogbane has narrow lanceolate leaves; Common Milkweed has broader oval leaves",
+      difference: "Hemp Dogbane has narrow spear-shaped leaves; Common Milkweed has broader oval leaves",
     },
     memoryHook: "Common milkweed = broad oval leaves + milky sap in stems and leaves + silky seeds",
     safetyNote:
@@ -1404,9 +1404,9 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Common_teasel",
       species: "Common Teasel",
-      difference: "Teasel has prickly inverted cone flowers; Musk Thistle has nodding purple flowers",
+      difference: "Teasel has prickly inverted cone flowers; Musk Thistle has drooping purple flowers",
     },
-    memoryHook: "Musk thistle = nodding purple flowers + coarse branched stems + biennial",
+    memoryHook: "Musk thistle = drooping purple flowers + coarse branched stems + biennial",
   },
 
   {
@@ -1464,7 +1464,7 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Musk_thistle",
       species: "Musk Thistle",
-      difference: "Musk Thistle has nodding purple flowers; Teasel has upright prickly cone flowers",
+      difference: "Musk Thistle has drooping purple flowers; Teasel has upright prickly cone flowers",
     },
     memoryHook: "Common Teasel = prickly inverted cone flower + rigid tall stems + biennial",
   },
@@ -1574,7 +1574,7 @@ export const weeds: Weed[] = [
     traits: [
       "Finely divided, feathery leaves",
       "Small, yellow four-petaled flowers in clusters",
-      "Slender, erect stem over 3 feet tall",
+      "Slender, upright stem over 3 feet tall",
       "Narrow, sickle-shaped seed pods",
     ],
     habitat: "Rangelands, disturbed areas, woodlands",
@@ -1602,7 +1602,7 @@ export const weeds: Weed[] = [
     image: "/images/False_London-rocket/plant_1.jpg",
     traits: [
       "Small yellow four-petaled flowers",
-      "Narrow, alternately arranged leaves on erect stems",
+      "Narrow, alternately arranged leaves on upright stems",
       "Linear seed pods (siliques)",
       "1–2 feet tall, sparse branching",
       "Fine delicate appearance",
@@ -1632,7 +1632,7 @@ export const weeds: Weed[] = [
     image: "/images/Field_Horsetail/plant_1.jpeg",
     traits: [
       "Hollow, jointed, ridged stems",
-      "Tiny, whorled leaves that encircle the stem at each joint",
+      "Tiny, whorled leaves (3 or more leaves attached at the same node) that encircle the stem at each joint",
       "Scale-like leaves (reduced)",
       "Spore-bearing fertile stems topped by a cone in spring",
       "Two stem types: reproductive stems (brown, unbranched, early spring, with cone) and vegetative stems (green, branched)",
@@ -1853,7 +1853,7 @@ export const weeds: Weed[] = [
       "Spines at leaf base on stems",
       "Small, yellow five-petaled flowers",
       "Oval coarsely toothed leaves",
-      "Branched, erect growth with stems up to 3 feet tall",
+      "Branched, upright growth with stems up to 3 feet tall",
       "Prickly, star-shaped, button-like seed pod covered in fine spines ",
     ],
     habitat: "Row crops, roadsides, waste areas, gardens",
@@ -2028,7 +2028,7 @@ export const weeds: Weed[] = [
     lifeCycle: "Perennial",
     origin: "Introduced",
     traits: [
-      "Spiny, lance-shaped leaves with lobed margins",
+      "Spiny, spear-shaped leaves with lobed margins",
       "Extensive lateral root system",
       "Purple or white flower heads",
       "Wind-dispersed seeds with fluffy plume-like structure",
@@ -2043,7 +2043,7 @@ export const weeds: Weed[] = [
       id: "Musk_thistle",
       species: "Musk Thistle",
       difference:
-        "Musk thistle has large nodding flower heads and winged spiny stems; Canada thistle has small clustered flowers",
+        "Musk thistle has large drooping flower heads and winged spiny stems; Canada thistle has small clustered flowers",
     },
     memoryHook: "Canada thistle = small purple flowers in clusters + creeping roots",
   },
@@ -2125,7 +2125,7 @@ export const weeds: Weed[] = [
       id: "green-foxtail",
       species: "Green Foxtail",
       difference:
-        "Green foxtail has upright seedheads and smooth leaves; Giant foxtail has nodding heads and hairy upper leaf surfaces",
+        "Green foxtail has upright seedheads and smooth leaves; Giant foxtail has drooping heads and hairy upper leaf surfaces",
     },
     memoryHook: "Giant foxtail = fuzzy seedhead + hairy sheath + tallest foxtail",
   },
@@ -2263,7 +2263,7 @@ export const weeds: Weed[] = [
       id: "lambsquarters",
       species: "Lambsquarters",
       difference:
-        "Lambsquarters has mealy white coating on leaves and diamond-shaped leaves; Kochia has narrow lance-shaped leaves and pyramidal form",
+        "Lambsquarters has mealy white coating on leaves and diamond-shaped leaves; Kochia has narrow spear-shaped leaves and pyramidal form",
     },
     memoryHook: "Kochia = Christmas tree shape + becomes tumbleweed + tolerates salt + resistance prone",
     safetyNote:
@@ -2293,7 +2293,7 @@ export const weeds: Weed[] = [
       id: "kochia",
       species: "Kochia",
       difference:
-        "Kochia has narrow lance-shaped leaves and pyramidal form; Lambsquarters has diamond-shaped leaves with white mealy coating",
+        "Kochia has narrow spear-shaped leaves and pyramidal form; Lambsquarters has diamond-shaped leaves with white mealy coating",
     },
     memoryHook: "Lambsquarters = white mealy leaf coating + diamond-shaped leaves + goosefoot family",
   },
@@ -2339,7 +2339,7 @@ export const weeds: Weed[] = [
       "Smooth stem that an grow up to 30 inches",
       "Prominent, wavy fringe along leaf sheaths and ochrea",
       "Reddish-pink cylindrical flower",
-      "Elongated, lance-shaped leaves",
+      "Elongated, spear-shaped leaves",
     ],
     habitat: "Waste grounds, wetlands, low-lying areas",
     primaryHabitat: "Wet / Poorly Drained",
