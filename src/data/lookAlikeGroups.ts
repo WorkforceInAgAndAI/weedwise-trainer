@@ -156,3 +156,25 @@ export const LOOKALIKE_TRIPLES: LookAlikeTriple[] = [
     difference: "Large crabgrass: finger-like branches, very hairy sheaths, no cupule. Yellow foxtail: cylindrical spike with yellow bristles. Woolly cupgrass: cupule at spikelet base, hairy, spike-like racemes.",
   },
 ];
+
+/**
+ * Species whose look-alike comparisons are clearest at the VEGETATIVE stage
+ * (ragweeds and the climbing vines). Whenever a look-alike group contains one
+ * of these, the whole group is shown at the vegetative stage so students always
+ * compare the same image type.
+ */
+export const VEGETATIVE_LOOKALIKE_IDS = new Set<string>([
+  "common-ragweed",
+  "giant-ragweed",
+  "Tall_morningglory",
+  "Field_bindweed",
+  "Hedge_bindweed",
+  "Wild_buckwheat",
+  "Honey-vine_climbing_milkweed",
+  "Burcucumber",
+]);
+
+/** Pick one shared image stage for a look-alike group. */
+export function lookAlikeStage(ids: string[]): "flower" | "vegetative" {
+  return ids.some((id) => VEGETATIVE_LOOKALIKE_IDS.has(id)) ? "vegetative" : "flower";
+}
