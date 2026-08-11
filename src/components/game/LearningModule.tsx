@@ -932,12 +932,6 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
       "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a droopy, nodding head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
   },
   {
-    title: "Bindweeds (Climbing Vines)",
-    weedIds: ["Field_bindweed", "Hedge_bindweed"],
-    difference:
-      "Both have white or pink trumpet-shaped flowers and twist around other plants. Field Bindweed has small flowers (about an inch) and arrowhead-shaped leaves. Hedge Bindweed has large flowers (2–3 inches) and bigger leaves with squared-off bottoms.",
-  },
-  {
     title: "Ragweeds",
     weedIds: ["common-ragweed", "giant-ragweed"],
     difference:
@@ -945,27 +939,27 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Thistles (Spiny Weeds)",
-    weedIds: ["canada-thistle", "Musk_thistle", "Russian_thistle"],
+    weedIds: ["canada-thistle", "Musk_thistle", "Common_Burdock"],
     difference:
-      "All three have spines and prickly leaves. Canada Thistle has small purple flowers and spreads underground in big patches. Musk Thistle has a single huge purple flower that nods over to one side. Russian Thistle (tumbleweed) is bushy and rolls across the ground when it dries out.",
+      "All three are prickly or coarse weeds with purple flower heads. Canada Thistle has small purple flowers and spreads underground in big patches. Musk Thistle has a single huge purple flower that droops over to one side and very spiny, winged stems. Common Burdock is not a true thistle — it has huge dock-like leaves and round burs covered in hooks instead of spiny leaves.",
   },
   {
     title: "Smartweeds",
-    weedIds: ["pennsylvania-smartweed", "Water_smartweed"],
+    weedIds: ["pennsylvania-smartweed", "Water_smartweed", "Ladysthumb"],
     difference:
-      "Both have pink flower spikes and a papery sheath around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems. Water Smartweed grows in wet places like ponds with leaves that often float on the water.",
+      "All three have pink flower spikes and a papery sheath (ocrea) around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems and a smooth sheath. Water Smartweed grows in wet places like ponds with leaves that often float on the water. Lady's Thumb has a dark purple V-shaped smudge in the middle of each leaf — like a thumbprint — and its sheath is fringed with tiny bristles.",
   },
   {
     title: "Mustards (Yellow-Flowered)",
-    weedIds: ["Wild_mustard", "yellow_Rocket", "Shepherds_Purse"],
+    weedIds: ["Wild_mustard", "yellow_Rocket"],
     difference:
-      "All three are in the mustard family with four-petal flowers. Wild Mustard has bright yellow flowers and big lobed leaves. Yellow Rocket has yellow flowers too but smaller, shinier leaves that stay green all winter. Shepherd's Purse has tiny white flowers and little heart-shaped seed pods that look like purses.",
+      "Both are in the mustard family with four-petal yellow flowers. Wild Mustard has bright yellow flowers, big lobed leaves, and bristly hairs on the lower stem. Yellow Rocket has yellow flowers too, but smaller, shiny, dark-green leaves with a big rounded end lobe that stay green all winter.",
   },
   {
     title: "Chickweeds & Small Spring Weeds",
-    weedIds: ["CommonChickweed", "Mouseear_chickweed", "Henbit_deadnettle"],
+    weedIds: ["CommonChickweed", "Mouseear_chickweed"],
     difference:
-      "All three are short weeds you see in early spring. Common Chickweed has tiny white star-shaped flowers and a single line of hairs down one side of the stem. Mouse-ear Chickweed is covered in soft fuzzy hairs all over (like a mouse's ear!). Henbit has pink-purple flowers and square stems because it's in the mint family.",
+      "Both are short weeds you see in early spring with tiny white flowers. Common Chickweed has smooth leaves and a single line of hairs running down one side of the stem. Mouse-ear Chickweed is covered in soft fuzzy hairs all over (like a mouse's ear!) and often creeps into thick mats.",
   },
   {
     title: "Nightshades (Berry-Makers — Don't Eat!)",
@@ -975,9 +969,9 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Wild Carrot Look-Alikes (Be Careful!)",
-    weedIds: ["Wild_Carrot", "poison-hemlock", "golden-alexanders"],
+    weedIds: ["Wild_Carrot", "poison-hemlock", "wild-parsnip"],
     difference:
-      "All three have lacy leaves and flat clusters of small flowers. Wild Carrot (Queen Anne's Lace) has white flowers and a hairy stem that smells like carrot. Poison Hemlock has white flowers too but a SMOOTH stem with purple spots — it is very dangerous and should never be touched. Golden Alexanders has bright yellow flowers instead of white.",
+      "All three have flat-topped clusters of small flowers called umbels. Wild Carrot (Queen Anne's Lace) has lacy leaves, white flowers, and a hairy stem that smells like carrot. Poison Hemlock has lacy leaves and white flowers too, but a SMOOTH stem with purple blotches — it is very dangerous and should never be touched. Wild Parsnip has yellow flowers and leaves made of large toothed leaflets, and its sap can burn your skin in sunlight — never touch it either.",
   },
   {
     title: "Crabgrass & Look-Alike Grasses",
@@ -987,15 +981,15 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Lambsquarters Look-Alikes",
-    weedIds: ["lambsquarters", "Redroot_pigweed", "Russian_thistle"],
+    weedIds: ["lambsquarters", "kochia", "Russian_thistle"],
     difference:
-      "All three are tall summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Redroot Pigweed has hairy stems and a bright reddish-pink root. Russian Thistle has skinny spiny leaves and turns into a tumbleweed when it dries up.",
+      "All three are bushy summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Kochia has soft, hairy, narrow spear-shaped leaves and grows in a neat pyramid shape. Russian Thistle has skinny, spine-tipped leaves and turns into a tumbleweed when it dries up.",
   },
   {
-    title: "Morningglory Vines",
-    weedIds: ["Tall_morningglory", "Field_bindweed", "Wild_buckwheat"],
+    title: "Climbing Vines",
+    weedIds: ["Tall_morningglory", "Field_bindweed", "Hedge_bindweed", "Wild_buckwheat"],
     difference:
-      "All three are twining vines that climb on other plants. Tall Morningglory has big purple or blue trumpet flowers and heart-shaped leaves. Field Bindweed has smaller white or pink trumpet flowers and arrowhead leaves. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no trumpets — and a papery sheath where the leaf meets the stem.",
+      "All four are twining vines that climb on other plants. Tall Morningglory has big purple or blue bell-shaped flowers and heart-shaped leaves. Field Bindweed has small white or pink bell-shaped flowers (about an inch) and arrowhead leaves. Hedge Bindweed has much larger white bell-shaped flowers (2–3 inches) and bigger leaves with squared-off bottoms. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no bells — and a papery sheath where the leaf meets the stem.",
   },
 ];
 
