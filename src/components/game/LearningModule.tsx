@@ -1911,6 +1911,12 @@ function TopicContent({
 }) {
   switch (topicId) {
     /* ═══════════════════════════════════════════════════════════
+       BOTANY TERMS (6-8 & 9-12) — plant parts vocabulary
+    ═══════════════════════════════════════════════════════════ */
+    case "botany-terms":
+      return <BotanyTermsModule advanced={grade === "high"} />;
+
+    /* ═══════════════════════════════════════════════════════════
        NAMES
     ═══════════════════════════════════════════════════════════ */
     case "names":
