@@ -98,6 +98,8 @@ export const MIDDLE_SCHOOL_WEED_IDS: string[] = [
   "Field_Horsetail",          // replaces Yellow woodsorrel
   "large-crabgrass",
   "barnyardgrass",
+  "golden-alexanders",
+  "Witchgrass",
 ];
 
 const ELEM_ID_SET = new Set(ELEMENTARY_WEED_IDS);

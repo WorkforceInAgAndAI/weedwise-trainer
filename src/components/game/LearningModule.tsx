@@ -8,7 +8,7 @@ import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { LOOKALIKE_TRIPLES } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
-import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award } from "lucide-react";
+import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award, Search } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 import { DetectiveCard, EvidenceTag, CaseCallout, NotebookSection, FieldNote, SelfCheck, JournalHeader, KeyCouplet, TermSidebar, LabCallout, Citation } from "./learning/ThemedBlocks";
@@ -78,6 +78,64 @@ type TopicId =
 
 type CategoryId = "identification" | "lifecycle" | "control";
 
+// Enlarge-on-click photo used by the Life Cycles comparison panels.
+function ZoomableStagePhoto({
+  weedId,
+  stage,
+  caption,
+  badge,
+  badgeClass,
+}: {
+  weedId: string;
+  stage: string;
+  caption: string;
+  badge: string;
+  badgeClass: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="relative aspect-square bg-muted block w-full group"
+        aria-label={`Enlarge ${caption} photo`}
+      >
+        <WeedImage weedId={weedId} stage={stage} className="w-full h-full object-cover" />
+        <span className={`absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white ${badgeClass}`}>
+          {badge}
+        </span>
+        <span className="absolute top-1 right-1 opacity-70 group-hover:opacity-100 bg-background/80 rounded p-0.5">
+          <Search className="w-3 h-3 text-foreground" />
+        </span>
+      </button>
+      {open && (
+        <div
+          className="fixed inset-0 z-[60] bg-background/95 flex items-center justify-center p-6"
+          onClick={() => setOpen(false)}
+          role="dialog"
+        >
+          <div className="max-w-3xl w-full text-center" onClick={(e) => e.stopPropagation()}>
+            <WeedImage weedId={weedId} stage={stage} className="w-full max-h-[75vh] object-contain rounded-lg" />
+            <p className="mt-3 font-display font-bold text-foreground">{caption}</p>
+            <button
+              onClick={() => setOpen(false)}
+              className="mt-3 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** True when the species actually has a photo file for the given stage prefix. */
+function hasStagePhoto(weedId: string, prefix: string): boolean {
+  return ["jpg", "jpeg", "png", "webp"].some((ext) => hasImage(weedId, `${prefix}_1.${ext}`));
+}
+
 // Biennial species with rosette (Year 1) and shoot/bolted (Year 2) photos.
 // Used inside the Life Cycles topic to show the two-year transformation.
 const BIENNIAL_YEAR_PHOTOS: { id: string; name: string }[] = [
@@ -86,13 +144,22 @@ const BIENNIAL_YEAR_PHOTOS: { id: string; name: string }[] = [
   { id: "Common_teasel", name: "Common Teasel" },
   { id: "Garlic_mustard", name: "Garlic Mustard" },
   { id: "caraway", name: "Caraway" },
+  { id: "Common_mullein", name: "Common Mullein" },
   { id: "poison-hemlock", name: "Poison Hemlock" },
   { id: "Wild_Carrot", name: "Wild Carrot" },
   { id: "wild-parsnip", name: "Wild Parsnip" },
   { id: "yellow_Rocket", name: "Yellow Rocket" },
 ];
 
-function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
+function BiennialYearComparison({ compact = false, allowedIds }: { compact?: boolean; allowedIds?: Set<string> }) {
+  // Only show species that (a) belong to this grade's weed list and (b) really
+  // have BOTH a Year 1 rosette photo and a Year 2 shoot photo, so the two
+  // columns never fall back to the same image.
+  const shown = BIENNIAL_YEAR_PHOTOS.filter(
+    (w) =>
+      (!allowedIds || allowedIds.has(w.id)) && hasStagePhoto(w.id, "rosette") && hasStagePhoto(w.id, "shoot"),
+  );
+  if (shown.length === 0) return null;
   return (
     <div className="mt-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-3">
       <div className="flex items-center gap-2">
@@ -105,23 +172,26 @@ function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
         <strong>rosette</strong>. In <strong>Year 2</strong> they <strong>bolt</strong> — a tall flowering shoot
         shoots up, sets seed, and the plant dies.
       </p>
+      <p className="text-[11px] text-muted-foreground italic">Tap any photo to enlarge it.</p>
       <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
-        {BIENNIAL_YEAR_PHOTOS.map((w) => (
+        {shown.map((w) => (
           <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
             <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
             <div className="grid grid-cols-2">
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="rosette" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">
-                  Year 1 · Rosette
-                </span>
-              </div>
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="shoot" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white">
-                  Year 2 · Shoot
-                </span>
-              </div>
+              <ZoomableStagePhoto
+                weedId={w.id}
+                stage="rosette"
+                caption={`${w.name} — Year 1 rosette`}
+                badge="Year 1 · Rosette"
+                badgeClass="bg-green-600"
+              />
+              <ZoomableStagePhoto
+                weedId={w.id}
+                stage="shoot"
+                caption={`${w.name} — Year 2 bolted shoot`}
+                badge="Year 2 · Shoot"
+                badgeClass="bg-amber-600"
+              />
             </div>
           </div>
         ))}
@@ -161,7 +231,9 @@ const PERENNIAL_UNDERGROUND_PHOTOS: { id: string; name: string; structure: strin
   { id: "yellow-nutsedge", name: "Yellow Nutsedge", structure: "Tubers (nutlets)" },
 ];
 
-function PerennialUndergroundComparison({ compact = false }: { compact?: boolean }) {
+function PerennialUndergroundComparison({ compact = false, allowedIds }: { compact?: boolean; allowedIds?: Set<string> }) {
+  const shown = PERENNIAL_UNDERGROUND_PHOTOS.filter((w) => !allowedIds || allowedIds.has(w.id));
+  if (shown.length === 0) return null;
   return (
     <div className="mt-2 rounded-lg border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 space-y-3">
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">
@@ -174,23 +246,39 @@ function PerennialUndergroundComparison({ compact = false }: { compact?: boolean
         Cutting the tops doesn't kill the plant; it regrows from these underground parts each spring, which is why
         they're so difficult to control.
       </p>
+      <p className="text-[11px] text-muted-foreground italic">Tap any photo to enlarge it.</p>
       <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
-        {PERENNIAL_UNDERGROUND_PHOTOS.map((w) => (
+        {shown.map((w) => (
           <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
             <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
             <div className="grid grid-cols-2">
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">
-                  Above ground
-                </span>
-              </div>
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="underground" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white">
-                  Below ground
-                </span>
-              </div>
+              <ZoomableStagePhoto
+                weedId={w.id}
+                stage="flower"
+                caption={`${w.name} — above-ground shoot`}
+                badge="Above ground"
+                badgeClass="bg-green-600"
+              />
+              {hasStagePhoto(w.id, "underground") ? (
+                <ZoomableStagePhoto
+                  weedId={w.id}
+                  stage="underground"
+                  caption={`${w.name} — below-ground ${w.structure.toLowerCase()}`}
+                  badge="Below ground"
+                  badgeClass="bg-amber-700"
+                />
+              ) : (
+                <div className="relative aspect-square bg-amber-950/10 border-l border-border flex items-center justify-center p-2">
+                  <p className="text-[9px] text-muted-foreground text-center leading-tight">
+                    Below-ground photo coming soon
+                    <br />
+                    <span className="font-bold text-foreground">{w.structure}</span>
+                  </p>
+                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white">
+                    Below ground
+                  </span>
+                </div>
+              )}
             </div>
             <p className="text-[10px] text-muted-foreground text-center px-2 py-1 italic">{w.structure}</p>
           </div>
@@ -929,13 +1017,7 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
     title: "Foxtail Grasses",
     weedIds: ["giant-foxtail", "green-foxtail", "yellow-foxtail"],
     difference:
-      "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a droopy, nodding head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
-  },
-  {
-    title: "Bindweeds (Climbing Vines)",
-    weedIds: ["Field_bindweed", "Hedge_bindweed"],
-    difference:
-      "Both have white or pink trumpet-shaped flowers and twist around other plants. Field Bindweed has small flowers (about an inch) and arrowhead-shaped leaves. Hedge Bindweed has large flowers (2–3 inches) and bigger leaves with squared-off bottoms.",
+      "All three have fuzzy seedheads that look like a fox's tail. Giant Foxtail is the tallest with a drooping head and hairs on top of the leaves. Green Foxtail has a small, upright green head and no hairs. Yellow Foxtail has a stiff yellowish head and long hairs near the base of the leaf.",
   },
   {
     title: "Ragweeds",
@@ -945,27 +1027,27 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Thistles (Spiny Weeds)",
-    weedIds: ["canada-thistle", "Musk_thistle", "Russian_thistle"],
+    weedIds: ["canada-thistle", "Musk_thistle", "Common_Burdock"],
     difference:
-      "All three have spines and prickly leaves. Canada Thistle has small purple flowers and spreads underground in big patches. Musk Thistle has a single huge purple flower that nods over to one side. Russian Thistle (tumbleweed) is bushy and rolls across the ground when it dries out.",
+      "All three are prickly or coarse weeds with purple flower heads. Canada Thistle has small purple flowers and spreads underground in big patches. Musk Thistle has a single huge purple flower that droops over to one side and very spiny, winged stems. Common Burdock is not a true thistle — it has huge dock-like leaves and round burs covered in hooks instead of spiny leaves.",
   },
   {
     title: "Smartweeds",
-    weedIds: ["pennsylvania-smartweed", "Water_smartweed"],
+    weedIds: ["pennsylvania-smartweed", "Water_smartweed", "Ladysthumb"],
     difference:
-      "Both have pink flower spikes and a papery sheath around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems. Water Smartweed grows in wet places like ponds with leaves that often float on the water.",
+      "All three have pink flower spikes and a papery sheath (ocrea) around the stem joints. Pennsylvania Smartweed grows in fields and along roads with upright stems and a smooth sheath. Water Smartweed grows in wet places like ponds with leaves that often float on the water. Lady's Thumb has a dark purple V-shaped smudge in the middle of each leaf — like a thumbprint — and its sheath is fringed with tiny bristles.",
   },
   {
     title: "Mustards (Yellow-Flowered)",
-    weedIds: ["Wild_mustard", "yellow_Rocket", "Shepherds_Purse"],
+    weedIds: ["Wild_mustard", "yellow_Rocket"],
     difference:
-      "All three are in the mustard family with four-petal flowers. Wild Mustard has bright yellow flowers and big lobed leaves. Yellow Rocket has yellow flowers too but smaller, shinier leaves that stay green all winter. Shepherd's Purse has tiny white flowers and little heart-shaped seed pods that look like purses.",
+      "Both are in the mustard family with four-petal yellow flowers. Wild Mustard has bright yellow flowers, big lobed leaves, and bristly hairs on the lower stem. Yellow Rocket has yellow flowers too, but smaller, shiny, dark-green leaves with a big rounded end lobe that stay green all winter.",
   },
   {
     title: "Chickweeds & Small Spring Weeds",
-    weedIds: ["CommonChickweed", "Mouseear_chickweed", "Henbit_deadnettle"],
+    weedIds: ["CommonChickweed", "Mouseear_chickweed"],
     difference:
-      "All three are short weeds you see in early spring. Common Chickweed has tiny white star-shaped flowers and a single line of hairs down one side of the stem. Mouse-ear Chickweed is covered in soft fuzzy hairs all over (like a mouse's ear!). Henbit has pink-purple flowers and square stems because it's in the mint family.",
+      "Both are short weeds you see in early spring with tiny white flowers. Common Chickweed has smooth leaves and a single line of hairs running down one side of the stem. Mouse-ear Chickweed is covered in soft fuzzy hairs all over (like a mouse's ear!) and often creeps into thick mats.",
   },
   {
     title: "Nightshades (Berry-Makers — Don't Eat!)",
@@ -975,9 +1057,9 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Wild Carrot Look-Alikes (Be Careful!)",
-    weedIds: ["Wild_Carrot", "poison-hemlock", "golden-alexanders"],
+    weedIds: ["Wild_Carrot", "poison-hemlock", "wild-parsnip"],
     difference:
-      "All three have lacy leaves and flat clusters of small flowers. Wild Carrot (Queen Anne's Lace) has white flowers and a hairy stem that smells like carrot. Poison Hemlock has white flowers too but a SMOOTH stem with purple spots — it is very dangerous and should never be touched. Golden Alexanders has bright yellow flowers instead of white.",
+      "All three have flat-topped clusters of small flowers called umbels. Wild Carrot (Queen Anne's Lace) has lacy leaves, white flowers, and a hairy stem that smells like carrot. Poison Hemlock has lacy leaves and white flowers too, but a SMOOTH stem with purple blotches — it is very dangerous and should never be touched. Wild Parsnip has yellow flowers and leaves made of large toothed leaflets, and its sap can burn your skin in sunlight — never touch it either.",
   },
   {
     title: "Crabgrass & Look-Alike Grasses",
@@ -987,21 +1069,30 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Lambsquarters Look-Alikes",
-    weedIds: ["lambsquarters", "Redroot_pigweed", "Russian_thistle"],
+    weedIds: ["lambsquarters", "kochia", "Russian_thistle"],
     difference:
-      "All three are tall summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Redroot Pigweed has hairy stems and a bright reddish-pink root. Russian Thistle has skinny spiny leaves and turns into a tumbleweed when it dries up.",
+      "All three are bushy summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Kochia has soft, hairy, narrow spear-shaped leaves and grows in a neat pyramid shape. Russian Thistle has skinny, spine-tipped leaves and turns into a tumbleweed when it dries up.",
   },
   {
-    title: "Morningglory Vines",
-    weedIds: ["Tall_morningglory", "Field_bindweed", "Wild_buckwheat"],
+    title: "Climbing Vines",
+    weedIds: ["Tall_morningglory", "Field_bindweed", "Hedge_bindweed", "Wild_buckwheat"],
     difference:
-      "All three are twining vines that climb on other plants. Tall Morningglory has big purple or blue trumpet flowers and heart-shaped leaves. Field Bindweed has smaller white or pink trumpet flowers and arrowhead leaves. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no trumpets — and a papery sheath where the leaf meets the stem.",
+      "All four are twining vines that climb on other plants. Tall Morningglory has big purple or blue bell-shaped flowers and heart-shaped leaves. Field Bindweed has small white or pink bell-shaped flowers (about an inch) and arrowhead leaves. Hedge Bindweed has much larger white bell-shaped flowers (2–3 inches) and bigger leaves with squared-off bottoms. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no bells — and a papery sheath where the leaf meets the stem.",
   },
 ];
 
 function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
   return (
     <div className="space-y-4">
+      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3">
+        <p className="text-sm text-foreground font-semibold">
+          Click any photo to open that plant's page for more specific facts, extra photos, and ID details.
+        </p>
+        <p className="text-xs text-muted-foreground mt-1">
+          <strong>Bolting</strong> means a plant stops growing low and shoots a tall flowering stem up fast — many
+          look-alikes are easiest to tell apart once they bolt and flower.
+        </p>
+      </div>
       {ELEM_LOOKALIKE_GROUPS.map((g) => {
         const members = g.weedIds
           .map((id) => weeds.find((w) => w.id === id))
@@ -2668,6 +2759,7 @@ function TopicContent({
        LIFE CYCLES
     ═══════════════════════════════════════════════════════════ */
     case "life-cycles": {
+      const lifeCyclePoolIds = new Set(topicWeeds.map((w) => w.id));
       const annuals = topicWeeds.filter(
         (w) =>
           w.lifeCycle.includes("Annual") && !w.lifeCycle.includes("Perennial") && !w.lifeCycle.includes("Biennial"),
@@ -2779,7 +2871,7 @@ function TopicContent({
                   energy in its roots during the first year.
                 </p>
               </div>
-              <BiennialYearComparison compact />
+              <BiennialYearComparison compact allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Perennial */}
@@ -2790,7 +2882,7 @@ function TopicContent({
                 bulbs each year. Perennials spread by seeds or through <strong>underground stems and roots</strong> that
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
-              <PerennialUndergroundComparison compact />
+              <PerennialUndergroundComparison compact allowedIds={lifeCyclePoolIds} />
             </div>
           </div>
         );
@@ -2871,7 +2963,7 @@ function TopicContent({
                 <strong>vegetative growth</strong>. In the second year, they bolt, flower, produce seeds, and die.
                 Control is most effective during the <strong>rosette stage</strong>.
               </p>
-              <BiennialYearComparison />
+              <BiennialYearComparison allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Perennial section */}
@@ -2883,7 +2975,7 @@ function TopicContent({
                 most difficult weeds to manage because they can regrow from underground structures even after top growth
                 is removed.
               </p>
-            <PerennialUndergroundComparison />
+            <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Dual lifecycle */}
@@ -2999,7 +3091,7 @@ function TopicContent({
               producing only vegetative growth in the first year and then flowering, setting seed, and dying in the
               second.
             </p>
-            <BiennialYearComparison />
+            <BiennialYearComparison allowedIds={lifeCyclePoolIds} />
           </div>
 
           {/* Perennial */}
@@ -3014,7 +3106,7 @@ function TopicContent({
               Matching control strategies to the specific life cycle of a target weed species is fundamental to
               achieving durable suppression rather than temporary or cosmetic results.
             </p>
-            <PerennialUndergroundComparison />
+            <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
           </div>
         </div>
       );
@@ -3053,6 +3145,36 @@ function TopicContent({
                 <strong>invasive</strong>. Invasive weeds hurt native plants and animals.
               </p>
             </CaseCallout>
+
+            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+              <p className="font-display font-bold text-foreground text-sm">Word Bank</p>
+              <ul className="text-xs text-muted-foreground space-y-1.5">
+                <li>
+                  <strong className="text-foreground">Tuber</strong> — a swollen underground storage stem (like a
+                  small potato) that stores food and can sprout a brand-new plant.
+                </li>
+                <li>
+                  <strong className="text-foreground">Nutlet</strong> — a tiny, hard, nut-like structure. In Yellow
+                  Nutsedge the underground tubers are often called nutlets.
+                </li>
+                <li>
+                  <strong className="text-foreground">Umbel</strong> — a flower cluster where all the little flower
+                  stalks start from one point and spread out flat, like the ribs of an umbrella.
+                </li>
+                <li>
+                  <strong className="text-foreground">Whorled</strong> — 3 or more leaves attached at the same node
+                  (the same spot on the stem).
+                </li>
+                <li>
+                  <strong className="text-foreground">Pappus bristles</strong> — the fine feathery hairs on a seed
+                  that let it float away on the wind.
+                </li>
+                <li>
+                  <strong className="text-foreground">Bolting</strong> — when a low rosette suddenly sends up a tall
+                  flowering stem.
+                </li>
+              </ul>
+            </div>
 
             {invasives.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
@@ -5087,7 +5209,7 @@ function TopicContent({
         {
           id: "Field_bindweed",
           name: "13. Morningglory",
-          spotIt: "Twisty vines that climb up other plants, with trumpet-shaped purple, pink, or blue flowers.",
+          spotIt: "Twisty vines that climb up other plants, with bell-shaped purple, pink, or blue flowers.",
           funFact: "The flowers open in the morning and close up when the sun gets hot — that's how it got its name!",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
