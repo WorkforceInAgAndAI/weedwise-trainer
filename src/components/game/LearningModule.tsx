@@ -12,6 +12,7 @@ import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, 
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 import { DetectiveCard, EvidenceTag, CaseCallout, NotebookSection, FieldNote, SelfCheck, JournalHeader, KeyCouplet, TermSidebar, LabCallout, Citation } from "./learning/ThemedBlocks";
+import BotanyTermsModule from "./learning/BotanyTermsModule";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
