@@ -20,7 +20,6 @@ import K5LookAlike from './practice-games/k5/K5LookAlike';
 import NameTheWeed from './practice-games/k5/NameTheWeed';
 import LifeStagesSequence from './practice-games/k5/LifeStagesSequence';
 import LifeCycleMatching from './practice-games/k5/LifeCycleMatching';
-import EcologyScramble from './practice-games/k5/EcologyScramble';
 import HabitatMapping from './practice-games/k5/HabitatMapping';
 import WeedSeedBanks from './practice-games/k5/WeedSeedBanks';
 import WeedTravel from './practice-games/k5/WeedTravel';
@@ -48,7 +47,6 @@ import SproutClimb from './practice-games/k5/SproutClimb';
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
 import FieldScout from './practice-games/middle/FieldScout';
-import PestID from './practice-games/middle/PestID';
 import MSHabitatMapping from './practice-games/middle/HabitatMapping';
 import WeedOrigins from './practice-games/middle/WeedOrigins';
 import NativeLookAlike from './practice-games/middle/NativeLookAlike';
@@ -102,7 +100,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   // K-5
   'weed-or-crop': 'names', 'name-the-weed': 'names', 'leaf-artist': 'monocot-dicot',
   'taxonomy-tower': 'monocot-dicot', 'look-alike': 'look-alikes', 'life-stages': 'life-stages',
-  'life-cycle-match': 'life-cycles', 'ecology-scramble': 'ecology', 'habitat-mapping': 'habitats',
+  'life-cycle-match': 'life-cycles', 'habitat-mapping': 'habitats',
   'seed-banks': 'seeds', 'weed-travel': 'seeds', 'invasive-match': 'native-introduced',
   'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety', 'weed-control': 'control-methods',
   'great-garden-race': 'life-cycles',
@@ -121,7 +119,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'sprout-climb': 'life-cycles',
   // 6-8
   'ms-name-weed': 'names', 'ms-taxonomy': 'taxonomy', 'field-scout': 'field-scouting',
-  'pest-id': 'ecology', 'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
+  'ms-habitat': 'habitats', 'weed-origins': 'native-introduced',
   'native-lookalike': 'look-alikes', 'ms-look-alike': 'look-alikes', 'weed-competitors': 'weed-competitors',
   'invasive-quiz': 'native-introduced', 'ms-safe-toxic': 'safety',
   'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
@@ -142,7 +140,6 @@ const GAME_TO_TOPIC: Record<string, string> = {
 
 const k5Games: GameDef[] = [
  { id: 'field-scout', name: 'Field Scout', Icon: Footprints, category: 'Field Methods', description: 'You are a hired scout — find and count weeds for pay.', howToPlay: 'Walk through fields, identify weeds, and earn money. Correct IDs earn $50, wrong ones earn $10. Complete 10 rounds!', component: FieldScout },
- { id: 'pest-id', name: 'Pest ID', Icon: Microscope, category: 'Ecology', description: 'Classify weeds as aquatic, terrestrial, or parasitic.', howToPlay: 'Look at the weed and its habitat, classify it, then select its survival needs from a word bank.', component: PestID },
  { id: 'weed-origins', name: 'Weed Origins', Icon: Globe, category: 'Origin', description: 'Identify weed continent of origin.', howToPlay: 'A weed appears over a world map. Click the continent where it came from.', component: WeedOrigins },
  { id: 'native-lookalike', name: 'Native or Introduced?', Icon: Eye, category: 'Look-Alikes', description: 'Sort look-alike pairs into Native or Introduced.', howToPlay: 'Two similar plants are shown. Drag each to the Native or Introduced box.', component: NativeLookAlike },
  { id: 'ms-look-alike', name: 'Look-Alike Trios', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from three commonly-confused look-alikes.', howToPlay: 'Three look-alike weeds appear. Choose the image that matches the target common + scientific name, then read how to tell them apart.', component: MSLookAlike },
@@ -161,7 +158,6 @@ const newK5Games: GameDef[] = [
  { id: 'leaf-artist', name: 'Leaf Detective', Icon: Palette, category: 'Leaf Morphology', description: 'Identify leaf venation: parallel or netted?', howToPlay: 'Look closely at each leaf. Decide if its veins are parallel (running side by side, like grass) or netted (branching like a net). Track your finds in the side panel.', component: LeafArtist },
  { id: 'name-the-weed', name: 'Name the Weed', Icon: Tag, category: 'Names', description: 'Identify weeds by their image and description.', howToPlay: 'Look at the weed image and read the clue. Choose the correct common name from four options.', component: NameTheWeed },
  { id: 'life-stages', name: 'Life Stages Sequence', Icon: ArrowUpDown, category: 'Life Stages', description: 'Put weed growth stages in the right order.', howToPlay: 'Images of the same weed at different life stages are jumbled. Drag them into correct order.', component: LifeStagesSequence },
- { id: 'ecology-scramble', name: 'Ecology Scramble', Icon: Globe, category: 'Ecology', description: 'Sort survival needs and quickly categorize them as aquatic, terrestrial, or parasitic.', howToPlay: 'First, sort survival needs into the correct plant type. Then, needs appear one at a time — you have 10 seconds to classify each as terrestrial, aquatic, or parasitic.', component: EcologyScramble },
  { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Sort seeds and predict how many are hiding in the field.', howToPlay: 'Sort seed images into columns by species, then predict the count for each type. Click a seed for a hint!', component: WeedSeedBanks },
  { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel to a new location.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle on your journey.', component: WeedTravel },
  { id: 'invasive-match', name: 'Invasive Match', Icon: AlertTriangle, category: 'Invasive Weeds', description: 'Match invasive weeds to the damage they cause.', howToPlay: 'Connect each invasive weed with the negative effect it has on the environment.', component: InvasiveMatch },
