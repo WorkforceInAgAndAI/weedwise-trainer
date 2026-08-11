@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
@@ -12,7 +12,15 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  const rounds = useMemo(() => {
   const selected = levelSlice(shuffle(weeds), level, d.rounds);
   return selected.map(w => {
-   const wrong = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, Math.max(1, d.options - 1)).map(x => x.scientificName);
+   // Distractors must be distinct species AND distinct scientific names, so the
+   // photo shown always has exactly one matching answer.
+   const wrong: string[] = [];
+   for (const x of shuffle(weeds)) {
+    if (x.id === w.id || x.scientificName === w.scientificName) continue;
+    if (wrong.includes(x.scientificName)) continue;
+    wrong.push(x.scientificName);
+    if (wrong.length >= Math.max(1, d.options - 1)) break;
+   }
    return { weed: w, options: shuffle([w.scientificName, ...wrong]) };
   });
  }, [level, d.rounds, d.options]);
@@ -49,12 +57,15 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
      <span className="text-sm text-muted-foreground">{idx + 1}/{rounds.length}</span>
     </div>
     <div className="flex justify-center mb-4">
-     <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-border bg-secondary">
-      <WeedImage weedId={current.weed.id} stage="flower" className="w-full h-full object-cover" />
+  <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-border bg-secondary">
+      <WeedImage key={current.weed.id} weedId={current.weed.id} stage="flower" className="w-full h-full object-cover" />
      </div>
     </div>
     {d.showHints && <p className="text-sm text-muted-foreground text-center mb-1 italic">{current.weed.traits[0]}</p>}
     {d.showHints && <p className="text-xs text-muted-foreground text-center mb-4">Common: {current.weed.commonName} -- Family: {current.weed.family}</p>}
+    {submitted && !d.showHints && (
+     <p className="text-xs text-muted-foreground text-center mb-4">{current.weed.commonName} -- {current.weed.family}</p>
+    )}
     <div className="grid gap-2 sm:grid-cols-2">
      {current.options.map(opt => {
       let cls = 'border-border bg-card hover:border-primary';
