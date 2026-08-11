@@ -78,6 +78,64 @@ type TopicId =
 
 type CategoryId = "identification" | "lifecycle" | "control";
 
+// Enlarge-on-click photo used by the Life Cycles comparison panels.
+function ZoomableStagePhoto({
+  weedId,
+  stage,
+  caption,
+  badge,
+  badgeClass,
+}: {
+  weedId: string;
+  stage: string;
+  caption: string;
+  badge: string;
+  badgeClass: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="relative aspect-square bg-muted block w-full group"
+        aria-label={`Enlarge ${caption} photo`}
+      >
+        <WeedImage weedId={weedId} stage={stage} className="w-full h-full object-cover" />
+        <span className={`absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white ${badgeClass}`}>
+          {badge}
+        </span>
+        <span className="absolute top-1 right-1 opacity-70 group-hover:opacity-100 bg-background/80 rounded p-0.5">
+          <Search className="w-3 h-3 text-foreground" />
+        </span>
+      </button>
+      {open && (
+        <div
+          className="fixed inset-0 z-[60] bg-background/95 flex items-center justify-center p-6"
+          onClick={() => setOpen(false)}
+          role="dialog"
+        >
+          <div className="max-w-3xl w-full text-center" onClick={(e) => e.stopPropagation()}>
+            <WeedImage weedId={weedId} stage={stage} className="w-full max-h-[75vh] object-contain rounded-lg" />
+            <p className="mt-3 font-display font-bold text-foreground">{caption}</p>
+            <button
+              onClick={() => setOpen(false)}
+              className="mt-3 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** True when the species actually has a photo file for the given stage prefix. */
+function hasStagePhoto(weedId: string, prefix: string): boolean {
+  return ["jpg", "jpeg", "png", "webp"].some((ext) => hasImage(weedId, `${prefix}_1.${ext}`));
+}
+
 // Biennial species with rosette (Year 1) and shoot/bolted (Year 2) photos.
 // Used inside the Life Cycles topic to show the two-year transformation.
 const BIENNIAL_YEAR_PHOTOS: { id: string; name: string }[] = [
@@ -86,13 +144,22 @@ const BIENNIAL_YEAR_PHOTOS: { id: string; name: string }[] = [
   { id: "Common_teasel", name: "Common Teasel" },
   { id: "Garlic_mustard", name: "Garlic Mustard" },
   { id: "caraway", name: "Caraway" },
+  { id: "Common_mullein", name: "Common Mullein" },
   { id: "poison-hemlock", name: "Poison Hemlock" },
   { id: "Wild_Carrot", name: "Wild Carrot" },
   { id: "wild-parsnip", name: "Wild Parsnip" },
   { id: "yellow_Rocket", name: "Yellow Rocket" },
 ];
 
-function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
+function BiennialYearComparison({ compact = false, allowedIds }: { compact?: boolean; allowedIds?: Set<string> }) {
+  // Only show species that (a) belong to this grade's weed list and (b) really
+  // have BOTH a Year 1 rosette photo and a Year 2 shoot photo, so the two
+  // columns never fall back to the same image.
+  const shown = BIENNIAL_YEAR_PHOTOS.filter(
+    (w) =>
+      (!allowedIds || allowedIds.has(w.id)) && hasStagePhoto(w.id, "rosette") && hasStagePhoto(w.id, "shoot"),
+  );
+  if (shown.length === 0) return null;
   return (
     <div className="mt-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-3">
       <div className="flex items-center gap-2">
@@ -105,23 +172,26 @@ function BiennialYearComparison({ compact = false }: { compact?: boolean }) {
         <strong>rosette</strong>. In <strong>Year 2</strong> they <strong>bolt</strong> — a tall flowering shoot
         shoots up, sets seed, and the plant dies.
       </p>
+      <p className="text-[11px] text-muted-foreground italic">Tap any photo to enlarge it.</p>
       <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
-        {BIENNIAL_YEAR_PHOTOS.map((w) => (
+        {shown.map((w) => (
           <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
             <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
             <div className="grid grid-cols-2">
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="rosette" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">
-                  Year 1 · Rosette
-                </span>
-              </div>
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="shoot" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white">
-                  Year 2 · Shoot
-                </span>
-              </div>
+              <ZoomableStagePhoto
+                weedId={w.id}
+                stage="rosette"
+                caption={`${w.name} — Year 1 rosette`}
+                badge="Year 1 · Rosette"
+                badgeClass="bg-green-600"
+              />
+              <ZoomableStagePhoto
+                weedId={w.id}
+                stage="shoot"
+                caption={`${w.name} — Year 2 bolted shoot`}
+                badge="Year 2 · Shoot"
+                badgeClass="bg-amber-600"
+              />
             </div>
           </div>
         ))}
