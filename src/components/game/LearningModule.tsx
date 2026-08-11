@@ -6221,23 +6221,44 @@ function TopicContent({
       ];
 
       if (grade === "elementary") {
-        // Group unsafe weeds by WHY they are dangerous, based on keywords in safetyNote.
+        // Curriculum-set placements. A species may belong to more than one
+        // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
+        const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
+          Curly_dock: ["toxic"],
+          Horsenettle: ["toxic", "physical"],
+          Tall_morningglory: ["toxic"],
+          Field_bindweed: ["toxic"],
+          Jimsonweed: ["toxic", "physical"],
+          "common-ragweed": ["skin"],
+          "giant-foxtail": ["physical"],
+          "giant-ragweed": ["skin"],
+          "wild-parsnip": ["toxic", "skin"],
+          Common_Burdock: ["physical"],
+          Musk_thistle: ["physical"],
+          Common_teasel: ["physical"],
+          commonPokeweed: ["toxic"],
+          common_Cocklebur: ["physical", "toxic"],
+          "canada-thistle": ["physical"],
+        };
+        // Keyword fallback for species without an explicit placement.
         const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
-        const physical = topicWeeds.filter((w) => matches(w, /thorn|spine|prick|bur|sharp|puncture|stab/i));
-        const skin = topicWeeds.filter(
-          (w) =>
-            !physical.includes(w) &&
-            matches(w, /skin|dermat|rash|irrit|sap|sting|blister|burn|contact|allerg/i),
-        );
-        const toxic = topicWeeds.filter(
-          (w) =>
-            !physical.includes(w) &&
-            !skin.includes(w) &&
-            matches(w, /toxic|poison|ingest|consum|eat|swallow|livestock|cattle|horse|hallucin|fatal|death|nausea|vomit|nitrate/i),
-        );
-        const other = topicWeeds.filter(
-          (w) => !physical.includes(w) && !skin.includes(w) && !toxic.includes(w),
-        );
+        const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
+          if (matches(w, /thorn|spine|prick|bur|sharp|puncture|stab/i)) return ["physical"];
+          if (matches(w, /skin|dermat|rash|irrit|sap|sting|blister|burn|contact|allerg/i)) return ["skin"];
+          if (
+            matches(
+              w,
+              /toxic|poison|ingest|consum|eat|swallow|livestock|cattle|horse|hallucin|fatal|death|nausea|vomit|nitrate/i,
+            )
+          )
+            return ["toxic"];
+          return [];
+        };
+        const groupsFor = (w: Weed) => SAFETY_PLACEMENT[w.id] ?? fallback(w);
+        const physical = topicWeeds.filter((w) => groupsFor(w).includes("physical"));
+        const skin = topicWeeds.filter((w) => groupsFor(w).includes("skin"));
+        const toxic = topicWeeds.filter((w) => groupsFor(w).includes("toxic"));
+        const other = topicWeeds.filter((w) => groupsFor(w).length === 0);
 
         const renderGroup = (
           title: string,
