@@ -52,7 +52,7 @@ type TopicId =
   | "taxonomy"
   | "dioecious"
   | "grass-id"
-  | "ecology"
+  | "botany-terms"
   | "plant-needs"
   | "intro-control-methods"
   | "plant-parts"
