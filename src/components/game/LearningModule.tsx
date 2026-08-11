@@ -6,7 +6,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { LOOKALIKE_TRIPLES } from "@/data/lookAlikeGroups";
+import { LOOKALIKE_TRIPLES, lookAlikeStage } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award, Search } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
@@ -509,7 +509,7 @@ const TOPICS: Topic[] = [
     name: "Plant Parts & Botany Terms",
     icon: "leaf",
     description: "Build the vocabulary every weed scout needs — petiole, sheath, ligule, bract, lobe, ocrea, raceme, umbel, tuber, nutlet, and more.",
-    grades: ["middle", "high"],
+    grades: ["elementary", "middle", "high"],
     category: "identification",
   },
   {
@@ -1070,9 +1070,9 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
   },
   {
     title: "Lambsquarters Look-Alikes",
-    weedIds: ["lambsquarters", "kochia", "Russian_thistle"],
+    weedIds: ["kochia", "Russian_thistle"],
     difference:
-      "All three are bushy summer weeds with small green flowers. Lambsquarters has dusty white powder on the back of its diamond-shaped leaves. Kochia has soft, hairy, narrow spear-shaped leaves and grows in a neat pyramid shape. Russian Thistle has skinny, spine-tipped leaves and turns into a tumbleweed when it dries up.",
+      "Both are bushy summer weeds with small green flowers and skinny leaves. Kochia has soft, hairy, narrow spear-shaped leaves and grows in a neat pyramid shape. Russian Thistle has skinny, spine-tipped leaves and turns into a tumbleweed when it dries up.",
   },
   {
     title: "Climbing Vines",
@@ -1099,6 +1099,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
           .map((id) => weeds.find((w) => w.id === id))
           .filter((w): w is Weed => Boolean(w));
         if (members.length < 2) return null;
+        const groupStage = lookAlikeStage(g.weedIds);
         return (
           <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
@@ -1112,7 +1113,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
                     className="block w-full rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
                     style={{ aspectRatio: "1 / 1" }}
                   >
-                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                    <WeedImage weedId={w.id} stage={groupStage} className="w-full h-full" />
                   </button>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
                 </div>
