@@ -2750,6 +2750,7 @@ function TopicContent({
        LIFE CYCLES
     ═══════════════════════════════════════════════════════════ */
     case "life-cycles": {
+      const lifeCyclePoolIds = new Set(topicWeeds.map((w) => w.id));
       const annuals = topicWeeds.filter(
         (w) =>
           w.lifeCycle.includes("Annual") && !w.lifeCycle.includes("Perennial") && !w.lifeCycle.includes("Biennial"),
@@ -2861,7 +2862,7 @@ function TopicContent({
                   energy in its roots during the first year.
                 </p>
               </div>
-              <BiennialYearComparison compact />
+              <BiennialYearComparison compact allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Perennial */}
@@ -2872,7 +2873,7 @@ function TopicContent({
                 bulbs each year. Perennials spread by seeds or through <strong>underground stems and roots</strong> that
                 form new plants. Perennials can be difficult to manage because of their deep root systems.
               </p>
-              <PerennialUndergroundComparison compact />
+              <PerennialUndergroundComparison compact allowedIds={lifeCyclePoolIds} />
             </div>
           </div>
         );
@@ -2953,7 +2954,7 @@ function TopicContent({
                 <strong>vegetative growth</strong>. In the second year, they bolt, flower, produce seeds, and die.
                 Control is most effective during the <strong>rosette stage</strong>.
               </p>
-              <BiennialYearComparison />
+              <BiennialYearComparison allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Perennial section */}
@@ -2965,7 +2966,7 @@ function TopicContent({
                 most difficult weeds to manage because they can regrow from underground structures even after top growth
                 is removed.
               </p>
-            <PerennialUndergroundComparison />
+            <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Dual lifecycle */}
@@ -3081,7 +3082,7 @@ function TopicContent({
               producing only vegetative growth in the first year and then flowering, setting seed, and dying in the
               second.
             </p>
-            <BiennialYearComparison />
+            <BiennialYearComparison allowedIds={lifeCyclePoolIds} />
           </div>
 
           {/* Perennial */}
@@ -3096,7 +3097,7 @@ function TopicContent({
               Matching control strategies to the specific life cycle of a target weed species is fundamental to
               achieving durable suppression rather than temporary or cosmetic results.
             </p>
-            <PerennialUndergroundComparison />
+            <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
           </div>
         </div>
       );
