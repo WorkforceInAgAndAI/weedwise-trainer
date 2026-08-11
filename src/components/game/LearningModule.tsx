@@ -610,14 +610,6 @@ const TOPICS: Topic[] = [
     category: "lifecycle",
   },
   {
-    id: "ecology",
-    name: "Ecology & Growth Types",
-    icon: "ecology",
-    description: "Investigate terrestrial, aquatic, and parasitic weeds and explain the unique resources each growth type requires.",
-    grades: ["elementary"],
-    category: "lifecycle",
-  },
-  {
     id: "plant-needs",
     name: "What Plants Need",
     icon: "sun",
@@ -1363,7 +1355,6 @@ const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, stri
   seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
   "seed-dormancy": { high: "sleepy-seeds" },
   habitats: { elementary: "habitat-mapping", middle: "ms-habitat", high: "hs-habitat" },
-  ecology: { elementary: "ecology-scramble", middle: "pest-id" },
   safety: { elementary: "safe-vs-toxic", middle: "ms-safe-toxic" },
   "control-methods": { elementary: "weed-control", middle: "ms-weed-control", high: "hs-weed-control" },
   "field-scouting": { middle: "field-scout", high: "hs-field-scout" },
