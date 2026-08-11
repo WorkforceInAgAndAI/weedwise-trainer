@@ -231,7 +231,9 @@ const PERENNIAL_UNDERGROUND_PHOTOS: { id: string; name: string; structure: strin
   { id: "yellow-nutsedge", name: "Yellow Nutsedge", structure: "Tubers (nutlets)" },
 ];
 
-function PerennialUndergroundComparison({ compact = false }: { compact?: boolean }) {
+function PerennialUndergroundComparison({ compact = false, allowedIds }: { compact?: boolean; allowedIds?: Set<string> }) {
+  const shown = PERENNIAL_UNDERGROUND_PHOTOS.filter((w) => !allowedIds || allowedIds.has(w.id));
+  if (shown.length === 0) return null;
   return (
     <div className="mt-2 rounded-lg border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 space-y-3">
       <div className="text-xs font-bold uppercase tracking-wide text-emerald-800 dark:text-emerald-200">
@@ -244,23 +246,39 @@ function PerennialUndergroundComparison({ compact = false }: { compact?: boolean
         Cutting the tops doesn't kill the plant; it regrows from these underground parts each spring, which is why
         they're so difficult to control.
       </p>
+      <p className="text-[11px] text-muted-foreground italic">Tap any photo to enlarge it.</p>
       <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
-        {PERENNIAL_UNDERGROUND_PHOTOS.map((w) => (
+        {shown.map((w) => (
           <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
             <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
             <div className="grid grid-cols-2">
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">
-                  Above ground
-                </span>
-              </div>
-              <div className="relative aspect-square bg-muted">
-                <WeedImage weedId={w.id} stage="underground" className="w-full h-full object-cover" />
-                <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white">
-                  Below ground
-                </span>
-              </div>
+              <ZoomableStagePhoto
+                weedId={w.id}
+                stage="flower"
+                caption={`${w.name} — above-ground shoot`}
+                badge="Above ground"
+                badgeClass="bg-green-600"
+              />
+              {hasStagePhoto(w.id, "underground") ? (
+                <ZoomableStagePhoto
+                  weedId={w.id}
+                  stage="underground"
+                  caption={`${w.name} — below-ground ${w.structure.toLowerCase()}`}
+                  badge="Below ground"
+                  badgeClass="bg-amber-700"
+                />
+              ) : (
+                <div className="relative aspect-square bg-amber-950/10 border-l border-border flex items-center justify-center p-2">
+                  <p className="text-[9px] text-muted-foreground text-center leading-tight">
+                    Below-ground photo coming soon
+                    <br />
+                    <span className="font-bold text-foreground">{w.structure}</span>
+                  </p>
+                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white">
+                    Below ground
+                  </span>
+                </div>
+              )}
             </div>
             <p className="text-[10px] text-muted-foreground text-center px-2 py-1 italic">{w.structure}</p>
           </div>
