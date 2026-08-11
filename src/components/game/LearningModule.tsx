@@ -12,6 +12,7 @@ import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, 
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
 import { DetectiveCard, EvidenceTag, CaseCallout, NotebookSection, FieldNote, SelfCheck, JournalHeader, KeyCouplet, TermSidebar, LabCallout, Citation } from "./learning/ThemedBlocks";
+import BotanyTermsModule from "./learning/BotanyTermsModule";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
@@ -52,7 +53,7 @@ type TopicId =
   | "taxonomy"
   | "dioecious"
   | "grass-id"
-  | "ecology"
+  | "botany-terms"
   | "plant-needs"
   | "intro-control-methods"
   | "plant-parts"
@@ -504,6 +505,14 @@ interface Topic {
 const TOPICS: Topic[] = [
   // Identification & Morphology
   {
+    id: "botany-terms",
+    name: "Plant Parts & Botany Terms",
+    icon: "leaf",
+    description: "Build the vocabulary every weed scout needs — petiole, sheath, ligule, bract, lobe, ocrea, raceme, umbel, tuber, nutlet, and more.",
+    grades: ["middle", "high"],
+    category: "identification",
+  },
+  {
     id: "names",
     name: "Weed Names & ID",
     icon: "names",
@@ -607,14 +616,6 @@ const TOPICS: Topic[] = [
     icon: "habitats",
     description: "Predict where each weed thrives across warm, cool, wet, and dry habitats based on its biology.",
     grades: ["elementary", "middle", "high"],
-    category: "lifecycle",
-  },
-  {
-    id: "ecology",
-    name: "Ecology & Growth Types",
-    icon: "ecology",
-    description: "Investigate terrestrial, aquatic, and parasitic weeds and explain the unique resources each growth type requires.",
-    grades: ["elementary"],
     category: "lifecycle",
   },
   {
@@ -1363,7 +1364,6 @@ const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, stri
   seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
   "seed-dormancy": { high: "sleepy-seeds" },
   habitats: { elementary: "habitat-mapping", middle: "ms-habitat", high: "hs-habitat" },
-  ecology: { elementary: "ecology-scramble", middle: "pest-id" },
   safety: { elementary: "safe-vs-toxic", middle: "ms-safe-toxic" },
   "control-methods": { elementary: "weed-control", middle: "ms-weed-control", high: "hs-weed-control" },
   "field-scouting": { middle: "field-scout", high: "hs-field-scout" },
@@ -1911,6 +1911,12 @@ function TopicContent({
   onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }) {
   switch (topicId) {
+    /* ═══════════════════════════════════════════════════════════
+       BOTANY TERMS (6-8 & 9-12) — plant parts vocabulary
+    ═══════════════════════════════════════════════════════════ */
+    case "botany-terms":
+      return <BotanyTermsModule advanced={grade === "high"} />;
+
     /* ═══════════════════════════════════════════════════════════
        NAMES
     ═══════════════════════════════════════════════════════════ */
@@ -3731,148 +3737,6 @@ function TopicContent({
           </div>
         );
       }
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       ECOLOGY (Terrestrial, Parasitic, Aquatic)
-    ═══════════════════════════════════════════════════════════ */
-    case "ecology": {
-      const aquatic = topicWeeds.filter((w) => w.id === "Water_Smartweed" || w.commonName.toLowerCase().includes("water"));
-      const terrestrial = topicWeeds.filter((w) => !aquatic.find((a) => a.id === w.id));
-
-      if (grade === "elementary") {
-        return (
-          <div className="space-y-5">
-            <DetectiveCard title="Case File: Land, Water, or Freeloader?" badge="Case 06 · Growth Types">
-              <p className="text-sm">
-                Different weeds need different things to live. We sort weeds into three groups based on how and
-                where they get what they need: <strong>terrestrial</strong> (on land), <strong>aquatic</strong>
-                (in water), and <strong>parasitic</strong> (taking food from other plants).
-              </p>
-              <div className="flex flex-wrap gap-2 mt-3">
-                <EvidenceTag label="Terrestrial · Soil" tone="clue" />
-                <EvidenceTag label="Aquatic · Water" tone="clue" />
-                <EvidenceTag label="Parasitic · Steals food" tone="suspect" />
-              </div>
-            </DetectiveCard>
-
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">
-                Terrestrial Weeds <span className="text-xs text-muted-foreground font-normal">({terrestrial.length})</span>
-              </p>
-              <p className="text-sm text-foreground">
-                <strong>Terrestrial weeds</strong> grow on land. They need <strong>soil, rain, and air</strong> to
-                live, just like the plants in your yard.
-              </p>
-              <div className="overflow-x-auto pb-2">
-                <div className="flex gap-3" style={{ minWidth: `${Math.max(terrestrial.length, 1) * 7}rem` }}>
-                  {terrestrial.map((w) => (
-                    <div key={w.id} className="text-center shrink-0 w-24">
-                      <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                      </div>
-                      <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <p className="text-[10px] text-muted-foreground">← Scroll to see all {terrestrial.length} →</p>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">
-                Aquatic Weeds <span className="text-xs text-muted-foreground font-normal">({aquatic.length})</span>
-              </p>
-              <p className="text-sm text-foreground">
-                <strong>Aquatic weeds</strong> live in or right next to water. They need <strong>water, sunlight,
-                and nutrients in the water</strong> to grow.
-              </p>
-              {aquatic.length > 0 && (
-                <div className="overflow-x-auto pb-2">
-                  <div className="flex gap-3" style={{ minWidth: `${Math.max(aquatic.length, 1) * 7}rem` }}>
-                    {aquatic.map((w) => (
-                      <div key={w.id} className="text-center shrink-0 w-24">
-                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted border border-border">
-                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                        </div>
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[10px] mt-1" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Parasitic Weeds</p>
-              <p className="text-sm text-foreground">
-                <strong>Parasitic weeds</strong> can't make their own food. They use special roots to grab food
-                and water from another plant, called the <strong>host</strong>.
-              </p>
-            </div>
-          </div>
-        );
-      }
-
-      // 6-8
-      return (
-        <div className="space-y-5">
-          <NotebookSection title="Growth Types: Terrestrial, Aquatic, Parasitic" subtitle="Research Log · Resource Acquisition">
-            <div className="space-y-2 text-sm">
-              <p>
-                Not all weeds grow the same way or in the same places — some grow on land, some grow in water, and some
-                actually steal nutrients from other plants!
-              </p>
-              <p>
-                Weeds can be broadly categorized into three growth types based on where and how they obtain resources:
-                <strong> terrestrial, parasitic, and aquatic</strong>.
-              </p>
-            </div>
-            <FieldNote label="Why it matters">
-              Growth type dictates the control tool. A parasitic weed like dodder can't be killed with a soil
-              herbicide targeting its host — you have to break the host connection.
-            </FieldNote>
-          </NotebookSection>
-
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">
-              Terrestrial Weeds <span className="text-xs text-muted-foreground font-normal">({terrestrial.length})</span>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Grow in soil on land and compete directly with crops for light, water, and nutrients in agricultural and
-              natural settings.
-            </p>
-            <HorizontalWeedRow weeds={terrestrial} onSelectWeed={onSelectWeed} stage="flower" showScientific />
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">
-              Aquatic Weeds <span className="text-xs text-muted-foreground font-normal">({aquatic.length})</span>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Establish in or around bodies of water such as ponds, lakes, irrigation canals, and wetlands, where they
-              can disrupt water flow and reduce water quality.
-            </p>
-            <HorizontalWeedRow weeds={aquatic} onSelectWeed={onSelectWeed} stage="flower" showScientific />
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <p className="font-display font-bold text-foreground text-base">Parasitic Weeds</p>
-            <p className="text-sm text-muted-foreground">
-              Among the most damaging — they attach directly to the root or stem tissue of a host plant through
-              specialized structures and extract water and nutrients at the host's expense. Parasitic weeds are not
-              represented in this Midwest dataset, but well-known examples include dodder (<em>Cuscuta</em> spp.) and
-              broomrape (<em>Orobanche</em> spp.).
-            </p>
-          </div>
-
-          <p className="text-sm text-foreground">
-            Each growth type presents distinct identification challenges and requires fundamentally different
-            management strategies, making it important to correctly classify a weed's growth type before selecting a
-            control approach.
-          </p>
-        </div>
-      );
     }
 
     /* ═══════════════════════════════════════════════════════════
