@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
+import { lookAlikeStage } from '@/data/lookAlikeGroups';
 
 // Group weeds by family, only families with 2+ members
 function getFamilyPairs(): Array<[Weed, Weed]> {
