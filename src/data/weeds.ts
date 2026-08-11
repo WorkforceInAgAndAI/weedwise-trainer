@@ -247,6 +247,8 @@ export const weeds: Weed[] = [
   {
     id: "Curly_dock",
     commonName: "Curly Dock",
+    safetyNote:
+      "Leaves and seeds contain soluble oxalates; eating them can cause mouth irritation and digestive upset in people and livestock.",
     scientificName: "Rumex crispus",
     family: "Polygonaceae",
     plantType: "Dicot",
@@ -1351,6 +1353,8 @@ export const weeds: Weed[] = [
   {
     id: "Common_Burdock",
     commonName: "Common Burdock",
+    safetyNote:
+      "Large hooked burs cling to skin, hair, and clothing and can scratch skin or injure eyes of animals.",
     scientificName: "Arctium minus",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -1382,6 +1386,8 @@ export const weeds: Weed[] = [
   {
     id: "Musk_thistle",
     commonName: "Musk Thistle",
+    safetyNote:
+      "Sharp spines line the leaves, stems, and flower heads and can easily puncture bare skin.",
     scientificName: "Carduus nutans",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -1442,6 +1448,8 @@ export const weeds: Weed[] = [
   {
     id: "Common_teasel",
     commonName: "Common Teasel",
+    safetyNote:
+      "Stiff prickles cover the stems and cone-shaped seed heads and can poke or scratch unprotected skin.",
     scientificName: "Dipsacus fullonum",
     family: "Caprifoliaceae",
     plantType: "Dicot",
@@ -1873,6 +1881,8 @@ export const weeds: Weed[] = [
   {
     id: "common_Cocklebur",
     commonName: "Common Cocklebur",
+    safetyNote:
+      "Spiny burs can poke skin, and seedlings and seeds are toxic if eaten by people or livestock.",
     scientificName: "Xanthium strumarium",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -2022,6 +2032,8 @@ export const weeds: Weed[] = [
   {
     id: "canada-thistle",
     commonName: "Canada Thistle",
+    safetyNote:
+      "Spiny-margined leaves and bracts can prick and cut bare skin; wear gloves when handling.",
     scientificName: "Cirsium arvense",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -2075,6 +2087,8 @@ export const weeds: Weed[] = [
   {
     id: "common-ragweed",
     commonName: "Common Ragweed",
+    safetyNote:
+      "A major allergen — pollen triggers hay fever, and contact with foliage can cause skin irritation or rash.",
     scientificName: "Ambrosia artemisiifolia",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -2104,6 +2118,8 @@ export const weeds: Weed[] = [
   {
     id: "giant-foxtail",
     commonName: "Giant Foxtail",
+    safetyNote:
+      "Barbed seedhead awns can lodge in skin, eyes, gums, and animal mouths, causing sores.",
     scientificName: "Setaria faberi",
     family: "Poaceae",
     plantType: "Monocot",
@@ -2133,6 +2149,8 @@ export const weeds: Weed[] = [
   {
     id: "giant-ragweed",
     commonName: "Giant Ragweed",
+    safetyNote:
+      "Highly allergenic pollen, and the rough, bristly foliage can irritate or scratch skin on contact.",
     scientificName: "Ambrosia trifida",
     family: "Asteraceae",
     plantType: "Dicot",
