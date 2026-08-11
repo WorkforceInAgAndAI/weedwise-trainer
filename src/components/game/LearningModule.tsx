@@ -1084,6 +1084,15 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
 function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
   return (
     <div className="space-y-4">
+      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3">
+        <p className="text-sm text-foreground font-semibold">
+          Click any photo to open that plant's page for more specific facts, extra photos, and ID details.
+        </p>
+        <p className="text-xs text-muted-foreground mt-1">
+          <strong>Bolting</strong> means a plant stops growing low and shoots a tall flowering stem up fast — many
+          look-alikes are easiest to tell apart once they bolt and flower.
+        </p>
+      </div>
       {ELEM_LOOKALIKE_GROUPS.map((g) => {
         const members = g.weedIds
           .map((id) => weeds.find((w) => w.id === id))
