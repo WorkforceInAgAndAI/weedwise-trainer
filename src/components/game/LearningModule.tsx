@@ -6700,6 +6700,16 @@ function TopicContent({
             )}
           </div>
 
+          {isElementary && (
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm text-foreground">
+              <p className="font-display font-bold text-primary mb-1">Word Bank</p>
+              <p>
+                <strong>Cash crop</strong> — the main crop a farmer grows to sell for money, such as soybeans, corn, or
+                wheat. Cash crops are what weeds compete against for sunlight, water, and nutrients.
+              </p>
+            </div>
+          )}
+
           <div className="space-y-3">
             {methods.map((method) => (
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
