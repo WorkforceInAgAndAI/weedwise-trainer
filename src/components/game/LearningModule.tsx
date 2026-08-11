@@ -2759,11 +2759,33 @@ function TopicContent({
        LIFE CYCLES
     ═══════════════════════════════════════════════════════════ */
     case "life-cycles": {
+      // Collegiate (source grade "high") shows an expanded biennial and
+      // perennial photo set that isn't limited to the topic's ID pool.
+      const COLLEGIATE_EXTRA_LIFECYCLE_IDS = [
+        // Biennials
+        "Common_teasel",
+        "Musk_thistle",
+        "poison-hemlock",
+        // Perennials
+        "Smooth_Groundcherry",
+        "Mouseear_chickweed",
+        "Nimblewill",
+        "commonPokeweed",
+        "Dandelion",
+        "Foxtail_barley",
+        "Hedge_bindweed",
+        "Hemp_dogbane",
+        "Honey-vine_climbing_milkweed",
+        "horsenettle",
+        "Scouringrush",
+        "Water_smartweed",
+        "White_campion",
+        "Wild_Four-o'clock",
+        "golden-alexanders",
+      ];
       const lifeCyclePoolIds = new Set([
-        ...topicWeeds.map((w) => w.id),
-        // Caraway is a classic teaching biennial that isn't in the ID pool;
-        // include it in the collegiate Year 1 / Year 2 comparison.
-        ...(grade === "high" ? ["caraway"] : []),
+        ...topicWeeds.map((w) => w.id).filter((id) => !(grade === "high" && id === "caraway")),
+        ...(grade === "high" ? COLLEGIATE_EXTRA_LIFECYCLE_IDS : []),
       ]);
       const annuals = topicWeeds.filter(
         (w) =>
