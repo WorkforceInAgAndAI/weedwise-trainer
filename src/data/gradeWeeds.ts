@@ -147,7 +147,7 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "Common_mullein",
   "Field_Horsetail",
   "Garlic_mustard",
-  "Poison_Hemlock",
+  "poison-hemlock",
   "Catchweed_bedstraw",
   "Common_Mallow",
   "Marijuana",
