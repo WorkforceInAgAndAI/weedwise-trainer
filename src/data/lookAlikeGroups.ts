@@ -316,7 +316,7 @@ export interface LookAlikeGroup<T> {
  */
 export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[], maxSize = 3): LookAlikeGroup<T>[] {
   const poolIds = new Set(pool.map((w) => w.id));
-  const groups: LookAlikeGroup<T>[] = [];
+  const candidates: LookAlikeGroup<T>[] = [];
   const seenKeys = new Set<string>();
   for (const w of pool) {
     const partners = officialPartners(w.id, poolIds);
@@ -327,9 +327,18 @@ export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[], maxSize = 
     seenKeys.add(key);
     const members = ids.map((id) => pool.find((x) => x.id === id)!).filter(Boolean);
     if (members.length < 2) continue;
-    groups.push({ ids, weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
+    candidates.push({ ids, weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
   }
-  return groups;
+  // Drop any group whose species are already fully contained in a larger group,
+  // so students don't see the same comparison repeated in smaller pieces.
+  const bySize = [...candidates].sort((a, b) => b.ids.length - a.ids.length);
+  const kept: LookAlikeGroup<T>[] = [];
+  for (const g of bySize) {
+    const set = new Set(g.ids);
+    const isSubset = kept.some((k) => g.ids.every((id) => k.ids.includes(id)) && set.size <= k.ids.length);
+    if (!isSubset) kept.push(g);
+  }
+  return kept;
 }
 
 /** Official look-alike pairs available inside a grade pool. */

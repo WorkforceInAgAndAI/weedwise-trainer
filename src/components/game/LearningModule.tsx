@@ -5711,8 +5711,8 @@ function TopicContent({
         { stage: "seedling", label: "Seedling" },
         { stage: "vegetative", label: "Vegetative" },
         { stage: "flower", label: "Reproductive" },
-        { stage: "whole", label: "Whole Plant" },
       ];
+      const elementaryStages = [{ stage: "whole", label: "Whole Plant" }];
 
       // Official look-alike groups, restricted to this grade's weed pool.
       const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
@@ -5754,7 +5754,7 @@ function TopicContent({
             </div>
 
             {/* All growth stages side by side */}
-            {(grade === "elementary" ? stages.slice(3) : stages).map((s) => (
+            {(grade === "elementary" ? elementaryStages : stages).map((s) => (
               <div key={s.stage}>
                 <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
                 <div className="grid grid-cols-2 gap-3">
@@ -5813,87 +5813,12 @@ function TopicContent({
           { stage: "flower", label: "Reproductive" },
         ];
         const anyGrass = group.some((w) => w.plantType === "Monocot" && w.family === "Poaceae");
-
-        // High school layout: each species is its own ROW, stages laid out as
-        // COLUMNS the user scrolls horizontally. Images are smaller for density.
-        if (grade === "high") {
-          const stageCols = anyGrass
-            ? [...compareStages, { stage: "ligule", label: "Ligule" }]
-            : compareStages;
-          const colWidth = 9; // rem per stage column
-          const nameColWidth = 11; // rem for the species name/label column
-          return (
-            <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-3">
-              <div className="overflow-x-auto -mx-1">
-                <div
-                  className="px-1"
-                  style={{ minWidth: `${nameColWidth + stageCols.length * colWidth}rem` }}
-                >
-                  {/* Stage header row */}
-                  <div
-                    className="grid gap-2 mb-2"
-                    style={{ gridTemplateColumns: `${nameColWidth}rem repeat(${stageCols.length}, ${colWidth}rem)` }}
-                  >
-                    <div />
-                    {stageCols.map((s) => (
-                      <div
-                        key={s.stage}
-                        className="text-[10px] font-bold text-muted-foreground uppercase text-center"
-                      >
-                        {s.label}
-                      </div>
-                    ))}
-                  </div>
-                  {/* Species rows */}
-                  {group.map((w) => (
-                    <div
-                      key={w.id}
-                      className="grid gap-2 mb-2 items-center"
-                      style={{ gridTemplateColumns: `${nameColWidth}rem repeat(${stageCols.length}, ${colWidth}rem)` }}
-                    >
-                      <div className="pr-2">
-                        <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs font-bold leading-tight block" />
-                        <div className="text-[10px] text-primary italic leading-tight">{w.scientificName}</div>
-                        <div className="text-[9px] text-muted-foreground">{w.family}</div>
-                        <span
-                          className={`inline-block text-[9px] px-1.5 py-0.5 rounded-full mt-1 ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                        >
-                          {w.origin === "Introduced" ? "Introduced" : "Native"}
-                        </span>
-                      </div>
-                      {stageCols.map((s) => (
-                        <div
-                          key={s.stage}
-                          className="aspect-square rounded-md overflow-hidden bg-muted"
-                        >
-                          {s.stage === "ligule" && !(w.plantType === "Monocot" && w.family === "Poaceae") ? (
-                            <div className="flex items-center justify-center h-full text-[9px] text-muted-foreground text-center px-1">
-                              Not a grass
-                            </div>
-                          ) : (
-                            <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <p className="text-[10px] text-muted-foreground">← Scroll to see all stages →</p>
-              {customDifference && (
-                <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
-                  <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
-                  <p>{customDifference}</p>
-                </div>
-              )}
-            </div>
-          );
-        }
+        const colsClass = group.length === 2 ? "grid-cols-2" : "grid-cols-3";
 
         return (
           <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
             {/* Header row */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className={`grid ${colsClass} gap-3`}>
               {group.map((w) => (
                 <div key={w.id} className="text-center">
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
@@ -5914,7 +5839,7 @@ function TopicContent({
                 <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">
                   {s.label}
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className={`grid ${colsClass} gap-2`}>
                   {group.map((w) => (
                     <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
                       <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
@@ -5930,7 +5855,7 @@ function TopicContent({
                 <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">
                   Ligule
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className={`grid ${colsClass} gap-2`}>
                   {group.map((w) => (
                     <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
                       {w.plantType === "Monocot" && w.family === "Poaceae" ? (
