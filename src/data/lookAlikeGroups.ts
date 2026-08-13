@@ -105,11 +105,11 @@ export const LOOKALIKE_TRIPLES: LookAlikeTriple[] = [
   },
   {
     ids: ["Field_bindweed", "Hedge_bindweed", "common_Milkweed"],
-    difference: "Field bindweed: vine, no milky sap, trumpet flowers, arrowhead leaves. Hedge bindweed: larger vine and trumpet, square leaf base. Common milkweed: erect, milky sap, broad opposite leaves, globe flower cluster, broad pods.",
+    difference: "Field bindweed: vine, no milky sap, trumpet flowers, arrowhead leaves. Hedge bindweed: larger vine and trumpet, square leaf base. Common milkweed: upright, milky sap, broad opposite leaves, globe flower cluster, broad pods.",
   },
   {
     ids: ["Henbit_deadnettle", "Common_Mallow", "Ground_ivy"],
-    difference: "Henbit: erect annual, upper leaves clasp the stem, purple flowers. Common mallow: round lobed leaves, no square stem, no mint odor. Ground ivy (Creeping Charlie): creeping stolons, square stem, minty odor, round scalloped leaves.",
+    difference: "Henbit: upright annual, upper leaves clasp the stem, purple flowers. Common mallow: round lobed leaves, no square stem, no mint odor. Ground ivy (Creeping Charlie): creeping stolons, square stem, minty odor, round scalloped leaves.",
   },
   {
     ids: ["Scouringrush", "annual-ryegrass", "barnyardgrass"],
@@ -129,11 +129,11 @@ export const LOOKALIKE_TRIPLES: LookAlikeTriple[] = [
   },
   {
     ids: ["yellow-foxtail", "green-foxtail", "large-crabgrass"],
-    difference: "Yellow foxtail: yellow-gold bristles, erect spike, long hairs near leaf base only. Green foxtail: green bristles, short hairs, narrower erect spike. Large crabgrass: finger-like branches at the top, very hairy leaves and sheaths.",
+    difference: "Yellow foxtail: yellow-gold bristles, upright spike, long hairs near leaf base only. Green foxtail: green bristles, short hairs, narrower upright spike. Large crabgrass: finger-like branches at the top, very hairy leaves and sheaths.",
   },
   {
     ids: ["green-foxtail", "giant-foxtail", "large-crabgrass"],
-    difference: "Green foxtail: green bristles, short hairs, erect spike. Giant foxtail: drooping spike tip, wide hairy blade with twist. Large crabgrass: finger-like branches, no bristly spike.",
+    difference: "Green foxtail: green bristles, short hairs, upright spike. Giant foxtail: drooping spike tip, wide hairy blade with twist. Large crabgrass: finger-like branches, no bristly spike.",
   },
   {
     ids: ["Quackgrass", "Downy_brome", "Foxtail_barley"],
