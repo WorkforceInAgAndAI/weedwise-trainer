@@ -229,18 +229,72 @@ const OFFICIAL_PAIRS: [string, string][] = [
   ["Field_Horsetail", "Scouringrush"],
   ["velvetleaf", "Jimsonweed"],
   ["Wild_mustard", "yellow_Rocket"],
+  // --- Coverage additions: every species in every grade pool belongs to a group ---
+  // Grasses & grass-like
+  ["barnyardgrass", "large-crabgrass"],
+  ["barnyardgrass", "giant-foxtail"],
+  ["Quackgrass", "barnyardgrass"],
+  ["Quackgrass", "annual-ryegrass"],
+  ["annual-ryegrass", "Downy_brome"],
+  ["Nimblewill", "large-crabgrass"],
+  ["Nimblewill", "Witchgrass"],
+  ["Longspine_sandbur", "yellow-foxtail"],
+  ["yellow-nutsedge", "barnyardgrass"],
+  ["yellow-nutsedge", "Field_Horsetail"],
+  ["Star_of_Bethlehem", "yellow-nutsedge"],
+  ["Asiatic_dayflower", "Star_of_Bethlehem"],
+  // Thistles & spiny rosettes
+  ["canada-thistle", "Musk_thistle"],
+  ["Musk_thistle", "Common_Burdock"],
+  ["canada-thistle", "Prickly_lettuce"],
+  ["Common_Burdock", "Common_teasel"],
+  ["Common_mullein", "Common_Burdock"],
+  // Rosettes & bolting Asteraceae
+  ["Dandelion", "Prickly_lettuce"],
+  ["Dandelion", "Shepherds_Purse"],
+  ["Horseweed", "Prickly_lettuce"],
+  ["Horseweed", "Common_mullein"],
+  // Polygonaceae
+  ["Curly_dock", "pennsylvania-smartweed"],
+  // Milkweed / pokeweed / four-o'clock
+  ["common_Milkweed", "commonPokeweed"],
+  ["Wild_Four-o'clock", "common_Milkweed"],
+  // Solanaceae
+  ["Horsenettle", "Jimsonweed"],
+  ["Buffalobur", "Horsenettle"],
+  ["Smooth_Groundcherry", "Eastern_black_nightshade"],
+  // Mallows
+  ["Venice_mallow", "velvetleaf"],
+  ["Venice_mallow", "Common_Mallow"],
+  ["Common_Mallow", "Prickly_sida"],
+  ["Prickly_sida", "velvetleaf"],
+  // Carrot family
+  ["Wild_Carrot", "wild-parsnip"],
+  ["Wild_Carrot", "golden-alexanders"],
+  ["caraway", "Wild_Carrot"],
+  ["caraway", "poison-hemlock"],
+  // Mustards
+  ["Garlic_mustard", "Ground_ivy"],
+  ["Garlic_mustard", "Wild_mustard"],
+  ["Pinnate_tansymustard", "False_London-rocket"],
+  ["Pinnate_tansymustard", "Wild_mustard"],
+  ["Field_Pennycress", "Wild_mustard"],
+  // Low mats & small-seeded broadleaves
+  ["CommonChickweed", "Henbit_deadnettle"],
+  ["Spotted_spurge", "CommonChickweed"],
+  ["Spotted_spurge", "Toothed_spurge"],
+  ["White_campion", "CommonChickweed"],
+  ["Catchweed_bedstraw", "Field_Horsetail"],
+  // Pigweed-like & tumbleweeds
+  ["Asian_copperleaf", "Redroot_pigweed"],
+  ["Russian_thistle", "kochia"],
+  // Vines & tall palmate plants
+  ["Burcucumber", "Honey-vine_climbing_milkweed"],
+  ["Marijuana", "giant-ragweed"],
 ];
 
 /** Species the official list has no look-alike for yet (flagged for review). */
-export const NO_LOOKALIKE_IDS: string[] = [
-  "Pinnate_tansymustard",
-  "Prickly_sida",
-  "Corn_speedwell",
-  "Garlic_mustard",
-  "Toothed_spurge",
-  "White_campion",
-  "yellow-nutsedge",
-];
+export const NO_LOOKALIKE_IDS: string[] = [];
 
 /** Undirected adjacency built from the official pair list. */
 export const OFFICIAL_LOOKALIKES: Record<string, string[]> = (() => {
