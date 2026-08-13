@@ -49,6 +49,9 @@ export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' 
  return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage, isInvasiveVsNative };
  }, [grade]);
 
+ const [choice, setChoice] = useState<string | null>(null);
+ const [submitted, setSubmitted] = useState(false);
+
  if (!pair) {
  return (
  <div className="text-center p-6 text-sm text-muted-foreground">
@@ -57,9 +60,6 @@ export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' 
  </div>
  );
  }
-
- const [choice, setChoice] = useState<string | null>(null);
- const [submitted, setSubmitted] = useState(false);
 
  const isCorrect = choice === pair.target.id;
 
