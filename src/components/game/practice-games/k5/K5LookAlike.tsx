@@ -67,6 +67,22 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
 
   const next = () => { setRound(r => r + 1); setSelected(null); setSubmitted(false); };
 
+  if (pairs.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-bold text-foreground text-lg flex-1">Look-Alike Challenge</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center p-6 text-center">
+          <p className="max-w-md text-foreground font-semibold">
+            No look-alike pairs are listed yet for the K-5 weed list. Check back soon!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (done) return <LevelComplete level={level} score={score} total={pairs.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
   return (
