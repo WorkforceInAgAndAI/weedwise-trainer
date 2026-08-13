@@ -10,6 +10,7 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 type Weed = typeof weeds[0];
 interface Trio {
+  name: string;
   weeds: Weed[];
   difference: string;
   stage: 'flower' | 'vegetative';
@@ -18,6 +19,7 @@ interface Trio {
 function buildTrios(): Trio[] {
   // Only official look-alikes that are inside the 6-8 weed pool.
   return lookAlikeGroupsForPool(weeds).map(g => ({
+    name: g.name,
     weeds: g.weeds as Weed[],
     difference: g.difference,
     stage: g.stage,
@@ -120,6 +122,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
                   ? 'Correct!'
                   : `Not quite! You chose ${options.find(o => o.id === selected)?.commonName} (${options.find(o => o.id === selected)?.scientificName}). The correct answer was ${target?.commonName} (${target?.scientificName}).`}
               </p>
+              <p className="text-xs font-bold uppercase tracking-wide text-primary">{trio?.name}</p>
               <p className="text-sm text-foreground"><span className="font-semibold text-primary">How to tell them apart:</span> {trio?.difference}</p>
               <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
             </div>
