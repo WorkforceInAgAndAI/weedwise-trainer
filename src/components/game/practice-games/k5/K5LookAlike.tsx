@@ -1,12 +1,18 @@
 import { useState, useMemo } from 'react';
-import { elementaryWeeds as weeds } from '@/data/gradeWeeds';
+import { weeds as allWeeds } from '@/data/weeds';
+import { ELEMENTARY_WEED_IDS } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty } from '@/lib/difficulty';
-import { lookAlikeGroupsForPool } from '@/data/lookAlikeGroups';
+import { lookAlikeGroupsForPool, K5_LOOKALIKE_EXTRA_IDS } from '@/data/lookAlikeGroups';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
+
+// K-5 pool: the 15 spotting weeds plus the species used in the K-5
+// look-alike learning groups. Nothing outside this pool can appear.
+const K5_POOL_IDS = new Set([...ELEMENTARY_WEED_IDS, ...K5_LOOKALIKE_EXTRA_IDS]);
+const weeds = allWeeds.filter(w => K5_POOL_IDS.has(w.id));
 
 function buildAllPairs() {
   // Official look-alike pairs limited to the K-5 weed pool.
