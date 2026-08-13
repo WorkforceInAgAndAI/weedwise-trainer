@@ -6058,10 +6058,10 @@ function TopicContent({
             <div className="space-y-4">
               <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
                 <h3 className="font-display font-bold text-foreground text-base mb-1">
-                  Look-Alike Groups (3 species each)
+                  Look-Alike Groups
                 </h3>
                 <p className="text-sm text-foreground">
-                  Compare these commonly-confused trios at each growth stage. For grass groups, the{" "}
+                  Compare these commonly-confused species at each growth stage. For grass groups, the{" "}
                   <strong>ligule</strong> row is one of the most reliable ID features.
                 </p>
               </div>
@@ -6087,11 +6087,32 @@ function TopicContent({
             </div>
           )}
 
-          {/* Family-based Look-Alike Pairs (legacy 2-weed) */}
+          {/* Official Look-Alike Pairs */}
           {pairs.length > 0 && (
             <div className="border-t border-border pt-4 space-y-4">
-              <h3 className="font-display font-bold text-foreground text-base">Family-Based Look-Alike Pairs</h3>
+              <h3 className="font-display font-bold text-foreground text-base">Look-Alike Pairs</h3>
               {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
+            </div>
+          )}
+
+          {/* Species still awaiting an official look-alike */}
+          {noLookAlikeWeeds.length > 0 && (
+            <div className="border-t border-border pt-4">
+              <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/40 p-4">
+                <h3 className="font-display font-bold text-foreground text-sm mb-1">
+                  No look-alike listed yet ({noLookAlikeWeeds.length})
+                </h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  These species have no confirmed look-alike on the official list — comparisons will be added later.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {noLookAlikeWeeds.map((w) => (
+                    <span key={w.id} className="text-xs px-2 py-1 rounded-full bg-card border border-border">
+                      {w.commonName}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
