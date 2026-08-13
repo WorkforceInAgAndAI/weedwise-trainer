@@ -178,3 +178,173 @@ export const VEGETATIVE_LOOKALIKE_IDS = new Set<string>([
 export function lookAlikeStage(ids: string[]): "flower" | "vegetative" {
   return ids.some((id) => VEGETATIVE_LOOKALIKE_IDS.has(id)) ? "vegetative" : "flower";
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   OFFICIAL LOOK-ALIKE LIST
+   Source of truth provided by the curriculum team. Only species that
+   actually exist in `weeds.ts` are kept here; outside species from the
+   source list are ignored. Pairs are treated as undirected.
+   ═══════════════════════════════════════════════════════════════════ */
+const OFFICIAL_PAIRS: [string, string][] = [
+  ["common_Milkweed", "Hemp_dogbane"],
+  ["CommonChickweed", "Mouseear_chickweed"],
+  ["waterhemp", "palmer-amaranth"],
+  ["waterhemp", "Redroot_pigweed"],
+  ["palmer-amaranth", "Redroot_pigweed"],
+  ["pennsylvania-smartweed", "Ladysthumb"],
+  ["Ladysthumb", "Water_smartweed"],
+  ["Shattercane_Sorghums", "johnsongrass"],
+  ["Woolly_cupgrass", "barnyardgrass"],
+  ["Woolly_cupgrass", "yellow-foxtail"],
+  ["Downy_brome", "Foxtail_barley"],
+  ["Foxtail_barley", "wild-oat"],
+  ["Smooth_Witchgrass", "barnyardgrass"],
+  ["Smooth_Witchgrass", "Witchgrass"],
+  ["Witchgrass", "large-crabgrass"],
+  ["giant-foxtail", "yellow-foxtail"],
+  ["giant-foxtail", "green-foxtail"],
+  ["yellow-foxtail", "green-foxtail"],
+  ["green-foxtail", "barnyardgrass"],
+  ["Goosegrass", "large-crabgrass"],
+  ["Field_Pennycress", "Shepherds_Purse"],
+  ["giant-ragweed", "volunteer-sunflower"],
+  ["giant-ragweed", "common_Cocklebur"],
+  ["giant-ragweed", "common-ragweed"],
+  ["kochia", "Redroot_pigweed"],
+  ["lambsquarters", "Redroot_pigweed"],
+  ["lambsquarters", "palmer-amaranth"],
+  ["poison-hemlock", "Wild_Carrot"],
+  ["poison-hemlock", "golden-alexanders"],
+  ["wild-parsnip", "golden-alexanders"],
+  ["Common_teasel", "Common_mullein"],
+  ["Field_bindweed", "Hedge_bindweed"],
+  ["Field_bindweed", "Tall_morningglory"],
+  ["Hedge_bindweed", "Tall_morningglory"],
+  ["Field_bindweed", "Wild_buckwheat"],
+  ["Field_bindweed", "Honey-vine_climbing_milkweed"],
+  ["Honey-vine_climbing_milkweed", "Tall_morningglory"],
+  ["Ground_ivy", "Henbit_deadnettle"],
+  ["Henbit_deadnettle", "Corn_speedwell"],
+  ["Horsenettle", "Eastern_black_nightshade"],
+  ["Field_Horsetail", "Scouringrush"],
+  ["velvetleaf", "Jimsonweed"],
+  ["Wild_mustard", "yellow_Rocket"],
+];
+
+/** Species the official list has no look-alike for yet (flagged for review). */
+export const NO_LOOKALIKE_IDS: string[] = [
+  "Pinnate_tansymustard",
+  "Prickly_sida",
+  "Corn_speedwell",
+  "Garlic_mustard",
+  "Toothed_spurge",
+  "White_campion",
+  "yellow-nutsedge",
+];
+
+/** Undirected adjacency built from the official pair list. */
+export const OFFICIAL_LOOKALIKES: Record<string, string[]> = (() => {
+  const map: Record<string, string[]> = {};
+  for (const [a, b] of OFFICIAL_PAIRS) {
+    (map[a] ||= []).push(b);
+    (map[b] ||= []).push(a);
+  }
+  return map;
+})();
+
+/** Official look-alike partners of `id`, optionally limited to a grade pool. */
+export function officialPartners(id: string, poolIds?: Set<string>): string[] {
+  const partners = OFFICIAL_LOOKALIKES[id] ?? [];
+  return poolIds ? partners.filter((p) => poolIds.has(p)) : partners;
+}
+
+/** True when the two species are an official look-alike pair. */
+export function isOfficialLookAlike(a: string, b: string): boolean {
+  return (OFFICIAL_LOOKALIKES[a] ?? []).includes(b);
+}
+
+/* Difference notes: reuse curated wording where it exists. */
+const PAIR_NOTES: Record<string, string> = (() => {
+  const notes: Record<string, string> = {};
+  for (const t of LOOKALIKE_TRIPLES) {
+    for (let i = 0; i < t.ids.length; i++) {
+      for (let j = i + 1; j < t.ids.length; j++) {
+        const key = [t.ids[i], t.ids[j]].sort().join("|");
+        if (!notes[key]) notes[key] = t.difference;
+      }
+    }
+  }
+  return notes;
+})();
+
+interface PoolWeed {
+  id: string;
+  commonName: string;
+  memoryHook?: string;
+  lookAlike?: { id: string; difference: string };
+}
+
+function noteFor(ids: string[], pool: PoolWeed[]): string {
+  for (let i = 0; i < ids.length; i++) {
+    for (let j = i + 1; j < ids.length; j++) {
+      const n = PAIR_NOTES[[ids[i], ids[j]].sort().join("|")];
+      if (n) return n;
+    }
+  }
+  for (const id of ids) {
+    const w = pool.find((x) => x.id === id);
+    if (w?.lookAlike && ids.includes(w.lookAlike.id)) return w.lookAlike.difference;
+  }
+  return ids
+    .map((id) => pool.find((x) => x.id === id))
+    .filter(Boolean)
+    .map((w) => `${w!.commonName}: ${w!.memoryHook ?? "compare leaf shape, stem, and flower closely."}`)
+    .join(" ");
+}
+
+export interface LookAlikeGroup<T> {
+  ids: string[];
+  weeds: T[];
+  difference: string;
+  stage: "flower" | "vegetative";
+}
+
+/**
+ * Build look-alike groups restricted to a grade-level weed pool. Only the
+ * official look-alike relationships are used, so no species outside the
+ * grade list can ever appear.
+ */
+export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[], maxSize = 3): LookAlikeGroup<T>[] {
+  const poolIds = new Set(pool.map((w) => w.id));
+  const groups: LookAlikeGroup<T>[] = [];
+  const seenKeys = new Set<string>();
+  for (const w of pool) {
+    const partners = officialPartners(w.id, poolIds);
+    if (partners.length === 0) continue;
+    const ids = [w.id, ...partners].slice(0, maxSize);
+    const key = [...ids].sort().join("|");
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    const members = ids.map((id) => pool.find((x) => x.id === id)!).filter(Boolean);
+    if (members.length < 2) continue;
+    groups.push({ ids, weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
+  }
+  return groups;
+}
+
+/** Official look-alike pairs available inside a grade pool. */
+export function lookAlikePairsForPool<T extends PoolWeed>(pool: T[]): [T, T][] {
+  const poolIds = new Set(pool.map((w) => w.id));
+  const pairs: [T, T][] = [];
+  const seen = new Set<string>();
+  for (const w of pool) {
+    for (const p of officialPartners(w.id, poolIds)) {
+      const key = [w.id, p].sort().join("|");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const other = pool.find((x) => x.id === p);
+      if (other) pairs.push([w, other]);
+    }
+  }
+  return pairs;
+}
