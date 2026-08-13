@@ -188,6 +188,24 @@ export const highSchoolWeeds = applyRegionPriority(weeds.filter((w) => HIGH_ID_S
 /** Full 87-species collegiate pool, region-prioritized. */
 export const collegiateWeeds = applyRegionPriority(weeds);
 
+/**
+ * Complete, unfiltered collegiate species list. Learning modules must show
+ * every species, so they use this instead of the region-thinned pool.
+ */
+export const collegiateWeedsAll: Weed[] = weeds;
+
+/** Grade levels usable for content pools, including collegiate. */
+export type PoolGrade = GradeLevel | "collegiate";
+
+/**
+ * Weed pool for learning-module content. Collegiate always receives the
+ * complete species list (no region thinning, no 9-12 subset).
+ */
+export function weedsForPool(grade: PoolGrade): Weed[] {
+  if (grade === "collegiate") return collegiateWeedsAll;
+  return weedsForGrade(grade);
+}
+
 /** Convenience predicate for one-off checks. */
 export const isMiddleSchoolWeed = (id: string): boolean => MIDDLE_ID_SET.has(id);
 export const isElementaryWeed = (id: string): boolean => ELEM_ID_SET.has(id);
