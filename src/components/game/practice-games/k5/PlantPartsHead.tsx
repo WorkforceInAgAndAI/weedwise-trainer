@@ -63,11 +63,10 @@ const PART_ORDER: PartKind[] = ['leaves', 'flower', 'seeds'];
 interface SlotDef { id: string; kind: PartKind; x: number; y: number; w: number; h: number; label: string; oval?: boolean; }
 
 const SLOTS: SlotDef[] = [
-  { id: 'leaves-left',  kind: 'leaves', x: 105, y: 240, w: 100, h: 100, label: 'Leaf' },
-  { id: 'leaves-mid',   kind: 'leaves', x: 200, y: 200, w: 100, h: 100, label: 'Leaf' },
-  { id: 'leaves-right', kind: 'leaves', x: 295, y: 240, w: 100, h: 100, label: 'Leaf' },
-  { id: 'flower',       kind: 'flower', x: 200, y: 95,  w: 120, h: 120, label: 'Flower' },
-  { id: 'seeds',        kind: 'seeds',  x: 325, y: 95,  w: 110, h: 110, label: 'Seeds' },
+  { id: 'leaves-left',  kind: 'leaves', x: 118, y: 250, w: 100, h: 100, label: 'Leaf' },
+  { id: 'leaves-right', kind: 'leaves', x: 282, y: 250, w: 100, h: 100, label: 'Leaf' },
+  { id: 'flower',       kind: 'flower', x: 200, y: 105, w: 120, h: 120, label: 'Flower' },
+  { id: 'seeds',        kind: 'seeds',  x: 200, y: 415, w: 110, h: 110, label: 'Seeds' },
 ];
 
 const PART_LABELS: Record<PartKind, string> = {
@@ -177,11 +176,11 @@ function shuffle<T>(a: T[]): T[] { return [...a].sort(() => Math.random() - 0.5)
 // photo of the plant before students start assembling parts.
 const NAME_TO_WEED_ID: Record<string, string> = {
   'Dandelion': 'Dandelion',
-  'Giant Foxtail': 'Giant_foxtail',
-  'Canada Thistle': 'Canada_thistle',
-  'Common Milkweed': 'Common_milkweed',
-  'Lambsquarters': 'Common_lambsquarters',
-  'Wild Carrot': 'Wild_carrot',
+  'Giant Foxtail': 'giant-foxtail',
+  'Canada Thistle': 'canada-thistle',
+  'Common Milkweed': 'common_Milkweed',
+  'Lambsquarters': 'lambsquarters',
+  'Wild Carrot': 'Wild_Carrot',
   'Field Bindweed': 'Field_bindweed',
 };
 
@@ -476,12 +475,22 @@ function PartVisual({ kind, color, variant, size, weedId, stage }: { kind: PartK
 
 function buildRound(caseIdx: number) {
   const c = CASES[caseIdx];
-  // Offer every style option for every part kind so students can build a
-  // custom plant. Any style placed in the matching slot counts as correct.
+  const todayId = NAME_TO_WEED_ID[c.name];
+  // Photo stage used for each part kind — always TODAY'S weed, so the bin
+  // changes every round and matches the plant students are building.
+  const PHOTO_STAGE: Partial<Record<PartKind, string>> = {
+    leaves: 'vegetative', flower: 'flower', seeds: 'seedhead',
+  };
   const palette: PaletteItem[] = [];
   PART_ORDER.forEach((k) => {
+    // Real photo of today's weed for this part.
+    const stage = PHOTO_STAGE[k];
+    if (todayId && stage) {
+      palette.push({ id: `${k}-photo`, kind: k, color: c.parts[k].color, variant: 'photo', label: `${c.name} ${PART_LABELS[k].toLowerCase()}`, weedId: todayId, stage });
+    }
+    // Cartoon styles (never photos of other species).
     PART_STYLES[k].forEach((s) => {
-      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label, weedId: s.weedId, stage: s.stage });
+      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label });
     });
   });
   return { case: c, palette: shuffle(palette) };
@@ -642,11 +651,28 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
         <div className="grid md:grid-cols-[1fr,280px] gap-4">
           {/* Plant body with slots */}
           <div className="relative rounded-xl overflow-hidden border-4 border-green-800/40 shadow-lg"
-               style={{ background: 'linear-gradient(180deg, #e0f2fe 0%, #dbeafe 60%, #a3d977 60%, #6b9d3f 100%)', aspectRatio: '5/6' }}>
+               style={{ background: 'linear-gradient(180deg, #e0f2fe 0%, #dbeafe 66%, #a3d977 66%, #8bbf55 71%, #8a5a34 71%, #5f3b21 100%)', aspectRatio: '5/6' }}>
             <svg viewBox="0 0 400 480" className="w-full h-full">
+              {/* Painted-in plant body: stem the leaves and flower attach to */}
+              <g opacity={0.9}>
+                <path d="M200 340 C 196 280, 204 220, 200 150" stroke="#4d7c0f" strokeWidth={18} strokeLinecap="round" fill="none" />
+                <path d="M195 330 C 192 275, 199 215, 196 160" stroke="#84cc16" strokeWidth={5} strokeLinecap="round" fill="none" opacity={0.6} />
+                {/* little branch stubs pointing at the two leaf spots */}
+                <path d="M200 255 Q 165 248, 140 250" stroke="#4d7c0f" strokeWidth={9} strokeLinecap="round" fill="none" />
+                <path d="M200 255 Q 235 248, 260 250" stroke="#4d7c0f" strokeWidth={9} strokeLinecap="round" fill="none" />
+                {/* roots below the soil line */}
+                <g stroke="#8a5a34" strokeWidth={8} strokeLinecap="round" fill="none">
+                  <path d="M200 340 L 200 390" />
+                </g>
+                <g stroke="#a97142" strokeWidth={5} strokeLinecap="round" fill="none">
+                  <path d="M200 360 Q 165 375, 145 400" />
+                  <path d="M200 370 Q 240 385, 258 410" />
+                </g>
+              </g>
               {/* Ground line */}
               <line x1={0} y1={340} x2={400} y2={340} stroke="#3f6212" strokeWidth={3} strokeDasharray="6 4" />
-              <text x={10} y={355} fontSize={12} fill="#3f6212" fontWeight={700}>SOIL LINE</text>
+              <text x={10} y={358} fontSize={12} fill="#fef3c7" fontWeight={700}>SOIL LINE</text>
+              <text x={10} y={470} fontSize={11} fill="#fef3c7" fontWeight={700}>UNDERGROUND — seeds fall down here</text>
 
               {/* Slot markers */}
               {SLOTS.map(slot => {
