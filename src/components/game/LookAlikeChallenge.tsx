@@ -1,16 +1,17 @@
 import { useState, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { weedsForGrade } from '@/data/gradeWeeds';
 import type { Weed } from '@/types/game';
+import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
 import { lookAlikeStage, lookAlikePairsForPool, isOfficialLookAlike } from '@/data/lookAlikeGroups';
 
-// Official look-alike pairs only
-function getFamilyPairs(): Array<[Weed, Weed]> {
+// Official look-alike pairs only, limited to the grade's weed pool
+function getFamilyPairs(weeds: Weed[]): Array<[Weed, Weed]> {
  return lookAlikePairsForPool(weeds) as Array<[Weed, Weed]>;
 }
 
 // Invasive vs native official look-alike pairs
-function getInvasiveNativePairs(): Array<[Weed, Weed]> {
+function getInvasiveNativePairs(weeds: Weed[]): Array<[Weed, Weed]> {
  const invasive = weeds.filter(w => w.origin === 'Introduced');
  const native = weeds.filter(w => w.origin === 'Native');
  const pairs: Array<[Weed, Weed]> = [];
@@ -29,15 +30,17 @@ function getInvasiveNativePairs(): Array<[Weed, Weed]> {
 interface Props {
  onComplete: (results: Array<{ weedId: string; correct: boolean }>) => void;
  onNext: () => void;
+ grade?: GradeLevel;
 }
 
-export default function LookAlikeChallenge({ onComplete, onNext }: Props) {
+export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' }: Props) {
  const STAGES = ['seedling', 'vegetative', 'flower', 'whole'] as const;
  const pair = useMemo(() => {
+ const weeds = weedsForGrade(grade) as Weed[];
  // 40% chance to get an invasive vs native pair
  const useInvasiveNative = Math.random() < 0.4;
- const invNatPairs = useInvasiveNative ? getInvasiveNativePairs() : [];
- const allPairs = invNatPairs.length > 0 ? invNatPairs : getFamilyPairs();
+ const invNatPairs = useInvasiveNative ? getInvasiveNativePairs(weeds) : [];
+ const allPairs = invNatPairs.length > 0 ? invNatPairs : getFamilyPairs(weeds);
  const p = allPairs[Math.floor(Math.random() * allPairs.length)];
  const flipped = Math.random() < 0.5;
  const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
