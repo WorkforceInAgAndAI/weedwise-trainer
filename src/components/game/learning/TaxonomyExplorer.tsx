@@ -54,11 +54,25 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
 
   const toggle = (k: string) => setOpen(o => ({ ...o, [k]: !o[k] }));
 
-  const classes: { key: string; label: string; sub: string; members: Weed[] }[] = [
-    { key: 'Dicotyledon', label: 'Dicotyledon', sub: 'Two seed leaves · branching veins', members: weeds.filter(w => w.plantType === 'Dicot') },
-    { key: 'Monocotyledon', label: 'Monocotyledon', sub: 'One seed leaf · parallel veins', members: weeds.filter(w => w.plantType === 'Monocot') },
-    { key: 'Non-flowering', label: 'Non-flowering Plants', sub: 'Spore producers (no true flowers)', members: weeds.filter(w => w.plantType === 'Non-flowering') },
-  ].filter(c => c.members.length > 0);
+  const divisions: { key: string; label: string; sub: string; classes: { key: string; label: string; sub: string; members: Weed[] }[] }[] = [
+    {
+      key: 'div-flowering',
+      label: 'Division: Magnoliophyta (Flowering Plants)',
+      sub: 'Produce true flowers and seeds enclosed in fruit',
+      classes: [
+        { key: 'Dicotyledon', label: 'Class: Dicotyledon', sub: 'Two seed leaves · branching veins', members: weeds.filter(w => w.plantType === 'Dicot') },
+        { key: 'Monocotyledon', label: 'Class: Monocotyledon', sub: 'One seed leaf · parallel veins', members: weeds.filter(w => w.plantType === 'Monocot') },
+      ].filter(c => c.members.length > 0),
+    },
+    {
+      key: 'div-nonflowering',
+      label: 'Division: Non-flowering Plants',
+      sub: 'Spore producers — no true flowers or seeds',
+      classes: [
+        { key: 'Non-flowering', label: 'Class: Non-flowering', sub: 'Ferns and allies', members: weeds.filter(w => w.plantType === 'Non-flowering') },
+      ].filter(c => c.members.length > 0),
+    },
+  ].filter(d => d.classes.length > 0);
 
   const familiesOf = (members: Weed[]) => {
     const m = new Map<string, Weed[]>();
@@ -76,8 +90,8 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
         <button onClick={() => setZoom(1)} aria-label="Reset zoom" className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-foreground"><Maximize2 className="w-4 h-4" /></button>
       </div>
       <p className="text-xs text-muted-foreground">
-        Click any box to expand it. Dark boxes are groupings (kingdom, class, family); green boxes are individual species —
-        tap a species photo to see its full taxonomy pyramid.
+        Click any box to expand it. Work down the levels: Kingdom → Division (flowering or non-flowering) → Class → Family → Species.
+        Dark boxes are groupings; green boxes are individual species — tap a species to see its full taxonomy pyramid.
       </p>
 
       <div className="overflow-auto rounded-lg border border-border bg-muted/20 p-3 max-h-[70vh]">
@@ -90,50 +104,69 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
               <span className="ml-auto text-[10px] text-background/70">{weeds.length} species</span>
             </button>
             {open.Plantae && (
-              <div className="mt-2 space-y-2">
-                {classes.map(c => (
-                  <div key={c.key} className="rounded-lg border-2 border-foreground/60 bg-background p-2">
-                    <button onClick={() => toggle(c.key)} className="w-full flex items-center gap-2 text-left">
-                      {open[c.key] ? <ChevronDown className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
-                      <span className="font-bold text-foreground text-sm">Class: {c.label}</span>
-                      <span className="ml-auto text-[10px] text-muted-foreground">{c.members.length} species</span>
-                    </button>
-                    <p className="text-[10px] text-muted-foreground pl-6">{c.sub}</p>
-                    {open[c.key] && (
-                      <div className="mt-2 space-y-2 max-h-[50vh] overflow-y-auto pr-1">
-                        {familiesOf(c.members).map(([fam, list]) => {
-                          const key = `${c.key}:${fam}`;
-                          return (
-                            <div key={key} className="rounded-lg border-2 border-foreground/40 bg-secondary/60 p-2">
-                              <button onClick={() => toggle(key)} className="w-full flex items-center gap-2 text-left">
-                                {open[key] ? <ChevronDown className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
-                                <span className="font-bold text-foreground text-xs">Family: {fam}</span>
-                                <span className="ml-auto text-[10px] text-muted-foreground">{list.length}</span>
+              <div className="mt-2 space-y-2 pl-3 border-l-2 border-background/40">
+                {divisions.map(d => {
+                  const dCount = d.classes.reduce((n, c) => n + c.members.length, 0);
+                  return (
+                    <div key={d.key} className="rounded-lg border-2 border-foreground/60 bg-background p-2">
+                      <button onClick={() => toggle(d.key)} className="w-full flex items-center gap-2 text-left">
+                        {open[d.key] ? <ChevronDown className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
+                        <span className="font-bold text-foreground text-sm">{d.label}</span>
+                        <span className="ml-auto text-[10px] text-muted-foreground">{dCount} species</span>
+                      </button>
+                      <p className="text-[10px] text-muted-foreground pl-6">{d.sub}</p>
+                      {open[d.key] && (
+                        <div className="mt-2 space-y-2 pl-3 border-l-2 border-foreground/20">
+                          {d.classes.map(c => (
+                            <div key={c.key} className="rounded-lg border-2 border-foreground/50 bg-muted/40 p-2">
+                              <button onClick={() => toggle(c.key)} className="w-full flex items-center gap-2 text-left">
+                                {open[c.key] ? <ChevronDown className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
+                                <span className="font-bold text-foreground text-sm">{c.label}</span>
+                                <span className="ml-auto text-[10px] text-muted-foreground">{c.members.length} species</span>
                               </button>
-                              {open[key] && (
-                                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-1">
-                                  {list.map(w => (
-                                    <button
-                                      key={w.id}
-                                      onClick={() => setPyramidWeed(w)}
-                                      className="rounded-lg border-2 border-primary/60 bg-primary/10 p-1.5 text-left hover:border-primary transition-colors"
-                                    >
-                                      <div className="w-full h-16 rounded overflow-hidden bg-muted mb-1">
-                                        <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                              <p className="text-[10px] text-muted-foreground pl-6">{c.sub}</p>
+                              {open[c.key] && (
+                                <div className="mt-2 space-y-2 max-h-[50vh] overflow-y-auto pr-1 pl-3 border-l-2 border-foreground/20">
+                                  {familiesOf(c.members).map(([fam, list]) => {
+                                    const key = `${c.key}:${fam}`;
+                                    return (
+                                      <div key={key} className="rounded-lg border-2 border-foreground/40 bg-secondary/60 p-2">
+                                        <button onClick={() => toggle(key)} className="w-full flex items-center gap-2 text-left">
+                                          {open[key] ? <ChevronDown className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
+                                          <span className="font-bold text-foreground text-xs">Family: {fam}</span>
+                                          <span className="ml-auto text-[10px] text-muted-foreground">{list.length}</span>
+                                        </button>
+                                        {open[key] && (
+                                          <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto pr-1 pl-3 border-l-2 border-primary/30">
+                                            {list.map(w => (
+                                              <button
+                                                key={w.id}
+                                                onClick={() => setPyramidWeed(w)}
+                                                className="w-full flex items-center gap-2 rounded-lg border-2 border-primary/60 bg-primary/10 p-1.5 text-left hover:border-primary transition-colors"
+                                              >
+                                                <div className="w-12 h-12 rounded overflow-hidden bg-muted flex-shrink-0">
+                                                  <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                  <p className="text-[11px] font-bold text-foreground leading-tight truncate">{w.commonName}</p>
+                                                  <p className="text-[10px] italic text-muted-foreground leading-tight truncate">{w.scientificName}</p>
+                                                </div>
+                                              </button>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
-                                      <p className="text-[10px] font-bold text-foreground leading-tight">{w.commonName}</p>
-                                      <p className="text-[9px] italic text-muted-foreground leading-tight">{w.scientificName}</p>
-                                    </button>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
