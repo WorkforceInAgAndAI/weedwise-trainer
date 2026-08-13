@@ -7580,12 +7580,12 @@ function TopicContent({
         {
           label: "Physiological Dormancy",
           desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
-          examples: ["Lambsquarters", "Redroot Pigweed", "Giant Foxtail", "Green Foxtail", "Yellow Foxtail", "Wild Mustard", "Curly Dock"],
+          examples: ["Lambsquarters", "Redroot Pigweed", "Giant Foxtail", "Green Foxtail", "Yellow Foxtail", "Wild Mustard", "Curly Dock", "Wild Oat"],
         },
         {
           label: "Chemical Dormancy",
           desc: "A specialized case of physiological dormancy involving high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out by rainfall or degraded by microbes before germination can occur.",
-          examples: ["Common Cocklebur", "Wild Oat", "Johnsongrass"],
+          examples: ["Common Cocklebur", "Johnsongrass"],
         },
         {
           label: "Morphological Dormancy",
@@ -7659,16 +7659,16 @@ function TopicContent({
         { label: "Volatilization", desc: "Chemicals are released into the air that may reduce germination or growth of seedlings nearby." },
         { label: "Soil Accumulation", desc: "Allelopathic chemicals persist and build up over time, reducing soil health and crop vigor." },
       ];
-      const ALLELOPATHIC_EXAMPLES: { id: string; name: string; compound: string; note: string }[] = [
-        { id: "Johnsongrass", name: "Johnsongrass", compound: "Sorgoleone (root exudate)", note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves." },
-        { id: "Quackgrass", name: "Quackgrass", compound: "Phenolic acids & agropyrene from rhizomes", note: "Rhizome residues suppress alfalfa, corn, and soybean establishment." },
-        { id: "Giant_Foxtail", name: "Giant Foxtail", compound: "Phenolic acids from decomposing residue", note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue." },
-        { id: "Yellow_Nutsedge", name: "Yellow Nutsedge", compound: "Tuber-derived phenolics", note: "Suppresses germination of grasses and many broadleaf crops near tuber colonies." },
-        { id: "Velvetleaf", name: "Velvetleaf", compound: "Phenolics & cyanogenic glycosides in residue", note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth." },
-        { id: "Canada_Thistle", name: "Canada Thistle", compound: "Root-exuded phenolic acids", note: "Reduces emergence and biomass of neighboring crops within thistle patches." },
-        { id: "Volunteer_Sunflower", name: "Volunteer Sunflower", compound: "Chlorogenic & isochlorogenic acids", note: "Leaf leachate and residue suppress competing weeds and small-seeded crops." },
-        { id: "Redroot_Pigweed", name: "Redroot Pigweed", compound: "Water-soluble leaf leachates", note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies." },
-        { id: "Common_Lambsquarters", name: "Lambsquarters", compound: "Oxalic acid & phenolic compounds", note: "Residue leachate inhibits germination of small-seeded crops like alfalfa and flax." },
+      const ALLELOPATHIC_EXAMPLES: { id: string; name: string; compound: string; pathway: string; note: string }[] = [
+        { id: "Johnsongrass", name: "Johnsongrass", compound: "Sorgoleone (root exudate)", pathway: "Root Exudation", note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves." },
+        { id: "Quackgrass", name: "Quackgrass", compound: "Phenolic acids & agropyrene from rhizomes", pathway: "Root Exudation + Decomposition Leaching", note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment." },
+        { id: "Giant_Foxtail", name: "Giant Foxtail", compound: "Phenolic acids from decomposing residue", pathway: "Decomposition Leaching", note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue." },
+        { id: "Yellow_Nutsedge", name: "Yellow Nutsedge", compound: "Tuber-derived phenolics", pathway: "Root Exudation + Soil Accumulation", note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops." },
+        { id: "Velvetleaf", name: "Velvetleaf", compound: "Phenolics & cyanogenic glycosides in residue", pathway: "Decomposition Leaching", note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth." },
+        { id: "Canada_Thistle", name: "Canada Thistle", compound: "Root-exuded phenolic acids", pathway: "Root Exudation", note: "Reduces emergence and biomass of neighboring crops within thistle patches." },
+        { id: "Volunteer_Sunflower", name: "Volunteer Sunflower", compound: "Chlorogenic & isochlorogenic acids", pathway: "Leaf Leachate + Decomposition Leaching", note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops." },
+        { id: "Redroot_Pigweed", name: "Redroot Pigweed", compound: "Water-soluble leaf leachates", pathway: "Leaf Leachate", note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies." },
+        { id: "Common_Lambsquarters", name: "Lambsquarters", compound: "Oxalic acid & phenolic compounds", pathway: "Leaf Leachate + Decomposition Leaching", note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax." },
       ];
       const availableAllelo = ALLELOPATHIC_EXAMPLES
         .map(e => ({ ...e, weed: weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
@@ -7703,6 +7703,7 @@ function TopicContent({
                 </div>
                 <p className="font-bold text-foreground text-xs">{e.name}</p>
                 <p className="text-[10px] italic text-primary">{e.weed?.scientificName}</p>
+                <p className="text-[10px] text-foreground mt-1"><strong>Pathway:</strong> {e.pathway}</p>
                 <p className="text-[10px] text-muted-foreground mt-1"><strong>Compound:</strong> {e.compound}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
               </button>
