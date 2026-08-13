@@ -475,12 +475,22 @@ function PartVisual({ kind, color, variant, size, weedId, stage }: { kind: PartK
 
 function buildRound(caseIdx: number) {
   const c = CASES[caseIdx];
-  // Offer every style option for every part kind so students can build a
-  // custom plant. Any style placed in the matching slot counts as correct.
+  const todayId = NAME_TO_WEED_ID[c.name];
+  // Photo stage used for each part kind — always TODAY'S weed, so the bin
+  // changes every round and matches the plant students are building.
+  const PHOTO_STAGE: Partial<Record<PartKind, string>> = {
+    leaves: 'vegetative', flower: 'flower', seeds: 'seedhead',
+  };
   const palette: PaletteItem[] = [];
   PART_ORDER.forEach((k) => {
+    // Real photo of today's weed for this part.
+    const stage = PHOTO_STAGE[k];
+    if (todayId && stage) {
+      palette.push({ id: `${k}-photo`, kind: k, color: c.parts[k].color, variant: 'photo', label: `${c.name} ${PART_LABELS[k].toLowerCase()}`, weedId: todayId, stage });
+    }
+    // Cartoon styles (never photos of other species).
     PART_STYLES[k].forEach((s) => {
-      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label, weedId: s.weedId, stage: s.stage });
+      palette.push({ id: `${k}-${s.id}`, kind: k, color: s.color, variant: s.variant, label: s.label });
     });
   });
   return { case: c, palette: shuffle(palette) };
