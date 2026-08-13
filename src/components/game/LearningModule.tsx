@@ -6,7 +6,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { LOOKALIKE_TRIPLES, lookAlikeStage } from "@/data/lookAlikeGroups";
+import { lookAlikeStage, lookAlikeGroupsForPool, officialPartners, NO_LOOKALIKE_IDS } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award, Search } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
@@ -826,7 +826,7 @@ function getTopicWeeds(topicId: TopicId, sourceGrade: GradeLevel = "high"): Weed
   const base = weedsForGrade(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return base.filter((w) => base.some((x) => x.id === w.lookAlike.id));
+      return base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0);
     case "safety":
       return base.filter((w) => w.safetyNote);
     default:
