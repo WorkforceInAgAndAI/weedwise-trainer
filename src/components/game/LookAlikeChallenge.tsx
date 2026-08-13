@@ -44,9 +44,19 @@ export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' 
  const p = allPairs[Math.floor(Math.random() * allPairs.length)];
  const flipped = Math.random() < 0.5;
  const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
+ if (!p) return null;
  const isInvasiveVsNative = invNatPairs.length > 0 && useInvasiveNative;
  return { weedA: flipped ? p[1] : p[0], weedB: flipped ? p[0] : p[1], target: flipped ? p[1] : p[0], stage, isInvasiveVsNative };
- }, []);
+ }, [grade]);
+
+ if (!pair) {
+ return (
+ <div className="text-center p-6 text-sm text-muted-foreground">
+ No look-alike pairs are available for this level yet.
+ <button onClick={onNext} className="ml-2 underline text-primary">Skip</button>
+ </div>
+ );
+ }
 
  const [choice, setChoice] = useState<string | null>(null);
  const [submitted, setSubmitted] = useState(false);
