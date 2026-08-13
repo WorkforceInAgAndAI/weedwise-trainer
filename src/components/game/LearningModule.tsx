@@ -5681,7 +5681,7 @@ function TopicContent({
       // `grade` prop is the legacy source grade and is one level lower.
       const gradePool =
         dg === "collegiate"
-          ? collegiateWeeds
+          ? collegiateWeedsAll
           : dg === "high"
             ? highSchoolWeeds
             : dg === "middle"
