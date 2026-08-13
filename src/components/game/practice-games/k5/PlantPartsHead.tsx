@@ -63,11 +63,10 @@ const PART_ORDER: PartKind[] = ['leaves', 'flower', 'seeds'];
 interface SlotDef { id: string; kind: PartKind; x: number; y: number; w: number; h: number; label: string; oval?: boolean; }
 
 const SLOTS: SlotDef[] = [
-  { id: 'leaves-left',  kind: 'leaves', x: 105, y: 240, w: 100, h: 100, label: 'Leaf' },
-  { id: 'leaves-mid',   kind: 'leaves', x: 200, y: 200, w: 100, h: 100, label: 'Leaf' },
-  { id: 'leaves-right', kind: 'leaves', x: 295, y: 240, w: 100, h: 100, label: 'Leaf' },
-  { id: 'flower',       kind: 'flower', x: 200, y: 95,  w: 120, h: 120, label: 'Flower' },
-  { id: 'seeds',        kind: 'seeds',  x: 325, y: 95,  w: 110, h: 110, label: 'Seeds' },
+  { id: 'leaves-left',  kind: 'leaves', x: 118, y: 250, w: 100, h: 100, label: 'Leaf' },
+  { id: 'leaves-right', kind: 'leaves', x: 282, y: 250, w: 100, h: 100, label: 'Leaf' },
+  { id: 'flower',       kind: 'flower', x: 200, y: 105, w: 120, h: 120, label: 'Flower' },
+  { id: 'seeds',        kind: 'seeds',  x: 200, y: 415, w: 110, h: 110, label: 'Seeds' },
 ];
 
 const PART_LABELS: Record<PartKind, string> = {
