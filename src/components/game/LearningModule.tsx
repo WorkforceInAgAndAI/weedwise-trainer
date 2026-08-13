@@ -7337,6 +7337,9 @@ function TopicContent({
             </div>
           </div>
 
+          {/* Interactive expandable taxonomy map */}
+          <TaxonomyExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} />
+
           {/* Family groupings */}
           <FamilyGroupings familyGroups={familyGroups} familyColors={familyColors} onSelectWeed={onSelectWeed} />
         </div>
