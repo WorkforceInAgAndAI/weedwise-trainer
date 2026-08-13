@@ -6,7 +6,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { LOOKALIKE_TRIPLES, lookAlikeStage } from "@/data/lookAlikeGroups";
+import { lookAlikeStage, lookAlikeGroupsForPool, officialPartners, NO_LOOKALIKE_IDS } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
 import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award, Search } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
@@ -826,7 +826,7 @@ function getTopicWeeds(topicId: TopicId, sourceGrade: GradeLevel = "high"): Weed
   const base = weedsForGrade(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return base.filter((w) => base.some((x) => x.id === w.lookAlike.id));
+      return base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0);
     case "safety":
       return base.filter((w) => w.safetyNote);
     default:
@@ -5669,11 +5669,16 @@ function TopicContent({
        LOOK-ALIKES
     ═══════════════════════════════════════════════════════════ */
     case "look-alikes": {
+      // Every look-alike shown here must be inside this grade's weed pool.
+      const gradePool = weedsForGrade(grade);
+      const gradePoolIds = new Set(gradePool.map((w) => w.id));
       const seen = new Set<string>();
       const pairs: [Weed, Weed][] = [];
       topicWeeds.forEach((w) => {
-        const pairedWith = weeds.find((x) => x.id === w.lookAlike.id);
-        if (pairedWith && !seen.has(w.id) && !seen.has(pairedWith.id)) {
+        if (seen.has(w.id)) return;
+        const partnerId = officialPartners(w.id, gradePoolIds).find((id) => !seen.has(id));
+        const pairedWith = partnerId ? gradePool.find((x) => x.id === partnerId) : undefined;
+        if (pairedWith) {
           seen.add(w.id);
           seen.add(pairedWith.id);
           pairs.push([w, pairedWith]);
@@ -5683,12 +5688,13 @@ function TopicContent({
       // Build invasive vs native look-alike pairs for 6-8 and 9-12
       const invasiveNativePairs: [Weed, Weed][] = [];
       if (grade === "middle" || grade === "high") {
-        const invasiveWeeds = weeds.filter((w) => w.origin === "Introduced");
-        const nativeWeeds = weeds.filter((w) => w.origin === "Native");
+        const invasiveWeeds = gradePool.filter((w) => w.origin === "Introduced");
+        const nativeWeeds = gradePool.filter((w) => w.origin === "Native");
         const invNatSeen = new Set<string>();
         invasiveWeeds.forEach((inv) => {
+          const partners = officialPartners(inv.id, gradePoolIds);
           const nativeLookAlike = nativeWeeds.find(
-            (nat) => nat.family === inv.family && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
+            (nat) => partners.includes(nat.id) && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
           );
           if (nativeLookAlike) {
             invNatSeen.add(inv.id);
@@ -5705,15 +5711,14 @@ function TopicContent({
         { stage: "whole", label: "Whole Plant" },
       ];
 
-      // Curated 3-species look-alike groups live in @/data/lookAlikeGroups
-      // so the 6-8 Look-Alike practice game can share them.
-      const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = LOOKALIKE_TRIPLES
-        .map((t) => {
-          const ws = t.ids.map((id) => weeds.find((w) => w.id === id));
-          if (ws.some((w) => !w)) return null;
-          return { weeds: ws as Weed[], difference: t.difference };
-        })
-        .filter((g): g is { weeds: Weed[]; difference: string } => g !== null);
+      // Official look-alike groups, restricted to this grade's weed pool.
+      const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
+        weeds: g.weeds as Weed[],
+        difference: g.difference,
+      }));
+
+      // Species in this grade pool that have no look-alike on the official list yet.
+      const noLookAlikeWeeds = gradePool.filter((w) => NO_LOOKALIKE_IDS.includes(w.id));
 
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
         const aIsGrass = a.plantType === "Monocot" && a.family === "Poaceae";
@@ -6053,10 +6058,10 @@ function TopicContent({
             <div className="space-y-4">
               <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
                 <h3 className="font-display font-bold text-foreground text-base mb-1">
-                  Look-Alike Groups (3 species each)
+                  Look-Alike Groups
                 </h3>
                 <p className="text-sm text-foreground">
-                  Compare these commonly-confused trios at each growth stage. For grass groups, the{" "}
+                  Compare these commonly-confused species at each growth stage. For grass groups, the{" "}
                   <strong>ligule</strong> row is one of the most reliable ID features.
                 </p>
               </div>
@@ -6082,11 +6087,32 @@ function TopicContent({
             </div>
           )}
 
-          {/* Family-based Look-Alike Pairs (legacy 2-weed) */}
+          {/* Official Look-Alike Pairs */}
           {pairs.length > 0 && (
             <div className="border-t border-border pt-4 space-y-4">
-              <h3 className="font-display font-bold text-foreground text-base">Family-Based Look-Alike Pairs</h3>
+              <h3 className="font-display font-bold text-foreground text-base">Look-Alike Pairs</h3>
               {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
+            </div>
+          )}
+
+          {/* Species still awaiting an official look-alike */}
+          {noLookAlikeWeeds.length > 0 && (
+            <div className="border-t border-border pt-4">
+              <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/40 p-4">
+                <h3 className="font-display font-bold text-foreground text-sm mb-1">
+                  No look-alike listed yet ({noLookAlikeWeeds.length})
+                </h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  These species have no confirmed look-alike on the official list — comparisons will be added later.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {noLookAlikeWeeds.map((w) => (
+                    <span key={w.id} className="text-xs px-2 py-1 rounded-full bg-card border border-border">
+                      {w.commonName}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -2,35 +2,21 @@ import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
-import { lookAlikeStage } from '@/data/lookAlikeGroups';
+import { lookAlikeStage, lookAlikePairsForPool, isOfficialLookAlike } from '@/data/lookAlikeGroups';
 
-// Group weeds by family, only families with 2+ members
+// Official look-alike pairs only
 function getFamilyPairs(): Array<[Weed, Weed]> {
- const byFamily: Record<string, Weed[]> = {};
- weeds.forEach(w => {
- if (!byFamily[w.family]) byFamily[w.family] = [];
- byFamily[w.family].push(w);
- });
- const pairs: Array<[Weed, Weed]> = [];
- Object.values(byFamily).forEach(group => {
- if (group.length < 2) return;
- for (let i = 0; i < group.length - 1; i++) {
- for (let j = i + 1; j < group.length; j++) {
- pairs.push([group[i], group[j]]);
- }
- }
- });
- return pairs;
+ return lookAlikePairsForPool(weeds) as Array<[Weed, Weed]>;
 }
 
-// Invasive vs native pairs from the same family
+// Invasive vs native official look-alike pairs
 function getInvasiveNativePairs(): Array<[Weed, Weed]> {
  const invasive = weeds.filter(w => w.origin === 'Introduced');
  const native = weeds.filter(w => w.origin === 'Native');
  const pairs: Array<[Weed, Weed]> = [];
  const used = new Set<string>();
  invasive.forEach(inv => {
- const match = native.find(nat => nat.family === inv.family && !used.has(nat.id));
+ const match = native.find(nat => isOfficialLookAlike(inv.id, nat.id) && !used.has(nat.id));
  if (match) {
  used.add(match.id);
  used.add(inv.id);
