@@ -5672,15 +5672,17 @@ function TopicContent({
        LOOK-ALIKES
     ═══════════════════════════════════════════════════════════ */
     case "look-alikes": {
+      // Displayed grade drives every look-alike decision in this topic.
+      const dg = (displayGrade ?? "middle") as "elementary" | "middle" | "high" | "collegiate";
       // Every look-alike shown here must be inside the DISPLAYED grade's weed
       // pool (6-8 = 37 species, 9-12 = 58, Collegiate = 87). The internal
       // `grade` prop is the legacy source grade and is one level lower.
       const gradePool =
-        displayGrade === "collegiate"
+        dg === "collegiate"
           ? collegiateWeeds
-          : displayGrade === "high"
+          : dg === "high"
             ? highSchoolWeeds
-            : displayGrade === "middle"
+            : dg === "middle"
               ? middleSchoolWeeds
               : elementaryWeeds;
       const gradePoolIds = new Set(gradePool.map((w) => w.id));
@@ -5699,7 +5701,7 @@ function TopicContent({
 
       // Build invasive vs native look-alike pairs for 6-8 and 9-12
       const invasiveNativePairs: [Weed, Weed][] = [];
-      if (grade === "middle" || grade === "high") {
+      if (dg !== "elementary") {
         const invasiveWeeds = gradePool.filter((w) => w.origin === "Introduced");
         const nativeWeeds = gradePool.filter((w) => w.origin === "Native");
         const invNatSeen = new Set<string>();
