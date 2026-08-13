@@ -3,7 +3,7 @@ import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
-import { LOOKALIKE_TRIPLES, lookAlikeStage } from '@/data/lookAlikeGroups';
+import { lookAlikeGroupsForPool } from '@/data/lookAlikeGroups';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
@@ -16,13 +16,12 @@ interface Trio {
 }
 
 function buildTrios(): Trio[] {
-  return LOOKALIKE_TRIPLES
-    .map(t => {
-      const ws = t.ids.map(id => weeds.find(w => w.id === id));
-      if (ws.some(w => !w)) return null;
-      return { weeds: ws as Weed[], difference: t.difference, stage: lookAlikeStage(t.ids) };
-    })
-    .filter((g): g is Trio => g !== null);
+  // Only official look-alikes that are inside the 6-8 weed pool.
+  return lookAlikeGroupsForPool(weeds).map(g => ({
+    weeds: g.weeds as Weed[],
+    difference: g.difference,
+    stage: g.stage,
+  }));
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
