@@ -5672,12 +5672,21 @@ function TopicContent({
        LOOK-ALIKES
     ═══════════════════════════════════════════════════════════ */
     case "look-alikes": {
-      // Every look-alike shown here must be inside this grade's weed pool.
-      const gradePool = weedsForGrade(grade);
+      // Every look-alike shown here must be inside the DISPLAYED grade's weed
+      // pool (6-8 = 37 species, 9-12 = 58, Collegiate = 87). The internal
+      // `grade` prop is the legacy source grade and is one level lower.
+      const gradePool =
+        displayGrade === "collegiate"
+          ? collegiateWeeds
+          : displayGrade === "high"
+            ? highSchoolWeeds
+            : displayGrade === "middle"
+              ? middleSchoolWeeds
+              : elementaryWeeds;
       const gradePoolIds = new Set(gradePool.map((w) => w.id));
       const seen = new Set<string>();
       const pairs: [Weed, Weed][] = [];
-      topicWeeds.forEach((w) => {
+      gradePool.forEach((w) => {
         if (seen.has(w.id)) return;
         const partnerId = officialPartners(w.id, gradePoolIds).find((id) => !seen.has(id));
         const pairedWith = partnerId ? gradePool.find((x) => x.id === partnerId) : undefined;
