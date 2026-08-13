@@ -505,14 +505,26 @@ export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[], maxSize = 
     if (members.length < 2) continue;
     candidates.push({ ids, name: lookAlikeGroupName(ids, pool), weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
   }
-  // Drop any group whose species are already fully contained in a larger group,
-  // so students don't see the same comparison repeated in smaller pieces.
+  // Each species belongs to exactly ONE group: prefer the largest groups first,
+  // then skip any later group that reuses an already-grouped species.
   const bySize = [...candidates].sort((a, b) => b.ids.length - a.ids.length);
+  const used = new Set<string>();
   const kept: LookAlikeGroup<T>[] = [];
   for (const g of bySize) {
-    const set = new Set(g.ids);
-    const isSubset = kept.some((k) => g.ids.every((id) => k.ids.includes(id)) && set.size <= k.ids.length);
-    if (!isSubset) kept.push(g);
+    if (g.ids.some((id) => used.has(id))) continue;
+    g.ids.forEach((id) => used.add(id));
+    kept.push(g);
+  }
+  // Any species left without a group: pair it with another leftover partner if possible.
+  for (const w of pool) {
+    if (used.has(w.id)) continue;
+    const partner = officialPartners(w.id, poolIds).find((p) => !used.has(p));
+    if (!partner) continue;
+    const ids = [w.id, partner];
+    const members = ids.map((id) => pool.find((x) => x.id === id)!).filter(Boolean);
+    if (members.length < 2) continue;
+    ids.forEach((id) => used.add(id));
+    kept.push({ ids, name: lookAlikeGroupName(ids, pool), weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
   }
   return kept;
 }
