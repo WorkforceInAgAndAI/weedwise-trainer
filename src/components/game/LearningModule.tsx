@@ -1444,10 +1444,11 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   //   Field Scout (6-8)      -> 34 species
   //   IPM Specialist (9-12)  -> full 86 species
   //   Collegiate             -> full 86 species
-  const curriculumGrade: GradeLevel =
+  const curriculumGrade: PoolGrade =
     selectedGrade === "elementary" ? "elementary" :
     selectedGrade === "middle" ? "middle" :
-    "high";
+    selectedGrade === "high" ? "high" :
+    "collegiate";
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
