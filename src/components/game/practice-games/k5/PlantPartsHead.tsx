@@ -651,11 +651,28 @@ export default function PlantPartsHead({ onBack, gameId, gameName, gradeLabel }:
         <div className="grid md:grid-cols-[1fr,280px] gap-4">
           {/* Plant body with slots */}
           <div className="relative rounded-xl overflow-hidden border-4 border-green-800/40 shadow-lg"
-               style={{ background: 'linear-gradient(180deg, #e0f2fe 0%, #dbeafe 60%, #a3d977 60%, #6b9d3f 100%)', aspectRatio: '5/6' }}>
+               style={{ background: 'linear-gradient(180deg, #e0f2fe 0%, #dbeafe 66%, #a3d977 66%, #8bbf55 71%, #8a5a34 71%, #5f3b21 100%)', aspectRatio: '5/6' }}>
             <svg viewBox="0 0 400 480" className="w-full h-full">
+              {/* Painted-in plant body: stem the leaves and flower attach to */}
+              <g opacity={0.9}>
+                <path d="M200 340 C 196 280, 204 220, 200 150" stroke="#4d7c0f" strokeWidth={18} strokeLinecap="round" fill="none" />
+                <path d="M195 330 C 192 275, 199 215, 196 160" stroke="#84cc16" strokeWidth={5} strokeLinecap="round" fill="none" opacity={0.6} />
+                {/* little branch stubs pointing at the two leaf spots */}
+                <path d="M200 255 Q 165 248, 140 250" stroke="#4d7c0f" strokeWidth={9} strokeLinecap="round" fill="none" />
+                <path d="M200 255 Q 235 248, 260 250" stroke="#4d7c0f" strokeWidth={9} strokeLinecap="round" fill="none" />
+                {/* roots below the soil line */}
+                <g stroke="#8a5a34" strokeWidth={8} strokeLinecap="round" fill="none">
+                  <path d="M200 340 L 200 390" />
+                </g>
+                <g stroke="#a97142" strokeWidth={5} strokeLinecap="round" fill="none">
+                  <path d="M200 360 Q 165 375, 145 400" />
+                  <path d="M200 370 Q 240 385, 258 410" />
+                </g>
+              </g>
               {/* Ground line */}
               <line x1={0} y1={340} x2={400} y2={340} stroke="#3f6212" strokeWidth={3} strokeDasharray="6 4" />
-              <text x={10} y={355} fontSize={12} fill="#3f6212" fontWeight={700}>SOIL LINE</text>
+              <text x={10} y={358} fontSize={12} fill="#fef3c7" fontWeight={700}>SOIL LINE</text>
+              <text x={10} y={470} fontSize={11} fill="#fef3c7" fontWeight={700}>UNDERGROUND — seeds fall down here</text>
 
               {/* Slot markers */}
               {SLOTS.map(slot => {
