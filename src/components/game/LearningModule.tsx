@@ -6077,7 +6077,7 @@ function TopicContent({
         },
       ];
 
-      if (dg === "elementary") {
+      if (grade === "elementary") {
         // Curriculum-set placements. A species may belong to more than one
         // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
         const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
