@@ -5726,13 +5726,17 @@ function TopicContent({
       const elementaryStages = [{ stage: "whole", label: "Whole Plant" }];
 
       // Official look-alike groups, restricted to this grade's weed pool.
-      const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
+      const lookAlikeGroups: { name: string; weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
+        name: g.name,
         weeds: g.weeds as Weed[],
         difference: g.difference,
       }));
 
       // Species in this grade pool that have no look-alike on the official list yet.
-      const noLookAlikeWeeds = gradePool.filter((w) => NO_LOOKALIKE_IDS.includes(w.id));
+      const groupedIds = new Set(lookAlikeGroups.flatMap((g) => g.weeds.map((w) => w.id)));
+      const noLookAlikeWeeds = gradePool.filter(
+        (w) => !groupedIds.has(w.id) && officialPartners(w.id, gradePoolIds).length === 0,
+      );
 
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
         const aIsGrass = a.plantType === "Monocot" && a.family === "Poaceae";
@@ -5817,7 +5821,7 @@ function TopicContent({
 
       // 3-species comparison card: shows seedling / vegetative / reproductive (+ ligule
       // when any member is a grass) side-by-side for all three species.
-      const renderTripleCard = (group: Weed[], key: string, customDifference?: string) => {
+      const renderTripleCard = (group: Weed[], key: string, customDifference?: string, groupName?: string) => {
         const compareStages = [
           { stage: "seedling", label: "Seedling" },
           { stage: "vegetative", label: "Vegetative" },
@@ -5828,6 +5832,12 @@ function TopicContent({
 
         return (
           <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
+            {groupName && (
+              <div className="flex items-center gap-2 border-b border-border pb-2">
+                <span className="w-2 h-2 rounded-full bg-primary" />
+                <h4 className="font-display font-bold text-foreground text-sm">{groupName}</h4>
+              </div>
+            )}
             {/* Header row */}
             <div className={`grid ${colsClass} gap-3`}>
               {group.map((w) => (
@@ -6005,7 +6015,7 @@ function TopicContent({
                 </p>
               </div>
               {lookAlikeGroups.map((g, i) =>
-                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference)
+                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference, g.name)
               )}
             </div>
           )}
