@@ -1102,7 +1102,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
           .map((id) => weeds.find((w) => w.id === id))
           .filter((w): w is Weed => Boolean(w));
         if (members.length < 2) return null;
-        const groupStage = lookAlikeStage(g.weedIds);
+        const groupStage = lookAlikeStage(members.map((w) => w.id));
         return (
           <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
