@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { weeds } from "@/data/weeds";
-import { weedsForGrade, elementaryWeeds, middleSchoolWeeds, highSchoolWeeds, collegiateWeeds } from "@/data/gradeWeeds";
+import { weedsForGrade, weedsForPool, type PoolGrade, elementaryWeeds, middleSchoolWeeds, highSchoolWeeds, collegiateWeedsAll } from "@/data/gradeWeeds";
 import type { GradeLevel, Weed } from "@/types/game";
 import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
@@ -820,10 +820,11 @@ const TOPICS: Topic[] = [
   },
 ];
 
-function getTopicWeeds(topicId: TopicId, sourceGrade: GradeLevel = "high"): Weed[] {
+function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[] {
   // Grade-aware base pool. K-5 uses the 14 "Weeds You Can Spot" species,
-  // 6-8 uses the 34-species middle-school curriculum, 9-12 uses all species.
-  const base = weedsForGrade(sourceGrade);
+  // 6-8 uses the middle-school curriculum, 9-12 the high-school curriculum,
+  // and collegiate the complete species dataset.
+  const base = weedsForPool(sourceGrade);
   switch (topicId) {
     case "look-alikes":
       return base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0);
@@ -1443,10 +1444,11 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   //   Field Scout (6-8)      -> 34 species
   //   IPM Specialist (9-12)  -> full 86 species
   //   Collegiate             -> full 86 species
-  const curriculumGrade: GradeLevel =
+  const curriculumGrade: PoolGrade =
     selectedGrade === "elementary" ? "elementary" :
     selectedGrade === "middle" ? "middle" :
-    "high";
+    selectedGrade === "high" ? "high" :
+    "collegiate";
   const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
     (initialTopicId as TopicId) ?? null,
   );
@@ -5679,7 +5681,7 @@ function TopicContent({
       // `grade` prop is the legacy source grade and is one level lower.
       const gradePool =
         dg === "collegiate"
-          ? collegiateWeeds
+          ? collegiateWeedsAll
           : dg === "high"
             ? highSchoolWeeds
             : dg === "middle"
