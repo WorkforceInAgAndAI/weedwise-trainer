@@ -8363,16 +8363,16 @@ function GrassIdentificationModule({
                 <figcaption className="text-[11px] font-bold uppercase tracking-wide text-primary px-2 py-1 bg-primary/10">
                   Ligule &amp; collar
                 </figcaption>
-                <div className="h-56 sm:h-64">
-                  <WeedImage weedId={g.id} stage="ligule" className="w-full h-full" />
+                <div className="aspect-square w-full max-w-[20rem] mx-auto bg-muted">
+                  <WeedImage weedId={g.id} stage="ligule" className="w-full h-full !object-contain" />
                 </div>
               </figure>
               <figure className="rounded-lg border-2 border-accent/50 overflow-hidden bg-muted">
                 <figcaption className="text-[11px] font-bold uppercase tracking-wide text-accent px-2 py-1 bg-accent/10">
                   Reproductive — seed head
                 </figcaption>
-                <div className="h-56 sm:h-64">
-                  <WeedImage weedId={g.id} stage="repros" className="w-full h-full" />
+                <div className="aspect-square w-full max-w-[20rem] mx-auto bg-muted">
+                  <WeedImage weedId={g.id} stage="repros" className="w-full h-full !object-contain" />
                 </div>
               </figure>
             </div>
@@ -8384,8 +8384,8 @@ function GrassIdentificationModule({
                   <figcaption className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground px-1.5 py-0.5 bg-muted/70">
                     {label}
                   </figcaption>
-                  <div className="h-20 sm:h-24">
-                    <WeedImage weedId={g.id} stage={stage} className="w-full h-full" />
+                  <div className="aspect-square w-full max-w-[10rem] mx-auto bg-muted">
+                    <WeedImage weedId={g.id} stage={stage} className="w-full h-full !object-contain" />
                   </div>
                 </figure>
               ))}
