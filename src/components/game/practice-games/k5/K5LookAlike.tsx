@@ -1,25 +1,22 @@
 import { useState, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { elementaryWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty } from '@/lib/difficulty';
-import { lookAlikeStage } from '@/data/lookAlikeGroups';
+import { lookAlikePairsForPool, lookAlikeStage } from '@/data/lookAlikeGroups';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 function buildAllPairs() {
-  const valid = weeds.filter(w => w.lookAlike && weeds.find(x => x.id === w.lookAlike.id));
-  const used = new Set<string>();
-  const result: { weed: typeof weeds[0]; alike: typeof weeds[0]; difference: string; stage: 'flower' | 'vegetative' }[] = [];
-  for (const w of shuffle(valid)) {
-    if (used.has(w.id)) continue;
-    const alike = weeds.find(x => x.id === w.lookAlike.id);
-    if (!alike || used.has(alike.id)) continue;
-    used.add(w.id); used.add(alike.id);
-    result.push({ weed: w, alike, difference: w.lookAlike.difference, stage: lookAlikeStage([w.id, alike.id]) });
-  }
-  return result;
+  // Official look-alike pairs limited to the K-5 weed pool.
+  const groups = lookAlikeGroupsForPool(weeds, 2);
+  return shuffle(groups).map(g => ({
+    weed: g.weeds[0],
+    alike: g.weeds[1],
+    difference: g.difference,
+    stage: g.stage,
+  }));
 }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
