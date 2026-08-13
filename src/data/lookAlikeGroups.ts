@@ -349,33 +349,5 @@ export function lookAlikePairsForPool<T extends PoolWeed>(pool: T[]): [T, T][] {
   return pairs;
 }
 
-/**
- * Extra species approved for the K-5 "look-alike" content (they appear in the
- * K-5 learning-module look-alike groups even though they are not part of the
- * 15-species K-5 spotting list).
- */
-export const K5_LOOKALIKE_EXTRA_IDS: string[] = [
-  "waterhemp",
-  "palmer-amaranth",
-  "Redroot_pigweed",
-  "green-foxtail",
-  "yellow-foxtail",
-  "common-ragweed",
-  "Musk_thistle",
-  "Common_Burdock",
-  "Water_smartweed",
-  "Ladysthumb",
-  "Wild_mustard",
-  "yellow_Rocket",
-  "CommonChickweed",
-  "Mouseear_chickweed",
-  "Eastern_black_nightshade",
-  "Horsenettle",
-  "Buffalobur",
-  "poison-hemlock",
-  "large-crabgrass",
-  "Witchgrass",
-  "barnyardgrass",
-  "Russian_thistle",
-  "golden-alexanders",
-];
+/** Deprecated: K-5 look-alike content is now strictly limited to the K-5 weed list. */
+export const K5_LOOKALIKE_EXTRA_IDS: string[] = [];

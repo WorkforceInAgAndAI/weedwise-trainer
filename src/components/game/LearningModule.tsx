@@ -1083,6 +1083,8 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
 ];
 
 function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) => void }) {
+  // Strictly the K-5 curriculum pool — no species outside the 15-weed list.
+  const poolIds = new Set(weedsForGrade("elementary").map((w) => w.id));
   return (
     <div className="space-y-4">
       <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3">
@@ -1096,10 +1098,11 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
       </div>
       {ELEM_LOOKALIKE_GROUPS.map((g) => {
         const members = g.weedIds
+          .filter((id) => poolIds.has(id))
           .map((id) => weeds.find((w) => w.id === id))
           .filter((w): w is Weed => Boolean(w));
         if (members.length < 2) return null;
-        const groupStage = lookAlikeStage(g.weedIds);
+        const groupStage = lookAlikeStage(members.map((w) => w.id));
         return (
           <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-display font-bold text-foreground text-base">

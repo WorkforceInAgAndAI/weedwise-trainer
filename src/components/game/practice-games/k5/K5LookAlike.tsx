@@ -1,18 +1,15 @@
 import { useState, useMemo } from 'react';
-import { weeds as allWeeds } from '@/data/weeds';
-import { ELEMENTARY_WEED_IDS } from '@/data/gradeWeeds';
+import { elementaryWeeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty } from '@/lib/difficulty';
-import { lookAlikeGroupsForPool, K5_LOOKALIKE_EXTRA_IDS } from '@/data/lookAlikeGroups';
+import { lookAlikeGroupsForPool } from '@/data/lookAlikeGroups';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-// K-5 pool: the 15 spotting weeds plus the species used in the K-5
-// look-alike learning groups. Nothing outside this pool can appear.
-const K5_POOL_IDS = new Set([...ELEMENTARY_WEED_IDS, ...K5_LOOKALIKE_EXTRA_IDS]);
-const weeds = allWeeds.filter(w => K5_POOL_IDS.has(w.id));
+// K-5 pool: strictly the 15 K-5 curriculum species. Nothing else can appear.
+const weeds = elementaryWeeds;
 
 function buildAllPairs() {
   // Official look-alike pairs limited to the K-5 weed pool.
@@ -69,6 +66,22 @@ export default function K5LookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
   };
 
   const next = () => { setRound(r => r + 1); setSelected(null); setSubmitted(false); };
+
+  if (pairs.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-bold text-foreground text-lg flex-1">Look-Alike Challenge</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center p-6 text-center">
+          <p className="max-w-md text-foreground font-semibold">
+            No look-alike pairs are listed yet for the K-5 weed list. Check back soon!
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (done) return <LevelComplete level={level} score={score} total={pairs.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
