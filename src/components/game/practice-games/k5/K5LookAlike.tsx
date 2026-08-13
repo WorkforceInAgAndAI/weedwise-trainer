@@ -4,7 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty } from '@/lib/difficulty';
-import { lookAlikePairsForPool, lookAlikeStage } from '@/data/lookAlikeGroups';
+import { lookAlikeGroupsForPool } from '@/data/lookAlikeGroups';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
