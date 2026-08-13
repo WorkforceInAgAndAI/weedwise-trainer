@@ -88,7 +88,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
             Which one is <span className="text-primary">{target?.commonName}</span>
             {target && <span className="block text-xs italic text-primary mt-1">({target.scientificName})</span>}?
           </p>
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 w-full max-w-3xl">
+          <div className={`grid gap-3 sm:gap-4 w-full ${options.length === 2 ? 'grid-cols-2 max-w-xl' : 'grid-cols-3 max-w-3xl'}`}>
             {options.map(w => (
               <button
                 key={w.id}
@@ -132,7 +132,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
             {history.map((h, i) => (
               <div key={i} className={`p-2 rounded-md border-2 ${h.correct ? 'border-green-500/50 bg-green-500/5' : 'border-destructive/50 bg-destructive/5'}`}>
                 <p className="text-[10px] font-bold text-foreground mb-1 truncate">{h.targetName}</p>
-                <div className="grid grid-cols-3 gap-1">
+                <div className={`grid gap-1 ${h.ids.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                   {h.ids.map(id => (
                     <div key={id} className="aspect-square rounded overflow-hidden">
                       <WeedImage weedId={id} stage={h.stage} className="w-full h-full object-cover" />
