@@ -176,11 +176,11 @@ function shuffle<T>(a: T[]): T[] { return [...a].sort(() => Math.random() - 0.5)
 // photo of the plant before students start assembling parts.
 const NAME_TO_WEED_ID: Record<string, string> = {
   'Dandelion': 'Dandelion',
-  'Giant Foxtail': 'Giant_foxtail',
-  'Canada Thistle': 'Canada_thistle',
-  'Common Milkweed': 'Common_milkweed',
-  'Lambsquarters': 'Common_lambsquarters',
-  'Wild Carrot': 'Wild_carrot',
+  'Giant Foxtail': 'giant-foxtail',
+  'Canada Thistle': 'canada-thistle',
+  'Common Milkweed': 'common_Milkweed',
+  'Lambsquarters': 'lambsquarters',
+  'Wild Carrot': 'Wild_Carrot',
   'Field Bindweed': 'Field_bindweed',
 };
 
