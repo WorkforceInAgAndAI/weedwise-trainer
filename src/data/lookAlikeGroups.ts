@@ -356,8 +356,130 @@ function noteFor(ids: string[], pool: PoolWeed[]): string {
     .join(" ");
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   GROUP NAMES
+   Every species belongs to a "look-alike family" theme so each group
+   card can be given a friendly, teachable title.
+   ═══════════════════════════════════════════════════════════════════ */
+const THEME_BY_ID: Record<string, string> = {
+  // Pigweeds
+  "palmer-amaranth": "The Pigweeds",
+  waterhemp: "The Pigweeds",
+  Redroot_pigweed: "The Pigweeds",
+  Asian_copperleaf: "The Pigweeds",
+  // Tumbleweed-type
+  kochia: "Tumbleweed Look-Alikes",
+  Russian_thistle: "Tumbleweed Look-Alikes",
+  lambsquarters: "Tumbleweed Look-Alikes",
+  // Grasses
+  "giant-foxtail": "The Foxtails",
+  "green-foxtail": "The Foxtails",
+  "yellow-foxtail": "The Foxtails",
+  Longspine_sandbur: "The Foxtails",
+  barnyardgrass: "Summer Annual Grasses",
+  "large-crabgrass": "Summer Annual Grasses",
+  Goosegrass: "Summer Annual Grasses",
+  Witchgrass: "Summer Annual Grasses",
+  Smooth_Witchgrass: "Summer Annual Grasses",
+  Woolly_cupgrass: "Summer Annual Grasses",
+  Nimblewill: "Summer Annual Grasses",
+  Quackgrass: "Cool-Season Grasses",
+  "annual-ryegrass": "Cool-Season Grasses",
+  Downy_brome: "Cool-Season Grasses",
+  Foxtail_barley: "Cool-Season Grasses",
+  "wild-oat": "Cool-Season Grasses",
+  johnsongrass: "Big Sorghum-Type Grasses",
+  Shattercane_Sorghums: "Big Sorghum-Type Grasses",
+  "yellow-nutsedge": "Grass-Like Imposters",
+  Field_Horsetail: "Grass-Like Imposters",
+  Scouringrush: "Grass-Like Imposters",
+  Star_of_Bethlehem: "Grass-Like Imposters",
+  Asiatic_dayflower: "Grass-Like Imposters",
+  Catchweed_bedstraw: "Grass-Like Imposters",
+  // Composites
+  "canada-thistle": "The Thistles",
+  Musk_thistle: "The Thistles",
+  Common_Burdock: "The Thistles",
+  Common_teasel: "The Thistles",
+  Common_mullein: "Tall Rosette Biennials",
+  Horseweed: "Tall Rosette Biennials",
+  Prickly_lettuce: "Milky-Sap Rosettes",
+  Dandelion: "Milky-Sap Rosettes",
+  "giant-ragweed": "The Ragweed Crew",
+  "common-ragweed": "The Ragweed Crew",
+  common_Cocklebur: "The Ragweed Crew",
+  "volunteer-sunflower": "The Ragweed Crew",
+  Marijuana: "The Ragweed Crew",
+  // Polygonaceae
+  "pennsylvania-smartweed": "The Smartweeds & Docks",
+  Ladysthumb: "The Smartweeds & Docks",
+  Water_smartweed: "The Smartweeds & Docks",
+  Curly_dock: "The Smartweeds & Docks",
+  Wild_buckwheat: "The Smartweeds & Docks",
+  // Vines
+  Field_bindweed: "The Climbing Vines",
+  Hedge_bindweed: "The Climbing Vines",
+  Tall_morningglory: "The Climbing Vines",
+  "Honey-vine_climbing_milkweed": "The Climbing Vines",
+  Burcucumber: "The Climbing Vines",
+  // Milky sap / upright perennials
+  common_Milkweed: "Milky-Sap Perennials",
+  Hemp_dogbane: "Milky-Sap Perennials",
+  commonPokeweed: "Milky-Sap Perennials",
+  "Wild_Four-o'clock": "Milky-Sap Perennials",
+  Spotted_spurge: "The Spurges & Mats",
+  Toothed_spurge: "The Spurges & Mats",
+  CommonChickweed: "The Spurges & Mats",
+  Mouseear_chickweed: "The Spurges & Mats",
+  White_campion: "The Spurges & Mats",
+  // Nightshades
+  Horsenettle: "The Nightshade Family",
+  Eastern_black_nightshade: "The Nightshade Family",
+  Buffalobur: "The Nightshade Family",
+  Smooth_Groundcherry: "The Nightshade Family",
+  Jimsonweed: "The Nightshade Family",
+  // Mallows
+  velvetleaf: "The Mallows",
+  Common_Mallow: "The Mallows",
+  Venice_mallow: "The Mallows",
+  Prickly_sida: "The Mallows",
+  // Umbels
+  Wild_Carrot: "The Carrot Family (Umbels)",
+  "poison-hemlock": "The Carrot Family (Umbels)",
+  "wild-parsnip": "The Carrot Family (Umbels)",
+  "golden-alexanders": "The Carrot Family (Umbels)",
+  caraway: "The Carrot Family (Umbels)",
+  // Mustards
+  Wild_mustard: "The Mustards",
+  yellow_Rocket: "The Mustards",
+  Shepherds_Purse: "The Mustards",
+  Field_Pennycress: "The Mustards",
+  Pinnate_tansymustard: "The Mustards",
+  "False_London-rocket": "The Mustards",
+  Garlic_mustard: "The Mustards",
+  // Mints / low spring weeds
+  Ground_ivy: "The Square-Stem Mints",
+  Henbit_deadnettle: "The Square-Stem Mints",
+  Corn_speedwell: "The Square-Stem Mints",
+};
+
+/** Friendly title for a look-alike group. */
+export function lookAlikeGroupName(ids: string[], pool: { id: string; commonName: string }[]): string {
+  const counts: Record<string, number> = {};
+  for (const id of ids) {
+    const t = THEME_BY_ID[id];
+    if (t) counts[t] = (counts[t] ?? 0) + 1;
+  }
+  const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  if (best && best[1] >= 2) return best[0];
+  const names = ids.map((id) => pool.find((w) => w.id === id)?.commonName ?? id);
+  return names.join(" vs ");
+}
+
 export interface LookAlikeGroup<T> {
   ids: string[];
+  name: string;
   weeds: T[];
   difference: string;
   stage: "flower" | "vegetative";
@@ -381,7 +503,7 @@ export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[], maxSize = 
     seenKeys.add(key);
     const members = ids.map((id) => pool.find((x) => x.id === id)!).filter(Boolean);
     if (members.length < 2) continue;
-    candidates.push({ ids, weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
+    candidates.push({ ids, name: lookAlikeGroupName(ids, pool), weeds: members, difference: noteFor(ids, pool), stage: lookAlikeStage(ids) });
   }
   // Drop any group whose species are already fully contained in a larger group,
   // so students don't see the same comparison repeated in smaller pieces.
