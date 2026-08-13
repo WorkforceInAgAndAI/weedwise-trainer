@@ -7684,34 +7684,39 @@ function TopicContent({
             <p>Allelopathy in weeds is the process where plants release biochemicals into the environment through their roots, leaves, or decaying tissues that <strong>inhibit the germination, growth, or development</strong> of neighboring plants.</p>
             <p>This chemical interference gives weeds a competitive advantage over crops, native plants, and even other weeds. Understanding allelopathy helps farmers see that weed impacts aren't limited to physical crowding or nutrient competition.</p>
           </div>
-          <h3 className="font-display font-bold text-foreground text-sm">Allelopathic Pathways</h3>
-          <div className="space-y-3">
-            {PATHWAYS.map(p => (
-              <div key={p.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                <p className="font-bold text-foreground">{p.label}</p>
-                <p className="text-sm text-muted-foreground">{p.desc}</p>
-              </div>
-            ))}
-          </div>
-          <h3 className="font-display font-bold text-foreground text-sm">Documented Allelopathic Weeds</h3>
-          <p className="text-xs text-muted-foreground -mt-2">Scroll to see species with peer-reviewed evidence of allelopathy.</p>
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-            {availableAllelo.map(e => (
-              <button
-                key={e.name}
-                onClick={() => e.weed && onSelectWeed(e.weed)}
-                className="flex-shrink-0 w-48 bg-card border border-border rounded-lg p-3 text-left hover:border-primary transition-colors"
-              >
-                <div className="w-full h-24 rounded-md overflow-hidden bg-muted mb-2">
-                  {e.weed && <WeedImage weedId={e.weed.id} stage="mature" className="w-full h-full" />}
+          <h3 className="font-display font-bold text-foreground text-sm">Allelopathic Pathways &amp; Their Weeds</h3>
+          <p className="text-xs text-muted-foreground -mt-2">Each pathway lists the documented species that use it. Weeds using more than one pathway appear in each group.</p>
+          <div className="space-y-4">
+            {PATHWAYS.map(p => {
+              const members = availableAllelo.filter(e => e.pathway.toLowerCase().includes(p.label.toLowerCase()));
+              return (
+                <div key={p.label} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                  <p className="font-bold text-foreground">{p.label}</p>
+                  <p className="text-sm text-muted-foreground">{p.desc}</p>
+                  {members.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic">No documented species in this course's weed list.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {members.map(e => (
+                        <button
+                          key={e.name}
+                          onClick={() => e.weed && onSelectWeed(e.weed)}
+                          className="bg-muted/30 border border-border rounded-lg p-3 text-left hover:border-primary transition-colors"
+                        >
+                          <div className="w-full h-24 rounded-md overflow-hidden bg-muted mb-2">
+                            {e.weed && <WeedImage weedId={e.weed.id} stage="mature" className="w-full h-full" />}
+                          </div>
+                          <p className="font-bold text-foreground text-xs">{e.name}</p>
+                          <p className="text-[10px] italic text-primary">{e.weed?.scientificName}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1"><strong>Compound:</strong> {e.compound}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <p className="font-bold text-foreground text-xs">{e.name}</p>
-                <p className="text-[10px] italic text-primary">{e.weed?.scientificName}</p>
-                <p className="text-[10px] text-foreground mt-1"><strong>Pathway:</strong> {e.pathway}</p>
-                <p className="text-[10px] text-muted-foreground mt-1"><strong>Compound:</strong> {e.compound}</p>
-                <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
-              </button>
-            ))}
+              );
+            })}
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Connection to Economic Thresholds</p>
