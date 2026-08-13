@@ -5711,8 +5711,8 @@ function TopicContent({
         { stage: "seedling", label: "Seedling" },
         { stage: "vegetative", label: "Vegetative" },
         { stage: "flower", label: "Reproductive" },
-        { stage: "whole", label: "Whole Plant" },
       ];
+      const elementaryStages = [{ stage: "whole", label: "Whole Plant" }];
 
       // Official look-alike groups, restricted to this grade's weed pool.
       const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
@@ -5754,7 +5754,7 @@ function TopicContent({
             </div>
 
             {/* All growth stages side by side */}
-            {(grade === "elementary" ? stages.slice(3) : stages).map((s) => (
+            {(grade === "elementary" ? elementaryStages : stages).map((s) => (
               <div key={s.stage}>
                 <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
                 <div className="grid grid-cols-2 gap-3">
