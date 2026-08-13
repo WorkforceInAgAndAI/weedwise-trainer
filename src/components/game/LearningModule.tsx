@@ -5744,7 +5744,7 @@ function TopicContent({
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <ClickableWeedName weed={a} onSelect={onSelectWeed} className="text-sm font-bold" />
-                {grade !== "elementary" && <div className="text-xs text-primary italic">{a.scientificName}</div>}
+                {dg !== "elementary" && <div className="text-xs text-primary italic">{a.scientificName}</div>}
                 <div className="text-[10px] text-muted-foreground">{a.family}</div>
                 <span
                   className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${a.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
@@ -5754,7 +5754,7 @@ function TopicContent({
               </div>
               <div className="text-center">
                 <ClickableWeedName weed={b} onSelect={onSelectWeed} className="text-sm font-bold" />
-                {grade !== "elementary" && <div className="text-xs text-primary italic">{b.scientificName}</div>}
+                {dg !== "elementary" && <div className="text-xs text-primary italic">{b.scientificName}</div>}
                 <div className="text-[10px] text-muted-foreground">{b.family}</div>
                 <span
                   className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${b.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
@@ -5765,7 +5765,7 @@ function TopicContent({
             </div>
 
             {/* All growth stages side by side */}
-            {(grade === "elementary" ? elementaryStages : stages).map((s) => (
+            {(dg === "elementary" ? elementaryStages : stages).map((s) => (
               <div key={s.stage}>
                 <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
                 <div className="grid grid-cols-2 gap-3">
@@ -5780,7 +5780,7 @@ function TopicContent({
             ))}
 
             {/* Ligule comparison for grasses */}
-            {showLigule && grade !== "elementary" && (
+            {showLigule && dg !== "elementary" && (
               <div>
                 <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">Ligule</div>
                 <div className="grid grid-cols-2 gap-3">
@@ -5891,7 +5891,7 @@ function TopicContent({
         );
       };
 
-      if (grade === "elementary") {
+      if (dg === "elementary") {
         return (
           <div className="space-y-5">
             <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
@@ -5913,7 +5913,7 @@ function TopicContent({
 
       return (
         <div className="space-y-4">
-          {grade === "middle" ? (
+          {dg === "middle" ? (
             <NotebookSection title="Look-Alike Species" subtitle="Entry 03 · Comparative ID">
               <div className="text-sm space-y-3">
                 <p>
@@ -6077,7 +6077,7 @@ function TopicContent({
         },
       ];
 
-      if (grade === "elementary") {
+      if (dg === "elementary") {
         // Curriculum-set placements. A species may belong to more than one
         // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
         const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
