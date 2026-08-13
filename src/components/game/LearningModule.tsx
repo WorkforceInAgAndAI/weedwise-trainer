@@ -5669,11 +5669,16 @@ function TopicContent({
        LOOK-ALIKES
     ═══════════════════════════════════════════════════════════ */
     case "look-alikes": {
+      // Every look-alike shown here must be inside this grade's weed pool.
+      const gradePool = weedsForGrade(grade);
+      const gradePoolIds = new Set(gradePool.map((w) => w.id));
       const seen = new Set<string>();
       const pairs: [Weed, Weed][] = [];
       topicWeeds.forEach((w) => {
-        const pairedWith = weeds.find((x) => x.id === w.lookAlike.id);
-        if (pairedWith && !seen.has(w.id) && !seen.has(pairedWith.id)) {
+        if (seen.has(w.id)) return;
+        const partnerId = officialPartners(w.id, gradePoolIds).find((id) => !seen.has(id));
+        const pairedWith = partnerId ? gradePool.find((x) => x.id === partnerId) : undefined;
+        if (pairedWith) {
           seen.add(w.id);
           seen.add(pairedWith.id);
           pairs.push([w, pairedWith]);
@@ -5683,12 +5688,13 @@ function TopicContent({
       // Build invasive vs native look-alike pairs for 6-8 and 9-12
       const invasiveNativePairs: [Weed, Weed][] = [];
       if (grade === "middle" || grade === "high") {
-        const invasiveWeeds = weeds.filter((w) => w.origin === "Introduced");
-        const nativeWeeds = weeds.filter((w) => w.origin === "Native");
+        const invasiveWeeds = gradePool.filter((w) => w.origin === "Introduced");
+        const nativeWeeds = gradePool.filter((w) => w.origin === "Native");
         const invNatSeen = new Set<string>();
         invasiveWeeds.forEach((inv) => {
+          const partners = officialPartners(inv.id, gradePoolIds);
           const nativeLookAlike = nativeWeeds.find(
-            (nat) => nat.family === inv.family && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
+            (nat) => partners.includes(nat.id) && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
           );
           if (nativeLookAlike) {
             invNatSeen.add(inv.id);
@@ -5705,15 +5711,14 @@ function TopicContent({
         { stage: "whole", label: "Whole Plant" },
       ];
 
-      // Curated 3-species look-alike groups live in @/data/lookAlikeGroups
-      // so the 6-8 Look-Alike practice game can share them.
-      const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = LOOKALIKE_TRIPLES
-        .map((t) => {
-          const ws = t.ids.map((id) => weeds.find((w) => w.id === id));
-          if (ws.some((w) => !w)) return null;
-          return { weeds: ws as Weed[], difference: t.difference };
-        })
-        .filter((g): g is { weeds: Weed[]; difference: string } => g !== null);
+      // Official look-alike groups, restricted to this grade's weed pool.
+      const lookAlikeGroups: { weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
+        weeds: g.weeds as Weed[],
+        difference: g.difference,
+      }));
+
+      // Species in this grade pool that have no look-alike on the official list yet.
+      const noLookAlikeWeeds = gradePool.filter((w) => NO_LOOKALIKE_IDS.includes(w.id));
 
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
         const aIsGrass = a.plantType === "Monocot" && a.family === "Poaceae";
