@@ -26,7 +26,6 @@ import WeedTravel from './practice-games/k5/WeedTravel';
 import InvasiveMatch from './practice-games/k5/InvasiveMatch';
 import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
-import WeedControl from './practice-games/k5/WeedControl';
 import GreatGardenRace from './practice-games/k5/GreatGardenRace';
 import SeedJourney from './practice-games/k5/SeedJourney';
 import WeedHeroSquad from './practice-games/k5/WeedHeroSquad';
@@ -102,7 +101,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'taxonomy-tower': 'monocot-dicot', 'look-alike': 'look-alikes', 'life-stages': 'life-stages',
   'life-cycle-match': 'life-cycles', 'habitat-mapping': 'habitats',
   'seed-banks': 'seeds', 'weed-travel': 'seeds', 'invasive-match': 'native-introduced',
-  'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety', 'weed-control': 'control-methods',
+  'invasive-id': 'native-introduced', 'safe-vs-toxic': 'safety',
   'great-garden-race': 'life-cycles',
   'seed-journey': 'seeds',
   'weed-hero-squad': 'control-methods',
@@ -160,9 +159,8 @@ const newK5Games: GameDef[] = [
  { id: 'weed-travel', name: 'Weed Travel', Icon: Wind, category: 'Seed Dispersal', description: 'Help a seed travel to a new location.', howToPlay: 'You are a seed! Choose the right dispersal method to overcome each obstacle on your journey.', component: WeedTravel },
  { id: 'invasive-id', name: 'Invasive ID', Icon: MapPin, category: 'Origin', description: 'Is this plant native or invasive?', howToPlay: 'Given a weed, its origin, and where it was found, decide if it is native or invasive.', component: InvasiveID },
  { id: 'safe-vs-toxic', name: 'Safe or Toxic?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are toxic?', howToPlay: 'A group of weeds appears — identify which one is toxic, learn why it is dangerous, then decide how to safely manage it.', component: SafeVsToxic },
- { id: 'weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'You are the agronomist — manage weeds in the field.', howToPlay: 'Weeds appear in a field. Click each, identify it, then choose the right control method.', component: WeedControl },
  { id: 'great-garden-race', name: 'The Great Garden Race', Icon: Trophy, category: 'Growth & Competition', description: 'Pac-Man style race — grab sun, water, and nutrients before the weed does!', howToPlay: 'Use arrow keys (or the on-screen D-pad) to steer your flower through the maze. Collect Sun, Water, and Nutrient pellets before the weed reaches them. After each day, both plants grow — but the weed grows faster per resource, so out-race it!', component: GreatGardenRace },
- { id: 'weed-hero-squad', name: 'Weed Hero Squad', Icon: Swords, category: 'Control Methods', description: 'Suit up as a weed-fighting superhero! Pick, Pull, Block, Outsmart, Eat, or Stop to rescue the crops.', howToPlay: 'Each mission shows a crop in danger and a weed villain. Choose the best of the 5 superpowers — Pull It, Block It, Outsmart It, Eat It, or Stop It — to defeat the weed and free the crop.', component: WeedHeroSquad },
+ { id: 'weed-hero-squad', name: 'Weed Hero Squad', Icon: Swords, category: 'Control Methods', description: 'Suit up as a weed-fighting superhero! Pick, Pull, Block, Outsmart, Swarm, or Stop to rescue the crops.', howToPlay: 'Each mission shows a crop in danger and a weed villain. Choose the best of the 5 superpowers — Pull It, Block It, Outsmart It, Swarm It, or Stop It — to defeat the weed and free the crop.', component: WeedHeroSquad },
  { id: 'plant-doctor', name: 'Plant Doctor', Icon: Stethoscope, category: 'What Plants Need', description: 'Sick plants walk into your clinic! Diagnose the sick part and prescribe what the plant needs.', howToPlay: 'Read the patient\u2019s symptom and case notes, spot which part is sick, then pick the missing resource — sunlight, water, nutrients, air, soil, or space — to heal the plant.', component: PlantDoctor },
  { id: 'fun-fact-detective', name: 'Fun Fact Detective', Icon: Search, category: 'Weed ID', description: 'Match each weed photo to its Fun Fact clue card from the 14 Weeds You Can Spot module!', howToPlay: 'Tap a clue card and then tap the weed photo you think it matches. Use the fun-fact hint (and the spot-it clue) to solve every case in the round.', component: FunFactDetective },
     { id: 'invasive-splat', name: 'Invasive Splat!', Icon: Droplets, category: 'Invasive Weeds', description: 'Splatter-art style! Drop the runny invasive paint blob and watch it spread across the meadow — just like a real invasive weed out-competes native plants.', howToPlay: 'Drag the invasive paint blob from the palette onto the meadow. The invasive "paint" is extra runny, so it spreads WAY farther than the native plants and covers whatever it lands on. Use your 2 blobs each round to see how fast an invasive can take over.', component: InvasiveSplat },
@@ -272,7 +270,7 @@ export default function PracticeHub({
    <>
      <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
       {/* Animated hero buddy keeps students company inside every game */}
-      <HeroBuddy defaultOpen={selectedGrade === 'newk5'} />
+      <HeroBuddy tips={[`${selectedGame.name}: ${selectedGame.description}`, selectedGame.howToPlay.split('. ')[0] + '.', `Tip for ${selectedGame.name} — ${selectedGame.howToPlay.split('. ').slice(1,2).join('') || 'take your time and look closely!'}`]} />
       {/* Standardized top nav bar for every practice game */}
       <div className="fixed top-0 left-0 right-0 z-[70] bg-card/95 backdrop-blur border-b-2 border-border shadow-card">
         <div className="max-w-[1400px] mx-auto px-3 sm:px-5 py-2 flex items-center gap-2 sm:gap-3">

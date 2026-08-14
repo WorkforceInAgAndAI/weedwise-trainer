@@ -29,20 +29,20 @@ const COLS = 6;
 const ROWS = 5;
 
 // tile => target tile. Positive = ladder (vine), negative meaning target<from = chute (weed)
-const VINES: Record<number, { to: number; reason: string; resource: string }> = {
-  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: '💧 Water' },
-  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: '☀️ Sunlight' },
-  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: '🌱 Nutrients' },
-  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: '🪱 Healthy soil' },
-  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: '🐝 Pollinator' },
+const VINES: Record<number, { to: number; reason: string; resource: string; day: string }> = {
+  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: '💧 Water', day: 'A nice rainy day' },
+  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: '☀️ Sunlight', day: 'A sunny warm day' },
+  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: '🌱 Nutrients', day: 'Plant fertilizer day' },
+  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: '🪱 Healthy soil', day: 'Earthworms loosen the soil' },
+  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: '🐝 Pollinator', day: 'Busy honeybee visit day' },
 };
 
-const WEEDS: Record<number, { to: number; reason: string; weed: string }> = {
-  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail' },
-  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed' },
-  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp' },
-  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle' },
-  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters' },
+const WEEDS: Record<number, { to: number; reason: string; weed: string; day: string }> = {
+  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail', day: 'A hungry insect swarm' },
+  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed', day: 'A blistering hot day' },
+  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp', day: 'A long dry drought' },
+  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle', day: 'A local flood event' },
+  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters', day: 'A late frost night' },
 };
 
 // Life stage banner based on tile position
@@ -220,10 +220,10 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
               const v = VINES[landed];
               const w = WEEDS[landed];
               if (v) {
-                setMessage({ text: `${v.resource} — ${v.reason}`, kind: 'vine' });
+                setMessage({ text: `${v.day} (${v.resource}) — ${v.reason}`, kind: 'vine' });
                 setTimeout(() => setTile(v.to), 500);
               } else if (w) {
-                setMessage({ text: `${w.weed} — ${w.reason}`, kind: 'weed' });
+                setMessage({ text: `${w.day} — ${w.reason} (${w.weed} takes over.)`, kind: 'weed' });
                 setTimeout(() => setTile(w.to), 500);
               }
               if (Math.min(BOARD_SIZE, startTile + final) >= BOARD_SIZE) {
@@ -325,8 +325,15 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
           </div>
         </div>
 
-        {/* Board */}
+        {/* Board — a growing-season wall calendar */}
         <div className="rounded-2xl border-4 border-amber-800/40 p-2 bg-gradient-to-b from-amber-50 to-amber-100 shadow-inner mb-3">
+          <div className="rounded-t-xl bg-primary text-primary-foreground text-center font-display font-extrabold py-1.5 mb-1">
+            🗓️ The Growing Season Calendar — 30 Days
+          </div>
+          <div className="grid gap-1 mb-1 text-center text-[9px] font-bold uppercase text-amber-900/70"
+            style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0,1fr))` }}>
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => <div key={d}>{d}</div>)}
+          </div>
           <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0,1fr))` }}>
             {Array.from({ length: BOARD_SIZE }, (_, i) => {
               const t = BOARD_SIZE - i; // fill top-to-bottom, but tiles start bottom
@@ -348,18 +355,26 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                 const isFinish = tileNum === BOARD_SIZE;
                 return (
                   <div key={`${r}-${c}`}
-                    className={`relative aspect-square rounded-lg border-2 flex flex-col items-center justify-center text-[10px] font-bold transition-all ${
+                    className={`relative aspect-square rounded-md border-2 overflow-hidden flex flex-col items-center justify-end p-0.5 text-[10px] font-bold transition-all ${
                       isPawn ? 'ring-4 ring-primary scale-105 z-10 ' : ''
                     }${
                       isFinish ? 'bg-gradient-to-br from-yellow-300 to-orange-400 border-orange-500' :
-                      v ? 'bg-gradient-to-br from-lime-200 to-green-300 border-green-500' :
-                      w ? 'bg-gradient-to-br from-red-200 to-rose-300 border-rose-500' :
-                      'bg-white/70 border-amber-300'
+                      v ? 'bg-green-100 border-green-500' :
+                      w ? 'bg-red-100 border-rose-500' :
+                      'bg-white border-amber-300'
                     }`}>
-                    <span className="absolute top-0.5 left-1 text-[9px] text-foreground/50">{tileNum}</span>
-                    {v && <span className="text-lg leading-none">🌿</span>}
-                    {w && <span className="text-lg leading-none">🌾</span>}
-                    {isFinish && <span className="text-lg leading-none">🌻</span>}
+                    <span className="absolute top-0 left-1 text-[11px] font-black text-foreground/60">{tileNum}</span>
+                    {v && (
+                      <span className="w-full text-[7px] sm:text-[8px] leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
+                        {v.day}
+                      </span>
+                    )}
+                    {w && (
+                      <span className="w-full text-[7px] sm:text-[8px] leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
+                        {w.day}
+                      </span>
+                    )}
+                    {isFinish && <span className="w-full text-[8px] leading-tight text-orange-900 text-center">🌻 Seed set!</span>}
                     {isPawn && (
                       <div className="absolute inset-0 flex items-center justify-start pl-0.5">
                         <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg animate-bounce">
@@ -380,8 +395,8 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
             )}
           </div>
           <div className="flex items-center justify-center gap-4 mt-2 text-[10px] text-foreground/70">
-            <span className="flex items-center gap-1">🌿 Resource (climb)</span>
-            <span className="flex items-center gap-1">🌾 Weed (slide)</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-200 border border-green-500" /> Good day (climb)</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-rose-200 border border-rose-500" /> Bad day (slide)</span>
             <span className="flex items-center gap-1">🌻 Seed set (goal)</span>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { weeds } from '@/data/weeds';
+import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import { Sun, Thermometer, Droplets, Wind } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';

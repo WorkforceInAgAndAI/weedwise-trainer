@@ -40,7 +40,7 @@ export const K5_ITEMS: StoreItem[] = [
   // Powers — used in the Farm module
   { id: 'k5-pull',   name: 'Super Strength Pull', cost: 100, category: 'power', desc: 'Yank a big weed right out of the ground.',        farmPerk: 'Farm action: pull one weed for free.' },
   { id: 'k5-mulch',  name: 'Mulch Blanket Blast', cost: 130, category: 'power', desc: 'Cover the soil so weed seeds stay asleep.',       farmPerk: 'Farm action: stops new weeds for one season.' },
-  { id: 'k5-goat',   name: 'Goat Squad Call',     cost: 150, category: 'power', desc: 'Hungry goats munch the weeds in a pasture.',      farmPerk: 'Farm action: clears weeds in one field corner.' },
+  { id: 'k5-goat',   name: 'Bug Squad Call',      cost: 150, category: 'power', desc: 'Hungry helper insects swarm the weeds in a pasture.', farmPerk: 'Farm action: clears weeds in one field corner.' },
   { id: 'k5-bee',    name: 'Pollinator Friends',  cost: 110, category: 'power', desc: 'Bees and butterflies help your crops.',           farmPerk: 'Farm bonus: extra yield at harvest.' },
   { id: 'k5-rain',   name: 'Rain Cloud Helper',   cost: 120, category: 'power', desc: 'Bring a gentle rain to thirsty crops.',           farmPerk: 'Farm action: water the crops once per season.' },
 ];

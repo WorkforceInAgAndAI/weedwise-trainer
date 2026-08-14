@@ -741,7 +741,7 @@ const TOPICS: Topic[] = [
     name: "The 5 Weed-Fighting Superheroes",
     icon: "control",
     description:
-      "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
+      "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Swarm It, and Stop It!",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -4193,7 +4193,7 @@ function TopicContent({
 
           {/* FLIP CARDS - front shows need, back shows the "weed steals" detail */}
           <p className="font-display font-extrabold text-amber-100 text-center text-base">🍽️ Tap a plate to flip it!</p>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {NEEDS.map((n) => (
               <FlipPlateCard key={n.key} n={n} />
             ))}
@@ -4636,7 +4636,7 @@ function TopicContent({
 
           {/* Steps arranged in a real CIRCLE (clockwise: top, right, bottom, left) */}
           <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle — Clockwise! ↻</p>
-          <div className="relative mx-auto w-full max-w-md aspect-square">
+          <div className="relative mx-auto w-full max-w-3xl aspect-[16/11]">
             {STEPS.map((s, i) => {
               // Clockwise positions: 0=top, 1=right, 2=bottom, 3=left
               const positions = [
@@ -4645,24 +4645,29 @@ function TopicContent({
                 "bottom-0 left-1/2 -translate-x-1/2",
                 "top-1/2 left-0 -translate-y-1/2",
               ];
+              // Steps 2 and 4 sit out to the sides with extra room to breathe.
+              const isSide = i === 1 || i === 3;
               return (
-                <div key={s.key} className={`absolute ${positions[i]} w-[46%] rounded-2xl border-2 p-3 ${s.bg} shadow`}>
+                <div
+                  key={s.key}
+                  className={`absolute ${positions[i]} ${isSide ? "w-[34%]" : "w-[42%]"} rounded-2xl border-2 p-4 ${s.bg} shadow-lg`}
+                >
                   <div
-                    className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}
+                    className={`absolute -top-4 -left-4 w-10 h-10 rounded-full ${s.dot} text-white text-lg font-extrabold flex items-center justify-center shadow-md`}
                   >
                     {i + 1}
                   </div>
-                  <p className="font-display font-extrabold text-foreground text-sm">
+                  <p className="font-display font-extrabold text-foreground text-base sm:text-lg">
                     {s.title.replace(/^Step \d+: /, "")}
                   </p>
-                  <p className="text-[10px] font-semibold text-muted-foreground mb-1">{s.season}</p>
-                  <p className="text-[11px] text-foreground leading-snug">{s.body}</p>
+                  <p className="text-xs font-semibold text-muted-foreground mb-1">{s.season}</p>
+                  <p className="text-xs sm:text-sm text-foreground leading-snug">{s.body}</p>
                 </div>
               );
             })}
             {/* Center clockwise arrow */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
-              <RotateCcw className="h-8 w-8 -scale-x-100" />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+              <RotateCcw className="h-12 w-12 -scale-x-100" />
             </div>
           </div>
           <p className="text-center text-xs text-muted-foreground italic">…and back to step 1! It never stops.</p>
@@ -4988,12 +4993,12 @@ function TopicContent({
         },
         {
           key: "eat",
-          hero: "Eat It!",
-          power: "Animal Allies",
-          emoji: "🐐",
+          hero: "Swarm It!",
+          power: "Bug Buddies",
+          emoji: "🐞",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
-          how: "Bring in helpers like goats, sheep, or bugs that love to munch on certain weeds.",
+          how: "Bring in helper insects like lady beetles, leaf beetles, and weevils that love to munch on certain weeds.",
           bestFor: "Hillsides, pastures, and places where machines or sprays are hard to use.",
           reallife: "This is called biological control.",
         },
@@ -5047,7 +5052,7 @@ function TopicContent({
 
           <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-primary mb-1">Remember the 5 Superpowers:</p>
-            <p>Pull It • Block It • Outsmart It • Eat It • Stop It.</p>
+            <p>Pull It • Block It • Outsmart It • Swarm It • Stop It.</p>
           </div>
         </div>
       );
@@ -6062,11 +6067,11 @@ function TopicContent({
         {
           key: "biological",
           title: "Biological Control",
-          emoji: "🐐",
+          emoji: "🐞",
           dot: "bg-accent",
           bg: "bg-accent/10 border-accent/40",
           what: "Using living helpers — like insects, animals, or tiny germs — to eat or weaken weeds.",
-          examples: "Beetles that munch on leafy spurge, or goats that love to eat prickly thistle.",
+          examples: "Lady beetles and leaf beetles that munch on leafy spurge, or thistle-feeding weevils on prickly thistle.",
           bestFor: "A good fit for pastures, parks, and wild areas where sprays are hard to use.",
         },
         {
@@ -6878,7 +6883,7 @@ function TopicContent({
             key: "biological",
             label: "Biological Control (Insects, Pathogens, Targeted Grazing)",
             description:
-              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing animal (goats, sheep) — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
+              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing insect release — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
             match: /biolog|insect|pathogen|biocontrol|graz/i,
           },
           {
@@ -9316,17 +9321,17 @@ function ToolShelf({ methods }: { methods: Method[] }) {
         (() => {
           const m = methods.find((x) => x.key === open)!;
           return (
-            <div className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
-              <p className="font-display font-bold text-foreground text-base">
+            <div className={`rounded-lg border-2 p-4 space-y-2 bg-amber-950/70 border-yellow-500/60`}>
+              <p className="font-display font-bold text-yellow-100 text-base">
                 {m.emoji} {m.title}
               </p>
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-yellow-50">
                 <strong>What it is:</strong> {m.what}
               </p>
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-yellow-50">
                 <strong>Examples:</strong> {m.examples}
               </p>
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-yellow-50">
                 <strong>When it works best:</strong> {m.bestFor}
               </p>
             </div>

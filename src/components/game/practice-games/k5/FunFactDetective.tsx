@@ -64,6 +64,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
+  const [wrongPicks, setWrongPicks] = useState<string[]>([]);
   const [done, setDone] = useState(false);
 
   const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
@@ -73,10 +74,15 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
   const answered = picked !== null;
   const isCorrect = answered && picked === round.answer.id;
 
+  // Students keep guessing until they find the right weed.
   const choose = (id: string) => {
-    if (answered) return;
-    setPicked(id);
-    if (id === round.answer.id) setScore(s => s + 1);
+    if (answered || wrongPicks.includes(id)) return;
+    if (id === round.answer.id) {
+      setPicked(id);
+      if (wrongPicks.length === 0) setScore(s => s + 1);
+    } else {
+      setWrongPicks(w => [...w, id]);
+    }
   };
 
   const next = () => {
@@ -85,6 +91,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
     } else {
       setStep(s => s + 1);
       setPicked(null);
+      setWrongPicks([]);
     }
   };
 
@@ -92,6 +99,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
     setStep(0);
     setScore(0);
     setPicked(null);
+    setWrongPicks([]);
     setDone(false);
   };
 
@@ -166,20 +174,20 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {round.choices.map(w => {
-            const isPick = picked === w.id;
+            const isWrong = wrongPicks.includes(w.id);
             const isAnswer = w.id === round.answer.id;
-            const state = !answered
-              ? 'border-border hover:border-primary hover:scale-[1.02]'
-              : isAnswer
-                ? 'border-emerald-500 ring-4 ring-emerald-300'
-                : isPick
-                  ? 'border-red-500 ring-4 ring-red-300'
-                  : 'border-border opacity-50';
+            const state = answered && isAnswer
+              ? 'border-emerald-500 ring-4 ring-emerald-300'
+              : isWrong
+                ? 'border-red-500 ring-4 ring-red-300 opacity-60'
+                : answered
+                  ? 'border-border opacity-50'
+                  : 'border-border hover:border-primary hover:scale-[1.02]';
             return (
               <button
                 key={w.id}
                 onClick={() => choose(w.id)}
-                disabled={answered}
+                disabled={answered || isWrong}
                 className={`relative rounded-2xl overflow-hidden border-4 transition-all bg-card shadow-md ${state}`}
                 aria-label={`Choose ${w.name}`}
               >
@@ -188,7 +196,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
                 </div>
                 <div className={`py-3 px-2 text-center font-display font-extrabold text-lg
                   ${answered && isAnswer ? 'bg-emerald-500 text-white' :
-                    answered && isPick    ? 'bg-red-500 text-white' :
+                    isWrong               ? 'bg-red-500 text-white' :
                                             'bg-card text-foreground'}`}>
                   {w.name}
                 </div>
@@ -197,7 +205,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
                     <Check className="w-6 h-6 text-white" />
                   </div>
                 )}
-                {answered && isPick && !isAnswer && (
+                {isWrong && (
                   <div className="absolute top-2 right-2 bg-red-500 rounded-full p-1.5 shadow">
                     <X className="w-6 h-6 text-white" />
                   </div>
@@ -208,20 +216,23 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
         </div>
 
         {/* Feedback + next button */}
-        {answered && (
-          <div className={`mt-5 rounded-2xl p-5 border-4 animate-scale-in
-            ${isCorrect ? 'bg-emerald-50 border-emerald-400' : 'bg-amber-50 border-amber-400'}`}>
+        {!answered && wrongPicks.length > 0 && (
+          <div className="mt-5 rounded-2xl p-5 border-4 bg-amber-50 border-amber-400 animate-scale-in">
             <div className="text-2xl font-extrabold text-foreground mb-2 flex items-center gap-2">
-              {isCorrect
-                ? <><Check className="w-7 h-7 text-emerald-600" /> Case solved!</>
-                : <><X className="w-7 h-7 text-red-600" /> Not quite!</>
-              }
+              <X className="w-7 h-7 text-red-600" /> Not quite — keep looking!
             </div>
             <p className="text-base text-foreground leading-snug">
-              {isCorrect
-                ? <>Nice detective work! That was <strong>{round.answer.name}</strong>.</>
-                : <>The answer was <strong>{round.answer.name}</strong>. Look for: {round.answer.hint}</>
-              }
+              That one is not it. Re-read the clue and tap another picture: {round.answer.hint}
+            </p>
+          </div>
+        )}
+        {answered && (
+          <div className="mt-5 rounded-2xl p-5 border-4 animate-scale-in bg-emerald-50 border-emerald-400">
+            <div className="text-2xl font-extrabold text-foreground mb-2 flex items-center gap-2">
+              <Check className="w-7 h-7 text-emerald-600" /> Case solved!
+            </div>
+            <p className="text-base text-foreground leading-snug">
+              Nice detective work! That was <strong>{round.answer.name}</strong>.
             </p>
             <div className="mt-3 rounded-lg bg-yellow-50 border-2 border-yellow-400 p-3">
               <div className="text-[11px] font-extrabold uppercase tracking-wide text-yellow-800 mb-1">Remember it in the field</div>

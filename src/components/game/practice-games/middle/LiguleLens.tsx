@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { collegiateWeedsAll as weeds } from '@/data/gradeWeeds';
 import { hasImage } from '@/lib/imageMap';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { elementaryWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
@@ -321,7 +321,10 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
           className="max-w-md mx-auto mb-3"
           message={`One of these ${r!.group.length} weeds is toxic. Look at leaves, stems, and flowers — then tap your guess!`}
         />
-        <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-4">
+        <div
+          className="grid gap-3 max-w-3xl mx-auto mb-4"
+          style={{ gridTemplateColumns: `repeat(${r!.group.length}, minmax(0,1fr))` }}
+        >
           {r!.group.map(w => (
             <button key={w.id} onClick={() => !identified && setSelected(w.id)}
               className={`rounded-xl overflow-hidden border-2 transition-all ${
@@ -336,8 +339,8 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
         </div>
         {!identified && selected && (
           <button onClick={() => { identify(); setShowToxicAnswer(true); }}
-            className="w-full max-w-sm mx-auto block py-3 rounded-lg bg-destructive text-destructive-foreground font-bold">
-            That's the toxic one!
+            className="w-full max-w-sm mx-auto block py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+            Lock in my guess
           </button>
         )}
       </div>

@@ -152,6 +152,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   // Keyboard controls
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.repeat) return; // held keys must not sprint the flower across cells
       const map: Record<string, Pos> = {
         ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 },
         ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 },

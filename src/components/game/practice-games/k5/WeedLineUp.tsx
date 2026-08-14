@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { weeds } from '@/data/weeds';
+import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
