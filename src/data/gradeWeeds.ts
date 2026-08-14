@@ -59,8 +59,8 @@ export const ELEMENTARY_WEED_IDS: string[] = [
  * `weeds` list down to these IDs so students only see the species defined
  * in the 6-8 curriculum.
  *
- * NOTE: `Henbit_deadnettle` covers both "Henbit" and "Purple deadnettle"
- * from the curriculum list — the dataset stores them as a single entry.
+ * NOTE: `Henbit_deadnettle` is the dataset id for Henbit (Lamium
+ * amplexicaule); the species is displayed simply as "Henbit".
  */
 export const MIDDLE_SCHOOL_WEED_IDS: string[] = [
   "barnyardgrass",
@@ -149,7 +149,6 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "Musk_thistle",
   "palmer-amaranth",
   "pennsylvania-smartweed",
-  "poison-hemlock",
   "Prickly_lettuce",
   "Quackgrass",
   "Redroot_pigweed",
@@ -169,6 +168,7 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "yellow_Rocket",
   "golden-alexanders",
   "Witchgrass",
+  "Ivyleaf_morningglory",
 ];
 
 const HIGH_ID_SET = new Set(HIGH_SCHOOL_WEED_IDS);

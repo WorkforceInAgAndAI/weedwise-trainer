@@ -1182,7 +1182,7 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
     title: "Climbing Vines",
     weedIds: ["Tall_morningglory", "Field_bindweed", "Hedge_bindweed", "Wild_buckwheat"],
     difference:
-      "All four are twining vines that climb on other plants. Tall Morningglory has big purple or blue bell-shaped flowers and heart-shaped leaves. Field Bindweed has small white or pink bell-shaped flowers (about an inch) and arrowhead leaves. Hedge Bindweed has much larger white bell-shaped flowers (2–3 inches) and bigger leaves with squared-off bottoms. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no bells — and a papery sheath where the leaf meets the stem.",
+      "All four are twining vines that climb on other plants. Common Morningglory has big purple or blue bell-shaped flowers and heart-shaped leaves. Field Bindweed has small white or pink bell-shaped flowers (about an inch) and arrowhead leaves. Hedge Bindweed has much larger white bell-shaped flowers (2–3 inches) and bigger leaves with squared-off bottoms. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no bells — and a papery sheath where the leaf meets the stem.",
   },
 ];
 
@@ -3747,7 +3747,7 @@ function TopicContent({
           "Canada thistle",
           "Caraway",
           "Common teasel",
-          "False London rocket",
+          "Tall Hedge Mustard",
           "Golden alexanders",
           "Musk thistle",
           "Pinnate tansymustard",
@@ -3794,7 +3794,7 @@ function TopicContent({
           "Horseweed",
           "Jimsonweed",
           "Kochia",
-          "Marijuana",
+          "Hemp",
           "Palmer amaranth",
           "Prickly sida",
           "Redroot pigweed",
@@ -3862,7 +3862,7 @@ function TopicContent({
           "Canada thistle",
           "Caraway",
           "Common teasel",
-          "False London rocket",
+          "Tall Hedge Mustard",
           "Golden alexanders",
           "Musk thistle",
           "Pinnate tansymustard",
@@ -3892,7 +3892,7 @@ function TopicContent({
           "Horseweed",
           "Jimsonweed",
           "Kochia",
-          "Marijuana",
+          "Hemp",
           "Palmer amaranth",
           "Prickly sida",
           "Redroot pigweed",
@@ -8151,7 +8151,7 @@ function TopicContent({
       const DIOECIOUS_SPECIES = [
         {
           id: "Marijuana",
-          name: "Marijuana",
+          name: "Hemp",
           maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
           femaleDesc: "Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes",
         },
@@ -8314,7 +8314,7 @@ function TopicContent({
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">In this group of weeds, there are 3 dioecious species:</p>
-            <p className="mt-1">Marijuana, Palmer Amaranth, and Waterhemp.</p>
+            <p className="mt-1">Hemp, Palmer Amaranth, and Waterhemp.</p>
             <p className="mt-2 text-xs text-muted-foreground">
               Look at each species profile below to learn the key differences between the male and female plants.
             </p>
@@ -8383,7 +8383,7 @@ function TopicContent({
         {
           label: "Physical Dormancy",
           desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
-          examples: ["Field Bindweed", "Hedge Bindweed", "Tall Morningglory", "Velvetleaf"],
+          examples: ["Field Bindweed", "Hedge Bindweed", "Common Morningglory", "Velvetleaf"],
         },
         {
           label: "Physiological Dormancy",

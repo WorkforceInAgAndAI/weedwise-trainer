@@ -13,7 +13,7 @@ const DIOECIOUS_CANDIDATES = [
  // Descriptions never use giveaway words (pollen, pistil, anther, male, female).
  { id: 'waterhemp', name: 'Waterhemp', maleDesc: 'Seed head is loose, soft, and feathery — tassels open up in the wind and dry quickly after shedding.', femaleDesc: 'Seed head is short, dense, and compact — packed tightly along the stem and heavy at maturity.' },
  { id: 'palmer-amaranth', name: 'Palmer Amaranth', maleDesc: 'Seed head is soft and drooping, with smooth flowers and no sharp bracts.', femaleDesc: 'Seed head is long, stiff, and bristly — covered in sharp bracts that feel prickly to touch.' },
- { id: 'Marijuana', name: 'Marijuana', maleDesc: 'Seed head is loose with hanging clusters of small greenish flowers on thin stalks.', femaleDesc: 'Seed head is dense and resinous, with tight bracts and small white threads at the stem nodes.' },
+ { id: 'Marijuana', name: 'Hemp', maleDesc: 'Seed head is loose with hanging clusters of small greenish flowers on thin stalks.', femaleDesc: 'Seed head is dense and resinous, with tight bracts and small white threads at the stem nodes.' },
  { id: 'Shattercane_Sorghums', name: 'Shattercane', maleDesc: 'Seed head is open and loose with feathery, wispy tips that dry and drop quickly at maturity.', femaleDesc: 'Seed head is compact with tightly clustered, plump seeds that ripen reddish-brown before shattering off the stalk.' },
 ];
 
