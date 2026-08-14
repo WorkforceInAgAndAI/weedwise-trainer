@@ -125,12 +125,21 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
       if (spawnTimer.current >= config.spawnEverySec) {
         spawnTimer.current = 0;
         setWeeds(list => {
+          // Never stack pictures: only spawn into a lane whose newest weed has
+          // already marched well clear of the top of the field.
+          const topOf = (lane: number) => {
+            const inLane = list.filter(w => w.lane === lane);
+            return inLane.length ? Math.min(...inLane.map(w => w.pos)) : 999;
+          };
+          const openLanes = [0, 1, 2].filter(l => topOf(l) > 26);
+          if (!openLanes.length) return list;
+          const lane = openLanes[Math.floor(Math.random() * openLanes.length)];
           const spec = WEED_POOL[Math.floor(Math.random() * WEED_POOL.length)];
           const speed = config.speedMin + Math.random() * (config.speedMax - config.speedMin);
           const hp = 1 + (Math.random() < 0.25 && level >= 2 ? 1 : 0);
           return [...list, {
             id: nextId.current++,
-            lane: Math.floor(Math.random() * LANES),
+            lane,
             pos: 0,
             speed,
             hp,
@@ -211,7 +220,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   };
 
   const restart = () => {
-    nextId.current = 1; spawnTimer.current = 0;
+    nextId.current = 1; spawnTimer.current = 9999; // first weed appears right away
     setScore(0); setCropHp(CROP_HP_START); setEnergy(ENERGY_MAX); setWeeds([]);
     setSelected(null); setCooldowns({ pull: 0, block: 0, outsmart: 0, eat: 0, stop: 0 });
     setDefeated(0); setEscaped(0); setRunning(true); setDone(false); setFeedback(null);
