@@ -4797,7 +4797,7 @@ function TopicContent({
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
           how: "These seeds float! Rain, puddles, and streams carry them to new spots.",
-          example: "Curly Dock seeds ride streams like little surfboards!",
+          example: "Curly dock seeds ride streams like little surfboards!",
           extras: "Other surfers: Smartweed and marsh weeds.",
           image: surfSeedImg,
           imageAlt: "Cartoon seed with a surfboard heading to the beach",
