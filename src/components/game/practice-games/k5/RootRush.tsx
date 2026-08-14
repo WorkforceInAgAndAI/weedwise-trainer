@@ -133,6 +133,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
   const [totalPossible, setTotalPossible] = useState(0);
   const [done, setDone] = useState(false);
   const [pulseIdx, setPulseIdx] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(DIG_SECONDS);
 
   const flashTimer = useRef<number | null>(null);
 
@@ -146,10 +147,28 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
     setSproutsClaimed(0);
     setScore(0);
     setMessage('');
+    setTimeLeft(DIG_SECONDS);
     setPhase('playing');
   };
 
   useEffect(() => () => { if (flashTimer.current) window.clearTimeout(flashTimer.current); }, []);
+
+  // One-minute digging timer.
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const t = window.setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          window.clearInterval(t);
+          flashRef.current?.('Time is up! The digging shift is over.');
+          window.setTimeout(() => endRoundRef.current?.(false, 0), 600);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(t);
+  }, [phase]);
 
   const tip = path[path.length - 1];
   const tipRow = tip !== undefined ? Math.floor(tip / COLS) : 0;
