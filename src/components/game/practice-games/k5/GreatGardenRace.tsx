@@ -129,10 +129,25 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
   const [showTally, setShowTally] = useState(false);
   const [done, setDone] = useState(false);
   const dirRef = useRef<Pos>({ x: 0, y: 0 });
+  const lastMoveRef = useRef(0);
   const [paused, setPaused] = useState(false);
   const [boostMs, setBoostMs] = useState(0); // flower speed boost time remaining
 
   const totalPellets = useMemo(() => buildPellets().length, []);
+
+  // One key press = exactly one step (1:1 movement).
+  const moveFlower = useCallback((d: Pos) => {
+    if (paused || showTally || done) return;
+    const now = performance.now();
+    if (now - lastMoveRef.current < 70) return; // debounce key auto-repeat bursts
+    lastMoveRef.current = now;
+    dirRef.current = d;
+    setFlower(prev => {
+      const nx = prev.x + d.x, ny = prev.y + d.y;
+      if (isWall(nx, ny)) return prev;
+      return { x: nx, y: ny };
+    });
+  }, [paused, showTally, done]);
 
   // Keyboard controls
   useEffect(() => {
@@ -143,25 +158,20 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
         w: { x: 0, y: -1 }, s: { x: 0, y: 1 }, a: { x: -1, y: 0 }, d: { x: 1, y: 0 },
       };
       const d = map[e.key];
-      if (d) { e.preventDefault(); dirRef.current = d; }
+      if (d) { e.preventDefault(); moveFlower(d); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [moveFlower]);
 
   // Game tick
   useEffect(() => {
     if (paused || showTally || done) return;
     const boosted = boostMs > 0;
-    const tickMs = boosted ? 130 : Math.max(120, Math.round(220 / diff.speed));
+    // Sunburst boost slows the weed down so the player can catch up.
+    const tickMs = boosted ? 620 : Math.max(260, Math.round(420 / diff.speed));
     const tick = setInterval(() => {
-      // Move flower in requested direction if not into a wall
-      setFlower(prev => {
-        const d = dirRef.current;
-        const nx = prev.x + d.x, ny = prev.y + d.y;
-        if (isWall(nx, ny)) return prev;
-        return { x: nx, y: ny };
-      });
+      // The flower only moves when the player presses a direction (1:1).
       // Weed AI moves toward nearest pellet
       setWeed(prev => {
         const step = nextStepTowardPellet(prev, pellets);
@@ -258,7 +268,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
     );
   }
 
-  const dPad = (dir: Pos) => () => { dirRef.current = dir; };
+  const dPad = (dir: Pos) => () => { moveFlower(dir); };
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto p-4">

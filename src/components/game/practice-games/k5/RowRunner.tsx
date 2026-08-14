@@ -5,6 +5,17 @@ import FarmerGuide from '@/components/game/FarmerGuide';
 import WeedImage from '@/components/game/WeedImage';
 import { elementaryWeeds } from '@/data/gradeWeeds';
 import { getDifficulty } from '@/lib/difficulty';
+import { getCropImages } from '@/lib/imageMap';
+
+// Real crop photos (same set used by the K-5 "Weed or Crop?" game).
+const CROP_FOLDERS = ['Alfalfa', 'Barley', 'Canola', 'Corn', 'Cotton', 'Field Peas', 'Millet', 'Mungbean', 'Oats', 'Potatoes', 'Pumpkin', 'Rice', 'Sorghum', 'Soybean', 'Sugarcane', 'Wheat'];
+const CROP_PHOTOS: { name: string; url: string }[] = CROP_FOLDERS.flatMap(name =>
+  getCropImages(name).map(url => ({ name, url }))
+);
+function randomCropPhoto() {
+  if (CROP_PHOTOS.length === 0) return null;
+  return CROP_PHOTOS[Math.floor(Math.random() * CROP_PHOTOS.length)];
+}
 // -------- Row Runner (K-5 Explorer) --------------------------------------
 // Aerial "drone" view of a crop field scrolling vertically. Weeds pop up
 // between the crop rows. Kids click a weed to "snip" it, then drag it to
@@ -24,6 +35,8 @@ interface Sprite {
   id: number;
   kind: 'weed' | 'crop';
   weedId: string;   // for weeds only
+  cropName?: string; // for crops only
+  cropImage?: string; // for crops only
   lane: number;     // 0..ROW_COUNT-1
   y: number;        // px in area coords, top of sprite
   picked: boolean;  // being dragged
@@ -171,10 +184,13 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
       const isCrop = Math.random() < 0.28;
       const lane = Math.floor(Math.random() * ROW_COUNT);
       const w = elementaryWeeds[Math.floor(Math.random() * elementaryWeeds.length)];
+      const crop = isCrop ? randomCropPhoto() : null;
       spritesRef.current.push({
         id: ++idRef.current,
         kind: isCrop ? 'crop' : 'weed',
         weedId: w.id,
+        cropName: crop?.name,
+        cropImage: crop?.url,
         lane,
         y: -WEED_SIZE - Math.random() * 40,
         picked: false, removed: false, escaped: false,
@@ -459,14 +475,16 @@ export default function RowRunner({ onBack, gameId, gameName, gradeLabel }: Prop
                       </>
                     ) : (
                       <>
-                        <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden"
-                          style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }}>
-                          <div className="absolute inset-2 rounded-full opacity-70"
-                            style={{ background: 'repeating-radial-gradient(circle, #558b2f 0 6px, #33691e 6px 10px)' }} />
+                        <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden bg-emerald-900">
+                          {s.cropImage ? (
+                            <img src={s.cropImage} alt={s.cropName || 'Crop'} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full" style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }} />
+                          )}
                         </div>
                         {/* Label sits OUTSIDE the clipped circle so it reads on top */}
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
-                          Crop
+                          {s.cropName || 'Crop'}
                         </div>
                       </>
                     )}

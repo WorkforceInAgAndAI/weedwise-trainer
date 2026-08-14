@@ -103,6 +103,9 @@ function buildGrid(cfg: LevelCfg): { grid: Cell[]; start: number } {
   return { grid: cells, start };
 }
 
+// One-minute digging shift per tunnel.
+const DIG_SECONDS = 60;
+
 function buildCfg(levelIdx: number): LevelCfg {
   const base = LEVELS[levelIdx % LEVELS.length];
   const diff = getDifficulty(levelIdx + 1, 'k5');
@@ -133,8 +136,10 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
   const [totalPossible, setTotalPossible] = useState(0);
   const [done, setDone] = useState(false);
   const [pulseIdx, setPulseIdx] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(DIG_SECONDS);
 
   const flashTimer = useRef<number | null>(null);
+  const timeUpRef = useRef<() => void>(() => {});
 
   const startRound = (idx: number) => {
     const c = buildCfg(idx);
@@ -146,10 +151,27 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
     setSproutsClaimed(0);
     setScore(0);
     setMessage('');
+    setTimeLeft(DIG_SECONDS);
     setPhase('playing');
   };
 
   useEffect(() => () => { if (flashTimer.current) window.clearTimeout(flashTimer.current); }, []);
+
+  // One-minute digging timer.
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const t = window.setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          window.clearInterval(t);
+          timeUpRef.current();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(t);
+  }, [phase]);
 
   const tip = path[path.length - 1];
   const tipRow = tip !== undefined ? Math.floor(tip / COLS) : 0;
@@ -245,6 +267,12 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
     setPhase('roundEnd');
   };
 
+  // Keep the timer's end-of-shift callback pointing at the latest state.
+  timeUpRef.current = () => {
+    flash('Time is up! Your digging shift is over.');
+    window.setTimeout(() => endRound(false, 0), 600);
+  };
+
   const onNextLevel = () => {
     setDone(false);
     const next = levelIdx + 1;
@@ -292,7 +320,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
               </p>
             </div>
             <p className="text-sm text-amber-900/70 mb-4 italic">
-              Level {levelIdx + 1}: You are a <b>{cfg.weed}</b>. Spread to {cfg.goal} sprout points!
+              Level {levelIdx + 1}: You are a <b>{cfg.weed}</b>. Spread to {cfg.goal} sprout points — you have <b>1 minute</b> to dig!
             </p>
             <button
               onClick={() => startRound(levelIdx)}
@@ -358,6 +386,11 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
           <div className="flex items-center gap-1 text-amber-50 font-bold drop-shadow">
             <Sparkles className="w-4 h-4 text-emerald-600" />
             {sproutsClaimed}/{cfg.goal} sprouts
+          </div>
+          <div className={`flex items-center gap-1 font-black drop-shadow px-2 py-0.5 rounded-full border-2 ${
+            timeLeft <= 10 ? 'text-rose-100 bg-rose-700 border-rose-300 animate-pulse' : 'text-amber-50 bg-stone-900/70 border-amber-700'
+          }`}>
+            ⏱ {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
           </div>
           <div className="flex-1 flex items-center gap-2">
             <Zap className="w-4 h-4 text-yellow-300" />
@@ -428,16 +461,26 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
                   extraStyle.background = 'radial-gradient(circle, #fef08a 0%, #facc15 50%, #a16207 100%)';
                   extraStyle.boxShadow = '0 0 20px rgba(250,204,21,0.9), 0 0 40px rgba(250,204,21,0.5)';
                   // Cartoon worm-root with headlamp
+                  // Cartoon root tip wearing a miner's hard hat, holding a shovel
                   content = (
                     <svg viewBox="0 0 24 24" className="w-full h-full">
-                      <ellipse cx="12" cy="14" rx="7" ry="6" fill="#f0abfc" stroke="#701a75" strokeWidth="1.2" />
-                      <circle cx="9.5" cy="12" r="1.2" fill="#701a75" />
-                      <circle cx="14.5" cy="12" r="1.2" fill="#701a75" />
-                      <circle cx="9.8" cy="11.7" r="0.4" fill="#fff" />
-                      <circle cx="14.8" cy="11.7" r="0.4" fill="#fff" />
-                      <path d="M9 16 Q12 18 15 16" stroke="#701a75" strokeWidth="1" fill="none" strokeLinecap="round" />
-                      <circle cx="12" cy="6" r="2.2" fill="#fef08a" stroke="#a16207" strokeWidth="0.8" />
-                      <path d="M12 8 L12 10" stroke="#4a2c10" strokeWidth="1" />
+                      {/* wiggly root tail */}
+                      <path d="M4 21 Q8 19 9 15" stroke="#c084fc" strokeWidth="2" fill="none" strokeLinecap="round" />
+                      {/* root body */}
+                      <ellipse cx="12" cy="14" rx="6.2" ry="5.6" fill="#fbcfe8" stroke="#7e22ce" strokeWidth="1.1" />
+                      {/* face */}
+                      <circle cx="10" cy="13.2" r="1" fill="#4a1063" />
+                      <circle cx="14" cy="13.2" r="1" fill="#4a1063" />
+                      <circle cx="10.3" cy="12.9" r="0.35" fill="#fff" />
+                      <circle cx="14.3" cy="12.9" r="0.35" fill="#fff" />
+                      <path d="M10 16 Q12 17.6 14 16" stroke="#7e22ce" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+                      {/* hard hat */}
+                      <path d="M6.6 9.4 Q12 4.4 17.4 9.4 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="0.8" />
+                      <rect x="5.8" y="9.2" width="12.4" height="1.5" rx="0.7" fill="#fbbf24" stroke="#b45309" strokeWidth="0.6" />
+                      <circle cx="12" cy="7.4" r="1" fill="#fef08a" stroke="#b45309" strokeWidth="0.5" />
+                      {/* shovel */}
+                      <line x1="18.4" y1="17.8" x2="20.4" y2="10.4" stroke="#92400e" strokeWidth="1.2" strokeLinecap="round" />
+                      <path d="M17 17.4 Q18.6 21.4 20.4 17.6 Q19 16.6 17 17.4 Z" fill="#cbd5e1" stroke="#475569" strokeWidth="0.7" />
                     </svg>
                   );
                 }

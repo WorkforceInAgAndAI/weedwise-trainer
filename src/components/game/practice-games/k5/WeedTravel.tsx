@@ -18,8 +18,8 @@ interface SeedCharacter {
 
 const ALL_SEED_CANDIDATES: Omit<SeedCharacter, 'weedId'>[] = [
   // Trait values reflect verified dispersal mechanisms in published weed biology references.
-  // marestail (Conyza canadensis): tiny pappus seeds carried hundreds of km on wind.
-  { name: 'Marestail Seed', traits: { wind: 3, water: 1, animal: 1, heat: 2, cold: 2 }, description: 'Tiny pappus (parachute) seed — carried for miles on the wind.' },
+  // horseweed (Conyza canadensis): tiny pappus seeds carried hundreds of km on wind.
+  { name: 'Horseweed Seed', traits: { wind: 3, water: 1, animal: 1, heat: 2, cold: 2 }, description: 'Tiny pappus (parachute) seed — carried for miles on the wind.' },
   // morningglory (Ipomoea spp.): hard, water-resistant seed coat; spread by water/animals/equipment.
   { name: 'Morningglory Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Hard round seed coat — survives heat, water, and digestion.' },
   // giant ragweed (Ambrosia trifida): large, heavy seeds float and overwinter; spread mainly by water and equipment.
