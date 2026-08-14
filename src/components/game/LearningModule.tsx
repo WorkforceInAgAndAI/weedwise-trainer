@@ -4636,7 +4636,7 @@ function TopicContent({
 
           {/* Steps arranged in a real CIRCLE (clockwise: top, right, bottom, left) */}
           <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle — Clockwise! ↻</p>
-          <div className="relative mx-auto w-full max-w-md aspect-square">
+          <div className="relative mx-auto w-full max-w-3xl aspect-[16/11]">
             {STEPS.map((s, i) => {
               // Clockwise positions: 0=top, 1=right, 2=bottom, 3=left
               const positions = [
@@ -4645,24 +4645,29 @@ function TopicContent({
                 "bottom-0 left-1/2 -translate-x-1/2",
                 "top-1/2 left-0 -translate-y-1/2",
               ];
+              // Steps 2 and 4 sit out to the sides with extra room to breathe.
+              const isSide = i === 1 || i === 3;
               return (
-                <div key={s.key} className={`absolute ${positions[i]} w-[46%] rounded-2xl border-2 p-3 ${s.bg} shadow`}>
+                <div
+                  key={s.key}
+                  className={`absolute ${positions[i]} ${isSide ? "w-[34%]" : "w-[42%]"} rounded-2xl border-2 p-4 ${s.bg} shadow-lg`}
+                >
                   <div
-                    className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}
+                    className={`absolute -top-4 -left-4 w-10 h-10 rounded-full ${s.dot} text-white text-lg font-extrabold flex items-center justify-center shadow-md`}
                   >
                     {i + 1}
                   </div>
-                  <p className="font-display font-extrabold text-foreground text-sm">
+                  <p className="font-display font-extrabold text-foreground text-base sm:text-lg">
                     {s.title.replace(/^Step \d+: /, "")}
                   </p>
-                  <p className="text-[10px] font-semibold text-muted-foreground mb-1">{s.season}</p>
-                  <p className="text-[11px] text-foreground leading-snug">{s.body}</p>
+                  <p className="text-xs font-semibold text-muted-foreground mb-1">{s.season}</p>
+                  <p className="text-xs sm:text-sm text-foreground leading-snug">{s.body}</p>
                 </div>
               );
             })}
             {/* Center clockwise arrow */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
-              <RotateCcw className="h-8 w-8 -scale-x-100" />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+              <RotateCcw className="h-12 w-12 -scale-x-100" />
             </div>
           </div>
           <p className="text-center text-xs text-muted-foreground italic">…and back to step 1! It never stops.</p>
