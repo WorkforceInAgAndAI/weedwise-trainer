@@ -78,6 +78,8 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = {
   "lambsquarters": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "large-crabgrass": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "Longspine_sandbur": ["Fast germination", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal"],
+  "Common_copperleaf": ["Fast germination", "Seed dormancy", "High seed output"],
+  "Ivyleaf_morningglory": ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   "Marijuana": ["Fast germination", "Aggressive canopy", "Chemical defense", "Seed dormancy", "High seed output"],
   "Mouseear_chickweed": ["Fast germination", "Seed dormancy", "High seed output"],
   "Musk_thistle": ["Aggressive canopy", "Physical defense", "Seed dormancy", "High seed output", "Seed dispersal"],

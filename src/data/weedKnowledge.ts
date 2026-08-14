@@ -95,6 +95,8 @@ export const WEED_ARRIVAL_KNOWLEDGE: Record<string, WeedArrival> = {
   "yellow-foxtail": { method: "accident", continent: "europe", story: "Introduced from Europe via contaminated grain; warm-season annual spreading through farm equipment, water, and livestock movement across crop fields." },
   "yellow-nutsedge": { method: "accident", continent: "europe", story: "Introduced from Eurasia via contaminated soil and plant material; underground tubers persist for years and spread easily by tillage equipment." },
   "White_campion": { method: "accident", continent: "europe", story: "Introduced from Europe via contaminated crop and forage seed; nocturnal-blooming perennial spreading by seed through grain fields, roadsides, and meadows." },
+  "Common_copperleaf": { method: "native-spread", continent: "americas", story: "Native North American annual that moved out of woodland edges into crop fields and gardens; seeds spread by tillage, water, and equipment." },
+  "Ivyleaf_morningglory": { method: "accident", continent: "americas", story: "Introduced from tropical America in contaminated crop seed; hard-coated seeds survive in soil for years and spread with harvest equipment." },
   "Marijuana": { method: "purpose", continent: "asia", story: "Introduced from Central Asia for fiber and medicinal use; feral hemp persists from historical cultivation and spreads via seeds in disturbed areas." },
 };
 
@@ -147,6 +149,8 @@ export const WEED_TOP_MOAS: Record<string, [string, string, string]> = {
   "lambsquarters": ["psii-5", "als-post", "hppd"],
   "large-crabgrass": ["vlcfa-15", "accase", "microtubule-3"],
   "Longspine_sandbur": ["vlcfa-15", "accase", "microtubule-3"],
+  "Common_copperleaf": ["als-post", "ppo-post", "auxin"],
+  "Ivyleaf_morningglory": ["auxin", "als-post", "ppo-post"],
   "Marijuana": ["epsps", "auxin", "als-post"],
   "Mouseear_chickweed": ["als-post", "auxin", "epsps"],
   "Musk_thistle": ["auxin", "als-post", "epsps"],
