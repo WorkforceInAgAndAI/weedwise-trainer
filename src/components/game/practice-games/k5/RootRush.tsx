@@ -103,8 +103,10 @@ function buildGrid(cfg: LevelCfg): { grid: Cell[]; start: number } {
   return { grid: cells, start };
 }
 
+// One-minute digging shift per tunnel.
+const DIG_SECONDS = 60;
+
 function buildCfg(levelIdx: number): LevelCfg {
-  // One-minute digging shift per tunnel.
   const base = LEVELS[levelIdx % LEVELS.length];
   const diff = getDifficulty(levelIdx + 1, 'k5');
   const bump = diff.level - 1;
@@ -137,6 +139,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
   const [timeLeft, setTimeLeft] = useState(DIG_SECONDS);
 
   const flashTimer = useRef<number | null>(null);
+  const timeUpRef = useRef<() => void>(() => {});
 
   const startRound = (idx: number) => {
     const c = buildCfg(idx);
@@ -161,8 +164,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
       setTimeLeft(prev => {
         if (prev <= 1) {
           window.clearInterval(t);
-          flashRef.current?.('Time is up! The digging shift is over.');
-          window.setTimeout(() => endRoundRef.current?.(false, 0), 600);
+          timeUpRef.current();
           return 0;
         }
         return prev - 1;
