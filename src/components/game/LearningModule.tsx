@@ -9321,17 +9321,17 @@ function ToolShelf({ methods }: { methods: Method[] }) {
         (() => {
           const m = methods.find((x) => x.key === open)!;
           return (
-            <div className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
-              <p className="font-display font-bold text-foreground text-base">
+            <div className={`rounded-lg border-2 p-4 space-y-2 bg-amber-950/70 border-yellow-500/60`}>
+              <p className="font-display font-bold text-yellow-100 text-base">
                 {m.emoji} {m.title}
               </p>
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-yellow-50">
                 <strong>What it is:</strong> {m.what}
               </p>
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-yellow-50">
                 <strong>Examples:</strong> {m.examples}
               </p>
-              <p className="text-sm text-foreground">
+              <p className="text-sm text-yellow-50">
                 <strong>When it works best:</strong> {m.bestFor}
               </p>
             </div>
