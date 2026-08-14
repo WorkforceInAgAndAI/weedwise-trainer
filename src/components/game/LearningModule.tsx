@@ -1,6 +1,14 @@
 import { useState, useMemo } from "react";
 import { weeds } from "@/data/weeds";
-import { weedsForGrade, weedsForPool, type PoolGrade, elementaryWeeds, middleSchoolWeeds, highSchoolWeeds, collegiateWeedsAll } from "@/data/gradeWeeds";
+import {
+  weedsForGrade,
+  weedsForPool,
+  type PoolGrade,
+  elementaryWeeds,
+  middleSchoolWeeds,
+  highSchoolWeeds,
+  collegiateWeedsAll,
+} from "@/data/gradeWeeds";
 import type { GradeLevel, Weed } from "@/types/game";
 import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
@@ -8,10 +16,45 @@ import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
 import { lookAlikeStage, lookAlikeGroupsForPool, officialPartners } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
-import { ArrowLeft, X, Play, ThumbsUp, RotateCcw, Sprout, Trees, Leaf, Flower2, Sparkles, MapPin, Zap, Star, ChevronDown, Hand, ChevronLeft, ChevronRight, Check, HelpCircle, Target, Award, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  X,
+  Play,
+  ThumbsUp,
+  RotateCcw,
+  Sprout,
+  Trees,
+  Leaf,
+  Flower2,
+  Sparkles,
+  MapPin,
+  Zap,
+  Star,
+  ChevronDown,
+  Hand,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  HelpCircle,
+  Target,
+  Award,
+  Search,
+} from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
-import { DetectiveCard, EvidenceTag, CaseCallout, NotebookSection, FieldNote, SelfCheck, JournalHeader, KeyCouplet, TermSidebar, LabCallout, Citation } from "./learning/ThemedBlocks";
+import {
+  DetectiveCard,
+  EvidenceTag,
+  CaseCallout,
+  NotebookSection,
+  FieldNote,
+  SelfCheck,
+  JournalHeader,
+  KeyCouplet,
+  TermSidebar,
+  LabCallout,
+  Citation,
+} from "./learning/ThemedBlocks";
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
@@ -104,7 +147,9 @@ function ZoomableStagePhoto({
         aria-label={`Enlarge ${caption} photo`}
       >
         <WeedImage weedId={weedId} stage={stage} className="w-full h-full object-cover" />
-        <span className={`absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white ${badgeClass}`}>
+        <span
+          className={`absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded text-white ${badgeClass}`}
+        >
           {badge}
         </span>
         <span className="absolute top-1 right-1 opacity-70 group-hover:opacity-100 bg-background/80 rounded p-0.5">
@@ -158,8 +203,7 @@ function BiennialYearComparison({ compact = false, allowedIds }: { compact?: boo
   // have BOTH a Year 1 rosette photo and a Year 2 shoot photo, so the two
   // columns never fall back to the same image.
   const shown = BIENNIAL_YEAR_PHOTOS.filter(
-    (w) =>
-      (!allowedIds || allowedIds.has(w.id)) && hasStagePhoto(w.id, "rosette") && hasStagePhoto(w.id, "shoot"),
+    (w) => (!allowedIds || allowedIds.has(w.id)) && hasStagePhoto(w.id, "rosette") && hasStagePhoto(w.id, "shoot"),
   );
   if (shown.length === 0) return null;
   return (
@@ -171,11 +215,13 @@ function BiennialYearComparison({ compact = false, allowedIds }: { compact?: boo
       </div>
       <p className="text-xs text-muted-foreground">
         Biennials look completely different in each year. In <strong>Year 1</strong> they stay low as a{" "}
-        <strong>rosette</strong>. In <strong>Year 2</strong> they <strong>bolt</strong> — a tall flowering shoot
-        shoots up, sets seed, and the plant dies.
+        <strong>rosette</strong>. In <strong>Year 2</strong> they <strong>bolt</strong> — a tall flowering shoot shoots
+        up, sets seed, and the plant dies.
       </p>
       <p className="text-[11px] text-muted-foreground italic">Tap any photo to enlarge it.</p>
-      <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+      <div
+        className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}
+      >
         {shown.map((w) => (
           <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
             <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
@@ -233,7 +279,13 @@ const PERENNIAL_UNDERGROUND_PHOTOS: { id: string; name: string; structure: strin
   { id: "yellow-nutsedge", name: "Yellow Nutsedge", structure: "Tubers (nutlets)" },
 ];
 
-function PerennialUndergroundComparison({ compact = false, allowedIds }: { compact?: boolean; allowedIds?: Set<string> }) {
+function PerennialUndergroundComparison({
+  compact = false,
+  allowedIds,
+}: {
+  compact?: boolean;
+  allowedIds?: Set<string>;
+}) {
   const shown = PERENNIAL_UNDERGROUND_PHOTOS.filter((w) => !allowedIds || allowedIds.has(w.id));
   if (shown.length === 0) return null;
   return (
@@ -242,14 +294,16 @@ function PerennialUndergroundComparison({ compact = false, allowedIds }: { compa
         Above vs. Below Ground — Real Perennials
       </div>
       <p className="text-xs text-muted-foreground">
-        Each pair shows <strong>two reproductive structures of the same plant</strong> — the aboveground shoot on
-        the left and the belowground overwintering structure on the right. Perennials can reproduce both by seed from
-        their flowers and vegetatively from <strong>rhizomes, taproots, tubers, stolons, or creeping roots</strong>.
-        Cutting the tops doesn't kill the plant; it regrows from these underground parts each spring, which is why
-        they're so difficult to control.
+        Each pair shows <strong>two reproductive structures of the same plant</strong> — the aboveground shoot on the
+        left and the belowground overwintering structure on the right. Perennials can reproduce both by seed from their
+        flowers and vegetatively from <strong>rhizomes, taproots, tubers, stolons, or creeping roots</strong>. Cutting
+        the tops doesn't kill the plant; it regrows from these underground parts each spring, which is why they're so
+        difficult to control.
       </p>
       <p className="text-[11px] text-muted-foreground italic">Tap any photo to enlarge it.</p>
-      <div className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+      <div
+        className={`grid gap-3 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}
+      >
         {shown.map((w) => (
           <div key={w.id} className="rounded-md overflow-hidden bg-card border border-border">
             <p className="text-[11px] font-bold text-foreground px-2 py-1 bg-muted/50 text-center">{w.name}</p>
@@ -331,11 +385,31 @@ function SeedBankDiagram() {
         {/* Deep soil */}
         <rect x="0" y="120" width="400" height="100" fill="#3f2a17" />
         {/* Labels */}
-        <text x="8" y="55" fontSize="11" fill="#fff">Leaf litter</text>
-        <text x="8" y="78" fontSize="11" fill="#fff">Topsoil — seeds sprout here</text>
-        <text x="8" y="140" fontSize="11" fill="#fff">Deep soil — seeds wait for years</text>
+        <text x="8" y="55" fontSize="11" fill="#fff">
+          Leaf litter
+        </text>
+        <text x="8" y="78" fontSize="11" fill="#fff">
+          Topsoil — seeds sprout here
+        </text>
+        <text x="8" y="140" fontSize="11" fill="#fff">
+          Deep soil — seeds wait for years
+        </text>
         {/* Seeds */}
-        {[[40,52],[120,55],[210,50],[320,54],[70,80],[160,90],[250,85],[340,95],[60,150],[140,170],[230,200],[300,160],[360,190]].map(([x,y],i)=> (
+        {[
+          [40, 52],
+          [120, 55],
+          [210, 50],
+          [320, 54],
+          [70, 80],
+          [160, 90],
+          [250, 85],
+          [340, 95],
+          [60, 150],
+          [140, 170],
+          [230, 200],
+          [300, 160],
+          [360, 190],
+        ].map(([x, y], i) => (
           <circle key={i} cx={x} cy={y} r={3.5} fill="#f5d678" stroke="#7a5a1f" strokeWidth="0.8" />
         ))}
         {/* Sprout from topsoil */}
@@ -439,7 +513,9 @@ function FlipPlateCard({
         style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
       >
         {/* Front — the plate */}
-        <div className={`absolute inset-0 rounded-full border-4 border-amber-700 shadow-lg flex flex-col items-center justify-center gap-1 [backface-visibility:hidden] ${n.bg}`}>
+        <div
+          className={`absolute inset-0 rounded-full border-4 border-amber-700 shadow-lg flex flex-col items-center justify-center gap-1 [backface-visibility:hidden] ${n.bg}`}
+        >
           {icons[n.key]}
           <p className="font-display font-extrabold text-foreground text-xs sm:text-sm">{n.title}</p>
           <p className="text-[9px] text-muted-foreground italic">flip me!</p>
@@ -509,7 +585,8 @@ const TOPICS: Topic[] = [
     id: "botany-terms",
     name: "Plant Parts & Botany Terms",
     icon: "leaf",
-    description: "Build the vocabulary every weed scout needs — petiole, sheath, ligule, bract, lobe, ocrea, raceme, umbel, tuber, nutlet, and more.",
+    description:
+      "Build the vocabulary every weed scout needs — petiole, sheath, ligule, bract, lobe, ocrea, raceme, umbel, tuber, nutlet, and more.",
     grades: ["elementary", "middle", "high"],
     category: "identification",
   },
@@ -517,7 +594,8 @@ const TOPICS: Topic[] = [
     id: "names",
     name: "Weed Names & ID",
     icon: "names",
-    description: "Recall common and scientific names while analyzing the key traits used to identify each species in the field.",
+    description:
+      "Recall common and scientific names while analyzing the key traits used to identify each species in the field.",
     grades: ["elementary", "middle", "high"],
     category: "identification",
   },
@@ -525,7 +603,8 @@ const TOPICS: Topic[] = [
     id: "monocot-dicot",
     name: "Monocot vs Dicot",
     icon: "monocot",
-    description: "Distinguish monocots from dicots by comparing leaf venation, seed structure, and overall growth habit.",
+    description:
+      "Distinguish monocots from dicots by comparing leaf venation, seed structure, and overall growth habit.",
     grades: ["elementary", "middle"],
     category: "identification",
   },
@@ -533,7 +612,8 @@ const TOPICS: Topic[] = [
     id: "look-alikes",
     name: "Look-Alike Species",
     icon: "lookalike",
-    description: "Compare easily confused weed pairs and evaluate the subtle features that separate one species from another.",
+    description:
+      "Compare easily confused weed pairs and evaluate the subtle features that separate one species from another.",
     grades: ["elementary", "middle", "high"],
     category: "identification",
   },
@@ -541,7 +621,8 @@ const TOPICS: Topic[] = [
     id: "native-introduced",
     name: "Native vs Introduced",
     icon: "origin",
-    description: "Differentiate native species from introduced ones and assess their ecological impact on Midwest cropland.",
+    description:
+      "Differentiate native species from introduced ones and assess their ecological impact on Midwest cropland.",
     grades: ["elementary", "middle", "high"],
     category: "identification",
   },
@@ -549,7 +630,8 @@ const TOPICS: Topic[] = [
     id: "taxonomy",
     name: "Taxonomy",
     icon: "taxonomy",
-    description: "Understand the scientific hierarchy used to classify and name every living organism from kingdom to species.",
+    description:
+      "Understand the scientific hierarchy used to classify and name every living organism from kingdom to species.",
     grades: ["middle", "high"],
     category: "identification",
   },
@@ -565,7 +647,8 @@ const TOPICS: Topic[] = [
     id: "dioecious",
     name: "Dioecious & Monoecious Weeds",
     icon: "dioecious",
-    description: "Compare weeds with separate male and female plants (dioecious) to those carrying both flower types on one plant (monoecious), and explain how this affects reproduction and control.",
+    description:
+      "Compare weeds with separate male and female plants (dioecious) to those carrying both flower types on one plant (monoecious), and explain how this affects reproduction and control.",
     grades: ["high"],
     category: "identification",
   },
@@ -573,7 +656,8 @@ const TOPICS: Topic[] = [
     id: "grass-id",
     name: "Grass Identification",
     icon: "families",
-    description: "Identify weedy grasses species-by-species using the ligule, auricles, collar, sheath, blade, and seed head — the characters that work before and after heading.",
+    description:
+      "Identify weedy grasses species-by-species using the ligule, auricles, collar, sheath, blade, and seed head — the characters that work before and after heading.",
     grades: ["middle", "high"],
     category: "identification",
   },
@@ -583,7 +667,8 @@ const TOPICS: Topic[] = [
     id: "life-stages",
     name: "Life Stages",
     icon: "stages",
-    description: "Identify weeds across seed, seedling, vegetative, and reproductive stages to support timely management decisions.",
+    description:
+      "Identify weeds across seed, seedling, vegetative, and reproductive stages to support timely management decisions.",
     grades: ["elementary", "middle", "high"],
     category: "lifecycle",
   },
@@ -591,7 +676,8 @@ const TOPICS: Topic[] = [
     id: "life-cycles",
     name: "Life Cycles",
     icon: "cycles",
-    description: "Compare annual, biennial, and perennial growth patterns and predict how each cycle influences control timing.",
+    description:
+      "Compare annual, biennial, and perennial growth patterns and predict how each cycle influences control timing.",
     grades: ["elementary", "middle", "high"],
     category: "lifecycle",
   },
@@ -607,7 +693,8 @@ const TOPICS: Topic[] = [
     id: "seed-dormancy",
     name: "Seed Dormancy",
     icon: "dormancy",
-    description: "Analyze how physical, physiological, chemical, and morphological dormancy allow seeds to survive harsh conditions.",
+    description:
+      "Analyze how physical, physiological, chemical, and morphological dormancy allow seeds to survive harsh conditions.",
     grades: ["high"],
     category: "lifecycle",
   },
@@ -623,7 +710,8 @@ const TOPICS: Topic[] = [
     id: "plant-needs",
     name: "What Plants Need",
     icon: "sun",
-    description: "Discover the five things every plant needs to grow — sunlight, water, air, nutrients, and space — and learn how weeds steal them from crops.",
+    description:
+      "Discover the five things every plant needs to grow — sunlight, water, air, nutrients, and space — and learn how weeds steal them from crops.",
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
@@ -632,7 +720,8 @@ const TOPICS: Topic[] = [
     id: "weed-problem-picnic",
     name: "Why Are Weeds a Problem?",
     icon: "control",
-    description: "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
+    description:
+      "Join the field picnic to see how uninvited weeds gobble up the sunlight, water, nutrients, and space that crops need to grow.",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -641,7 +730,8 @@ const TOPICS: Topic[] = [
     id: "intro-control-methods",
     name: "Ways to Control Weeds",
     icon: "control",
-    description: "Meet the five main kinds of weed control — physical, cultural, chemical, biological, and preventative — and see when each one is the right tool for the job.",
+    description:
+      "Meet the five main kinds of weed control — physical, cultural, chemical, biological, and preventative — and see when each one is the right tool for the job.",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -650,7 +740,8 @@ const TOPICS: Topic[] = [
     id: "weed-superheroes",
     name: "The 5 Weed-Fighting Superheroes",
     icon: "control",
-    description: "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
+    description:
+      "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -659,7 +750,8 @@ const TOPICS: Topic[] = [
     id: "plant-parts",
     name: "Parts of a Plant",
     icon: "leaf",
-    description: "Take a ground-up tour of a weed — from roots to stem to leaves to flowers to seeds — and learn what each part does for the plant.",
+    description:
+      "Take a ground-up tour of a weed — from roots to stem to leaves to flowers to seeds — and learn what each part does for the plant.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -668,7 +760,8 @@ const TOPICS: Topic[] = [
     id: "crop-vs-weed",
     name: "Crop or Weed?",
     icon: "leaf",
-    description: "Learn the difference between a crop and a weed — it's less about the plant and more about where it's growing.",
+    description:
+      "Learn the difference between a crop and a weed — it's less about the plant and more about where it's growing.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -677,7 +770,8 @@ const TOPICS: Topic[] = [
     id: "seasonal-life-cycle",
     name: "A Plant's Life Cycle",
     icon: "sun",
-    description: "Follow a plant's journey through the seasons — from tiny seed to sprout to flower to new seeds — and meet annuals and perennials.",
+    description:
+      "Follow a plant's journey through the seasons — from tiny seed to sprout to flower to new seeds — and meet annuals and perennials.",
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
@@ -686,7 +780,8 @@ const TOPICS: Topic[] = [
     id: "seed-travel",
     name: "How Do Weed Seeds Travel?",
     icon: "seed",
-    description: "Meet three clever seed travelers — parachute jumpers, water surfers, and animal hitchhikers — and see how weeds spread to new places.",
+    description:
+      "Meet three clever seed travelers — parachute jumpers, water surfers, and animal hitchhikers — and see how weeds spread to new places.",
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
@@ -695,7 +790,8 @@ const TOPICS: Topic[] = [
     id: "safe-vs-toxic-explorer",
     name: "Safe vs. Toxic Weeds",
     icon: "safety",
-    description: "Become a Plant Detective! Learn why some weeds are safe and others are toxic — and how to stay safe when you spot a plant you don't know.",
+    description:
+      "Become a Plant Detective! Learn why some weeds are safe and others are toxic — and how to stay safe when you spot a plant you don't know.",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -704,7 +800,8 @@ const TOPICS: Topic[] = [
     id: "invasive-playground",
     name: "Invasive Plants: The Playground Bullies",
     icon: "leaf",
-    description: "Ever played tag with someone way too fast? Meet invasive plants — the players who take over the playground and crowd out the natives.",
+    description:
+      "Ever played tag with someone way too fast? Meet invasive plants — the players who take over the playground and crowd out the natives.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -713,7 +810,8 @@ const TOPICS: Topic[] = [
     id: "root-tunnels",
     name: "The Secret Tunnels of Roots",
     icon: "leaf",
-    description: "Some weeds are secret underground explorers! Discover how creeping roots build hidden tunnels and pop up as brand-new plants.",
+    description:
+      "Some weeds are secret underground explorers! Discover how creeping roots build hidden tunnels and pop up as brand-new plants.",
     grades: [],
     plantExplorer: true,
     category: "lifecycle",
@@ -722,7 +820,8 @@ const TOPICS: Topic[] = [
     id: "distinctive-weeds",
     name: "14 Weeds You Can Spot!",
     icon: "leaf",
-    description: "Get to know 14 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
+    description:
+      "Get to know 14 famous weeds by sight — the yellow dandelion, sticky cocklebur, fuzzy foxtails, and more.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -731,7 +830,8 @@ const TOPICS: Topic[] = [
     id: "resource-race",
     name: "The Great Garden Race",
     icon: "competition",
-    description: "On your mark, get set, grow! Cheer on the crop and farmer as they race the weed for sunlight, water, and nutrients.",
+    description:
+      "On your mark, get set, grow! Cheer on the crop and farmer as they race the weed for sunlight, water, and nutrients.",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -740,7 +840,8 @@ const TOPICS: Topic[] = [
     id: "weed-helpers",
     name: "Weeds Can Be Helpers Too!",
     icon: "leaf",
-    description: "Not every weed is a bad guy! Discover three superpowers that make weeds helpful — feeding bees, holding soil, and loosening the earth.",
+    description:
+      "Not every weed is a bad guy! Discover three superpowers that make weeds helpful — feeding bees, holding soil, and loosening the earth.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -751,7 +852,8 @@ const TOPICS: Topic[] = [
     id: "safety",
     name: "Safety & Control",
     icon: "safety",
-    description: "Recognize dangerous and toxic species and apply basic safety practices when handling them in the field.",
+    description:
+      "Recognize dangerous and toxic species and apply basic safety practices when handling them in the field.",
     grades: ["elementary", "middle", "high"],
     category: "control",
   },
@@ -759,7 +861,8 @@ const TOPICS: Topic[] = [
     id: "control-methods",
     name: "Control Methods",
     icon: "control",
-    description: "Compare cultural, mechanical, biological, and chemical control methods and choose the right tool for each situation.",
+    description:
+      "Compare cultural, mechanical, biological, and chemical control methods and choose the right tool for each situation.",
     grades: ["elementary", "middle", "high"],
     category: "control",
   },
@@ -767,7 +870,8 @@ const TOPICS: Topic[] = [
     id: "field-scouting",
     name: "Field Scouting",
     icon: "scouting",
-    description: "Apply systematic walking patterns to scout fields and accurately estimate weed pressure across the season.",
+    description:
+      "Apply systematic walking patterns to scout fields and accurately estimate weed pressure across the season.",
     grades: ["middle", "high"],
     category: "control",
   },
@@ -991,9 +1095,7 @@ function HorizontalWeedRow({
                 <WeedImage weedId={w.id} stage={stage} className="w-full h-full" />
               </button>
               <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
-              {showScientific && (
-                <p className="text-[10px] text-primary italic leading-tight">{w.scientificName}</p>
-              )}
+              {showScientific && <p className="text-[10px] text-primary italic leading-tight">{w.scientificName}</p>}
             </div>
           ))}
         </div>
@@ -1108,9 +1210,12 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
         return (
           <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
-              {g.title} <span className="text-xs text-muted-foreground font-normal">({members.length} look-alikes)</span>
+              {g.title}{" "}
+              <span className="text-xs text-muted-foreground font-normal">({members.length} look-alikes)</span>
             </p>
-            <div className={`grid gap-3 ${members.length === 2 ? "grid-cols-2" : members.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}>
+            <div
+              className={`grid gap-3 ${members.length === 2 ? "grid-cols-2" : members.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}
+            >
               {members.map((w) => (
                 <div key={w.id} className="text-center">
                   <button
@@ -1189,9 +1294,12 @@ function WeedFlashcardDeck({
     return (
       <div className="bg-card border border-border rounded-xl shadow-card p-5 space-y-4">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>Card {index + 1} of {total}</span>
           <span>
-            <span className="text-success font-semibold">Confident: {confident.length}</span>{" · "}
+            Card {index + 1} of {total}
+          </span>
+          <span>
+            <span className="text-success font-semibold">Confident: {confident.length}</span>
+            {" · "}
             <span className="text-terracotta font-semibold">Review: {review.length}</span>
           </span>
         </div>
@@ -1252,9 +1360,7 @@ function WeedFlashcardDeck({
                   </>
                 ) : (
                   <>
-                    <p className="font-display font-bold text-foreground text-2xl sm:text-3xl">
-                      {current.commonName}
-                    </p>
+                    <p className="font-display font-bold text-foreground text-2xl sm:text-3xl">{current.commonName}</p>
                     <p className="text-sm italic text-primary">{current.scientificName}</p>
                     <p className="text-xs text-muted-foreground">
                       {current.plantType} • {current.lifeCycle}
@@ -1446,13 +1552,14 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   //   IPM Specialist (9-12)  -> full 86 species
   //   Collegiate             -> full 86 species
   const curriculumGrade: PoolGrade =
-    selectedGrade === "elementary" ? "elementary" :
-    selectedGrade === "middle" ? "middle" :
-    selectedGrade === "high" ? "high" :
-    "collegiate";
-  const [selectedTopic, setSelectedTopic] = useState<TopicId | null>(
-    (initialTopicId as TopicId) ?? null,
-  );
+    selectedGrade === "elementary"
+      ? "elementary"
+      : selectedGrade === "middle"
+        ? "middle"
+        : selectedGrade === "high"
+          ? "high"
+          : "collegiate";
+  const [selectedTopic, setSelectedTopic] = useState<TopicId | null>((initialTopicId as TopicId) ?? null);
   const [selectedWeed, setSelectedWeed] = useState<Weed | null>(null);
   const viewMode: "list" | "box" = "list";
 
@@ -1480,7 +1587,9 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   ];
 
   return (
-    <div className={`fixed inset-0 z-50 bg-background overflow-y-auto ${selectedGrade === "middle" ? "learning-middle" : ""}`}>
+    <div
+      className={`fixed inset-0 z-50 bg-background overflow-y-auto ${selectedGrade === "middle" ? "learning-middle" : ""}`}
+    >
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 py-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -1573,7 +1682,9 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 <div key={category.id}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`inline-block w-2 h-2 rounded-full ${category.dotClass}`} />
-                    <h3 className={`text-[11px] font-display font-bold uppercase tracking-wide ${category.headerClass}`}>
+                    <h3
+                      className={`text-[11px] font-display font-bold uppercase tracking-wide ${category.headerClass}`}
+                    >
                       {category.label}
                     </h3>
                   </div>
@@ -1585,9 +1696,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                           key={topic.id}
                           onClick={() => setSelectedTopic(topic.id)}
                           className={`px-3 py-2 rounded-md text-xs font-medium text-left transition-all duration-200 border ${
-                            isActive
-                              ? category.activeClass
-                              : `${category.cardClass} text-foreground/80`
+                            isActive ? category.activeClass : `${category.cardClass} text-foreground/80`
                           }`}
                         >
                           {topic.name}
@@ -1604,11 +1713,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 <h2 className="text-lg font-display font-bold text-foreground">
                   {TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
-                <PracticeButton
-                  topicId={selectedTopic}
-                  grade={sourceGrade}
-                  onOpenPractice={onOpenPractice}
-                />
+                <PracticeButton topicId={selectedTopic} grade={sourceGrade} onOpenPractice={onOpenPractice} />
               </div>
               <TopicContent
                 topicId={selectedTopic}
@@ -1635,7 +1740,9 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                     >
                       <ArrowLeft className="w-4 h-4 shrink-0" />
                       <span className="flex flex-col items-start leading-tight">
-                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Previous module</span>
+                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                          Previous module
+                        </span>
                         <span>{prev ? prev.name : "No previous module"}</span>
                       </span>
                     </button>
@@ -1726,16 +1833,9 @@ function MSStageViewer({ weedId }: { weedId: string }) {
 
 type NailStatus = "unseen" | "review" | "confident";
 
-function MiddleSchoolNamesModule({
-  weeds: pool,
-  onSelectWeed,
-}: {
-  weeds: Weed[];
-  onSelectWeed: (w: Weed) => void;
-}) {
+function MiddleSchoolNamesModule({ weeds: pool, onSelectWeed }: { weeds: Weed[]; onSelectWeed: (w: Weed) => void }) {
   const [status, setStatus] = useState<Record<string, NailStatus>>({});
-  const mark = (id: string, s: NailStatus) =>
-    setStatus((prev) => ({ ...prev, [id]: prev[id] === s ? "unseen" : s }));
+  const mark = (id: string, s: NailStatus) => setStatus((prev) => ({ ...prev, [id]: prev[id] === s ? "unseen" : s }));
 
   const confidentCount = Object.values(status).filter((s) => s === "confident").length;
   const reviewCount = Object.values(status).filter((s) => s === "review").length;
@@ -1754,12 +1854,12 @@ function MiddleSchoolNamesModule({
           </div>
           <p className="text-sm text-foreground">
             Weeds are sneaky. The same plant can look totally different as a <strong>seedling</strong>, a leafy{" "}
-            <strong>teen plant</strong>, and a grown-up with <strong>flowers or seedheads</strong>. Your job:
-            study each suspect's disguises, then decide if you cracked the ID or need another look.
+            <strong>teen plant</strong>, and a grown-up with <strong>flowers or seedheads</strong>. Your job: study each
+            suspect's disguises, then decide if you cracked the ID or need another look.
           </p>
           <CaseCallout heading="How to work the case">
-            Tap the arrows to flip through each weed's three life stages. Hit{" "}
-            <strong>Cracked it</strong> when you're sure or <strong>Reopen</strong> to come back later. Your case log fills up on the right.
+            Tap the arrows to flip through each weed's three life stages. Hit <strong>Cracked it</strong> when you're
+            sure or <strong>Reopen</strong> to come back later. Your case log fills up on the right.
           </CaseCallout>
         </div>
       </DetectiveCard>
@@ -1777,8 +1877,8 @@ function MiddleSchoolNamesModule({
                   st === "confident"
                     ? "border-success/60 shadow-sm"
                     : st === "review"
-                    ? "border-accent/60 shadow-sm"
-                    : "border-border hover:border-primary/30 hover:shadow-card-hover"
+                      ? "border-accent/60 shadow-sm"
+                      : "border-border hover:border-primary/30 hover:shadow-card-hover"
                 }`}
               >
                 <MSStageViewer weedId={w.id} />
@@ -1842,10 +1942,7 @@ function MiddleSchoolNamesModule({
               <span className="text-xs text-muted-foreground">{pct}%</span>
             </div>
             <div className="h-2 rounded-full bg-secondary overflow-hidden">
-              <div
-                className="h-full bg-success transition-all"
-                style={{ width: `${pct}%` }}
-              />
+              <div className="h-full bg-success transition-all" style={{ width: `${pct}%` }} />
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
               {reviewCount} case{reviewCount === 1 ? "" : "s"} reopened
@@ -1863,15 +1960,17 @@ function MiddleSchoolNamesModule({
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-success font-bold mb-1.5">Solved</p>
                   <ul className="space-y-1">
-                    {pool.filter((w) => status[w.id] === "confident").map((w) => (
-                      <li key={w.id} className="flex items-center gap-2 text-xs">
-                        <div className="w-6 h-6 rounded overflow-hidden bg-muted shrink-0">
-                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
-                        </div>
-                        <span className="text-foreground truncate">{w.commonName}</span>
-                        <Check className="w-3 h-3 text-success ml-auto shrink-0" />
-                      </li>
-                    ))}
+                    {pool
+                      .filter((w) => status[w.id] === "confident")
+                      .map((w) => (
+                        <li key={w.id} className="flex items-center gap-2 text-xs">
+                          <div className="w-6 h-6 rounded overflow-hidden bg-muted shrink-0">
+                            <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-foreground truncate">{w.commonName}</span>
+                          <Check className="w-3 h-3 text-success ml-auto shrink-0" />
+                        </li>
+                      ))}
                   </ul>
                 </div>
               )}
@@ -1879,15 +1978,17 @@ function MiddleSchoolNamesModule({
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-accent font-bold mb-1.5">Reopened</p>
                   <ul className="space-y-1">
-                    {pool.filter((w) => status[w.id] === "review").map((w) => (
-                      <li key={w.id} className="flex items-center gap-2 text-xs">
-                        <div className="w-6 h-6 rounded overflow-hidden bg-muted shrink-0">
-                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
-                        </div>
-                        <span className="text-foreground truncate">{w.commonName}</span>
-                        <HelpCircle className="w-3 h-3 text-accent ml-auto shrink-0" />
-                      </li>
-                    ))}
+                    {pool
+                      .filter((w) => status[w.id] === "review")
+                      .map((w) => (
+                        <li key={w.id} className="flex items-center gap-2 text-xs">
+                          <div className="w-6 h-6 rounded overflow-hidden bg-muted shrink-0">
+                            <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-foreground truncate">{w.commonName}</span>
+                          <HelpCircle className="w-3 h-3 text-accent ml-auto shrink-0" />
+                        </li>
+                      ))}
                   </ul>
                 </div>
               )}
@@ -1932,12 +2033,7 @@ function TopicContent({
       // Uses the 34-species middle-school curriculum + multi-stage viewer +
       // "Weeds You Nailed" tracker.
       if (displayGrade === "middle") {
-        return (
-          <MiddleSchoolNamesModule
-            weeds={topicWeeds}
-            onSelectWeed={onSelectWeed}
-          />
-        );
+        return <MiddleSchoolNamesModule weeds={topicWeeds} onSelectWeed={onSelectWeed} />;
       }
       if (grade === "elementary") {
         return (
@@ -1945,13 +2041,13 @@ function TopicContent({
             <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-primary text-base">What Makes a Plant a Weed?</p>
               <p>
-                A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed in
-                a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out the
-                plants we want to keep, like crops in a farmer's field.
+                A <strong>weed</strong> is a plant growing where someone does not want it. The same plant can be a weed
+                in a corn field but a wildflower along a road. Weeds usually grow fast, spread easily, and can crowd out
+                the plants we want to keep, like crops in a farmer's field.
               </p>
               <p>
-                Each weed has a <strong>common name</strong> we use every day. Look at the picture, guess the name,
-                then tap the card to check yourself.
+                Each weed has a <strong>common name</strong> we use every day. Look at the picture, guess the name, then
+                tap the card to check yourself.
               </p>
             </div>
             <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
@@ -1964,24 +2060,25 @@ function TopicContent({
           <div className="space-y-5">
             <NotebookSection title="Common Names & Why They Fail" subtitle="Entry 01 · Nomenclature">
               <div className="text-sm space-y-3">
-              <p>
-                A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops or
-                other plants for <strong>sunlight, water, and nutrients</strong>. Plants are usually grouped as either
-                <strong> pest plants</strong> (those that cause harm, reduce yields, or crowd out the plants we want)
-                or <strong>beneficial plants</strong> (those that provide food, habitat, or improve the soil). A weed is
-                a pest plant in the place it is currently growing, even if the same species could be useful somewhere
-                else.
-              </p>
-              <p>
-                Weeds are frequently known by <strong>multiple common names</strong> that vary by region, state, and
-                country, which can create significant confusion in identification and communication among farmers,
-                scientists, and land managers.
-              </p>
-              <p>
-                A single plant species may carry entirely different names depending on geographic location, local
-                tradition, or historical usage. This inconsistency in naming makes accurate communication about weed
-                identification and management more difficult across different regions and disciplines.
-              </p>
+                <p>
+                  A weed is any plant growing where it is not wanted, often spreading quickly and competing with crops
+                  or other plants for <strong>sunlight, water, and nutrients</strong>. Plants are usually grouped as
+                  either
+                  <strong> pest plants</strong> (those that cause harm, reduce yields, or crowd out the plants we want)
+                  or <strong>beneficial plants</strong> (those that provide food, habitat, or improve the soil). A weed
+                  is a pest plant in the place it is currently growing, even if the same species could be useful
+                  somewhere else.
+                </p>
+                <p>
+                  Weeds are frequently known by <strong>multiple common names</strong> that vary by region, state, and
+                  country, which can create significant confusion in identification and communication among farmers,
+                  scientists, and land managers.
+                </p>
+                <p>
+                  A single plant species may carry entirely different names depending on geographic location, local
+                  tradition, or historical usage. This inconsistency in naming makes accurate communication about weed
+                  identification and management more difficult across different regions and disciplines.
+                </p>
               </div>
               <FieldNote label="Hypothesis">
                 If two farmers use different common names for the same plant, their control decisions will drift apart —
@@ -2000,18 +2097,18 @@ function TopicContent({
 
       // Collegiate (high) - Scientific Names / Binomial Nomenclature
       {
-        const waterhemp = topicWeeds.find(w => w.commonName === "Waterhemp") || topicWeeds[0];
-        const foxtails = topicWeeds.filter(w => w.scientificName.startsWith("Setaria"));
+        const waterhemp = topicWeeds.find((w) => w.commonName === "Waterhemp") || topicWeeds[0];
+        const foxtails = topicWeeds.filter((w) => w.scientificName.startsWith("Setaria"));
         return (
           <div className="space-y-5">
             <JournalHeader title="Binomial Nomenclature & Species Identity" subtitle="Lab Journal · Module 01" />
             <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
               <p>
-                Weeds are plants growing in undesirable locations. Weeds impact <strong>crop yields, input costs</strong>,
-                and overall farm success. According to the Weed Science Society of America, without weed control in corn,
-                soybean, and sugar beet fields across North America, farmers would lose roughly{" "}
-                <strong>50% of corn</strong>, <strong>52% of soybean</strong>, and <strong>72% of sugar beet</strong>{" "}
-                yields each year (
+                Weeds are plants growing in undesirable locations. Weeds impact{" "}
+                <strong>crop yields, input costs</strong>, and overall farm success. According to the Weed Science
+                Society of America, without weed control in corn, soybean, and sugar beet fields across North America,
+                farmers would lose roughly <strong>50% of corn</strong>, <strong>52% of soybean</strong>, and{" "}
+                <strong>72% of sugar beet</strong> yields each year (
                 <a
                   href="https://wssa.net/resources/weed-impacts-on-crop-yields/"
                   target="_blank"
@@ -2023,27 +2120,41 @@ function TopicContent({
                 ).
               </p>
               <p>
-                At a national and global level, scientists need more precise terms to ensure they are discussing the same
-                plant. Scientific names are written in the form of <strong>binomial nomenclature</strong>.
+                At a national and global level, scientists need more precise terms to ensure they are discussing the
+                same plant. Scientific names are written in the form of <strong>binomial nomenclature</strong>.
               </p>
               <Citation>Bradley, K. et al. Weed Science Society of America — Crop Loss Assessments.</Citation>
             </div>
 
             <LabCallout heading="Definition">
               <p>
-                Binomial nomenclature is the formal, two-term scientific system for naming plants, which uses terms
-                in Latin to state the <strong>genus</strong> and <strong>species</strong>. It was developed by
-                <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for species
-                worldwide.
+                Binomial nomenclature is the formal, two-term scientific system for naming plants, which uses terms in
+                Latin to state the <strong>genus</strong> and <strong>species</strong>. It was developed by
+                <strong> Carl Linnaeus</strong> in the 18th century to provide a standardized, universal name for
+                species worldwide.
               </p>
             </LabCallout>
 
-            <TermSidebar terms={[
-              { term: "Genus", def: "The first (capitalized, italicized) term — a group of closely related species sharing morphological and genetic traits." },
-              { term: "Species", def: "The second (lowercase, italicized) epithet identifying a specific organism within the genus." },
-              { term: "Authority", def: "The abbreviated name of the botanist who first described the species, sometimes appended after the binomial." },
-              { term: "Synonymy", def: "Alternate scientific names historically applied to the same taxon; only one is currently accepted." },
-            ]} />
+            <TermSidebar
+              terms={[
+                {
+                  term: "Genus",
+                  def: "The first (capitalized, italicized) term — a group of closely related species sharing morphological and genetic traits.",
+                },
+                {
+                  term: "Species",
+                  def: "The second (lowercase, italicized) epithet identifying a specific organism within the genus.",
+                },
+                {
+                  term: "Authority",
+                  def: "The abbreviated name of the botanist who first described the species, sometimes appended after the binomial.",
+                },
+                {
+                  term: "Synonymy",
+                  def: "Alternate scientific names historically applied to the same taxon; only one is currently accepted.",
+                },
+              ]}
+            />
 
             {/* Waterhemp example */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
@@ -2055,19 +2166,19 @@ function TopicContent({
                 <div className="space-y-3">
                   <p className="text-lg italic text-primary font-bold">{waterhemp.scientificName}</p>
                   <p className="text-sm text-foreground">
-                  Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
-                  edges, known for its smooth hairless stems and distinct leaf shape.
-                </p>
-                <div className="grid grid-cols-2 gap-2 max-w-sm">
-                  <div className="bg-primary/10 rounded-lg p-2 text-center">
-                    <p className="text-[10px] text-muted-foreground">GENUS</p>
-                    <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[0]}</p>
+                    Also known as <strong>{waterhemp.commonName}</strong>. A weed often found near rivers and wet field
+                    edges, known for its smooth hairless stems and distinct leaf shape.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 max-w-sm">
+                    <div className="bg-primary/10 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground">GENUS</p>
+                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(" ")[0]}</p>
+                    </div>
+                    <div className="bg-accent/10 rounded-lg p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground">SPECIES</p>
+                      <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(" ")[1]}</p>
+                    </div>
                   </div>
-                  <div className="bg-accent/10 rounded-lg p-2 text-center">
-                    <p className="text-[10px] text-muted-foreground">SPECIES</p>
-                    <p className="font-bold text-foreground italic">{waterhemp.scientificName.split(' ')[1]}</p>
-                  </div>
-                </div>
                 </div>
               </div>
             </div>
@@ -2077,11 +2188,11 @@ function TopicContent({
               <div className="bg-accent/10 border border-accent/30 rounded-lg p-5 space-y-3">
                 <p className="font-display font-bold text-foreground text-base">Genus Relationships: Foxtails</p>
                 <p className="text-sm text-foreground">
-                  Plants with scientific names closer in form can be more closely related. These foxtails all share
-                  the genus <strong className="italic">Setaria</strong>, showing their common lineage and characteristics.
+                  Plants with scientific names closer in form can be more closely related. These foxtails all share the
+                  genus <strong className="italic">Setaria</strong>, showing their common lineage and characteristics.
                 </p>
                 <div className="grid grid-cols-3 gap-3">
-                  {foxtails.slice(0, 3).map(w => (
+                  {foxtails.slice(0, 3).map((w) => (
                     <div key={w.id} className="bg-card border border-border rounded-lg p-3 text-center">
                       <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border mb-2">
                         <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
@@ -2098,8 +2209,8 @@ function TopicContent({
             <div className="bg-card border border-border rounded-lg p-5 space-y-4">
               <p className="font-display font-bold text-foreground text-base">Visual ID Reference</p>
               <p className="text-sm text-muted-foreground">
-                Each card pairs a reproductive-stage photo with the diagnostic features you would use in the field.
-                Use the image plus the trait list to narrow your ID, then confirm with the scientific name and family.
+                Each card pairs a reproductive-stage photo with the diagnostic features you would use in the field. Use
+                the image plus the trait list to narrow your ID, then confirm with the scientific name and family.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topicWeeds.map((w) => (
@@ -2118,7 +2229,8 @@ function TopicContent({
                       />
                       <p className="text-xs italic text-primary">{w.scientificName}</p>
                       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                        Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} • {w.lifeCycle}
+                        Family: <span className="text-foreground normal-case">{w.family}</span> • {w.plantType} •{" "}
+                        {w.lifeCycle}
                       </p>
                       {w.traits && w.traits.length > 0 && (
                         <ul className="text-xs text-foreground list-disc list-inside space-y-0.5">
@@ -2157,15 +2269,15 @@ function TopicContent({
                   sprout later.
                 </p>
                 <p>
-                  Seeds look different based on what weed they come from, and their characteristics can help them
-                  travel by <strong>wind, water, or by sticking to animals</strong>. Seeds can also have hard shells
-                  called a <strong>seed coat</strong> that protect them from damage and help them survive in the soil
-                  during cold winters.
+                  Seeds look different based on what weed they come from, and their characteristics can help them travel
+                  by <strong>wind, water, or by sticking to animals</strong>. Seeds can also have hard shells called a{" "}
+                  <strong>seed coat</strong> that protect them from damage and help them survive in the soil during cold
+                  winters.
                 </p>
                 <p>
-                  Seeds in seed banks can help us predict how many weeds will be in the field the next year. If you
-                  find lots of seeds of waterhemp in a seed bank, it is likely you will find many waterhemp plants in
-                  the area during the next growing season.
+                  Seeds in seed banks can help us predict how many weeds will be in the field the next year. If you find
+                  lots of seeds of waterhemp in a seed bank, it is likely you will find many waterhemp plants in the
+                  area during the next growing season.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <EvidenceTag label="Hidden clue" tone="clue" />
@@ -2192,10 +2304,10 @@ function TopicContent({
                   seed bank underground can reinfest it for years to come.
                 </p>
                 <p>
-                  <strong>Seed dispersal</strong> is how weeds spread their bets across the landscape. Different
-                  species have evolved remarkably creative ways to move their seeds far from the parent plant. Some,
-                  like dandelion and common ragweed, produce lightweight seeds with feathery attachments that float on
-                  the wind. Others, like common burdock and cocklebur, grow hooked burs that hitchhike on animal fur or
+                  <strong>Seed dispersal</strong> is how weeds spread their bets across the landscape. Different species
+                  have evolved remarkably creative ways to move their seeds far from the parent plant. Some, like
+                  dandelion and common ragweed, produce lightweight seeds with feathery attachments that float on the
+                  wind. Others, like common burdock and cocklebur, grow hooked burs that hitchhike on animal fur or
                   clothing — nature's version of velcro. Pokeweed and eastern black nightshade produce fleshy berries
                   that birds eat and then deposit far away, seeds and all, in a ready-made package of fertilizer.
                 </p>
@@ -2206,16 +2318,16 @@ function TopicContent({
                   resist digestion, drought, and even some herbicide applications.
                 </p>
                 <p>
-                  <strong>Timing germination</strong> is the final piece of the puzzle. Many weed seeds don't all
-                  sprout at once — they stagger their germination across weeks or even months. This is called
+                  <strong>Timing germination</strong> is the final piece of the puzzle. Many weed seeds don't all sprout
+                  at once — they stagger their germination across weeks or even months. This is called
                   <strong> germination staggering</strong>, and it's a brilliant survival hedge. If a late frost, a
                   herbicide application, or a drought wipes out the first wave of seedlings, the next wave is already
                   queued up and ready to go. It's the same reason you can spray a field and think you've won, only to
                   see a fresh flush of weeds emerge two weeks later.
                 </p>
                 <FieldNote label="Field observation">
-                  A "clean" field after a single herbicide pass is often a false victory — expect a second flush
-                  from staggered germination within 2–4 weeks.
+                  A "clean" field after a single herbicide pass is often a false victory — expect a second flush from
+                  staggered germination within 2–4 weeks.
                 </FieldNote>
                 <SelfCheck
                   question="Why can lambsquarters reinfest a field 40 years after the last plant went to seed?"
@@ -2226,10 +2338,22 @@ function TopicContent({
                   <dl className="text-xs space-y-1.5">
                     {[
                       ["Seed bank", "The reservoir of dormant seeds living in the soil, sometimes for many years."],
-                      ["Dormancy", "A seed's ability to pause development and wait until growing conditions are favorable."],
-                      ["Seed dispersal", "The ways seeds travel away from the parent plant — wind, animals, water, or hitchhiking."],
-                      ["Germination staggering", "When seeds in the same population sprout at different times, spreading the risk of total wipeout."],
-                      ["Seed coat", "The tough outer layer of a seed that protects it from physical damage, digestion, and harsh conditions."],
+                      [
+                        "Dormancy",
+                        "A seed's ability to pause development and wait until growing conditions are favorable.",
+                      ],
+                      [
+                        "Seed dispersal",
+                        "The ways seeds travel away from the parent plant — wind, animals, water, or hitchhiking.",
+                      ],
+                      [
+                        "Germination staggering",
+                        "When seeds in the same population sprout at different times, spreading the risk of total wipeout.",
+                      ],
+                      [
+                        "Seed coat",
+                        "The tough outer layer of a seed that protects it from physical damage, digestion, and harsh conditions.",
+                      ],
                       ["Viable", "A seed that is still alive and capable of germinating when conditions are right."],
                     ].map(([term, def]) => (
                       <div key={term} className="grid grid-cols-[10rem_1fr] gap-2">
@@ -2249,26 +2373,27 @@ function TopicContent({
                 <p>
                   Seed biology drives nearly every weed management decision a grower makes. Each year a mature weed
                   releases new seeds into the field, called <strong>seed rain</strong>. Those seeds join the
-                  <strong> soil seed bank</strong>, the underground reservoir of viable seeds that can germinate now
-                  or wait dormant for years. A single field can hold millions of weed seeds per acre.
+                  <strong> soil seed bank</strong>, the underground reservoir of viable seeds that can germinate now or
+                  wait dormant for years. A single field can hold millions of weed seeds per acre.
                 </p>
               </LabCallout>
               <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
                 <p>
-                  The seed bank shifts over time through <strong>seed bank dynamics</strong>: new inputs from seed
-                  rain, losses from germination, predation by insects and rodents, microbial decay, and burial too
-                  deep for emergence. Seeds also use <strong>dormancy mechanisms</strong> (physical, physiological,
-                  or chemical) to delay germination until soil temperature, moisture, and light are right, which is
-                  why one wet spring can pull years of buried seeds out of the bank at once.
+                  The seed bank shifts over time through <strong>seed bank dynamics</strong>: new inputs from seed rain,
+                  losses from germination, predation by insects and rodents, microbial decay, and burial too deep for
+                  emergence. Seeds also use <strong>dormancy mechanisms</strong> (physical, physiological, or chemical)
+                  to delay germination until soil temperature, moisture, and light are right, which is why one wet
+                  spring can pull years of buried seeds out of the bank at once.
                 </p>
                 <p>
-                  Weed seeds spread through four main <strong>dispersal vectors</strong>. <strong>Wind
-                  (anemochory)</strong> carries lightweight seeds with wings or tufts, like dandelion and horseweed.
+                  Weed seeds spread through four main <strong>dispersal vectors</strong>.{" "}
+                  <strong>Wind (anemochory)</strong> carries lightweight seeds with wings or tufts, like dandelion and
+                  horseweed.
                   <strong> Water (hydrochory)</strong> floats seeds along ditches, streams, and irrigation lines.
-                  <strong> Animals (zoochory)</strong> move seeds by eating fruit and depositing them, or by
-                  carrying burrs and barbs on fur and feathers. <strong>Humans and machinery (anthropochory)</strong>
-                  spread seeds farther and faster than any other vector through combines, tillage equipment,
-                  vehicles, manure, and contaminated crop seed.
+                  <strong> Animals (zoochory)</strong> move seeds by eating fruit and depositing them, or by carrying
+                  burrs and barbs on fur and feathers. <strong>Humans and machinery (anthropochory)</strong>
+                  spread seeds farther and faster than any other vector through combines, tillage equipment, vehicles,
+                  manure, and contaminated crop seed.
                 </p>
                 <p>
                   The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
@@ -2280,10 +2405,15 @@ function TopicContent({
                   { term: "Seed rain", def: "Annual input of new seeds from mature weeds to the soil surface." },
                   { term: "Anemochory", def: "Wind-mediated seed dispersal." },
                   { term: "Zoochory", def: "Animal-mediated dispersal (endo- and epi-)." },
-                  { term: "Anthropochory", def: "Human/machinery-mediated dispersal — the dominant vector in modern cropping." },
+                  {
+                    term: "Anthropochory",
+                    def: "Human/machinery-mediated dispersal — the dominant vector in modern cropping.",
+                  },
                 ]}
               />
-              <Citation>Buhler DD, Hartzler RG, Forcella F. Implications of weed seedbank dynamics to weed management. Weed Sci.</Citation>
+              <Citation>
+                Buhler DD, Hartzler RG, Forcella F. Implications of weed seedbank dynamics to weed management. Weed Sci.
+              </Citation>
             </>
           )}
 
@@ -2293,9 +2423,9 @@ function TopicContent({
               <div className="bg-card border border-border rounded-lg p-5 space-y-3">
                 <p className="font-display font-bold text-foreground text-base">What is a Seed Bank?</p>
                 <p className="text-sm text-foreground">
-                  A <strong>seed bank</strong> is all the weed seeds hiding in the soil, waiting to grow. Some
-                  seeds sit right on top in the leaves, others are tucked into the topsoil where they sprout fastest,
-                  and some get buried deep where they can wait for years until a plow or storm brings them back up.
+                  A <strong>seed bank</strong> is all the weed seeds hiding in the soil, waiting to grow. Some seeds sit
+                  right on top in the leaves, others are tucked into the topsoil where they sprout fastest, and some get
+                  buried deep where they can wait for years until a plow or storm brings them back up.
                 </p>
                 <SeedBankDiagram />
               </div>
@@ -2396,8 +2526,8 @@ function TopicContent({
             <DetectiveCard title="Case File: Growing Up Weedy" badge="Case 02 · Life Stages">
               <p className="text-sm">
                 Just like people, weeds grow up. They go through five stages:
-                <strong> seed, seedling, vegetative, reproductive, and mature</strong>. A good detective can spot
-                a suspect at any stage.
+                <strong> seed, seedling, vegetative, reproductive, and mature</strong>. A good detective can spot a
+                suspect at any stage.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <EvidenceTag label="5 stages" tone="clue" />
@@ -2405,20 +2535,20 @@ function TopicContent({
                 <EvidenceTag label="Stop the spread" tone="verdict" />
               </div>
               <CaseCallout heading="Detective Tip">
-                Catch a weed at the <strong>seedling</strong> stage and it's easy to pull. Wait until it flowers and
-                it has already made new seeds for next year.
+                Catch a weed at the <strong>seedling</strong> stage and it's easy to pull. Wait until it flowers and it
+                has already made new seeds for next year.
               </CaseCallout>
             </DetectiveCard>
           ) : grade === "middle" ? (
             <NotebookSection title="Why Life Stages Matter" subtitle="Research Log · Growth Phases">
               <p className="text-sm">
                 Weeds look very different at each growth stage. Learning to recognize them{" "}
-                <strong>early (seedling)</strong> is critical — that's when herbicides work best and hand-pulling
-                is still practical.
+                <strong>early (seedling)</strong> is critical — that's when herbicides work best and hand-pulling is
+                still practical.
               </p>
               <FieldNote label="Scouting rule">
-                In IPM, <strong>scouting timing</strong> is everything. The right control at the wrong stage wastes
-                time and money.
+                In IPM, <strong>scouting timing</strong> is everything. The right control at the wrong stage wastes time
+                and money.
               </FieldNote>
               <SelfCheck
                 question="Why is the seedling stage the best window for post-emergent herbicide?"
@@ -2429,14 +2559,20 @@ function TopicContent({
             <>
               <JournalHeader title="Ontogeny & Growth Stages" subtitle="Phenology" />
               <LabCallout heading="Concept">
-                Weed morphology, physiology, and herbicide susceptibility all shift by growth stage. Accurate
-                staging (BBCH or equivalent) drives control-timing decisions and label compliance.
+                Weed morphology, physiology, and herbicide susceptibility all shift by growth stage. Accurate staging
+                (BBCH or equivalent) drives control-timing decisions and label compliance.
               </LabCallout>
               <TermSidebar
                 terms={[
-                  { term: "Cotyledon", def: "Seed leaf — the first photosynthetic organ; number distinguishes monocots from dicots." },
+                  {
+                    term: "Cotyledon",
+                    def: "Seed leaf — the first photosynthetic organ; number distinguishes monocots from dicots.",
+                  },
                   { term: "True leaf", def: "Leaf produced after cotyledons; morphology matches the mature species." },
-                  { term: "Bolting", def: "Rapid stem elongation preceding flowering, especially in rosette biennials." },
+                  {
+                    term: "Bolting",
+                    def: "Rapid stem elongation preceding flowering, especially in rosette biennials.",
+                  },
                   { term: "Anthesis", def: "The period of flower opening and receptivity to pollination." },
                 ]}
               />
@@ -2446,9 +2582,7 @@ function TopicContent({
           {/* Visual cycle diagram (Elementary + High School) */}
           {(grade === "elementary" || grade === "high") && (
             <div className="bg-card border border-border rounded-xl p-5">
-              <p className="font-display font-bold text-foreground text-sm text-center mb-4">
-                The Weed Life Cycle
-              </p>
+              <p className="font-display font-bold text-foreground text-sm text-center mb-4">The Weed Life Cycle</p>
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 {[
                   { label: "Seed", color: "bg-amber-100 text-amber-900 border-amber-300" },
@@ -2487,8 +2621,8 @@ function TopicContent({
               <div className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <div className="font-bold text-foreground text-sm">Maturity</div>
                 <p className="text-xs text-muted-foreground">
-                  A grown-up weed that has spread its seeds. At the end of the season it may die, but its seeds
-                  start the cycle all over again.
+                  A grown-up weed that has spread its seeds. At the end of the season it may die, but its seeds start
+                  the cycle all over again.
                 </p>
               </div>
             </div>
@@ -2521,7 +2655,9 @@ function TopicContent({
                   <div className={`grid ${isGrass ? "grid-cols-5" : "grid-cols-4"} gap-3`}>
                     {LIFE_STAGE_INFO.map((s) => (
                       <div key={s.stage} className="space-y-1">
-                        <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">{s.label}</div>
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase text-center">
+                          {s.label}
+                        </div>
                         <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                           <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
                         </div>
@@ -2568,9 +2704,7 @@ function TopicContent({
                             onSelect={onSelectWeed}
                             className="text-xs font-bold block text-center"
                           />
-                          <p className="text-[10px] text-primary italic text-center">
-                            {w.scientificName}
-                          </p>
+                          <p className="text-[10px] text-primary italic text-center">{w.scientificName}</p>
                         </div>
                       ))}
                     </div>
@@ -2598,8 +2732,8 @@ function TopicContent({
             <DetectiveCard title="Case File: Grass or Broadleaf?" badge="Case 02 · Plant Type">
               <p className="text-sm">
                 These two groups of weeds are called <strong>monocots</strong> (thin, straight leaves) and{" "}
-                <strong>dicots</strong> (broad, wide leaves). Even though all plants might look similar at first, monocots
-                and dicots are different in a few important ways: their <strong>roots</strong>, their{" "}
+                <strong>dicots</strong> (broad, wide leaves). Even though all plants might look similar at first,
+                monocots and dicots are different in a few important ways: their <strong>roots</strong>, their{" "}
                 <strong>leaves</strong>, how they <strong>move water and nutrients through their stems</strong>, the way
                 their <strong>flowers are organized</strong>, and their <strong>seed structure</strong>.
               </p>
@@ -2655,11 +2789,11 @@ function TopicContent({
                 </div>
               </div>
               <p className="text-xs text-foreground mt-3">
-                  A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.
-                </p>
+                A <strong>cotyledon</strong> is a place where a seed stores its food to give it energy to grow.
+              </p>
               <p className="text-xs text-foreground mt-2">
-                As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the
-                plant looks like.
+                As plants grow from seeds to seedlings to mature plants, the number of cotyledons impacts what the plant
+                looks like.
               </p>
             </CaseCallout>
 
@@ -2669,9 +2803,15 @@ function TopicContent({
                 Monocots (Grasses) — All {monocots.length} Species
               </p>
               <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-5">
-                <li><strong>One seed leaf</strong> (cotyledon)</li>
-                <li><strong>Parallel</strong> leaf veins</li>
-                <li><strong>Fibrous</strong> root system</li>
+                <li>
+                  <strong>One seed leaf</strong> (cotyledon)
+                </li>
+                <li>
+                  <strong>Parallel</strong> leaf veins
+                </li>
+                <li>
+                  <strong>Fibrous</strong> root system
+                </li>
               </ul>
               <div className="overflow-x-auto pb-2">
                 <div className="flex gap-3" style={{ minWidth: `${monocots.length * 7}rem` }}>
@@ -2694,9 +2834,15 @@ function TopicContent({
                 Dicots (Broadleaves) — All {dicots.length} Species
               </p>
               <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-5">
-                <li><strong>Two seed leaves</strong> (cotyledons)</li>
-                <li><strong>Branching (net)</strong> leaf veins</li>
-                <li><strong>Taproot</strong> system</li>
+                <li>
+                  <strong>Two seed leaves</strong> (cotyledons)
+                </li>
+                <li>
+                  <strong>Branching (net)</strong> leaf veins
+                </li>
+                <li>
+                  <strong>Taproot</strong> system
+                </li>
               </ul>
               <div className="overflow-x-auto pb-2">
                 <div className="flex gap-3" style={{ minWidth: `${dicots.length * 7}rem` }}>
@@ -2721,11 +2867,11 @@ function TopicContent({
         <div className="space-y-4">
           <NotebookSection title="Monocots vs Dicots" subtitle="Entry 02 · Plant Classification">
             <p className="text-sm text-foreground">
-              Plants can be grouped by similar characteristics and physical patterns. Plants are grouped into
-              monocots and dicots based on how many <strong>cotyledons</strong> they have as seeds. Cotyledons are
-              structures in seeds and seedlings that store nutrients to act as an energy source during germination.
-              Cotyledons also become the first leaves of a plant. Differentiating monocots and dicots allow us to
-              identify plants and better manage weeds.
+              Plants can be grouped by similar characteristics and physical patterns. Plants are grouped into monocots
+              and dicots based on how many <strong>cotyledons</strong> they have as seeds. Cotyledons are structures in
+              seeds and seedlings that store nutrients to act as an energy source during germination. Cotyledons also
+              become the first leaves of a plant. Differentiating monocots and dicots allow us to identify plants and
+              better manage weeds.
             </p>
             <div className="grid grid-cols-2 gap-4 mt-3">
               <div className="bg-card rounded-lg p-3 border border-border">
@@ -2758,11 +2904,21 @@ function TopicContent({
           </NotebookSection>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Monocots ({monocots.length} species)</h3>
-            <HorizontalWeedRow weeds={monocots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
+            <HorizontalWeedRow
+              weeds={monocots}
+              onSelectWeed={onSelectWeed}
+              stage="vegetative"
+              showScientific={grade === "high"}
+            />
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Dicots ({dicots.length} species)</h3>
-            <HorizontalWeedRow weeds={dicots} onSelectWeed={onSelectWeed} stage="vegetative" showScientific={grade === "high"} />
+            <HorizontalWeedRow
+              weeds={dicots}
+              onSelectWeed={onSelectWeed}
+              stage="vegetative"
+              showScientific={grade === "high"}
+            />
           </div>
         </div>
       );
@@ -2856,9 +3012,9 @@ function TopicContent({
           <div className="space-y-5">
             <DetectiveCard title="Case File: How Long Do Weeds Live?" badge="Case 03 · Life Cycles">
               <p className="text-sm">
-                The life cycle of a weed is how long the weed takes to go through all of its life stages (<strong>seed,
-                seedling, vegetative, reproductive, and mature</strong>). Weeds have different life cycles that last for
-                different lengths of time. Knowing the life cycle of a weed can help us manage them.
+                The life cycle of a weed is how long the weed takes to go through all of its life stages (
+                <strong>seed, seedling, vegetative, reproductive, and mature</strong>). Weeds have different life cycles
+                that last for different lengths of time. Knowing the life cycle of a weed can help us manage them.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <EvidenceTag label="Annual · 1 year" tone="clue" />
@@ -2942,8 +3098,14 @@ function TopicContent({
               terms={[
                 { term: "Annual", def: "Completes seed → seed in one growing season; obligate seed reproduction." },
                 { term: "Biennial", def: "Two-year cycle: rosette in year 1, bolt/flower/seed in year 2." },
-                { term: "Perennial", def: "Persists >2 years; often reproduces vegetatively via rhizomes, stolons, tubers." },
-                { term: "Facultative", def: "Species that shift between annual and perennial habit based on climate/management." },
+                {
+                  term: "Perennial",
+                  def: "Persists >2 years; often reproduces vegetatively via rhizomes, stolons, tubers.",
+                },
+                {
+                  term: "Facultative",
+                  def: "Species that shift between annual and perennial habit based on climate/management.",
+                },
               ]}
             />
 
@@ -3015,7 +3177,7 @@ function TopicContent({
                 most difficult weeds to manage because they can regrow from underground structures even after top growth
                 is removed.
               </p>
-            <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
+              <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
             </div>
 
             {/* Dual lifecycle */}
@@ -3050,13 +3212,13 @@ function TopicContent({
         <div className="space-y-5">
           <NotebookSection title="Life Cycles: Annual, Biennial, Perennial" subtitle="Research Log · Timing">
             <p className="text-sm">
-              Just like people go through different stages of life, every weed has a life cycle that describes how it
-              is born, grows, reproduces, and eventually dies. This process has a direct and significant influence on
-              how certain weeds should be managed.
+              Just like people go through different stages of life, every weed has a life cycle that describes how it is
+              born, grows, reproduces, and eventually dies. This process has a direct and significant influence on how
+              certain weeds should be managed.
             </p>
             <FieldNote label="Why it matters">
-              Match the tool to the life cycle. Perennials laugh at a mower — they regrow from rhizomes. Annuals
-              are stopped cold if you prevent seed set for one season.
+              Match the tool to the life cycle. Perennials laugh at a mower — they regrow from rhizomes. Annuals are
+              stopped cold if you prevent seed set for one season.
             </FieldNote>
             <SelfCheck
               question="A field is overrun with Canada thistle (perennial). Why won't repeated mowing eradicate it?"
@@ -3078,7 +3240,8 @@ function TopicContent({
               ))}
             </div>
             <p className="text-[10px] text-muted-foreground text-center mt-2 italic">
-              The reproductive (or flowering) stage groups flowering, pollination, and fertilization together, ending with the mature plant releasing seeds.
+              The reproductive (or flowering) stage groups flowering, pollination, and fertilization together, ending
+              with the mature plant releasing seeds.
             </p>
           </div>
 
@@ -3139,8 +3302,9 @@ function TopicContent({
             <p className="font-display font-bold text-foreground text-base">Perennial Weeds</p>
             <p className="text-sm text-foreground">
               Perennial weeds are the most persistent and difficult to manage, as they survive for multiple years and
-              often regenerate from underground structures such as <strong>taproots, rhizomes, stolons, or
-              tubers</strong> even after the aboveground portions of the plant have been removed or destroyed.
+              often regenerate from underground structures such as{" "}
+              <strong>taproots, rhizomes, stolons, or tubers</strong> even after the aboveground portions of the plant
+              have been removed or destroyed.
             </p>
             <p className="text-xs text-muted-foreground">
               Matching control strategies to the specific life cycle of a target weed species is fundamental to
@@ -3190,8 +3354,8 @@ function TopicContent({
               <p className="font-display font-bold text-foreground text-sm">Word Bank</p>
               <ul className="text-xs text-muted-foreground space-y-1.5">
                 <li>
-                  <strong className="text-foreground">Tuber</strong> — a swollen underground storage stem (like a
-                  small potato) that stores food and can sprout a brand-new plant.
+                  <strong className="text-foreground">Tuber</strong> — a swollen underground storage stem (like a small
+                  potato) that stores food and can sprout a brand-new plant.
                 </li>
                 <li>
                   <strong className="text-foreground">Nutlet</strong> — a tiny, hard, nut-like structure. In Yellow
@@ -3202,12 +3366,12 @@ function TopicContent({
                   stalks start from one point and spread out flat, like the ribs of an umbrella.
                 </li>
                 <li>
-                  <strong className="text-foreground">Whorled</strong> — 3 or more leaves attached at the same node
-                  (the same spot on the stem).
+                  <strong className="text-foreground">Whorled</strong> — 3 or more leaves attached at the same node (the
+                  same spot on the stem).
                 </li>
                 <li>
-                  <strong className="text-foreground">Pappus bristles</strong> — the fine feathery hairs on a seed
-                  that let it float away on the wind.
+                  <strong className="text-foreground">Pappus bristles</strong> — the fine feathery hairs on a seed that
+                  let it float away on the wind.
                 </li>
                 <li>
                   <strong className="text-foreground">Bolting</strong> — when a low rosette suddenly sends up a tall
@@ -3222,8 +3386,8 @@ function TopicContent({
                   Invasive Weeds in the Midwest ({invasives.length})
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  These weeds were introduced from other places and now hurt our farms and native plants. Scroll
-                  across to see them all, and tap any weed to learn more.
+                  These weeds were introduced from other places and now hurt our farms and native plants. Scroll across
+                  to see them all, and tap any weed to learn more.
                 </p>
                 <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" tileWidth="13rem" />
               </div>
@@ -3234,7 +3398,9 @@ function TopicContent({
               <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+              <h3 className="font-display font-bold text-foreground text-base">
+                Introduced Species ({introduced.length})
+              </h3>
               <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" />
             </div>
           </div>
@@ -3247,19 +3413,19 @@ function TopicContent({
             <NotebookSection title="Weed Origins by Continent" subtitle="Entry 04 · Biogeography">
               <div className="text-sm space-y-3">
                 <p>
-                Many of the most troublesome weeds we deal with in the United States didn't actually start here. They
-                were brought over from other parts of the world, sometimes accidentally and sometimes on purpose.
-              </p>
-              <p>
-                Tracing the continental origins of major weed species provides important context for understanding why
-                they are often so difficult to manage in their introduced range. Plants introduced to a new region
-                frequently leave behind the natural biological controls, including insects, pathogens, and competing
-                plant species, that limited their populations in their native environment.
-              </p>
-              <p>
-                Without these checks, introduced species can establish rapidly, spread aggressively, and outcompete
-                both native vegetation and cultivated crops.
-              </p>
+                  Many of the most troublesome weeds we deal with in the United States didn't actually start here. They
+                  were brought over from other parts of the world, sometimes accidentally and sometimes on purpose.
+                </p>
+                <p>
+                  Tracing the continental origins of major weed species provides important context for understanding why
+                  they are often so difficult to manage in their introduced range. Plants introduced to a new region
+                  frequently leave behind the natural biological controls, including insects, pathogens, and competing
+                  plant species, that limited their populations in their native environment.
+                </p>
+                <p>
+                  Without these checks, introduced species can establish rapidly, spread aggressively, and outcompete
+                  both native vegetation and cultivated crops.
+                </p>
               </div>
               <FieldNote label="Finding">
                 Most Midwestern invasives arrived via <strong>Eurasian trade routes</strong> — contaminated crop seed,
@@ -3271,16 +3437,16 @@ function TopicContent({
             <NotebookSection title="How Invasive Weeds Travel" subtitle="Vectors">
               <div className="text-sm space-y-3">
                 <p>
-                Invasive weeds are like uninvited guests that show up, take over, and refuse to leave — and they
-                usually arrive because of human activity, even when it's completely accidental. Seeds can hitchhike
-                on the muddy tires of a tractor, hide inside a bag of crop seed, cling to an animal's fur, or float
-                down a river to a new location.
-              </p>
-              <p>
-                In some historical cases, plants were deliberately introduced to new regions for agricultural,
-                horticultural, or erosion control purposes, only to escape cultivation and spread beyond intended
-                boundaries.
-              </p>
+                  Invasive weeds are like uninvited guests that show up, take over, and refuse to leave — and they
+                  usually arrive because of human activity, even when it's completely accidental. Seeds can hitchhike on
+                  the muddy tires of a tractor, hide inside a bag of crop seed, cling to an animal's fur, or float down
+                  a river to a new location.
+                </p>
+                <p>
+                  In some historical cases, plants were deliberately introduced to new regions for agricultural,
+                  horticultural, or erosion control purposes, only to escape cultivation and spread beyond intended
+                  boundaries.
+                </p>
               </div>
               <SelfCheck
                 question="If a weed 'escapes' the natural enemies that kept it in check back home, what happens next?"
@@ -3293,7 +3459,9 @@ function TopicContent({
               <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific />
             </div>
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
+              <h3 className="font-display font-bold text-foreground text-base">
+                Introduced Species ({introduced.length})
+              </h3>
               <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific />
             </div>
           </div>
@@ -3322,27 +3490,61 @@ function TopicContent({
               defense. Some invasive weeds may adapt to better suit their new environments, making it challenging to
               find control solutions.
             </p>
-            <Citation>Pimentel, D. et al. (2005) — Economic and environmental costs of alien invertebrate, vertebrate, and plant species in the United States. <em>Ecological Economics</em>.</Citation>
+            <Citation>
+              Pimentel, D. et al. (2005) — Economic and environmental costs of alien invertebrate, vertebrate, and plant
+              species in the United States. <em>Ecological Economics</em>.
+            </Citation>
           </div>
-          <TermSidebar terms={[
-            { term: "Native range", def: "The geographic region where a species evolved and coexists with its natural enemies." },
-            { term: "Enemy release", def: "Hypothesis that non-native species gain a competitive edge when introduced beyond their coevolved pests and pathogens." },
-            { term: "Propagule pressure", def: "The number and frequency of individuals introduced — a strong predictor of successful establishment." },
-            { term: "Introduction pathway", def: "The vector of arrival: ballast water, contaminated seed, ornamental trade, forage crops, erosion planting, etc." },
-            { term: "Naturalized vs. invasive", def: "Naturalized = reproducing without help; invasive = spreading and causing measurable ecological or economic harm." },
-          ]} />
+          <TermSidebar
+            terms={[
+              {
+                term: "Native range",
+                def: "The geographic region where a species evolved and coexists with its natural enemies.",
+              },
+              {
+                term: "Enemy release",
+                def: "Hypothesis that non-native species gain a competitive edge when introduced beyond their coevolved pests and pathogens.",
+              },
+              {
+                term: "Propagule pressure",
+                def: "The number and frequency of individuals introduced — a strong predictor of successful establishment.",
+              },
+              {
+                term: "Introduction pathway",
+                def: "The vector of arrival: ballast water, contaminated seed, ornamental trade, forage crops, erosion planting, etc.",
+              },
+              {
+                term: "Naturalized vs. invasive",
+                def: "Naturalized = reproducing without help; invasive = spreading and causing measurable ecological or economic harm.",
+              },
+            ]}
+          />
           <LabCallout heading="Case Analysis">
-            When investigating a new invasion, characterize (1) native range, (2) likely introduction pathway,
-            (3) date of first record, and (4) trait syndrome (seed output, dispersal mode, allelopathy) before selecting
-            a management strategy.
+            When investigating a new invasion, characterize (1) native range, (2) likely introduction pathway, (3) date
+            of first record, and (4) trait syndrome (seed output, dispersal mode, allelopathy) before selecting a
+            management strategy.
           </LabCallout>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
             <h3 className="font-display font-bold text-foreground text-base">Native Species ({natives.length})</h3>
-            <HorizontalWeedRow weeds={natives} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
+            <HorizontalWeedRow
+              weeds={natives}
+              onSelectWeed={onSelectWeed}
+              stage="flower"
+              showScientific
+              tileWidth="13.5rem"
+            />
           </div>
           <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <h3 className="font-display font-bold text-foreground text-base">Introduced Species ({introduced.length})</h3>
-            <HorizontalWeedRow weeds={introduced} onSelectWeed={onSelectWeed} stage="flower" showScientific tileWidth="13.5rem" />
+            <h3 className="font-display font-bold text-foreground text-base">
+              Introduced Species ({introduced.length})
+            </h3>
+            <HorizontalWeedRow
+              weeds={introduced}
+              onSelectWeed={onSelectWeed}
+              stage="flower"
+              showScientific
+              tileWidth="13.5rem"
+            />
           </div>
         </div>
       );
@@ -3423,9 +3625,9 @@ function TopicContent({
           <div className="space-y-5">
             <DetectiveCard title="Case File: Where Do Weeds Hide?" badge="Case 05 · Habitats">
               <p className="text-sm">
-                A <strong>habitat</strong> is the kind of place where a plant likes to live. Some weeds love hot
-                sunny spots, others like cool or wet places. Knowing where a weed likes to grow helps us guess where
-                we will find it.
+                A <strong>habitat</strong> is the kind of place where a plant likes to live. Some weeds love hot sunny
+                spots, others like cool or wet places. Knowing where a weed likes to grow helps us guess where we will
+                find it.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <EvidenceTag label="Sun · Warm" tone="clue" />
@@ -3434,8 +3636,8 @@ function TopicContent({
                 <EvidenceTag label="Dry · Roadside" tone="suspect" />
               </div>
               <CaseCallout heading="Detective Tip">
-                A weed's favorite habitat is its fingerprint. Find <strong>yellow nutsedge</strong> and you've
-                spotted a wet, poorly-drained corner of the field.
+                A weed's favorite habitat is its fingerprint. Find <strong>yellow nutsedge</strong> and you've spotted a
+                wet, poorly-drained corner of the field.
               </CaseCallout>
             </DetectiveCard>
 
@@ -3454,7 +3656,10 @@ function TopicContent({
                     strokeWidth="1.5"
                   />
                   {/* Cool-Season: Northern US */}
-                  <path d="M60,40 L120,30 L180,30 L230,40 L235,70 L180,75 L120,72 L65,72 Z" fill="rgb(56 189 248 / 0.65)" />
+                  <path
+                    d="M60,40 L120,30 L180,30 L230,40 L235,70 L180,75 L120,72 L65,72 Z"
+                    fill="rgb(56 189 248 / 0.65)"
+                  />
                   {/* Warm-Season: Southern central US */}
                   <path d="M65,72 L235,70 L240,110 L200,130 L120,128 L65,115 Z" fill="rgb(245 158 11 / 0.6)" />
                   {/* Dry: Southwest */}
@@ -3483,7 +3688,8 @@ function TopicContent({
                   <div className="flex items-center gap-2">
                     <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
                     <p className="font-display font-bold text-foreground text-base">
-                      {h.label} <span className="text-xs text-muted-foreground font-normal">({grouped.length} species)</span>
+                      {h.label}{" "}
+                      <span className="text-xs text-muted-foreground font-normal">({grouped.length} species)</span>
                     </p>
                   </div>
                   <p className="text-sm text-foreground">{h.desc}</p>
@@ -3509,57 +3715,199 @@ function TopicContent({
 
       if (grade === "middle") {
         const normName = (s: string) =>
-          s.toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, "");
+          s
+            .toLowerCase()
+            .replace(/\(.*?\)/g, "")
+            .replace(/[^a-z0-9]/g, "");
 
         const COOL_SEASON = [
-          "Annual ryegrass","Downy brome","Field horsetail","Foxtail barley","Quackgrass",
-          "Scouringrush","Wild oat","Catchweed bedstraw","Common chickweed","Corn speedwell",
-          "Curly dock","Dandelion","Field pennycress","Garlic mustard","Ground ivy",
-          "Henbit deadnettle","Mouseear chickweed","Poison hemlock","Shepherd's purse",
-          "Star of Bethlehem","Wild carrot","Wild mustard","Yellow rocket","Canada thistle",
-          "Caraway","Common teasel","False London rocket","Golden alexanders","Musk thistle",
-          "Pinnate tansymustard","Prickly lettuce","Russian thistle","White campion","Wild parsnip",
+          "Annual ryegrass",
+          "Downy brome",
+          "Field horsetail",
+          "Foxtail barley",
+          "Quackgrass",
+          "Scouringrush",
+          "Wild oat",
+          "Catchweed bedstraw",
+          "Common chickweed",
+          "Corn speedwell",
+          "Curly dock",
+          "Dandelion",
+          "Field pennycress",
+          "Garlic mustard",
+          "Ground ivy",
+          "Henbit deadnettle",
+          "Mouseear chickweed",
+          "Poison hemlock",
+          "Shepherd's purse",
+          "Star of Bethlehem",
+          "Wild carrot",
+          "Wild mustard",
+          "Yellow rocket",
+          "Canada thistle",
+          "Caraway",
+          "Common teasel",
+          "False London rocket",
+          "Golden alexanders",
+          "Musk thistle",
+          "Pinnate tansymustard",
+          "Prickly lettuce",
+          "Russian thistle",
+          "White campion",
+          "Wild parsnip",
         ].map(normName);
 
         const WARM_SEASON = [
-          "Barnyardgrass","Goosegrass","Johnsongrass","Large crabgrass","Nimblewill",
-          "Yellow nutsedge","Asiatic dayflower","Common pokeweed","Eastern black nightshade",
-          "Ladysthumb","Pennsylvania smartweed","Water smartweed","Waterhemp","Burcucumber",
-          "Honey vine climbing milkweed","Giant foxtail","Green foxtail","Longspine sandbur",
-          "Shattercane Sorghums","Smooth witchgrass","Witchgrass","Woolly cupgrass","Yellow foxtail",
-          "Asian copperleaf","Buffalobur","Common burdock","Common cocklebur","Common mallow",
-          "Common milkweed","Common ragweed","Giant ragweed","Hemp dogbane","Horsenettle",
-          "Horseweed","Jimsonweed","Kochia","Marijuana","Palmer amaranth","Prickly sida",
-          "Redroot pigweed","Russian thistle","Smooth groundcherry","Spotted spurge",
-          "Toothed spurge","Velvetleaf","Venice mallow","Volunteer sunflower","Wild buckwheat",
-          "Wild four o'clock","Wild parsnip","Field bindweed","Hedge bindweed","Morningglory",
+          "Barnyardgrass",
+          "Goosegrass",
+          "Johnsongrass",
+          "Large crabgrass",
+          "Nimblewill",
+          "Yellow nutsedge",
+          "Asiatic dayflower",
+          "Common pokeweed",
+          "Eastern black nightshade",
+          "Ladysthumb",
+          "Pennsylvania smartweed",
+          "Water smartweed",
+          "Waterhemp",
+          "Burcucumber",
+          "Honey vine climbing milkweed",
+          "Giant foxtail",
+          "Green foxtail",
+          "Longspine sandbur",
+          "Shattercane Sorghums",
+          "Smooth witchgrass",
+          "Witchgrass",
+          "Woolly cupgrass",
+          "Yellow foxtail",
+          "Asian copperleaf",
+          "Buffalobur",
+          "Common burdock",
+          "Common cocklebur",
+          "Common mallow",
+          "Common milkweed",
+          "Common ragweed",
+          "Giant ragweed",
+          "Hemp dogbane",
+          "Horsenettle",
+          "Horseweed",
+          "Jimsonweed",
+          "Kochia",
+          "Marijuana",
+          "Palmer amaranth",
+          "Prickly sida",
+          "Redroot pigweed",
+          "Russian thistle",
+          "Smooth groundcherry",
+          "Spotted spurge",
+          "Toothed spurge",
+          "Velvetleaf",
+          "Venice mallow",
+          "Volunteer sunflower",
+          "Wild buckwheat",
+          "Wild four o'clock",
+          "Wild parsnip",
+          "Field bindweed",
+          "Hedge bindweed",
+          "Morningglory",
           "Tall morningglory",
         ].map(normName);
 
         const WET_COMPACT = [
-          "Annual ryegrass","Downy brome","Field horsetail","Foxtail barley","Quackgrass",
-          "Scouringrush","Wild oat","Catchweed bedstraw","Common chickweed","Corn speedwell",
-          "Curly dock","Dandelion","Field pennycress","Garlic mustard","Ground ivy",
-          "Henbit deadnettle","Mouseear chickweed","Poison hemlock","Shepherd's purse",
-          "Star of Bethlehem","Wild carrot","Wild mustard","Yellow rocket","Barnyardgrass",
-          "Goosegrass","Johnsongrass","Large crabgrass","Nimblewill","Yellow nutsedge",
-          "Asiatic dayflower","Common pokeweed","Eastern black nightshade","Ladysthumb",
-          "Pennsylvania smartweed","Water smartweed","Waterhemp","Burcucumber",
+          "Annual ryegrass",
+          "Downy brome",
+          "Field horsetail",
+          "Foxtail barley",
+          "Quackgrass",
+          "Scouringrush",
+          "Wild oat",
+          "Catchweed bedstraw",
+          "Common chickweed",
+          "Corn speedwell",
+          "Curly dock",
+          "Dandelion",
+          "Field pennycress",
+          "Garlic mustard",
+          "Ground ivy",
+          "Henbit deadnettle",
+          "Mouseear chickweed",
+          "Poison hemlock",
+          "Shepherd's purse",
+          "Star of Bethlehem",
+          "Wild carrot",
+          "Wild mustard",
+          "Yellow rocket",
+          "Barnyardgrass",
+          "Goosegrass",
+          "Johnsongrass",
+          "Large crabgrass",
+          "Nimblewill",
+          "Yellow nutsedge",
+          "Asiatic dayflower",
+          "Common pokeweed",
+          "Eastern black nightshade",
+          "Ladysthumb",
+          "Pennsylvania smartweed",
+          "Water smartweed",
+          "Waterhemp",
+          "Burcucumber",
           "Honey vine climbing milkweed",
         ].map(normName);
 
         const DRY_DISTURBED = [
-          "Downy brome","Foxtail barley","Wild oat","Canada thistle","Caraway","Common teasel",
-          "False London rocket","Golden alexanders","Musk thistle","Pinnate tansymustard",
-          "Prickly lettuce","Russian thistle","White campion","Wild parsnip","Giant foxtail",
-          "Green foxtail","Johnsongrass","Longspine sandbur","Shattercane Sorghums",
-          "Smooth witchgrass","Witchgrass","Woolly cupgrass","Yellow foxtail","Asian copperleaf",
-          "Buffalobur","Common burdock","Common cocklebur","Common mallow","Common milkweed",
-          "Common ragweed","Giant ragweed","Hemp dogbane","Horsenettle","Horseweed","Jimsonweed",
-          "Kochia","Marijuana","Palmer amaranth","Prickly sida","Redroot pigweed",
-          "Smooth groundcherry","Spotted spurge","Toothed spurge","Velvetleaf","Venice mallow",
-          "Volunteer sunflower","Wild buckwheat","Wild four o'clock","Field bindweed",
-          "Hedge bindweed","Morningglory","Tall morningglory",
+          "Downy brome",
+          "Foxtail barley",
+          "Wild oat",
+          "Canada thistle",
+          "Caraway",
+          "Common teasel",
+          "False London rocket",
+          "Golden alexanders",
+          "Musk thistle",
+          "Pinnate tansymustard",
+          "Prickly lettuce",
+          "Russian thistle",
+          "White campion",
+          "Wild parsnip",
+          "Giant foxtail",
+          "Green foxtail",
+          "Johnsongrass",
+          "Longspine sandbur",
+          "Shattercane Sorghums",
+          "Smooth witchgrass",
+          "Witchgrass",
+          "Woolly cupgrass",
+          "Yellow foxtail",
+          "Asian copperleaf",
+          "Buffalobur",
+          "Common burdock",
+          "Common cocklebur",
+          "Common mallow",
+          "Common milkweed",
+          "Common ragweed",
+          "Giant ragweed",
+          "Hemp dogbane",
+          "Horsenettle",
+          "Horseweed",
+          "Jimsonweed",
+          "Kochia",
+          "Marijuana",
+          "Palmer amaranth",
+          "Prickly sida",
+          "Redroot pigweed",
+          "Smooth groundcherry",
+          "Spotted spurge",
+          "Toothed spurge",
+          "Velvetleaf",
+          "Venice mallow",
+          "Volunteer sunflower",
+          "Wild buckwheat",
+          "Wild four o'clock",
+          "Field bindweed",
+          "Hedge bindweed",
+          "Morningglory",
+          "Tall morningglory",
         ].map(normName);
 
         const matchAny = (w: Weed, list: string[]) => {
@@ -3623,15 +3971,16 @@ function TopicContent({
                   have preferences about where they like to hang out.
                 </p>
                 <p>
-                  Factors such as <strong>soil texture, moisture availability, light levels, temperature ranges,
-                  pH</strong>, and the degree of soil disturbance all influence which weed species are likely to establish
-                  and become dominant in a given location.
+                  Factors such as{" "}
+                  <strong>soil texture, moisture availability, light levels, temperature ranges, pH</strong>, and the
+                  degree of soil disturbance all influence which weed species are likely to establish and become
+                  dominant in a given location.
                 </p>
                 <p>
-                  Below, weeds are organized two ways: by the <strong>season</strong> they grow in
-                  (cool-season vs. warm-season) and by the <strong>soil-type habitat</strong> they prefer
-                  (wet / compact vs. dry / disturbed). The same weed may appear in more than one soil-type
-                  group when it tolerates both conditions.
+                  Below, weeds are organized two ways: by the <strong>season</strong> they grow in (cool-season vs.
+                  warm-season) and by the <strong>soil-type habitat</strong> they prefer (wet / compact vs. dry /
+                  disturbed). The same weed may appear in more than one soil-type group when it tolerates both
+                  conditions.
                 </p>
               </div>
               <FieldNote label="Indicator species">
@@ -3685,17 +4034,18 @@ function TopicContent({
           <div className="space-y-5">
             <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
             <LabCallout heading="Concept">
-              Climate — thermal regime, photoperiod, precipitation, and edaphic conditions — is the primary filter
-              on weed community composition. Species distribution reflects underlying physiological adaptations
-              (C3/C4 photosynthesis, root architecture, cuticular resistance, dormancy thermal requirements).
+              Climate — thermal regime, photoperiod, precipitation, and edaphic conditions — is the primary filter on
+              weed community composition. Species distribution reflects underlying physiological adaptations (C3/C4
+              photosynthesis, root architecture, cuticular resistance, dormancy thermal requirements).
             </LabCallout>
             <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
               <p>
-                Different species are adapted to different climates because of differences in <strong>photosynthesis
-                type (C3 vs. C4)</strong>, <strong>root depth and structure</strong>, <strong>leaf shape and waxy
-                coatings</strong>, and the <strong>temperature range their seeds need to break dormancy</strong>. A
-                cool-season C3 species like Henbit shuts down in July heat, while a C4 species like Palmer Amaranth
-                barely starts growing until the soil is warm enough to fry an egg on.
+                Different species are adapted to different climates because of differences in{" "}
+                <strong>photosynthesis type (C3 vs. C4)</strong>, <strong>root depth and structure</strong>,{" "}
+                <strong>leaf shape and waxy coatings</strong>, and the{" "}
+                <strong>temperature range their seeds need to break dormancy</strong>. A cool-season C3 species like
+                Henbit shuts down in July heat, while a C4 species like Palmer Amaranth barely starts growing until the
+                soil is warm enough to fry an egg on.
               </p>
               <p>
                 The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
@@ -3704,10 +4054,19 @@ function TopicContent({
             </div>
             <TermSidebar
               terms={[
-                { term: "C3 photosynthesis", def: "Predominant pathway; efficient at cool temperatures and moderate light." },
-                { term: "C4 photosynthesis", def: "CO2-concentrating mechanism; high water-use efficiency at high temperature and light." },
+                {
+                  term: "C3 photosynthesis",
+                  def: "Predominant pathway; efficient at cool temperatures and moderate light.",
+                },
+                {
+                  term: "C4 photosynthesis",
+                  def: "CO2-concentrating mechanism; high water-use efficiency at high temperature and light.",
+                },
                 { term: "Aerenchyma", def: "Air-conducting parenchyma that oxygenates roots in flooded soils." },
-                { term: "Xerophyte", def: "Species adapted to arid conditions via deep roots, waxy cuticles, or CAM metabolism." },
+                {
+                  term: "Xerophyte",
+                  def: "Species adapted to arid conditions via deep roots, waxy cuticles, or CAM metabolism.",
+                },
               ]}
             />
 
@@ -3756,7 +4115,8 @@ function TopicContent({
           title: "Sunlight",
           emoji: "Sun",
           plantUses: "Plants use sunlight to make their own food in their leaves. This is called photosynthesis.",
-          weedSteals: "Tall weeds like giant ragweed can grow up over corn and soybean plants and shade them out — the crop leaves get less light and can't make as much food.",
+          weedSteals:
+            "Tall weeds like giant ragweed can grow up over corn and soybean plants and shade them out — the crop leaves get less light and can't make as much food.",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           dot: "bg-yellow-500",
         },
@@ -3764,8 +4124,10 @@ function TopicContent({
           key: "water",
           title: "Water",
           emoji: "Drop",
-          plantUses: "Plants drink water through their roots. Water carries food all around the plant and keeps the leaves strong.",
-          weedSteals: "Weeds have thirsty roots too. When a weed grows next to a soybean plant, it sips up water the crop needed — especially on hot, dry summer days.",
+          plantUses:
+            "Plants drink water through their roots. Water carries food all around the plant and keeps the leaves strong.",
+          weedSteals:
+            "Weeds have thirsty roots too. When a weed grows next to a soybean plant, it sips up water the crop needed — especially on hot, dry summer days.",
           bg: "bg-info/10 border-info/40",
           dot: "bg-info",
         },
@@ -3773,8 +4135,10 @@ function TopicContent({
           key: "air",
           title: "Air",
           emoji: "Wind",
-          plantUses: "Plants breathe in a gas from the air called carbon dioxide (CO₂) and use it to make food. Their roots also need air pockets in the soil.",
-          weedSteals: "When lots of weeds crowd a field, they fill the air around crops with their own leaves and roots — leaving less fresh air moving around the crop.",
+          plantUses:
+            "Plants breathe in a gas from the air called carbon dioxide (CO₂) and use it to make food. Their roots also need air pockets in the soil.",
+          weedSteals:
+            "When lots of weeds crowd a field, they fill the air around crops with their own leaves and roots — leaving less fresh air moving around the crop.",
           bg: "bg-secondary/40 border-border",
           dot: "bg-muted-foreground",
         },
@@ -3783,7 +4147,8 @@ function TopicContent({
           title: "Nutrients",
           emoji: "Seedling",
           plantUses: "Nutrients are like plant vitamins in the soil. They help plants grow big, green, and strong.",
-          weedSteals: "Weeds like waterhemp are greedy eaters. They gobble up nutrients from the soil that the farmer wanted the corn or soybeans to have.",
+          weedSteals:
+            "Weeds like waterhemp are greedy eaters. They gobble up nutrients from the soil that the farmer wanted the corn or soybeans to have.",
           bg: "bg-success/10 border-success/40",
           dot: "bg-success",
         },
@@ -3791,8 +4156,10 @@ function TopicContent({
           key: "space",
           title: "Space",
           emoji: "Expand",
-          plantUses: "Plants need room for their leaves to spread out and their roots to grow deep. Crowded plants can't grow their best.",
-          weedSteals: "Weeds squeeze in between rows and push against crops. The crops end up short, skinny, and unhappy because they don't have room to stretch.",
+          plantUses:
+            "Plants need room for their leaves to spread out and their roots to grow deep. Crowded plants can't grow their best.",
+          weedSteals:
+            "Weeds squeeze in between rows and push against crops. The crops end up short, skinny, and unhappy because they don't have room to stretch.",
           bg: "bg-accent/10 border-accent/40",
           dot: "bg-accent",
         },
@@ -3802,14 +4169,15 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(to bottom, hsl(215 35% 22%) 0%, hsl(215 30% 30%) 60%, hsl(30 30% 55%) 100%)",
+            background: "linear-gradient(to bottom, hsl(215 35% 22%) 0%, hsl(215 30% 30%) 60%, hsl(30 30% 55%) 100%)",
           }}
         >
           {/* Cozy dinner-table header */}
           <div className="rounded-xl bg-amber-50/95 p-5 text-center space-y-2 border-4 border-amber-700 shadow-lg">
             <p className="font-display font-extrabold text-amber-900 text-xl">🕯️ Welcome to Plant Dinner!</p>
-            <p className="text-sm text-amber-950">Every plant needs 5 things at the table: <strong>Sun • Water • Air • Food • Space</strong></p>
+            <p className="text-sm text-amber-950">
+              Every plant needs 5 things at the table: <strong>Sun • Water • Air • Food • Space</strong>
+            </p>
           </div>
 
           <div className="rounded-xl border-4 border-amber-700 bg-amber-100/90 p-3">
@@ -3818,7 +4186,9 @@ function TopicContent({
               alt="Two side-by-side plants: one thriving with sunlight, water, and fresh air; one struggling with no sun, no water, and weed competition"
               className="w-full rounded-lg object-contain bg-background"
             />
-            <p className="text-center text-[11px] text-amber-900 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-amber-900 italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
           </div>
 
           {/* FLIP CARDS - front shows need, back shows the "weed steals" detail */}
@@ -3835,15 +4205,21 @@ function TopicContent({
             <div className="space-y-3">
               {/* Crop speaks */}
               <div className="flex items-start gap-2">
-                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌽</div>
+                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">
+                  🌽
+                </div>
                 <div className="relative bg-success/20 border-2 border-success rounded-2xl rounded-tl-none p-3 flex-1">
                   <p className="text-xs font-bold text-success mb-0.5">Cornelius the Crop</p>
-                  <p className="text-sm text-foreground">"I was really looking forward to my sunshine and water tonight!"</p>
+                  <p className="text-sm text-foreground">
+                    "I was really looking forward to my sunshine and water tonight!"
+                  </p>
                 </div>
               </div>
               {/* Weed speaks */}
               <div className="flex items-start gap-2 flex-row-reverse">
-                <div className="w-12 h-12 rounded-full bg-destructive/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌿</div>
+                <div className="w-12 h-12 rounded-full bg-destructive/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">
+                  🌿
+                </div>
                 <div className="relative bg-destructive/20 border-2 border-destructive rounded-2xl rounded-tr-none p-3 flex-1">
                   <p className="text-xs font-bold text-destructive mb-0.5">Wally the Weed</p>
                   <p className="text-sm text-foreground">"Too bad! I got here first and I'm eating YOUR share too!"</p>
@@ -3851,18 +4227,26 @@ function TopicContent({
               </div>
               {/* Crop replies */}
               <div className="flex items-start gap-2">
-                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">🌽</div>
+                <div className="w-12 h-12 rounded-full bg-success/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">
+                  🌽
+                </div>
                 <div className="relative bg-success/20 border-2 border-success rounded-2xl rounded-tl-none p-3 flex-1">
                   <p className="text-xs font-bold text-success mb-0.5">Cornelius the Crop</p>
-                  <p className="text-sm text-foreground">"But… I need those to grow big! Now I'm going to be tiny and thirsty!"</p>
+                  <p className="text-sm text-foreground">
+                    "But… I need those to grow big! Now I'm going to be tiny and thirsty!"
+                  </p>
                 </div>
               </div>
               {/* Farmer speaks */}
               <div className="flex items-start gap-2 flex-row-reverse">
-                <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">👩‍🌾</div>
+                <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-2xl shrink-0 border-2 border-amber-800">
+                  👩‍🌾
+                </div>
                 <div className="relative bg-primary/20 border-2 border-primary rounded-2xl rounded-tr-none p-3 flex-1">
                   <p className="text-xs font-bold text-primary mb-0.5">Farmer Frank</p>
-                  <p className="text-sm text-foreground">"Not on my watch, Wally! I'll clear you out so Cornelius gets his full dinner."</p>
+                  <p className="text-sm text-foreground">
+                    "Not on my watch, Wally! I'll clear you out so Cornelius gets his full dinner."
+                  </p>
                 </div>
               </div>
             </div>
@@ -3875,8 +4259,12 @@ function TopicContent({
 
           <div className="rounded-xl bg-yellow-100 border-4 border-yellow-500 p-4 text-center">
             <p className="font-display font-extrabold text-foreground text-base">✨ Remember ✨</p>
-            <p className="text-sm text-foreground mt-1"><strong>Sun • Water • Air • Food • Space</strong></p>
-            <p className="text-xs text-muted-foreground mt-1">Five things every plant needs — and five things weeds try to steal!</p>
+            <p className="text-sm text-foreground mt-1">
+              <strong>Sun • Water • Air • Food • Space</strong>
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Five things every plant needs — and five things weeds try to steal!
+            </p>
           </div>
         </div>
       );
@@ -3914,7 +4302,7 @@ function TopicContent({
           where: "Sticking out from the stem.",
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
-          job: "The kitchen! Leaves catch sunlight to cook food.",
+          job: "The kitchen! Leaves catch sunlight to make energy.",
           weedFact: "Velvetleaf's giant leaves steal sun from corn!",
         },
         {
@@ -3943,18 +4331,23 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(to bottom, hsl(0 0% 98%) 0%, hsl(200 40% 92%) 100%)",
+            background: "linear-gradient(to bottom, hsl(0 0% 98%) 0%, hsl(200 40% 92%) 100%)",
           }}
         >
           {/* Doctor-themed header */}
           <div className="rounded-xl bg-white border-4 border-red-500 p-5 text-center space-y-2 shadow-lg">
             <div className="flex items-center justify-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">+</div>
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">
+                +
+              </div>
               <p className="font-display font-extrabold text-red-600 text-2xl">Plant Checkup!</p>
-              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">+</div>
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white text-3xl font-extrabold shadow">
+                +
+              </div>
             </div>
-            <p className="text-sm text-foreground">🩺 Dr. Green here — let's examine the <strong>5 parts</strong> every plant has!</p>
+            <p className="text-sm text-foreground">
+              🩺 Dr. Green here — let's examine the <strong>5 parts</strong> every plant has!
+            </p>
             <p className="text-xs text-muted-foreground">🍭 Good job! Here's a lollipop after your visit!</p>
           </div>
 
@@ -3964,8 +4357,12 @@ function TopicContent({
               alt="Side-by-side illustration comparing a corn plant with its parts labeled to a velvetleaf weed with its parts labeled"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
-            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-muted-foreground mt-2">A crop and a weed share the same parts — but use them very differently!</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              A crop and a weed share the same parts — but use them very differently!
+            </p>
           </div>
 
           <div className="bg-red-50 border-2 border-red-400 rounded-lg p-3 text-center text-sm font-semibold text-red-700 shadow">
@@ -3974,20 +4371,40 @@ function TopicContent({
 
           <div className="space-y-4">
             {PARTS.map((p) => (
-              <details key={p.key} className="group rounded-xl border-4 border-red-300 bg-white p-4 transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden shadow">
+              <details
+                key={p.key}
+                className="group rounded-xl border-4 border-red-300 bg-white p-4 transition-all hover:shadow-md cursor-pointer [&_summary::-webkit-details-marker]:hidden shadow"
+              >
                 <summary className="flex items-center gap-3 list-none cursor-pointer select-none">
                   <div className={`w-10 h-10 rounded-full ${p.dot} flex items-center justify-center shadow shrink-0`}>
                     <p.Icon className="h-6 w-6 text-white" />
                   </div>
                   <p className="font-display font-extrabold text-foreground text-lg flex-1">{p.title}</p>
-                  <span className="text-xs font-bold text-red-700 bg-red-100 border border-red-400 rounded-full px-2 py-1 group-open:hidden">🩺 Chart</span>
+                  <span className="text-xs font-bold text-red-700 bg-red-100 border border-red-400 rounded-full px-2 py-1 group-open:hidden">
+                    🩺 Chart
+                  </span>
                   <ChevronDown className="h-5 w-5 text-red-600 transition-transform group-open:rotate-180" />
                 </summary>
                 <div className="mt-3 space-y-2 pl-1">
-                  <p className="text-sm text-foreground flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-terracotta shrink-0" /><span><strong>Where:</strong> {p.where}</span></p>
-                  <p className="text-sm text-foreground flex items-start gap-2"><Zap className="h-4 w-4 mt-0.5 text-info shrink-0" /><span><strong>Job:</strong> {p.job}</span></p>
+                  <p className="text-sm text-foreground flex items-start gap-2">
+                    <MapPin className="h-4 w-4 mt-0.5 text-terracotta shrink-0" />
+                    <span>
+                      <strong>Where:</strong> {p.where}
+                    </span>
+                  </p>
+                  <p className="text-sm text-foreground flex items-start gap-2">
+                    <Zap className="h-4 w-4 mt-0.5 text-info shrink-0" />
+                    <span>
+                      <strong>Job:</strong> {p.job}
+                    </span>
+                  </p>
                   <div className="bg-background/60 border border-primary/20 rounded-md p-2">
-                    <p className="text-sm text-foreground flex items-start gap-2"><Star className="h-4 w-4 mt-0.5 text-yellow-500 shrink-0 fill-yellow-500" /><span><strong>Weed fact:</strong> {p.weedFact}</span></p>
+                    <p className="text-sm text-foreground flex items-start gap-2">
+                      <Star className="h-4 w-4 mt-0.5 text-yellow-500 shrink-0 fill-yellow-500" />
+                      <span>
+                        <strong>Weed fact:</strong> {p.weedFact}
+                      </span>
+                    </p>
                   </div>
                 </div>
               </details>
@@ -3996,7 +4413,9 @@ function TopicContent({
 
           <div className="bg-white border-4 border-emerald-500 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-emerald-700 text-base">💊 Clean Bill of Health!</p>
-            <p className="text-sm text-foreground">Roots drink, stems carry, leaves cook, flowers bloom, seeds travel. Every part needs the others!</p>
+            <p className="text-sm text-foreground">
+              Roots drink, stems carry, leaves cook, flowers bloom, seeds travel. Every part needs the others!
+            </p>
           </div>
 
           <div className="bg-white border-4 border-red-500 rounded-lg p-4 text-sm text-foreground shadow">
@@ -4018,15 +4437,39 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "crop-vs-weed": {
       const CROP_TRAITS = [
-        { label: "Feed people", detail: "Crops become the food on our plates every day.", examples: "Corn, Wheat, Carrots" },
-        { label: "Feed animals", detail: "Cows, pigs, and chickens eat crops so they can grow too.", examples: "Soybeans, Oats, Alfalfa" },
-        { label: "Make useful things", detail: "Some crops turn into clothes, fuel, and everyday products.", examples: "Cotton, Corn, Sugarcane" },
+        {
+          label: "Feed people",
+          detail: "Crops become the food on our plates every day.",
+          examples: "Corn, Wheat, Carrots",
+        },
+        {
+          label: "Feed animals",
+          detail: "Cows, pigs, and chickens eat crops so they can grow too.",
+          examples: "Soybeans, Oats, Alfalfa",
+        },
+        {
+          label: "Make useful things",
+          detail: "Some crops turn into clothes, fuel, and everyday products.",
+          examples: "Cotton, Corn, Sugarcane",
+        },
       ];
 
       const WEED_TRAITS = [
-        { label: "Not planted on purpose", detail: "Nobody chose to grow them there — they just showed up.", examples: "Dandelion, Crabgrass" },
-        { label: "Growing in the wrong place", detail: "A sunflower is pretty in a garden, but a weed in a cornfield.", examples: "Sunflower in corn, Grass in a sidewalk" },
-        { label: "Competing with crops", detail: "They take sunlight, water, nutrients, and space from the plants farmers want.", examples: "Pigweed, Foxtail, Lambsquarters" },
+        {
+          label: "Not planted on purpose",
+          detail: "Nobody chose to grow them there — they just showed up.",
+          examples: "Dandelion, Crabgrass",
+        },
+        {
+          label: "Growing in the wrong place",
+          detail: "A sunflower is pretty in a garden, but a weed in a cornfield.",
+          examples: "Sunflower in corn, Grass in a sidewalk",
+        },
+        {
+          label: "Competing with crops",
+          detail: "They take sunlight, water, nutrients, and space from the plants farmers want.",
+          examples: "Pigweed, Foxtail, Lambsquarters",
+        },
       ];
 
       return (
@@ -4051,8 +4494,8 @@ function TopicContent({
           <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
             <p className="font-display font-bold text-amber-900 text-base">🌱 It's All About WHERE It Grows</p>
             <p>
-              At first glance, crops and weeds can look a lot alike — they're both plants! The biggest
-              difference isn't <em>what</em> the plant is, it's <em>where</em> it's growing.
+              At first glance, crops and weeds can look a lot alike — they're both plants! The biggest difference isn't{" "}
+              <em>what</em> the plant is, it's <em>where</em> it's growing.
             </p>
           </div>
 
@@ -4063,8 +4506,8 @@ function TopicContent({
                 <p className="font-display font-extrabold text-emerald-700 text-base">Crops (Friends!)</p>
               </div>
               <p className="text-sm text-foreground">
-                Crops are plants that farmers grow <strong>on purpose</strong>. They give us food, feed animals,
-                or make useful products like fabric and fuel.
+                Crops are plants that farmers grow <strong>on purpose</strong>. They give us food, feed animals, or make
+                useful products like fabric and fuel.
               </p>
               <div className="space-y-2">
                 {CROP_TRAITS.map((c) => (
@@ -4083,8 +4526,8 @@ function TopicContent({
                 <p className="font-display font-extrabold text-destructive text-base">Weeds (Sneakers!)</p>
               </div>
               <p className="text-sm text-foreground">
-                Weeds are plants growing <strong>where they aren't wanted</strong>. Nobody planted them, and
-                they compete with crops for the things every plant needs.
+                Weeds are plants growing <strong>where they aren't wanted</strong>. Nobody planted them, and they
+                compete with crops for the things every plant needs.
               </p>
               <div className="space-y-2">
                 {WEED_TRAITS.map((w) => (
@@ -4104,19 +4547,21 @@ function TopicContent({
               alt="Illustration comparing crops (plants we want) and weeds (unwanted plants) side by side"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
-            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
           </div>
 
           <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-amber-900 text-base">🐄 Think About It Like This…</p>
             <p className="text-sm text-foreground">
-              Imagine your classroom. Every student has an assigned desk. Now imagine someone from another
-              class walks in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just
-              in the wrong place! They take up your space and make it harder for you to do your work.
+              Imagine your classroom. Every student has an assigned desk. Now imagine someone from another class walks
+              in and sits down at <em>your</em> desk. They aren't a "bad" student — they're just in the wrong place!
+              They take up your space and make it harder for you to do your work.
             </p>
             <p className="text-sm text-foreground">
-              Weeds are like that student in the wrong seat. They aren't bad plants, but when they grow in a
-              crop field, they take the sunlight, water, nutrients, and space that the crops need.
+              Weeds are like that student in the wrong seat. They aren't bad plants, but when they grow in a crop field,
+              they take the sunlight, water, nutrients, and space that the crops need.
             </p>
           </div>
 
@@ -4170,10 +4615,12 @@ function TopicContent({
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">A Plant's Life Cycle: From Tiny Seed to New Seeds</p>
+            <p className="font-display font-bold text-primary text-base">
+              A Plant's Life Cycle: From Tiny Seed to New Seeds
+            </p>
             <p>
-              Plants have a life cycle, just like butterflies and frogs! You can think of it as a plant's
-              journey through the seasons — waking up, growing tall, making seeds, and starting over again.
+              Plants have a life cycle, just like butterflies and frogs! You can think of it as a plant's journey
+              through the seasons — waking up, growing tall, making seeds, and starting over again.
             </p>
           </div>
 
@@ -4183,7 +4630,9 @@ function TopicContent({
             alt="Illustrated map of a plant's full life cycle — from seed to sprout, flowers, and seed spreading"
             className="w-full rounded-lg bg-background/60 object-contain border-2 border-border"
           />
-          <p className="text-center text-[11px] text-muted-foreground italic -mt-3">Image generated with Google Gemini 1.5 Pro.</p>
+          <p className="text-center text-[11px] text-muted-foreground italic -mt-3">
+            Image generated with Google Gemini 1.5 Pro.
+          </p>
 
           {/* Steps arranged in a real CIRCLE (clockwise: top, right, bottom, left) */}
           <p className="font-display font-bold text-primary text-base text-center">Follow the Cycle — Clockwise! ↻</p>
@@ -4197,12 +4646,15 @@ function TopicContent({
                 "top-1/2 left-0 -translate-y-1/2",
               ];
               return (
-                <div
-                  key={s.key}
-                  className={`absolute ${positions[i]} w-[46%] rounded-2xl border-2 p-3 ${s.bg} shadow`}
-                >
-                  <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}>{i + 1}</div>
-                  <p className="font-display font-extrabold text-foreground text-sm">{s.title.replace(/^Step \d+: /, "")}</p>
+                <div key={s.key} className={`absolute ${positions[i]} w-[46%] rounded-2xl border-2 p-3 ${s.bg} shadow`}>
+                  <div
+                    className={`absolute -top-3 -left-3 w-8 h-8 rounded-full ${s.dot} text-white font-extrabold flex items-center justify-center shadow-md`}
+                  >
+                    {i + 1}
+                  </div>
+                  <p className="font-display font-extrabold text-foreground text-sm">
+                    {s.title.replace(/^Step \d+: /, "")}
+                  </p>
                   <p className="text-[10px] font-semibold text-muted-foreground mb-1">{s.season}</p>
                   <p className="text-[11px] text-foreground leading-snug">{s.body}</p>
                 </div>
@@ -4224,7 +4676,8 @@ function TopicContent({
           <div className="rounded-2xl border-2 border-success/50 bg-success/10 p-4 space-y-3">
             <p className="font-display font-extrabold text-success text-base">🌱 Annuals — One-Season Plants</p>
             <p className="text-sm text-foreground">
-              Annuals live for <strong>ONE year</strong>. Sprout → grow → make seeds → done! Like <strong>Kochia</strong>:
+              Annuals live for <strong>ONE year</strong>. Sprout → grow → make seeds → done! Like{" "}
+              <strong>Kochia</strong>:
             </p>
             <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
               {[
@@ -4256,8 +4709,8 @@ function TopicContent({
           <div className="rounded-2xl border-2 border-info/50 bg-info/10 p-4 space-y-3">
             <p className="font-display font-extrabold text-info text-base">🔄 Perennials — Year-After-Year Plants</p>
             <p className="text-sm text-foreground">
-              Perennials come back <strong>every year</strong>. They start from a seed, then loop forever!
-              Like <strong>Canada Thistle</strong>:
+              Perennials come back <strong>every year</strong>. They start from a seed, then loop forever! Like{" "}
+              <strong>Canada Thistle</strong>:
             </p>
             {/* Line: seed -> seedling */}
             <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
@@ -4297,14 +4750,16 @@ function TopicContent({
                 </div>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground italic">A line into a circle — underground roots keep it coming back!</p>
+            <p className="text-xs text-muted-foreground italic">
+              A line into a circle — underground roots keep it coming back!
+            </p>
           </div>
 
           <div className="bg-primary/5 border-2 border-primary/30 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Why This Matters for Farmers</p>
             <p className="text-sm text-foreground">
-              If a farmer knows a weed is an annual, they can stop it before it makes new seeds. If it's a
-              perennial, they know its roots will try to come back next year — so they plan ahead!
+              If a farmer knows a weed is an annual, they can stop it before it makes new seeds. If it's a perennial,
+              they know its roots will try to come back next year — so they plan ahead!
             </p>
           </div>
 
@@ -4366,18 +4821,19 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(to bottom, hsl(210 60% 88%) 0%, hsl(210 45% 78%) 50%, hsl(215 30% 60%) 100%)",
+            background: "linear-gradient(to bottom, hsl(210 60% 88%) 0%, hsl(210 45% 78%) 50%, hsl(215 30% 60%) 100%)",
           }}
         >
           {/* Airport departures board header */}
           <div className="rounded-xl bg-slate-900 p-5 text-center space-y-2 border-4 border-yellow-500 shadow-lg font-mono">
             <p className="text-yellow-300 text-xs tracking-widest">◆ SEED INTERNATIONAL AIRPORT ◆ DEPARTURES ◆</p>
             <p className="font-display font-extrabold text-yellow-400 text-2xl">✈️ HOW DO SEEDS TRAVEL?</p>
-            <p className="text-xs text-yellow-200 tracking-wider">🛫  ON TIME  •  NOW BOARDING  •  🛬</p>
+            <p className="text-xs text-yellow-200 tracking-wider">🛫 ON TIME • NOW BOARDING • 🛬</p>
           </div>
           <div className="rounded-lg bg-white/95 border-2 border-slate-400 p-4 text-sm text-foreground">
-            <p>Seeds can't walk… so how do they get around? Tap each <strong>gate</strong> to see the flight!</p>
+            <p>
+              Seeds can't walk… so how do they get around? Tap each <strong>gate</strong> to see the flight!
+            </p>
           </div>
           {/* Runway strip */}
           <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -4390,19 +4846,33 @@ function TopicContent({
 
           <div className="grid gap-4 sm:grid-cols-3">
             {TRAVELERS.map((t) => (
-              <details key={t.key} className="rounded-2xl border-4 border-slate-400 bg-white/95 p-3 cursor-pointer group transition-transform hover:scale-[1.02] shadow-lg">
+              <details
+                key={t.key}
+                className="rounded-2xl border-4 border-slate-400 bg-white/95 p-3 cursor-pointer group transition-transform hover:scale-[1.02] shadow-lg"
+              >
                 <summary className="list-none text-center space-y-2">
-                  <div className="text-[10px] font-mono font-bold text-slate-500 tracking-widest bg-slate-100 rounded py-1">GATE {t.key.toUpperCase().slice(0, 3)}-{["01","07","23"][["wind","water","animal"].indexOf(t.key)]}</div>
+                  <div className="text-[10px] font-mono font-bold text-slate-500 tracking-widest bg-slate-100 rounded py-1">
+                    GATE {t.key.toUpperCase().slice(0, 3)}-
+                    {["01", "07", "23"][["wind", "water", "animal"].indexOf(t.key)]}
+                  </div>
                   <div className="text-4xl">{t.emoji}</div>
                   <p className="font-display font-extrabold text-foreground text-base">{t.title}</p>
                   <p className="text-xs italic text-muted-foreground">"{t.nickname}"</p>
-                  <p className="text-[10px] text-primary font-bold group-open:hidden bg-yellow-200 rounded px-2 py-0.5 inline-block">🎫 tap ticket!</p>
+                  <p className="text-[10px] text-primary font-bold group-open:hidden bg-yellow-200 rounded px-2 py-0.5 inline-block">
+                    🎫 tap ticket!
+                  </p>
                 </summary>
                 <div className="mt-3 space-y-2">
                   <img src={t.image} alt={t.imageAlt} className="w-full rounded-lg bg-background object-contain" />
-                  <p className="text-center text-[10px] text-muted-foreground italic">Image generated with Google Gemini 1.5 Pro.</p>
-                  <p className="text-sm text-foreground"><strong>How:</strong> {t.how}</p>
-                  <p className="text-sm text-foreground"><strong>Example:</strong> {t.example}</p>
+                  <p className="text-center text-[10px] text-muted-foreground italic">
+                    Image generated with Google Gemini 1.5 Pro.
+                  </p>
+                  <p className="text-sm text-foreground">
+                    <strong>How:</strong> {t.how}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    <strong>Example:</strong> {t.example}
+                  </p>
                   <p className="text-xs text-muted-foreground">{t.extras}</p>
                 </div>
               </details>
@@ -4410,15 +4880,20 @@ function TopicContent({
           </div>
 
           <div className="bg-yellow-100 border-4 border-yellow-500 rounded-2xl p-4 text-center shadow">
-            <p className="font-display font-extrabold text-amber-900 text-base">🚜 Why Farmers Care (Airport Security!)</p>
+            <p className="font-display font-extrabold text-amber-900 text-base">
+              🚜 Why Farmers Care (Airport Security!)
+            </p>
             <p className="text-sm text-foreground mt-1">
-              Weeds sneak into fields as stowaways! Farmers even wash their boots and tractors — like TSA for seeds — so no free rides!
+              Weeds sneak into fields as stowaways! Farmers even wash their boots and tractors — like TSA for seeds — so
+              no free rides!
             </p>
           </div>
 
           <div className="bg-slate-900 border-4 border-yellow-500 rounded-2xl p-4 text-center font-mono shadow-lg">
             <p className="font-display font-extrabold text-yellow-400 text-base">📋 3 FLIGHT ROUTES</p>
-            <p className="text-sm text-yellow-100 mt-1"><strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong></p>
+            <p className="text-sm text-yellow-100 mt-1">
+              <strong>🌬️ Wind • 🌊 Water • 🐾 Animals</strong>
+            </p>
             <p className="text-yellow-200 text-xs mt-1 tracking-wider">HAVE A GREAT FLIGHT, SEEDS!</p>
           </div>
         </div>
@@ -4468,9 +4943,7 @@ function TopicContent({
         },
       ];
 
-      return (
-        <PicnicModule items={PICNIC_ITEMS} img={plantPicnicImg} />
-      );
+      return <PicnicModule items={PICNIC_ITEMS} img={plantPicnicImg} />;
     }
 
     /* placeholder removed */
@@ -4541,8 +5014,7 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(180deg, hsl(100 50% 25%) 0%, hsl(28 45% 30%) 100%)",
+            background: "linear-gradient(180deg, hsl(100 50% 25%) 0%, hsl(28 45% 30%) 100%)",
           }}
         >
           <div className="rounded-2xl bg-yellow-100 border-4 border-yellow-500 p-5 text-center shadow-lg">
@@ -4553,13 +5025,12 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">The Five Weed-Fighting Superpowers!</p>
             <p>
               Weeds may be tough, but farmers and gardeners have <strong>five weed-fighting superpowers</strong>
-              to help protect their crops! Since weeds steal sunlight, water, nutrients, and space, farmers
-              use different strategies to keep their plants healthy and growing strong.
+              to help protect their crops! Since weeds steal sunlight, water, nutrients, and space, farmers use
+              different strategies to keep their plants healthy and growing strong.
             </p>
             <p>
-              Each superpower works best in a different situation, so farmers often use more than one at a
-              time. Teaming them up is called an <strong>integrated approach</strong> — the ultimate
-              weed-fighting team!
+              Each superpower works best in a different situation, so farmers often use more than one at a time. Teaming
+              them up is called an <strong>integrated approach</strong> — the ultimate weed-fighting team!
             </p>
           </div>
 
@@ -4568,9 +5039,9 @@ function TopicContent({
           <div className="bg-yellow-50/95 border-4 border-amber-700 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-success text-base">Assemble the Team!</p>
             <p className="text-sm text-foreground">
-              Just like superheroes work together to save the day, farmers combine these five superpowers to
-              protect their crops and grow the delicious food we eat every day. One hero alone can't defeat
-              every weed — but together, they're unstoppable!
+              Just like superheroes work together to save the day, farmers combine these five superpowers to protect
+              their crops and grow the delicious food we eat every day. One hero alone can't defeat every weed — but
+              together, they're unstoppable!
             </p>
           </div>
 
@@ -4593,7 +5064,8 @@ function TopicContent({
           emoji: "👀",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          detail: "Look at the plant from a safe distance. Don't touch, pick, or taste any weed you don't already know.",
+          detail:
+            "Look at the plant from a safe distance. Don't touch, pick, or taste any weed you don't already know.",
         },
         {
           key: "observe",
@@ -4625,8 +5097,7 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(180deg, hsl(0 0% 12%) 0%, hsl(28 45% 22%) 100%)",
+            background: "linear-gradient(180deg, hsl(0 0% 12%) 0%, hsl(28 45% 22%) 100%)",
           }}
         >
           <div className="rounded-2xl bg-amber-100 border-4 border-slate-900 p-5 text-center shadow-lg">
@@ -4638,21 +5109,19 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">Not All Weeds Are the Same!</p>
             <p>
               Did you know that not all weeds are alike? Some are totally harmless, but others can be
-              <strong> toxic</strong> — meaning they can make people or animals sick if they're touched or
-              eaten.
+              <strong> toxic</strong> — meaning they can make people or animals sick if they're touched or eaten.
             </p>
           </div>
 
           <div className="bg-amber-50/95 border-4 border-amber-900 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-info text-base">The Mystery Surprise Box</p>
             <p className="text-sm text-foreground">
-              Think of weeds like mystery surprise boxes. Some boxes have fun surprises inside — but others
-              might have something you really shouldn't play with. Since you can't tell what's inside just by
-              looking, the safest thing to do is <strong>not open the box</strong>.
+              Think of weeds like mystery surprise boxes. Some boxes have fun surprises inside — but others might have
+              something you really shouldn't play with. Since you can't tell what's inside just by looking, the safest
+              thing to do is <strong>not open the box</strong>.
             </p>
             <p className="text-sm text-foreground">
-              Plants work the same way! You can't always tell if a weed is safe or toxic just by looking at
-              it.
+              Plants work the same way! You can't always tell if a weed is safe or toxic just by looking at it.
             </p>
           </div>
 
@@ -4684,14 +5153,14 @@ function TopicContent({
               alt="Be a Plant Detective poster — use your eyes not your hands, observe clues, ask a trusted adult, and wash up after playing"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
-            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
           </div>
 
           <div className="bg-amber-50/95 border-4 border-slate-900 rounded-lg p-5 space-y-3 shadow">
             <p className="font-display font-bold text-slate-900 text-lg">🕵️ Be a Plant Detective!</p>
-            <p className="text-sm text-foreground">
-              Tap each clue in your Detective's Notebook to uncover the rule:
-            </p>
+            <p className="text-sm text-foreground">Tap each clue in your Detective's Notebook to uncover the rule:</p>
             <DetectiveNotebook rules={DETECTIVE_RULES} />
           </div>
 
@@ -4704,7 +5173,12 @@ function TopicContent({
                 coverClass="bg-gradient-to-br from-amber-600 to-red-700"
                 openClass="bg-amber-50"
                 textClass="text-amber-950"
-                body={<>Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with your <strong>mouth</strong>!</>}
+                body={
+                  <>
+                    Look with your <strong>eyes</strong> — not with your <strong>hands</strong> and never with your{" "}
+                    <strong>mouth</strong>!
+                  </>
+                }
               />
               <div className="bg-amber-50/95 border-2 border-amber-900 rounded-lg p-4 text-sm text-foreground shadow">
                 <p className="font-semibold text-slate-900 mb-1">Remember:</p>
@@ -4717,7 +5191,9 @@ function TopicContent({
                 alt="Cartoon weed detective following clues toward an evidence lock-box"
                 className="w-full rounded-lg bg-background/60 object-contain"
               />
-              <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+              <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+                Image generated with Google Gemini 1.5 Pro.
+              </p>
             </div>
           </div>
 
@@ -4727,7 +5203,9 @@ function TopicContent({
               alt="Cartoon weed detective with a magnifying glass investigating clues underground"
               className="w-full rounded-lg bg-background/60 object-contain"
             />
-            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
           </div>
         </div>
       );
@@ -4784,8 +5262,7 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(to bottom, hsl(48 95% 85%) 0%, hsl(45 90% 75%) 100%)",
+            background: "linear-gradient(to bottom, hsl(48 95% 85%) 0%, hsl(45 90% 75%) 100%)",
           }}
         >
           {/* School-themed header — chalkboard */}
@@ -4795,10 +5272,9 @@ function TopicContent({
           </div>
           <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
             <p>
-              Imagine you're playing a game of tag on the playground. Everyone is following the rules and
-              taking turns. Then one player runs <em>way</em> faster than everyone else, tags everyone, and
-              takes over the whole playground! Pretty soon, the other kids don't have much room left to
-              play.
+              Imagine you're playing a game of tag on the playground. Everyone is following the rules and taking turns.
+              Then one player runs <em>way</em> faster than everyone else, tags everyone, and takes over the whole
+              playground! Pretty soon, the other kids don't have much room left to play.
             </p>
             <p>
               Some plants act the same way. We call them <strong>invasive plants</strong>.
@@ -4811,7 +5287,9 @@ function TopicContent({
               alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               Invasive plants act like playground bullies — pushing native plants out of their space.
             </p>
@@ -4820,8 +5298,8 @@ function TopicContent({
           <div className="bg-white/95 border-2 border-amber-700 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-amber-900 text-base">📓 What Is an Invasive Plant?</p>
             <p className="text-sm text-foreground">
-              An invasive plant is a plant that <strong>moved in from far away</strong> and grows SUPER fast.
-              It shoots past the plants that were already living there — like a new kid who takes over the whole recess game!
+              An invasive plant is a plant that <strong>moved in from far away</strong> and grows SUPER fast. It shoots
+              past the plants that were already living there — like a new kid who takes over the whole recess game!
             </p>
           </div>
 
@@ -4831,9 +5309,14 @@ function TopicContent({
             </p>
             <div className="grid gap-3 md:grid-cols-2">
               {SUPERPOWERS.map((s) => (
-                <div key={s.key} className={`rounded-2xl border-4 border-amber-700 p-4 space-y-2 bg-white/95 shadow-lg transition-transform hover:scale-[1.03]`}>
+                <div
+                  key={s.key}
+                  className={`rounded-2xl border-4 border-amber-700 p-4 space-y-2 bg-white/95 shadow-lg transition-transform hover:scale-[1.03]`}
+                >
                   <div className="flex items-center gap-3">
-                    <div className={`relative w-14 h-14 rounded-full ${s.dot} flex items-center justify-center shadow-md border-2 border-amber-800`}>
+                    <div
+                      className={`relative w-14 h-14 rounded-full ${s.dot} flex items-center justify-center shadow-md border-2 border-amber-800`}
+                    >
                       <s.Icon className={`h-7 w-7 text-white ${s.animate}`} />
                       <span className="absolute -top-2 -right-2 text-lg">{s.emoji}</span>
                     </div>
@@ -4848,9 +5331,8 @@ function TopicContent({
           <div className="bg-red-100 border-4 border-red-600 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-destructive text-base">Who Gets Left Out?</p>
             <p className="text-sm text-foreground">
-              As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for
-              the plants that belong there. That makes it harder for native plants, wildflowers, and even
-              some animals to survive.
+              As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for the plants
+              that belong there. That makes it harder for native plants, wildflowers, and even some animals to survive.
             </p>
           </div>
 
@@ -4860,7 +5342,9 @@ function TopicContent({
               alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
             </p>
@@ -4869,15 +5353,18 @@ function TopicContent({
           <div className="bg-white/95 border-4 border-emerald-700 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-emerald-800 text-base">🍎 Team Up to Keep Things Fair</p>
             <p className="text-sm text-foreground">
-              Farmers, gardeners, and scientists work together to stop invasive plants before they take over.
-              By protecting native plants and keeping invasive plants under control, we help our forests,
-              parks, gardens, and farms stay healthy for everyone — plants, animals, and people!
+              Farmers, gardeners, and scientists work together to stop invasive plants before they take over. By
+              protecting native plants and keeping invasive plants under control, we help our forests, parks, gardens,
+              and farms stay healthy for everyone — plants, animals, and people!
             </p>
           </div>
 
           <div className="bg-yellow-200 border-4 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-amber-900 mb-1">✏️ Remember:</p>
-            <p>Invasive plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong there.</p>
+            <p>
+              Invasive plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong
+              there.
+            </p>
           </div>
         </div>
       );
@@ -4893,28 +5380,32 @@ function TopicContent({
           title: "Underground Explorers",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
-          detail: "Some weeds send long roots creeping sideways through the soil — like secret tunnels no one can see from above.",
+          detail:
+            "Some weeds send long roots creeping sideways through the soil — like secret tunnels no one can see from above.",
         },
         {
           key: "popup",
           title: "Surprise Pop-Ups",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
-          detail: "Every so often, a tunnel sends a new shoot up to the surface. A brand-new weed pops up — sometimes several feet away from the first one!",
+          detail:
+            "Every so often, a tunnel sends a new shoot up to the surface. A brand-new weed pops up — sometimes several feet away from the first one!",
         },
         {
           key: "connected",
           title: "All Connected",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          detail: "Even though they look like separate plants above ground, they're all part of one big hidden network below.",
+          detail:
+            "Even though they look like separate plants above ground, they're all part of one big hidden network below.",
         },
         {
           key: "tricky",
           title: "Tricky to Remove",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
-          detail: "If even a tiny piece of tunnel is left behind, it can grow into a brand-new weed. That's why root weeds are so hard to get rid of!",
+          detail:
+            "If even a tiny piece of tunnel is left behind, it can grow into a brand-new weed. That's why root weeds are so hard to get rid of!",
         },
       ];
 
@@ -4928,7 +5419,9 @@ function TopicContent({
         >
           {/* Header with grass and dirt */}
           <div className="rounded-xl bg-amber-950/70 p-5 text-center space-y-2 border-2 border-amber-700 shadow-inner">
-            <p className="font-display font-extrabold text-yellow-100 text-xl drop-shadow">⛏️ The Secret Tunnels of Roots</p>
+            <p className="font-display font-extrabold text-yellow-100 text-xl drop-shadow">
+              ⛏️ The Secret Tunnels of Roots
+            </p>
             <p className="text-sm text-amber-100">Grab your flashlight — we're going UNDERGROUND! 🔦</p>
           </div>
 
@@ -4939,12 +5432,19 @@ function TopicContent({
               alt="Cartoon weed digging secret underground tunnels with a lantern and pickaxe"
               className="w-full rounded-lg object-contain"
             />
-            <p className="text-center text-[11px] text-amber-100/80 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-amber-100/80 italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
           </div>
 
           <div className="rounded-xl bg-amber-900/60 p-4 text-sm text-amber-50 space-y-2 border border-amber-700">
-            <p>Most weeds spread with seeds. But some are <strong className="text-yellow-200">sneaky diggers</strong>!</p>
-            <p>Their roots stretch out under the dirt like <strong className="text-yellow-200">secret tunnels</strong> — connecting one plant to a whole hidden family!</p>
+            <p>
+              Most weeds spread with seeds. But some are <strong className="text-yellow-200">sneaky diggers</strong>!
+            </p>
+            <p>
+              Their roots stretch out under the dirt like <strong className="text-yellow-200">secret tunnels</strong> —
+              connecting one plant to a whole hidden family!
+            </p>
           </div>
 
           {/* Interactive dirt-clod boxes */}
@@ -4960,7 +5460,7 @@ function TopicContent({
               >
                 <summary className="list-none text-center space-y-1">
                   <div className="mx-auto w-12 h-12 rounded-full bg-amber-950 flex items-center justify-center text-2xl shadow-inner border-2 border-amber-800">
-                    {["🕳️","🌱","🕸️","⚠️"][i]}
+                    {["🕳️", "🌱", "🕸️", "⚠️"][i]}
                   </div>
                   <p className="font-display font-extrabold text-yellow-100 text-base drop-shadow">{f.title}</p>
                   <p className="text-[10px] text-amber-200 font-bold group-open:hidden">🔦 tap to dig!</p>
@@ -4973,20 +5473,25 @@ function TopicContent({
           <div className="rounded-xl bg-amber-950/70 p-4 border-2 border-amber-700 space-y-2">
             <p className="font-display font-extrabold text-yellow-200 text-base">🌿 Famous Tunnel Builders</p>
             <p className="text-sm text-amber-50">
-              <strong className="text-yellow-100">Canada Thistle</strong>, <strong className="text-yellow-100">Field Bindweed</strong>, and <strong className="text-yellow-100">Quackgrass</strong> can stretch tunnels many feet in every direction!
+              <strong className="text-yellow-100">Canada Thistle</strong>,{" "}
+              <strong className="text-yellow-100">Field Bindweed</strong>, and{" "}
+              <strong className="text-yellow-100">Quackgrass</strong> can stretch tunnels many feet in every direction!
             </p>
           </div>
 
           <div className="rounded-xl bg-amber-900/60 p-4 border border-amber-700">
             <p className="font-display font-extrabold text-yellow-200 text-base">🚜 Why Farmers Dig Deep</p>
             <p className="text-sm text-amber-50 mt-1">
-              If you only pull the top, the hidden tunnels sprout NEW weeds! Farmers dig up the whole root to stop them for good.
+              If you only pull the top, the hidden tunnels sprout NEW weeds! Farmers dig up the whole root to stop them
+              for good.
             </p>
           </div>
 
           <div className="rounded-xl bg-yellow-100 border-4 border-yellow-500 p-4 text-center">
             <p className="font-display font-extrabold text-amber-900 text-base">✨ Remember ✨</p>
-            <p className="text-sm text-amber-900 mt-1">Every weed you see might have a <strong>whole hidden world</strong> under your feet!</p>
+            <p className="text-sm text-amber-900 mt-1">
+              Every weed you see might have a <strong>whole hidden world</strong> under your feet!
+            </p>
           </div>
         </div>
       );
@@ -5009,7 +5514,8 @@ function TopicContent({
         {
           id: "Dandelion",
           name: "1. Dandelion",
-          spotIt: "Bright yellow flowers that turn into fluffy white puffballs — nature's little parachutes for the seeds.",
+          spotIt:
+            "Bright yellow flowers that turn into fluffy white puffballs — nature's little parachutes for the seeds.",
           funFact: "One big puff of wind and those parachute seeds can float far, far away!",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
@@ -5017,7 +5523,8 @@ function TopicContent({
         {
           id: "giant-foxtail",
           name: "2. Giant Foxtail",
-          spotIt: "A fuzzy seed head that curves over — just like a fox's bushy tail. Its leaves are covered in tiny short hairs.",
+          spotIt:
+            "A fuzzy seed head that curves over — just like a fox's bushy tail. Its leaves are covered in tiny short hairs.",
           funFact: "If you gently rub a leaf, you can feel the tiny hairs like soft fuzz.",
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
@@ -5043,7 +5550,8 @@ function TopicContent({
         {
           id: "Wild_Carrot",
           name: "5. Wild Carrot",
-          spotIt: "Flat clusters of tiny white flowers that look like lacy umbrellas — sometimes called 'Queen Anne's Lace.'",
+          spotIt:
+            "Flat clusters of tiny white flowers that look like lacy umbrellas — sometimes called 'Queen Anne's Lace.'",
           funFact: "It's a biennial — that means it takes TWO years to finish its whole life cycle.",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
@@ -5075,7 +5583,8 @@ function TopicContent({
         {
           id: "kochia",
           name: "9. Kochia",
-          spotIt: "A bushy, feathery green plant that turns red in fall — sometimes it snaps off and tumbles like a tumbleweed!",
+          spotIt:
+            "A bushy, feathery green plant that turns red in fall — sometimes it snaps off and tumbles like a tumbleweed!",
           funFact: "One kochia plant can roll for miles, scattering seeds the whole way.",
           dot: "bg-terracotta",
           bg: "bg-terracotta/10 border-terracotta/40",
@@ -5084,7 +5593,8 @@ function TopicContent({
           id: "wild-parsnip",
           name: "10. Wild Parsnip",
           spotIt: "Tall plant with flat-topped clusters of tiny yellow flowers.",
-          funFact: "WARNING — never touch it! Its sap plus sunlight can give you a nasty burn. Always tell an adult if you see it.",
+          funFact:
+            "WARNING — never touch it! Its sap plus sunlight can give you a nasty burn. Always tell an adult if you see it.",
           dot: "bg-destructive",
           bg: "bg-destructive/10 border-destructive/40",
         },
@@ -5092,7 +5602,7 @@ function TopicContent({
           id: "yellow-nutsedge",
           name: "11. Yellow Nutsedge",
           spotIt: "Looks like a shiny yellow-green grass, but the stem is a triangle — you can feel the 3 sides!",
-          funFact: "\"Sedges have edges\" — a rhyme scientists use to remember that trick.",
+          funFact: '"Sedges have edges" — a rhyme scientists use to remember that trick.',
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
         },
@@ -5120,20 +5630,29 @@ function TopicContent({
           dot: "bg-primary",
           bg: "bg-primary/10 border-primary/40",
         },
-      ] as Array<{ id: string; name: string; spotIt: string; funFact: string; dot: string; bg: string; photo?: string; photoAlt?: string }>;
+      ] as Array<{
+        id: string;
+        name: string;
+        spotIt: string;
+        funFact: string;
+        dot: string;
+        bg: string;
+        photo?: string;
+        photoAlt?: string;
+      }>;
 
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">14 Weeds You Can Spot!</p>
             <p>
-              Ready to become a Weed Spotter? Here are 14 famous weeds that show up in yards, fields, and
-              parks. Each one has a special clue — like a shape, color, or texture — that makes it easy to
-              recognize once you know what to look for.
+              Ready to become a Weed Spotter? Here are 14 famous weeds that show up in yards, fields, and parks. Each
+              one has a special clue — like a shape, color, or texture — that makes it easy to recognize once you know
+              what to look for.
             </p>
             <p className="text-xs text-muted-foreground">
-              The photos below show the flower or seed part of each weed — the part that helps you tell them
-              apart the fastest.
+              The photos below show the flower or seed part of each weed — the part that helps you tell them apart the
+              fastest.
             </p>
           </div>
 
@@ -5146,8 +5665,8 @@ function TopicContent({
           <div className="bg-success/10 border-2 border-success/40 rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-success text-base">You're a Weed Spotter Now!</p>
             <p className="text-sm text-foreground">
-              Next time you're outside, see how many of these 14 weeds you can spot. Just remember — look
-              with your eyes, and if you don't recognize a plant, ask a trusted adult before touching it!
+              Next time you're outside, see how many of these 14 weeds you can spot. Just remember — look with your
+              eyes, and if you don't recognize a plant, ask a trusted adult before touching it!
             </p>
           </div>
         </div>
@@ -5166,7 +5685,8 @@ function TopicContent({
           prize: "🏆",
           dot: "bg-warning",
           bg: "bg-warning/10 border-warning/40",
-          detail: "The energy plants use to cook their own food. Whoever grows tallest first hogs the biggest slice of sunshine!",
+          detail:
+            "The energy plants use to cook their own food. Whoever grows tallest first hogs the biggest slice of sunshine!",
         },
         {
           key: "water",
@@ -5202,7 +5722,8 @@ function TopicContent({
           emoji: "👨‍🌾",
           color: "bg-primary/10 border-primary/40",
           chip: "bg-primary text-primary-foreground",
-          blurb: "The coach of the whole race! Farmers plant crops, pull weeds, and cheer the crops on toward a big harvest.",
+          blurb:
+            "The coach of the whole race! Farmers plant crops, pull weeds, and cheer the crops on toward a big harvest.",
         },
         {
           key: "crop",
@@ -5210,7 +5731,8 @@ function TopicContent({
           emoji: "🌽",
           color: "bg-success/10 border-success/40",
           chip: "bg-success text-white",
-          blurb: "Corn, wheat, tomatoes — the plants we grow on purpose. Their prize is turning sunshine and water into the food we eat.",
+          blurb:
+            "Corn, wheat, tomatoes — the plants we grow on purpose. Their prize is turning sunshine and water into the food we eat.",
         },
         {
           key: "weed",
@@ -5218,7 +5740,8 @@ function TopicContent({
           emoji: "🌿",
           color: "bg-destructive/10 border-destructive/40",
           chip: "bg-destructive text-white",
-          blurb: "The uninvited speed demon. Weeds sprout fast, grab resources, and try to make as many seeds as possible before the season ends.",
+          blurb:
+            "The uninvited speed demon. Weeds sprout fast, grab resources, and try to make as many seeds as possible before the season ends.",
         },
       ];
 
@@ -5226,12 +5749,13 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl relative overflow-hidden"
           style={{
-            background:
-              "repeating-linear-gradient(90deg, hsl(0 0% 5%) 0 24px, hsl(0 0% 100%) 24px 48px)",
+            background: "repeating-linear-gradient(90deg, hsl(0 0% 5%) 0 24px, hsl(0 0% 100%) 24px 48px)",
           }}
         >
           <div className="rounded-2xl bg-white border-4 border-black p-5 text-center shadow-lg">
-            <p className="font-display font-extrabold text-black text-2xl tracking-wider">🏁 THE GREAT GARDEN RACE 🏁</p>
+            <p className="font-display font-extrabold text-black text-2xl tracking-wider">
+              🏁 THE GREAT GARDEN RACE 🏁
+            </p>
             <p className="text-xs text-black mt-1">🏃 Ready, set, GROW!</p>
           </div>
 
@@ -5239,9 +5763,9 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">On Your Mark, Get Set, Grow!</p>
             <p>
               Imagine a garden or farm field isn't just a place for plants to grow — it's the site of a{" "}
-              <strong>high-stakes, season-long race!</strong> The finish line isn't about being the tallest
-              or the fastest. The ultimate prize is to <strong>reproduce</strong> and send as many seeds as
-              possible out into the world to start the next generation.
+              <strong>high-stakes, season-long race!</strong> The finish line isn't about being the tallest or the
+              fastest. The ultimate prize is to <strong>reproduce</strong> and send as many seeds as possible out into
+              the world to start the next generation.
             </p>
           </div>
 
@@ -5252,7 +5776,9 @@ function TopicContent({
               alt="Cartoon of Farmer Frank, Cornelius Cob, and Wally Weed racing in the Field Day Marathon"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               And they're off! Every plant is racing to make seeds before the season ends.
             </p>
@@ -5277,13 +5803,18 @@ function TopicContent({
 
           {/* Resources shown as podium-style prizes */}
           <div className="bg-white/95 rounded-xl p-4 border-4 border-black shadow-lg space-y-3">
-            <p className="font-display font-extrabold text-black text-center text-lg">🏆 The Race for Resources — 3 Big Prizes!</p>
+            <p className="font-display font-extrabold text-black text-center text-lg">
+              🏆 The Race for Resources — 3 Big Prizes!
+            </p>
             <p className="text-sm text-foreground text-center">
               To win the race, a plant needs fuel. Here are the prizes every racer is scrambling to grab:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {RESOURCES.map((r) => (
-                <div key={r.key} className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 text-center ${r.bg} relative`}>
+                <div
+                  key={r.key}
+                  className={`rounded-lg border-4 border-yellow-500 p-4 space-y-2 text-center ${r.bg} relative`}
+                >
                   <div className="absolute -top-3 -right-2 text-3xl">{r.prize}</div>
                   <div className="text-5xl">{r.emoji}</div>
                   <p className="font-display font-extrabold text-foreground text-base">{r.title}</p>
@@ -5296,27 +5827,26 @@ function TopicContent({
           <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-warning-foreground text-base">How the Race Plays Out</p>
             <p className="text-sm text-foreground">
-              Weeds are the ultimate <strong>race car drivers</strong> of the plant world — built for speed
-              and survival. They sprout quickly, drink up water, soak up sunshine, and pull nutrients out of
-              the soil before the crops can catch up. If nobody helps, the weeds can zoom right past the
-              crops and hog the whole field!
+              Weeds are the ultimate <strong>race car drivers</strong> of the plant world — built for speed and
+              survival. They sprout quickly, drink up water, soak up sunshine, and pull nutrients out of the soil before
+              the crops can catch up. If nobody helps, the weeds can zoom right past the crops and hog the whole field!
             </p>
           </div>
 
           <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Who Cheers the Crops On?</p>
             <p className="text-sm text-foreground">
-              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close
-              together, mulch the soil, and use the 5 weed-fighting superpowers so the crops can reach the
-              finish line first — and fill our plates with delicious food.
+              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close together, mulch
+              the soil, and use the 5 weed-fighting superpowers so the crops can reach the finish line first — and fill
+              our plates with delicious food.
             </p>
           </div>
 
           <div className="bg-white/95 border-4 border-black rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary mb-1">Remember:</p>
             <p>
-              Every field is a race for sunlight, water, and nutrients. With a good coach — the farmer — the
-              crops can beat the weeds to the finish line and win a big harvest!
+              Every field is a race for sunlight, water, and nutrients. With a good coach — the farmer — the crops can
+              beat the weeds to the finish line and win a big harvest!
             </p>
           </div>
         </div>
@@ -5339,14 +5869,15 @@ function TopicContent({
           animation: (
             <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-100 to-pink-100 border-2 border-yellow-500">
               <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-4xl animate-bounce">🌸</div>
-              <div
-                className="absolute text-2xl"
-                style={{ animation: "bee-fly 3s ease-in-out infinite" }}
-              >🐝</div>
+              <div className="absolute text-2xl" style={{ animation: "bee-fly 3s ease-in-out infinite" }}>
+                🐝
+              </div>
               <div
                 className="absolute text-xl"
                 style={{ animation: "bee-fly 3.5s ease-in-out infinite 0.5s", top: "10%" }}
-              >🦋</div>
+              >
+                🦋
+              </div>
               <style>{`@keyframes bee-fly { 0%{left:-15%;top:20%} 50%{left:60%;top:50%} 100%{left:110%;top:15%} }`}</style>
             </div>
           ),
@@ -5363,9 +5894,16 @@ function TopicContent({
             <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-amber-800 border-2 border-amber-800">
               {/* Wind lines */}
               <div className="absolute top-2 left-1 text-xs animate-pulse">💨</div>
-              <div className="absolute top-4 left-6 text-xs animate-pulse" style={{ animationDelay: "0.3s" }}>💨</div>
+              <div className="absolute top-4 left-6 text-xs animate-pulse" style={{ animationDelay: "0.3s" }}>
+                💨
+              </div>
               {/* Roots gripping */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl" style={{ animation: "grip-shake 0.6s ease-in-out infinite" }}>🌱</div>
+              <div
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 text-4xl"
+                style={{ animation: "grip-shake 0.6s ease-in-out infinite" }}
+              >
+                🌱
+              </div>
               <div className="absolute bottom-0 left-2 text-2xl">🤝</div>
               <div className="absolute bottom-0 right-2 text-2xl">🤝</div>
               <style>{`@keyframes grip-shake { 0%,100%{transform:translateX(-50%) rotate(-3deg)} 50%{transform:translateX(-50%) rotate(3deg)} }`}</style>
@@ -5385,7 +5923,9 @@ function TopicContent({
               <span className="absolute inline-flex h-16 w-16 rounded-full bg-yellow-300/60 animate-ping" />
               <span className="absolute inline-flex h-12 w-12 rounded-full bg-orange-400/70 animate-ping [animation-delay:0.4s]" />
               <div className="absolute top-1 text-xl">💥</div>
-              <div className="text-4xl relative z-10" style={{ animation: "drill 1.5s ease-in-out infinite" }}>⛏️</div>
+              <div className="text-4xl relative z-10" style={{ animation: "drill 1.5s ease-in-out infinite" }}>
+                ⛏️
+              </div>
               <style>{`@keyframes drill { 0%,100%{transform:translateY(-6px) rotate(-8deg)} 50%{transform:translateY(6px) rotate(8deg)} }`}</style>
             </div>
           ),
@@ -5396,8 +5936,7 @@ function TopicContent({
         <div
           className="space-y-5 p-5 rounded-2xl"
           style={{
-            background:
-              "linear-gradient(135deg, hsl(140 55% 55%) 0%, hsl(200 65% 65%) 50%, hsl(330 70% 78%) 100%)",
+            background: "linear-gradient(135deg, hsl(140 55% 55%) 0%, hsl(200 65% 65%) 50%, hsl(330 70% 78%) 100%)",
           }}
         >
           {/* Volunteer-themed header */}
@@ -5407,9 +5946,8 @@ function TopicContent({
           </div>
           <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-3 border-2 border-emerald-500 shadow">
             <p>
-              Not every plant we call a "weed" is a troublemaker. We pull them out of gardens so our crops
-              have room to grow — but out in nature, many weeds are actually{" "}
-              <strong>secret helpers</strong> with important jobs!
+              Not every plant we call a "weed" is a troublemaker. We pull them out of gardens so our crops have room to
+              grow — but out in nature, many weeds are actually <strong>secret helpers</strong> with important jobs!
             </p>
           </div>
 
@@ -5420,7 +5958,9 @@ function TopicContent({
               alt="The superpowers of weeds: supporting pollinators, preventing erosion, and improving soil health"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
-<p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+            <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+              Image generated with Google Gemini 1.5 Pro.
+            </p>
             <p className="text-center text-xs text-muted-foreground mt-2">
               A flower feeds a bee, a butterfly flutters by, and a weed's deep roots hold the soil in place.
             </p>
@@ -5432,7 +5972,10 @@ function TopicContent({
           </p>
           <div className="space-y-3">
             {POWERS.map((p) => (
-              <div key={p.key} className="rounded-2xl border-4 border-white bg-white/95 p-4 shadow-lg transition-transform hover:scale-[1.01]">
+              <div
+                key={p.key}
+                className="rounded-2xl border-4 border-white bg-white/95 p-4 shadow-lg transition-transform hover:scale-[1.01]"
+              >
                 <div className="flex items-start gap-4">
                   {p.animation}
                   <div className="flex-1 space-y-2">
@@ -5455,23 +5998,23 @@ function TopicContent({
             <div className="bg-sky-50 rounded-md p-3 border-2 border-sky-300">
               <p className="font-extrabold text-sky-800 text-sm mb-1">Remember:</p>
               <p className="text-sm text-slate-800 font-medium">
-                Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil,
-                and loosen the dirt — three superpowers that keep nature strong!
+                Weeds aren't always the bad guys. In the right place, they feed pollinators, hold the soil, and loosen
+                the dirt — three superpowers that keep nature strong!
               </p>
             </div>
             <p className="text-sm text-slate-800 font-medium">
-              A plant is only a "weed" when it's growing somewhere we don't want it. That same plant, out in
-              a meadow or on the edge of a forest, might be feeding butterflies and holding the soil
-              together! Farmers try to keep weeds out of crop fields — but along ditches, roadsides, and
-              wild spaces, these plants help keep nature humming.
+              A plant is only a "weed" when it's growing somewhere we don't want it. That same plant, out in a meadow or
+              on the edge of a forest, might be feeding butterflies and holding the soil together! Farmers try to keep
+              weeds out of crop fields — but along ditches, roadsides, and wild spaces, these plants help keep nature
+              humming.
             </p>
           </div>
 
           <div className="bg-white border-4 border-pink-500 rounded-2xl p-5 space-y-2 shadow-lg">
             <p className="font-display font-extrabold text-pink-700 text-lg">💗 A Team of Tiny Helpers</p>
             <p className="text-sm text-slate-800 font-medium">
-              Pollinators like bees and butterflies need flowers. Soil needs roots. Ecosystems need lots of
-              different plants working together. When weeds do their jobs, they help keep our whole
+              Pollinators like bees and butterflies need flowers. Soil needs roots. Ecosystems need lots of different
+              plants working together. When weeds do their jobs, they help keep our whole
               <strong> earth healthy</strong>.
             </p>
           </div>
@@ -5501,7 +6044,8 @@ function TopicContent({
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           what: "Growing crops in smart ways that make it hard for weeds to sneak in.",
-          examples: "Planting rows close together so crop leaves shade the soil, rotating corn and soybeans each year, or planting a cover crop in winter.",
+          examples:
+            "Planting rows close together so crop leaves shade the soil, rotating corn and soybeans each year, or planting a cover crop in winter.",
           bestFor: "Best on big farm fields where the farmer wants weeds to lose the race before they even start.",
         },
         {
@@ -5512,7 +6056,8 @@ function TopicContent({
           bg: "bg-info/10 border-info/40",
           what: "Using special sprays called herbicides that stop weeds from growing.",
           examples: "A farmer spraying a soybean field so weeds like waterhemp can't take over.",
-          bestFor: "Helpful when there are too many weeds to pull by hand — but must be used carefully so crops, people, and animals stay safe.",
+          bestFor:
+            "Helpful when there are too many weeds to pull by hand — but must be used carefully so crops, people, and animals stay safe.",
         },
         {
           key: "biological",
@@ -5531,7 +6076,8 @@ function TopicContent({
           dot: "bg-yellow-500",
           bg: "bg-yellow-500/10 border-yellow-500/40",
           what: "Stopping weeds before they ever get a chance to grow.",
-          examples: "Cleaning mud off tractors and boots, using clean seed, and pulling one weed before it makes thousands of new seeds.",
+          examples:
+            "Cleaning mud off tractors and boots, using clean seed, and pulling one weed before it makes thousands of new seeds.",
           bestFor: "The smartest kind of control — a little bit of prevention saves a whole lot of work later!",
         },
       ];
@@ -5541,59 +6087,62 @@ function TopicContent({
           <div
             className="rounded-2xl p-5 space-y-5 relative overflow-hidden"
             style={{
-              background:
-                "linear-gradient(180deg, hsl(32 55% 78%) 0%, hsl(28 45% 58%) 100%)",
+              background: "linear-gradient(180deg, hsl(32 55% 78%) 0%, hsl(28 45% 58%) 100%)",
               boxShadow: "inset 0 0 60px hsl(40 80% 85% / 0.5)",
             }}
           >
-          <div className="absolute top-2 right-4 text-2xl">🔨</div>
-          <div className="absolute top-2 left-4 text-2xl">🔧</div>
-          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
-            <p className="font-display font-bold text-primary text-base">Five Ways to Control Weeds</p>
-            <p>
-              Weeds can steal sunlight, water, air, nutrients, and space from crops. So how do farmers and
-              gardeners fight back? There are <strong>five main ways</strong> to control weeds, and each one
-              works best in a different kind of situation.
-            </p>
-            <p>
-              A good farmer usually mixes several of them together — this is called an <strong>integrated</strong>
-              {" "}approach, and it keeps weeds from ever getting the upper hand.
-            </p>
-          </div>
+            <div className="absolute top-2 right-4 text-2xl">🔨</div>
+            <div className="absolute top-2 left-4 text-2xl">🔧</div>
+            <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-5 text-sm text-foreground space-y-3 shadow">
+              <p className="font-display font-bold text-primary text-base">Five Ways to Control Weeds</p>
+              <p>
+                Weeds can steal sunlight, water, air, nutrients, and space from crops. So how do farmers and gardeners
+                fight back? There are <strong>five main ways</strong> to control weeds, and each one works best in a
+                different kind of situation.
+              </p>
+              <p>
+                A good farmer usually mixes several of them together — this is called an <strong>integrated</strong>{" "}
+                approach, and it keeps weeds from ever getting the upper hand.
+              </p>
+            </div>
 
-          <div className="rounded-xl border-4 border-amber-800 bg-yellow-50/95 p-3 shadow-lg">
-            <img
-              src={weedControlToolsImg}
-              alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
-              className="w-full rounded-md bg-background/60 object-contain"
-            />
-            <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
-            <p className="text-center text-xs text-amber-900 font-semibold mt-1">🏚️ Step into the Weed-Control Shed — pick a tool off the shelf!</p>
-          </div>
+            <div className="rounded-xl border-4 border-amber-800 bg-yellow-50/95 p-3 shadow-lg">
+              <img
+                src={weedControlToolsImg}
+                alt="Cartoon barn full of weed control tools — hoe, backpack sprayer, rotary tiller, cultivator, and tractor"
+                className="w-full rounded-md bg-background/60 object-contain"
+              />
+              <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+                Image generated with Google Gemini 1.5 Pro.
+              </p>
+              <p className="text-center text-xs text-amber-900 font-semibold mt-1">
+                🏚️ Step into the Weed-Control Shed — pick a tool off the shelf!
+              </p>
+            </div>
 
-          <ToolShelf methods={METHODS} />
+            <ToolShelf methods={METHODS} />
 
-          <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-3 shadow">
-            <p className="font-display font-bold text-success text-base">Different Tools for Different Jobs</p>
-            <p className="text-sm text-foreground">
-              No single method can stop every weed on its own. Pulling weeds by hand works in a small garden
-              but not on a huge field. A spray might knock back a giant patch of weeds, but it won't help if
-              new weed seeds keep hitching a ride on dirty boots.
-            </p>
-            <p className="text-sm text-foreground">
-              That's why the best weed fighters <strong>pick the right tool for the right situation</strong>{" "}
-              and use two or three methods together. Physical, cultural, chemical, biological, and preventative —
-              five ways to keep crops winning the race!
-            </p>
-          </div>
+            <div className="bg-yellow-50/95 border-4 border-amber-800 rounded-lg p-5 space-y-3 shadow">
+              <p className="font-display font-bold text-success text-base">Different Tools for Different Jobs</p>
+              <p className="text-sm text-foreground">
+                No single method can stop every weed on its own. Pulling weeds by hand works in a small garden but not
+                on a huge field. A spray might knock back a giant patch of weeds, but it won't help if new weed seeds
+                keep hitching a ride on dirty boots.
+              </p>
+              <p className="text-sm text-foreground">
+                That's why the best weed fighters <strong>pick the right tool for the right situation</strong> and use
+                two or three methods together. Physical, cultural, chemical, biological, and preventative — five ways to
+                keep crops winning the race!
+              </p>
+            </div>
 
-          <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-4 text-sm text-foreground shadow">
-            <p className="font-semibold text-primary mb-1">Remember:</p>
-            <p>
-              Physical, cultural, chemical, biological, preventative. Five ways to control weeds — and each one
-              shines in a different job.
-            </p>
-          </div>
+            <div className="bg-yellow-50/95 border-2 border-amber-800 rounded-lg p-4 text-sm text-foreground shadow">
+              <p className="font-semibold text-primary mb-1">Remember:</p>
+              <p>
+                Physical, cultural, chemical, biological, preventative. Five ways to control weeds — and each one shines
+                in a different job.
+              </p>
+            </div>
           </div>
         </div>
       );
@@ -5615,8 +6164,8 @@ function TopicContent({
           <div className="space-y-4">
             <JournalHeader title="Plant Families of the Midwest Weed Flora" subtitle="Comparative Morphology" />
             <LabCallout heading="Protocol">
-              Click a family tile to review its diagnostic characters (floral formula, inflorescence type,
-              leaf arrangement) and the member species represented in this dataset.
+              Click a family tile to review its diagnostic characters (floral formula, inflorescence type, leaf
+              arrangement) and the member species represented in this dataset.
             </LabCallout>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from(famGroups.entries())
@@ -5645,9 +6194,9 @@ function TopicContent({
         <div className="space-y-4">
           <JournalHeader title="Plant Families of the Midwest Weed Flora" subtitle="Comparative Morphology" />
           <LabCallout heading="Concept">
-            Family-level classification is anchored in shared reproductive morphology — floral structure,
-            inflorescence architecture, and fruit type — which typically correlates with predictable
-            herbicide sensitivity within the family.
+            Family-level classification is anchored in shared reproductive morphology — floral structure, inflorescence
+            architecture, and fruit type — which typically correlates with predictable herbicide sensitivity within the
+            family.
           </LabCallout>
           <TermSidebar
             terms={[
@@ -5664,7 +6213,12 @@ function TopicContent({
                 <h3 className="font-display font-bold text-foreground text-base">
                   {family} ({members.length} species)
                 </h3>
-                <HorizontalWeedRow weeds={members} onSelectWeed={onSelectWeed} stage="flower" showScientific={grade === "high"} />
+                <HorizontalWeedRow
+                  weeds={members}
+                  onSelectWeed={onSelectWeed}
+                  stage="flower"
+                  showScientific={grade === "high"}
+                />
               </div>
             ))}
         </div>
@@ -5729,7 +6283,9 @@ function TopicContent({
       const elementaryStages = [{ stage: "whole", label: "Whole Plant" }];
 
       // Official look-alike groups, restricted to this grade's weed pool.
-      const lookAlikeGroups: { name: string; weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(gradePool).map((g) => ({
+      const lookAlikeGroups: { name: string; weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(
+        gradePool,
+      ).map((g) => ({
         name: g.name,
         weeds: g.weeds as Weed[],
         difference: g.difference,
@@ -5860,9 +6416,7 @@ function TopicContent({
             {/* Stage-by-stage comparison */}
             {compareStages.map((s) => (
               <div key={s.stage}>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">
-                  {s.label}
-                </div>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
                 <div className={`grid ${colsClass} gap-2`}>
                   {group.map((w) => (
                     <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
@@ -5876,9 +6430,7 @@ function TopicContent({
             {/* Ligule row (only if at least one species is a grass) */}
             {anyGrass && (
               <div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">
-                  Ligule
-                </div>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">Ligule</div>
                 <div className={`grid ${colsClass} gap-2`}>
                   {group.map((w) => (
                     <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
@@ -5910,8 +6462,8 @@ function TopicContent({
             <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
               <p className="text-sm">
                 Some weeds look very similar to other weeds. It is important to tell them apart so we can manage them
-                the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look
-                alike — see if you can spot what makes each one different!
+                the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look alike
+                — see if you can spot what makes each one different!
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <EvidenceTag label="Suspects: 2–4" tone="suspect" />
@@ -5932,8 +6484,8 @@ function TopicContent({
                 <p>
                   Have you ever looked out at a field or a lawn and thought all the weeds looked pretty much the same?
                   You're not alone — even farmers and scientists sometimes have to look twice. Many common weeds are
-                  like nature's copycats. They have similar leaf shapes, the same spiky seeds, or grow in the exact
-                  same spots, making them really easy to mix up.
+                  like nature's copycats. They have similar leaf shapes, the same spiky seeds, or grow in the exact same
+                  spots, making them really easy to mix up.
                 </p>
                 <p>
                   But here's why it matters: not all weeds play by the same rules. Some can be pulled out easily, while
@@ -5946,9 +6498,11 @@ function TopicContent({
                 <p>
                   Getting the ID right is the first step to dealing with a weed the smart way — whether that's pulling
                   it, spraying it, or knowing to stay away from it entirely. The good news is that once you know what
-                  clues to look for, like <strong>leaf shape, stem texture, flower color, or whether the plant has
-                  milky sap when you break it</strong> — telling these lookalikes apart becomes a lot easier than it
-                  sounds.
+                  clues to look for, like{" "}
+                  <strong>
+                    leaf shape, stem texture, flower color, or whether the plant has milky sap when you break it
+                  </strong>{" "}
+                  — telling these lookalikes apart becomes a lot easier than it sounds.
                 </p>
               </div>
               <FieldNote label="Hypothesis">
@@ -5966,38 +6520,56 @@ function TopicContent({
               <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
                 <p>
                   In a soybean or corn field, two species that look nearly identical at the seedling stage can demand
-                  completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a textbook
-                  example — both are dioecious pigweeds, both can produce 250,000+ seeds per plant, and both have
-                  evolved resistance to multiple herbicide groups, but Palmer is the more aggressive competitor and
+                  completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a
+                  textbook example — both are dioecious pigweeds, both can produce 250,000+ seeds per plant, and both
+                  have evolved resistance to multiple herbicide groups, but Palmer is the more aggressive competitor and
                   triggers a zero-tolerance threshold across most of the Midwest. Misidentifying one as the other can
                   cost a grower 30–80% of yield in a heavily infested field.
                 </p>
                 <p>
                   Reliable identification at the high-school level means moving past general impressions and using
-                  <strong> diagnostic morphological characters</strong>: leaf venation and pubescence, stem cross-section
-                  and trichomes, petiole-to-leaf-blade ratio, inflorescence architecture, ligule and auricle shape in
-                  grasses, and the presence or absence of milky latex, square stems, or sheathing ocreae. Many of these
-                  features only become diagnostic at specific growth stages, so a single photograph at one stage is
-                  rarely enough — you have to compare species across the seedling, vegetative, and reproductive phases.
+                  <strong> diagnostic morphological characters</strong>: leaf venation and pubescence, stem
+                  cross-section and trichomes, petiole-to-leaf-blade ratio, inflorescence architecture, ligule and
+                  auricle shape in grasses, and the presence or absence of milky latex, square stems, or sheathing
+                  ocreae. Many of these features only become diagnostic at specific growth stages, so a single
+                  photograph at one stage is rarely enough — you have to compare species across the seedling,
+                  vegetative, and reproductive phases.
                 </p>
                 <p>
                   The consequences of misidentification extend beyond yield loss. Choosing the wrong mode-of-action
                   herbicide because you confused a Group-9-resistant Waterhemp with a still-susceptible Redroot Pigweed
-                  selects for further resistance and burns through control options. Confusing a native pollinator host
-                  (<em>e.g.</em> Common Milkweed) with an invasive look-alike can waste conservation effort or destroy
+                  selects for further resistance and burns through control options. Confusing a native pollinator host (
+                  <em>e.g.</em> Common Milkweed) with an invasive look-alike can waste conservation effort or destroy
                   monarch habitat. And confusing Wild Carrot with Poison Hemlock is a safety event, not a botany
                   mistake. The triples below are the species pairings most commonly confused in field-scouting reports;
                   use the side-by-side layout to build a mental key based on the features that actually distinguish
                   them.
                 </p>
               </div>
-              <TermSidebar terms={[
-                { term: "Pubescence", def: "The presence, type, and density of hairs (trichomes) on stems and leaves." },
-                { term: "Ocrea", def: "A sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds/knotweeds." },
-                { term: "Ligule / Auricle", def: "Grass features at the leaf-blade / sheath junction; often the most reliable ID character for grasses." },
-                { term: "Inflorescence", def: "The arrangement of flowers on the stem (spike, panicle, umbel, raceme)." },
-                { term: "Dioecious", def: "Male and female flowers on separate plants — key trait separating Amaranthus species." },
-              ]} />
+              <TermSidebar
+                terms={[
+                  {
+                    term: "Pubescence",
+                    def: "The presence, type, and density of hairs (trichomes) on stems and leaves.",
+                  },
+                  {
+                    term: "Ocrea",
+                    def: "A sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds/knotweeds.",
+                  },
+                  {
+                    term: "Ligule / Auricle",
+                    def: "Grass features at the leaf-blade / sheath junction; often the most reliable ID character for grasses.",
+                  },
+                  {
+                    term: "Inflorescence",
+                    def: "The arrangement of flowers on the stem (spike, panicle, umbel, raceme).",
+                  },
+                  {
+                    term: "Dioecious",
+                    def: "Male and female flowers on separate plants — key trait separating Amaranthus species.",
+                  },
+                ]}
+              />
               <LabCallout heading="Diagnostic Protocol">
                 Compare specimens at <strong>at least two life stages</strong>, verify with a genus-level key before
                 naming to species, and record which character was decisive — future you will need that note.
@@ -6009,16 +6581,14 @@ function TopicContent({
           {lookAlikeGroups.length > 0 && (
             <div className="space-y-4">
               <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <h3 className="font-display font-bold text-foreground text-base mb-1">
-                  Look-Alike Groups
-                </h3>
+                <h3 className="font-display font-bold text-foreground text-base mb-1">Look-Alike Groups</h3>
                 <p className="text-sm text-foreground">
                   Compare these commonly-confused species at each growth stage. For grass groups, the{" "}
                   <strong>ligule</strong> row is one of the most reliable ID features.
                 </p>
               </div>
               {lookAlikeGroups.map((g, i) =>
-                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference, g.name)
+                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference, g.name),
               )}
             </div>
           )}
@@ -6130,12 +6700,7 @@ function TopicContent({
         const toxic = topicWeeds.filter((w) => groupsFor(w).includes("toxic"));
         const other = topicWeeds.filter((w) => groupsFor(w).length === 0);
 
-        const renderGroup = (
-          title: string,
-          desc: string,
-          tone: string,
-          group: Weed[],
-        ) =>
+        const renderGroup = (title: string, desc: string, tone: string, group: Weed[]) =>
           group.length === 0 ? null : (
             <div key={title} className={`border rounded-lg p-4 space-y-3 ${tone}`}>
               <div>
@@ -6170,8 +6735,8 @@ function TopicContent({
                 touched or ingested, they can cause harm to people.
               </p>
               <p>
-                Not all unsafe weeds are dangerous in the same way. Some hurt your <strong>skin</strong> when you
-                touch them, some are <strong>poisonous</strong> if eaten, and some have sharp parts that can{" "}
+                Not all unsafe weeds are dangerous in the same way. Some hurt your <strong>skin</strong> when you touch
+                them, some are <strong>poisonous</strong> if eaten, and some have sharp parts that can{" "}
                 <strong>physically</strong> hurt you. They are grouped below by the kind of harm they can cause.
               </p>
             </div>
@@ -6228,14 +6793,14 @@ function TopicContent({
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-destructive text-base">Safety</p>
               <p>
-                Working around weeds might not sound dangerous, but there are actually quite a few hazards that
-                farmers, scientists, and land managers need to watch out for in the field.
+                Working around weeds might not sound dangerous, but there are actually quite a few hazards that farmers,
+                scientists, and land managers need to watch out for in the field.
               </p>
               <p>
-                Certain weed species pose direct physical risks, including plants with <strong>sharp thorns or
-                spines</strong> capable of causing puncture wounds, species that produce <strong>irritating or toxic
-                sap</strong> that causes dermatitis or chemical burns upon skin contact, and highly <strong>allergenic
-                plants</strong> whose pollen triggers significant respiratory responses.
+                Certain weed species pose direct physical risks, including plants with{" "}
+                <strong>sharp thorns or spines</strong> capable of causing puncture wounds, species that produce{" "}
+                <strong>irritating or toxic sap</strong> that causes dermatitis or chemical burns upon skin contact, and
+                highly <strong>allergenic plants</strong> whose pollen triggers significant respiratory responses.
               </p>
               <p>
                 Herbicide application introduces additional risks related to chemical exposure, requiring the proper
@@ -6397,8 +6962,7 @@ function TopicContent({
     /* ═══════════════════════════════════════════════════════════
        CONTROL METHODS
     ═══════════════════════════════════════════════════════════ */
-    case "control-methods":
-    {
+    case "control-methods": {
       const isHighSchool = grade === "high";
       const isElementary = grade === "elementary";
 
@@ -6441,7 +7005,8 @@ function TopicContent({
           key: "chemical",
           label: "Chemical Methods (Herbicides)",
           desc: "Herbicides are special chemicals that farmers spray on fields to stop weeds. Pre-emergent herbicides are sprayed before weed seeds sprout. Post-emergent herbicides are sprayed on weeds that are already growing. Farmers wear safety gear and follow the label exactly to keep people, animals, and crops safe.",
-          example: "A farmer sprays a pre-emergent herbicide on a soybean field in early spring to stop weeds before they sprout.",
+          example:
+            "A farmer sprays a pre-emergent herbicide on a soybean field in early spring to stop weeds before they sprout.",
         },
       ];
 
@@ -6468,13 +7033,15 @@ function TopicContent({
           key: "chemical",
           label: "Chemical Control (Herbicides)",
           desc: "Herbicides are chemicals specifically designed to kill or slow the growth of unwanted plants. They are classified by their mode of action, application timing (pre-emergent or post-emergent), and selectivity. Pre-emergent herbicides are applied before weed seeds germinate. Post-emergent herbicides target actively growing weeds.",
-          example: "Applying a pre-emergent herbicide to the soil surface before weeds sprout to create a chemical barrier.",
+          example:
+            "Applying a pre-emergent herbicide to the soil surface before weeds sprout to create a chemical barrier.",
         },
         {
           key: "integrated",
           label: "Integrated Approach",
           desc: "The most effective and sustainable long-term weed management programs integrate multiple control methods in a coordinated strategy, reducing reliance on any single approach and minimizing the risk of weed adaptation or resistance development.",
-          example: "Combining cover crops, crop rotation, mechanical cultivation, and targeted herbicide use across a season.",
+          example:
+            "Combining cover crops, crop rotation, mechanical cultivation, and targeted herbicide use across a season.",
         },
       ];
 
@@ -6546,14 +7113,15 @@ function TopicContent({
             {isElementary ? (
               <p>
                 There are many ways to manage and remove weeds. Farmers, gardeners, and scientists use different methods
-                depending on the type of weed and where it is growing. Learning about control methods helps us keep
-                our fields, gardens, and environments healthy.
+                depending on the type of weed and where it is growing. Learning about control methods helps us keep our
+                fields, gardens, and environments healthy.
               </p>
             ) : isHighSchool ? (
               <>
                 <p>
                   Effective weed management requires an <strong>Integrated Pest Management (IPM)</strong> approach —
-                  combining multiple control tactics to reduce weed pressure, prevent resistance, and protect crop yield.
+                  combining multiple control tactics to reduce weed pressure, prevent resistance, and protect crop
+                  yield.
                 </p>
                 <p className="text-muted-foreground">
                   Understanding each tool's <strong>mode of action</strong>, <strong>timing window</strong>, and{" "}
@@ -6564,7 +7132,8 @@ function TopicContent({
               <>
                 <p>
                   Controlling weeds isn't just about spraying chemicals — there's actually a whole toolbox of strategies
-                  that farmers can use including <strong>cultural, mechanical, biological, and chemical</strong> methods.
+                  that farmers can use including <strong>cultural, mechanical, biological, and chemical</strong>{" "}
+                  methods.
                 </p>
               </>
             )}
@@ -6586,19 +7155,21 @@ function TopicContent({
                 <h3 className="font-display font-bold text-foreground">{method.label}</h3>
                 <p className="text-sm text-foreground">{method.desc}</p>
                 <div className="flex gap-3 items-start">
-                  {isHighSchool && (method as any).weedId && (() => {
-                    const exW = weeds.find((w) => w.id === (method as any).weedId);
-                    if (!exW) return null;
-                    return (
-                      <button
-                        onClick={() => onSelectWeed(exW)}
-                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
-                        aria-label={`Open ${exW.commonName}`}
-                      >
-                        <WeedImage weedId={exW.id} stage="mature" className="w-full h-full" />
-                      </button>
-                    );
-                  })()}
+                  {isHighSchool &&
+                    (method as any).weedId &&
+                    (() => {
+                      const exW = weeds.find((w) => w.id === (method as any).weedId);
+                      if (!exW) return null;
+                      return (
+                        <button
+                          onClick={() => onSelectWeed(exW)}
+                          className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary transition-colors"
+                          aria-label={`Open ${exW.commonName}`}
+                        >
+                          <WeedImage weedId={exW.id} stage="mature" className="w-full h-full" />
+                        </button>
+                      );
+                    })()}
                   <div className="bg-primary/10 rounded-lg p-3 flex-1">
                     <p className="text-xs text-primary">
                       <span className="font-semibold">Example:</span> {method.example}
@@ -6615,9 +7186,9 @@ function TopicContent({
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-sm text-foreground space-y-2">
                 <p className="font-bold text-destructive">Match the Herbicide to the Crop</p>
                 <p className="text-xs">
-                  Soybean is itself a <strong>broadleaf</strong>, so spraying a non-selective broadleaf herbicide
-                  over conventional soybean will damage the crop along with the weeds. Corn is a <strong>grass</strong>,
-                  so a non-selective grass herbicide will damage corn. Always read the label and confirm the herbicide is
+                  Soybean is itself a <strong>broadleaf</strong>, so spraying a non-selective broadleaf herbicide over
+                  conventional soybean will damage the crop along with the weeds. Corn is a <strong>grass</strong>, so a
+                  non-selective grass herbicide will damage corn. Always read the label and confirm the herbicide is
                   labeled for the crop you are growing.
                 </p>
               </div>
@@ -6628,10 +7199,18 @@ function TopicContent({
                   lets growers spray over the top of the crop. Common platforms include:
                 </p>
                 <ul className="text-xs list-disc ml-5 space-y-1">
-                  <li><strong>Roundup Ready</strong> — tolerance to glyphosate (Group 9).</li>
-                  <li><strong>LibertyLink</strong> — tolerance to glufosinate (Group 10).</li>
-                  <li><strong>Xtend / XtendiMax</strong> — tolerance to dicamba (Group 4).</li>
-                  <li><strong>Enlist E3</strong> — tolerance to 2,4-D choline + glyphosate + glufosinate.</li>
+                  <li>
+                    <strong>Roundup Ready</strong> — tolerance to glyphosate (Group 9).
+                  </li>
+                  <li>
+                    <strong>LibertyLink</strong> — tolerance to glufosinate (Group 10).
+                  </li>
+                  <li>
+                    <strong>Xtend / XtendiMax</strong> — tolerance to dicamba (Group 4).
+                  </li>
+                  <li>
+                    <strong>Enlist E3</strong> — tolerance to 2,4-D choline + glyphosate + glufosinate.
+                  </li>
                 </ul>
                 <p className="text-xs text-muted-foreground">
                   Trait stacking allows multiple modes of action over the same crop, which is a key tool for managing
@@ -6659,31 +7238,43 @@ function TopicContent({
                           <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
                           <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Resistance & Documented Resistant Weeds</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">
+                            Resistance & Documented Resistant Weeds
+                          </th>
                         </tr>
                       </thead>
-                       <tbody>
-                         {[...HERBICIDE_MOA].sort((a, b) => {
-                           if (a.group !== b.group) return a.group - b.group;
-                           const order = { PRE: 0, BOTH: 1, POST: 2 } as const;
-                           return (order[a.timing] ?? 3) - (order[b.timing] ?? 3);
-                         }).map(h => {
-                           const resistantWeeds = RESISTANT_WEEDS_BY_GROUP[h.group];
-                           return (
-                          <tr key={h.id} className="even:bg-muted/20">
-                            <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
-                            <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
-                            <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
-                            <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
-                            <td className="p-2 border border-border align-top">
-                              <span className={`font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</span>
-                              {resistantWeeds && (
-                                <div className="text-[10px] text-muted-foreground mt-1">Examples: {resistantWeeds.join(', ')}</div>
-                              )}
-                            </td>
-                          </tr>
-                          );
-                        })}
+                      <tbody>
+                        {[...HERBICIDE_MOA]
+                          .sort((a, b) => {
+                            if (a.group !== b.group) return a.group - b.group;
+                            const order = { PRE: 0, BOTH: 1, POST: 2 } as const;
+                            return (order[a.timing] ?? 3) - (order[b.timing] ?? 3);
+                          })
+                          .map((h) => {
+                            const resistantWeeds = RESISTANT_WEEDS_BY_GROUP[h.group];
+                            return (
+                              <tr key={h.id} className="even:bg-muted/20">
+                                <td className="p-2 border border-border font-medium text-foreground">
+                                  {h.moa} (Group {h.group})
+                                </td>
+                                <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
+                                <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
+                                <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
+                                <td className="p-2 border border-border align-top">
+                                  <span
+                                    className={`font-medium ${h.resistanceLevel === "Very high" || h.resistanceLevel === "High" ? "text-destructive" : "text-foreground"}`}
+                                  >
+                                    {h.resistanceLevel}
+                                  </span>
+                                  {resistantWeeds && (
+                                    <div className="text-[10px] text-muted-foreground mt-1">
+                                      Examples: {resistantWeeds.join(", ")}
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
                       </tbody>
                     </table>
                   </div>
@@ -6695,8 +7286,8 @@ function TopicContent({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {Object.entries(SYMPTOM_TYPES).map(([key, info]) => {
                       const groups = [...HERBICIDE_MOA]
-                        .filter(h => h.symptomType === key)
-                        .map(h => h.group)
+                        .filter((h) => h.symptomType === key)
+                        .map((h) => h.group)
                         .filter((g, i, arr) => arr.indexOf(g) === i)
                         .sort((a, b) => a - b);
                       return (
@@ -6705,7 +7296,8 @@ function TopicContent({
                           <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
                           {groups.length > 0 && (
                             <p className="text-[10px] text-primary mt-1">
-                              <span className="font-semibold">MOA groups:</span> {groups.map(g => `Group ${g}`).join(', ')}
+                              <span className="font-semibold">MOA groups:</span>{" "}
+                              {groups.map((g) => `Group ${g}`).join(", ")}
                             </p>
                           )}
                         </div>
@@ -6720,23 +7312,36 @@ function TopicContent({
                     <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
                   </p>
                   <div className="space-y-2">
-                    {[...getMiddleSchoolMOAs()].sort((a, b) => a.group - b.group).map(h => (
-                      <div key={h.id} className="bg-card border border-border rounded-lg p-3">
-                        <p className="font-bold text-foreground text-xs">{h.moa} (Group {h.group})</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          <span className="font-medium">Timing:</span> {h.timing === 'PRE' ? 'Pre-emergent (before weeds sprout)' : 'Post-emergent (after weeds are growing)'}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          <span className="font-medium">Targets:</span> {h.spectrum === 'Both' ? 'Grasses and broadleaves' : h.spectrum === 'Grass' ? 'Grasses (monocots)' : 'Broadleaves (dicots)'}
-                        </p>
-                         <p className="text-[10px] text-muted-foreground">
-                           <span className="font-medium">Chemical:</span> {h.brands[0]}
-                         </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          <span className="font-medium">What it looks like:</span> {SYMPTOM_TYPES[h.symptomType]?.label}
-                        </p>
-                      </div>
-                    ))}
+                    {[...getMiddleSchoolMOAs()]
+                      .sort((a, b) => a.group - b.group)
+                      .map((h) => (
+                        <div key={h.id} className="bg-card border border-border rounded-lg p-3">
+                          <p className="font-bold text-foreground text-xs">
+                            {h.moa} (Group {h.group})
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            <span className="font-medium">Timing:</span>{" "}
+                            {h.timing === "PRE"
+                              ? "Pre-emergent (before weeds sprout)"
+                              : "Post-emergent (after weeds are growing)"}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            <span className="font-medium">Targets:</span>{" "}
+                            {h.spectrum === "Both"
+                              ? "Grasses and broadleaves"
+                              : h.spectrum === "Grass"
+                                ? "Grasses (monocots)"
+                                : "Broadleaves (dicots)"}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            <span className="font-medium">Chemical:</span> {h.brands[0]}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            <span className="font-medium">What it looks like:</span>{" "}
+                            {SYMPTOM_TYPES[h.symptomType]?.label}
+                          </p>
+                        </div>
+                      ))}
                   </div>
                 </>
               )}
@@ -6782,8 +7387,20 @@ function TopicContent({
           diagram: (
             <svg viewBox="0 0 120 70" className="w-full h-auto">
               <rect x="4" y="6" width="112" height="58" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
-              <polyline points="10,12 35,58 60,12 85,58 110,12" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round" />
-              {[[10,12],[35,58],[60,12],[85,58],[110,12]].map(([x,y],i) => (
+              <polyline
+                points="10,12 35,58 60,12 85,58 110,12"
+                fill="none"
+                stroke="hsl(var(--primary))"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+              {[
+                [10, 12],
+                [35, 58],
+                [60, 12],
+                [85, 58],
+                [110, 12],
+              ].map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--accent))" />
               ))}
             </svg>
@@ -6798,7 +7415,13 @@ function TopicContent({
               <rect x="4" y="4" width="62" height="62" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
               <line x1="8" y1="8" x2="62" y2="62" stroke="hsl(var(--primary))" strokeWidth="2.5" />
               <line x1="62" y1="8" x2="8" y2="62" stroke="hsl(var(--primary))" strokeWidth="2.5" />
-              {[[8,8],[62,62],[62,8],[8,62],[35,35]].map(([x,y],i) => (
+              {[
+                [8, 8],
+                [62, 62],
+                [62, 8],
+                [8, 62],
+                [35, 35],
+              ].map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r="2.5" fill="hsl(var(--accent))" />
               ))}
             </svg>
@@ -6811,8 +7434,23 @@ function TopicContent({
           diagram: (
             <svg viewBox="0 0 160 40" className="w-full h-auto">
               <rect x="4" y="6" width="152" height="28" fill="hsl(var(--muted))" stroke="hsl(var(--border))" />
-              <polyline points="10,30 30,10 50,30 70,10 90,30 110,10 130,30 150,10" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round" />
-              {[[10,30],[30,10],[50,30],[70,10],[90,30],[110,10],[130,30],[150,10]].map(([x,y],i) => (
+              <polyline
+                points="10,30 30,10 50,30 70,10 90,30 110,10 130,30 150,10"
+                fill="none"
+                stroke="hsl(var(--primary))"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+              {[
+                [10, 30],
+                [30, 10],
+                [50, 30],
+                [70, 10],
+                [90, 30],
+                [110, 10],
+                [130, 30],
+                [150, 10],
+              ].map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r="2" fill="hsl(var(--accent))" />
               ))}
             </svg>
@@ -6826,9 +7464,7 @@ function TopicContent({
             <p className="font-display font-bold text-primary text-base">Field Walking Methods and Patterns</p>
             {grade === "middle" ? (
               <>
-                <p>
-                  Imagine being asked to check an entire football field for weeds. Where would you even start?
-                </p>
+                <p>Imagine being asked to check an entire football field for weeds. Where would you even start?</p>
                 <p>
                   Systematic field scouting is a foundational practice in weed management that involves walking through
                   a field in a <strong>structured, repeatable pattern</strong> to accurately assess the type,
@@ -6840,24 +7476,36 @@ function TopicContent({
                   visually obvious areas.
                 </p>
                 <p>
-                  The choice of scouting pattern depends on factors such as <strong>field size, shape, crop type</strong>,
-                  and the suspected distribution of weed pressure. Accurate scouting data ensures that weed populations
-                  are neither overestimated nor underestimated.
+                  The choice of scouting pattern depends on factors such as{" "}
+                  <strong>field size, shape, crop type</strong>, and the suspected distribution of weed pressure.
+                  Accurate scouting data ensures that weed populations are neither overestimated nor underestimated.
                 </p>
               </>
             ) : (
               <>
                 <p>
-                  Field scouting starts with <strong>manual walking patterns</strong> that an agronomist or grower can use on
-                  foot. These patterns are the foundation of every weed assessment — they are how you ground-truth what is
-                  actually growing in the field.
+                  Field scouting starts with <strong>manual walking patterns</strong> that an agronomist or grower can
+                  use on foot. These patterns are the foundation of every weed assessment — they are how you
+                  ground-truth what is actually growing in the field.
                 </p>
                 <p>
                   However, the average Iowa crop farm now spans roughly <strong>345 acres</strong>
-                  <span className="text-xs text-muted-foreground"> (<a href="https://www.extension.iastate.edu/Agdm/articles/edwards/EdwMar24.html" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-primary/80">Edwards, ISU Extension, March 2024</a>)</span>,
-                  which is far too large for a person to cover thoroughly on foot every week. To scale up scouting,
-                  agronomists now combine manual walks with <strong>drones, rovers, and satellites</strong> that can survey
-                  whole fields quickly and pinpoint problem areas for a closer manual look.
+                  <span className="text-xs text-muted-foreground">
+                    {" "}
+                    (
+                    <a
+                      href="https://www.extension.iastate.edu/Agdm/articles/edwards/EdwMar24.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-primary hover:text-primary/80"
+                    >
+                      Edwards, ISU Extension, March 2024
+                    </a>
+                    )
+                  </span>
+                  , which is far too large for a person to cover thoroughly on foot every week. To scale up scouting,
+                  agronomists now combine manual walks with <strong>drones, rovers, and satellites</strong> that can
+                  survey whole fields quickly and pinpoint problem areas for a closer manual look.
                 </p>
               </>
             )}
@@ -6866,14 +7514,16 @@ function TopicContent({
           {/* Manual scouting patterns (always shown first) */}
           <h3 className="font-display font-bold text-foreground text-sm">Manual Scouting Patterns</h3>
           <p className="text-xs text-muted-foreground -mt-2">
-            Match the pattern to the field shape so every part of the field has a fair chance of being sampled. The dots show
-            sampling stops along each route.
+            Match the pattern to the field shape so every part of the field has a fair chance of being sampled. The dots
+            show sampling stops along each route.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {PATTERNS.map((p) => (
               <div key={p.name} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <p className="font-bold text-foreground text-lg text-center">{p.name}</p>
-                <p className="text-[10px] uppercase tracking-wide text-primary text-center font-semibold">Best for: {p.bestFor}</p>
+                <p className="text-[10px] uppercase tracking-wide text-primary text-center font-semibold">
+                  Best for: {p.bestFor}
+                </p>
                 <div className="bg-secondary/30 rounded p-2">{p.diagram}</div>
                 <p className="text-xs text-muted-foreground">{p.desc}</p>
               </div>
@@ -6884,7 +7534,8 @@ function TopicContent({
             <>
               <h3 className="font-display font-bold text-foreground text-sm">Technology-Assisted Scouting</h3>
               <p className="text-xs text-muted-foreground -mt-2">
-                Because modern fields are too large to walk every week, manual patterns are now combined with these tools.
+                Because modern fields are too large to walk every week, manual patterns are now combined with these
+                tools.
               </p>
               <div className="space-y-3">
                 {[
@@ -6912,7 +7563,10 @@ function TopicContent({
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Why Consistent Scouting Matters</p>
-            <p className="mt-1">These tools help farmers find small weed patches early, ultimately reducing labor costs and yield losses from aggressive early-season weed competition.</p>
+            <p className="mt-1">
+              These tools help farmers find small weed patches early, ultimately reducing labor costs and yield losses
+              from aggressive early-season weed competition.
+            </p>
           </div>
         </div>
       );
@@ -6971,13 +7625,25 @@ function TopicContent({
                   <p className="font-bold text-foreground text-sm mb-2">Key definitions</p>
                   <dl className="text-xs space-y-1.5">
                     {[
-                      ["Germination rate", "How quickly a seed sprouts after hitting the soil — faster means a bigger head start over competitors."],
+                      [
+                        "Germination rate",
+                        "How quickly a seed sprouts after hitting the soil — faster means a bigger head start over competitors.",
+                      ],
                       ["Canopy competition", "Racing to grow tall and spread wide to shade out neighboring plants."],
-                      ["Deep / extensive root systems", "Roots that reach far down or spread wide underground to access water and nutrients others can't reach."],
+                      [
+                        "Deep / extensive root systems",
+                        "Roots that reach far down or spread wide underground to access water and nutrients others can't reach.",
+                      ],
                       ["Allelopathy", "Releasing chemicals into the soil to slow or stop nearby plants from growing."],
                       ["Physical deterrents", "Spines, thorns, or rough hairs that make a plant hard to eat."],
-                      ["Chemical defense", "Toxic or bad-tasting compounds produced inside the plant to discourage predators."],
-                      ["Dormancy", "A seed's ability to pause development and wait in the soil until conditions are right to sprout."],
+                      [
+                        "Chemical defense",
+                        "Toxic or bad-tasting compounds produced inside the plant to discourage predators.",
+                      ],
+                      [
+                        "Dormancy",
+                        "A seed's ability to pause development and wait in the soil until conditions are right to sprout.",
+                      ],
                     ].map(([term, def]) => (
                       <div key={term} className="grid grid-cols-[10rem_1fr] gap-2">
                         <dt className="font-semibold text-primary">{term}</dt>
@@ -7001,9 +7667,10 @@ function TopicContent({
                   closure, late-emerging weeds matter less for yield but still drive next year's seedbank.
                 </p>
                 <p>
-                  Understanding interspecific competition among weeds helps predict <strong>weed succession patterns</strong>
-                  — for example, why repeated glyphosate use shifted Midwest fields toward Palmer amaranth and waterhemp —
-                  and supports management strategies that account for the full ecological complexity of weed communities.
+                  Understanding interspecific competition among weeds helps predict{" "}
+                  <strong>weed succession patterns</strong>— for example, why repeated glyphosate use shifted Midwest
+                  fields toward Palmer amaranth and waterhemp — and supports management strategies that account for the
+                  full ecological complexity of weed communities.
                 </p>
               </>
             )}
@@ -7035,7 +7702,13 @@ function TopicContent({
             <p className="font-display font-bold text-foreground text-sm">Real-World Examples</p>
             {COMPETITION_EXAMPLES.map((cat) => {
               const ws = cat.weedIds
-                .map((id) => weeds.find((w) => w.id === id) || weeds.find((w) => w.commonName.toLowerCase().replace(/[ _]/g, "") === id.toLowerCase().replace(/[ _]/g, "")))
+                .map(
+                  (id) =>
+                    weeds.find((w) => w.id === id) ||
+                    weeds.find(
+                      (w) => w.commonName.toLowerCase().replace(/[ _]/g, "") === id.toLowerCase().replace(/[ _]/g, ""),
+                    ),
+                )
                 .filter((w): w is Weed => !!w);
               if (ws.length === 0) return null;
               return (
@@ -7079,13 +7752,55 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "economic-threshold": {
       const THRESHOLD_EXAMPLES: { weedId: string; name: string; crop: string; threshold: string; note: string }[] = [
-        { weedId: "palmer-amaranth", name: "Palmer Amaranth", crop: "Soybean", threshold: "1–2 plants per 30 ft of row", note: "Extremely low threshold — even sparse populations can cause 10%+ yield loss because of rapid biomass accumulation." },
-        { weedId: "waterhemp", name: "Waterhemp", crop: "Soybean", threshold: "Fewer than 1 plant per ft of row", note: "Aggressive seed production (250k+ seeds/female) makes seedbank prevention as important as yield protection." },
-        { weedId: "giant-ragweed", name: "Giant Ragweed", crop: "Corn", threshold: "~1 plant per 100 ft²", note: "Very tall, very competitive — a handful of plants per acre can justify control." },
-        { weedId: "lambsquarters", name: "Lambsquarters", crop: "Soybean", threshold: "~4–8 plants per m²", note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's." },
-        { weedId: "velvetleaf", name: "Velvetleaf", crop: "Corn", threshold: "~1 plant per m²", note: "Wide leaves shade corn rapidly, but corn outgrows lower densities." },
-        { weedId: "giant-foxtail", name: "Giant Foxtail", crop: "Corn", threshold: "10–20 plants per m²", note: "Much higher tolerance — economic loss only at dense infestations." },
-      ].map(e => ({ ...e, weed: weeds.find(w => w.id === e.weedId) || weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
+        {
+          weedId: "palmer-amaranth",
+          name: "Palmer Amaranth",
+          crop: "Soybean",
+          threshold: "1–2 plants per 30 ft of row",
+          note: "Extremely low threshold — even sparse populations can cause 10%+ yield loss because of rapid biomass accumulation.",
+        },
+        {
+          weedId: "waterhemp",
+          name: "Waterhemp",
+          crop: "Soybean",
+          threshold: "Fewer than 1 plant per ft of row",
+          note: "Aggressive seed production (250k+ seeds/female) makes seedbank prevention as important as yield protection.",
+        },
+        {
+          weedId: "giant-ragweed",
+          name: "Giant Ragweed",
+          crop: "Corn",
+          threshold: "~1 plant per 100 ft²",
+          note: "Very tall, very competitive — a handful of plants per acre can justify control.",
+        },
+        {
+          weedId: "lambsquarters",
+          name: "Lambsquarters",
+          crop: "Soybean",
+          threshold: "~4–8 plants per m²",
+          note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's.",
+        },
+        {
+          weedId: "velvetleaf",
+          name: "Velvetleaf",
+          crop: "Corn",
+          threshold: "~1 plant per m²",
+          note: "Wide leaves shade corn rapidly, but corn outgrows lower densities.",
+        },
+        {
+          weedId: "giant-foxtail",
+          name: "Giant Foxtail",
+          crop: "Corn",
+          threshold: "10–20 plants per m²",
+          note: "Much higher tolerance — economic loss only at dense infestations.",
+        },
+      ]
+        .map((e) => ({
+          ...e,
+          weed:
+            weeds.find((w) => w.id === e.weedId) ||
+            weeds.find((w) => w.commonName.toLowerCase() === e.name.toLowerCase()),
+        }))
         .filter((e): e is typeof e & { weed: Weed } => !!e.weed) as any;
       return (
         <div className="space-y-5">
@@ -7123,49 +7838,123 @@ function TopicContent({
           <div className="bg-card border border-border rounded-lg p-4 space-y-2">
             <p className="font-display font-bold text-foreground text-sm text-center">Economic Threshold Over Time</p>
             <div className="w-full overflow-x-auto">
-              <svg viewBox="0 0 420 260" className="w-full h-auto max-w-lg mx-auto block" role="img" aria-label="Economic threshold graph showing weed infestation level over time with and without control">
+              <svg
+                viewBox="0 0 420 260"
+                className="w-full h-auto max-w-lg mx-auto block"
+                role="img"
+                aria-label="Economic threshold graph showing weed infestation level over time with and without control"
+              >
                 {/* Axes */}
                 <line x1="50" y1="220" x2="390" y2="220" stroke="hsl(var(--border))" strokeWidth="2" />
                 <line x1="50" y1="20" x2="50" y2="220" stroke="hsl(var(--border))" strokeWidth="2" />
                 {/* Y-axis label */}
-                <text x="18" y="125" fontSize="11" fill="hsl(var(--foreground))" transform="rotate(-90 18 125)" textAnchor="middle" fontWeight="bold">Weed Infestation Level</text>
+                <text
+                  x="18"
+                  y="125"
+                  fontSize="11"
+                  fill="hsl(var(--foreground))"
+                  transform="rotate(-90 18 125)"
+                  textAnchor="middle"
+                  fontWeight="bold"
+                >
+                  Weed Infestation Level
+                </text>
                 {/* X-axis label */}
-                <text x="225" y="250" fontSize="11" fill="hsl(var(--foreground))" textAnchor="middle" fontWeight="bold">Time</text>
+                <text x="225" y="250" fontSize="11" fill="hsl(var(--foreground))" textAnchor="middle" fontWeight="bold">
+                  Time
+                </text>
 
                 {/* Economic injury level (dashed, upper) */}
-                <line x1="50" y1="55" x2="390" y2="55" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" strokeDasharray="5 4" />
-                <text x="60" y="50" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">Economic injury level</text>
+                <line
+                  x1="50"
+                  y1="55"
+                  x2="390"
+                  y2="55"
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 4"
+                />
+                <text x="60" y="50" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">
+                  Economic injury level
+                </text>
 
                 {/* Economic threshold (solid, middle) */}
                 <line x1="50" y1="105" x2="390" y2="105" stroke="hsl(var(--foreground))" strokeWidth="1.5" />
-                <text x="60" y="100" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">Economic threshold</text>
+                <text x="60" y="100" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">
+                  Economic threshold
+                </text>
 
                 {/* Without control curve (dashed black, rises above injury level) */}
-                <path d="M 50 200 C 110 190, 150 150, 190 110 C 230 70, 280 40, 340 55 C 370 65, 390 90, 390 120" fill="none" stroke="hsl(var(--foreground))" strokeWidth="2.5" strokeDasharray="6 4" />
-                <text x="300" y="35" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">Without control</text>
+                <path
+                  d="M 50 200 C 110 190, 150 150, 190 110 C 230 70, 280 40, 340 55 C 370 65, 390 90, 390 120"
+                  fill="none"
+                  stroke="hsl(var(--foreground))"
+                  strokeWidth="2.5"
+                  strokeDasharray="6 4"
+                />
+                <text x="300" y="35" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">
+                  Without control
+                </text>
 
                 {/* With control curve (solid green filled) */}
-                <path d="M 50 200 C 110 190, 150 150, 185 105 L 185 220 L 50 220 Z" fill="#558B2F" fillOpacity="0.25" stroke="none" />
-                <path d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165" fill="none" stroke="#558B2F" strokeWidth="2.5" />
-                <path d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165 L 390 220 L 185 220 Z" fill="#558B2F" fillOpacity="0.25" stroke="none" />
-                <text x="260" y="175" fontSize="10" fill="#558B2F" fontWeight="bold">With control</text>
+                <path
+                  d="M 50 200 C 110 190, 150 150, 185 105 L 185 220 L 50 220 Z"
+                  fill="#558B2F"
+                  fillOpacity="0.25"
+                  stroke="none"
+                />
+                <path
+                  d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165"
+                  fill="none"
+                  stroke="#558B2F"
+                  strokeWidth="2.5"
+                />
+                <path
+                  d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165 L 390 220 L 185 220 Z"
+                  fill="#558B2F"
+                  fillOpacity="0.25"
+                  stroke="none"
+                />
+                <text x="260" y="175" fontSize="10" fill="#558B2F" fontWeight="bold">
+                  With control
+                </text>
 
                 {/* Chemical control arrow and label */}
-                <line x1="185" y1="25" x2="185" y2="95" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+                <line
+                  x1="185"
+                  y1="25"
+                  x2="185"
+                  y2="95"
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeWidth="1.5"
+                  markerEnd="url(#arrowhead)"
+                />
                 <defs>
                   <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                     <polygon points="0 0, 8 3, 0 6" fill="hsl(var(--muted-foreground))" />
                   </marker>
                 </defs>
-                <text x="120" y="22" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">Chemical control</text>
+                <text x="120" y="22" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">
+                  Chemical control
+                </text>
 
                 {/* Drop arrow at intervention */}
-                <line x1="200" y1="95" x2="200" y2="125" stroke="hsl(var(--muted-foreground))" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+                <line
+                  x1="200"
+                  y1="95"
+                  x2="200"
+                  y2="125"
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeWidth="1.5"
+                  markerEnd="url(#arrowhead)"
+                />
               </svg>
             </div>
             <p className="text-[11px] text-muted-foreground text-center">
-              When weed pressure rises past the <span className="text-foreground font-bold">economic threshold</span>, control becomes profitable.
-              Without action, the population may reach the <span className="text-foreground font-bold">economic injury level</span>, where losses exceed any recoverable yield.
+              When weed pressure rises past the <span className="text-foreground font-bold">economic threshold</span>,
+              control becomes profitable. Without action, the population may reach the{" "}
+              <span className="text-foreground font-bold">economic injury level</span>, where losses exceed any
+              recoverable yield.
             </p>
           </div>
 
@@ -7192,8 +7981,8 @@ function TopicContent({
             <div className="space-y-2">
               <p className="font-display font-bold text-foreground text-sm">Thresholds Differ Between Species</p>
               <p className="text-xs text-muted-foreground">
-                Every weed species has its own competitive ability, so the threshold density that triggers control is very
-                different from one weed to another — even in the same crop.
+                Every weed species has its own competitive ability, so the threshold density that triggers control is
+                very different from one weed to another — even in the same crop.
               </p>
               <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
                 {THRESHOLD_EXAMPLES.map((e: any) => (
@@ -7207,7 +7996,9 @@ function TopicContent({
                     </div>
                     <p className="font-bold text-foreground text-xs">{e.name}</p>
                     <p className="text-[10px] italic text-primary">{e.weed.scientificName}</p>
-                    <p className="text-[10px] text-foreground mt-1"><strong>{e.crop}:</strong> {e.threshold}</p>
+                    <p className="text-[10px] text-foreground mt-1">
+                      <strong>{e.crop}:</strong> {e.threshold}
+                    </p>
                     <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
                   </button>
                 ))}
@@ -7219,8 +8010,8 @@ function TopicContent({
             <p className="font-bold text-accent">Key Principle</p>
             <p>
               Incorporating economic thresholds into weed management decisions promotes financially responsible,
-              data-driven practice and discourages unnecessary herbicide applications that increase costs and
-              accelerate the development of herbicide resistance.
+              data-driven practice and discourages unnecessary herbicide applications that increase costs and accelerate
+              the development of herbicide resistance.
             </p>
           </div>
         </div>
@@ -7294,13 +8085,16 @@ function TopicContent({
             <>
               <JournalHeader title="Systematic Classification" subtitle="Taxonomy & Nomenclature" />
               <LabCallout heading="Concept">
-                Taxonomy is the hierarchical classification of organisms based on shared morphology and phylogeny.
-                In weed science, taxonomic relationships predict herbicide response, allelopathic potential,
-                pollination biology, and dormancy behavior.
+                Taxonomy is the hierarchical classification of organisms based on shared morphology and phylogeny. In
+                weed science, taxonomic relationships predict herbicide response, allelopathic potential, pollination
+                biology, and dormancy behavior.
               </LabCallout>
               <TermSidebar
                 terms={[
-                  { term: "Binomial", def: "Two-part Latin name (Genus + specific epithet), italicized, with genus capitalized." },
+                  {
+                    term: "Binomial",
+                    def: "Two-part Latin name (Genus + specific epithet), italicized, with genus capitalized.",
+                  },
                   { term: "Authority", def: "Author who first validly published the name (e.g., 'L.' for Linnaeus)." },
                   { term: "Synonymy", def: "Alternate names for the same taxon resulting from taxonomic revision." },
                   { term: "Type specimen", def: "The preserved reference specimen that anchors a species name." },
@@ -7379,14 +8173,16 @@ function TopicContent({
         {
           id: "common-ragweed",
           name: "Common Ragweed",
-          maleDesc: "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
+          maleDesc:
+            "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
           femaleDesc: "Inconspicuous clusters tucked into the leaf axils below, each maturing into a small woody bur",
         },
         {
           id: "giant-ragweed",
           name: "Giant Ragweed",
           maleDesc: "Long, wand-like terminal racemes of tiny nodding pollen cups at the top of the stem",
-          femaleDesc: "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
+          femaleDesc:
+            "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
         },
         {
           id: "common_Cocklebur",
@@ -7403,14 +8199,18 @@ function TopicContent({
         {
           id: "Redroot_pigweed",
           name: "Redroot Pigweed",
-          maleDesc: "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
-          femaleDesc: "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
+          maleDesc:
+            "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
+          femaleDesc:
+            "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
         },
         {
           id: "Spotted_spurge",
           name: "Spotted Spurge",
-          maleDesc: "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
-          femaleDesc: "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
+          maleDesc:
+            "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
+          femaleDesc:
+            "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
         },
         {
           id: "Toothed_spurge",
@@ -7504,11 +8304,13 @@ function TopicContent({
             ]}
           />
           <LabCallout heading="Management implication">
-            Obligate outcrossing drives rapid herbicide-resistance evolution in Palmer amaranth and waterhemp.
-            Diversify modes of action, use overlapping residuals, and prevent seed production — a single escaped
-            female can reseed a field.
+            Obligate outcrossing drives rapid herbicide-resistance evolution in Palmer amaranth and waterhemp. Diversify
+            modes of action, use overlapping residuals, and prevent seed production — a single escaped female can reseed
+            a field.
           </LabCallout>
-          <Citation>Ward SM, Webster TM, Steckel LE. Palmer amaranth (Amaranthus palmeri): a review. Weed Technology.</Citation>
+          <Citation>
+            Ward SM, Webster TM, Steckel LE. Palmer amaranth (Amaranthus palmeri): a review. Weed Technology.
+          </Citation>
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">In this group of weeds, there are 3 dioecious species:</p>
@@ -7533,28 +8335,30 @@ function TopicContent({
           <JournalHeader title="Monoecious Weeds" subtitle="Both Sexes, One Plant" />
           <LabCallout heading="Definition">
             <p>
-              Monoecious weeds carry <strong>separate male (staminate) and female (pistillate) flowers on the same
-              individual plant</strong>, usually in different positions — one near the stem tips and the other lower
-              down or tucked into the leaf axils.
+              Monoecious weeds carry{" "}
+              <strong>separate male (staminate) and female (pistillate) flowers on the same individual plant</strong>,
+              usually in different positions — one near the stem tips and the other lower down or tucked into the leaf
+              axils.
             </p>
           </LabCallout>
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
             <p>
-              Because every plant can set seed on its own, a <strong>single escaped individual can reinfest a
-              field</strong> — there is no requirement for a mate nearby. Many monoecious weeds are still largely
-              wind-pollinated and outcrossing, so genetic diversity remains high.
+              Because every plant can set seed on its own, a{" "}
+              <strong>single escaped individual can reinfest a field</strong> — there is no requirement for a mate
+              nearby. Many monoecious weeds are still largely wind-pollinated and outcrossing, so genetic diversity
+              remains high.
             </p>
             <p>
               Scouting means knowing <strong>where each flower type sits</strong>: terminal spikes shedding pollen
-              above, and the seed-producing structures — burs, capsules, or bristly clusters — below or within the
-              leaf axils. Timing control before those lower structures mature is what prevents seed return.
+              above, and the seed-producing structures — burs, capsules, or bristly clusters — below or within the leaf
+              axils. Timing control before those lower structures mature is what prevents seed return.
             </p>
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Monoecious species in this collection:</p>
             <p className="mt-1">
-              Common Ragweed, Giant Ragweed, Common Cocklebur, Burcucumber, Redroot Pigweed, Spotted Spurge, and
-              Toothed Spurge.
+              Common Ragweed, Giant Ragweed, Common Cocklebur, Burcucumber, Redroot Pigweed, Spotted Spurge, and Toothed
+              Spurge.
             </p>
           </div>
 
@@ -7584,7 +8388,16 @@ function TopicContent({
         {
           label: "Physiological Dormancy",
           desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
-          examples: ["Lambsquarters", "Redroot Pigweed", "Giant Foxtail", "Green Foxtail", "Yellow Foxtail", "Wild Mustard", "Curly Dock", "Wild Oat"],
+          examples: [
+            "Lambsquarters",
+            "Redroot Pigweed",
+            "Giant Foxtail",
+            "Green Foxtail",
+            "Yellow Foxtail",
+            "Wild Mustard",
+            "Curly Dock",
+            "Wild Oat",
+          ],
         },
         {
           label: "Chemical Dormancy",
@@ -7608,17 +8421,25 @@ function TopicContent({
           <TermSidebar
             terms={[
               { term: "Physical dormancy", def: "Impermeable seed coat blocks water/gas exchange until weathered." },
-              { term: "Physiological dormancy", def: "Embryo-borne chemical inhibitors delay germination; most common type." },
+              {
+                term: "Physiological dormancy",
+                def: "Embryo-borne chemical inhibitors delay germination; most common type.",
+              },
               { term: "Chemical dormancy", def: "High inhibitor loads in seed coverings; leached by rainfall." },
-              { term: "Morphological dormancy", def: "Embryo underdeveloped at dispersal; requires post-shed maturation." },
+              {
+                term: "Morphological dormancy",
+                def: "Embryo underdeveloped at dispersal; requires post-shed maturation.",
+              },
               { term: "Stratification", def: "Prolonged chilling that satisfies physiological dormancy." },
             ]}
           />
-          <Citation>Baskin CC, Baskin JM. Seeds: Ecology, Biogeography, and Evolution of Dormancy and Germination.</Citation>
+          <Citation>
+            Baskin CC, Baskin JM. Seeds: Ecology, Biogeography, and Evolution of Dormancy and Germination.
+          </Citation>
           <div className="space-y-4">
-            {DORMANCY_TYPES.map(d => {
+            {DORMANCY_TYPES.map((d) => {
               const exampleWeeds = d.examples
-                .map(n => weeds.find(w => w.commonName.toLowerCase() === n.toLowerCase()))
+                .map((n) => weeds.find((w) => w.commonName.toLowerCase() === n.toLowerCase()))
                 .filter((w): w is Weed => !!w);
               return (
                 <div key={d.label} className="bg-card border border-border rounded-lg p-4 space-y-3">
@@ -7628,7 +8449,7 @@ function TopicContent({
                     <>
                       <p className="text-xs font-bold text-primary uppercase tracking-wide">Example Weeds</p>
                       <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-                        {exampleWeeds.map(w => (
+                        {exampleWeeds.map((w) => (
                           <button
                             key={w.id}
                             onClick={() => onSelectWeed(w)}
@@ -7657,47 +8478,130 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "allelopathy": {
       const PATHWAYS = [
-        { label: "Root Exudation", desc: "Chemicals are secreted directly from roots into the surrounding soil, disrupting nearby plant growth and nutrient uptake." },
-        { label: "Leaf Leachate", desc: "Rainfall or dew washes inhibitory compounds off leaves onto the soil surface, suppressing the germination of other plants." },
-        { label: "Decomposition Leaching", desc: "As plant residues break down, they release compounds into the soil that can linger and impact future crops." },
-        { label: "Volatilization", desc: "Chemicals are released into the air that may reduce germination or growth of seedlings nearby." },
-        { label: "Soil Accumulation", desc: "Allelopathic chemicals persist and build up over time, reducing soil health and crop vigor." },
+        {
+          label: "Root Exudation",
+          desc: "Chemicals are secreted directly from roots into the surrounding soil, disrupting nearby plant growth and nutrient uptake.",
+        },
+        {
+          label: "Leaf Leachate",
+          desc: "Rainfall or dew washes inhibitory compounds off leaves onto the soil surface, suppressing the germination of other plants.",
+        },
+        {
+          label: "Decomposition Leaching",
+          desc: "As plant residues break down, they release compounds into the soil that can linger and impact future crops.",
+        },
+        {
+          label: "Volatilization",
+          desc: "Chemicals are released into the air that may reduce germination or growth of seedlings nearby.",
+        },
+        {
+          label: "Soil Accumulation",
+          desc: "Allelopathic chemicals persist and build up over time, reducing soil health and crop vigor.",
+        },
       ];
       const ALLELOPATHIC_EXAMPLES: { id: string; name: string; compound: string; pathway: string; note: string }[] = [
-        { id: "Johnsongrass", name: "Johnsongrass", compound: "Sorgoleone (root exudate)", pathway: "Root Exudation", note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves." },
-        { id: "Quackgrass", name: "Quackgrass", compound: "Phenolic acids & agropyrene from rhizomes", pathway: "Root Exudation + Decomposition Leaching", note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment." },
-        { id: "Giant_Foxtail", name: "Giant Foxtail", compound: "Phenolic acids from decomposing residue", pathway: "Decomposition Leaching", note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue." },
-        { id: "Yellow_Nutsedge", name: "Yellow Nutsedge", compound: "Tuber-derived phenolics", pathway: "Root Exudation + Soil Accumulation", note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops." },
-        { id: "Velvetleaf", name: "Velvetleaf", compound: "Phenolics & cyanogenic glycosides in residue", pathway: "Decomposition Leaching", note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth." },
-        { id: "Canada_Thistle", name: "Canada Thistle", compound: "Root-exuded phenolic acids", pathway: "Root Exudation", note: "Reduces emergence and biomass of neighboring crops within thistle patches." },
-        { id: "Volunteer_Sunflower", name: "Volunteer Sunflower", compound: "Chlorogenic & isochlorogenic acids", pathway: "Leaf Leachate + Decomposition Leaching", note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops." },
-        { id: "Redroot_Pigweed", name: "Redroot Pigweed", compound: "Water-soluble leaf leachates", pathway: "Leaf Leachate", note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies." },
-        { id: "Common_Lambsquarters", name: "Lambsquarters", compound: "Oxalic acid & phenolic compounds", pathway: "Leaf Leachate + Decomposition Leaching", note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax." },
+        {
+          id: "Johnsongrass",
+          name: "Johnsongrass",
+          compound: "Sorgoleone (root exudate)",
+          pathway: "Root Exudation",
+          note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves.",
+        },
+        {
+          id: "Quackgrass",
+          name: "Quackgrass",
+          compound: "Phenolic acids & agropyrene from rhizomes",
+          pathway: "Root Exudation + Decomposition Leaching",
+          note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment.",
+        },
+        {
+          id: "Giant_Foxtail",
+          name: "Giant Foxtail",
+          compound: "Phenolic acids from decomposing residue",
+          pathway: "Decomposition Leaching",
+          note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue.",
+        },
+        {
+          id: "Yellow_Nutsedge",
+          name: "Yellow Nutsedge",
+          compound: "Tuber-derived phenolics",
+          pathway: "Root Exudation + Soil Accumulation",
+          note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops.",
+        },
+        {
+          id: "Velvetleaf",
+          name: "Velvetleaf",
+          compound: "Phenolics & cyanogenic glycosides in residue",
+          pathway: "Decomposition Leaching",
+          note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth.",
+        },
+        {
+          id: "Canada_Thistle",
+          name: "Canada Thistle",
+          compound: "Root-exuded phenolic acids",
+          pathway: "Root Exudation",
+          note: "Reduces emergence and biomass of neighboring crops within thistle patches.",
+        },
+        {
+          id: "Volunteer_Sunflower",
+          name: "Volunteer Sunflower",
+          compound: "Chlorogenic & isochlorogenic acids",
+          pathway: "Leaf Leachate + Decomposition Leaching",
+          note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops.",
+        },
+        {
+          id: "Redroot_Pigweed",
+          name: "Redroot Pigweed",
+          compound: "Water-soluble leaf leachates",
+          pathway: "Leaf Leachate",
+          note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies.",
+        },
+        {
+          id: "Common_Lambsquarters",
+          name: "Lambsquarters",
+          compound: "Oxalic acid & phenolic compounds",
+          pathway: "Leaf Leachate + Decomposition Leaching",
+          note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax.",
+        },
       ];
-      const availableAllelo = ALLELOPATHIC_EXAMPLES
-        .map(e => ({ ...e, weed: weeds.find(w => w.commonName.toLowerCase() === e.name.toLowerCase()) }))
-        .filter(e => !!e.weed);
+      const availableAllelo = ALLELOPATHIC_EXAMPLES.map((e) => ({
+        ...e,
+        weed: weeds.find((w) => w.commonName.toLowerCase() === e.name.toLowerCase()),
+      })).filter((e) => !!e.weed);
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Allelopathy</p>
-            <p>Allelopathy in weeds is the process where plants release biochemicals into the environment through their roots, leaves, or decaying tissues that <strong>inhibit the germination, growth, or development</strong> of neighboring plants.</p>
-            <p>This chemical interference gives weeds a competitive advantage over crops, native plants, and even other weeds. Understanding allelopathy helps farmers see that weed impacts aren't limited to physical crowding or nutrient competition.</p>
+            <p>
+              Allelopathy in weeds is the process where plants release biochemicals into the environment through their
+              roots, leaves, or decaying tissues that <strong>inhibit the germination, growth, or development</strong>{" "}
+              of neighboring plants.
+            </p>
+            <p>
+              This chemical interference gives weeds a competitive advantage over crops, native plants, and even other
+              weeds. Understanding allelopathy helps farmers see that weed impacts aren't limited to physical crowding
+              or nutrient competition.
+            </p>
           </div>
           <h3 className="font-display font-bold text-foreground text-sm">Allelopathic Pathways &amp; Their Weeds</h3>
-          <p className="text-xs text-muted-foreground -mt-2">Each pathway lists the documented species that use it. Weeds using more than one pathway appear in each group.</p>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Each pathway lists the documented species that use it. Weeds using more than one pathway appear in each
+            group.
+          </p>
           <div className="space-y-4">
-            {PATHWAYS.map(p => {
-              const members = availableAllelo.filter(e => e.pathway.toLowerCase().includes(p.label.toLowerCase()));
+            {PATHWAYS.map((p) => {
+              const members = availableAllelo.filter((e) => e.pathway.toLowerCase().includes(p.label.toLowerCase()));
               return (
                 <div key={p.label} className="bg-card border border-border rounded-lg p-4 space-y-3">
                   <p className="font-bold text-foreground">{p.label}</p>
                   <p className="text-sm text-muted-foreground">{p.desc}</p>
                   {members.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic">No documented species in this course's weed list.</p>
+                    <p className="text-xs text-muted-foreground italic">
+                      No documented species in this course's weed list.
+                    </p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {members.map(e => (
+                      {members.map((e) => (
                         <button
                           key={e.name}
                           onClick={() => e.weed && onSelectWeed(e.weed)}
@@ -7708,7 +8612,9 @@ function TopicContent({
                           </div>
                           <p className="font-bold text-foreground text-xs">{e.name}</p>
                           <p className="text-[10px] italic text-primary">{e.weed?.scientificName}</p>
-                          <p className="text-[10px] text-muted-foreground mt-1"><strong>Compound:</strong> {e.compound}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">
+                            <strong>Compound:</strong> {e.compound}
+                          </p>
                           <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
                         </button>
                       ))}
@@ -7720,7 +8626,10 @@ function TopicContent({
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Connection to Economic Thresholds</p>
-            <p className="mt-1">These biochemical interactions may influence economic thresholds by intensifying crop stress, sometimes requiring earlier or more strategic management to prevent lasting soil and yield effects.</p>
+            <p className="mt-1">
+              These biochemical interactions may influence economic thresholds by intensifying crop stress, sometimes
+              requiring earlier or more strategic management to prevent lasting soil and yield effects.
+            </p>
           </div>
         </div>
       );
@@ -7734,21 +8643,57 @@ function TopicContent({
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Herbicide Mode of Action (MOA)</p>
-            <p>Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being an essential part of crop management, herbicides represent a <strong>major input cost</strong> in United States row-crop production.</p>
-            <p>Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The MOA describes the specific biochemical pathway inside the plant that the herbicide disrupts — for example, blocking amino-acid synthesis, photosynthesis, or cell division.</p>
-            <p>Chemicals within the same MOA group impact the plant in the same way, so <strong>resistance to one chemical typically results in resistance to every other chemical in that herbicide group</strong>. That is why rotating across different MOA groups — not just different brand names — is essential for long-term weed control.</p>
+            <p>
+              Herbicides are chemical or biological substances used to eliminate or reduce weeds. In addition to being
+              an essential part of crop management, herbicides represent a <strong>major input cost</strong> in United
+              States row-crop production.
+            </p>
+            <p>
+              Herbicides are categorized into different groups based on their <strong>Mode of Action (MOA)</strong>. The
+              MOA describes the specific biochemical pathway inside the plant that the herbicide disrupts — for example,
+              blocking amino-acid synthesis, photosynthesis, or cell division.
+            </p>
+            <p>
+              Chemicals within the same MOA group impact the plant in the same way, so{" "}
+              <strong>
+                resistance to one chemical typically results in resistance to every other chemical in that herbicide
+                group
+              </strong>
+              . That is why rotating across different MOA groups — not just different brand names — is essential for
+              long-term weed control.
+            </p>
           </div>
           <h3 className="font-display font-bold text-foreground text-sm">Herbicide Groups in Use Today</h3>
           <div className="space-y-3">
-            {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(m => (
-              <div key={m.id} className="bg-card border border-border rounded-lg p-4">
-                <p className="font-bold text-foreground">Group {m.group}: {m.moa}</p>
-                <p className="text-sm text-muted-foreground mt-1"><strong>Chemistry:</strong> {m.chemistry}</p>
-                <p className="text-sm text-muted-foreground mt-1"><strong>Timing / Spectrum:</strong> {m.timing} · {m.spectrum}</p>
-                <p className="text-sm text-muted-foreground mt-1"><strong>Resistance risk:</strong> <span className={m.resistanceLevel === 'Very high' || m.resistanceLevel === 'High' ? 'text-destructive font-medium' : 'text-foreground'}>{m.resistanceLevel}</span> — {m.resistanceNotes}</p>
-                <p className="text-xs text-primary mt-1">Examples: {m.brands.join(', ')}</p>
-              </div>
-            ))}
+            {[...HERBICIDE_MOA]
+              .sort((a, b) => a.group - b.group)
+              .map((m) => (
+                <div key={m.id} className="bg-card border border-border rounded-lg p-4">
+                  <p className="font-bold text-foreground">
+                    Group {m.group}: {m.moa}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    <strong>Chemistry:</strong> {m.chemistry}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    <strong>Timing / Spectrum:</strong> {m.timing} · {m.spectrum}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    <strong>Resistance risk:</strong>{" "}
+                    <span
+                      className={
+                        m.resistanceLevel === "Very high" || m.resistanceLevel === "High"
+                          ? "text-destructive font-medium"
+                          : "text-foreground"
+                      }
+                    >
+                      {m.resistanceLevel}
+                    </span>{" "}
+                    — {m.resistanceNotes}
+                  </p>
+                  <p className="text-xs text-primary mt-1">Examples: {m.brands.join(", ")}</p>
+                </div>
+              ))}
           </div>
           <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-semibold text-primary">Full MOA Reference Table</p>
@@ -7764,22 +8709,34 @@ function TopicContent({
                   </tr>
                 </thead>
                 <tbody>
-                  {[...HERBICIDE_MOA].sort((a, b) => a.group - b.group).map(h => (
-                    <tr key={h.id} className="even:bg-muted/20">
-                      <td className="p-2 border border-border font-medium text-foreground">{h.moa} (Group {h.group})</td>
-                      <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
-                      <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
-                      <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
-                      <td className={`p-2 border border-border font-medium ${h.resistanceLevel === 'Very high' || h.resistanceLevel === 'High' ? 'text-destructive' : 'text-foreground'}`}>{h.resistanceLevel}</td>
-                    </tr>
-                  ))}
+                  {[...HERBICIDE_MOA]
+                    .sort((a, b) => a.group - b.group)
+                    .map((h) => (
+                      <tr key={h.id} className="even:bg-muted/20">
+                        <td className="p-2 border border-border font-medium text-foreground">
+                          {h.moa} (Group {h.group})
+                        </td>
+                        <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
+                        <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
+                        <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
+                        <td
+                          className={`p-2 border border-border font-medium ${h.resistanceLevel === "Very high" || h.resistanceLevel === "High" ? "text-destructive" : "text-foreground"}`}
+                        >
+                          {h.resistanceLevel}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Key Takeaway</p>
-            <p className="mt-1">Learning how these MOAs work helps farmers apply herbicides strategically by <strong>rotating different groups</strong> instead of relying on one to manage weeds effectively and slow the spread of herbicide resistance.</p>
+            <p className="mt-1">
+              Learning how these MOAs work helps farmers apply herbicides strategically by{" "}
+              <strong>rotating different groups</strong> instead of relying on one to manage weeds effectively and slow
+              the spread of herbicide resistance.
+            </p>
           </div>
         </div>
       );
@@ -7790,48 +8747,175 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "crop-injury": {
       const INJURY_PATTERNS = [
-        { group: "1", name: "ACCase Inhibitors", part: "New grass leaves at the whorl & growing points", symptoms: "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl." },
-        { group: "2", name: "ALS Inhibitors", part: "Top (newest) leaves, veins, and shoot tips", symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis." },
-        { group: "3", name: "Microtubule Inhibitors", part: "Roots and root tips", symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor." },
-        { group: "4", name: "Synthetic Auxins", part: "New growth: top leaves, stems, and petioles", symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty)." },
-        { group: "5", name: "PSII Inhibitors (Triazines)", part: "Older (bottom) leaves first", symptoms: "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward." },
-        { group: "6", name: "PSII Inhibitors (Benzothiadiazoles)", part: "Leaf surface where spray contacted", symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure." },
-        { group: "7", name: "PSII Inhibitors (Ureas & Amides)", part: "Older (bottom) leaves first", symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning." },
-        { group: "8", name: "Lipid Synthesis Inhibitors", part: "Emerging seedling whorl and shoots", symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl." },
-        { group: "9", name: "EPSPS Inhibitors", part: "Whole plant, starting at growing points and newest leaves", symptoms: "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks." },
-        { group: "10", name: "Glutamine Synthase Inhibitors", part: "Leaf surface where spray contacted", symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application." },
-        { group: "12", name: "Phytoene Desaturase Inhibitors", part: "Newest leaves and growing points", symptoms: "Bright white bleached new growth; older leaves stay green." },
-        { group: "13", name: "DOXP Inhibitors", part: "Newest leaves and shoot tips", symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature." },
-        { group: "14", name: "PPO Inhibitors", part: "Leaf surface and emerging cotyledons/stems", symptoms: "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings." },
-        { group: "15", name: "VLCFA Inhibitors", part: "Emerging seedling shoots and hypocotyl", symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings." },
-        { group: "19", name: "Auxin Transport Inhibitors", part: "New growth: top leaves and stems", symptoms: "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified." },
-        { group: "22", name: "PSI Electron Diverters", part: "Leaf surface where spray contacted", symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact." },
-        { group: "23", name: "Mitosis Inhibitors", part: "Outer (oldest) leaves and central whorl", symptoms: "Outer leaves desiccate and brown while the central whorl stays green." },
-        { group: "25", name: "Cell Wall (Cellulose) Inhibitors", part: "Newest leaves at the whorl", symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips." },
-        { group: "26", name: "Nucleic Acid Inhibitors", part: "Leaf surface where spray contacted", symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury." },
-        { group: "27", name: "HPPD Inhibitors", part: "Newest leaves and growing points", symptoms: "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal." },
+        {
+          group: "1",
+          name: "ACCase Inhibitors",
+          part: "New grass leaves at the whorl & growing points",
+          symptoms:
+            "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl.",
+        },
+        {
+          group: "2",
+          name: "ALS Inhibitors",
+          part: "Top (newest) leaves, veins, and shoot tips",
+          symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis.",
+        },
+        {
+          group: "3",
+          name: "Microtubule Inhibitors",
+          part: "Roots and root tips",
+          symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor.",
+        },
+        {
+          group: "4",
+          name: "Synthetic Auxins",
+          part: "New growth: top leaves, stems, and petioles",
+          symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty).",
+        },
+        {
+          group: "5",
+          name: "PSII Inhibitors (Triazines)",
+          part: "Older (bottom) leaves first",
+          symptoms:
+            "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward.",
+        },
+        {
+          group: "6",
+          name: "PSII Inhibitors (Benzothiadiazoles)",
+          part: "Leaf surface where spray contacted",
+          symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure.",
+        },
+        {
+          group: "7",
+          name: "PSII Inhibitors (Ureas & Amides)",
+          part: "Older (bottom) leaves first",
+          symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning.",
+        },
+        {
+          group: "8",
+          name: "Lipid Synthesis Inhibitors",
+          part: "Emerging seedling whorl and shoots",
+          symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl.",
+        },
+        {
+          group: "9",
+          name: "EPSPS Inhibitors",
+          part: "Whole plant, starting at growing points and newest leaves",
+          symptoms:
+            "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks.",
+        },
+        {
+          group: "10",
+          name: "Glutamine Synthase Inhibitors",
+          part: "Leaf surface where spray contacted",
+          symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application.",
+        },
+        {
+          group: "12",
+          name: "Phytoene Desaturase Inhibitors",
+          part: "Newest leaves and growing points",
+          symptoms: "Bright white bleached new growth; older leaves stay green.",
+        },
+        {
+          group: "13",
+          name: "DOXP Inhibitors",
+          part: "Newest leaves and shoot tips",
+          symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature.",
+        },
+        {
+          group: "14",
+          name: "PPO Inhibitors",
+          part: "Leaf surface and emerging cotyledons/stems",
+          symptoms:
+            "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings.",
+        },
+        {
+          group: "15",
+          name: "VLCFA Inhibitors",
+          part: "Emerging seedling shoots and hypocotyl",
+          symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings.",
+        },
+        {
+          group: "19",
+          name: "Auxin Transport Inhibitors",
+          part: "New growth: top leaves and stems",
+          symptoms:
+            "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified.",
+        },
+        {
+          group: "22",
+          name: "PSI Electron Diverters",
+          part: "Leaf surface where spray contacted",
+          symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact.",
+        },
+        {
+          group: "23",
+          name: "Mitosis Inhibitors",
+          part: "Outer (oldest) leaves and central whorl",
+          symptoms: "Outer leaves desiccate and brown while the central whorl stays green.",
+        },
+        {
+          group: "25",
+          name: "Cell Wall (Cellulose) Inhibitors",
+          part: "Newest leaves at the whorl",
+          symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips.",
+        },
+        {
+          group: "26",
+          name: "Nucleic Acid Inhibitors",
+          part: "Leaf surface where spray contacted",
+          symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury.",
+        },
+        {
+          group: "27",
+          name: "HPPD Inhibitors",
+          part: "Newest leaves and growing points",
+          symptoms:
+            "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal.",
+        },
       ];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Herbicide Injury Symptoms</p>
-            <p>While herbicides are designed to kill weeds, sometimes they miss their target and harm crops or other nearby plants. Herbicide injury can range from <strong>mild discoloration to severe damage</strong> that reduces crop yield.</p>
-            <p>Each herbicide group damages plants in a specific way, depending on which process in the plant it disrupts. Because herbicides in the same group share the same MOA, they often cause <strong>similar injury symptoms</strong>.</p>
+            <p>
+              While herbicides are designed to kill weeds, sometimes they miss their target and harm crops or other
+              nearby plants. Herbicide injury can range from <strong>mild discoloration to severe damage</strong> that
+              reduces crop yield.
+            </p>
+            <p>
+              Each herbicide group damages plants in a specific way, depending on which process in the plant it
+              disrupts. Because herbicides in the same group share the same MOA, they often cause{" "}
+              <strong>similar injury symptoms</strong>.
+            </p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 space-y-2">
             <p className="font-bold text-foreground">Common Injury Types</p>
             <div className="grid grid-cols-3 gap-2 text-xs">
-              {["Chlorosis (yellowing)", "Bleaching (whitening)", "Epinasty (twisting/curling)", "Necrosis (browning/death)", "Stunting (reduced growth)", "Purpling (anthocyanin)"].map(s => (
-                <div key={s} className="bg-secondary/30 border border-border rounded p-2 text-foreground text-center">{s}</div>
+              {[
+                "Chlorosis (yellowing)",
+                "Bleaching (whitening)",
+                "Epinasty (twisting/curling)",
+                "Necrosis (browning/death)",
+                "Stunting (reduced growth)",
+                "Purpling (anthocyanin)",
+              ].map((s) => (
+                <div key={s} className="bg-secondary/30 border border-border rounded p-2 text-foreground text-center">
+                  {s}
+                </div>
               ))}
             </div>
           </div>
           <h3 className="font-display font-bold text-foreground text-sm">Injury Patterns by Group</h3>
           <div className="space-y-3">
-            {INJURY_PATTERNS.map(p => (
+            {INJURY_PATTERNS.map((p) => (
               <div key={p.group} className="bg-card border border-border rounded-lg p-4">
-                <p className="font-bold text-foreground">Group {p.group}: {p.name}</p>
-                <p className="text-xs text-primary mt-1"><span className="font-semibold">Where injury appears:</span> {p.part}</p>
+                <p className="font-bold text-foreground">
+                  Group {p.group}: {p.name}
+                </p>
+                <p className="text-xs text-primary mt-1">
+                  <span className="font-semibold">Where injury appears:</span> {p.part}
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">{p.symptoms}</p>
                 {(() => {
                   const g = parseInt(p.group, 10);
@@ -7842,14 +8926,26 @@ function TopicContent({
                     <div className="grid grid-cols-2 gap-2 mt-3">
                       {br && (
                         <figure>
-                          <img src={br} alt={`Group ${p.group} broadleaf injury`} className="w-full h-32 object-cover rounded-md border border-border" />
-                          <figcaption className="text-[10px] text-muted-foreground text-center mt-1">Broadleaf injury</figcaption>
+                          <img
+                            src={br}
+                            alt={`Group ${p.group} broadleaf injury`}
+                            className="w-full h-32 object-cover rounded-md border border-border"
+                          />
+                          <figcaption className="text-[10px] text-muted-foreground text-center mt-1">
+                            Broadleaf injury
+                          </figcaption>
                         </figure>
                       )}
                       {gr && (
                         <figure>
-                          <img src={gr} alt={`Group ${p.group} grass injury`} className="w-full h-32 object-cover rounded-md border border-border" />
-                          <figcaption className="text-[10px] text-muted-foreground text-center mt-1">Grass injury</figcaption>
+                          <img
+                            src={gr}
+                            alt={`Group ${p.group} grass injury`}
+                            className="w-full h-32 object-cover rounded-md border border-border"
+                          />
+                          <figcaption className="text-[10px] text-muted-foreground text-center mt-1">
+                            Grass injury
+                          </figcaption>
                         </figure>
                       )}
                     </div>
@@ -7860,7 +8956,11 @@ function TopicContent({
           </div>
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Diagnosis Tip</p>
-            <p className="mt-1">By paying close attention to <strong>which part of the plant shows damage</strong> — whether it appears first on leaves, stems, or roots — agronomists can often determine which herbicide group caused the injury.</p>
+            <p className="mt-1">
+              By paying close attention to <strong>which part of the plant shows damage</strong> — whether it appears
+              first on leaves, stems, or roots — agronomists can often determine which herbicide group caused the
+              injury.
+            </p>
           </div>
         </div>
       );
@@ -7871,67 +8971,118 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "life-stage-control": {
       const STAGE_CONTROL = [
-        { stage: "Seed (Seed Bank)", exampleWeedIds: ["lambsquarters", "waterhemp", "velvetleaf"], desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.", control: "Pre-emergent herbicides, cover crops, tillage to bury seeds" },
-        { stage: "Seedling", exampleWeedIds: ["palmer-amaranth", "giant-foxtail", "common-ragweed"], desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.", control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window" },
-        { stage: "Vegetative", exampleWeedIds: ["waterhemp", "kochia", "barnyardgrass"], desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.", control: "Higher herbicide rates needed, mechanical cultivation" },
-        { stage: "Reproductive", exampleWeedIds: ["giant-ragweed", "Horseweed", "velvetleaf"], desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.", control: "Hand weeding escapes, prevent seed set at all costs" },
-        { stage: "Mature", exampleWeedIds: ["canada-thistle", "johnsongrass", "Field_bindweed"], desc: "Mature perennial weeds regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time. (Note: seed dispersal happens during the mature stage — it is not a separate life stage.)", control: "Systemic herbicides, deep tillage, multi-year management plans" },
+        {
+          stage: "Seed (Seed Bank)",
+          exampleWeedIds: ["lambsquarters", "waterhemp", "velvetleaf"],
+          desc: "Many weed seeds are stored in seed banks and can remain dormant for years until growing conditions are favorable. Preventing seed bank replenishment is critical.",
+          control: "Pre-emergent herbicides, cover crops, tillage to bury seeds",
+        },
+        {
+          stage: "Seedling",
+          exampleWeedIds: ["palmer-amaranth", "giant-foxtail", "common-ragweed"],
+          desc: "Weeds are the easiest to control because they are small and have not yet developed extensive roots or stems.",
+          control: "Post-emergent herbicides, cultivation, hand removal — most cost-effective window",
+        },
+        {
+          stage: "Vegetative",
+          exampleWeedIds: ["waterhemp", "kochia", "barnyardgrass"],
+          desc: "Weeds become harder to manage but can still be controlled through herbicide applications, cultivation, mowing, or hand removal.",
+          control: "Higher herbicide rates needed, mechanical cultivation",
+        },
+        {
+          stage: "Reproductive",
+          exampleWeedIds: ["giant-ragweed", "Horseweed", "velvetleaf"],
+          desc: "Especially important to manage before they disperse seeds. Once seeds are released, they may be added back into the seed bank.",
+          control: "Hand weeding escapes, prevent seed set at all costs",
+        },
+        {
+          stage: "Mature",
+          exampleWeedIds: ["canada-thistle", "johnsongrass", "Field_bindweed"],
+          desc: "Mature perennial weeds regrow from roots, rhizomes, tubers, or crowns, requiring repeated management over time. (Note: seed dispersal happens during the mature stage — it is not a separate life stage.)",
+          control: "Systemic herbicides, deep tillage, multi-year management plans",
+        },
       ];
       const STAGE_TO_IMAGE_STAGE: Record<string, string> = {
         "Seed (Seed Bank)": "seed",
-        "Seedling": "seedling",
-        "Vegetative": "vegetative",
-        "Reproductive": "flower",
-        "Mature": "flower",
+        Seedling: "seedling",
+        Vegetative: "vegetative",
+        Reproductive: "flower",
+        Mature: "flower",
       };
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
             <p className="font-display font-bold text-primary text-base">Weed Control Across Life Stages</p>
-            <p>Agronomists can use their knowledge of weed life stages and life cycles to target weeds and use control methods more effectively.</p>
-            <p>The general rule of thumb: <strong>control weeds early in their life cycle</strong>, before they have the chance to become established and reproduce.</p>
+            <p>
+              Agronomists can use their knowledge of weed life stages and life cycles to target weeds and use control
+              methods more effectively.
+            </p>
+            <p>
+              The general rule of thumb: <strong>control weeds early in their life cycle</strong>, before they have the
+              chance to become established and reproduce.
+            </p>
           </div>
           {/* Control timeline */}
           <div className="bg-card border border-border rounded-lg p-4">
-            <p className="font-display font-bold text-foreground text-sm text-center mb-3">Control Effectiveness Timeline</p>
+            <p className="font-display font-bold text-foreground text-sm text-center mb-3">
+              Control Effectiveness Timeline
+            </p>
             <div className="flex items-center gap-1">
               {["Seed", "Seedling", "Vegetative", "Reproductive", "Mature"].map((s, i) => (
                 <div key={s} className="flex-1 text-center">
-                  <div className={`rounded-lg p-2 text-xs font-bold ${
-                    i === 0 ? 'bg-success/60 text-success-foreground border-2 border-success' :
-                    i === 1 ? 'bg-success/45 text-success-foreground border-2 border-success/80' :
-                    i === 2 ? 'bg-primary/15 text-primary border border-primary/30' :
-                    i === 3 ? 'bg-destructive/15 text-destructive border border-destructive/30' :
-                    'bg-destructive/25 text-destructive border border-destructive/50'
-                  }`}>
+                  <div
+                    className={`rounded-lg p-2 text-xs font-bold ${
+                      i === 0
+                        ? "bg-success/60 text-success-foreground border-2 border-success"
+                        : i === 1
+                          ? "bg-success/45 text-success-foreground border-2 border-success/80"
+                          : i === 2
+                            ? "bg-primary/15 text-primary border border-primary/30"
+                            : i === 3
+                              ? "bg-destructive/15 text-destructive border border-destructive/30"
+                              : "bg-destructive/25 text-destructive border border-destructive/50"
+                    }`}
+                  >
                     {s}
                   </div>
-                  <p className="text-[9px] text-muted-foreground mt-1">{i === 0 ? 'Easiest' : i === 1 ? 'Easy' : i === 2 ? 'Moderate' : i === 3 ? 'Hard' : 'Hardest'}</p>
+                  <p className="text-[9px] text-muted-foreground mt-1">
+                    {i === 0 ? "Easiest" : i === 1 ? "Easy" : i === 2 ? "Moderate" : i === 3 ? "Hard" : "Hardest"}
+                  </p>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">Darker green (Seed &amp; Seedling) = easiest control window. Darker red = hardest. Hit weeds early.</p>
+            <p className="text-[10px] text-muted-foreground text-center mt-2 italic">
+              Darker green (Seed &amp; Seedling) = easiest control window. Darker red = hardest. Hit weeds early.
+            </p>
           </div>
           <div className="space-y-3">
-            {STAGE_CONTROL.map(s => (
+            {STAGE_CONTROL.map((s) => (
               <div key={s.stage} className="bg-card border border-border rounded-lg p-4 space-y-2">
                 <p className="font-display font-bold text-foreground">{s.stage}</p>
                 <p className="text-sm text-foreground">{s.desc}</p>
                 <div className="grid grid-cols-3 gap-2 mt-2">
-                  {s.exampleWeedIds.map(wid => {
-                    const w = weeds.find(x => x.id === wid);
+                  {s.exampleWeedIds.map((wid) => {
+                    const w = weeds.find((x) => x.id === wid);
                     return (
                       <figure key={wid} className="space-y-1">
                         <div className="aspect-square rounded-md overflow-hidden bg-secondary border border-border">
-                          <WeedImage weedId={wid} stage={STAGE_TO_IMAGE_STAGE[s.stage] || 'flower'} className="w-full h-full object-cover" />
+                          <WeedImage
+                            weedId={wid}
+                            stage={STAGE_TO_IMAGE_STAGE[s.stage] || "flower"}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <figcaption className="text-[10px] text-center text-muted-foreground">{w?.commonName ?? wid}</figcaption>
+                        <figcaption className="text-[10px] text-center text-muted-foreground">
+                          {w?.commonName ?? wid}
+                        </figcaption>
                       </figure>
                     );
                   })}
                 </div>
                 <div className="bg-primary/10 rounded-lg p-3">
-                  <p className="text-xs text-primary"><span className="font-semibold">Best methods:</span> {s.control}</p>
+                  <p className="text-xs text-primary">
+                    <span className="font-semibold">Best methods:</span> {s.control}
+                  </p>
                 </div>
               </div>
             ))}
@@ -8021,8 +9172,7 @@ function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
     <div
       className="space-y-5 p-5 rounded-2xl relative overflow-hidden"
       style={{
-        backgroundImage:
-          "repeating-linear-gradient(45deg, hsl(0 75% 60%) 0 20px, hsl(0 0% 100%) 20px 40px)",
+        backgroundImage: "repeating-linear-gradient(45deg, hsl(0 75% 60%) 0 20px, hsl(0 0% 100%) 20px 40px)",
       }}
     >
       <div className="absolute top-2 right-3 text-2xl animate-bounce">🐞</div>
@@ -8036,12 +9186,12 @@ function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
 
       <div className="bg-white/95 rounded-lg p-5 text-sm text-foreground space-y-2 border-2 border-red-400">
         <p>
-          Imagine all the plants in the field are having a picnic. There's just enough sunlight, water,
-          nutrients, and space for every crop to grow big and healthy.
+          Imagine all the plants in the field are having a picnic. There's just enough sunlight, water, nutrients, and
+          space for every crop to grow big and healthy.
         </p>
         <p>
-          Then some <strong>weeds</strong> show up… <em>uninvited</em>! They gobble the food, drink the water,
-          and hog the blanket. Suddenly, there isn't enough for everyone!
+          Then some <strong>weeds</strong> show up… <em>uninvited</em>! They gobble the food, drink the water, and hog
+          the blanket. Suddenly, there isn't enough for everyone!
         </p>
       </div>
 
@@ -8051,16 +9201,22 @@ function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
           alt="Two picnic panels — overcrowded and cramped versus spacious and plentiful"
           className="w-full h-auto rounded-md bg-background/60 object-contain"
         />
-        <p className="text-center text-[11px] text-muted-foreground italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+        <p className="text-center text-[11px] text-muted-foreground italic mt-1">
+          Image generated with Google Gemini 1.5 Pro.
+        </p>
       </div>
 
       {/* Interactive: pack the basket */}
       <div className="bg-white/95 rounded-lg p-4 border-2 border-red-400 space-y-3">
         <div className="flex items-center justify-between">
           <p className="font-display font-bold text-red-700">🧺 Pack It for the Trip!</p>
-          <span className="text-xs font-bold bg-red-600 text-white rounded-full px-3 py-1">{packedCount}/{items.length} packed</span>
+          <span className="text-xs font-bold bg-red-600 text-white rounded-full px-3 py-1">
+            {packedCount}/{items.length} packed
+          </span>
         </div>
-        <p className="text-xs text-foreground">Tap an item to learn about it, then tap "Pack it!" to put it in the basket.</p>
+        <p className="text-xs text-foreground">
+          Tap an item to learn about it, then tap "Pack it!" to put it in the basket.
+        </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {items.map((p) => {
             const isOpen = open === p.key;
@@ -8078,29 +9234,41 @@ function PicnicModule({ items, img }: { items: PicnicItem[]; img: string }) {
             );
           })}
         </div>
-        {open && (() => {
-          const p = items.find((i) => i.key === open)!;
-          return (
-            <div className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
-              <p className="font-display font-bold text-foreground text-base">{p.emoji} {p.resource}</p>
-              <p className="text-sm text-foreground"><strong>At the picnic:</strong> {p.crop}</p>
-              <p className="text-sm text-foreground"><strong>Uninvited weeds:</strong> {p.weed}</p>
-              {!packed[p.key] ? (
-                <button
-                  onClick={() => { setPacked({ ...packed, [p.key]: true }); setOpen(null); }}
-                  className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold rounded-md py-2 text-sm"
-                >
-                  🧺 Pack it for the trip!
-                </button>
-              ) : (
-                <p className="text-xs text-success font-bold text-center">Already in the basket!</p>
-              )}
-            </div>
-          );
-        })()}
+        {open &&
+          (() => {
+            const p = items.find((i) => i.key === open)!;
+            return (
+              <div className={`rounded-lg border-2 p-4 space-y-2 ${p.bg}`}>
+                <p className="font-display font-bold text-foreground text-base">
+                  {p.emoji} {p.resource}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>At the picnic:</strong> {p.crop}
+                </p>
+                <p className="text-sm text-foreground">
+                  <strong>Uninvited weeds:</strong> {p.weed}
+                </p>
+                {!packed[p.key] ? (
+                  <button
+                    onClick={() => {
+                      setPacked({ ...packed, [p.key]: true });
+                      setOpen(null);
+                    }}
+                    className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold rounded-md py-2 text-sm"
+                  >
+                    🧺 Pack it for the trip!
+                  </button>
+                ) : (
+                  <p className="text-xs text-success font-bold text-center">Already in the basket!</p>
+                )}
+              </div>
+            );
+          })()}
         {packedCount === items.length && (
           <div className="bg-success/20 border-2 border-success rounded-lg p-3 text-center">
-            <p className="font-bold text-success text-sm">🎉 Basket packed! You're ready for the picnic — and you know what weeds are trying to steal!</p>
+            <p className="font-bold text-success text-sm">
+              🎉 Basket packed! You're ready for the picnic — and you know what weeds are trying to steal!
+            </p>
           </div>
         )}
       </div>
@@ -8128,7 +9296,9 @@ function ToolShelf({ methods }: { methods: Method[] }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <div className="rounded-xl bg-amber-900/90 border-4 border-amber-950 p-4 shadow-inner space-y-3">
-      <p className="text-center font-display font-extrabold text-yellow-100 text-base">🛠️ The Weed-Control Tool Shelf</p>
+      <p className="text-center font-display font-extrabold text-yellow-100 text-base">
+        🛠️ The Weed-Control Tool Shelf
+      </p>
       <p className="text-center text-xs text-yellow-100/90">Click a tool to grab it off the shelf!</p>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-amber-950 rounded-md p-3 border-t-4 border-b-4 border-amber-800">
         {methods.map((m) => (
@@ -8142,17 +9312,26 @@ function ToolShelf({ methods }: { methods: Method[] }) {
           </button>
         ))}
       </div>
-      {open && (() => {
-        const m = methods.find((x) => x.key === open)!;
-        return (
-          <div className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
-            <p className="font-display font-bold text-foreground text-base">{m.emoji} {m.title}</p>
-            <p className="text-sm text-foreground"><strong>What it is:</strong> {m.what}</p>
-            <p className="text-sm text-foreground"><strong>Examples:</strong> {m.examples}</p>
-            <p className="text-sm text-foreground"><strong>When it works best:</strong> {m.bestFor}</p>
-          </div>
-        );
-      })()}
+      {open &&
+        (() => {
+          const m = methods.find((x) => x.key === open)!;
+          return (
+            <div className={`rounded-lg border-2 p-4 space-y-2 ${m.bg}`}>
+              <p className="font-display font-bold text-foreground text-base">
+                {m.emoji} {m.title}
+              </p>
+              <p className="text-sm text-foreground">
+                <strong>What it is:</strong> {m.what}
+              </p>
+              <p className="text-sm text-foreground">
+                <strong>Examples:</strong> {m.examples}
+              </p>
+              <p className="text-sm text-foreground">
+                <strong>When it works best:</strong> {m.bestFor}
+              </p>
+            </div>
+          );
+        })()}
     </div>
   );
 }
@@ -8179,7 +9358,9 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
           alt="The Weed Control Squad — five weed-fighting heroes"
           className="w-full h-auto rounded-md bg-background/60 object-contain"
         />
-        <p className="text-center text-[11px] text-yellow-100 italic mt-1">Image generated with Google Gemini 1.5 Pro.</p>
+        <p className="text-center text-[11px] text-yellow-100 italic mt-1">
+          Image generated with Google Gemini 1.5 Pro.
+        </p>
         <p className="text-center text-xs text-yellow-100 mt-1">🦸 Click a hero below to reveal their superpower!</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -8194,23 +9375,39 @@ function HeroPicker({ heroes, img }: { heroes: Hero[]; img: string }) {
           </button>
         ))}
       </div>
-      {open && (() => {
-        const h = heroes.find((x) => x.key === open)!;
-        return (
-          <div className="rounded-lg border-4 border-yellow-400 p-4 space-y-2 bg-white shadow-xl">
-            <p className="font-display font-extrabold text-emerald-900 text-lg">{h.emoji} {h.hero}</p>
-            <span className="inline-block text-xs font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-950 border-2 border-emerald-900">Power: {h.power}</span>
-            <p className="text-sm text-slate-900 font-medium"><strong className="text-emerald-800">How the power works:</strong> {h.how}</p>
-            <p className="text-sm text-slate-900 font-medium"><strong className="text-emerald-800">Best for:</strong> {h.bestFor}</p>
-            <p className="text-xs text-slate-700 italic">{h.reallife}</p>
-          </div>
-        );
-      })()}
+      {open &&
+        (() => {
+          const h = heroes.find((x) => x.key === open)!;
+          return (
+            <div className="rounded-lg border-4 border-yellow-400 p-4 space-y-2 bg-white shadow-xl">
+              <p className="font-display font-extrabold text-emerald-900 text-lg">
+                {h.emoji} {h.hero}
+              </p>
+              <span className="inline-block text-xs font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-emerald-950 border-2 border-emerald-900">
+                Power: {h.power}
+              </span>
+              <p className="text-sm text-slate-900 font-medium">
+                <strong className="text-emerald-800">How the power works:</strong> {h.how}
+              </p>
+              <p className="text-sm text-slate-900 font-medium">
+                <strong className="text-emerald-800">Best for:</strong> {h.bestFor}
+              </p>
+              <p className="text-xs text-slate-700 italic">{h.reallife}</p>
+            </div>
+          );
+        })()}
     </div>
   );
 }
 
-interface DetectiveRule { key: string; rule: string; emoji: string; dot: string; bg: string; detail: string; }
+interface DetectiveRule {
+  key: string;
+  rule: string;
+  emoji: string;
+  dot: string;
+  bg: string;
+  detail: string;
+}
 
 function RevealBox({
   title,
@@ -8238,9 +9435,7 @@ function RevealBox({
         open ? openClass : `${coverClass} hover:scale-[1.02]`
       }`}
     >
-      <p className={`font-display font-extrabold text-base ${open ? textClass : titleClass}`}>
-        {title}
-      </p>
+      <p className={`font-display font-extrabold text-base ${open ? textClass : titleClass}`}>{title}</p>
       {open ? (
         <p className={`text-sm font-medium animate-fade-in ${textClass}`}>{body}</p>
       ) : (
@@ -8266,15 +9461,18 @@ function DetectiveNotebook({ rules }: { rules: DetectiveRule[] }) {
           </button>
         ))}
       </div>
-      {open && (() => {
-        const r = rules.find((x) => x.key === open)!;
-        return (
-          <div className={`rounded-lg border-2 border-slate-900 p-4 ${r.bg}`}>
-            <p className="font-display font-bold text-foreground text-sm mb-1">{r.emoji} {r.rule}</p>
-            <p className="text-sm text-foreground">{r.detail}</p>
-          </div>
-        );
-      })()}
+      {open &&
+        (() => {
+          const r = rules.find((x) => x.key === open)!;
+          return (
+            <div className={`rounded-lg border-2 border-slate-900 p-4 ${r.bg}`}>
+              <p className="font-display font-bold text-foreground text-sm mb-1">
+                {r.emoji} {r.rule}
+              </p>
+              <p className="text-sm text-foreground">{r.detail}</p>
+            </div>
+          );
+        })()}
     </div>
   );
 }
@@ -8311,10 +9509,20 @@ function GrassIdentificationModule({
           <strong>inflorescence</strong> once the plant heads. Work through four questions on every specimen:
         </p>
         <ol className="list-decimal pl-5 space-y-1">
-          <li><strong>Ligule</strong> — membranous, a fringe of hairs, both, or absent? Note its height and whether the top is smooth, toothed, or pointed.</li>
-          <li><strong>Auricles</strong> — are there claw-like appendages clasping the stem at the collar?</li>
-          <li><strong>Sheath &amp; blade</strong> — round or flattened, hairy or smooth, rolled or folded in the bud (vernation)?</li>
-          <li><strong>Seed head</strong> — spike, raceme, or panicle; bristles, awns, or burs?</li>
+          <li>
+            <strong>Ligule</strong> — membranous, a fringe of hairs, both, or absent? Note its height and whether the
+            top is smooth, toothed, or pointed.
+          </li>
+          <li>
+            <strong>Auricles</strong> — are there claw-like appendages clasping the stem at the collar?
+          </li>
+          <li>
+            <strong>Sheath &amp; blade</strong> — round or flattened, hairy or smooth, rolled or folded in the bud
+            (vernation)?
+          </li>
+          <li>
+            <strong>Seed head</strong> — spike, raceme, or panicle; bristles, awns, or burs?
+          </li>
         </ol>
         <p className="text-muted-foreground">
           The ligule is the single most reliable vegetative character, which is why every card below leads with a
@@ -8344,7 +9552,9 @@ function GrassIdentificationModule({
             key={t}
             onClick={() => setFilter(t)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-colors ${
-              filter === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary"
+              filter === t
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-foreground border-border hover:border-primary"
             }`}
           >
             {t === "All" ? `All grasses (${GRASS_FEATURES.length})` : `${t} ligule`}
@@ -8358,7 +9568,9 @@ function GrassIdentificationModule({
             <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h3 className="font-display font-bold text-foreground text-lg">{g.commonName}</h3>
               <p className="italic text-sm text-muted-foreground">{g.scientificName}</p>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${LIGULE_TYPE_STYLE[g.liguleType]}`}>
+              <span
+                className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${LIGULE_TYPE_STYLE[g.liguleType]}`}
+              >
                 {g.liguleType === "Absent" ? "No ligule" : `${g.liguleType} ligule`}
               </span>
               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-border text-muted-foreground">
@@ -8391,7 +9603,13 @@ function GrassIdentificationModule({
 
             {/* Supporting imagery — smaller */}
             <div className="grid grid-cols-3 gap-2">
-              {([["vegetative", "Vegetative"], ["seedling", "Seedling"], ["seed", "Seed"]] as const).map(([stage, label]) => (
+              {(
+                [
+                  ["vegetative", "Vegetative"],
+                  ["seedling", "Seedling"],
+                  ["seed", "Seed"],
+                ] as const
+              ).map(([stage, label]) => (
                 <figure key={stage} className="rounded-md border border-border overflow-hidden bg-muted">
                   <figcaption className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground px-1.5 py-0.5 bg-muted/70">
                     {label}
