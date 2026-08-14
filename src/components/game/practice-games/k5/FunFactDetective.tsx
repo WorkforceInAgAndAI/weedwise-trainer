@@ -119,7 +119,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
   }
 
   return (
-    <div className="fixed inset-0 practice-game-extra-offset bg-background z-50 overflow-y-auto p-4">
+    <div className="fixed top-[84px] inset-x-0 bottom-0 practice-game-extra-offset bg-background z-50 overflow-y-auto p-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="bg-card border-2 border-primary/40 rounded-lg p-4 mb-4 flex items-center gap-3">

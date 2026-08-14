@@ -239,7 +239,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   const laneWeeds = (n: number) => weeds.filter(w => w.lane === n);
 
   return (
-    <div className="fixed inset-0 practice-game-extra-offset bg-background z-50 overflow-y-auto p-3 sm:p-4">
+    <div className="fixed top-[84px] inset-x-0 bottom-0 practice-game-extra-offset bg-background z-50 overflow-y-auto p-3 sm:p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-card border-2 border-primary/40 rounded-lg p-3 mb-3 flex items-center gap-3 flex-wrap">
