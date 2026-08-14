@@ -741,7 +741,7 @@ const TOPICS: Topic[] = [
     name: "The 5 Weed-Fighting Superheroes",
     icon: "control",
     description:
-      "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Eat It, and Stop It!",
+      "Meet the 5 weed-fighting superpowers farmers team up to protect their crops — Pull It, Block It, Outsmart It, Swarm It, and Stop It!",
     grades: [],
     plantExplorer: true,
     category: "control",
@@ -4988,12 +4988,12 @@ function TopicContent({
         },
         {
           key: "eat",
-          hero: "Eat It!",
-          power: "Animal Allies",
+          hero: "Swarm It!",
+          power: "Bug Buddies",
           emoji: "🐐",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
-          how: "Bring in helpers like goats, sheep, or bugs that love to munch on certain weeds.",
+          how: "Bring in helper insects like lady beetles, leaf beetles, and weevils that love to munch on certain weeds.",
           bestFor: "Hillsides, pastures, and places where machines or sprays are hard to use.",
           reallife: "This is called biological control.",
         },
@@ -5047,7 +5047,7 @@ function TopicContent({
 
           <div className="bg-yellow-50/95 border-2 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-primary mb-1">Remember the 5 Superpowers:</p>
-            <p>Pull It • Block It • Outsmart It • Eat It • Stop It.</p>
+            <p>Pull It • Block It • Outsmart It • Swarm It • Stop It.</p>
           </div>
         </div>
       );
@@ -6066,7 +6066,7 @@ function TopicContent({
           dot: "bg-accent",
           bg: "bg-accent/10 border-accent/40",
           what: "Using living helpers — like insects, animals, or tiny germs — to eat or weaken weeds.",
-          examples: "Beetles that munch on leafy spurge, or goats that love to eat prickly thistle.",
+          examples: "Lady beetles and leaf beetles that munch on leafy spurge, or thistle-feeding weevils on prickly thistle.",
           bestFor: "A good fit for pastures, parks, and wild areas where sprays are hard to use.",
         },
         {
@@ -6878,7 +6878,7 @@ function TopicContent({
             key: "biological",
             label: "Biological Control (Insects, Pathogens, Targeted Grazing)",
             description:
-              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing animal (goats, sheep) — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
+              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing insect release — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
             match: /biolog|insect|pathogen|biocontrol|graz/i,
           },
           {
