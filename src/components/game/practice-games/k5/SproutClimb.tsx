@@ -220,10 +220,10 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
               const v = VINES[landed];
               const w = WEEDS[landed];
               if (v) {
-                setMessage({ text: `${v.resource} — ${v.reason}`, kind: 'vine' });
+                setMessage({ text: `${v.day} (${v.resource}) — ${v.reason}`, kind: 'vine' });
                 setTimeout(() => setTile(v.to), 500);
               } else if (w) {
-                setMessage({ text: `${w.weed} — ${w.reason}`, kind: 'weed' });
+                setMessage({ text: `${w.day} — ${w.reason} (${w.weed} takes over.)`, kind: 'weed' });
                 setTimeout(() => setTile(w.to), 500);
               }
               if (Math.min(BOARD_SIZE, startTile + final) >= BOARD_SIZE) {
