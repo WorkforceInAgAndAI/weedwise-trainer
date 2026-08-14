@@ -8232,10 +8232,10 @@ function TopicContent({
 
       const availableDioecious = DIOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
-      );
+      ).sort((a, b) => a.name.localeCompare(b.name));
       const availableMonoecious = MONOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
-      );
+      ).sort((a, b) => a.name.localeCompare(b.name));
 
       const renderSpeciesCard = (
         sp: { id: string; name: string; maleDesc: string; femaleDesc: string },
