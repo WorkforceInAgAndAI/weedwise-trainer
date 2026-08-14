@@ -92,17 +92,13 @@ export default function TaxonomyTower({ onBack }: Props) {
           <div className="bg-secondary/50 rounded-xl p-3 text-center">
             <p className="text-sm text-muted-foreground">Classify this weed:</p>
           </div>
-          <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-primary/30">
-            <WeedImage weedId={target.id} stage="flower" className="w-full h-full object-cover" />
-          </div>
 
           <div className="w-full max-w-2xl flex flex-col items-center gap-2">
           {pyramid.map((_, i) => {
-            const displayIdx = pyramid.length - 1 - i;
-            const actualLevel = pyramid[displayIdx];
-            const actualIdx = displayIdx;
-            // Wider rows + species level (top) gets full width so long names fit
-            const widthPercent = Math.min(100, 75 + (pyramid.length - 1 - actualIdx) * 8);
+            const actualIdx = i;
+            const actualLevel = pyramid[actualIdx];
+            // Widest at top (broadest question), narrowest at bottom (species)
+            const widthPercent = Math.min(100, 100 - actualIdx * 8);
 
             return (
               <div key={actualIdx} className="w-full flex justify-center" style={{ maxWidth: `${widthPercent}%` }}>
@@ -134,6 +130,10 @@ export default function TaxonomyTower({ onBack }: Props) {
               </div>
             );
           })}
+          </div>
+
+          <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl overflow-hidden border-2 border-primary/30">
+            <WeedImage weedId={target.id} stage="flower" className="w-full h-full object-cover" />
           </div>
 
           {found && (

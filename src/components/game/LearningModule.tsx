@@ -925,6 +925,10 @@ const TOPICS: Topic[] = [
   },
 ];
 
+function byCommonName(list: Weed[]): Weed[] {
+  return [...list].sort((a, b) => a.commonName.localeCompare(b.commonName));
+}
+
 function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[] {
   // Grade-aware base pool. K-5 uses the 14 "Weeds You Can Spot" species,
   // 6-8 uses the middle-school curriculum, 9-12 the high-school curriculum,
@@ -932,11 +936,11 @@ function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[
   const base = weedsForPool(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0);
+      return byCommonName(base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0));
     case "safety":
-      return base.filter((w) => w.safetyNote);
+      return byCommonName(base.filter((w) => w.safetyNote));
     default:
-      return base;
+      return byCommonName(base);
   }
 }
 
@@ -4976,7 +4980,7 @@ function TopicContent({
           emoji: "🛡️",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          how: "Cover the soil with mulch, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
+          how: "Cover the soil with a cover crop, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
           bestFor: "Around trees, flower beds, and vegetable rows.",
           reallife: "This is a kind of cultural control.",
         },
@@ -5841,8 +5845,8 @@ function TopicContent({
           <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Who Cheers the Crops On?</p>
             <p className="text-sm text-foreground">
-              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close together, mulch
-              the soil, and use the 5 weed-fighting superpowers so the crops can reach the finish line first — and fill
+              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close together, grow cover crops
+              to protect the soil, and use the 5 weed-fighting superpowers so the crops can reach the finish line first — and fill
               our plates with delicious food.
             </p>
           </div>
@@ -6163,6 +6167,7 @@ function TopicContent({
         list.push(w);
         famGroups.set(w.family, list);
       });
+      famGroups.forEach((list, key) => famGroups.set(key, byCommonName(list)));
 
       if (viewMode === "box") {
         return (
@@ -7093,7 +7098,7 @@ function TopicContent({
         },
         {
           key: "mulch-cover",
-          label: "Mulch / Cover Crops",
+          label: "Cover Cropping",
           desc: "Cover crops suppress weeds through physical biomass that blocks light, allelopathic compounds that inhibit germination, and competition for resources. Species like cereal rye can produce 4,000-8,000 lbs/acre of biomass.",
           example:
             "Planting cereal rye at 60-90 lbs/acre after corn harvest, then roller-crimping in spring before soybean planting.",
@@ -7358,7 +7363,7 @@ function TopicContent({
             {isElementary ? (
               <p className="text-sm text-foreground">
                 The best way to manage weeds is to use <strong>more than one method</strong>. For example, you can pull
-                weeds by hand AND use mulch to stop new ones from growing. Using different methods together keeps weeds
+                weeds by hand AND grow a cover crop to stop new ones from growing. Using different methods together keeps weeds
                 from coming back.
               </p>
             ) : isHighSchool ? (
@@ -8227,10 +8232,10 @@ function TopicContent({
 
       const availableDioecious = DIOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
-      );
+      ).sort((a, b) => a.name.localeCompare(b.name));
       const availableMonoecious = MONOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
-      );
+      ).sort((a, b) => a.name.localeCompare(b.name));
 
       const renderSpeciesCard = (
         sp: { id: string; name: string; maleDesc: string; femaleDesc: string },
@@ -9122,6 +9127,7 @@ function FamilyGroupings({
         {Array.from(familyGroups.entries())
           .sort()
           .map(([family, members], fi) => {
+            members = byCommonName(members);
             return (
               <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
                 <p className="font-bold text-foreground text-xs mb-2">

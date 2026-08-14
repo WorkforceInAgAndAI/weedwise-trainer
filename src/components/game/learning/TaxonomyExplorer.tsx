@@ -77,7 +77,9 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
   const familiesOf = (members: Weed[]) => {
     const m = new Map<string, Weed[]>();
     members.forEach(w => m.set(w.family, [...(m.get(w.family) || []), w]));
-    return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    return [...m.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([fam, list]) => [fam, [...list].sort((a, b) => a.commonName.localeCompare(b.commonName))] as [string, Weed[]]);
   };
 
   return (

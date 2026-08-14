@@ -1,11 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import FloatingCoach from '@/components/game/FloatingCoach';
-import { DollarSign, Lock } from 'lucide-react';
-import BetweenLevelShop from '@/components/game/BetweenLevelShop';
-import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -25,26 +23,7 @@ const CONTROLS = [
   { id: 'biocontrol', label: 'Biological Control', stages: ['vegetative', 'reproductive'] },
 ];
 
-// SHORTER levels + persistent shop = students BUILD up their toolkit
-// across levels instead of grinding a long round.
 const QUESTIONS_PER_ROUND = 5;
-
-// Only Hand Pull + Cultivation are free to start. Everything else must be
-// bought between levels. Prices are tuned so a student earning full marks
-// on 5 questions ($100 × 5 = $500) can afford one mid-tier tool per level.
-// Prices tuned so any student who earns partial credit ($25 avg × 5 = $125)
-// can afford at least one tool between levels. A perfect run ($500) can buy
-// two or three, keeping progression brisk.
-const SHOP_CATALOG: ShopItem[] = [
-  { id: 'pre-herb',   name: 'Pre-Emergence Herbicide',  cost: 125, tag: 'Chemical',   desc: 'Unlocks Pre-emergence Herbicide.' },
-  { id: 'post-herb',  name: 'Post-Emergence Herbicide', cost: 150, tag: 'Chemical',   desc: 'Unlocks Post-emergence Herbicide.' },
-  { id: 'mow',        name: 'Mower',                    cost: 125, tag: 'Mechanical', desc: 'Unlocks Mow / Cut.' },
-  { id: 'cover-crop', name: 'Cover-Crop Seed',          cost: 175, tag: 'Cultural',   desc: 'Unlocks Cover Crops / Competition.' },
-  { id: 'spot-spray', name: 'Precision Spot Sprayer',   cost: 225, tag: 'Chemical',   desc: 'Unlocks Spot Spray Treatment.' },
-  { id: 'biocontrol', name: 'Biocontrol Release',       cost: 200, tag: 'Biological', desc: 'Unlocks Biological Control.' },
-];
-
-const STARTER_OWNED = ['hand-pull', 'cultivate'];
 
 function buildRounds(level: number, questionsPerRound = QUESTIONS_PER_ROUND) {
   const offset = ((level - 1) * questionsPerRound) % weeds.length;
@@ -68,8 +47,6 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
   const items = useMemo(() => buildRounds(level, d.rounds), [level, d.rounds]);
-  const shop = usePracticeShop('life-stage-control', STARTER_OWNED, 0);
-  const [earnedThisLevel, setEarnedThisLevel] = useState(0);
 
   const [idx, setIdx] = useState(0);
   const [step, setStep] = useState<'stage' | 'weed' | 'control' | 'feedback'>('stage');
@@ -79,16 +56,6 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
 
   const done = idx >= items.length;
-  // Guaranteed level-completion stipend so partial-credit students still
-  // accumulate enough to buy at least one new tool between levels.
-  const LEVEL_COMPLETION_BONUS = 100;
-  useEffect(() => {
-    if (done) {
-      shop.earn(LEVEL_COMPLETION_BONUS);
-      setEarnedThisLevel(v => v + LEVEL_COMPLETION_BONUS);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [done]);
   const current = !done ? items[idx] : null;
 
   // Generate distractors for weed identification
@@ -98,19 +65,15 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
     return shuffle([current.weed, ...others]);
   }, [idx, current?.weed.id, d.options]);
 
-  // Pick 5 control options. GUARANTEE every owned tool is included so
-  // students always have at least one clickable answer (progression must
-  // never be blocked by an all-locked option set). Then fill with valid
-  // options for the current stage, then invalid distractors.
+  // Pick control options: all valid options for the current stage plus
+  // shuffled distractors, capped at 5 total.
   const controlOptions = useMemo(() => {
     if (!current) return [];
-    const ownedSet = new Set(shop.owned);
-    const owned = CONTROLS.filter(c => ownedSet.has(c.id));
-    const valid = CONTROLS.filter(c => c.stages.includes(current.stage) && !ownedSet.has(c.id));
-    const rest  = CONTROLS.filter(c => !c.stages.includes(current.stage) && !ownedSet.has(c.id));
-    const picked = [...owned, ...valid, ...shuffle(rest)].slice(0, Math.max(5, owned.length + 1));
+    const valid = CONTROLS.filter(c => c.stages.includes(current.stage));
+    const rest  = CONTROLS.filter(c => !c.stages.includes(current.stage));
+    const picked = [...valid, ...shuffle(rest)].slice(0, 5);
     return shuffle(picked);
-  }, [idx, current?.stage, shop.owned]);
+  }, [idx, current?.stage]);
 
   const validControlIds = current ? CONTROLS.filter(c => c.stages.includes(current.stage)).map(c => c.id) : [];
 
@@ -127,19 +90,9 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   };
 
   const handleControl = (cId: string) => {
-    // Locked tools are visible for awareness but not selectable.
-    if (!shop.owns(cId)) return;
     setControlAnswer(cId);
-    const stageOk = stageAnswer === current!.stage;
-    const weedOk = weedAnswer === current!.weed.id;
     const controlOk = validControlIds.includes(cId);
     if (controlOk) setScore(sc => sc + 1);
-    // Money rewards mastery of all THREE — only full payout when all correct.
-    let award = 5;
-    if (stageOk && weedOk && controlOk) award = 100;
-    else if ([stageOk, weedOk, controlOk].filter(Boolean).length === 2) award = 25;
-    shop.earn(award);
-    setEarnedThisLevel(m => m + award);
     setStep('feedback');
   };
 
@@ -152,29 +105,22 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   };
 
   const restart = () => {
-    setIdx(0); setScore(0); setStep('stage'); setEarnedThisLevel(0);
+    setIdx(0); setScore(0); setStep('stage');
     setStageAnswer(null); setWeedAnswer(null); setControlAnswer(null);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); shop.reset(); restart(); };
+  const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
     const maxScore = items.length * 3;
     return (
-      <BetweenLevelShop
-        title="IPM Supply Shop"
+      <LevelComplete
         level={level}
         score={score}
         total={maxScore}
-        money={shop.money}
-        owned={shop.owned}
-        earnedThisLevel={earnedThisLevel}
-        catalog={SHOP_CATALOG}
-        onBuy={shop.buy}
-        onContinue={nextLevel}
+        onNextLevel={nextLevel}
         onStartOver={startOver}
         onBack={onBack}
-        gradeLabel="6-8"
       />
     );
   }
@@ -189,7 +135,6 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Life Stage Control</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm font-bold text-green-600 inline-flex items-center"><DollarSign className="w-3 h-3" />{shop.money}</span>
         <span className="text-sm text-muted-foreground">{idx + 1}/{items.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
@@ -264,29 +209,13 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
               How should you manage {current!.weed.commonName} at the {STAGE_LABELS[current!.stage].toLowerCase()} stage?
             </p>
             <div className="flex flex-col gap-2 w-full max-w-sm">
-              {controlOptions.map(c => {
-                const owned = shop.owns(c.id);
-                const shopEntry = SHOP_CATALOG.find(s => s.id === c.id);
-                return (
-                  <button key={c.id} onClick={() => handleControl(c.id)}
-                    disabled={!owned}
-                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-all text-left flex items-center justify-between gap-2 ${
-                      owned ? 'border-border bg-card hover:border-primary text-foreground'
-                            : 'border-dashed border-border bg-card/50 text-muted-foreground cursor-not-allowed'
-                    }`}>
-                    <span>{c.label}</span>
-                    {!owned && (
-                      <span className="text-[10px] inline-flex items-center gap-1"><Lock className="w-3 h-3" />
-                        {shopEntry ? `$${shopEntry.cost}` : 'Locked'}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+              {controlOptions.map(c => (
+                <button key={c.id} onClick={() => handleControl(c.id)}
+                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all text-left">
+                  {c.label}
+                </button>
+              ))}
             </div>
-            <p className="mt-3 text-[11px] text-muted-foreground italic max-w-sm text-center">
-              Locked tools can be bought in the shop between levels.
-            </p>
           </>
         )}
 
@@ -297,10 +226,10 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
               <p className="font-bold text-foreground mb-2">{current!.weed.commonName}</p>
               <p className="text-xs text-muted-foreground italic mb-2">{current!.weed.scientificName}</p>
               {stageCorrect && weedCorrect && controlCorrect ? (
-                <p className="text-sm font-bold text-green-600 mb-2">+$100 — Perfect! All three matter to control this weed.</p>
+                <p className="text-sm font-bold text-green-600 mb-2">Perfect! All three matter to control this weed.</p>
               ) : (
                 <p className="text-xs text-amber-600 mb-2 font-semibold">
-                  Knowing the stage, the species, AND the right control all together unlocks the full $100 reward — partial knowledge still leaves money on the table.
+                  Knowing the stage, the species, AND the right control together is key to effective management.
                 </p>
               )}
 
