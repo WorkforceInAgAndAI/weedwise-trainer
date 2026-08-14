@@ -22,7 +22,7 @@ const HEROES: Hero[] = [
   { key: 'pull',     name: 'Pull It',     power: 'Super Strength',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 1, cooldownMs: 500 },
   { key: 'block',    name: 'Block It',    power: 'Force Field',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 1, cooldownMs: 700 },
   { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 1, cooldownMs: 700 },
-  { key: 'eat',      name: 'Eat It',      power: 'Animal Allies',   Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
+  { key: 'eat',      name: 'Graze It',      power: 'Animal Allies',   Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
   { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 2, cooldownMs: 1100 },
 ];
 
