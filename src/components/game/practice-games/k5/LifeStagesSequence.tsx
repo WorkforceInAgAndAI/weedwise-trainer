@@ -32,11 +32,13 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
   const [history, setHistory] = useState<{ weedId: string; name: string; correct: boolean }[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+  const [wrongFlash, setWrongFlash] = useState(false);
+  const [attempts, setAttempts] = useState(0);
 
   const target = targets[targetIdx];
   const done = targetIdx >= targets.length;
 
-  const restart = () => { setTargetIdx(0); setOrder(shuffle([...STAGES])); setChecked(false); setScore(0); setHistory([]); setSelectedIdx(null); };
+  const restart = () => { setTargetIdx(0); setOrder(shuffle([...STAGES])); setChecked(false); setScore(0); setHistory([]); setSelectedIdx(null); setWrongFlash(false); setAttempts(0); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
@@ -49,6 +51,7 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
     const [item] = next.splice(from, 1);
     next.splice(to, 0, item);
     setOrder(next);
+    setWrongFlash(false);
   };
 
   // Click-to-move: first tap selects a card, second tap moves the selected card to that slot.
@@ -67,12 +70,18 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
     setSelectedIdx(null);
   };
 
+  // Students keep fixing the order until every stage is in the right spot.
   const check = () => {
-    setChecked(true);
     const correct = order.every((s, i) => s === STAGES[i]);
-    if (correct) setScore(sc => sc + 1);
-    setHistory(h => [...h, { weedId: target.id, name: target.commonName, correct }]);
     setSelectedIdx(null);
+    if (!correct) {
+      setWrongFlash(true);
+      setAttempts(a => a + 1);
+      return;
+    }
+    setChecked(true);
+    if (attempts === 0) setScore(sc => sc + 1);
+    setHistory(h => [...h, { weedId: target.id, name: target.commonName, correct: attempts === 0 }]);
   };
 
   const next = () => {
@@ -80,9 +89,11 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
     setOrder(shuffle([...STAGES]));
     setChecked(false);
     setSelectedIdx(null);
+    setWrongFlash(false);
+    setAttempts(0);
   };
 
-  const isCorrect = checked && order.every((s, i) => s === STAGES[i]);
+  const isCorrect = checked;
 
   if (done) return <LevelComplete level={level} score={score} total={targets.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gameId={gameId} gameName={gameName} gradeLabel={gradeLabel} />;
 
@@ -99,12 +110,12 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
         <div className="flex flex-col items-center justify-center gap-6">
           <FarmerGuide
             gradeLabel={gradeLabel}
-            tone={checked ? (isCorrect ? 'correct' : 'wrong') : 'hint'}
+            tone={checked ? 'correct' : wrongFlash ? 'wrong' : 'hint'}
             message={
               checked
-                ? isCorrect
-                  ? `Yee-haw! You put the ${target.commonName} stages in the right order.`
-                  : `Close, partner — every weed starts as a seed, sprouts into a seedling, grows tall (vegetative), then flowers (reproductive).`
+                ? `Yee-haw! You put the ${target.commonName} stages in the right order.`
+                : wrongFlash
+                  ? `Close, partner — keep moving the cards! Every weed starts as a seed, sprouts into a seedling, grows tall (vegetative), then flowers (reproductive). Try again!`
                 : `Put the ${target.commonName} stages in order from left to right. Use the ◀ ▶ buttons on a card, drag a card into the spot you want, or tap two cards to move.`
             }
             className="max-w-xl w-full"
@@ -114,8 +125,8 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
           <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
             {order.map((stage, i) => {
               const isSelected = selectedIdx === i;
-              const isCorrectSlot = checked && stage === STAGES[i];
-              const isWrongSlot = checked && stage !== STAGES[i];
+              const isCorrectSlot = (checked || wrongFlash) && stage === STAGES[i];
+              const isWrongSlot = (checked || wrongFlash) && stage !== STAGES[i];
               return (
                 <div key={i} className="flex items-center gap-1 sm:gap-2">
                   <button
