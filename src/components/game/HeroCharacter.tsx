@@ -92,47 +92,55 @@ const CHEERS = [
  * game. Collapsible so it never blocks gameplay.
  */
 export default function HeroBuddy({
-  band = 'k5', name = 'Your Weed Hero', defaultOpen = true,
-}: { band?: StoreBand; name?: string; defaultOpen?: boolean }) {
+  band = 'k5', name = 'Your Weed Hero', tips,
+}: { band?: StoreBand; name?: string; tips?: string[] }) {
   const store = usePracticeStore('k5');
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(0);
   const [cheering, setCheering] = useState(false);
 
-  useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % CHEERS.length), 12000);
-    return () => clearInterval(t);
-  }, []);
+  // Messages are game-specific when the hero is inside a game.
+  const messages = useMemo(
+    () => (tips && tips.length ? tips.filter(Boolean) : CHEERS),
+    [tips]
+  );
 
-  // Auto-tuck the speech bubble away so it can never sit on top of game
-  // controls for long. Students can tap the hero to bring it back.
+  // Pop a message up every so often, then tuck it away after 3 seconds so it
+  // can never sit on top of Farmer Joe or any game controls.
   useEffect(() => {
-    if (!open) return;
-    const t = setTimeout(() => setOpen(false), 9000);
-    return () => clearTimeout(t);
-  }, [open, idx]);
+    let hide: number | undefined;
+    const show = () => {
+      setIdx(i => (i + 1) % messages.length);
+      setOpen(true);
+      hide = window.setTimeout(() => setOpen(false), 3000);
+    };
+    const first = window.setTimeout(show, 1500);
+    const loop = window.setInterval(show, 20000);
+    return () => { window.clearTimeout(first); window.clearInterval(loop); if (hide) window.clearTimeout(hide); };
+  }, [messages]);
 
   const owned = useMemo(() => store.ownedIds, [store.ownedIds]);
 
   const cheer = () => {
     setOpen(true);
     setCheering(true);
-    setIdx(i => (i + 1) % CHEERS.length);
+    setIdx(i => (i + 1) % messages.length);
     setTimeout(() => setCheering(false), 1400);
+    setTimeout(() => setOpen(false), 3000);
   };
 
   if (typeof document === 'undefined') return null;
 
   const node = (
-    <div className="fixed bottom-3 left-3 z-[2147483000] flex flex-col items-start gap-2 pointer-events-none print:hidden">
+    <div className="fixed bottom-3 right-3 z-[2147483000] flex flex-col items-end gap-2 pointer-events-none print:hidden">
       {open && (
-        <div className="pointer-events-auto relative max-w-[220px] rounded-2xl border-2 border-emerald-600 bg-emerald-50 dark:bg-emerald-950/90 backdrop-blur px-3 py-2 shadow-lg">
+        <div className="pointer-events-auto relative max-w-[220px] rounded-2xl border-2 border-emerald-600 bg-emerald-50 dark:bg-emerald-950/95 backdrop-blur px-3 py-2 shadow-lg animate-scale-in">
           <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
               <MessageCircle className="w-3 h-3" /> {name}
             </p>
-            <p className="text-xs text-foreground leading-snug">{CHEERS[idx]}</p>
+            <p className="text-xs text-foreground leading-snug">{messages[idx % messages.length]}</p>
           </div>
           <button onClick={() => setOpen(false)} aria-label="Hide your weed hero" className="shrink-0 text-emerald-700 hover:text-emerald-900 dark:text-emerald-400">
             <X className="w-4 h-4" />
