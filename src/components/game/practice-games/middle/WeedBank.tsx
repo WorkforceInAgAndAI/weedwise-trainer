@@ -159,7 +159,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
     const slide = INTRO_SLIDES[introStep];
     const SlideIcon = slide.Icon;
     return (
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-4">
+      <div className="fixed inset-0 practice-game-extra-offset z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-4">
         <div className="max-w-xl mx-auto mt-4">
           <div className="rounded-2xl border-2 border-amber-400/60 bg-card shadow-lg overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground">
@@ -192,7 +192,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-3 sm:p-6">
+    <div className="fixed inset-0 practice-game-extra-offset z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-3 sm:p-6">
       <div className="max-w-4xl mx-auto space-y-3">
         {/* Bank header */}
         <div className="rounded-xl border-2 border-amber-400/60 bg-card shadow-lg overflow-hidden">

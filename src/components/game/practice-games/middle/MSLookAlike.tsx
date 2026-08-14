@@ -4,7 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { lookAlikeGroupsForPool } from '@/data/lookAlikeGroups';
-import { getDifficulty, levelSlice } from '@/lib/difficulty';
+import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -35,12 +35,9 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
   const trios = useMemo(() => {
     const all = buildTrios();
     const perLevel = Math.max(3, Math.round(d.rounds / 2));
-    const offset = ((level - 1) * perLevel) % Math.max(all.length, 1);
-    const picked: Trio[] = [];
-    for (let i = 0; i < perLevel && all.length > 0; i++) {
-      picked.push(all[(offset + i) % all.length]);
-    }
-    return shuffle(picked);
+    // Draw a fresh random group set at every level instead of advancing through
+    // the same fixed list and adding only one new group.
+    return shuffle(all).slice(0, Math.min(perLevel, all.length));
   }, [level, d.rounds]);
 
   const [round, setRound] = useState(0);
