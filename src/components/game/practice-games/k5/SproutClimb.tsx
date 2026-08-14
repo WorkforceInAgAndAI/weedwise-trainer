@@ -29,20 +29,20 @@ const COLS = 6;
 const ROWS = 5;
 
 // tile => target tile. Positive = ladder (vine), negative meaning target<from = chute (weed)
-const VINES: Record<number, { to: number; reason: string; resource: string }> = {
-  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: '💧 Water' },
-  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: '☀️ Sunlight' },
-  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: '🌱 Nutrients' },
-  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: '🪱 Healthy soil' },
-  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: '🐝 Pollinator' },
+const VINES: Record<number, { to: number; reason: string; resource: string; day: string }> = {
+  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: '💧 Water', day: 'A nice rainy day' },
+  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: '☀️ Sunlight', day: 'A sunny warm day' },
+  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: '🌱 Nutrients', day: 'Plant fertilizer day' },
+  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: '🪱 Healthy soil', day: 'Earthworms loosen the soil' },
+  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: '🐝 Pollinator', day: 'Busy honeybee visit day' },
 };
 
-const WEEDS: Record<number, { to: number; reason: string; weed: string }> = {
-  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail' },
-  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed' },
-  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp' },
-  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle' },
-  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters' },
+const WEEDS: Record<number, { to: number; reason: string; weed: string; day: string }> = {
+  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail', day: 'A hungry insect swarm' },
+  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed', day: 'A blistering hot day' },
+  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp', day: 'A long dry drought' },
+  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle', day: 'A local flood event' },
+  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters', day: 'A late frost night' },
 };
 
 // Life stage banner based on tile position
