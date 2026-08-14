@@ -249,11 +249,9 @@ export default function PracticeHub({
     setScreen('games');
   }, [initialGrade, initialGameId]);
 
-  // Ensure body class is cleared whenever we leave the playing screen or unmount.
+  // Keep fixed game overlays below the practice toolbar while a game is active.
   useEffect(() => {
-    if (screen !== 'playing') {
-      document.body.classList.remove('practice-game-active');
-    }
+    document.body.classList.toggle('practice-game-active', screen === 'playing');
     return () => document.body.classList.remove('practice-game-active');
   }, [screen]);
 
@@ -264,10 +262,6 @@ export default function PracticeHub({
 
  if (screen === 'playing' && selectedGame) {
  const GameComp = selectedGame.component;
-  // Toggle a body class so global CSS can offset fixed game overlays below the top nav.
-  if (typeof document !== 'undefined') {
-    document.body.classList.add('practice-game-active');
-  }
  const gradeLabel =
    selectedGrade === 'newk5' ? 'K-5'
    : selectedGrade === 'k5' ? '6-8'
@@ -315,8 +309,11 @@ export default function PracticeHub({
       </div>
       {/* Spacer to push game content below the fixed top bar */}
       <style>{`
-        body.practice-game-active .fixed.inset-0 { top: 68px !important; }
-        body.practice-game-active .fixed.inset-0.practice-game-extra-offset { top: 84px !important; }
+        body.practice-game-active .fixed.inset-0:not(.practice-game-extra-offset) { top: 68px !important; }
+        body.practice-game-active .fixed.inset-0.practice-game-extra-offset {
+          top: 84px !important;
+          height: auto !important;
+        }
       `}</style>
    </>
  );
