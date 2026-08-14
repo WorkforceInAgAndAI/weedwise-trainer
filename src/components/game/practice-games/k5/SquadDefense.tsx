@@ -80,7 +80,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   const [feedback, setFeedback] = useState<{ text: string; kind: 'good' | 'bad' } | null>(null);
 
   const nextId = useRef(1);
-  const spawnTimer = useRef(0);
+  const spawnTimer = useRef(9999); // spawn the first weed immediately
 
   // Level tuning
   const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
@@ -316,7 +316,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
                       className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 transition-all duration-200 ${badgeState}`}
                       style={{ top: `calc(24px + ${w.pos}% * 0.78)` }}
                     >
-                      <div className="w-24 h-24 rounded-xl bg-white border-4 border-red-500 shadow-lg overflow-hidden relative">
+                      <div className="w-20 h-20 rounded-xl bg-white border-4 border-red-500 shadow-lg overflow-hidden relative">
                         <WeedImage weedId={w.weedId} stage="flower" className="w-full h-full object-cover" />
                         {w.maxHp > 1 && (
                           <div className="absolute -top-1 -right-1 text-[10px] font-bold text-red-900 bg-white rounded-full w-4 h-4 flex items-center justify-center border border-red-400">{w.hp}</div>
