@@ -925,6 +925,10 @@ const TOPICS: Topic[] = [
   },
 ];
 
+function byCommonName(list: Weed[]): Weed[] {
+  return [...list].sort((a, b) => a.commonName.localeCompare(b.commonName));
+}
+
 function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[] {
   // Grade-aware base pool. K-5 uses the 14 "Weeds You Can Spot" species,
   // 6-8 uses the middle-school curriculum, 9-12 the high-school curriculum,
@@ -932,11 +936,11 @@ function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[
   const base = weedsForPool(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0);
+      return byCommonName(base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0));
     case "safety":
-      return base.filter((w) => w.safetyNote);
+      return byCommonName(base.filter((w) => w.safetyNote));
     default:
-      return base;
+      return byCommonName(base);
   }
 }
 
@@ -6163,6 +6167,7 @@ function TopicContent({
         list.push(w);
         famGroups.set(w.family, list);
       });
+      famGroups.forEach((list, key) => famGroups.set(key, byCommonName(list)));
 
       if (viewMode === "box") {
         return (
@@ -9122,6 +9127,7 @@ function FamilyGroupings({
         {Array.from(familyGroups.entries())
           .sort()
           .map(([family, members], fi) => {
+            members = byCommonName(members);
             return (
               <div key={family} className={`${familyColors[fi % familyColors.length]} border rounded-lg p-3`}>
                 <p className="font-bold text-foreground text-xs mb-2">

@@ -6,6 +6,15 @@ import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+/** Plant parts / life stages shown together, mirroring the 9-12 version. */
+const STAGES: Array<{ key: string; label: string }> = [
+  { key: 'seedling', label: 'Seedling' },
+  { key: 'vegetative', label: 'Leaves' },
+  { key: 'flower', label: 'Flower' },
+  { key: 'repros', label: 'Seed head' },
+  { key: 'seed', label: 'Seed' },
+];
+
 export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
@@ -56,9 +65,17 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
      <span className="text-sm text-muted-foreground">{idx + 1}/{rounds.length}</span>
     </div>
-    <div className="flex justify-center mb-4">
-  <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-border bg-secondary">
-      <WeedImage key={current.weed.id} weedId={current.weed.id} stage="flower" className="w-full h-full object-cover" />
+    <div className="mb-4">
+     <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2 text-center">Plant parts / life stages</p>
+     <div className="grid grid-cols-3 gap-2">
+      {STAGES.map(({ key, label }) => (
+       <figure key={key} className="bg-card border border-border rounded-lg p-1.5">
+        <div className="h-20 sm:h-24 rounded-md overflow-hidden bg-secondary">
+         <WeedImage key={`${current.weed.id}-${key}`} weedId={current.weed.id} stage={key} className="w-full h-full object-cover" />
+        </div>
+        <figcaption className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mt-1 text-center">{label}</figcaption>
+       </figure>
+      ))}
      </div>
     </div>
     {d.showHints && <p className="text-sm text-muted-foreground text-center mb-1 italic">{current.weed.traits[0]}</p>}

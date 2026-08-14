@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Dice5, ArrowLeft, Sprout, Flower2, Leaf, AlertTriangle, Sparkles, Bot, Trophy } from 'lucide-react';
+import { Dice5, ArrowLeft, Sprout, Flower2, Leaf, AlertTriangle, Sparkles, Bot, Trophy, Wheat, Wind, Droplets, CalendarDays } from 'lucide-react';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty } from '@/lib/difficulty';
 
 /** Computer rivals — a different weed racer each level. */
-const RIVALS = [
-  { name: 'Rowdy Ragweed', emoji: '🌾', taunt: 'Ragweed grows fast — I make a BILLION pollen grains!' },
-  { name: 'Speedy Foxtail', emoji: '🌱', taunt: 'Foxtail sprints up in just a few weeks. Keep up!' },
-  { name: 'Tricky Bindweed', emoji: '🌀', taunt: 'I twist around anything to climb higher!' },
-  { name: 'Wicked Waterhemp', emoji: '💧', taunt: 'I drink your water and grow an inch a day!' },
-  { name: 'Prickly Thistle', emoji: '🪻', taunt: 'My roots creep under the whole field!' },
+const RIVALS: { name: string; Icon: React.ComponentType<{ className?: string }>; taunt: string }[] = [
+  { name: 'Rowdy Ragweed', Icon: Wheat, taunt: 'Ragweed grows fast — I make a BILLION pollen grains!' },
+  { name: 'Speedy Foxtail', Icon: Sprout, taunt: 'Foxtail sprints up in just a few weeks. Keep up!' },
+  { name: 'Tricky Bindweed', Icon: Wind, taunt: 'I twist around anything to climb higher!' },
+  { name: 'Wicked Waterhemp', Icon: Droplets, taunt: 'I drink your water and grow an inch a day!' },
+  { name: 'Prickly Thistle', Icon: Flower2, taunt: 'My roots creep under the whole field!' },
 ];
 
 /**
@@ -29,20 +29,20 @@ const COLS = 6;
 const ROWS = 5;
 
 // tile => target tile. Positive = ladder (vine), negative meaning target<from = chute (weed)
-const VINES: Record<number, { to: number; reason: string; resource: string; day: string }> = {
-  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: '💧 Water', day: 'A nice rainy day' },
-  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: '☀️ Sunlight', day: 'A sunny warm day' },
-  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: '🌱 Nutrients', day: 'Plant fertilizer day' },
-  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: '🪱 Healthy soil', day: 'Earthworms loosen the soil' },
-  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: '🐝 Pollinator', day: 'Busy honeybee visit day' },
+const VINES: Record<number, { to: number; reason: string; resource: string; day: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: 'Water', day: 'A nice rainy day', Icon: RainDropIcon },
+  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: 'Sunlight', day: 'A sunny warm day', Icon: SunIcon },
+  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: 'Nutrients', day: 'Plant fertilizer day', Icon: FertilizerBagIcon },
+  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: 'Healthy soil', day: 'Earthworms loosen the soil', Icon: WormIcon },
+  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: 'Pollinator', day: 'Busy honeybee visit day', Icon: BeeIcon },
 };
 
-const WEEDS: Record<number, { to: number; reason: string; weed: string; day: string }> = {
-  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail', day: 'A hungry insect swarm' },
-  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed', day: 'A blistering hot day' },
-  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp', day: 'A long dry drought' },
-  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle', day: 'A local flood event' },
-  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters', day: 'A late frost night' },
+const WEEDS: Record<number, { to: number; reason: string; weed: string; day: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail', day: 'A hungry insect swarm', Icon: BugIcon },
+  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed', day: 'A blistering hot day', Icon: ThermometerIcon },
+  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp', day: 'A long dry drought', Icon: DroughtIcon },
+  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle', day: 'A local flood event', Icon: FloodIcon },
+  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters', day: 'A late frost night', Icon: FrostIcon },
 };
 
 // Life stage banner based on tile position
@@ -107,6 +107,138 @@ function GrowingPlant({ tile, className = '' }: { tile: number; className?: stri
           ))}
         </g>
       )}
+    </svg>
+  );
+}
+
+
+// ---------- Small hand-drawn event illustrations (no emoji) -------------
+// Each good/bad calendar-day tile gets a tiny inline SVG that visually
+// matches its label, so young students can "read" the tile at a glance.
+
+function RainDropIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Rain drop">
+      <path d="M12 2 C8 8 5 12 5 15.5 A7 7 0 0 0 19 15.5 C19 12 16 8 12 2 Z" fill="#38bdf8" stroke="#0369a1" strokeWidth="1" />
+      <ellipse cx="9.5" cy="14" rx="1.5" ry="2" fill="#bae6fd" opacity="0.7" />
+    </svg>
+  );
+}
+
+function SunIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Sunny day">
+      <circle cx="12" cy="12" r="5.5" fill="#fbbf24" stroke="#b45309" strokeWidth="1" />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (
+        <line key={a}
+          x1={12 + 7 * Math.cos((a * Math.PI) / 180)} y1={12 + 7 * Math.sin((a * Math.PI) / 180)}
+          x2={12 + 10.5 * Math.cos((a * Math.PI) / 180)} y2={12 + 10.5 * Math.sin((a * Math.PI) / 180)}
+          stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+      ))}
+    </svg>
+  );
+}
+
+function FertilizerBagIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Fertilizer bag">
+      <path d="M7 6 L17 6 L18.5 21 A2 2 0 0 1 16.5 23 L7.5 23 A2 2 0 0 1 5.5 21 Z" fill="#a3e635" stroke="#3f6212" strokeWidth="1" />
+      <rect x="8" y="3" width="8" height="4" rx="1" fill="#84cc16" stroke="#3f6212" strokeWidth="1" />
+      <text x="12" y="16" fontSize="7" fontWeight="900" textAnchor="middle" fill="#365314">N</text>
+    </svg>
+  );
+}
+
+function WormIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Earthworm loosening soil">
+      <path d="M3 17 Q6 10 10 17 T17 17" fill="none" stroke="#c2703d" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="19.5" cy="15.5" r="2" fill="#c2703d" />
+      <rect x="1" y="19" width="22" height="3" rx="1.5" fill="#6b4423" />
+    </svg>
+  );
+}
+
+function BeeIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Pollinating bee">
+      <ellipse cx="8" cy="9" rx="4.5" ry="3.2" fill="#fde047" opacity="0.85" />
+      <ellipse cx="16" cy="9" rx="4.5" ry="3.2" fill="#fde047" opacity="0.85" />
+      <ellipse cx="12" cy="13" rx="6" ry="4.5" fill="#facc15" stroke="#78350f" strokeWidth="1" />
+      <path d="M7 12 L17 12 M7.5 15 L16.5 15" stroke="#78350f" strokeWidth="1.5" />
+      <circle cx="12" cy="7" r="2.5" fill="#78350f" />
+    </svg>
+  );
+}
+
+function WateringCanIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Watering can">
+      <rect x="4" y="10" width="12" height="9" rx="2" fill="#38bdf8" stroke="#0369a1" strokeWidth="1" />
+      <path d="M16 12 L21 9 M21 9 L21 12 M21 9 L19 9" stroke="#0369a1" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M8 10 L8 6" stroke="#0369a1" strokeWidth="2" />
+      <path d="M18 13 L15 17 M17 15 L20 18" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function BugIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Insect swarm">
+      <ellipse cx="12" cy="13" rx="5" ry="6" fill="#78716c" stroke="#292524" strokeWidth="1" />
+      <line x1="12" y1="7" x2="12" y2="19" stroke="#292524" strokeWidth="1" />
+      <path d="M8 9 L4 6 M16 9 L20 6 M7 13 L3 13 M17 13 L21 13 M8 17 L4 20 M16 17 L20 20"
+        stroke="#292524" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M9 5 L8 2 M15 5 L16 2" stroke="#292524" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ThermometerIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Blistering hot day">
+      <rect x="10" y="2" width="4" height="13" rx="2" fill="#fecaca" stroke="#b91c1c" strokeWidth="1" />
+      <circle cx="12" cy="18" r="4" fill="#ef4444" stroke="#b91c1c" strokeWidth="1" />
+      <rect x="11" y="6" width="2" height="10" fill="#ef4444" />
+      {[0, 60, 120, 180, 240, 300].map(a => (
+        <line key={a} x1={19 + 2 * Math.cos((a * Math.PI) / 180)} y1={6 + 2 * Math.sin((a * Math.PI) / 180)}
+          x2={19 + 4 * Math.cos((a * Math.PI) / 180)} y2={6 + 4 * Math.sin((a * Math.PI) / 180)}
+          stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" />
+      ))}
+    </svg>
+  );
+}
+
+function DroughtIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Dry drought">
+      <ellipse cx="12" cy="6" rx="7" ry="4" fill="#e7e5e4" stroke="#78716c" strokeWidth="1" />
+      <path d="M4 16 L9 16 L7 21 M12 16 L16 16 L13.5 21 M17 16 L21 16 L19 21"
+        fill="none" stroke="#a16207" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FloodIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Flood">
+      <path d="M2 10 Q6 6 10 10 T18 10 T24 10" fill="none" stroke="#0369a1" strokeWidth="2" strokeLinecap="round" />
+      <path d="M1 15 Q5 11 9 15 T17 15 T23 15" fill="none" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" />
+      <path d="M1 20 Q5 16 9 20 T17 20 T23 20" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FrostIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Late frost night">
+      <g stroke="#38bdf8" strokeWidth="1.6" strokeLinecap="round">
+        <line x1="12" y1="3" x2="12" y2="21" />
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <line x1="6.5" y1="6.5" x2="17.5" y2="17.5" />
+        <line x1="17.5" y1="6.5" x2="6.5" y2="17.5" />
+      </g>
+      <circle cx="12" cy="12" r="2" fill="#0369a1" />
     </svg>
   );
 }
@@ -291,8 +423,8 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
           </div>
           <div className="rounded-2xl bg-white/85 border-2 border-rose-400 p-3 shadow">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center text-base">
-                {rival.emoji}
+              <div className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center">
+                <rival.Icon className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
@@ -328,7 +460,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
         {/* Board — a growing-season wall calendar */}
         <div className="rounded-2xl border-4 border-amber-800/40 p-2 bg-gradient-to-b from-amber-50 to-amber-100 shadow-inner mb-3">
           <div className="rounded-t-xl bg-primary text-primary-foreground text-center font-display font-extrabold py-1.5 mb-1">
-            🗓️ The Growing Season Calendar — 30 Days
+            <span className="inline-flex items-center gap-1.5 justify-center"><CalendarDays className="w-4 h-4" /> The Growing Season Calendar — 30 Days</span>
           </div>
           <div className="grid gap-1 mb-1 text-center text-[9px] font-bold uppercase text-amber-900/70"
             style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0,1fr))` }}>
@@ -365,16 +497,22 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                     }`}>
                     <span className="absolute top-0 left-1 text-[11px] font-black text-foreground/60">{tileNum}</span>
                     {v && (
-                      <span className="w-full text-[7px] sm:text-[8px] leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
-                        {v.day}
-                      </span>
+                      <>
+                        <v.Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 shrink-0" />
+                        <span className="w-full text-[7px] sm:text-[8px] leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
+                          {v.day}
+                        </span>
+                      </>
                     )}
                     {w && (
-                      <span className="w-full text-[7px] sm:text-[8px] leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
-                        {w.day}
-                      </span>
+                      <>
+                        <w.Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 shrink-0" />
+                        <span className="w-full text-[7px] sm:text-[8px] leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
+                          {w.day}
+                        </span>
+                      </>
                     )}
-                    {isFinish && <span className="w-full text-[8px] leading-tight text-orange-900 text-center">🌻 Seed set!</span>}
+                    {isFinish && <span className="w-full text-[8px] leading-tight text-orange-900 text-center">Seed set!</span>}
                     {isPawn && (
                       <div className="absolute inset-0 flex items-center justify-start pl-0.5">
                         <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg animate-bounce">
@@ -384,8 +522,8 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                     )}
                     {isCpu && (
                       <div className="absolute inset-0 flex items-center justify-end pr-0.5">
-                        <div className="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg text-sm">
-                          {rival.emoji}
+                        <div className="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg">
+                          <rival.Icon className="w-4 h-4" />
                         </div>
                       </div>
                     )}
@@ -397,7 +535,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
           <div className="flex items-center justify-center gap-4 mt-2 text-[10px] text-foreground/70">
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-200 border border-green-500" /> Good day (climb)</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-rose-200 border border-rose-500" /> Bad day (slide)</span>
-            <span className="flex items-center gap-1">🌻 Seed set (goal)</span>
+            <span className="flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" /> Seed set (goal)</span>
           </div>
         </div>
 
@@ -427,7 +565,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
 
         <div className="rounded-xl bg-white/70 border-2 border-amber-300 p-3 text-xs text-foreground">
           <p className="font-bold mb-1">How to grow up the board:</p>
-          <p>Every tile is a step in the plant life cycle. Land on a 🌿 <b>resource</b> (water, sun, nutrients, soil, pollinator) and climb a vine to the next stage. Land on a 🌾 <b>weed</b> and slide back — weeds compete with your plant for what it needs. Reach 🌻 to set new seeds and finish the cycle!</p>
+          <p>Every tile is a step in the plant life cycle. Land on a green day (a <b>resource</b> like water, sun, nutrients, soil, or a pollinator) and climb a vine to the next stage. Land on a red day (a <b>weed</b> problem) and slide back — weeds compete with your plant for what it needs. Reach the last tile to set new seeds and finish the cycle!</p>
           <p className="mt-2 text-rose-700 font-semibold">Never touch real weeds unless a trusted adult says it's safe.</p>
         </div>
       </div>

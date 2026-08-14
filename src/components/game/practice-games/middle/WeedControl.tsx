@@ -212,6 +212,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     if (round < ROUNDS_PER_LEVEL) { setRound(r => r + 1); resetRound(); }
   };
   const isLevelDone = round === ROUNDS_PER_LEVEL && showReview;
+  const cheapestLocked = SHOP_CATALOG.filter(item => !shop.owns(item.id)).sort((a, b) => a.cost - b.cost)[0];
+  const moneyBarMax = Math.max(cheapestLocked ? cheapestLocked.cost : 100, shop.money, 100);
   // Guaranteed level-completion stipend so no student can be stuck at $0.
   useEffect(() => {
     if (isLevelDone) {
@@ -297,6 +299,18 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <span className="text-sm font-bold text-foreground">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
       </div>
 
+      {/* Persistent money HUD bar so students can watch their earnings climb */}
+      <div className="px-4 py-2 bg-white/50 dark:bg-slate-900/50 border-b border-emerald-200/70 dark:border-emerald-900/70 flex items-center gap-3">
+        <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+        <div className="flex-1 h-3 rounded-full bg-secondary overflow-hidden">
+          <div
+            className="h-full bg-emerald-500 transition-all duration-500"
+            style={{ width: `${Math.min(100, (shop.money / moneyBarMax) * 100)}%` }}
+          />
+        </div>
+        <span className="text-xs font-bold text-foreground flex-shrink-0">${shop.money}</span>
+      </div>
+
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden">
         {/* LEFT: field + ID/method overlay */}
         <div className="relative overflow-hidden">
@@ -339,13 +353,22 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               {identified && !methodPick && (
                 <p className="text-xs text-muted-foreground">Pick a control method on the right →</p>
               )}
-              {methodPick && (
-                <p className={`font-bold text-sm text-center ${methodPick === getBestMethod(fw.weed) ? 'text-green-500' : 'text-destructive'}`}>
-                  {methodPick === getBestMethod(fw.weed)
-                    ? 'Effective control!'
-                    : `Mismanaged — best: ${ALL_METHODS.find(m => m.id === getBestMethod(fw.weed))?.label}. More appeared!`}
-                </p>
-              )}
+              {methodPick && (() => {
+                const best = getBestMethod(fw.weed);
+                const isCorrect = methodPick === best;
+                return (
+                  <div className={`rounded-lg p-3 text-center ${isCorrect ? 'bg-success/10 border border-success/40' : 'bg-destructive/10 border border-destructive/40'}`}>
+                    <p className={`font-extrabold text-sm ${isCorrect ? 'text-success' : 'text-destructive'}`}>
+                      {isCorrect ? 'Correct!' : 'Not quite'}
+                    </p>
+                    <p className={`text-xs mt-1 ${isCorrect ? 'text-success' : 'text-destructive'}`}>
+                      {isCorrect
+                        ? `${ALL_METHODS.find(m => m.id === best)?.label} works well here: ${fw.weed.management}`
+                        : `Best option was ${ALL_METHODS.find(m => m.id === best)?.label} — ${fw.weed.management}. More weeds appeared!`}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
@@ -379,13 +402,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             {history.length === 0 && <p className="text-xs text-muted-foreground italic">Managed weeds appear here.</p>}
             <div className="space-y-1.5">
               {history.map((h, i) => (
-                <div key={i} className={`flex items-center gap-2 p-2 rounded border ${h.correct ? 'border-green-500/40 bg-green-500/10' : 'border-destructive/40 bg-destructive/10'}`}>
+                <div key={i} className={`flex items-center gap-2 p-2 rounded border ${h.correct ? 'border-success/40 bg-success/10' : 'border-destructive/40 bg-destructive/10'}`}>
                   <div className="w-9 h-9 rounded overflow-hidden bg-secondary flex-shrink-0">
                     <WeedImage weedId={h.weedId.split('-')[0]} stage="flower" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold text-foreground truncate">{h.weedName}</p>
-                    <p className={`text-[10px] truncate ${h.correct ? 'text-green-600' : 'text-destructive'}`}>
+                    <p className={`text-[10px] truncate ${h.correct ? 'text-success' : 'text-destructive'}`}>
                       {ALL_METHODS.find(m => m.id === h.method)?.label} {h.correct ? '✓' : '✗'}
                     </p>
                   </div>
