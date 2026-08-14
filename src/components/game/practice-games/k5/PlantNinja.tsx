@@ -264,7 +264,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
               id: ++idRef.current,
               x: w.x + Math.cos(a) * d,
               y: w.y + Math.sin(a) * d,
-              text: '-5 BABY!', color: '#dc2626', life: 0.9 + Math.random() * 0.4,
+              text: '-5 SEEDLING!', color: '#dc2626', life: 0.9 + Math.random() * 0.4,
             });
           }
         }
@@ -337,7 +337,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
           <Swords className="w-6 h-6 text-primary" /> Plant Ninja
         </h1>
         <p className="text-muted-foreground mb-3">
-          Slice the <strong>flowering weeds</strong> before they seed the field! Leave the <strong>seedlings</strong> (baby plants) alone — a true ninja spares the young.
+          Slice the <strong>flowering weeds</strong> before they seed the field! Leave the <strong>seedlings</strong> (young plants) alone — a true ninja spares the young.
         </p>
 
         <div className="mb-3 rounded-lg border-2 border-red-300 bg-red-50 p-3 flex items-start gap-2">
@@ -405,7 +405,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
                         isRepro ? 'bg-amber-400 text-amber-950' : 'bg-emerald-500 text-white'
                       }`}
                     >
-                      {isRepro ? 'FLOWER' : 'BABY'}
+                      {isRepro ? 'FLOWER' : 'SEEDLING'}
                     </div>
                     {w.sliced && (
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -477,7 +477,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
                   <h2 className="text-2xl font-bold text-foreground mb-2">Round {round + 1}</h2>
                   <ul className="text-sm text-left text-muted-foreground space-y-1 mb-4">
                     <li>• Slice <span className="text-amber-600 font-bold">FLOWER</span> weeds: <span className="text-green-600 font-bold">+10</span></li>
-                    <li>• Slice <span className="text-emerald-600 font-bold">BABY</span> weeds: <span className="text-red-600 font-bold">-5</span></li>
+                    <li>• Slice <span className="text-emerald-600 font-bold">SEEDLING</span> weeds: <span className="text-red-600 font-bold">-5</span></li>
                     <li>• Miss a flower → it explodes into seeds!</li>
                   </ul>
                   <button
@@ -520,7 +520,7 @@ export default function PlantNinja({ onBack, gameId, gameName, gradeLabel }: Pro
             <div className="rounded-lg border-2 border-emerald-500 bg-emerald-50 p-3">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-6 h-6 rounded-full border-2 border-emerald-600 bg-white" />
-                <p className="font-bold text-emerald-900">Baby (seedling)</p>
+                <p className="font-bold text-emerald-900">Seedling</p>
               </div>
               <p className="text-xs text-emerald-900">Too young to seed. DON'T slice — you'll lose points.</p>
             </div>

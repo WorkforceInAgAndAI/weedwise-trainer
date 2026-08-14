@@ -106,8 +106,8 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
           {/* LEFT: larger world map */}
           <div>
             <p className="text-sm text-muted-foreground text-center mb-3">Where did this weed originate? Click a continent.</p>
-            <div className="relative w-full max-w-3xl mx-auto aspect-[2/1] rounded-xl border-2 border-border overflow-hidden">
-              <img src={worldMap} alt="World map" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="relative w-full max-w-2xl mx-auto aspect-[2/1] rounded-xl border-2 border-border overflow-hidden bg-sky-50 dark:bg-slate-900">
+              <img src={worldMap} alt="World map" className="absolute inset-0 w-full h-full object-contain" />
               {CONTINENTS.map(c => {
                 const isCorrect = c.id === current!.continent;
                 const bg = !answered ? 'bg-card/90 hover:bg-primary hover:text-primary-foreground border border-border' :

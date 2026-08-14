@@ -252,7 +252,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
     <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Safe or Toxic?</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">Safe or Dangerous?</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">{round + 1}/{rounds.length}</span>
       </div>
@@ -260,7 +260,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
         {phase === 'identify' && (
           <>
             <p className="text-sm text-muted-foreground mb-3 text-center">
-              One of these {current!.options.length} weeds is toxic. Can you spot it?
+              One of these {current!.options.length} weeds is dangerous to handle. Can you spot it?
             </p>
             <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto">
               {current!.options.map(w => (
@@ -283,7 +283,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
                 <WeedImage weedId={current!.toxic.id} stage="flower" className="w-full h-full object-cover" />
               </div>
               {selected === current!.toxic.id ? (
-                <p className="text-green-500 font-bold text-lg">Correct! You identified the toxic weed.</p>
+                <p className="text-green-500 font-bold text-lg">Correct! You identified the dangerous weed.</p>
               ) : (
                 <p className="text-destructive font-bold text-lg">Not quite!</p>
               )}
@@ -294,7 +294,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
             <div className="grid sm:grid-cols-2 gap-3 mb-4">
               {current!.toxic.safetyNote && (
                 <div className="bg-destructive/10 border border-destructive rounded-xl p-3 sm:col-span-2">
-                  <p className="text-sm font-bold text-destructive mb-1 flex items-center gap-1"><AlertTriangle className="w-4 h-4" /> Why it's toxic</p>
+                  <p className="text-sm font-bold text-destructive mb-1 flex items-center gap-1"><AlertTriangle className="w-4 h-4" /> Why it's dangerous</p>
                   <p className="text-sm text-foreground">{current!.toxic.safetyNote}</p>
                 </div>
               )}
@@ -355,7 +355,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
                 <p className="text-sm text-muted-foreground mb-4">{profile.ifExposed}</p>
               </>
             ) : (
-              <p className="font-bold text-lg text-destructive mb-2">The toxic weed was {current!.toxic.commonName}.</p>
+              <p className="font-bold text-lg text-destructive mb-2">The dangerous weed was {current!.toxic.commonName}.</p>
             )}
             <button onClick={next} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
           </div>

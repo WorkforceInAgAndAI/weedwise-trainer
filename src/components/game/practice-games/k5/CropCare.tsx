@@ -106,7 +106,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
     const now = performance.now();
     endRef.current = now + ROUND_SECONDS * 1000;
     weedTimerRef.current = now + weedSpawnInterval();
-    needTimerRef.current = now + 1200;
+    needTimerRef.current = now + 3200;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(loop);
   }
@@ -145,7 +145,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
 
     // rotate crop resource needs
     if (now > needTimerRef.current) {
-      needTimerRef.current = now + 2600;
+      needTimerRef.current = now + 6500;
       for (const p of plotsRef.current) {
         if (p && p.kind === 'crop' && p.growth < CROP_MAX) {
           p.need = randRes();
@@ -497,16 +497,6 @@ function Plot({ plant, onFeed, onPull, tool }: {
           className="absolute inset-0 flex flex-col items-center justify-end focus:outline-none group"
           aria-label={plant.kind === 'crop' ? `Feed ${plant.name}` : 'Feed weed (risky!)'}
         >
-          {/* Need bubble (crops only) */}
-          {plant.kind === 'crop' && plant.need && plant.growth < CROP_MAX && (
-            <NeedBubble need={plant.need} matches={tool === plant.need} />
-          )}
-          {/* Growth bar */}
-          <GrowthBar
-            growth={plant.growth}
-            max={plant.kind === 'crop' ? CROP_MAX : WEED_MAX}
-            kind={plant.kind}
-          />
           {/* Plant art */}
           <div
             className={`relative w-[70%] rounded-full border-4 shadow-lg overflow-hidden bg-white mb-1 ${
@@ -533,6 +523,15 @@ function Plot({ plant, onFeed, onPull, tool }: {
           }`}>
             {plant.kind === 'weed' ? 'WEED' : plant.name}
           </div>
+          {/* Needs + growth shown BELOW the picture so it is easy to read */}
+          {plant.kind === 'crop' && plant.need && plant.growth < CROP_MAX && (
+            <NeedBubble need={plant.need} matches={tool === plant.need} />
+          )}
+          <GrowthBar
+            growth={plant.growth}
+            max={plant.kind === 'crop' ? CROP_MAX : WEED_MAX}
+            kind={plant.kind}
+          />
         </button>
       )}
 
@@ -556,9 +555,10 @@ function NeedBubble({ need, matches }: { need: Resource; matches: boolean }) {
   const meta = RESOURCES.find(r => r.id === need)!;
   const Icon = meta.Icon;
   return (
-    <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-20 bg-white rounded-full p-1 border-2 shadow ${
+    <div className={`z-20 mb-1 flex items-center gap-1 bg-white rounded-full px-2 py-0.5 border-2 shadow ${
       matches ? 'border-primary animate-pulse' : 'border-border'
     }`}>
+      <span className="text-[9px] font-bold uppercase text-slate-600">Needs</span>
       <Icon className={`w-4 h-4 ${meta.color}`} />
     </div>
   );
@@ -566,7 +566,7 @@ function NeedBubble({ need, matches }: { need: Resource; matches: boolean }) {
 
 function GrowthBar({ growth, max, kind }: { growth: number; max: number; kind: PlantKind }) {
   return (
-    <div className="absolute top-2 left-2 right-2 flex gap-0.5 z-10">
+    <div className="w-[80%] mb-2 flex gap-0.5 z-10">
       {Array.from({ length: max }).map((_, i) => (
         <div
           key={i}

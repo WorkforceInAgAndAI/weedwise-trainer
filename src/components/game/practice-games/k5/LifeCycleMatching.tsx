@@ -145,9 +145,9 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
       <div className="flex-1 overflow-y-auto p-4">
         <FarmerGuide gradeLabel={gradeLabel} tone={farmerMsg.tone} message={farmerMsg.text} className="mb-4 max-w-3xl mx-auto" />
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 max-w-5xl mx-auto">
-          {/* Left: stacked cycle bins */}
-          <div className="space-y-3">
+        <div className="max-w-5xl mx-auto space-y-3">
+          {/* Cycle bins side by side across the top */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {CYCLES.map(cycle => {
               const placed = items.filter(i => placements[i.weed.id] === cycle);
               return (
@@ -156,12 +156,12 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                   onClick={() => handleDrop(cycle)}
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => handleDrop(cycle)}
-                  className={`rounded-xl border-2 p-4 min-h-[140px] transition-all ${
+                  className={`rounded-xl border-2 p-2.5 min-h-[110px] transition-all ${
                     (selected || draggedId) ? 'border-primary bg-primary/5 cursor-pointer hover:bg-primary/10' : 'border-border bg-card'
                   }`}
                 >
-                  <p className="text-base font-bold text-foreground mb-3">{cycle}</p>
-                  <div className="flex flex-wrap gap-3">
+                  <p className="text-sm font-bold text-foreground mb-2">{cycle}</p>
+                  <div className="flex flex-wrap gap-2">
                     {placed.map(i => {
                       const isWrong = checked && i.correct !== cycle;
                       const isRight = checked && i.correct === cycle;
@@ -169,19 +169,19 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                       return (
                         <div
                           key={i.weed.id}
-                          className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-500 ${
+                          className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg border-2 transition-all duration-500 ${
                             isBouncing ? 'opacity-0 -translate-y-12 scale-50 border-destructive' :
                             isWrong ? 'border-destructive bg-destructive/10' :
                             isRight ? 'border-green-500 bg-green-500/10' :
                             'border-border bg-secondary'
                           }`}
                         >
-                          <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted">
+                          <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted">
                             <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                           </div>
-                          <span className="text-xs font-medium text-foreground max-w-[80px] text-center leading-tight">{i.weed.commonName}</span>
+                          <span className="text-[10px] font-medium text-foreground max-w-[60px] text-center leading-tight">{i.weed.commonName}</span>
                           {!checked && (
-                            <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-[10px] text-muted-foreground hover:text-destructive">remove</button>
+                            <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-[9px] text-muted-foreground hover:text-destructive">remove</button>
                           )}
                         </div>
                       );
@@ -190,21 +190,12 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                 </div>
               );
             })}
-
-            {allPlaced && !checked && (
-              <button onClick={handleCheck} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
-            )}
-            {allCorrect && (
-              <button onClick={nextRound} className="w-full py-3 rounded-lg bg-success text-success-foreground font-bold">
-                {round + 1 < TOTAL_ROUNDS ? `Round ${round + 2} →` : 'See Results'}
-              </button>
-            )}
           </div>
 
-          {/* Right: weeds list */}
-          <div className="rounded-xl border-2 border-border bg-card p-3 h-fit sticky top-4">
-            <p className="text-xs font-bold uppercase text-foreground mb-3">Weeds to Sort ({unplaced.length})</p>
-            <div className="space-y-2">
+          {/* Weeds still to sort — below the bins, laid out across */}
+          <div className="rounded-xl border-2 border-border bg-card p-3">
+            <p className="text-xs font-bold uppercase text-foreground mb-2">Weeds to Sort ({unplaced.length})</p>
+            <div className="flex flex-wrap gap-2">
               {unplaced.length === 0 && (
                 <p className="text-xs text-muted-foreground italic">All placed! Hit "Check Answers".</p>
               )}
@@ -215,17 +206,28 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                   onDragStart={() => setDraggedId(i.weed.id)}
                   onDragEnd={() => setDraggedId(null)}
                   onClick={() => setSelected(selected === i.weed.id ? null : i.weed.id)}
-                  className={`flex items-center gap-2 w-full p-2 rounded-lg border-2 text-sm font-medium transition-all cursor-grab active:cursor-grabbing ${
+                  className={`flex items-center gap-2 p-1.5 rounded-lg border-2 transition-all cursor-grab active:cursor-grabbing ${
                     selected === i.weed.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-background text-foreground hover:border-primary/50'
                   }`}
                 >
-                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
+                  <div className="w-10 h-10 rounded-md overflow-hidden bg-muted shrink-0">
                     <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-left text-xs leading-tight">{i.weed.commonName}</span>
+                  <span className="text-left text-[11px] leading-tight max-w-[110px]">{i.weed.commonName}</span>
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            {allPlaced && !checked && (
+              <button onClick={handleCheck} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
+            )}
+            {allCorrect && (
+              <button onClick={nextRound} className="w-full py-2.5 rounded-lg bg-success text-success-foreground font-bold">
+                {round + 1 < TOTAL_ROUNDS ? `Round ${round + 2} →` : 'See Results'}
+              </button>
+            )}
           </div>
         </div>
       </div>

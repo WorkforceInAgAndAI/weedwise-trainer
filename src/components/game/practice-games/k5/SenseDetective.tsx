@@ -169,8 +169,9 @@ function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[], nu
     traitLike(weed, ['leaf', 'leaves', 'blade', 'lobed', 'hairy', 'smooth', 'midvein']) ||
     weed.traits[0];
   const flowerTrait =
-    traitLike(weed, ['flower', 'seed', 'panicle', 'head', 'bloom', 'spike']) ||
-    'small flowers with tiny seeds';
+    traitLike(weed, ['flower', 'panicle', 'head', 'bloom', 'spike']) ||
+    traitLike(weed, ['seed']) ||
+    'small flowers';
   const stemTrait =
     traitLike(weed, ['stem', 'stalk', 'hollow', 'spine', 'prickle', 'ridged', 'grooved']) ||
     'a plain green stem';
@@ -183,11 +184,23 @@ function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[], nu
   const distractors = shuffle(allWeeds.filter(w => w.id !== weed.id)).slice(0, numChoices - 1);
   const choices = shuffle([weed, ...distractors]);
 
+  // Describe only what the trait actually mentions — if it is a flower trait,
+  // do not also claim it describes seeds (and vice versa).
+  const ft = flowerTrait.toLowerCase();
+  const mentionsFlower = /flower|bloom|panicle|head|spike/.test(ft);
+  const mentionsSeed = /seed/.test(ft);
+  const flowerClue =
+    mentionsFlower && mentionsSeed
+      ? `The flowers and seeds look like ${ft}.`
+      : mentionsSeed
+        ? `The seeds look like ${ft}.`
+        : `The flowers look like ${ft}.`;
+
   const clues: Record<QuestionId, string> = {
     location: `It is growing in ${spot} of a ${crop} field.`,
     quantity: `The farmer saw ${quantity}.`,
     leaves: `The leaves are ${leafTrait.toLowerCase()}.`,
-    flowers: `The flowers or seeds look like ${flowerTrait.toLowerCase()}.`,
+    flowers: flowerClue,
     height: `The plant is ${height}.`,
     color: `Overall the plant looks ${plantColor}.`,
     stem: `The stem is ${stemTrait.toLowerCase()}.`,
@@ -304,19 +317,6 @@ export default function SenseDetective({ onBack, gameId, gameName, gradeLabel }:
           </div>
           <div className="text-lg font-extrabold text-foreground bg-muted px-4 py-1.5 rounded-full">
             Case {step + 1} / {rounds.length}
-          </div>
-        </div>
-
-        {/* Safety rule banner */}
-        <div className="bg-warning/10 border-4 border-warning rounded-2xl p-4 mb-4 flex items-start gap-3 shadow-md">
-          <div className="shrink-0 w-12 h-12 rounded-full bg-warning flex items-center justify-center">
-            <ShieldCheck className="w-7 h-7 text-warning-foreground" />
-          </div>
-          <div>
-            <p className="text-base font-extrabold uppercase tracking-wide text-warning-foreground mb-1">Safety First</p>
-            <p className="text-lg font-bold text-foreground leading-snug">
-              Never touch a mystery weed. Ask a trusted adult before touching any plant.
-            </p>
           </div>
         </div>
 
