@@ -82,7 +82,7 @@ function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length
 
 export default function WeedBank({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const diff = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const diff = useMemo(() => getDifficulty(level, 'hs'), [level]);
 
   // Harder levels: bigger starting bank, smaller yearly budget, seedier weeds
   const startBalance = 10000 + (level - 1) * 4000;
