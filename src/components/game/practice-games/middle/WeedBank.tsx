@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
@@ -52,6 +52,30 @@ interface Statement {
   spent: number;
 }
 
+
+const INTRO_SLIDES = [
+  {
+    Icon: Landmark,
+    title: 'Welcome to the Weed Bank',
+    body: 'Every field has a hidden bank account: the weed seed bank in the soil. You have just been hired to manage Field 12N for Farmer Sam. Your job is to shrink that balance over 5 seasons.',
+  },
+  {
+    Icon: TrendingDown,
+    title: 'Withdrawals shrink the bank',
+    body: 'Seeds leave the bank when they germinate, get eaten, or lose viability. Every weed that sprouts is a withdrawal — as long as you kill it before it flowers.',
+  },
+  {
+    Icon: TrendingUp,
+    title: 'Deposits grow the bank',
+    body: 'Any weed that escapes control and sets seed makes a huge deposit — one plant can return thousands of seeds. Escapes are what break the account.',
+  },
+  {
+    Icon: Tractor,
+    title: 'How each season works',
+    body: '1. Read the Farm Conditions card — weather and tillage change how many seeds germinate.\n2. Spend your Farm Dollars on management practices.\n3. Run the season and read your bank statement.\nAfter 5 seasons, you are ranked on how much you shrank the seed bank.',
+  },
+];
+
 const fmt = (n: number) => n.toLocaleString();
 
 function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -73,6 +97,7 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<Statement[]>([]);
   const [featured, setFeatured] = useState(() => pick(weeds));
   const [runId, setRunId] = useState(0);
+  const [introStep, setIntroStep] = useState(0);
 
   useEffect(() => {
     setBalance(startBalance);
@@ -128,6 +153,43 @@ export default function WeedBank({ onBack }: { onBack: () => void }) {
   const rank = reduction >= 0.6 ? '🥇 Seed Bank Master' : reduction >= 0.25 ? '🥈 Weed Warrior' : reduction > 0 ? '🥉 Farm in Training' : 'Seed Bank Grew — Try a New Strategy';
 
   const maxBar = Math.max(startBalance, ...history.map(h => h.end), balance, 1);
+
+  // --- Intro walkthrough: sets up the storyline every time the game opens ---
+  if (introStep < INTRO_SLIDES.length) {
+    const slide = INTRO_SLIDES[introStep];
+    const SlideIcon = slide.Icon;
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-4">
+        <div className="max-w-xl mx-auto mt-4">
+          <div className="rounded-2xl border-2 border-amber-400/60 bg-card shadow-lg overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground">
+              <Landmark className="w-6 h-6" />
+              <p className="text-sm font-black tracking-wide">FIRST NATIONAL WEED BANK</p>
+              <button onClick={onBack} className="ml-auto text-[11px] font-bold underline underline-offset-2">Exit</button>
+            </div>
+            <div className="p-6 text-center">
+              <SlideIcon className="w-12 h-12 mx-auto text-primary mb-3" />
+              <h2 className="text-xl font-black text-foreground mb-2">{slide.title}</h2>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{slide.body}</p>
+              <div className="flex items-center justify-center gap-1.5 my-5">
+                {INTRO_SLIDES.map((_, i) => (
+                  <span key={i} className={`h-2 rounded-full transition-all ${i === introStep ? 'w-6 bg-primary' : 'w-2 bg-muted'}`} />
+                ))}
+              </div>
+              <div className="flex gap-2 justify-center">
+                {introStep > 0 && (
+                  <button onClick={() => setIntroStep(s => s - 1)} className="px-4 py-2 rounded-full border-2 border-border font-bold text-foreground">Back</button>
+                )}
+                <button onClick={() => setIntroStep(s => s + 1)} className="px-6 py-2 rounded-full bg-primary text-primary-foreground font-bold">
+                  {introStep === INTRO_SLIDES.length - 1 ? 'Open my account →' : 'Next →'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900 to-amber-950 p-3 sm:p-6">
