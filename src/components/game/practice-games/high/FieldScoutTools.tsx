@@ -204,9 +204,12 @@ export default function FieldScoutTools({ onBack }: { onBack: () => void }) {
               </div>
             </div>
           )}
-          <div className="absolute bottom-2 left-2 right-2 bg-background/80 rounded-lg p-2">
-            <p className="text-xs text-foreground font-medium">{f.desc}</p>
-          </div>
+        </div>
+
+        {/* Field briefing — kept below the photo so it reads as key information */}
+        <div className="rounded-xl border-2 border-primary/50 bg-primary/5 p-3 mb-4">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-primary mb-1">Field Briefing</p>
+          <p className="text-sm text-foreground font-medium leading-snug">{f.desc}</p>
         </div>
 
         <p className="text-sm text-muted-foreground mb-3 text-center">Which scouting tool is best for this field?</p>
