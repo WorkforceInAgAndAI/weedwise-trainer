@@ -179,7 +179,9 @@ export default function LifeStagesSequence({ onBack, gameId, gameName, gradeLabe
           )}
 
           {!checked ? (
-            <button onClick={check} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Order</button>
+            <button onClick={check} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+              {wrongFlash ? 'Check Again' : 'Check Order'}
+            </button>
           ) : (
             <div className="text-center">
               <button onClick={next} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next →</button>
