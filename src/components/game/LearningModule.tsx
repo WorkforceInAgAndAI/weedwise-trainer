@@ -4193,7 +4193,7 @@ function TopicContent({
 
           {/* FLIP CARDS - front shows need, back shows the "weed steals" detail */}
           <p className="font-display font-extrabold text-amber-100 text-center text-base">🍽️ Tap a plate to flip it!</p>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {NEEDS.map((n) => (
               <FlipPlateCard key={n.key} n={n} />
             ))}
