@@ -3794,7 +3794,7 @@ function TopicContent({
           "Horseweed",
           "Jimsonweed",
           "Kochia",
-          "Marijuana",
+          "Hemp",
           "Palmer amaranth",
           "Prickly sida",
           "Redroot pigweed",
@@ -3892,7 +3892,7 @@ function TopicContent({
           "Horseweed",
           "Jimsonweed",
           "Kochia",
-          "Marijuana",
+          "Hemp",
           "Palmer amaranth",
           "Prickly sida",
           "Redroot pigweed",
@@ -8151,7 +8151,7 @@ function TopicContent({
       const DIOECIOUS_SPECIES = [
         {
           id: "Marijuana",
-          name: "Marijuana",
+          name: "Hemp",
           maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
           femaleDesc: "Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes",
         },
@@ -8314,7 +8314,7 @@ function TopicContent({
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">In this group of weeds, there are 3 dioecious species:</p>
-            <p className="mt-1">Marijuana, Palmer Amaranth, and Waterhemp.</p>
+            <p className="mt-1">Hemp, Palmer Amaranth, and Waterhemp.</p>
             <p className="mt-2 text-xs text-muted-foreground">
               Look at each species profile below to learn the key differences between the male and female plants.
             </p>
