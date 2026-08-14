@@ -77,6 +77,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
   const endRef = useRef(0);
   const weedTimerRef = useRef(0);
   const needTimerRef = useRef(0);
+  const toolRef = useRef<Resource>('water');
   const phaseRef = useRef<'ready' | 'playing' | 'roundEnd'>('ready');
   const [, forceTick] = useState(0);
 
@@ -100,13 +101,13 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
     floatersRef.current = [];
     scoreRef.current = 0;
     setScore(0); setHarvested(0); setChoked(0);
-    setTool('water');
+    setTool('water'); toolRef.current = 'water';
     setTimeLeft(ROUND_SECONDS);
     phaseRef.current = 'playing'; setPhase('playing');
     const now = performance.now();
     endRef.current = now + ROUND_SECONDS * 1000;
     weedTimerRef.current = now + weedSpawnInterval();
-    needTimerRef.current = now + 3200;
+    needTimerRef.current = now + 9000;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(loop);
   }
@@ -145,9 +146,12 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
 
     // rotate crop resource needs
     if (now > needTimerRef.current) {
-      needTimerRef.current = now + 6500;
+      needTimerRef.current = now + 18000;
       for (const p of plotsRef.current) {
         if (p && p.kind === 'crop' && p.growth < CROP_MAX) {
+          // Don't rotate a need away from a crop that is currently asking
+          // for the resource the student has selected — that feels unfair.
+          if (p.need === toolRef.current) continue;
           p.need = randRes();
           p.needSetAt = now;
         }
@@ -428,7 +432,7 @@ export default function CropCare({ onBack, gameId, gameName, gradeLabel }: Props
                     <button
                       key={r.id}
                       type="button"
-                      onClick={() => setTool(r.id)}
+                      onClick={() => { setTool(r.id); toolRef.current = r.id; }}
                       className={`flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all ${
                         active
                           ? 'border-primary bg-primary/10 scale-105'

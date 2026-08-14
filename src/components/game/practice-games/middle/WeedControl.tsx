@@ -30,14 +30,14 @@ const ALL_METHODS: Method[] = [
 // Start with only the two simplest tools — buy the rest between levels.
 const STARTER_OWNED = ['hoe', 'pull'];
 const SHOP_CATALOG: ShopItem[] = [
-  { id: 'cultivate',  name: 'Cultivator',              cost: 120, tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
-  { id: 'tillage',    name: 'Tillage Equipment',       cost: 150, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
-  { id: 'mow',        name: 'Mower',                   cost: 120, tag: 'Mechanical', desc: 'Unlocks Mowing.' },
-  { id: 'cover',      name: 'Cover-Crop Seed',         cost: 175, tag: 'Cultural',   desc: 'Unlocks Cover Crop.' },
-  { id: 'rotate',     name: 'Rotation Planning',       cost: 150, tag: 'Cultural',   desc: 'Unlocks Crop Rotation.' },
-  { id: 'pre',        name: 'Pre-emergent Herbicide',  cost: 175, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
-  { id: 'post',       name: 'Post-emergent Herbicide', cost: 200, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
-  { id: 'spot-spray', name: 'Precision Spot Sprayer',  cost: 250, tag: 'Chemical',   desc: 'Unlocks Spot-spray Herbicide.' },
+  { id: 'cultivate',  name: 'Cultivator',              cost: 80,  tag: 'Mechanical', desc: 'Unlocks Cultivation.' },
+  { id: 'tillage',    name: 'Tillage Equipment',       cost: 100, tag: 'Mechanical', desc: 'Unlocks Tillage.' },
+  { id: 'mow',        name: 'Mower',                   cost: 80,  tag: 'Mechanical', desc: 'Unlocks Mowing.' },
+  { id: 'cover',      name: 'Cover-Crop Seed',         cost: 110, tag: 'Cultural',   desc: 'Unlocks Cover Crop.' },
+  { id: 'rotate',     name: 'Rotation Planning',       cost: 100, tag: 'Cultural',   desc: 'Unlocks Crop Rotation.' },
+  { id: 'pre',        name: 'Pre-emergent Herbicide',  cost: 110, tag: 'Chemical',   desc: 'Unlocks Pre-emergent Herbicide.' },
+  { id: 'post',       name: 'Post-emergent Herbicide', cost: 130, tag: 'Chemical',   desc: 'Unlocks Post-emergent Herbicide.' },
+  { id: 'spot-spray', name: 'Precision Spot Sprayer',  cost: 160, tag: 'Chemical',   desc: 'Unlocks Spot-spray Herbicide.' },
 ];
 
 // Diversified per-species best methods. Different species → different recommended controls.
@@ -102,7 +102,15 @@ interface FieldWeed { weed: typeof weeds[0]; x: number; y: number; id: string }
 function buildRound(level: number, round: number): FieldWeed[] {
   const offset = ((level - 1) * ROUNDS_PER_LEVEL + (round - 1)) * 8;
   const pool = shuffle(weeds);
-  return pool.slice(offset % pool.length).concat(pool).slice(0, 8).map((w, i) => ({
+  let selection = pool.slice(offset % pool.length).concat(pool).slice(0, 8);
+  // Guarantee at least one weed per round whose correct answer is Hoeing or Hand Pull,
+  // so the two starter tools always have a genuinely correct target — especially level 1.
+  const hasStarterCorrect = selection.some(w => ['hoe', 'pull'].includes(getBestMethod(w)));
+  if (!hasStarterCorrect) {
+    const starterWeed = shuffle(weeds).find(w => ['hoe', 'pull'].includes(getBestMethod(w)));
+    if (starterWeed) selection = [starterWeed, ...selection.slice(1)];
+  }
+  return selection.map((w, i) => ({
     id: `${w.id}-${i}`,
     weed: w,
     x: 12 + Math.random() * 76,
@@ -114,7 +122,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const [round, setRound] = useState(1);
   const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
-  const shop = usePracticeShop('ms-weed-control', STARTER_OWNED, 0);
+  const STARTING_MONEY = 150;
+  const shop = usePracticeShop('ms-weed-control', STARTER_OWNED, STARTING_MONEY);
   const [earnedThisLevel, setEarnedThisLevel] = useState(0);
   const [showShop, setShowShop] = useState(false);
 

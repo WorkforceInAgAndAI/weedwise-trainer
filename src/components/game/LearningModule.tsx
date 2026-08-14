@@ -4976,7 +4976,7 @@ function TopicContent({
           emoji: "🛡️",
           dot: "bg-info",
           bg: "bg-info/10 border-info/40",
-          how: "Cover the soil with mulch, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
+          how: "Cover the soil with a cover crop, straw, or fabric so weed seeds don't get the sunlight they need to sprout.",
           bestFor: "Around trees, flower beds, and vegetable rows.",
           reallife: "This is a kind of cultural control.",
         },
@@ -5841,8 +5841,8 @@ function TopicContent({
           <div className="bg-white/95 border-4 border-black rounded-lg p-5 space-y-2">
             <p className="font-display font-bold text-primary text-base">Who Cheers the Crops On?</p>
             <p className="text-sm text-foreground">
-              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close together, mulch
-              the soil, and use the 5 weed-fighting superpowers so the crops can reach the finish line first — and fill
+              That's where the <strong>farmer</strong> jumps in! Farmers pull weeds, plant crops close together, grow cover crops
+              to protect the soil, and use the 5 weed-fighting superpowers so the crops can reach the finish line first — and fill
               our plates with delicious food.
             </p>
           </div>
@@ -7093,7 +7093,7 @@ function TopicContent({
         },
         {
           key: "mulch-cover",
-          label: "Mulch / Cover Crops",
+          label: "Cover Cropping",
           desc: "Cover crops suppress weeds through physical biomass that blocks light, allelopathic compounds that inhibit germination, and competition for resources. Species like cereal rye can produce 4,000-8,000 lbs/acre of biomass.",
           example:
             "Planting cereal rye at 60-90 lbs/acre after corn harvest, then roller-crimping in spring before soybean planting.",
@@ -7358,7 +7358,7 @@ function TopicContent({
             {isElementary ? (
               <p className="text-sm text-foreground">
                 The best way to manage weeds is to use <strong>more than one method</strong>. For example, you can pull
-                weeds by hand AND use mulch to stop new ones from growing. Using different methods together keeps weeds
+                weeds by hand AND grow a cover crop to stop new ones from growing. Using different methods together keeps weeds
                 from coming back.
               </p>
             ) : isHighSchool ? (

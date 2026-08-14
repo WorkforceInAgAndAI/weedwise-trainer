@@ -120,13 +120,13 @@ function stageFor(tile: number): { name: string; Icon: React.ComponentType<{ cla
   return { name: 'Reproductive: Seeds!', Icon: Sparkles, color: 'bg-yellow-500', fact: 'The plant makes NEW SEEDS. The life cycle starts all over again!' };
 }
 
-// Convert 1..30 to grid row/col (snake order, tile 1 bottom-left)
+// Convert 1..30 to grid row/col — normal calendar reading order:
+// tile 1 is top-left, numbers increase left-to-right, then wrap to the
+// next row down (just like reading a wall calendar).
 function tileToRC(tile: number): { row: number; col: number } {
   const idx = tile - 1;
-  const rowFromBottom = Math.floor(idx / COLS);
-  const row = ROWS - 1 - rowFromBottom;
-  const colInRow = idx % COLS;
-  const col = rowFromBottom % 2 === 0 ? colInRow : COLS - 1 - colInRow;
+  const row = Math.floor(idx / COLS);
+  const col = idx % COLS;
   return { row, col };
 }
 
