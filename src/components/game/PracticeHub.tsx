@@ -315,7 +315,7 @@ export default function PracticeHub({
       </div>
       {/* Spacer to push game content below the fixed top bar */}
       <style>{`
-        body.practice-game-active .fixed.inset-0.z-50 { top: 56px !important; }
+        body.practice-game-active .fixed.inset-0 { top: 68px !important; }
       `}</style>
    </>
  );
