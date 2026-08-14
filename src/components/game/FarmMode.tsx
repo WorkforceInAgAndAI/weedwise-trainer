@@ -303,7 +303,7 @@ const ALL_EVENTS: EventCard[] = [
  { id: 'b', label: 'Identify the weeds and remove any toxic species', correct: true, feedback: 'Correct! Always identify weeds near livestock. Poison hemlock and wild parsnip can be lethal.' },
  ], teachingPoint: 'Some weeds like poison hemlock are highly toxic to livestock and humans. Always identify weeds near grazing areas.', season: 'mid-summer', grades: ['elementary'] },
  { id: 'e5', title: 'How Seeds Travel', description: 'A windstorm is approaching your field.', question: 'Which dispersal method spreads seeds the farthest?', options: [
- { id: 'a', label: 'Wind (light, parachute-like seeds)', correct: true, feedback: 'Correct! Wind-dispersed seeds like marestail can travel miles.' },
+ { id: 'a', label: 'Wind (light, parachute-like seeds)', correct: true, feedback: 'Correct! Wind-dispersed seeds like horseweed can travel miles.' },
  { id: 'b', label: 'Water (heavy seeds in drainage)', correct: false, feedback: 'Water moves seeds along waterways but usually shorter distances.' },
  { id: 'c', label: 'Animals (burr-covered seeds)', correct: false, feedback: 'Animal-dispersed seeds travel moderate distances but not as far as wind.' },
  ], teachingPoint: 'Seeds disperse by wind, water, and animals. Understanding dispersal helps predict where new weeds will appear.', season: 'late-summer', grades: ['elementary'] },
