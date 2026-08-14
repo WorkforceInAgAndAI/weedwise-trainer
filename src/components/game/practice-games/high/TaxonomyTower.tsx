@@ -76,13 +76,7 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{gameLevel}</span>
      <span className="text-sm text-muted-foreground">{tIdx + 1}/{targets.length}</span>
     </div>
-    <div className="flex justify-center mb-4">
-     <div className="w-36 h-36 rounded-2xl overflow-hidden border-2 border-border">
-      <WeedImage weedId={t.id} stage="flower" className="w-full h-full object-cover" />
-     </div>
-    </div>
-    <p className="text-center text-sm text-muted-foreground mb-4">Identify: <strong className="text-foreground">{t.commonName}</strong></p>
-    <div className="flex flex-col-reverse gap-2 items-center">
+    <div className="flex flex-col gap-2 items-center">
      {tower.map((lv, i) => (
       <div key={i} style={{ width: pyramidWidths[i] }}
        className={`p-3 rounded-xl border-2 transition-all ${i < towerLevel ? 'border-green-500 bg-green-500/10' : i === towerLevel ? 'border-primary bg-primary/10' : 'border-border bg-secondary/30 opacity-50'}`}>
@@ -98,6 +92,13 @@ export default function TaxonomyTower({ onBack }: { onBack: () => void }) {
        ) : null}
       </div>
      ))}
+    </div>
+    {/* Specimen photo sits at the tip of the inverted pyramid */}
+    <p className="text-center text-sm text-muted-foreground mt-4 mb-2">Identify: <strong className="text-foreground">{t.commonName}</strong></p>
+    <div className="flex justify-center mb-4">
+     <div className="w-36 h-36 rounded-2xl overflow-hidden border-2 border-border">
+      <WeedImage weedId={t.id} stage="flower" className="w-full h-full object-cover" />
+     </div>
     </div>
     {wrong && <p className="text-center text-sm text-destructive mt-3">Wrong — try again!</p>}
    </div>
