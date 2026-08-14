@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { elementaryWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import midwestMap from '@/assets/images/midwest-map.jpg';
 import LevelComplete from '@/components/game/LevelComplete';

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { GRASS_FEATURES, GRASS_CLUE_FIELDS, type GrassFeature } from '@/data/grassFeatures';
-import { weeds } from '@/data/weeds';
+import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { weeds } from '@/data/weeds';
+import { elementaryWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getCropImages } from '@/lib/imageMap';
