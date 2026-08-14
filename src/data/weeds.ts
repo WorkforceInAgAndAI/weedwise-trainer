@@ -2606,7 +2606,7 @@ export const weeds: Weed[] = [
 
   {
     id: "Marijuana",
-    commonName: "Marijuana",
+    commonName: "Hemp",
     scientificName: "Cannabis sativa",
     family: "Cannabaceae",
     plantType: "Dicot",
@@ -2623,11 +2623,71 @@ export const weeds: Weed[] = [
       id: "Hemp_dogbane",
       species: "Hemp Dogbane",
       difference:
-        "Hemp Dogbane has simple opposite leaves with milky sap; Marijuana has palmate compound leaves with no milky sap",
+        "Hemp Dogbane has simple opposite leaves with milky sap; Hemp has palmate compound leaves with no milky sap",
     },
-    memoryHook: "Marijuana = palmate 5-7 leaflets + distinctive odor + feral Midwest populations",
+    memoryHook: "Hemp = palmate 5-7 leaflets + distinctive odor + feral Midwest populations",
     safetyNote:
       "Cannabis sativa is a regulated/controlled plant in most U.S. jurisdictions. Wild/feral hemp is common in the Midwest from historical cultivation. Always follow local laws.",
+  },
+
+  {
+    id: "Common_copperleaf",
+    commonName: "Common Copperleaf",
+    scientificName: "Acalypha rhomboidea",
+    family: "Euphorbiaceae",
+    plantType: "Dicot",
+    lifeCycle: "Annual",
+    origin: "Native",
+    traits: [
+      "Alternate, rhomboid (diamond-shaped) leaves with rounded teeth",
+      "Leaves and stems often turn coppery-red with age",
+      "Small green flowers hidden in leafy, deeply cut bracts at leaf axils",
+      "Upright branching stems 1-2 feet tall",
+      "Long leaf petioles about half the length of the blade",
+    ],
+    habitat: "Row crops, gardens, fencerows, woodland edges, disturbed ground",
+    primaryHabitat: "Warm-Season / Full Sun",
+    actImmediately: false,
+    actReason: "Moderate competitor that persists late in the season and adds to the seed bank",
+    management: "PRE residual herbicides, early POST broadleaf herbicides, cultivation, dense crop canopy",
+    controlTiming: "Seedling to early vegetative stage",
+    lookAlike: {
+      id: "Asian_copperleaf",
+      species: "Asian Copperleaf",
+      difference:
+        "Common Copperleaf has diamond-shaped leaves with long petioles and leafy bracts; Asian Copperleaf has oval leaves and spike-like flower clusters",
+    },
+    memoryHook: "Common copperleaf = diamond leaves + coppery color + leafy bracts hiding the flowers",
+  },
+
+  {
+    id: "Ivyleaf_morningglory",
+    commonName: "Ivyleaf Morningglory",
+    scientificName: "Ipomoea hederacea",
+    family: "Convolvulaceae",
+    plantType: "Dicot",
+    lifeCycle: "Annual",
+    origin: "Introduced",
+    traits: [
+      "Three-lobed, ivy-like leaves with hairy surfaces",
+      "Funnel-shaped blue to purple flowers fading to pink",
+      "Long, hairy sepals that curve outward at the tips",
+      "Twining vine climbing crops and fences",
+      "Hairy stems and petioles",
+    ],
+    habitat: "Row crops, fencerows, roadsides, disturbed fields",
+    primaryHabitat: "Warm-Season / Full Sun",
+    actImmediately: true,
+    actReason: "Twining vine that pulls down soybeans and clogs harvest equipment",
+    management: "PRE residual herbicides, POST broadleaf herbicides before vining, cultivation, narrow rows",
+    controlTiming: "Seedling stage before vines begin twining",
+    lookAlike: {
+      id: "Tall_morningglory",
+      species: "Common Morningglory",
+      difference:
+        "Ivyleaf Morningglory has 3-lobed leaves and long hairy sepals; Common Morningglory has heart-shaped, unlobed leaves and short sepals",
+    },
+    memoryHook: "Ivyleaf morningglory = 3-lobed ivy leaves + long hairy sepals + twining vine",
   },
 ];
 
