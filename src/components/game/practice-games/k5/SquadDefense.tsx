@@ -22,7 +22,7 @@ const HEROES: Hero[] = [
   { key: 'pull',     name: 'Pull It',     power: 'Super Strength',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 1, cooldownMs: 500 },
   { key: 'block',    name: 'Block It',    power: 'Force Field',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 1, cooldownMs: 700 },
   { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 1, cooldownMs: 700 },
-  { key: 'eat',      name: 'Graze It',      power: 'Animal Allies',   Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
+  { key: 'eat',      name: 'Swarm It',    power: 'Bug Buddies',     Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
   { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 2, cooldownMs: 1100 },
 ];
 
@@ -47,12 +47,12 @@ const WEED_POOL: Omit<WeedVillain, 'id' | 'lane' | 'pos' | 'speed' | 'hp' | 'max
   { name: 'Baby Dandelion',              weedId: 'Dandelion',       weakness: 'pull',     hint: 'Just a few young weeds — YANK them out!' },
   { name: 'Sleeping Lambsquarters Seeds',weedId: 'lambsquarters',   weakness: 'block',    hint: 'Weed seeds waiting for sunlight — mulch stops them!' },
   { name: 'Giant Foxtail Patch',         weedId: 'giant-foxtail',   weakness: 'outsmart', hint: 'Sneaking into row gaps — plant thicker crops!' },
-  { name: 'Prickly Canada Thistle Hill', weedId: 'canada-thistle',  weakness: 'eat',      hint: 'Too steep for tractors — send in the goats!' },
+  { name: 'Prickly Canada Thistle Hill', weedId: 'canada-thistle',  weakness: 'eat',      hint: 'Too steep for tractors — send in the hungry insects!' },
   { name: 'Field-Wide Waterhemp',        weedId: 'waterhemp',       weakness: 'stop',     hint: 'Millions of weeds across acres — precision spray!' },
   { name: 'One Big Burcucumber',         weedId: 'Burcucumber',     weakness: 'pull',     hint: 'A single grabby weed — pull it before it seeds!' },
   { name: 'Field Bindweed Seed Storm',   weedId: 'Field_bindweed',  weakness: 'block',    hint: 'Seeds on the wind — cover the soil!' },
   { name: 'Green Foxtail in Bare Spots', weedId: 'green-foxtail',   weakness: 'outsmart', hint: 'Thin crop rows let weeds in — outsmart the layout!' },
-  { name: 'Pasture Common Ragweed',      weedId: 'common-ragweed',  weakness: 'eat',      hint: 'Big pasture — hungry animals to the rescue!' },
+  { name: 'Pasture Common Ragweed',      weedId: 'common-ragweed',  weakness: 'eat',      hint: 'Big pasture — a swarm of leaf-munching bugs to the rescue!' },
   { name: 'Kochia Invasion',             weedId: 'kochia',          weakness: 'stop',     hint: 'Huge fields, tough weed — call the sprayer!' },
   { name: 'Young Velvetleaf',            weedId: 'velvetleaf',      weakness: 'pull',     hint: 'Small and young — pull by hand!' },
   { name: 'Yellow Nutsedge Seed Layer',  weedId: 'yellow-nutsedge', weakness: 'block',    hint: 'Block the sun so seeds cannot wake up!' },
@@ -87,9 +87,9 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   const config = useMemo(() => {
     // Gentle K-5 pacing: weeds march slowly and spawn far apart so students
     // have time to read each weakness badge before choosing a hero.
-    const spawnEverySec = Math.max(2.6, 4.6 - level * 0.25) / diff.speed;
-    const speedMin = (2.6 + level * 0.5) * diff.speed;      // % per second
-    const speedMax = (4.2 + level * 0.7) * diff.speed;
+    const spawnEverySec = Math.max(2.8, 4.6 - level * 0.2) / diff.speed;
+    const speedMin = (1.6 + level * 0.3) * diff.speed;      // % per second — slow and steady
+    const speedMax = (2.4 + level * 0.4) * diff.speed;
     const targetDefeated = 6 + level * 2;  // needed to win the level
     return { spawnEverySec, speedMin, speedMax, targetDefeated };
   }, [level, diff]);
