@@ -57,7 +57,7 @@ export const LOOKALIKE_TRIPLES: LookAlikeTriple[] = [
   },
   {
     ids: ["Hedge_bindweed", "Wild_buckwheat", "Honey-vine_climbing_milkweed"],
-    difference: "Hedge bindweed: large white trumpet flowers, square leaf base, large bracts clasping calyx. Wild buckwheat: tiny flowers, ochrea at nodes, 3-angled achene, not a trumpet. Honey-vine: milky sap, opposite heart leaves, pods with silky seeds.",
+    difference: "Hedge bindweed: large white trumpet flowers, square leaf base, large bracts clasping calyx. Wild buckwheat: tiny flowers, ochrea at nodes, 3-angled achene, not a trumpet. Honeyvine Milkweed: milky sap, opposite heart leaves, pods with silky seeds.",
   },
   {
     ids: ["Tall_morningglory", "Hedge_bindweed", "Wild_buckwheat"],

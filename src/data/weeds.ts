@@ -178,7 +178,7 @@ export const weeds: Weed[] = [
     controlTiming: "Seedling stage or before vine establishment",
     lookAlike: {
       id: "Tall_morningglory",
-      species: "Tall Morningglory",
+      species: "Common Morningglory",
       difference: "Morningglory has larger funnel flowers; Buckwheat has small clustered flowers",
     },
     memoryHook: "Buckwheat = greenish-white flowers + climbing vine + arrow-shaped leaves",
@@ -403,7 +403,7 @@ export const weeds: Weed[] = [
 
   {
     id: "Tall_morningglory",
-    commonName: "Tall Morningglory",
+    commonName: "Common Morningglory",
     scientificName: "Ipomoea purpurea",
     family: "Convolvulaceae",
     plantType: "Dicot",
@@ -426,9 +426,9 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "Field_bindweed",
       species: "Field Bindweed",
-      difference: "Bindweed is perennial with smaller flowers; Tall Morningglory is annual with large flowers",
+      difference: "Bindweed is perennial with smaller flowers; Common Morningglory is annual with large flowers",
     },
-    memoryHook: "Tall Morningglory = annual + climbing vine + large purple bell-shaped flowers",
+    memoryHook: "Common Morningglory = annual + climbing vine + large purple bell-shaped flowers",
     safetyNote:
       "Seeds contain compounds that can cause digestive upset and, in large doses, neurological signs in livestock.",
   },
@@ -457,7 +457,7 @@ export const weeds: Weed[] = [
     controlTiming: "Early growth stage or immediately after germination",
     lookAlike: {
       id: "Tall_morningglory",
-      species: "Tall Morningglory",
+      species: "Common Morningglory",
       difference: "Morningglory is annual with larger flowers; Bindweed is perennial with small flowers",
     },
     memoryHook: "Field bindweed = perennial vine + arrowhead leaves + small pink flowers + rhizomes",
@@ -1064,15 +1064,15 @@ export const weeds: Weed[] = [
     controlTiming: "Early vegetative growth",
     lookAlike: {
       id: "Tall_morningglory",
-      species: "Tall Morningglory",
-      difference: "Asiatic Dayflower has two blue petal flowers; Tall Morningglory has large funnel flowers",
+      species: "Common Morningglory",
+      difference: "Asiatic Dayflower has two blue petal flowers; Common Morningglory has large funnel flowers",
     },
     memoryHook: "Asiatic dayflower = two blue-petal flowers + jointed stems + opens for a day",
   },
 
   {
     id: "Burcucumber",
-    commonName: "Bur Cucumber",
+    commonName: "Burcucumber",
     scientificName: "Sicyos angulatus",
     family: "Cucurbitaceae",
     plantType: "Dicot",
@@ -1094,8 +1094,8 @@ export const weeds: Weed[] = [
     controlTiming: "Control at early seedling stage before vines begin climbing",
     lookAlike: {
       id: "Tall_morningglory",
-      species: "Tall Morningglory",
-      difference: "Morningglory twines; Bur Cucumber has tendrils and burry fruit",
+      species: "Common Morningglory",
+      difference: "Morningglory twines; Burcucumber has tendrils and burry fruit",
     },
     memoryHook: "Bur cucumber = spiny bur fruit + tendrils + vining growth",
   },
@@ -1135,7 +1135,7 @@ export const weeds: Weed[] = [
 
   {
     id: "Henbit_deadnettle",
-    commonName: "Henbit/Deadnettle",
+    commonName: "Henbit",
     scientificName: "Lamium amplexicaule",
     family: "Lamiaceae",
     plantType: "Dicot",
@@ -1261,7 +1261,7 @@ export const weeds: Weed[] = [
 
   {
     id: "Honey-vine_climbing_milkweed",
-    commonName: "Honey-vine Climbing Milkweed",
+    commonName: "Honeyvine Milkweed",
     scientificName: "Cynanchum laeve",
     family: "Apocynaceae",
     plantType: "Dicot",
@@ -1283,11 +1283,11 @@ export const weeds: Weed[] = [
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Tall_morningglory",
-      species: "Tall Morningglory",
+      species: "Common Morningglory",
       difference:
-        "Tall Morningglory is annual with funnel flowers; Honeyvine Climbing Milkweed is perennial with small fragrant flowers",
+        "Common Morningglory is annual with funnel flowers; Honeyvine Milkweed is perennial with small fragrant flowers",
     },
-    memoryHook: "Honey-vine = twining perennial + fragrant flowers + rhizome rooted + vines through crops",
+    memoryHook: "Honeyvine Milkweed = twining perennial + fragrant flowers + rhizome rooted + vines through crops",
     safetyNote:
       "Milkweed relative with cardiac glycosides; ingestion can cause vomiting, diarrhea, and heart rhythm disturbances in animals.",
   },
@@ -1564,7 +1564,7 @@ export const weeds: Weed[] = [
     controlTiming: "Seedling or early vegetative growth",
     lookAlike: {
       id: "Tall_morningglory",
-      species: "Tall Morningglory",
+      species: "Common Morningglory",
       difference: "Morningglory is annual with funnel flowers; Four-o'clock is perennial",
     },
     memoryHook: "Four-o'clock = pink flowers open at 4pm + closes morning + fleshy taproot perennial",
@@ -1601,7 +1601,7 @@ export const weeds: Weed[] = [
 
   {
     id: "False_London-rocket",
-    commonName: "False London-rocket",
+    commonName: "Tall Hedge Mustard",
     scientificName: "Sisymbrium loeselii",
     family: "Brassicaceae",
     plantType: "Dicot",
@@ -1624,9 +1624,9 @@ export const weeds: Weed[] = [
     lookAlike: {
       id: "yellow_Rocket",
       species: "Yellow Rocket",
-      difference: "Yellow Rocket is biennial with glossy leaves; False London-rocket is annual with fine leaves",
+      difference: "Yellow Rocket is biennial with glossy leaves; Tall Hedge Mustard is annual with fine leaves",
     },
-    memoryHook: "False London-rocket = small yellow flowers + narrow alternate leaves + linear pods",
+    memoryHook: "Tall Hedge Mustard = small yellow flowers + narrow alternate leaves + linear pods",
   },
 
   {

@@ -1182,7 +1182,7 @@ const ELEM_LOOKALIKE_GROUPS: { title: string; weedIds: string[]; difference: str
     title: "Climbing Vines",
     weedIds: ["Tall_morningglory", "Field_bindweed", "Hedge_bindweed", "Wild_buckwheat"],
     difference:
-      "All four are twining vines that climb on other plants. Tall Morningglory has big purple or blue bell-shaped flowers and heart-shaped leaves. Field Bindweed has small white or pink bell-shaped flowers (about an inch) and arrowhead leaves. Hedge Bindweed has much larger white bell-shaped flowers (2–3 inches) and bigger leaves with squared-off bottoms. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no bells — and a papery sheath where the leaf meets the stem.",
+      "All four are twining vines that climb on other plants. Common Morningglory has big purple or blue bell-shaped flowers and heart-shaped leaves. Field Bindweed has small white or pink bell-shaped flowers (about an inch) and arrowhead leaves. Hedge Bindweed has much larger white bell-shaped flowers (2–3 inches) and bigger leaves with squared-off bottoms. Wild Buckwheat looks similar but has tiny greenish flowers in clusters — no bells — and a papery sheath where the leaf meets the stem.",
   },
 ];
 
@@ -8383,7 +8383,7 @@ function TopicContent({
         {
           label: "Physical Dormancy",
           desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
-          examples: ["Field Bindweed", "Hedge Bindweed", "Tall Morningglory", "Velvetleaf"],
+          examples: ["Field Bindweed", "Hedge Bindweed", "Common Morningglory", "Velvetleaf"],
         },
         {
           label: "Physiological Dormancy",
