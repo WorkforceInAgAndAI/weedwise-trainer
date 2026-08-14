@@ -4990,7 +4990,7 @@ function TopicContent({
           key: "eat",
           hero: "Swarm It!",
           power: "Bug Buddies",
-          emoji: "🐐",
+          emoji: "🐞",
           dot: "bg-success",
           bg: "bg-success/10 border-success/40",
           how: "Bring in helper insects like lady beetles, leaf beetles, and weevils that love to munch on certain weeds.",
@@ -6062,7 +6062,7 @@ function TopicContent({
         {
           key: "biological",
           title: "Biological Control",
-          emoji: "🐐",
+          emoji: "🐞",
           dot: "bg-accent",
           bg: "bg-accent/10 border-accent/40",
           what: "Using living helpers — like insects, animals, or tiny germs — to eat or weaken weeds.",
