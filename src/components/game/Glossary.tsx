@@ -208,7 +208,7 @@ export default function Glossary({ onClose }: Props) {
  </button>
  {expandedGroup === 'Look-Alikes' && (
  <div className="flex flex-wrap gap-1.5 mt-1">
- {weeds.filter(w => weeds.findIndex(x => x.id === w.id) < weeds.findIndex(x => x.id === w.lookAlike.id) || !weeds.find(x => x.id === w.lookAlike.id)).map(w => (
+ {[...weeds.filter(w => weeds.findIndex(x => x.id === w.id) < weeds.findIndex(x => x.id === w.lookAlike.id) || !weeds.find(x => x.id === w.lookAlike.id))].sort((a, b) => a.commonName.localeCompare(b.commonName)).map(w => (
  <button
  key={w.id}
  onClick={() => toggleFilter(`lookalike:${w.id}`)}

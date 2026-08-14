@@ -45,7 +45,6 @@ import SproutClimb from './practice-games/k5/SproutClimb';
 
 import MSNameTheWeed from './practice-games/middle/NameTheWeed';
 import MSTaxonomyTower from './practice-games/middle/TaxonomyTower';
-import FieldScout from './practice-games/middle/FieldScout';
 import MSHabitatMapping from './practice-games/middle/HabitatMapping';
 import WeedOrigins from './practice-games/middle/WeedOrigins';
 import NativeLookAlike from './practice-games/middle/NativeLookAlike';
@@ -61,7 +60,7 @@ import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
 import LiguleLens from './practice-games/middle/LiguleLens';
-import PastureWalk from './practice-games/middle/PastureWalk';
+import FieldScoutChallenge from './practice-games/middle/FieldScoutChallenge';
 
 import HSNameTheWeed from './practice-games/high/NameTheWeed';
 import HSTaxonomyTower from './practice-games/high/TaxonomyTower';
@@ -138,7 +137,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
 };
 
 const k5Games: GameDef[] = [
- { id: 'field-scout', name: 'Field Scout', Icon: Footprints, category: 'Field Methods', description: 'You are a hired scout — find and count weeds for pay.', howToPlay: 'Walk through fields, identify weeds, and earn money. Correct IDs earn $50, wrong ones earn $10. Complete 10 rounds!', component: FieldScout },
+ { id: 'field-scout', name: 'Weed Searcher', Icon: Footprints, category: 'Field Methods', description: 'Draw the path your scout walks and find the best representation of the weeds in your field — spend as little as you can.', howToPlay: 'You start with $1,000 and scout the same field three times in one season (soon after planting, vegetative, and reproductive). Drag on the aerial field to draw the walking path — longer paths cost more money. Cover the whole field (a W pattern works well) so weed patches do not blow up before your next trip. The money you keep at the end is your score.', component: FieldScoutChallenge },
  { id: 'native-lookalike', name: 'Native or Introduced?', Icon: Eye, category: 'Look-Alikes', description: 'Sort look-alike pairs into Native or Introduced.', howToPlay: 'Two similar plants are shown. Drag each to the Native or Introduced box.', component: NativeLookAlike },
  { id: 'ms-look-alike', name: 'Look-Alikes', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from commonly-confused look-alikes.', howToPlay: 'Three look-alike weeds appear. Choose the image that matches the target common + scientific name, then read how to tell them apart.', component: MSLookAlike },
  { id: 'ms-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field using the right techniques.', howToPlay: 'Click weeds in the field, identify them, then choose the right control method. Review your answers after each round.', component: MSWeedControl },
@@ -187,7 +186,7 @@ const middleGames: GameDef[] = [
  { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
  { id: 'grass-id-lab', name: 'Grass ID Lab', Icon: Microscope, category: 'Grass ID', description: 'Identify grasses from ligule, collar, blade, and seed head characters.', howToPlay: 'Study the zoomable ligule and seed head images, unlock written characters only if you need them (each costs a point), then name the species.', component: GrassID },
  { id: 'ms-sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
- { id: 'ms-pasture-walk', name: 'Pasture Walk', Icon: Footprints, category: 'Field Methods', description: 'Walk a pasture on limited energy and herbicide — spray only what pays off.', howToPlay: 'Tap weeds to walk to them (farther = more energy). For each plant, choose spray now, mark to spray later, or skip — match the choice to the plant\u2019s life cycle and growth stage.', component: PastureWalk },
+ { id: 'ms-pasture-walk', name: 'Field Scout Challenge', Icon: Footprints, category: 'Field Methods', description: 'Draw the path your agronomist walks — find the best representation of the weeds in your field, as cheaply as possible.', howToPlay: 'You start with $1,000 and scout the same field three times in one season (soon after planting, vegetative, and reproductive). Drag on the aerial field to draw your walking path — the longer the path, the more it costs. A pattern that crosses the whole field (like a W) finds patches early; skipping big blocks lets weeds explode before your next trip. Money left after scouting costs and end-of-season yield loss is your score.', component: FieldScoutChallenge },
  { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Sort seeds and predict how many are hiding in the field.', howToPlay: 'Sort seed images into columns by species, then predict the count for each type. Click a seed for a hint!', component: WeedSeedBanks },
  { id: 'weed-lineup', name: 'Weed Line-Up', Icon: Scan, category: 'Look-Alikes', description: 'Police line-up! Study the suspect sketch, read the eyewitness clue, and pick the bad weed hiding among its innocent look-alikes.', howToPlay: 'Read the Case File to see what the bad weed is wanted for. Look at the black-and-white Suspect Sketch, then compare it with the three mugshots in the Line-Up. Pick the suspect that matches the clue to make the arrest!', component: WeedLineUp },
 ];
