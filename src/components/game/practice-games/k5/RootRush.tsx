@@ -267,6 +267,12 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
     setPhase('roundEnd');
   };
 
+  // Keep the timer's end-of-shift callback pointing at the latest state.
+  timeUpRef.current = () => {
+    flash('Time is up! Your digging shift is over.');
+    window.setTimeout(() => endRound(false, 0), 600);
+  };
+
   const onNextLevel = () => {
     setDone(false);
     const next = levelIdx + 1;
