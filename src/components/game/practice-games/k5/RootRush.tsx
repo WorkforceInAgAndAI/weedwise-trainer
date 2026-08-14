@@ -320,7 +320,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
               </p>
             </div>
             <p className="text-sm text-amber-900/70 mb-4 italic">
-              Level {levelIdx + 1}: You are a <b>{cfg.weed}</b>. Spread to {cfg.goal} sprout points!
+              Level {levelIdx + 1}: You are a <b>{cfg.weed}</b>. Spread to {cfg.goal} sprout points — you have <b>1 minute</b> to dig!
             </p>
             <button
               onClick={() => startRound(levelIdx)}
