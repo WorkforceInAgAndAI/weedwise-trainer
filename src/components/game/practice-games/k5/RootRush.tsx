@@ -104,6 +104,7 @@ function buildGrid(cfg: LevelCfg): { grid: Cell[]; start: number } {
 }
 
 function buildCfg(levelIdx: number): LevelCfg {
+  // One-minute digging shift per tunnel.
   const base = LEVELS[levelIdx % LEVELS.length];
   const diff = getDifficulty(levelIdx + 1, 'k5');
   const bump = diff.level - 1;
