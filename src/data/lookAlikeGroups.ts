@@ -172,6 +172,7 @@ export const VEGETATIVE_LOOKALIKE_IDS = new Set<string>([
   "Wild_buckwheat",
   "Honey-vine_climbing_milkweed",
   "Burcucumber",
+  "Ivyleaf_morningglory",
 ]);
 
 /** Pick one shared image stage for a look-alike group. */
@@ -287,9 +288,13 @@ const OFFICIAL_PAIRS: [string, string][] = [
   ["Catchweed_bedstraw", "Field_Horsetail"],
   // Pigweed-like & tumbleweeds
   ["Asian_copperleaf", "Redroot_pigweed"],
+  ["Common_copperleaf", "Asian_copperleaf"],
+  ["Common_copperleaf", "Redroot_pigweed"],
   ["Russian_thistle", "kochia"],
   // Vines & tall palmate plants
   ["Burcucumber", "Honey-vine_climbing_milkweed"],
+  ["Ivyleaf_morningglory", "Tall_morningglory"],
+  ["Ivyleaf_morningglory", "Field_bindweed"],
   ["Marijuana", "giant-ragweed"],
 ];
 
@@ -368,6 +373,7 @@ const THEME_BY_ID: Record<string, string> = {
   waterhemp: "The Pigweeds",
   Redroot_pigweed: "The Pigweeds",
   Asian_copperleaf: "The Pigweeds",
+  Common_copperleaf: "The Pigweeds",
   // Tumbleweed-type
   kochia: "Tumbleweed Look-Alikes",
   Russian_thistle: "Tumbleweed Look-Alikes",
@@ -422,6 +428,7 @@ const THEME_BY_ID: Record<string, string> = {
   Hedge_bindweed: "The Climbing Vines",
   Tall_morningglory: "The Climbing Vines",
   "Honey-vine_climbing_milkweed": "The Climbing Vines",
+  Ivyleaf_morningglory: "The Climbing Vines",
   Burcucumber: "The Climbing Vines",
   // Milky sap / upright perennials
   common_Milkweed: "Milky-Sap Perennials",
