@@ -382,6 +382,75 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
+      {/* Selected weed workspace — centered so the photo is always fully visible */}
+      {current && fw && (
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3">
+          <div className="bg-card border-2 border-border rounded-2xl w-full max-w-3xl max-h-[88vh] overflow-y-auto p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="w-full sm:w-64 flex-shrink-0 rounded-xl overflow-hidden bg-secondary border-2 border-border">
+                <WeedImage weedId={fw.weed.id} stage="flower" className="w-full h-56 sm:h-64 object-contain bg-secondary" />
+              </div>
+              <div className="flex-1 min-w-0 space-y-3">
+                {!identified ? (
+                  <>
+                    <p className="text-sm font-bold text-foreground">Identify this weed:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {idOptions.map(name => (
+                        <button key={name} onClick={() => identify(name)}
+                          className="p-2.5 rounded-lg border-2 border-border bg-background text-sm font-bold text-foreground hover:border-primary">
+                          {name}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-bold text-foreground text-lg">{fw.weed.commonName}</p>
+                    {!methodPick && (
+                      <>
+                        <p className="text-xs text-muted-foreground">Choose a control method you own:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {ALL_METHODS.map(m => {
+                            const owned = shop.owns(m.id);
+                            const shopEntry = SHOP_CATALOG.find(s => s.id === m.id);
+                            return (
+                              <button key={m.id} onClick={() => owned && pickMethod(m.id)} disabled={!owned}
+                                className={`p-2 rounded-lg border-2 text-[11px] font-bold text-left flex items-center justify-between gap-1 ${
+                                  owned ? 'border-border bg-background text-foreground hover:border-primary'
+                                        : 'border-dashed border-border bg-background/50 text-muted-foreground cursor-not-allowed'
+                                }`}>
+                                <span>{m.label}</span>
+                                {!owned && <span className="text-[9px] inline-flex items-center gap-0.5"><Lock className="w-2.5 h-2.5" />{shopEntry ? `$${shopEntry.cost}` : ''}</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                    {methodPick && (() => {
+                      const best = getBestMethod(fw.weed);
+                      const isCorrect = methodPick === best;
+                      return (
+                        <div className={`rounded-lg p-3 ${isCorrect ? 'bg-success/10 border border-success/40' : 'bg-destructive/10 border border-destructive/40'}`}>
+                          <p className={`font-extrabold text-sm ${isCorrect ? 'text-success' : 'text-destructive'}`}>
+                            {isCorrect ? 'Correct!' : 'Not quite'}
+                          </p>
+                          <p className={`text-xs mt-1 ${isCorrect ? 'text-success' : 'text-destructive'}`}>
+                            {isCorrect
+                              ? `${ALL_METHODS.find(m => m.id === best)?.label} works well here: ${fw.weed.management}`
+                              : `Best option was ${ALL_METHODS.find(m => m.id === best)?.label} — ${fw.weed.management}. More weeds appeared!`}
+                          </p>
+                        </div>
+                      );
+                    })()}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <FloatingCoach grade="6-8" tip={`Match the method to the weed — perennials need different control than annuals.`} />
     </div>
   );
