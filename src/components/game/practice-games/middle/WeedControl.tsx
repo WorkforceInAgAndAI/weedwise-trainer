@@ -199,7 +199,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         })),
       ]);
     }
-    setTimeout(() => { setCurrent(null); }, 700);
+    setTimeout(() => { setCurrent(null); }, 1800);
   };
 
   const resetRound = () => {
