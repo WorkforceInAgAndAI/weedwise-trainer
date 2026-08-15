@@ -65,6 +65,8 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const [retriedOnce, setRetriedOnce] = useState(false);
   const [done, setDone] = useState(false);
   const [score, setScore] = useState(0);
+  const [hint, setHint] = useState<string | null>(null);
+  const [hintWeedId, setHintWeedId] = useState<string | null>(null);
 
   const unplaced = group.filter(w => !placements[w.id]);
   const allPlaced = unplaced.length === 0;
