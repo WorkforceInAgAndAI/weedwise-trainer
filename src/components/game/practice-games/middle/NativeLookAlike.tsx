@@ -11,6 +11,35 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const GROUP_SIZE = 10;
 
+function buildHint(weed: typeof weeds[0]): string {
+  if (weed.origin === 'Native') {
+    const habitat = (weed.primaryHabitat || weed.habitat).toLowerCase();
+    if (habitat.includes('wet')) {
+      return `${weed.commonName} is Native — it belongs in North American wetlands and wet field edges.`;
+    }
+    if (habitat.includes('warm-season') || habitat.includes('full sun') || habitat.includes('dry')) {
+      return `${weed.commonName} is Native — it evolved in sunny North American prairies and open ground.`;
+    }
+    if (habitat.includes('cool-season')) {
+      return `${weed.commonName} is Native — it grows in cooler North American fields and roadsides.`;
+    }
+    return `${weed.commonName} is Native — it has lived in North America for thousands of years, not brought from another continent.`;
+  }
+
+  const knowledge = WEED_ARRIVAL_KNOWLEDGE[weed.id];
+  if (knowledge) {
+    const continentNames: Record<string, string> = {
+      europe: 'Europe',
+      asia: 'Asia',
+      africa: 'Africa',
+      americas: 'the Americas',
+      mediterranean: 'the Mediterranean',
+    };
+    return `${weed.commonName} is Introduced — it originally came from ${continentNames[knowledge.continent] || 'another continent'} and then spread into Midwest fields.`;
+  }
+  return `${weed.commonName} is Introduced — it traveled here from another continent and then spread into farms and roadsides.`;
+}
+
 function buildGroup(level: number, groupSize = GROUP_SIZE): typeof weeds {
   const natives = shuffle(weeds.filter(w => w.origin === 'Native'));
   const intros = shuffle(weeds.filter(w => w.origin === 'Introduced'));
