@@ -169,9 +169,15 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
 
         {/* Unplaced weed cards */}
         {unplaced.length > 0 && (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto space-y-3">
+            {retriedOnce && hint && (
+              <div className="flex items-start gap-2 rounded-xl border-2 border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 animate-scale-in">
+                <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground font-medium">{hint}</p>
+              </div>
+            )}
             {retriedOnce && (
-              <p className="text-xs text-amber-600 font-semibold text-center mb-2">
+              <p className="text-xs text-amber-600 font-semibold text-center">
                 Try again — re-place the {unplaced.length} weed{unplaced.length === 1 ? '' : 's'} you missed.
               </p>
             )}
@@ -179,7 +185,11 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
               {unplaced.map(w => (
                 <button key={w.id} onClick={() => setSelectedWeed(selectedWeed === w.id ? null : w.id)}
                   className={`p-2 rounded-lg border-2 transition-all text-center ${
-                    selectedWeed === w.id ? 'border-primary bg-primary/10 scale-105' : 'border-border bg-card hover:border-primary/50'
+                    selectedWeed === w.id
+                      ? 'border-primary bg-primary/10 scale-105'
+                      : hintWeedId === w.id
+                        ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-300'
+                        : 'border-border bg-card hover:border-primary/50'
                   }`}>
                   <div className="w-full aspect-square mb-1 overflow-hidden rounded bg-secondary">
                     <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
