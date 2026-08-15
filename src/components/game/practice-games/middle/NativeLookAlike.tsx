@@ -98,17 +98,23 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (bouncedIds.length === 0) return;
     const t = setTimeout(() => {
+      const target = group.find(w => w.id === bouncedIds[0]);
+      if (target) {
+        setHint(buildHint(target));
+        setHintWeedId(target.id);
+      }
       setPlacements(p => { const n = { ...p }; bouncedIds.forEach(id => delete n[id]); return n; });
       setChecked(false);
       setRetriedOnce(true);
       setBouncedIds([]);
     }, 800);
     return () => clearTimeout(t);
-  }, [bouncedIds]);
+  }, [bouncedIds, group]);
 
   const restart = () => {
     setPlacements({}); setSelectedWeed(null); setChecked(false);
     setBouncedIds([]); setRetriedOnce(false); setDone(false); setScore(0);
+    setHint(null); setHintWeedId(null);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
