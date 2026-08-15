@@ -249,7 +249,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   if (showReview) {
     const wrong = history.filter(r => !r.correct);
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col pt-[84px]">
         <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
           <h1 className="font-bold text-foreground text-lg flex-1">Round {round} Results</h1>
@@ -287,7 +287,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col pt-[84px]">
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Weed Control</h1>
@@ -311,10 +311,10 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <span className="text-xs font-bold text-foreground flex-shrink-0">${shop.money}</span>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-y-auto lg:overflow-hidden min-h-0">
         {/* LEFT: scrollable field grid — every weed stays visible and tappable */}
-        <div className="relative overflow-y-auto min-h-0">
-          <img src={fieldBg} alt="" aria-hidden className="fixed lg:absolute inset-0 w-full h-full object-cover pointer-events-none" />
+        <div className="relative overflow-visible lg:overflow-y-auto min-h-[46vh] lg:min-h-0">
+          <img src={fieldBg} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
           <div className="absolute inset-0 bg-black/25 pointer-events-none" />
           <div className="relative p-3 sm:p-4">
             <p className="text-xs font-bold text-white/90 mb-2 drop-shadow">
@@ -337,7 +337,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* RIGHT: methods + collection */}
-        <div className="bg-card border-l border-border flex flex-col overflow-hidden">
+        <div className="bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col lg:overflow-hidden">
           <div className="p-3 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">Management Options</p>
             <div className="grid grid-cols-2 gap-1.5">
@@ -360,7 +360,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             <p className="mt-2 text-[10px] text-muted-foreground italic">Locked tools unlock in the shop between levels.</p>
           </div>
 
-          <div className="p-3 flex-1 overflow-y-auto">
+          <div className="p-3 flex-1 lg:overflow-y-auto">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">Field Log ({history.length})</p>
             {history.length === 0 && <p className="text-xs text-muted-foreground italic">Managed weeds appear here.</p>}
             <div className="space-y-1.5">
