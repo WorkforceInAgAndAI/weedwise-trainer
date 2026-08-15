@@ -311,66 +311,29 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <span className="text-xs font-bold text-foreground flex-shrink-0">${shop.money}</span>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden">
-        {/* LEFT: field + ID/method overlay */}
-        <div className="relative overflow-hidden">
-          <img src={fieldBg} alt="Field" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/20" />
-          {fieldWeeds.map(f => (
-            <button key={f.id} onClick={() => clickWeed(f.id)}
-              style={{ left: `${f.x}%`, top: `${f.y}%` }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${done.includes(f.id) ? 'opacity-30 pointer-events-none' : 'animate-pulse'}`}>
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/70 bg-secondary shadow-lg">
-                <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
-              </div>
-            </button>
-          ))}
-
-          {current && fw && (
-            <div className="absolute bottom-0 left-0 right-0 bg-card/95 border-t-2 border-border p-4 backdrop-blur">
-              <div className="flex items-start gap-4 mb-3">
-                <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-lg overflow-hidden bg-secondary border-2 border-border flex-shrink-0">
-                  <WeedImage weedId={fw.weed.id} stage="flower" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  {!identified ? (
-                    <p className="text-sm font-bold text-foreground">Identify this weed:</p>
-                  ) : (
-                    <p className="font-bold text-foreground">{fw.weed.commonName}</p>
-                  )}
-                </div>
-              </div>
-              {!identified && (
-                <div className="grid grid-cols-2 gap-2">
-                  {idOptions.map(name => (
-                    <button key={name} onClick={() => identify(name)}
-                      className="p-2 rounded-lg border-2 border-border bg-background text-xs font-bold text-foreground hover:border-primary">
-                      {name}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {identified && !methodPick && (
-                <p className="text-xs text-muted-foreground">Pick a control method on the right →</p>
-              )}
-              {methodPick && (() => {
-                const best = getBestMethod(fw.weed);
-                const isCorrect = methodPick === best;
-                return (
-                  <div className={`rounded-lg p-3 text-center ${isCorrect ? 'bg-success/10 border border-success/40' : 'bg-destructive/10 border border-destructive/40'}`}>
-                    <p className={`font-extrabold text-sm ${isCorrect ? 'text-success' : 'text-destructive'}`}>
-                      {isCorrect ? 'Correct!' : 'Not quite'}
-                    </p>
-                    <p className={`text-xs mt-1 ${isCorrect ? 'text-success' : 'text-destructive'}`}>
-                      {isCorrect
-                        ? `${ALL_METHODS.find(m => m.id === best)?.label} works well here: ${fw.weed.management}`
-                        : `Best option was ${ALL_METHODS.find(m => m.id === best)?.label} — ${fw.weed.management}. More weeds appeared!`}
-                    </p>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden min-h-0">
+        {/* LEFT: scrollable field grid — every weed stays visible and tappable */}
+        <div className="relative overflow-y-auto min-h-0">
+          <img src={fieldBg} alt="" aria-hidden className="fixed lg:absolute inset-0 w-full h-full object-cover pointer-events-none" />
+          <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+          <div className="relative p-3 sm:p-4">
+            <p className="text-xs font-bold text-white/90 mb-2 drop-shadow">
+              Scout the field — tap a weed to identify and manage it ({fieldWeeds.length - done.length} left)
+            </p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
+              {fieldWeeds.map(f => (
+                <button key={f.id} onClick={() => clickWeed(f.id)}
+                  disabled={done.includes(f.id)}
+                  className={`rounded-xl overflow-hidden border-2 bg-secondary shadow-lg transition-all ${
+                    done.includes(f.id) ? 'opacity-30 border-white/40 cursor-not-allowed' : 'border-white/80 hover:border-primary hover:scale-[1.03]'
+                  }`}>
+                  <div className="w-full aspect-square">
+                    <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </div>
-                );
-              })()}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
         {/* RIGHT: methods + collection */}
