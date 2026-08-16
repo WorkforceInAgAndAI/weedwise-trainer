@@ -67,6 +67,21 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const { addBadge } = useGameProgress();
   const msPool = useMemo(() => getMiddleSchoolMOAs(), []);
   const shop = usePracticeShop('herbicide-applicator', STARTER_MOAS, 0);
+  // Starters are always owned, even for students whose saved locker predates
+  // the id fix (legacy saves stored chemical names, not MOA ids).
+  const owns = (id: string) => STARTER_MOAS.includes(id) || shop.owns(id);
+  const catalog: ShopItem[] = useMemo(
+    () => msPool
+      .filter(m => !STARTER_MOAS.includes(m.id))
+      .map(m => ({
+        id: m.id,
+        name: `${m.moa} (Group ${m.group})`,
+        cost: MOA_COST[m.id] ?? 175,
+        tag: m.spectrum,
+        desc: `${m.chemistry} — e.g. ${m.brands[0]}`,
+      })),
+    [msPool],
+  );
   const [earnedThisLevel, setEarnedThisLevel] = useState(0);
   const [showShop, setShowShop] = useState(false);
   const [round, setRound] = useState(1);
@@ -102,7 +117,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   };
 
   const apply = (moaId: string) => {
-    if (!shop.owns(moaId)) return;
+    if (!owns(moaId)) return;
     const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
     let killed = 0;
     // Broadcast effect: herbicide kills every susceptible plant it contacts.
@@ -152,7 +167,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
         money={shop.money}
         owned={shop.owned}
         earnedThisLevel={earnedThisLevel}
-        catalog={SHOP_CATALOG}
+        catalog={catalog}
         onBuy={shop.buy}
         onContinue={nextLevelFn}
         onStartOver={startOver}
@@ -164,7 +179,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   // Show only MOAs the student has unlocked (plus starter set).
   const moaOptions = useMemo(() => {
-    return msPool.filter(m => shop.owns(m.id));
+    return msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
   }, [msPool, shop.owned]);
 
   return (
