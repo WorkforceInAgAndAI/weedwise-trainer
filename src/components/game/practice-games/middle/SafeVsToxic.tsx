@@ -345,16 +345,17 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
 
         {phase === 'done' && (
           <div className="text-center mt-8 max-w-md mx-auto">
-            {removalPick ? (
-              <>
-                <p className={`font-bold text-lg mb-2 ${removalOpts.find(o => o.id === removalPick)?.safe ? 'text-green-500' : 'text-destructive'}`}>
-                  {removalOpts.find(o => o.id === removalPick)?.safe ? 'Safe removal — well done!' : 'That approach is unsafe.'}
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">{profile.ifExposed}</p>
-              </>
-            ) : (
-              <p className="font-bold text-lg text-destructive mb-2">The dangerous weed was {current!.toxic.commonName}.</p>
-            )}
+            <p className="font-bold text-lg mb-2">
+              {selected === current!.toxic.id ? (
+                <span className="text-green-500">You identified {current!.toxic.commonName}.</span>
+              ) : (
+                <span className="text-destructive">The dangerous weed was {current!.toxic.commonName}.</span>
+              )}
+            </p>
+            <p className={`font-bold text-lg mb-2 ${removalOpts.find(o => o.id === removalPick)?.safe ? 'text-green-500' : 'text-destructive'}`}>
+              {removalOpts.find(o => o.id === removalPick)?.safe ? 'Safe removal — well done!' : 'That approach is unsafe.'}
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">{profile.ifExposed}</p>
             <button onClick={next} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next</button>
           </div>
         )}
