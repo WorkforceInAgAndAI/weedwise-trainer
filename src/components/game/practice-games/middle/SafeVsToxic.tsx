@@ -193,19 +193,17 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
   const continueFromReview = () => {
     if (selected === current!.toxic.id) {
       setScore(s => s + 1);
-      setPhase('remove');
-    } else {
-      setResults(r => [...r, { weed: current!.toxic.commonName, identified: false, safeRemoval: false }]);
-      setPhase('done');
     }
+    setPhase('remove');
   };
 
   const remove = (id: string) => {
     setRemovalPick(id);
     const opt = removalOpts.find(o => o.id === id);
     const safeRemoval = !!opt?.safe;
+    const identified = selected === current!.toxic.id;
     if (safeRemoval) setScore(s => s + 1);
-    setResults(r => [...r, { weed: current!.toxic.commonName, identified: true, safeRemoval }]);
+    setResults(r => [...r, { weed: current!.toxic.commonName, identified, safeRemoval }]);
     setPhase('done');
   };
 
