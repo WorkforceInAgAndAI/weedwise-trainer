@@ -27,18 +27,18 @@ const REVENUE_PER_KILL = 40;
 // spray still accumulates enough to unlock a new chemical and progress.
 const LEVEL_COMPLETION_BONUS = 150;
 
-// Students START with only 2 basic MOAs. New herbicides must be UNLOCKED
-// between levels using earnings. This maps MOA ids -> shop items.
-const STARTER_MOAS = ['glyphosate', 'atrazine'];
-const SHOP_CATALOG: ShopItem[] = [
-  { id: '2,4-D',        name: '2,4-D (Auxin)',         cost: 125, tag: 'Broadleaf', desc: 'Cheap, effective on many broadleaves.' },
-  { id: 'dicamba',      name: 'Dicamba (Auxin)',       cost: 200, tag: 'Broadleaf', desc: 'Premium auxin for tough broadleaves.' },
-  { id: 'glufosinate',  name: 'Glufosinate (GS)',      cost: 225, tag: 'Contact',   desc: 'Non-selective contact burndown.' },
-  { id: 'mesotrione',   name: 'Mesotrione (HPPD)',     cost: 175, tag: 'Bleacher',  desc: 'Bleaches broadleaves & some grasses.' },
-  { id: 'metolachlor',  name: 'S-Metolachlor (VLCFA)', cost: 150, tag: 'Pre-plant', desc: 'Pre-emerge for grasses & small-seeded broadleaves.' },
-  { id: 'clethodim',    name: 'Clethodim (ACCase)',    cost: 175, tag: 'Grass',     desc: 'Selective grass killer.' },
-  { id: 'fomesafen',    name: 'Fomesafen (PPO)',       cost: 200, tag: 'Broadleaf', desc: 'PPO for resistant broadleaves.' },
-];
+// Students START with 2 basic MOAs (ids MUST match HERBICIDE_MOA ids, or every
+// chemical stays locked and the game is unplayable).
+const STARTER_MOAS = ['epsps', 'psii-6'];
+// Unlock costs keyed by real MOA id.
+const MOA_COST: Record<string, number> = {
+  auxin: 125,
+  'ppo-post': 200,
+  gs: 225,
+  hppd: 175,
+  'vlcfa-15': 150,
+  accase: 175,
+};
 
 function buildField(level: number, round: number): FieldWeed[] {
   const d = getDifficulty(level, 'ms');
