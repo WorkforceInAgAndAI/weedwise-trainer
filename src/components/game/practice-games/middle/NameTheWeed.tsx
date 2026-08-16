@@ -209,7 +209,7 @@ export default function NameTheWeed({ onBack }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-br from-emerald-50 via-background to-sky-50 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40">
       <GameHeader onBack={onBack} level={level} score={score} round={round} total={rounds.length} progressPct={progressPct} />
-      <div className="flex-1 overflow-hidden p-4 sm:p-6">
+      <div className="flex-1 overflow-hidden p-4 sm:p-6 pb-20 lg:pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 h-full max-w-6xl mx-auto">
           {/* MAIN */}
           <div className="flex flex-col items-center gap-4 min-h-0 overflow-y-auto">
@@ -260,8 +260,8 @@ export default function NameTheWeed({ onBack }: Props) {
             )}
           </div>
 
-          {/* SIDE: confident weeds */}
-          <aside className="rounded-2xl border border-border bg-card/80 backdrop-blur p-4 h-fit lg:sticky lg:top-6 shadow-sm">
+          {/* SIDE: confident weeds — desktop only */}
+          <aside className="hidden lg:block rounded-2xl border border-border bg-card/80 backdrop-blur p-4 h-fit lg:sticky lg:top-6 shadow-sm">
             <div className="flex items-center gap-2 mb-1">
               <Trophy className="w-4 h-4 text-amber-500" />
               <p className="text-sm font-bold text-foreground">Weeds You Nailed</p>
@@ -297,6 +297,35 @@ export default function NameTheWeed({ onBack }: Props) {
           </aside>
         </div>
       </div>
+
+      {/* Mobile scout log strip — fixed height so it never grows into the game area */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur border-t border-border px-4 py-2">
+        <div className="flex items-center gap-3 max-w-6xl mx-auto">
+          <div className="flex items-center gap-2 shrink-0">
+            <Trophy className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-bold text-foreground">Scout Log</span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 font-bold">{confidentIds.size}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            {history.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground italic truncate">Identified weeds will appear here.</p>
+            ) : (
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                {history.slice(-6).map((h, i) => (
+                  <div key={i} className="flex items-center gap-1.5 shrink-0 px-2 py-1 rounded-md border bg-background/60">
+                    <StageViewer weedId={h.weed.id} size="sm" />
+                    <div>
+                      <p className="text-[10px] font-bold text-foreground leading-tight whitespace-nowrap">{h.weed.commonName}</p>
+                      <p className={`text-[9px] font-semibold ${h.correct ? 'text-emerald-600' : 'text-destructive'}`}>{h.correct ? 'Confident' : 'Review'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <FloatingCoach grade="6-8" tip={`Compare 2–3 stages before you guess: seedling shape, mature leaves, and the flower/seedhead all give different clues.`} />
     </div>
   );
