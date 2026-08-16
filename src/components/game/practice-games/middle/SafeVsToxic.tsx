@@ -323,7 +323,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
             </div>
             <div className="text-center">
               <button onClick={continueFromReview} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-                {selected === current!.toxic.id ? 'Plan a safe removal →' : 'Continue'}
+                Plan a safe removal →
               </button>
             </div>
           </div>
