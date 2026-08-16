@@ -9,6 +9,8 @@ import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
   getBestMOAForWeed,
+  getTopMOAsForWeed,
+  type HerbicideMOA,
 } from '@/data/herbicides';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import BetweenLevelShop from '@/components/game/BetweenLevelShop';
@@ -90,7 +92,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const [appliedMOA, setAppliedMOA] = useState<string | null>(null);
   const [phase, setPhase] = useState<'select' | 'choose' | 'result'>('select');
   const [score, setScore] = useState(0);
-  const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number }[]>([]);
+  const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number; optimal: number }[]>([]);
 
   useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
 
@@ -107,32 +109,48 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   const selectAll = () => setSelected(items.filter(i => !i.killed).map(i => i.id));
 
-  // Compute kill score for an MOA across the selected weeds
+  // A curated recommendation is always effective. Spectrum matching also
+  // counts so broad-spectrum starter products remain usable in every round.
+  const isEffective = (moa: HerbicideMOA, weed: typeof weeds[0]): boolean => {
+    const recommendedIds = getTopMOAsForWeed(weed)?.map(option => option.id) ?? [getBestMOAForWeed(weed)];
+    if (recommendedIds.includes(moa.id)) return true;
+    if (moa.spectrum === 'Both') return true;
+    const isGrass = weed.plantType === 'Monocot';
+    return moa.spectrum === (isGrass ? 'Grass' : 'Broadleaf');
+  };
+
+  // Compute kill score for an MOA across the selected weeds.
   const scoreMOA = (moaId: string): number => {
+    const moa = HERBICIDE_MOA.find(option => option.id === moaId);
+    if (!moa) return 0;
     return selected.reduce((acc, id) => {
-      const it = items.find(i => i.id === id)!;
-      const best = getBestMOAForWeed(it.weed);
-      return acc + (best === moaId ? 1 : 0);
+      const item = items.find(fieldWeed => fieldWeed.id === id);
+      return acc + (item && !item.killed && isEffective(moa, item.weed) ? 1 : 0);
     }, 0);
   };
 
   const apply = (moaId: string) => {
     if (!owns(moaId)) return;
-    const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
-    let killed = 0;
-    // Broadcast effect: herbicide kills every susceptible plant it contacts.
-    setItems(prev => prev.map(it => {
-      if (it.killed) return it;
-      const best = getBestMOAForWeed(it.weed);
-      if (best === moaId) { killed++; return { ...it, killed: true }; }
-      return it;
-    }));
+    const moa = HERBICIDE_MOA.find(h => h.id === moaId);
+    if (!moa) return;
+
+    const optimal = Math.max(0, ...moaOptions.map(option => scoreMOA(option.id)));
+    const selectedIds = new Set(selected);
+    const killedIds = new Set(
+      items
+        .filter(item => selectedIds.has(item.id) && !item.killed && isEffective(moa, item.weed))
+        .map(item => item.id),
+    );
+    const killed = killedIds.size;
+
+    // Only selected weeds are in the sprayed area.
+    setItems(prev => prev.map(item => killedIds.has(item.id) ? { ...item, killed: true } : item));
     setAppliedMOA(moaId);
     setScore(s => s + killed);
     const revenue = killed * REVENUE_PER_KILL;
     shop.earn(revenue);
     setEarnedThisLevel(v => v + revenue);
-    setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length }]);
+    setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length, optimal }]);
     setPhase('result');
   };
 
@@ -156,6 +174,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const restart = () => { setRound(1); setScore(0); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); setEarnedThisLevel(0); setShowShop(false); };
   const nextLevelFn = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); shop.reset(); restart(); };
+  const moaOptions = msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
 
   if (showShop) {
     return (
@@ -176,11 +195,6 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
       />
     );
   }
-
-  // Show only MOAs the student has unlocked (plus starter set).
-  const moaOptions = useMemo(() => {
-    return msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
-  }, [msPool, shop.owned]);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
@@ -280,12 +294,10 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
               <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Spray Results</p>
               {(() => {
                 const last = history[history.length - 1];
-                const best = Math.max(...moaOptions.map(m => scoreMOA(m.id)));
-                const optimal = best;
                 return (
-                  <div className={`p-3 rounded-lg border-2 ${last.killed === optimal ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
+                  <div className={`p-3 rounded-lg border-2 ${last.killed === last.optimal ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
                     <p className="font-bold text-foreground flex items-center gap-1"><Target className="w-4 h-4" /> Controlled {last.killed}/{last.total}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Best possible with this selection: {optimal}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Best possible with this selection: {last.optimal}</p>
                     <p className="text-[10px] text-muted-foreground mt-1">{last.moaLabel}</p>
                   </div>
                 );
