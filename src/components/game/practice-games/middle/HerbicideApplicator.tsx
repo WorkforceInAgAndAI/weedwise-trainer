@@ -263,10 +263,10 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                 ))}
               </div>
               <p className="text-[10px] text-muted-foreground italic">Each kill earns ${REVENUE_PER_KILL} for your locker. Unlock more chemicals between levels.</p>
-              {msPool.some(m => !shop.owns(m.id)) && (
+              {msPool.some(m => !owns(m.id)) && (
                 <div className="mt-2 border-t border-border pt-2">
                   <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1 inline-flex items-center gap-1"><Lock className="w-3 h-3" />Locked</p>
-                  {msPool.filter(m => !shop.owns(m.id)).slice(0,4).map(m => (
+                  {msPool.filter(m => !owns(m.id)).slice(0,4).map(m => (
                     <p key={m.id} className="text-[10px] text-muted-foreground">{m.moa} (Group {m.group})</p>
                   ))}
                 </div>
