@@ -9,6 +9,8 @@ import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
   getBestMOAForWeed,
+  getTopMOAsForWeed,
+  type HerbicideMOA,
 } from '@/data/herbicides';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import BetweenLevelShop from '@/components/game/BetweenLevelShop';
@@ -107,26 +109,41 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   const selectAll = () => setSelected(items.filter(i => !i.killed).map(i => i.id));
 
-  // Compute kill score for an MOA across the selected weeds
+  // A curated recommendation is always effective. Spectrum matching also
+  // counts so broad-spectrum starter products remain usable in every round.
+  const isEffective = (moa: HerbicideMOA, weed: typeof weeds[0]): boolean => {
+    const recommendedIds = getTopMOAsForWeed(weed)?.map(option => option.id) ?? [getBestMOAForWeed(weed)];
+    if (recommendedIds.includes(moa.id)) return true;
+    if (moa.spectrum === 'Both') return true;
+    const isGrass = weed.plantType === 'Monocot';
+    return moa.spectrum === (isGrass ? 'Grass' : 'Broadleaf');
+  };
+
+  // Compute kill score for an MOA across the selected weeds.
   const scoreMOA = (moaId: string): number => {
+    const moa = HERBICIDE_MOA.find(option => option.id === moaId);
+    if (!moa) return 0;
     return selected.reduce((acc, id) => {
-      const it = items.find(i => i.id === id)!;
-      const best = getBestMOAForWeed(it.weed);
-      return acc + (best === moaId ? 1 : 0);
+      const item = items.find(fieldWeed => fieldWeed.id === id);
+      return acc + (item && !item.killed && isEffective(moa, item.weed) ? 1 : 0);
     }, 0);
   };
 
   const apply = (moaId: string) => {
     if (!owns(moaId)) return;
-    const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
-    let killed = 0;
-    // Broadcast effect: herbicide kills every susceptible plant it contacts.
-    setItems(prev => prev.map(it => {
-      if (it.killed) return it;
-      const best = getBestMOAForWeed(it.weed);
-      if (best === moaId) { killed++; return { ...it, killed: true }; }
-      return it;
-    }));
+    const moa = HERBICIDE_MOA.find(h => h.id === moaId);
+    if (!moa) return;
+
+    const selectedIds = new Set(selected);
+    const killedIds = new Set(
+      items
+        .filter(item => selectedIds.has(item.id) && !item.killed && isEffective(moa, item.weed))
+        .map(item => item.id),
+    );
+    const killed = killedIds.size;
+
+    // Only selected weeds are in the sprayed area.
+    setItems(prev => prev.map(item => killedIds.has(item.id) ? { ...item, killed: true } : item));
     setAppliedMOA(moaId);
     setScore(s => s + killed);
     const revenue = killed * REVENUE_PER_KILL;
