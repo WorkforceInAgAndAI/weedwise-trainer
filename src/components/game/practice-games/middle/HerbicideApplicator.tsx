@@ -174,6 +174,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const restart = () => { setRound(1); setScore(0); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); setEarnedThisLevel(0); setShowShop(false); };
   const nextLevelFn = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); shop.reset(); restart(); };
+  const moaOptions = msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
 
   if (showShop) {
     return (
@@ -194,11 +195,6 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
       />
     );
   }
-
-  // Show only MOAs the student has unlocked (plus starter set).
-  const moaOptions = useMemo(() => {
-    return msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
-  }, [msPool, shop.owned]);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
