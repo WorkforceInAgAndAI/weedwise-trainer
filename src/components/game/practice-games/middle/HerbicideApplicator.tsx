@@ -92,7 +92,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const [appliedMOA, setAppliedMOA] = useState<string | null>(null);
   const [phase, setPhase] = useState<'select' | 'choose' | 'result'>('select');
   const [score, setScore] = useState(0);
-  const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number }[]>([]);
+  const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number; optimal: number }[]>([]);
 
   useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
 
@@ -134,6 +134,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
     const moa = HERBICIDE_MOA.find(h => h.id === moaId);
     if (!moa) return;
 
+    const optimal = Math.max(0, ...moaOptions.map(option => scoreMOA(option.id)));
     const selectedIds = new Set(selected);
     const killedIds = new Set(
       items
@@ -149,7 +150,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
     const revenue = killed * REVENUE_PER_KILL;
     shop.earn(revenue);
     setEarnedThisLevel(v => v + revenue);
-    setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length }]);
+    setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length, optimal }]);
     setPhase('result');
   };
 
@@ -297,12 +298,10 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
               <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Spray Results</p>
               {(() => {
                 const last = history[history.length - 1];
-                const best = Math.max(...moaOptions.map(m => scoreMOA(m.id)));
-                const optimal = best;
                 return (
-                  <div className={`p-3 rounded-lg border-2 ${last.killed === optimal ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
+                  <div className={`p-3 rounded-lg border-2 ${last.killed === last.optimal ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
                     <p className="font-bold text-foreground flex items-center gap-1"><Target className="w-4 h-4" /> Controlled {last.killed}/{last.total}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Best possible with this selection: {optimal}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Best possible with this selection: {last.optimal}</p>
                     <p className="text-[10px] text-muted-foreground mt-1">{last.moaLabel}</p>
                   </div>
                 );
