@@ -27,18 +27,18 @@ const REVENUE_PER_KILL = 40;
 // spray still accumulates enough to unlock a new chemical and progress.
 const LEVEL_COMPLETION_BONUS = 150;
 
-// Students START with only 2 basic MOAs. New herbicides must be UNLOCKED
-// between levels using earnings. This maps MOA ids -> shop items.
-const STARTER_MOAS = ['glyphosate', 'atrazine'];
-const SHOP_CATALOG: ShopItem[] = [
-  { id: '2,4-D',        name: '2,4-D (Auxin)',         cost: 125, tag: 'Broadleaf', desc: 'Cheap, effective on many broadleaves.' },
-  { id: 'dicamba',      name: 'Dicamba (Auxin)',       cost: 200, tag: 'Broadleaf', desc: 'Premium auxin for tough broadleaves.' },
-  { id: 'glufosinate',  name: 'Glufosinate (GS)',      cost: 225, tag: 'Contact',   desc: 'Non-selective contact burndown.' },
-  { id: 'mesotrione',   name: 'Mesotrione (HPPD)',     cost: 175, tag: 'Bleacher',  desc: 'Bleaches broadleaves & some grasses.' },
-  { id: 'metolachlor',  name: 'S-Metolachlor (VLCFA)', cost: 150, tag: 'Pre-plant', desc: 'Pre-emerge for grasses & small-seeded broadleaves.' },
-  { id: 'clethodim',    name: 'Clethodim (ACCase)',    cost: 175, tag: 'Grass',     desc: 'Selective grass killer.' },
-  { id: 'fomesafen',    name: 'Fomesafen (PPO)',       cost: 200, tag: 'Broadleaf', desc: 'PPO for resistant broadleaves.' },
-];
+// Students START with 2 basic MOAs (ids MUST match HERBICIDE_MOA ids, or every
+// chemical stays locked and the game is unplayable).
+const STARTER_MOAS = ['epsps', 'psii-6'];
+// Unlock costs keyed by real MOA id.
+const MOA_COST: Record<string, number> = {
+  auxin: 125,
+  'ppo-post': 200,
+  gs: 225,
+  hppd: 175,
+  'vlcfa-15': 150,
+  accase: 175,
+};
 
 function buildField(level: number, round: number): FieldWeed[] {
   const d = getDifficulty(level, 'ms');
@@ -67,6 +67,21 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   const { addBadge } = useGameProgress();
   const msPool = useMemo(() => getMiddleSchoolMOAs(), []);
   const shop = usePracticeShop('herbicide-applicator', STARTER_MOAS, 0);
+  // Starters are always owned, even for students whose saved locker predates
+  // the id fix (legacy saves stored chemical names, not MOA ids).
+  const owns = (id: string) => STARTER_MOAS.includes(id) || shop.owns(id);
+  const catalog: ShopItem[] = useMemo(
+    () => msPool
+      .filter(m => !STARTER_MOAS.includes(m.id))
+      .map(m => ({
+        id: m.id,
+        name: `${m.moa} (Group ${m.group})`,
+        cost: MOA_COST[m.id] ?? 175,
+        tag: m.spectrum,
+        desc: `${m.chemistry} — e.g. ${m.brands[0]}`,
+      })),
+    [msPool],
+  );
   const [earnedThisLevel, setEarnedThisLevel] = useState(0);
   const [showShop, setShowShop] = useState(false);
   const [round, setRound] = useState(1);
@@ -102,7 +117,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   };
 
   const apply = (moaId: string) => {
-    if (!shop.owns(moaId)) return;
+    if (!owns(moaId)) return;
     const moa = HERBICIDE_MOA.find(h => h.id === moaId)!;
     let killed = 0;
     // Broadcast effect: herbicide kills every susceptible plant it contacts.
@@ -152,7 +167,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
         money={shop.money}
         owned={shop.owned}
         earnedThisLevel={earnedThisLevel}
-        catalog={SHOP_CATALOG}
+        catalog={catalog}
         onBuy={shop.buy}
         onContinue={nextLevelFn}
         onStartOver={startOver}
@@ -164,7 +179,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
   // Show only MOAs the student has unlocked (plus starter set).
   const moaOptions = useMemo(() => {
-    return msPool.filter(m => shop.owns(m.id));
+    return msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
   }, [msPool, shop.owned]);
 
   return (
@@ -248,10 +263,10 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
                 ))}
               </div>
               <p className="text-[10px] text-muted-foreground italic">Each kill earns ${REVENUE_PER_KILL} for your locker. Unlock more chemicals between levels.</p>
-              {msPool.some(m => !shop.owns(m.id)) && (
+              {msPool.some(m => !owns(m.id)) && (
                 <div className="mt-2 border-t border-border pt-2">
                   <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1 inline-flex items-center gap-1"><Lock className="w-3 h-3" />Locked</p>
-                  {msPool.filter(m => !shop.owns(m.id)).slice(0,4).map(m => (
+                  {msPool.filter(m => !owns(m.id)).slice(0,4).map(m => (
                     <p key={m.id} className="text-[10px] text-muted-foreground">{m.moa} (Group {m.group})</p>
                   ))}
                 </div>
