@@ -87,8 +87,8 @@ export default function TaxonomyTower({ onBack }: Props) {
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">{targetIdx + 1}/{targets.length}</span>
       </div>
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_220px] gap-4 p-4">
-        <div className="flex flex-col items-center justify-center gap-4">
+      <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 md:grid-cols-[1fr_220px] gap-4 p-4 pb-28">
+        <div className="flex flex-col items-center justify-start gap-4">
           <div className="bg-secondary/50 rounded-xl p-3 text-center">
             <p className="text-sm text-muted-foreground">Classify this weed:</p>
           </div>
@@ -136,12 +136,6 @@ export default function TaxonomyTower({ onBack }: Props) {
             <WeedImage weedId={target.id} stage="flower" className="w-full h-full object-cover" />
           </div>
 
-          {found && (
-            <div className="text-center mt-2">
-              <p className="text-lg font-bold text-green-500 mb-3">You found {target.commonName}!</p>
-              <button onClick={nextTarget} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Weed</button>
-            </div>
-          )}
           {wrong && <p className="text-destructive font-bold animate-pulse">Try again!</p>}
         </div>
 
@@ -164,6 +158,14 @@ export default function TaxonomyTower({ onBack }: Props) {
           </div>
         </div>
       </div>
+      {found && (
+        <div className="absolute bottom-0 left-0 right-0 z-10 p-4 border-t-2 border-emerald-200 dark:border-emerald-900 bg-white/90 dark:bg-slate-900/90 backdrop-blur flex flex-col sm:flex-row items-center justify-center gap-3">
+          <p className="text-lg font-bold text-green-600">You found {target.commonName}!</p>
+          <button onClick={nextTarget} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+            {targetIdx + 1 >= targets.length ? 'Finish Level' : 'Next Weed'}
+          </button>
+        </div>
+      )}
           <FloatingCoach grade="6-8" tip={`Family → Genus → Species. Use leaf and flower traits to climb the taxonomy ladder.`} />
 </div>
   );
