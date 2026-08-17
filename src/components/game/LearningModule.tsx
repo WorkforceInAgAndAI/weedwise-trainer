@@ -97,6 +97,7 @@ type TopicId =
   | "look-alikes"
   | "safety"
   | "control-methods"
+  | "herbicides-intro"
   | "taxonomy"
   | "dioecious"
   | "grass-id"
@@ -852,7 +853,7 @@ const TOPICS: Topic[] = [
   // Control, Safety & Field Management
   {
     id: "safety",
-    name: "Safety & Control",
+    name: "Safety",
     icon: "safety",
     description:
       "Recognize dangerous and toxic species and apply basic safety practices when handling them in the field.",
@@ -866,6 +867,15 @@ const TOPICS: Topic[] = [
     description:
       "Compare cultural, mechanical, biological, and chemical control methods and choose the right tool for each situation.",
     grades: ["elementary", "middle", "high"],
+    category: "control",
+  },
+  {
+    id: "herbicides-intro",
+    name: "Herbicides",
+    icon: "herbicide",
+    description:
+      "Learn what herbicides are, how pre-emergent and post-emergent timing works, how they are applied, and why weed ID matters.",
+    grades: ["middle"],
     category: "control",
   },
   {
@@ -1561,12 +1571,14 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   const viewMode: "list" | "box" = "list";
 
   const availableTopics = useMemo(() => {
+    const rename = (t: Topic): Topic =>
+      t.id === "habitats" && selectedGrade !== "elementary" ? { ...t, name: "Environment Profiles" } : t;
     if (selectedGrade === "elementary") {
       return TOPICS.filter((t) => t.plantExplorer);
     }
     const src = displayToSource[selectedGrade];
     if (!src) return [];
-    return TOPICS.filter((t) => !t.plantExplorer && t.grades.includes(src));
+    return TOPICS.filter((t) => !t.plantExplorer && t.grades.includes(src)).map(rename);
   }, [selectedGrade]);
 
   const topicsByCategory = useMemo(() => {
@@ -1708,7 +1720,8 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
             <div className="min-w-0">
               <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <h2 className="text-lg font-display font-bold text-foreground">
-                  {TOPICS.find((t) => t.id === selectedTopic)?.name}
+                  {availableTopics.find((t) => t.id === selectedTopic)?.name ??
+                    TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
                 <PracticeButton topicId={selectedTopic} grade={sourceGrade} onOpenPractice={onOpenPractice} />
               </div>
@@ -3819,28 +3832,26 @@ function TopicContent({
       if (grade === "middle") {
         return (
           <div className="space-y-5">
-            <NotebookSection title="Habitats: Reading the Field" subtitle="Research Log · Site Preferences">
+            <NotebookSection title="Environment Profiles: Reading the Field" subtitle="Research Log · Site Preferences">
               <div className="space-y-2 text-sm">
                 <p>
-                  A habitat is the natural home where a plant or animal lives and thrives, and weeds, just like people,
-                  have preferences about where they like to hang out.
+                  Have you ever noticed that some weeds always seem to pop up in the same kinds of places? That's not an
+                  accident! Just like animals need the right habitat to survive, plants—including weeds—need the right
+                  soil conditions to grow well. Things like how wet or dry the soil is, how packed down it is, and how
+                  many nutrients it has can all affect which plants can grow there.
                 </p>
                 <p>
-                  Factors such as{" "}
-                  <strong>soil texture, moisture availability, light levels, temperature ranges, pH</strong>, and the
-                  degree of soil disturbance all influence which weed species are likely to establish and become
-                  dominant in a given location.
+                  For example, some weeds are tough survivors that love growing in soil that's been squished down by
+                  people walking on it a lot, like along the edge of a sidewalk or a well-used path. Other weeds prefer
+                  soil that's rich in nutrients, so you might spot them growing near a garden or farm field where
+                  fertilizer has been used. There are even weeds that like really wet, soggy soil, so you'll often find
+                  them near ponds or in low spots where water collects after it rains.
                 </p>
                 <p>
-                  Below, species are grouped into the seven site types weed scouts use in the field. Slide through a
-                  habitat to see which species occupy it and the biology that lets them do it. A species can appear in
-                  more than one habitat when it tolerates both sets of conditions.
+                  So the next time you're outside, take a look at the weeds growing around you—they can actually give
+                  you clues about what the soil is like in that spot, kind of like nature's own detective work!
                 </p>
               </div>
-              <FieldNote label="Indicator species">
-                Persistent yellow nutsedge = drainage or compaction problem. Kochia on the headland = dry, disturbed
-                margin. The weed is telling you about the site.
-              </FieldNote>
               <SelfCheck
                 question="A grower reports foxtail barley taking over a low, salty spot in the field. What management step should come before another herbicide pass?"
                 answer="Address the site condition — improve drainage and, if salinity is confirmed by a soil test, plant a salt-tolerant cover. Herbicide alone won't hold if the site keeps favoring the weed."
@@ -3856,7 +3867,7 @@ function TopicContent({
       {
         return (
           <div className="space-y-5">
-            <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
+            <JournalHeader title="Environment Profiles" subtitle="Plant Ecophysiology" />
             <LabCallout heading="Concept">
               Climate — thermal regime, photoperiod, precipitation, and edaphic conditions — is the primary filter on
               weed community composition. Species distribution reflects underlying physiological adaptations (C3/C4
@@ -3872,8 +3883,17 @@ function TopicContent({
                 soil is warm enough to fry an egg on.
               </p>
               <p>
-                The seven habitats below show how Midwest weeds sort themselves across the sites they colonize. Slide
-                through each habitat to review its defining conditions and the species adapted to them.
+                <strong>Edaphic factors</strong> are the soil-related conditions—pH, texture, moisture, nutrient
+                availability, organic matter content, salinity, and compaction—that shape which plant species, including
+                weeds, can establish and thrive in a given location. Different weed species have evolved specific
+                tolerances and preferences, soil characteristics act as a filter: for example, species like curly dock
+                (Rumex crispus) often indicate compacted, poorly drained soils while nutrient-rich, high-nitrogen soils
+                (often from manure or fertilizer runoff) tend to favor aggressive, fast-growing species like pigweed
+                (Amaranthus spp.) or lambsquarters (Chenopodium album).
+              </p>
+              <p>
+                The seven habitats below show how Midwest weeds sort themselves across the sites they colonize. Each
+                profile lists its defining conditions and the species adapted to them.
               </p>
             </div>
             <TermSidebar
@@ -3889,10 +3909,6 @@ function TopicContent({
                 {
                   term: "Edaphic factors",
                   def: "Soil-related site conditions — texture, drainage, compaction, pH, and fertility.",
-                },
-                {
-                  term: "Indicator species",
-                  def: "A weed whose presence reliably signals a specific site condition, such as poor drainage.",
                 },
               ]}
             />
@@ -8127,6 +8143,82 @@ function TopicContent({
     /* ═══════════════════════════════════════════════════════════
        HERBICIDE MOA (High School)
     ═══════════════════════════════════════════════════════════ */
+    case "herbicides-intro": {
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-base text-foreground space-y-3 leading-relaxed">
+            <p>
+              Farmers have a lot of tools to help protect their crops from weeds, and one of the most important tools is
+              called an <strong>herbicide</strong>—a chemical designed to kill or stop the growth of unwanted plants. But
+              not all herbicides work the same way or at the same time, so let's break down some key terms!
+            </p>
+            <p className="font-display font-bold text-primary">Timing Matters: Pre-Emergent vs. Post-Emergent</p>
+            <p>
+              A <strong>pre-emergent</strong> herbicide is applied to the soil before weeds have sprouted. Think of it
+              like a protective shield—it stops weed seeds from ever growing into plants in the first place. A{" "}
+              <strong>post-emergent</strong> herbicide, on the other hand, is applied after weeds have already popped up
+              out of the ground. These herbicides target the actual weed plant, attacking its leaves and stems to kill
+              it.
+            </p>
+            <p>
+              There's also a method called <strong>PPI</strong>, which stands for Pre-Plant Incorporated. This means the
+              herbicide is mixed directly into the soil before the crop is even planted, using equipment like a tiller.
+              This helps make sure the chemical is right where it needs to be to stop weeds before the crop's growing
+              season even begins.
+            </p>
+            <p className="font-display font-bold text-primary">How Herbicides Get Applied</p>
+            <p>
+              Farmers use different equipment to spray herbicides across their fields, depending on the size of the
+              field and the situation:
+            </p>
+            <ul className="list-disc pl-6 space-y-1">
+              <li>
+                <strong>Tractor sprayers</strong> are common—a tractor pulls a large boom (a long arm with nozzles) that
+                sprays herbicide evenly across wide rows of crops.
+              </li>
+              <li>
+                <strong>Drone sprayers</strong> are a newer technology where a flying drone sprays herbicide from above.
+                This is especially helpful for hard-to-reach areas or smaller, precise spots that need treatment.
+              </li>
+              <li>
+                <strong>Other methods</strong> include backpack sprayers for small areas or spot-treating individual
+                weeds, and aerial sprayers using small planes for very large farms.
+              </li>
+            </ul>
+            <p className="font-display font-bold text-primary">Why Weed ID Matters</p>
+            <p>
+              Here's the big secret: not every herbicide works on every weed! Just like a doctor needs to know what's
+              making you sick before giving you medicine, farmers need to correctly identify which weed species are
+              growing in their field before choosing an herbicide. Some herbicides only work on grassy weeds, while
+              others target broadleaf weeds. Using the wrong herbicide wastes money, time, and can even harm the crop
+              itself. That's why proper weed identification is one of the most important steps in making sure herbicide
+              treatment actually works!
+            </p>
+          </div>
+
+          <p className="text-base font-semibold text-foreground">
+            Here are just a few of the common herbicide groups used by farmers today.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...HERBICIDE_MOA]
+              .sort((a, b) => a.group - b.group)
+              .map((m) => (
+                <div key={m.id} className="bg-card border border-border rounded-xl p-5 space-y-2">
+                  <p className="font-display font-bold text-foreground text-lg leading-snug">{m.moa}</p>
+                  <p className="text-base text-primary font-semibold">Group {m.group}</p>
+                  <p className="text-base text-foreground">
+                    <strong>Target:</strong> {m.spectrum === "Both" ? "Grass & Broadleaf" : m.spectrum} weeds
+                  </p>
+                  <p className="text-base text-foreground">
+                    <strong>Timing:</strong>{" "}
+                    {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </div>
+      );
+    }
     case "herbicide-moa": {
       return (
         <div className="space-y-5">

@@ -112,7 +112,7 @@ export default function Glossary({ onClose }: Props) {
  w.family.toLowerCase().includes(q)
  );
  }
- return result;
+ return [...result].sort((a, b) => a.commonName.localeCompare(b.commonName));
  }, [activeFilters, search]);
 
  const groups = useMemo(() => {
