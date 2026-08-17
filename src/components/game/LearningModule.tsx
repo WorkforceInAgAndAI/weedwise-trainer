@@ -6648,7 +6648,6 @@ function TopicContent({
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
                   <div className="text-sm text-destructive mt-1">{w.safetyNote}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Management: {w.management}</div>
                 </div>
               </div>
             ))}
