@@ -6468,10 +6468,9 @@ function TopicContent({
         },
       ];
 
-      if (grade === "elementary") {
-        // Curriculum-set placements. A species may belong to more than one
-        // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
-        const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
+      // Curriculum-set placements. A species may belong to more than one
+      // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
+      const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
           Curly_dock: ["toxic"],
           Horsenettle: ["toxic", "physical"],
           Tall_morningglory: ["toxic"],
@@ -6487,10 +6486,10 @@ function TopicContent({
           commonPokeweed: ["toxic"],
           common_Cocklebur: ["physical", "toxic"],
           "canada-thistle": ["physical"],
-        };
-        // Keyword fallback for species without an explicit placement.
-        const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
-        const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
+      };
+      // Keyword fallback for species without an explicit placement.
+      const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
+      const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
           if (matches(w, /thorn|spine|prick|bur|sharp|puncture|stab/i)) return ["physical"];
           if (matches(w, /skin|dermat|rash|irrit|sap|sting|blister|burn|contact|allerg/i)) return ["skin"];
           if (
@@ -6501,13 +6500,14 @@ function TopicContent({
           )
             return ["toxic"];
           return [];
-        };
-        const groupsFor = (w: Weed) => SAFETY_PLACEMENT[w.id] ?? fallback(w);
-        const physical = topicWeeds.filter((w) => groupsFor(w).includes("physical"));
-        const skin = topicWeeds.filter((w) => groupsFor(w).includes("skin"));
-        const toxic = topicWeeds.filter((w) => groupsFor(w).includes("toxic"));
-        const other = topicWeeds.filter((w) => groupsFor(w).length === 0);
+      };
+      const groupsFor = (w: Weed) => SAFETY_PLACEMENT[w.id] ?? fallback(w);
+      const physical = topicWeeds.filter((w) => groupsFor(w).includes("physical"));
+      const skin = topicWeeds.filter((w) => groupsFor(w).includes("skin"));
+      const toxic = topicWeeds.filter((w) => groupsFor(w).includes("toxic"));
+      const other = topicWeeds.filter((w) => groupsFor(w).length === 0);
 
+      if (grade === "elementary") {
         const renderGroup = (title: string, desc: string, tone: string, group: Weed[]) =>
           group.length === 0 ? null : (
             <div key={title} className={`border rounded-lg p-4 space-y-3 ${tone}`}>
