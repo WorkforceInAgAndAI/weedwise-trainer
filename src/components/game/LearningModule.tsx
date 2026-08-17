@@ -1966,8 +1966,10 @@ function MiddleSchoolNamesModule({ weeds: pool, onSelectWeed }: { weeds: Weed[];
       {/* Two-column: grid + tracker */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-5 items-start">
         {/* Grid of weed cards */}
+        <div className="space-y-4">
+        <WeedSearchBar value={query} onChange={setQuery} count={visible.length} total={pool.length} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {pool.map((w) => {
+          {visible.map((w) => {
             const st = status[w.id] ?? "unseen";
             return (
               <div
