@@ -7796,27 +7796,6 @@ function TopicContent({
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Rapid Germination</p>
-              <p className="text-xs text-muted-foreground">
-                Some weeds sprout faster than others, grabbing sunlight and soil space before neighbors can emerge.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Canopy Spread</p>
-              <p className="text-xs text-muted-foreground">
-                Wide, fast-growing leaves shade out shorter plants, cutting off their access to sunlight.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-              <p className="font-bold text-foreground">Allelopathy</p>
-              <p className="text-xs text-muted-foreground">
-                Some weeds release chemicals into the soil that prevent nearby seeds from germinating or growing.
-              </p>
-            </div>
-          </div>
-
           {/* Visual species examples */}
           <div className="space-y-4">
             <p className="font-display font-bold text-foreground text-sm">Real-World Examples</p>
