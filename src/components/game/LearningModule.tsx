@@ -6655,75 +6655,71 @@ function TopicContent({
         );
       }
 
-      // 9-12
+      // 9-12 and Collegiate — hazard exposure only. Control tactics live in the
+      // Control Methods module so the two topics no longer overlap.
       {
-        // Group safety weeds by the management technique their `management` field
-        // most closely matches, so the page reads as Mechanical / Cultural / Chemical / etc.
-        const TECHNIQUE_BUCKETS: { key: string; label: string; description: string; match: RegExp }[] = [
+        const HAZARD_GROUPS: { key: string; label: string; description: string; ppe: string; weeds: Weed[] }[] = [
           {
-            key: "mechanical",
-            label: "Mechanical & Physical Removal (Hand-pulling, Mowing, Tillage)",
+            key: "skin",
+            label: "Dermal & Respiratory Hazards",
             description:
-              "Crews physically remove or sever the plant — hand-pulling, hoeing, digging taproots, mowing before seed set, brush-cutting, or tillage (chisel, disk, row cultivator). Most effective on small infestations and before seed production, but it brings workers into direct contact with the plant, so PPE (chemical-resistant gloves, long sleeves, eye protection) is mandatory for species with toxic sap, spines, or allergenic pollen. Tillage can also bury herbicide-resistant seed and reset the seedbank.",
-            match: /hand[- ]?pull|dig|mow|cut|till|cultivat|mechanical|removal/i,
+              "Sap, trichomes, or pollen that cause contact dermatitis, phytophotodermatitis, chemical burns, or allergic respiratory response. Exposure risk is highest during hand removal, mowing, and anthesis (peak pollen shed).",
+            ppe: "Chemical-resistant gloves, long sleeves and pants, eye protection, and an N95 or organic-vapor respirator when pollen or dust is heavy.",
+            weeds: skin,
           },
           {
-            key: "cultural",
-            label: "Cultural & Preventive Practices (Crop Rotation, Cover Crops, Sanitation)",
+            key: "toxic",
+            label: "Ingestion & Systemic Toxicity",
             description:
-              "These practices change the field environment so the weed never gets a foothold. Includes crop rotation (corn → soybean → small grain) to disrupt life cycles, competitive cover crops (cereal rye, crimson clover) that shade and suppress germination, equipment sanitation to stop seed transport, livestock exclusion from infested pastures, and posted signage warning workers of toxic stands. Preventive — lowest worker exposure of any tactic because the dangerous plant ideally never reaches a harvestable size.",
-            match: /rotat|cover crop|sanit|prevent|exclud|fenc|sign|graz/i,
+              "Alkaloids, glycosides, nitrate accumulation, or other compounds that are toxic to humans and livestock when any plant part is consumed. Risk extends to contaminated hay, silage, and grazing.",
+            ppe: "Never taste or handle plant material near food or drink; wash hands and tools after contact; flag infested paddocks and exclude livestock.",
+            weeds: toxic,
           },
           {
-            key: "chemical",
-            label: "Chemical Control — Herbicides (PRE & POST Applications)",
+            key: "physical",
+            label: "Physical Injury (Spines, Awns, Burs)",
             description:
-              "Targeted application of a labeled herbicide — broadcast spray, banded over-the-row, or spot-treat with a backpack sprayer or wick. Effective on large infestations and species with deep roots or rhizomes that mechanical removal can't kill. Required PPE per the product label always includes chemical-resistant gloves and eye protection; long-sleeved coveralls and an organic-vapor respirator are required for many Group 4 (auxin) and Group 14 (PPO) products. Always rotate modes of action (Groups 1–27) to slow resistance.",
-            match: /herbicid|spray|chemical|spot[- ]?treat/i,
+              "Thorns, spines, stiff awns, and hooked burs that puncture skin, lodge in eyes, or embed in animal mouths and hooves. Injury sites can become infected.",
+            ppe: "Heavy leather or puncture-resistant gloves, eye protection, closed-toe boots, and durable long sleeves.",
+            weeds: physical,
           },
           {
-            key: "biological",
-            label: "Biological Control (Insects, Pathogens, Targeted Grazing)",
+            key: "other",
+            label: "Other Documented Hazards",
             description:
-              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing insect release — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
-            match: /biolog|insect|pathogen|biocontrol|graz/i,
-          },
-          {
-            key: "ipm",
-            label: "Integrated Pest Management — IPM (Scouting, Thresholds, Multiple Tactics)",
-            description:
-              "An overall decision framework — not a single tactic. IPM stacks regular scouting, economic and action thresholds, and a planned sequence of cultural, mechanical, biological, and chemical tools so no one tactic is overused. For toxic-plant management it also means matching each tool to the worker-exposure risk it carries (lowest-risk tool that still controls the population) and rotating herbicide modes of action to slow resistance.",
-            match: /integrat|ipm|combin|monitor|scout|threshold/i,
+              "Species with hazard notes that do not map cleanly to a single category above. Read the full toxicology profile before working around these stands.",
+            ppe: "Standard field PPE; review the species profile before contact.",
+            weeds: other,
           },
         ];
-
-        const buckets = TECHNIQUE_BUCKETS.map((b) => ({
-          ...b,
-          weeds: topicWeeds.filter((w) => b.match.test(w.management || "")),
-        }));
-        const placedIds = new Set(buckets.flatMap((b) => b.weeds.map((w) => w.id)));
-        const otherWeeds = topicWeeds.filter((w) => !placedIds.has(w.id));
 
         return (
           <div className="space-y-5">
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-2">
-              <p className="font-display font-bold text-destructive text-base">Safety First</p>
+              <p className="font-display font-bold text-destructive text-base">Hazard Assessment</p>
               <p>
-                Some weeds are <strong>dangerous to touch, inhale, or ingest</strong> — they may carry irritating sap,
-                allergenic pollen, sharp spines, or systemic toxins. The species below are grouped by the
-                <strong> management technique</strong> most commonly recommended for them so you can see at a glance
-                which control tool fits which population, and what level of PPE that tool requires. The right choice
-                balances three things: how effective the tactic is on that species, how much it exposes the worker, and
-                how it fits into a longer IPM rotation.
+                Some weeds are <strong>dangerous to touch, inhale, or ingest</strong> — irritating sap, allergenic
+                pollen, sharp spines, or systemic toxins. Species below are grouped by the <strong>type of harm</strong>{" "}
+                they cause and the personal protective equipment that exposure requires.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Control tactics for these species — mechanical, cultural, chemical, biological, and IPM — are covered in
+                the <strong>Control Methods</strong> module.
               </p>
             </div>
 
-            {buckets.map(
+            {HAZARD_GROUPS.map(
               (b) =>
                 b.weeds.length > 0 && (
                   <div key={b.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                    <p className="font-display font-bold text-foreground text-base">{b.label}</p>
+                    <p className="font-display font-bold text-foreground text-base">
+                      {b.label} <span className="text-xs text-muted-foreground font-normal">({b.weeds.length})</span>
+                    </p>
                     <p className="text-sm text-muted-foreground">{b.description}</p>
+                    <p className="text-xs text-foreground bg-secondary/40 border border-border rounded-lg p-3">
+                      <span className="font-bold">Required PPE / precautions: </span>
+                      {b.ppe}
+                    </p>
                     <div className="overflow-x-auto pb-3 -mx-1">
                       <div className="flex gap-3 px-1" style={{ minWidth: `${b.weeds.length * 18}rem` }}>
                         {b.weeds.map((w) => (
@@ -6740,7 +6736,7 @@ function TopicContent({
                             <div className="min-w-0">
                               <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold text-sm" />
                               <p className="text-[10px] italic text-primary">{w.scientificName}</p>
-                              <p className="text-xs text-destructive mt-1 line-clamp-3">{w.safetyNote}</p>
+                              <p className="text-xs text-destructive mt-1 line-clamp-4">{w.safetyNote}</p>
                             </div>
                           </div>
                         ))}
@@ -6749,17 +6745,6 @@ function TopicContent({
                     <p className="text-[10px] text-muted-foreground">← Scroll to see all {b.weeds.length} →</p>
                   </div>
                 ),
-            )}
-
-            {otherWeeds.length > 0 && (
-              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-                <p className="font-display font-bold text-foreground text-base">Other Toxic Species</p>
-                <p className="text-sm text-muted-foreground">
-                  Species whose management notes do not map cleanly to a single technique above. Always check the
-                  toxicology profile before selecting a control strategy.
-                </p>
-                <HorizontalWeedRow weeds={otherWeeds} onSelectWeed={onSelectWeed} stage="flower" showScientific />
-              </div>
             )}
           </div>
         );
