@@ -3819,28 +3819,26 @@ function TopicContent({
       if (grade === "middle") {
         return (
           <div className="space-y-5">
-            <NotebookSection title="Habitats: Reading the Field" subtitle="Research Log · Site Preferences">
+            <NotebookSection title="Environment Profiles: Reading the Field" subtitle="Research Log · Site Preferences">
               <div className="space-y-2 text-sm">
                 <p>
-                  A habitat is the natural home where a plant or animal lives and thrives, and weeds, just like people,
-                  have preferences about where they like to hang out.
+                  Have you ever noticed that some weeds always seem to pop up in the same kinds of places? That's not an
+                  accident! Just like animals need the right habitat to survive, plants—including weeds—need the right
+                  soil conditions to grow well. Things like how wet or dry the soil is, how packed down it is, and how
+                  many nutrients it has can all affect which plants can grow there.
                 </p>
                 <p>
-                  Factors such as{" "}
-                  <strong>soil texture, moisture availability, light levels, temperature ranges, pH</strong>, and the
-                  degree of soil disturbance all influence which weed species are likely to establish and become
-                  dominant in a given location.
+                  For example, some weeds are tough survivors that love growing in soil that's been squished down by
+                  people walking on it a lot, like along the edge of a sidewalk or a well-used path. Other weeds prefer
+                  soil that's rich in nutrients, so you might spot them growing near a garden or farm field where
+                  fertilizer has been used. There are even weeds that like really wet, soggy soil, so you'll often find
+                  them near ponds or in low spots where water collects after it rains.
                 </p>
                 <p>
-                  Below, species are grouped into the seven site types weed scouts use in the field. Slide through a
-                  habitat to see which species occupy it and the biology that lets them do it. A species can appear in
-                  more than one habitat when it tolerates both sets of conditions.
+                  So the next time you're outside, take a look at the weeds growing around you—they can actually give
+                  you clues about what the soil is like in that spot, kind of like nature's own detective work!
                 </p>
               </div>
-              <FieldNote label="Indicator species">
-                Persistent yellow nutsedge = drainage or compaction problem. Kochia on the headland = dry, disturbed
-                margin. The weed is telling you about the site.
-              </FieldNote>
               <SelfCheck
                 question="A grower reports foxtail barley taking over a low, salty spot in the field. What management step should come before another herbicide pass?"
                 answer="Address the site condition — improve drainage and, if salinity is confirmed by a soil test, plant a salt-tolerant cover. Herbicide alone won't hold if the site keeps favoring the weed."
@@ -3872,8 +3870,17 @@ function TopicContent({
                 soil is warm enough to fry an egg on.
               </p>
               <p>
-                The seven habitats below show how Midwest weeds sort themselves across the sites they colonize. Slide
-                through each habitat to review its defining conditions and the species adapted to them.
+                <strong>Edaphic factors</strong> are the soil-related conditions—pH, texture, moisture, nutrient
+                availability, organic matter content, salinity, and compaction—that shape which plant species, including
+                weeds, can establish and thrive in a given location. Different weed species have evolved specific
+                tolerances and preferences, soil characteristics act as a filter: for example, species like curly dock
+                (Rumex crispus) often indicate compacted, poorly drained soils while nutrient-rich, high-nitrogen soils
+                (often from manure or fertilizer runoff) tend to favor aggressive, fast-growing species like pigweed
+                (Amaranthus spp.) or lambsquarters (Chenopodium album).
+              </p>
+              <p>
+                The seven habitats below show how Midwest weeds sort themselves across the sites they colonize. Each
+                profile lists its defining conditions and the species adapted to them.
               </p>
             </div>
             <TermSidebar
@@ -3889,10 +3896,6 @@ function TopicContent({
                 {
                   term: "Edaphic factors",
                   def: "Soil-related site conditions — texture, drainage, compaction, pH, and fertility.",
-                },
-                {
-                  term: "Indicator species",
-                  def: "A weed whose presence reliably signals a specific site condition, such as poor drainage.",
                 },
               ]}
             />
