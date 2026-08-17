@@ -59,6 +59,7 @@ import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
 import HabitatExplorer from "./learning/HabitatExplorer";
 import SeasonGroups from "./learning/SeasonGroups";
+import SeedPanels from "./learning/SeedPanels";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
@@ -2512,8 +2513,8 @@ function TopicContent({
                   manure, and contaminated crop seed.
                 </p>
                 <p>
-                  The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
-                  replenishment. Allowing even a few plants to set seed can negate years of control efforts.
+                  Preventing seed-bank replenishment is the core of long-term management. Allowing even a few plants to
+                  set seed can negate years of control effort.
                 </p>
               </div>
               <TermSidebar
@@ -2569,15 +2570,17 @@ function TopicContent({
 
           {grade !== "elementary" && (
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
+              <p className="font-display font-bold text-foreground text-base">Seed Reference Panels</p>
               <p className="text-sm text-muted-foreground">
-                Identify the seed by its shape, size, and surface, then flip the card to see the species.
+                {displayGrade === "collegiate"
+                  ? "Each panel shows the seed and common name — click a panel to flip it for the scientific name, seed description, seed output and dispersal route. Panels are grouped by plant family."
+                  : "Species are grouped by plant family. Each panel gives the seed photo, common and scientific name, how much seed the plant makes, and how that seed travels."}
               </p>
-              <WeedFlashcardDeck
+              <SeedPanels
                 weeds={topicWeeds}
                 onSelectWeed={onSelectWeed}
-                stage="seed"
-                emphasizeScientific={grade === "high"}
+                mode={displayGrade === "collegiate" ? "flip" : "list"}
+                seedDescription={getElementarySeedDescription}
               />
             </div>
           )}
