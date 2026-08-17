@@ -7,7 +7,7 @@ import { DollarSign, Check, X } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
-const START_BUDGET = 500;
+const START_BUDGET = 1000;
 
 interface Method { id: string; label: string; cost: number; tag: string }
 const ALL_METHODS: Method[] = [
@@ -75,14 +75,38 @@ function getBestMethod(w: typeof weeds[0]): string {
   return 'hoe';
 }
 
-interface FieldWeed { id: string; weed: typeof weeds[0] }
+interface FieldWeed { id: string; weed: typeof weeds[0]; x: number; y: number }
+
+/** Scatter weed bubbles across the field, keeping them apart from each other. */
+function scatter(count: number): { x: number; y: number }[] {
+  const spots: { x: number; y: number }[] = [];
+  let guard = 0;
+  while (spots.length < count && guard < 800) {
+    guard++;
+    const p = { x: 8 + Math.random() * 78, y: 14 + Math.random() * 72 };
+    if (spots.every(s => Math.hypot(s.x - p.x, (s.y - p.y) * 0.6) > 14)) spots.push(p);
+  }
+  while (spots.length < count) {
+    const i = spots.length;
+    spots.push({ x: 10 + (i % 5) * 19, y: 18 + Math.floor(i / 5) * 22 });
+  }
+  return spots;
+}
 
 function buildField(count: number): FieldWeed[] {
   const pool = shuffle(weeds);
+  const spots = scatter(count);
   return Array.from({ length: count }, (_, i) => ({
     id: `${pool[i % pool.length].id}-${i}-${Math.random().toString(36).slice(2, 6)}`,
     weed: pool[i % pool.length],
+    x: spots[i].x,
+    y: spots[i].y,
   }));
+}
+
+/** Good control shrinks next season's population; escapes and mistakes grow it. */
+function nextPopulation(population: number, correct: number, missedOrWrong: number) {
+  return Math.max(2, Math.min(14, Math.round(population + missedOrWrong * 2 - correct * 1.5)));
 }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
