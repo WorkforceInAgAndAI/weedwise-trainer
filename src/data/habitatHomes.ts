@@ -1076,3 +1076,26 @@ const BY_NAME = new Map<string, HabitatHome>(HABITAT_HOMES.map(h => [norm(h.name
 export function getHabitatHome(commonName: string): HabitatHome | undefined {
   return BY_NAME.get(norm(commonName));
 }
+
+// Name aliases where the site's common name differs from the habitat list.
+const ALIASES: Record<string, string> = {
+  volunteersunflower: 'commonsunflower',
+  henbitpurpledeadnettle: 'henbit',
+  fallpanicumsmoothwitchgrass: 'fallpanicum',
+  burcucumber: 'burcucumber',
+};
+
+export function resolveHabitatHome(commonName: string): HabitatHome | undefined {
+  const key = norm(commonName);
+  return BY_NAME.get(key) ?? BY_NAME.get(ALIASES[key] ?? '');
+}
+
+export const HABITAT_HOUSES: Array<{ id: HabitatId; label: string; blurb: string; shortBlurb: string }> = [
+  { id: 'cropland', label: 'Cropland', blurb: 'Tilled crop fields that get worked and planted every year.', shortBlurb: 'Annually tilled, planted crop fields.' },
+  { id: 'pasture', label: 'Pasture', blurb: 'Grazed and mowed grassland where livestock feed.', shortBlurb: 'Grazed, mowed grassland.' },
+  { id: 'roadside', label: 'Roadside', blurb: 'Gravelly, salty, mowed strips along roads and ditches.', shortBlurb: 'Gravelly, mowed road margins.' },
+  { id: 'woodland', label: 'Woodland Edge', blurb: 'Shady tree lines and fencerows with dappled light.', shortBlurb: 'Shaded tree lines and fencerows.' },
+  { id: 'wetland', label: 'Wetland', blurb: 'Saturated, low-oxygen ground that floods for part of the year.', shortBlurb: 'Saturated, seasonally flooded ground.' },
+  { id: 'wet', label: 'Wet & Compacted', blurb: 'Heavy, poorly drained soil that stays soggy and packed down.', shortBlurb: 'Heavy, soggy, packed soil.' },
+  { id: 'dry', label: 'Dry & Disturbed', blurb: 'Bare, hot, hard-packed ground that keeps getting torn up.', shortBlurb: 'Bare, hot, disturbed ground.' },
+];
