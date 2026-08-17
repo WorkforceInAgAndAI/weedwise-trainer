@@ -57,6 +57,9 @@ import {
 } from "./learning/ThemedBlocks";
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
+import HabitatExplorer from "./learning/HabitatExplorer";
+import SeasonGroups from "./learning/SeasonGroups";
+import SeedPanels from "./learning/SeedPanels";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
@@ -2510,8 +2513,8 @@ function TopicContent({
                   manure, and contaminated crop seed.
                 </p>
                 <p>
-                  The <strong>economic threshold</strong> for weed management is often linked to preventing seed bank
-                  replenishment. Allowing even a few plants to set seed can negate years of control efforts.
+                  Preventing seed-bank replenishment is the core of long-term management. Allowing even a few plants to
+                  set seed can negate years of control effort.
                 </p>
               </div>
               <TermSidebar
@@ -2567,15 +2570,17 @@ function TopicContent({
 
           {grade !== "elementary" && (
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-base">Seed Flashcards</p>
+              <p className="font-display font-bold text-foreground text-base">Seed Reference Panels</p>
               <p className="text-sm text-muted-foreground">
-                Identify the seed by its shape, size, and surface, then flip the card to see the species.
+                {displayGrade === "collegiate"
+                  ? "Each panel shows the seed and common name — click a panel to flip it for the scientific name, seed description, seed output and dispersal route. Panels are grouped by plant family."
+                  : "Species are grouped by plant family. Each panel gives the seed photo, common and scientific name, how much seed the plant makes, and how that seed travels."}
               </p>
-              <WeedFlashcardDeck
+              <SeedPanels
                 weeds={topicWeeds}
                 onSelectWeed={onSelectWeed}
-                stage="seed"
-                emphasizeScientific={grade === "high"}
+                mode={displayGrade === "collegiate" ? "flip" : "list"}
+                seedDescription={getElementarySeedDescription}
               />
             </div>
           )}
@@ -3194,6 +3199,8 @@ function TopicContent({
               </p>
               <PerennialUndergroundComparison compact allowedIds={lifeCyclePoolIds} />
             </div>
+
+            <SeasonGroups weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -3293,6 +3300,12 @@ function TopicContent({
               </p>
               <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
             </div>
+
+            <SeasonGroups
+              weeds={topicWeeds}
+              onSelectWeed={onSelectWeed}
+              stage={displayGrade === "collegiate" ? "seedling" : "vegetative"}
+            />
 
             {/* Dual lifecycle */}
             {dualLifecycle.length > 0 && (
@@ -3804,254 +3817,6 @@ function TopicContent({
       }
 
       if (grade === "middle") {
-        const normName = (s: string) =>
-          s
-            .toLowerCase()
-            .replace(/\(.*?\)/g, "")
-            .replace(/[^a-z0-9]/g, "");
-
-        const COOL_SEASON = [
-          "Annual ryegrass",
-          "Downy brome",
-          "Field horsetail",
-          "Foxtail barley",
-          "Quackgrass",
-          "Scouringrush",
-          "Wild oat",
-          "Catchweed bedstraw",
-          "Common chickweed",
-          "Corn speedwell",
-          "Curly dock",
-          "Dandelion",
-          "Field pennycress",
-          "Garlic mustard",
-          "Ground ivy",
-          "Henbit deadnettle",
-          "Mouseear chickweed",
-          "Poison hemlock",
-          "Shepherd's purse",
-          "Star of Bethlehem",
-          "Wild carrot",
-          "Wild mustard",
-          "Yellow rocket",
-          "Canada thistle",
-          "Caraway",
-          "Common teasel",
-          "Tall Hedge Mustard",
-          "Golden alexanders",
-          "Musk thistle",
-          "Pinnate tansymustard",
-          "Prickly lettuce",
-          "Russian thistle",
-          "White campion",
-          "Wild parsnip",
-        ].map(normName);
-
-        const WARM_SEASON = [
-          "Barnyardgrass",
-          "Goosegrass",
-          "Johnsongrass",
-          "Large crabgrass",
-          "Nimblewill",
-          "Yellow nutsedge",
-          "Asiatic dayflower",
-          "Common pokeweed",
-          "Eastern black nightshade",
-          "Ladysthumb",
-          "Pennsylvania smartweed",
-          "Water smartweed",
-          "Waterhemp",
-          "Burcucumber",
-          "Honey vine climbing milkweed",
-          "Giant foxtail",
-          "Green foxtail",
-          "Longspine sandbur",
-          "Shattercane Sorghums",
-          "Smooth witchgrass",
-          "Witchgrass",
-          "Woolly cupgrass",
-          "Yellow foxtail",
-          "Asian copperleaf",
-          "Buffalobur",
-          "Common burdock",
-          "Common cocklebur",
-          "Common mallow",
-          "Common milkweed",
-          "Common ragweed",
-          "Giant ragweed",
-          "Hemp dogbane",
-          "Horsenettle",
-          "Horseweed",
-          "Jimsonweed",
-          "Kochia",
-          "Hemp",
-          "Palmer amaranth",
-          "Prickly sida",
-          "Redroot pigweed",
-          "Russian thistle",
-          "Smooth groundcherry",
-          "Spotted spurge",
-          "Toothed spurge",
-          "Velvetleaf",
-          "Venice mallow",
-          "Volunteer sunflower",
-          "Wild buckwheat",
-          "Wild four o'clock",
-          "Wild parsnip",
-          "Field bindweed",
-          "Hedge bindweed",
-          "Morningglory",
-          "Tall morningglory",
-        ].map(normName);
-
-        const WET_COMPACT = [
-          "Annual ryegrass",
-          "Downy brome",
-          "Field horsetail",
-          "Foxtail barley",
-          "Quackgrass",
-          "Scouringrush",
-          "Wild oat",
-          "Catchweed bedstraw",
-          "Common chickweed",
-          "Corn speedwell",
-          "Curly dock",
-          "Dandelion",
-          "Field pennycress",
-          "Garlic mustard",
-          "Ground ivy",
-          "Henbit deadnettle",
-          "Mouseear chickweed",
-          "Poison hemlock",
-          "Shepherd's purse",
-          "Star of Bethlehem",
-          "Wild carrot",
-          "Wild mustard",
-          "Yellow rocket",
-          "Barnyardgrass",
-          "Goosegrass",
-          "Johnsongrass",
-          "Large crabgrass",
-          "Nimblewill",
-          "Yellow nutsedge",
-          "Asiatic dayflower",
-          "Common pokeweed",
-          "Eastern black nightshade",
-          "Ladysthumb",
-          "Pennsylvania smartweed",
-          "Water smartweed",
-          "Waterhemp",
-          "Burcucumber",
-          "Honey vine climbing milkweed",
-        ].map(normName);
-
-        const DRY_DISTURBED = [
-          "Downy brome",
-          "Foxtail barley",
-          "Wild oat",
-          "Canada thistle",
-          "Caraway",
-          "Common teasel",
-          "Tall Hedge Mustard",
-          "Golden alexanders",
-          "Musk thistle",
-          "Pinnate tansymustard",
-          "Prickly lettuce",
-          "Russian thistle",
-          "White campion",
-          "Wild parsnip",
-          "Giant foxtail",
-          "Green foxtail",
-          "Johnsongrass",
-          "Longspine sandbur",
-          "Shattercane Sorghums",
-          "Smooth witchgrass",
-          "Witchgrass",
-          "Woolly cupgrass",
-          "Yellow foxtail",
-          "Asian copperleaf",
-          "Buffalobur",
-          "Common burdock",
-          "Common cocklebur",
-          "Common mallow",
-          "Common milkweed",
-          "Common ragweed",
-          "Giant ragweed",
-          "Hemp dogbane",
-          "Horsenettle",
-          "Horseweed",
-          "Jimsonweed",
-          "Kochia",
-          "Hemp",
-          "Palmer amaranth",
-          "Prickly sida",
-          "Redroot pigweed",
-          "Smooth groundcherry",
-          "Spotted spurge",
-          "Toothed spurge",
-          "Velvetleaf",
-          "Venice mallow",
-          "Volunteer sunflower",
-          "Wild buckwheat",
-          "Wild four o'clock",
-          "Field bindweed",
-          "Hedge bindweed",
-          "Morningglory",
-          "Tall morningglory",
-        ].map(normName);
-
-        const matchAny = (w: Weed, list: string[]) => {
-          const n = normName(w.commonName);
-          return list.some((x) => x === n || n.includes(x) || x.includes(n));
-        };
-
-        const seasonGroups = [
-          {
-            key: "cool",
-            label: "Cool-Season Weeds",
-            desc: "Germinate in fall or early spring when soils are cool. They grow rapidly before warm-season crops are planted and can compete early in the growing season.",
-            color: "bg-sky-500/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, COOL_SEASON)),
-          },
-          {
-            key: "warm",
-            label: "Warm-Season Weeds",
-            desc: "Germinate as soils warm in late spring and grow most vigorously through the hottest summer months. Common in corn and soybean fields.",
-            color: "bg-amber-500/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, WARM_SEASON)),
-          },
-        ];
-
-        const soilGroups = [
-          {
-            key: "wet",
-            label: "Wet / Compact Soil Habitats",
-            desc: "Wet, poorly drained or compacted soils — field edges, low spots, waterways, and high-traffic ground. These weeds tolerate saturated or dense soils.",
-            color: "bg-blue-700/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, WET_COMPACT)),
-          },
-          {
-            key: "dry",
-            label: "Dry / Disturbed Soil Habitats",
-            desc: "Dry, well-drained, or recently disturbed ground — roadsides, field margins, construction sites, and tilled areas. These weeds tolerate drought and rapid colonization of bare soil.",
-            color: "bg-orange-600/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, DRY_DISTURBED)),
-          },
-        ];
-
-        const renderGroup = (g: { key: string; label: string; desc: string; color: string; weeds: Weed[] }) => (
-          <div key={g.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className={`inline-block w-3 h-3 rounded ${g.color}`} />
-              <h3 className="font-display font-bold text-foreground text-base">
-                {g.label} <span className="text-xs text-muted-foreground font-normal">({g.weeds.length})</span>
-              </h3>
-            </div>
-            <p className="text-sm text-foreground">{g.desc}</p>
-            <HorizontalWeedRow weeds={g.weeds} onSelectWeed={onSelectWeed} stage="flower" />
-          </div>
-        );
-
         return (
           <div className="space-y-5">
             <NotebookSection title="Habitats: Reading the Field" subtitle="Research Log · Site Preferences">
@@ -4067,10 +3832,9 @@ function TopicContent({
                   dominant in a given location.
                 </p>
                 <p>
-                  Below, weeds are organized two ways: by the <strong>season</strong> they grow in (cool-season vs.
-                  warm-season) and by the <strong>soil-type habitat</strong> they prefer (wet / compact vs. dry /
-                  disturbed). The same weed may appear in more than one soil-type group when it tolerates both
-                  conditions.
+                  Below, species are grouped into the seven site types weed scouts use in the field. Slide through a
+                  habitat to see which species occupy it and the biology that lets them do it. A species can appear in
+                  more than one habitat when it tolerates both sets of conditions.
                 </p>
               </div>
               <FieldNote label="Indicator species">
@@ -4083,43 +3847,13 @@ function TopicContent({
               />
             </NotebookSection>
 
-            <div className="space-y-2">
-              <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Season</p>
-              {seasonGroups.map(renderGroup)}
-            </div>
-
-            <div className="space-y-2">
-              <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Habitat Soil Type</p>
-              {soilGroups.map(renderGroup)}
-            </div>
+            <HabitatExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
 
-      // 9-12 - Detailed habitats with phenotypic plasticity
+      // 9-12 and collegiate - site-based habitats with adaptation context
       {
-        const HIGH_HABITATS = [
-          {
-            key: "Warm-Season / Full Sun",
-            label: "Warm-Season Weeds",
-            desc: "Warm-season weeds wait until late spring, when soil temperatures climb above roughly 60 °F, to germinate. They use the C4 photosynthesis pathway, which is more efficient at high temperatures and during droughty, high-light conditions — that's why species like Palmer Amaranth, Waterhemp, and the foxtails explode in mid-summer corn and soybean fields and can grow more than an inch per day in July heat.",
-          },
-          {
-            key: "Cool-Season / Early Spring",
-            label: "Cool-Season Weeds",
-            desc: "Cool-season weeds germinate in fall or very early spring, when soils are between roughly 40–60 °F. They use the C3 photosynthesis pathway, which works best in cool, moist conditions. Many overwinter as low rosettes (like Henbit, Shepherd's Purse, and Field Pennycress) — a body shape that survives frost and lets the plant start photosynthesizing weeks before spring planting.",
-          },
-          {
-            key: "Wet / Poorly Drained",
-            label: "Wet-Habitat Weeds",
-            desc: "Wet-habitat species tolerate saturated, low-oxygen soils that would kill most crops. Many have hollow stems or special air channels (aerenchyma) that move oxygen down to flooded roots. Yellow Nutsedge, Barnyardgrass, and the smartweeds are classic indicators of poor drainage — when you see them dominating a patch, it usually points to a compaction or tile-drainage problem, not just a herbicide issue.",
-          },
-          {
-            key: "Dry / Disturbed",
-            label: "Dry-Habitat Weeds",
-            desc: "Dry-habitat weeds survive on sandy, low-organic, well-drained soils where water is scarce. Adaptations include deep taproots that mine subsoil moisture (Kochia, Russian Thistle), narrow or waxy leaves that lose less water, and CAM/C4 metabolism that allows photosynthesis with the stomata partly closed. These species dominate roadsides, terraces, and the sandy headlands of irrigated fields.",
-          },
-        ];
         return (
           <div className="space-y-5">
             <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
@@ -4138,8 +3872,8 @@ function TopicContent({
                 soil is warm enough to fry an egg on.
               </p>
               <p>
-                The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
-                for.
+                The seven habitats below show how Midwest weeds sort themselves across the sites they colonize. Slide
+                through each habitat to review its defining conditions and the species adapted to them.
               </p>
             </div>
             <TermSidebar
@@ -4152,44 +3886,22 @@ function TopicContent({
                   term: "C4 photosynthesis",
                   def: "CO2-concentrating mechanism; high water-use efficiency at high temperature and light.",
                 },
-                { term: "Aerenchyma", def: "Air-conducting parenchyma that oxygenates roots in flooded soils." },
                 {
-                  term: "Xerophyte",
-                  def: "Species adapted to arid conditions via deep roots, waxy cuticles, or CAM metabolism.",
+                  term: "Edaphic factors",
+                  def: "Soil-related site conditions — texture, drainage, compaction, pH, and fertility.",
+                },
+                {
+                  term: "Indicator species",
+                  def: "A weed whose presence reliably signals a specific site condition, such as poor drainage.",
                 },
               ]}
             />
 
-            {HIGH_HABITATS.map((h) => {
-              const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
-              return (
-                <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                  <p className="font-display font-bold text-foreground text-base">{h.label}</p>
-                  <p className="text-sm text-foreground">{h.desc}</p>
-                  {grouped.length > 0 && (
-                    <>
-                      <div className="overflow-x-auto pb-2 -mx-1">
-                        <div className="flex gap-3 px-1" style={{ minWidth: `${grouped.length * 7.5}rem` }}>
-                          {grouped.map((w) => (
-                            <div key={w.id} className="text-center shrink-0 w-28">
-                              <button
-                                onClick={() => onSelectWeed(w)}
-                                className="block w-28 h-28 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary"
-                              >
-                                <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                              </button>
-                              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[11px] mt-1 block" />
-                              <div className="text-[10px] text-primary italic leading-tight">{w.scientificName}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">← Scroll to see all {grouped.length} →</p>
-                    </>
-                  )}
-                </div>
-              );
-            })}
+            <HabitatExplorer
+              weeds={topicWeeds}
+              onSelectWeed={onSelectWeed}
+              stage={displayGrade === "collegiate" ? "seedling" : "vegetative"}
+            />
           </div>
         );
       }
@@ -6756,10 +6468,9 @@ function TopicContent({
         },
       ];
 
-      if (grade === "elementary") {
-        // Curriculum-set placements. A species may belong to more than one
-        // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
-        const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
+      // Curriculum-set placements. A species may belong to more than one
+      // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
+      const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
           Curly_dock: ["toxic"],
           Horsenettle: ["toxic", "physical"],
           Tall_morningglory: ["toxic"],
@@ -6775,10 +6486,10 @@ function TopicContent({
           commonPokeweed: ["toxic"],
           common_Cocklebur: ["physical", "toxic"],
           "canada-thistle": ["physical"],
-        };
-        // Keyword fallback for species without an explicit placement.
-        const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
-        const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
+      };
+      // Keyword fallback for species without an explicit placement.
+      const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
+      const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
           if (matches(w, /thorn|spine|prick|bur|sharp|puncture|stab/i)) return ["physical"];
           if (matches(w, /skin|dermat|rash|irrit|sap|sting|blister|burn|contact|allerg/i)) return ["skin"];
           if (
@@ -6789,13 +6500,14 @@ function TopicContent({
           )
             return ["toxic"];
           return [];
-        };
-        const groupsFor = (w: Weed) => SAFETY_PLACEMENT[w.id] ?? fallback(w);
-        const physical = topicWeeds.filter((w) => groupsFor(w).includes("physical"));
-        const skin = topicWeeds.filter((w) => groupsFor(w).includes("skin"));
-        const toxic = topicWeeds.filter((w) => groupsFor(w).includes("toxic"));
-        const other = topicWeeds.filter((w) => groupsFor(w).length === 0);
+      };
+      const groupsFor = (w: Weed) => SAFETY_PLACEMENT[w.id] ?? fallback(w);
+      const physical = topicWeeds.filter((w) => groupsFor(w).includes("physical"));
+      const skin = topicWeeds.filter((w) => groupsFor(w).includes("skin"));
+      const toxic = topicWeeds.filter((w) => groupsFor(w).includes("toxic"));
+      const other = topicWeeds.filter((w) => groupsFor(w).length === 0);
 
+      if (grade === "elementary") {
         const renderGroup = (title: string, desc: string, tone: string, group: Weed[]) =>
           group.length === 0 ? null : (
             <div key={title} className={`border rounded-lg p-4 space-y-3 ${tone}`}>
@@ -6936,7 +6648,6 @@ function TopicContent({
                 <div>
                   <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold" />
                   <div className="text-sm text-destructive mt-1">{w.safetyNote}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Management: {w.management}</div>
                 </div>
               </div>
             ))}
@@ -6944,75 +6655,71 @@ function TopicContent({
         );
       }
 
-      // 9-12
+      // 9-12 and Collegiate — hazard exposure only. Control tactics live in the
+      // Control Methods module so the two topics no longer overlap.
       {
-        // Group safety weeds by the management technique their `management` field
-        // most closely matches, so the page reads as Mechanical / Cultural / Chemical / etc.
-        const TECHNIQUE_BUCKETS: { key: string; label: string; description: string; match: RegExp }[] = [
+        const HAZARD_GROUPS: { key: string; label: string; description: string; ppe: string; weeds: Weed[] }[] = [
           {
-            key: "mechanical",
-            label: "Mechanical & Physical Removal (Hand-pulling, Mowing, Tillage)",
+            key: "skin",
+            label: "Dermal & Respiratory Hazards",
             description:
-              "Crews physically remove or sever the plant — hand-pulling, hoeing, digging taproots, mowing before seed set, brush-cutting, or tillage (chisel, disk, row cultivator). Most effective on small infestations and before seed production, but it brings workers into direct contact with the plant, so PPE (chemical-resistant gloves, long sleeves, eye protection) is mandatory for species with toxic sap, spines, or allergenic pollen. Tillage can also bury herbicide-resistant seed and reset the seedbank.",
-            match: /hand[- ]?pull|dig|mow|cut|till|cultivat|mechanical|removal/i,
+              "Sap, trichomes, or pollen that cause contact dermatitis, phytophotodermatitis, chemical burns, or allergic respiratory response. Exposure risk is highest during hand removal, mowing, and anthesis (peak pollen shed).",
+            ppe: "Chemical-resistant gloves, long sleeves and pants, eye protection, and an N95 or organic-vapor respirator when pollen or dust is heavy.",
+            weeds: skin,
           },
           {
-            key: "cultural",
-            label: "Cultural & Preventive Practices (Crop Rotation, Cover Crops, Sanitation)",
+            key: "toxic",
+            label: "Ingestion & Systemic Toxicity",
             description:
-              "These practices change the field environment so the weed never gets a foothold. Includes crop rotation (corn → soybean → small grain) to disrupt life cycles, competitive cover crops (cereal rye, crimson clover) that shade and suppress germination, equipment sanitation to stop seed transport, livestock exclusion from infested pastures, and posted signage warning workers of toxic stands. Preventive — lowest worker exposure of any tactic because the dangerous plant ideally never reaches a harvestable size.",
-            match: /rotat|cover crop|sanit|prevent|exclud|fenc|sign|graz/i,
+              "Alkaloids, glycosides, nitrate accumulation, or other compounds that are toxic to humans and livestock when any plant part is consumed. Risk extends to contaminated hay, silage, and grazing.",
+            ppe: "Never taste or handle plant material near food or drink; wash hands and tools after contact; flag infested paddocks and exclude livestock.",
+            weeds: toxic,
           },
           {
-            key: "chemical",
-            label: "Chemical Control — Herbicides (PRE & POST Applications)",
+            key: "physical",
+            label: "Physical Injury (Spines, Awns, Burs)",
             description:
-              "Targeted application of a labeled herbicide — broadcast spray, banded over-the-row, or spot-treat with a backpack sprayer or wick. Effective on large infestations and species with deep roots or rhizomes that mechanical removal can't kill. Required PPE per the product label always includes chemical-resistant gloves and eye protection; long-sleeved coveralls and an organic-vapor respirator are required for many Group 4 (auxin) and Group 14 (PPO) products. Always rotate modes of action (Groups 1–27) to slow resistance.",
-            match: /herbicid|spray|chemical|spot[- ]?treat/i,
+              "Thorns, spines, stiff awns, and hooked burs that puncture skin, lodge in eyes, or embed in animal mouths and hooves. Injury sites can become infected.",
+            ppe: "Heavy leather or puncture-resistant gloves, eye protection, closed-toe boots, and durable long sleeves.",
+            weeds: physical,
           },
           {
-            key: "biological",
-            label: "Biological Control (Insects, Pathogens, Targeted Grazing)",
+            key: "other",
+            label: "Other Documented Hazards",
             description:
-              "Releases a host-specific natural enemy — a leaf-feeding insect, a fungal pathogen, or a managed grazing insect release — that selectively reduces the weed population without human handlers ever needing to touch it. Slow-acting and rarely eradicates a population on its own, but extremely low worker-exposure risk and well suited to large rangeland or roadside infestations of species like Leafy Spurge or Canada Thistle.",
-            match: /biolog|insect|pathogen|biocontrol|graz/i,
-          },
-          {
-            key: "ipm",
-            label: "Integrated Pest Management — IPM (Scouting, Thresholds, Multiple Tactics)",
-            description:
-              "An overall decision framework — not a single tactic. IPM stacks regular scouting, economic and action thresholds, and a planned sequence of cultural, mechanical, biological, and chemical tools so no one tactic is overused. For toxic-plant management it also means matching each tool to the worker-exposure risk it carries (lowest-risk tool that still controls the population) and rotating herbicide modes of action to slow resistance.",
-            match: /integrat|ipm|combin|monitor|scout|threshold/i,
+              "Species with hazard notes that do not map cleanly to a single category above. Read the full toxicology profile before working around these stands.",
+            ppe: "Standard field PPE; review the species profile before contact.",
+            weeds: other,
           },
         ];
-
-        const buckets = TECHNIQUE_BUCKETS.map((b) => ({
-          ...b,
-          weeds: topicWeeds.filter((w) => b.match.test(w.management || "")),
-        }));
-        const placedIds = new Set(buckets.flatMap((b) => b.weeds.map((w) => w.id)));
-        const otherWeeds = topicWeeds.filter((w) => !placedIds.has(w.id));
 
         return (
           <div className="space-y-5">
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-2">
-              <p className="font-display font-bold text-destructive text-base">Safety First</p>
+              <p className="font-display font-bold text-destructive text-base">Hazard Assessment</p>
               <p>
-                Some weeds are <strong>dangerous to touch, inhale, or ingest</strong> — they may carry irritating sap,
-                allergenic pollen, sharp spines, or systemic toxins. The species below are grouped by the
-                <strong> management technique</strong> most commonly recommended for them so you can see at a glance
-                which control tool fits which population, and what level of PPE that tool requires. The right choice
-                balances three things: how effective the tactic is on that species, how much it exposes the worker, and
-                how it fits into a longer IPM rotation.
+                Some weeds are <strong>dangerous to touch, inhale, or ingest</strong> — irritating sap, allergenic
+                pollen, sharp spines, or systemic toxins. Species below are grouped by the <strong>type of harm</strong>{" "}
+                they cause and the personal protective equipment that exposure requires.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Control tactics for these species — mechanical, cultural, chemical, biological, and IPM — are covered in
+                the <strong>Control Methods</strong> module.
               </p>
             </div>
 
-            {buckets.map(
+            {HAZARD_GROUPS.map(
               (b) =>
                 b.weeds.length > 0 && (
                   <div key={b.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                    <p className="font-display font-bold text-foreground text-base">{b.label}</p>
+                    <p className="font-display font-bold text-foreground text-base">
+                      {b.label} <span className="text-xs text-muted-foreground font-normal">({b.weeds.length})</span>
+                    </p>
                     <p className="text-sm text-muted-foreground">{b.description}</p>
+                    <p className="text-xs text-foreground bg-secondary/40 border border-border rounded-lg p-3">
+                      <span className="font-bold">Required PPE / precautions: </span>
+                      {b.ppe}
+                    </p>
                     <div className="overflow-x-auto pb-3 -mx-1">
                       <div className="flex gap-3 px-1" style={{ minWidth: `${b.weeds.length * 18}rem` }}>
                         {b.weeds.map((w) => (
@@ -7029,7 +6736,7 @@ function TopicContent({
                             <div className="min-w-0">
                               <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-bold text-sm" />
                               <p className="text-[10px] italic text-primary">{w.scientificName}</p>
-                              <p className="text-xs text-destructive mt-1 line-clamp-3">{w.safetyNote}</p>
+                              <p className="text-xs text-destructive mt-1 line-clamp-4">{w.safetyNote}</p>
                             </div>
                           </div>
                         ))}
@@ -7038,17 +6745,6 @@ function TopicContent({
                     <p className="text-[10px] text-muted-foreground">← Scroll to see all {b.weeds.length} →</p>
                   </div>
                 ),
-            )}
-
-            {otherWeeds.length > 0 && (
-              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-                <p className="font-display font-bold text-foreground text-base">Other Toxic Species</p>
-                <p className="text-sm text-muted-foreground">
-                  Species whose management notes do not map cleanly to a single technique above. Always check the
-                  toxicology profile before selecting a control strategy.
-                </p>
-                <HorizontalWeedRow weeds={otherWeeds} onSelectWeed={onSelectWeed} stage="flower" showScientific />
-              </div>
             )}
           </div>
         );
