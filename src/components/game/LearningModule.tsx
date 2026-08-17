@@ -8239,11 +8239,6 @@ function TopicContent({
             <p className="font-display font-bold text-foreground text-sm text-center mb-1">
               Taxonomy Pyramid: {exampleWeed.commonName}
             </p>
-            <div className="flex justify-center mb-3">
-              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border">
-                <WeedImage weedId={exampleWeed.id} stage="flower" className="w-full h-full" />
-              </div>
-            </div>
             <div className="flex flex-col items-center gap-1">
               {taxonomyLevels.map((t, i) => {
                 const widths = ["100%", "88%", "76%", "64%", "52%", "40%"];
@@ -8259,14 +8254,14 @@ function TopicContent({
                   </div>
                 );
               })}
+              <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-border mt-2">
+                <WeedImage weedId={exampleWeed.id} stage="flower" className="w-full h-full" />
+              </div>
             </div>
           </div>
 
           {/* Interactive expandable taxonomy map */}
           <TaxonomyExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} />
-
-          {/* Family groupings */}
-          <FamilyGroupings familyGroups={familyGroups} familyColors={familyColors} onSelectWeed={onSelectWeed} />
         </div>
       );
     }
