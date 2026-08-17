@@ -1837,9 +1837,104 @@ function MSStageViewer({ weedId }: { weedId: string }) {
 
 type NailStatus = "unseen" | "review" | "confident";
 
+/** Reusable species search field used by every Weed Names & ID module. */
+function WeedSearchBar({
+  value,
+  onChange,
+  count,
+  total,
+  placeholder = "Search by common or scientific name…",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  count: number;
+  total: number;
+  placeholder?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+        <input
+          type="search"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          aria-label="Search species"
+          className="w-full pl-9 pr-3 py-2.5 rounded-lg border-2 border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition"
+        />
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Showing <strong className="text-foreground">{count}</strong> of {total} species
+        {value.trim() ? ` matching "${value.trim()}"` : ""}.
+      </p>
+    </div>
+  );
+}
+
+/** Case-insensitive match on common name, scientific name, or family. */
+function matchesWeedQuery(w: Weed, q: string) {
+  const s = q.trim().toLowerCase();
+  if (!s) return true;
+  return (
+    w.commonName.toLowerCase().includes(s) ||
+    w.scientificName.toLowerCase().includes(s) ||
+    (w.family ?? "").toLowerCase().includes(s)
+  );
+}
+
+/**
+ * Grades 9-12 Weed Names & ID — a searchable LIST (not flashcards) with every
+ * life-stage photo shown side by side for each species.
+ */
+const NAME_LIST_STAGES: Array<{ key: string; label: string }> = [
+  { key: "seed", label: "Seed" },
+  { key: "seedling", label: "Seedling" },
+  { key: "vegetative", label: "Vegetative" },
+  { key: "flower", label: "Reproductive" },
+];
+
+function WeedNameList({ weeds: pool, onSelectWeed }: { weeds: Weed[]; onSelectWeed: (w: Weed) => void }) {
+  const [query, setQuery] = useState("");
+  const filtered = useMemo(() => pool.filter((w) => matchesWeedQuery(w, query)), [pool, query]);
+  return (
+    <div className="space-y-4">
+      <WeedSearchBar value={query} onChange={setQuery} count={filtered.length} total={pool.length} />
+      <div className="space-y-3">
+        {filtered.map((w) => (
+          <div key={w.id} className="bg-card border border-border rounded-xl p-4 space-y-3">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="font-display font-bold text-base" />
+              <span className="italic text-primary text-sm">{w.scientificName}</span>
+              <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                {w.family} • {w.plantType} • {w.lifeCycle}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {NAME_LIST_STAGES.map((s) => (
+                <div key={s.key} className="space-y-1">
+                  <div className="aspect-square w-full rounded-lg overflow-hidden bg-muted border border-border">
+                    <WeedImage weedId={w.id} stage={s.key} className="w-full h-full object-cover" />
+                  </div>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground text-center">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <p className="text-sm text-muted-foreground italic py-6 text-center">No species match that search.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function MiddleSchoolNamesModule({ weeds: pool, onSelectWeed }: { weeds: Weed[]; onSelectWeed: (w: Weed) => void }) {
   const [status, setStatus] = useState<Record<string, NailStatus>>({});
   const mark = (id: string, s: NailStatus) => setStatus((prev) => ({ ...prev, [id]: prev[id] === s ? "unseen" : s }));
+  const [query, setQuery] = useState("");
+  const visible = useMemo(() => pool.filter((w) => matchesWeedQuery(w, query)), [pool, query]);
 
   const confidentCount = Object.values(status).filter((s) => s === "confident").length;
   const reviewCount = Object.values(status).filter((s) => s === "review").length;
