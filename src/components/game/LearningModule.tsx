@@ -8143,9 +8143,6 @@ function TopicContent({
     /* ═══════════════════════════════════════════════════════════
        HERBICIDE MOA (High School)
     ═══════════════════════════════════════════════════════════ */
-    case "herbicide-moa": {
-      return renderHerbicideMoa();
-    }
     case "herbicides-intro": {
       return (
         <div className="space-y-5">
@@ -8222,7 +8219,7 @@ function TopicContent({
         </div>
       );
     }
-    case "__herbicide-moa-unused": {
+    case "herbicide-moa": {
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
