@@ -170,7 +170,6 @@ function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[], nu
     weed.traits[0];
   const flowerTrait =
     traitLike(weed, ['flower', 'panicle', 'head', 'bloom', 'spike']) ||
-    traitLike(weed, ['seed']) ||
     'small flowers';
   const stemTrait =
     traitLike(weed, ['stem', 'stalk', 'hollow', 'spine', 'prickle', 'ridged', 'grooved']) ||
@@ -184,17 +183,9 @@ function buildRound(weed: Weed, allWeeds: Weed[], questions: ScoutQuestion[], nu
   const distractors = shuffle(allWeeds.filter(w => w.id !== weed.id)).slice(0, numChoices - 1);
   const choices = shuffle([weed, ...distractors]);
 
-  // Describe only what the trait actually mentions — if it is a flower trait,
-  // do not also claim it describes seeds (and vice versa).
-  const ft = flowerTrait.toLowerCase();
-  const mentionsFlower = /flower|bloom|panicle|head|spike/.test(ft);
-  const mentionsSeed = /seed/.test(ft);
-  const flowerClue =
-    mentionsFlower && mentionsSeed
-      ? `The flowers and seeds look like ${ft}.`
-      : mentionsSeed
-        ? `The seeds look like ${ft}.`
-        : `The flowers look like ${ft}.`;
+  // The answer photos are flowering-stage plants, so this clue always talks
+  // about the flower — never "flower / seed head".
+  const flowerClue = `The flowers look like ${flowerTrait.toLowerCase()}.`;
 
   const clues: Record<QuestionId, string> = {
     location: `It is growing in ${spot} of a ${crop} field.`,
