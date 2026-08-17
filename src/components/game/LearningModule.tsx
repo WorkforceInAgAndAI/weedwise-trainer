@@ -3609,30 +3609,6 @@ function TopicContent({
               species in the United States. <em>Ecological Economics</em>.
             </Citation>
           </div>
-          <TermSidebar
-            terms={[
-              {
-                term: "Native range",
-                def: "The geographic region where a species evolved and coexists with its natural enemies.",
-              },
-              {
-                term: "Enemy release",
-                def: "Hypothesis that non-native species gain a competitive edge when introduced beyond their coevolved pests and pathogens.",
-              },
-              {
-                term: "Propagule pressure",
-                def: "The number and frequency of individuals introduced — a strong predictor of successful establishment.",
-              },
-              {
-                term: "Introduction pathway",
-                def: "The vector of arrival: ballast water, contaminated seed, ornamental trade, forage crops, erosion planting, etc.",
-              },
-              {
-                term: "Naturalized vs. invasive",
-                def: "Naturalized = reproducing without help; invasive = spreading and causing measurable ecological or economic harm.",
-              },
-            ]}
-          />
           <LabCallout heading="Case Analysis">
             When investigating a new invasion, characterize (1) native range, (2) likely introduction pathway, (3) date
             of first record, and (4) trait syndrome (seed output, dispersal mode, allelopathy) before selecting a
