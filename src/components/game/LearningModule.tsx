@@ -114,7 +114,6 @@ type TopicId =
   | "weed-helpers"
   | "field-scouting"
   | "weed-competitors"
-  | "economic-threshold"
   | "seed-dormancy"
   | "allelopathy"
   | "herbicide-moa"
@@ -884,14 +883,6 @@ const TOPICS: Topic[] = [
     category: "control",
   },
   {
-    id: "economic-threshold",
-    name: "Economic Threshold",
-    icon: "threshold",
-    description: "Evaluate when treatment is justified by weighing control costs against the expected yield loss.",
-    grades: ["middle", "high"],
-    category: "control",
-  },
-  {
     id: "allelopathy",
     name: "Allelopathy",
     icon: "allelopathy",
@@ -1484,7 +1475,6 @@ const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, stri
   "control-methods": { elementary: "weed-control", middle: "ms-weed-control", high: "hs-weed-control" },
   "field-scouting": { middle: "field-scout", high: "hs-field-scout" },
   "weed-competitors": { middle: "weed-competitors" },
-  "economic-threshold": { middle: "economic-threshold", high: "form-farm" },
   allelopathy: { high: "allelopathy" },
   "herbicide-moa": { middle: "control-matching", high: "hs-control-match" },
   "crop-injury": { high: "crop-doctor" },
@@ -7877,276 +7867,6 @@ function TopicContent({
       );
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       ECONOMIC THRESHOLD
-    ═══════════════════════════════════════════════════════════ */
-    case "economic-threshold": {
-      const THRESHOLD_EXAMPLES: { weedId: string; name: string; crop: string; threshold: string; note: string }[] = [
-        {
-          weedId: "palmer-amaranth",
-          name: "Palmer Amaranth",
-          crop: "Soybean",
-          threshold: "1–2 plants per 30 ft of row",
-          note: "Extremely low threshold — even sparse populations can cause 10%+ yield loss because of rapid biomass accumulation.",
-        },
-        {
-          weedId: "waterhemp",
-          name: "Waterhemp",
-          crop: "Soybean",
-          threshold: "Fewer than 1 plant per ft of row",
-          note: "Aggressive seed production (250k+ seeds/female) makes seedbank prevention as important as yield protection.",
-        },
-        {
-          weedId: "giant-ragweed",
-          name: "Giant Ragweed",
-          crop: "Corn",
-          threshold: "~1 plant per 100 ft²",
-          note: "Very tall, very competitive — a handful of plants per acre can justify control.",
-        },
-        {
-          weedId: "lambsquarters",
-          name: "Lambsquarters",
-          crop: "Soybean",
-          threshold: "~4–8 plants per m²",
-          note: "Higher tolerance — crop competes well early-season, so threshold is several times Palmer's.",
-        },
-        {
-          weedId: "velvetleaf",
-          name: "Velvetleaf",
-          crop: "Corn",
-          threshold: "~1 plant per m²",
-          note: "Wide leaves shade corn rapidly, but corn outgrows lower densities.",
-        },
-        {
-          weedId: "giant-foxtail",
-          name: "Giant Foxtail",
-          crop: "Corn",
-          threshold: "10–20 plants per m²",
-          note: "Much higher tolerance — economic loss only at dense infestations.",
-        },
-      ]
-        .map((e) => ({
-          ...e,
-          weed:
-            weeds.find((w) => w.id === e.weedId) ||
-            weeds.find((w) => w.commonName.toLowerCase() === e.name.toLowerCase()),
-        }))
-        .filter((e): e is typeof e & { weed: Weed } => !!e.weed) as any;
-      return (
-        <div className="space-y-5">
-          <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
-            <p className="font-display font-bold text-primary text-base">Economic Threshold</p>
-            {grade === "middle" ? (
-              <>
-                <p>
-                  Here's a statement that might surprise you: sometimes it actually makes more sense to{" "}
-                  <strong>leave weeds alone</strong> than to spend money trying to kill them.
-                </p>
-                <p>
-                  The <strong>economic threshold</strong> is the point at which a weed population is large enough that
-                  the damage it causes to a crop is worth more than what it would cost to control it.
-                </p>
-                <p>
-                  Below this threshold, the expense of treatment — including the cost of herbicides, equipment, fuel,
-                  and labor — exceeds the value of the yield that would be lost to weed competition, making treatment
-                  economically counterproductive.
-                </p>
-                <p>
-                  Above the threshold, the opposite is true: crop losses from uncontrolled weed pressure would cost more
-                  than the investment required to manage them.
-                </p>
-              </>
-            ) : (
-              <p>
-                Applying the economic threshold principle requires accurate field scouting data and knowledge of
-                crop-weed competitive relationships.
-              </p>
-            )}
-          </div>
-
-          {/* Economic threshold graph */}
-          <div className="bg-card border border-border rounded-lg p-4 space-y-2">
-            <p className="font-display font-bold text-foreground text-sm text-center">Economic Threshold Over Time</p>
-            <div className="w-full overflow-x-auto">
-              <svg
-                viewBox="0 0 420 260"
-                className="w-full h-auto max-w-lg mx-auto block"
-                role="img"
-                aria-label="Economic threshold graph showing weed infestation level over time with and without control"
-              >
-                {/* Axes */}
-                <line x1="50" y1="220" x2="390" y2="220" stroke="hsl(var(--border))" strokeWidth="2" />
-                <line x1="50" y1="20" x2="50" y2="220" stroke="hsl(var(--border))" strokeWidth="2" />
-                {/* Y-axis label */}
-                <text
-                  x="18"
-                  y="125"
-                  fontSize="11"
-                  fill="hsl(var(--foreground))"
-                  transform="rotate(-90 18 125)"
-                  textAnchor="middle"
-                  fontWeight="bold"
-                >
-                  Weed Infestation Level
-                </text>
-                {/* X-axis label */}
-                <text x="225" y="250" fontSize="11" fill="hsl(var(--foreground))" textAnchor="middle" fontWeight="bold">
-                  Time
-                </text>
-
-                {/* Economic injury level (dashed, upper) */}
-                <line
-                  x1="50"
-                  y1="55"
-                  x2="390"
-                  y2="55"
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeWidth="1.5"
-                  strokeDasharray="5 4"
-                />
-                <text x="60" y="50" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">
-                  Economic injury level
-                </text>
-
-                {/* Economic threshold (solid, middle) */}
-                <line x1="50" y1="105" x2="390" y2="105" stroke="hsl(var(--foreground))" strokeWidth="1.5" />
-                <text x="60" y="100" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">
-                  Economic threshold
-                </text>
-
-                {/* Without control curve (dashed black, rises above injury level) */}
-                <path
-                  d="M 50 200 C 110 190, 150 150, 190 110 C 230 70, 280 40, 340 55 C 370 65, 390 90, 390 120"
-                  fill="none"
-                  stroke="hsl(var(--foreground))"
-                  strokeWidth="2.5"
-                  strokeDasharray="6 4"
-                />
-                <text x="300" y="35" fontSize="10" fill="hsl(var(--foreground))" fontWeight="bold">
-                  Without control
-                </text>
-
-                {/* With control curve (solid green filled) */}
-                <path
-                  d="M 50 200 C 110 190, 150 150, 185 105 L 185 220 L 50 220 Z"
-                  fill="#558B2F"
-                  fillOpacity="0.25"
-                  stroke="none"
-                />
-                <path
-                  d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165"
-                  fill="none"
-                  stroke="#558B2F"
-                  strokeWidth="2.5"
-                />
-                <path
-                  d="M 185 105 C 210 80, 250 120, 290 140 C 330 160, 370 150, 390 165 L 390 220 L 185 220 Z"
-                  fill="#558B2F"
-                  fillOpacity="0.25"
-                  stroke="none"
-                />
-                <text x="260" y="175" fontSize="10" fill="#558B2F" fontWeight="bold">
-                  With control
-                </text>
-
-                {/* Chemical control arrow and label */}
-                <line
-                  x1="185"
-                  y1="25"
-                  x2="185"
-                  y2="95"
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeWidth="1.5"
-                  markerEnd="url(#arrowhead)"
-                />
-                <defs>
-                  <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                    <polygon points="0 0, 8 3, 0 6" fill="hsl(var(--muted-foreground))" />
-                  </marker>
-                </defs>
-                <text x="120" y="22" fontSize="10" fill="hsl(var(--muted-foreground))" fontWeight="bold">
-                  Chemical control
-                </text>
-
-                {/* Drop arrow at intervention */}
-                <line
-                  x1="200"
-                  y1="95"
-                  x2="200"
-                  y2="125"
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeWidth="1.5"
-                  markerEnd="url(#arrowhead)"
-                />
-              </svg>
-            </div>
-            <p className="text-[11px] text-muted-foreground text-center">
-              When weed pressure rises past the <span className="text-foreground font-bold">economic threshold</span>,
-              control becomes profitable. Without action, the population may reach the{" "}
-              <span className="text-foreground font-bold">economic injury level</span>, where losses exceed any
-              recoverable yield.
-            </p>
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-            <p className="font-bold text-foreground">How It Works</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-                <p className="font-bold text-foreground text-sm">Below Threshold</p>
-                <p className="text-xs text-muted-foreground">
-                  Cost of treatment is greater than the value of crop loss. No action needed — save your money.
-                </p>
-              </div>
-              <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
-                <p className="font-bold text-foreground text-sm">Above Threshold</p>
-                <p className="text-xs text-muted-foreground">
-                  Crop losses would cost more than treatment. Time to act and apply control measures.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Species-specific thresholds */}
-          {grade === "high" && THRESHOLD_EXAMPLES.length > 0 && (
-            <div className="space-y-2">
-              <p className="font-display font-bold text-foreground text-sm">Thresholds Differ Between Species</p>
-              <p className="text-xs text-muted-foreground">
-                Every weed species has its own competitive ability, so the threshold density that triggers control is
-                very different from one weed to another — even in the same crop.
-              </p>
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-                {THRESHOLD_EXAMPLES.map((e: any) => (
-                  <button
-                    key={e.weedId}
-                    onClick={() => onSelectWeed(e.weed)}
-                    className="flex-shrink-0 w-48 bg-card border border-border rounded-lg p-3 text-left hover:border-primary transition-colors"
-                  >
-                    <div className="w-full h-20 rounded overflow-hidden bg-muted mb-2">
-                      <WeedImage weedId={e.weed.id} stage="mature" className="w-full h-full" />
-                    </div>
-                    <p className="font-bold text-foreground text-xs">{e.name}</p>
-                    <p className="text-[10px] italic text-primary">{e.weed.scientificName}</p>
-                    <p className="text-[10px] text-foreground mt-1">
-                      <strong>{e.crop}:</strong> {e.threshold}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground mt-1">{e.note}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-            <p className="font-bold text-accent">Key Principle</p>
-            <p>
-              Incorporating economic thresholds into weed management decisions promotes financially responsible,
-              data-driven practice and discourages unnecessary herbicide applications that increase costs and accelerate
-              the development of herbicide resistance.
-            </p>
-          </div>
-        </div>
-      );
-    }
 
     /* ═══════════════════════════════════════════════════════════
        TAXONOMY
@@ -8748,13 +8468,6 @@ function TopicContent({
                 </div>
               );
             })}
-          </div>
-          <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-bold text-accent">Connection to Economic Thresholds</p>
-            <p className="mt-1">
-              These biochemical interactions may influence economic thresholds by intensifying crop stress, sometimes
-              requiring earlier or more strategic management to prevent lasting soil and yield effects.
-            </p>
           </div>
         </div>
       );
