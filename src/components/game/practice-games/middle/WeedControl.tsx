@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
@@ -194,7 +194,11 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                   <div className="flex-1">
                     <p className="font-bold text-foreground text-sm">{r.weedName}</p>
                     <p className="text-xs text-destructive">Your pick: {ALL_METHODS.find(m => m.id === r.method)?.label}</p>
-                    <p className="text-xs text-success">Best: {ALL_METHODS.find(m => m.id === getBestMethod(r.weedName ? weeds.find(w => w.id === r.weedId)! : weeds[0]))?.label}</p>
+                    {(() => {
+                      const sp = weeds.find(w => w.id === r.weedId);
+                      const best = sp ? getBestMethod(sp) : null;
+                      return best ? <p className="text-xs text-success">Best: {ALL_METHODS.find(m => m.id === best)?.label}</p> : null;
+                    })()}
                   </div>
                 </div>
               ))}
