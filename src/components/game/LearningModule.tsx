@@ -8144,6 +8144,85 @@ function TopicContent({
        HERBICIDE MOA (High School)
     ═══════════════════════════════════════════════════════════ */
     case "herbicide-moa": {
+      return renderHerbicideMoa();
+    }
+    case "herbicides-intro": {
+      return (
+        <div className="space-y-5">
+          <div className="bg-muted/30 rounded-lg p-5 text-base text-foreground space-y-3 leading-relaxed">
+            <p>
+              Farmers have a lot of tools to help protect their crops from weeds, and one of the most important tools is
+              called an <strong>herbicide</strong>—a chemical designed to kill or stop the growth of unwanted plants. But
+              not all herbicides work the same way or at the same time, so let's break down some key terms!
+            </p>
+            <p className="font-display font-bold text-primary">Timing Matters: Pre-Emergent vs. Post-Emergent</p>
+            <p>
+              A <strong>pre-emergent</strong> herbicide is applied to the soil before weeds have sprouted. Think of it
+              like a protective shield—it stops weed seeds from ever growing into plants in the first place. A{" "}
+              <strong>post-emergent</strong> herbicide, on the other hand, is applied after weeds have already popped up
+              out of the ground. These herbicides target the actual weed plant, attacking its leaves and stems to kill
+              it.
+            </p>
+            <p>
+              There's also a method called <strong>PPI</strong>, which stands for Pre-Plant Incorporated. This means the
+              herbicide is mixed directly into the soil before the crop is even planted, using equipment like a tiller.
+              This helps make sure the chemical is right where it needs to be to stop weeds before the crop's growing
+              season even begins.
+            </p>
+            <p className="font-display font-bold text-primary">How Herbicides Get Applied</p>
+            <p>
+              Farmers use different equipment to spray herbicides across their fields, depending on the size of the
+              field and the situation:
+            </p>
+            <ul className="list-disc pl-6 space-y-1">
+              <li>
+                <strong>Tractor sprayers</strong> are common—a tractor pulls a large boom (a long arm with nozzles) that
+                sprays herbicide evenly across wide rows of crops.
+              </li>
+              <li>
+                <strong>Drone sprayers</strong> are a newer technology where a flying drone sprays herbicide from above.
+                This is especially helpful for hard-to-reach areas or smaller, precise spots that need treatment.
+              </li>
+              <li>
+                <strong>Other methods</strong> include backpack sprayers for small areas or spot-treating individual
+                weeds, and aerial sprayers using small planes for very large farms.
+              </li>
+            </ul>
+            <p className="font-display font-bold text-primary">Why Weed ID Matters</p>
+            <p>
+              Here's the big secret: not every herbicide works on every weed! Just like a doctor needs to know what's
+              making you sick before giving you medicine, farmers need to correctly identify which weed species are
+              growing in their field before choosing an herbicide. Some herbicides only work on grassy weeds, while
+              others target broadleaf weeds. Using the wrong herbicide wastes money, time, and can even harm the crop
+              itself. That's why proper weed identification is one of the most important steps in making sure herbicide
+              treatment actually works!
+            </p>
+          </div>
+
+          <p className="text-base font-semibold text-foreground">
+            Here are just a few of the common herbicide groups used by farmers today.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...HERBICIDE_MOA]
+              .sort((a, b) => a.group - b.group)
+              .map((m) => (
+                <div key={m.id} className="bg-card border border-border rounded-xl p-5 space-y-2">
+                  <p className="font-display font-bold text-foreground text-lg leading-snug">{m.moa}</p>
+                  <p className="text-base text-primary font-semibold">Group {m.group}</p>
+                  <p className="text-base text-foreground">
+                    <strong>Target:</strong> {m.spectrum === "Both" ? "Grass & Broadleaf" : m.spectrum} weeds
+                  </p>
+                  <p className="text-base text-foreground">
+                    <strong>Timing:</strong>{" "}
+                    {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </div>
+      );
+    }
+    case "__herbicide-moa-unused": {
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
