@@ -58,6 +58,7 @@ import {
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
 import HabitatExplorer from "./learning/HabitatExplorer";
+import SeasonGroups from "./learning/SeasonGroups";
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
@@ -3195,6 +3196,8 @@ function TopicContent({
               </p>
               <PerennialUndergroundComparison compact allowedIds={lifeCyclePoolIds} />
             </div>
+
+            <SeasonGroups weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -3294,6 +3297,12 @@ function TopicContent({
               </p>
               <PerennialUndergroundComparison allowedIds={lifeCyclePoolIds} />
             </div>
+
+            <SeasonGroups
+              weeds={topicWeeds}
+              onSelectWeed={onSelectWeed}
+              stage={displayGrade === "collegiate" ? "seedling" : "vegetative"}
+            />
 
             {/* Dual lifecycle */}
             {dualLifecycle.length > 0 && (
