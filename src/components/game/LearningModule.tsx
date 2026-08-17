@@ -3804,254 +3804,6 @@ function TopicContent({
       }
 
       if (grade === "middle") {
-        const normName = (s: string) =>
-          s
-            .toLowerCase()
-            .replace(/\(.*?\)/g, "")
-            .replace(/[^a-z0-9]/g, "");
-
-        const COOL_SEASON = [
-          "Annual ryegrass",
-          "Downy brome",
-          "Field horsetail",
-          "Foxtail barley",
-          "Quackgrass",
-          "Scouringrush",
-          "Wild oat",
-          "Catchweed bedstraw",
-          "Common chickweed",
-          "Corn speedwell",
-          "Curly dock",
-          "Dandelion",
-          "Field pennycress",
-          "Garlic mustard",
-          "Ground ivy",
-          "Henbit deadnettle",
-          "Mouseear chickweed",
-          "Poison hemlock",
-          "Shepherd's purse",
-          "Star of Bethlehem",
-          "Wild carrot",
-          "Wild mustard",
-          "Yellow rocket",
-          "Canada thistle",
-          "Caraway",
-          "Common teasel",
-          "Tall Hedge Mustard",
-          "Golden alexanders",
-          "Musk thistle",
-          "Pinnate tansymustard",
-          "Prickly lettuce",
-          "Russian thistle",
-          "White campion",
-          "Wild parsnip",
-        ].map(normName);
-
-        const WARM_SEASON = [
-          "Barnyardgrass",
-          "Goosegrass",
-          "Johnsongrass",
-          "Large crabgrass",
-          "Nimblewill",
-          "Yellow nutsedge",
-          "Asiatic dayflower",
-          "Common pokeweed",
-          "Eastern black nightshade",
-          "Ladysthumb",
-          "Pennsylvania smartweed",
-          "Water smartweed",
-          "Waterhemp",
-          "Burcucumber",
-          "Honey vine climbing milkweed",
-          "Giant foxtail",
-          "Green foxtail",
-          "Longspine sandbur",
-          "Shattercane Sorghums",
-          "Smooth witchgrass",
-          "Witchgrass",
-          "Woolly cupgrass",
-          "Yellow foxtail",
-          "Asian copperleaf",
-          "Buffalobur",
-          "Common burdock",
-          "Common cocklebur",
-          "Common mallow",
-          "Common milkweed",
-          "Common ragweed",
-          "Giant ragweed",
-          "Hemp dogbane",
-          "Horsenettle",
-          "Horseweed",
-          "Jimsonweed",
-          "Kochia",
-          "Hemp",
-          "Palmer amaranth",
-          "Prickly sida",
-          "Redroot pigweed",
-          "Russian thistle",
-          "Smooth groundcherry",
-          "Spotted spurge",
-          "Toothed spurge",
-          "Velvetleaf",
-          "Venice mallow",
-          "Volunteer sunflower",
-          "Wild buckwheat",
-          "Wild four o'clock",
-          "Wild parsnip",
-          "Field bindweed",
-          "Hedge bindweed",
-          "Morningglory",
-          "Tall morningglory",
-        ].map(normName);
-
-        const WET_COMPACT = [
-          "Annual ryegrass",
-          "Downy brome",
-          "Field horsetail",
-          "Foxtail barley",
-          "Quackgrass",
-          "Scouringrush",
-          "Wild oat",
-          "Catchweed bedstraw",
-          "Common chickweed",
-          "Corn speedwell",
-          "Curly dock",
-          "Dandelion",
-          "Field pennycress",
-          "Garlic mustard",
-          "Ground ivy",
-          "Henbit deadnettle",
-          "Mouseear chickweed",
-          "Poison hemlock",
-          "Shepherd's purse",
-          "Star of Bethlehem",
-          "Wild carrot",
-          "Wild mustard",
-          "Yellow rocket",
-          "Barnyardgrass",
-          "Goosegrass",
-          "Johnsongrass",
-          "Large crabgrass",
-          "Nimblewill",
-          "Yellow nutsedge",
-          "Asiatic dayflower",
-          "Common pokeweed",
-          "Eastern black nightshade",
-          "Ladysthumb",
-          "Pennsylvania smartweed",
-          "Water smartweed",
-          "Waterhemp",
-          "Burcucumber",
-          "Honey vine climbing milkweed",
-        ].map(normName);
-
-        const DRY_DISTURBED = [
-          "Downy brome",
-          "Foxtail barley",
-          "Wild oat",
-          "Canada thistle",
-          "Caraway",
-          "Common teasel",
-          "Tall Hedge Mustard",
-          "Golden alexanders",
-          "Musk thistle",
-          "Pinnate tansymustard",
-          "Prickly lettuce",
-          "Russian thistle",
-          "White campion",
-          "Wild parsnip",
-          "Giant foxtail",
-          "Green foxtail",
-          "Johnsongrass",
-          "Longspine sandbur",
-          "Shattercane Sorghums",
-          "Smooth witchgrass",
-          "Witchgrass",
-          "Woolly cupgrass",
-          "Yellow foxtail",
-          "Asian copperleaf",
-          "Buffalobur",
-          "Common burdock",
-          "Common cocklebur",
-          "Common mallow",
-          "Common milkweed",
-          "Common ragweed",
-          "Giant ragweed",
-          "Hemp dogbane",
-          "Horsenettle",
-          "Horseweed",
-          "Jimsonweed",
-          "Kochia",
-          "Hemp",
-          "Palmer amaranth",
-          "Prickly sida",
-          "Redroot pigweed",
-          "Smooth groundcherry",
-          "Spotted spurge",
-          "Toothed spurge",
-          "Velvetleaf",
-          "Venice mallow",
-          "Volunteer sunflower",
-          "Wild buckwheat",
-          "Wild four o'clock",
-          "Field bindweed",
-          "Hedge bindweed",
-          "Morningglory",
-          "Tall morningglory",
-        ].map(normName);
-
-        const matchAny = (w: Weed, list: string[]) => {
-          const n = normName(w.commonName);
-          return list.some((x) => x === n || n.includes(x) || x.includes(n));
-        };
-
-        const seasonGroups = [
-          {
-            key: "cool",
-            label: "Cool-Season Weeds",
-            desc: "Germinate in fall or early spring when soils are cool. They grow rapidly before warm-season crops are planted and can compete early in the growing season.",
-            color: "bg-sky-500/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, COOL_SEASON)),
-          },
-          {
-            key: "warm",
-            label: "Warm-Season Weeds",
-            desc: "Germinate as soils warm in late spring and grow most vigorously through the hottest summer months. Common in corn and soybean fields.",
-            color: "bg-amber-500/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, WARM_SEASON)),
-          },
-        ];
-
-        const soilGroups = [
-          {
-            key: "wet",
-            label: "Wet / Compact Soil Habitats",
-            desc: "Wet, poorly drained or compacted soils — field edges, low spots, waterways, and high-traffic ground. These weeds tolerate saturated or dense soils.",
-            color: "bg-blue-700/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, WET_COMPACT)),
-          },
-          {
-            key: "dry",
-            label: "Dry / Disturbed Soil Habitats",
-            desc: "Dry, well-drained, or recently disturbed ground — roadsides, field margins, construction sites, and tilled areas. These weeds tolerate drought and rapid colonization of bare soil.",
-            color: "bg-orange-600/70",
-            weeds: topicWeeds.filter((w) => matchAny(w, DRY_DISTURBED)),
-          },
-        ];
-
-        const renderGroup = (g: { key: string; label: string; desc: string; color: string; weeds: Weed[] }) => (
-          <div key={g.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className={`inline-block w-3 h-3 rounded ${g.color}`} />
-              <h3 className="font-display font-bold text-foreground text-base">
-                {g.label} <span className="text-xs text-muted-foreground font-normal">({g.weeds.length})</span>
-              </h3>
-            </div>
-            <p className="text-sm text-foreground">{g.desc}</p>
-            <HorizontalWeedRow weeds={g.weeds} onSelectWeed={onSelectWeed} stage="flower" />
-          </div>
-        );
-
         return (
           <div className="space-y-5">
             <NotebookSection title="Habitats: Reading the Field" subtitle="Research Log · Site Preferences">
@@ -4067,10 +3819,9 @@ function TopicContent({
                   dominant in a given location.
                 </p>
                 <p>
-                  Below, weeds are organized two ways: by the <strong>season</strong> they grow in (cool-season vs.
-                  warm-season) and by the <strong>soil-type habitat</strong> they prefer (wet / compact vs. dry /
-                  disturbed). The same weed may appear in more than one soil-type group when it tolerates both
-                  conditions.
+                  Below, species are grouped into the seven site types weed scouts use in the field. Slide through a
+                  habitat to see which species occupy it and the biology that lets them do it. A species can appear in
+                  more than one habitat when it tolerates both sets of conditions.
                 </p>
               </div>
               <FieldNote label="Indicator species">
@@ -4083,43 +3834,13 @@ function TopicContent({
               />
             </NotebookSection>
 
-            <div className="space-y-2">
-              <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Season</p>
-              {seasonGroups.map(renderGroup)}
-            </div>
-
-            <div className="space-y-2">
-              <p className="font-display font-bold text-primary text-sm uppercase tracking-wide">Habitat Soil Type</p>
-              {soilGroups.map(renderGroup)}
-            </div>
+            <HabitatExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
 
-      // 9-12 - Detailed habitats with phenotypic plasticity
+      // 9-12 and collegiate - site-based habitats with adaptation context
       {
-        const HIGH_HABITATS = [
-          {
-            key: "Warm-Season / Full Sun",
-            label: "Warm-Season Weeds",
-            desc: "Warm-season weeds wait until late spring, when soil temperatures climb above roughly 60 °F, to germinate. They use the C4 photosynthesis pathway, which is more efficient at high temperatures and during droughty, high-light conditions — that's why species like Palmer Amaranth, Waterhemp, and the foxtails explode in mid-summer corn and soybean fields and can grow more than an inch per day in July heat.",
-          },
-          {
-            key: "Cool-Season / Early Spring",
-            label: "Cool-Season Weeds",
-            desc: "Cool-season weeds germinate in fall or very early spring, when soils are between roughly 40–60 °F. They use the C3 photosynthesis pathway, which works best in cool, moist conditions. Many overwinter as low rosettes (like Henbit, Shepherd's Purse, and Field Pennycress) — a body shape that survives frost and lets the plant start photosynthesizing weeks before spring planting.",
-          },
-          {
-            key: "Wet / Poorly Drained",
-            label: "Wet-Habitat Weeds",
-            desc: "Wet-habitat species tolerate saturated, low-oxygen soils that would kill most crops. Many have hollow stems or special air channels (aerenchyma) that move oxygen down to flooded roots. Yellow Nutsedge, Barnyardgrass, and the smartweeds are classic indicators of poor drainage — when you see them dominating a patch, it usually points to a compaction or tile-drainage problem, not just a herbicide issue.",
-          },
-          {
-            key: "Dry / Disturbed",
-            label: "Dry-Habitat Weeds",
-            desc: "Dry-habitat weeds survive on sandy, low-organic, well-drained soils where water is scarce. Adaptations include deep taproots that mine subsoil moisture (Kochia, Russian Thistle), narrow or waxy leaves that lose less water, and CAM/C4 metabolism that allows photosynthesis with the stomata partly closed. These species dominate roadsides, terraces, and the sandy headlands of irrigated fields.",
-          },
-        ];
         return (
           <div className="space-y-5">
             <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
@@ -4138,8 +3859,8 @@ function TopicContent({
                 soil is warm enough to fry an egg on.
               </p>
               <p>
-                The four groups below show how Midwest weeds sort themselves by the climate conditions they're built
-                for.
+                The seven habitats below show how Midwest weeds sort themselves across the sites they colonize. Slide
+                through each habitat to review its defining conditions and the species adapted to them.
               </p>
             </div>
             <TermSidebar
@@ -4152,44 +3873,22 @@ function TopicContent({
                   term: "C4 photosynthesis",
                   def: "CO2-concentrating mechanism; high water-use efficiency at high temperature and light.",
                 },
-                { term: "Aerenchyma", def: "Air-conducting parenchyma that oxygenates roots in flooded soils." },
                 {
-                  term: "Xerophyte",
-                  def: "Species adapted to arid conditions via deep roots, waxy cuticles, or CAM metabolism.",
+                  term: "Edaphic factors",
+                  def: "Soil-related site conditions — texture, drainage, compaction, pH, and fertility.",
+                },
+                {
+                  term: "Indicator species",
+                  def: "A weed whose presence reliably signals a specific site condition, such as poor drainage.",
                 },
               ]}
             />
 
-            {HIGH_HABITATS.map((h) => {
-              const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
-              return (
-                <div key={h.key} className="bg-card border border-border rounded-lg p-5 space-y-3">
-                  <p className="font-display font-bold text-foreground text-base">{h.label}</p>
-                  <p className="text-sm text-foreground">{h.desc}</p>
-                  {grouped.length > 0 && (
-                    <>
-                      <div className="overflow-x-auto pb-2 -mx-1">
-                        <div className="flex gap-3 px-1" style={{ minWidth: `${grouped.length * 7.5}rem` }}>
-                          {grouped.map((w) => (
-                            <div key={w.id} className="text-center shrink-0 w-28">
-                              <button
-                                onClick={() => onSelectWeed(w)}
-                                className="block w-28 h-28 rounded-lg overflow-hidden bg-muted border border-border hover:border-primary"
-                              >
-                                <WeedImage weedId={w.id} stage="flower" className="w-full h-full" />
-                              </button>
-                              <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-[11px] mt-1 block" />
-                              <div className="text-[10px] text-primary italic leading-tight">{w.scientificName}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">← Scroll to see all {grouped.length} →</p>
-                    </>
-                  )}
-                </div>
-              );
-            })}
+            <HabitatExplorer
+              weeds={topicWeeds}
+              onSelectWeed={onSelectWeed}
+              stage={displayGrade === "collegiate" ? "seedling" : "vegetative"}
+            />
           </div>
         );
       }
