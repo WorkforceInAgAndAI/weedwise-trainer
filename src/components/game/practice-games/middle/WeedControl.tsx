@@ -259,11 +259,11 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <div className="relative min-h-[46vh] lg:min-h-0 lg:overflow-y-auto">
           <img src={fieldBg} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
           <div className="absolute inset-0 bg-black/25 pointer-events-none" />
-          <div className="relative p-3 sm:p-4">
+          <div className="relative p-3 sm:p-4 h-full min-h-[46vh]">
             <p className="text-xs font-bold text-white/90 mb-2 drop-shadow">
               Scout the field — tap a weed and choose a control method ({remaining.length} left)
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
+            <div className="relative w-full h-[38vh] lg:h-[calc(100%-5rem)] min-h-[280px]">
               {field.map(f => {
                 const rec = handled.find(h => h.id === f.id);
                 return (
@@ -271,20 +271,19 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                     key={f.id}
                     onClick={() => !rec && setCurrent(f.id)}
                     disabled={!!rec}
-                    className={`rounded-xl overflow-hidden border-2 bg-secondary shadow-lg transition-all ${
-                      rec ? 'opacity-40 border-white/40 cursor-not-allowed' : 'border-white/80 hover:border-primary hover:scale-[1.03]'
+                    style={{ left: `${f.x}%`, top: `${f.y}%` }}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-[3px] bg-secondary shadow-xl transition-all ${
+                      rec ? 'opacity-40 border-white/40 cursor-not-allowed' : 'border-white hover:border-primary hover:scale-110'
                     }`}
                   >
-                    <div className="w-full aspect-square">
-                      <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
-                    </div>
+                    <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
                   </button>
                 );
               })}
             </div>
             <button
               onClick={endSeason}
-              className="mt-4 px-4 py-2 rounded-lg bg-white/90 dark:bg-slate-900/90 text-foreground text-sm font-bold border border-border"
+              className="mt-3 px-4 py-2 rounded-lg bg-white/90 dark:bg-slate-900/90 text-foreground text-sm font-bold border border-border"
             >
               End Season {season} →
             </button>
