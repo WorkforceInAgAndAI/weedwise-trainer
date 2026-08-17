@@ -23,9 +23,6 @@ function PyramidCard({ weed, onClose, onSelectWeed }: { weed: Weed; onClose: () 
     <div className="fixed inset-0 z-[60] bg-background/90 backdrop-blur-sm overflow-y-auto p-4" onClick={onClose}>
       <div className="max-w-lg mx-auto bg-card border border-border rounded-xl p-5 space-y-3 my-8" onClick={e => e.stopPropagation()}>
         <div className="flex items-start gap-3">
-          <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border flex-shrink-0">
-            <WeedImage weedId={weed.id} stage="flower" className="w-full h-full" />
-          </div>
           <div className="flex-1">
             <p className="font-display font-bold text-foreground">{weed.commonName}</p>
             <p className="text-xs italic text-primary">{weed.scientificName}</p>
@@ -41,6 +38,9 @@ function PyramidCard({ weed, onClose, onSelectWeed }: { weed: Weed; onClose: () 
               <p className="text-[10px] text-muted-foreground">{t.desc}</p>
             </div>
           ))}
+          <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-border mt-2">
+            <WeedImage weedId={weed.id} stage="flower" className="w-full h-full" />
+          </div>
         </div>
       </div>
     </div>
@@ -96,7 +96,7 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
         Dark boxes are groupings; green boxes are individual species — tap a species to see its full taxonomy pyramid.
       </p>
 
-      <div className="overflow-auto rounded-lg border border-border bg-muted/20 p-3 max-h-[70vh]">
+      <div className="overflow-auto rounded-lg border border-border bg-muted/20 p-3 max-h-[82vh] min-h-[36rem]">
         <div style={{ transform: `scale(${zoom})`, transformOrigin: '0 0', width: `${100 / zoom}%` }}>
           {/* Kingdom */}
           <div className="rounded-lg border-2 border-foreground/70 bg-foreground/90 p-2">
@@ -128,7 +128,7 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
                               </button>
                               <p className="text-[10px] text-muted-foreground pl-6">{c.sub}</p>
                               {open[c.key] && (
-                                <div className="mt-2 space-y-2 max-h-[50vh] overflow-y-auto pr-1 pl-3 border-l-2 border-foreground/20">
+                                <div className="mt-2 space-y-2 max-h-[60vh] overflow-y-auto pr-1 pl-3 border-l-2 border-foreground/20">
                                   {familiesOf(c.members).map(([fam, list]) => {
                                     const key = `${c.key}:${fam}`;
                                     return (
@@ -139,7 +139,7 @@ export default function TaxonomyExplorer({ weeds, onSelectWeed }: Props) {
                                           <span className="ml-auto text-[10px] text-muted-foreground">{list.length}</span>
                                         </button>
                                         {open[key] && (
-                                          <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto pr-1 pl-3 border-l-2 border-primary/30">
+                                          <div className="mt-2 space-y-1.5 max-h-96 overflow-y-auto pr-1 pl-3 border-l-2 border-primary/30">
                                             {list.map(w => (
                                               <button
                                                 key={w.id}
