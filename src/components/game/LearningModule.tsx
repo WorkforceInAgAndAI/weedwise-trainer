@@ -8684,20 +8684,30 @@ function TopicContent({
           </div>
           <div className="bg-card border border-border rounded-lg p-4 space-y-2">
             <p className="font-bold text-foreground">Common Injury Types</p>
-            <div className="grid grid-cols-3 gap-2 text-xs">
+            <p className="text-xs text-muted-foreground">
+              Each injury type is colour-coded below; the same colours are used when describing symptoms in the field.
+            </p>
+            <ul className="space-y-2 text-xs">
               {[
-                "Chlorosis (yellowing)",
-                "Bleaching (whitening)",
-                "Epinasty (twisting/curling)",
-                "Necrosis (browning/death)",
-                "Stunting (reduced growth)",
-                "Purpling (anthocyanin)",
-              ].map((s) => (
-                <div key={s} className="bg-secondary/30 border border-border rounded p-2 text-foreground text-center">
-                  {s}
-                </div>
+                { name: "Chlorosis", note: "Yellowing of leaf tissue as chlorophyll breaks down.", swatch: "#EAB308" },
+                { name: "Bleaching", note: "White or pink new growth where pigments never form.", swatch: "#F1F5F9" },
+                { name: "Epinasty", note: "Twisting, cupping, and curling of leaves, stems, and petioles.", swatch: "#8B5E3C" },
+                { name: "Necrosis", note: "Brown, dead tissue — spots, margins, or whole leaves.", swatch: "#7F1D1D" },
+                { name: "Stunting", note: "Reduced height and biomass with shortened internodes.", swatch: "#2D5016" },
+                { name: "Purpling", note: "Anthocyanin build-up on veins and stems under stress.", swatch: "#6B21A8" },
+              ].map((t) => (
+                <li key={t.name} className="flex items-start gap-2 bg-secondary/30 border border-border rounded p-2">
+                  <span
+                    className="w-4 h-4 rounded-sm border border-border flex-shrink-0 mt-0.5"
+                    style={{ backgroundColor: t.swatch }}
+                    aria-hidden="true"
+                  />
+                  <span className="text-foreground">
+                    <strong>{t.name}</strong> — <span className="text-muted-foreground">{t.note}</span>
+                  </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
           <h3 className="font-display font-bold text-foreground text-sm">Injury Patterns by Group</h3>
           <div className="space-y-3">
@@ -8722,7 +8732,7 @@ function TopicContent({
                           <img
                             src={br}
                             alt={`Group ${p.group} broadleaf injury`}
-                            className="w-full h-32 object-cover rounded-md border border-border"
+                            className="w-full aspect-square object-cover rounded-md border border-border"
                           />
                           <figcaption className="text-[10px] text-muted-foreground text-center mt-1">
                             Broadleaf injury
@@ -8734,7 +8744,7 @@ function TopicContent({
                           <img
                             src={gr}
                             alt={`Group ${p.group} grass injury`}
-                            className="w-full h-32 object-cover rounded-md border border-border"
+                            className="w-full aspect-square object-cover rounded-md border border-border"
                           />
                           <figcaption className="text-[10px] text-muted-foreground text-center mt-1">
                             Grass injury
