@@ -152,7 +152,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
   const nextSeason = () => {
     const wrong = handled.length - seasonCorrect + remaining.length;
-    const next = Math.max(3, Math.min(14, population + wrong * 2 - seasonCorrect));
+    const next = nextPopulation(population, seasonCorrect, wrong);
     if (season >= SEASONS) { setGameOver(true); setShowSummary(false); return; }
     setSeason(s => s + 1);
     setPopulation(next);
@@ -195,7 +195,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
 
   if (showSummary) {
     const wrong = handled.filter(h => !h.correct);
-    const nextPop = Math.max(3, Math.min(14, population + (wrong.length + remaining.length) * 2 - seasonCorrect));
+    const nextPop = nextPopulation(population, seasonCorrect, wrong.length + remaining.length);
     return (
       <div className={shell}>
         <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
