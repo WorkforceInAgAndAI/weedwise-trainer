@@ -3854,7 +3854,7 @@ function TopicContent({
       {
         return (
           <div className="space-y-5">
-            <JournalHeader title="Climate & Habitat Adaptation" subtitle="Plant Ecophysiology" />
+            <JournalHeader title="Environment Profiles" subtitle="Plant Ecophysiology" />
             <LabCallout heading="Concept">
               Climate — thermal regime, photoperiod, precipitation, and edaphic conditions — is the primary filter on
               weed community composition. Species distribution reflects underlying physiological adaptations (C3/C4
