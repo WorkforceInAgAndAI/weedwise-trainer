@@ -703,7 +703,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: "habitats",
-    name: "Habitats & Climate",
+    name: "Environment Profiles",
     icon: "habitats",
     description: "Predict where each weed thrives across warm, cool, wet, and dry habitats based on its biology.",
     grades: ["elementary", "middle", "high"],
