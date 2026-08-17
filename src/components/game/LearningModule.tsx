@@ -97,6 +97,7 @@ type TopicId =
   | "look-alikes"
   | "safety"
   | "control-methods"
+  | "herbicides-intro"
   | "taxonomy"
   | "dioecious"
   | "grass-id"
