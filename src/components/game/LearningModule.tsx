@@ -1571,12 +1571,14 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
   const viewMode: "list" | "box" = "list";
 
   const availableTopics = useMemo(() => {
+    const rename = (t: Topic): Topic =>
+      t.id === "habitats" && selectedGrade !== "elementary" ? { ...t, name: "Environment Profiles" } : t;
     if (selectedGrade === "elementary") {
       return TOPICS.filter((t) => t.plantExplorer);
     }
     const src = displayToSource[selectedGrade];
     if (!src) return [];
-    return TOPICS.filter((t) => !t.plantExplorer && t.grades.includes(src));
+    return TOPICS.filter((t) => !t.plantExplorer && t.grades.includes(src)).map(rename);
   }, [selectedGrade]);
 
   const topicsByCategory = useMemo(() => {
@@ -1718,7 +1720,8 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
             <div className="min-w-0">
               <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <h2 className="text-lg font-display font-bold text-foreground">
-                  {TOPICS.find((t) => t.id === selectedTopic)?.name}
+                  {availableTopics.find((t) => t.id === selectedTopic)?.name ??
+                    TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
                 <PracticeButton topicId={selectedTopic} grade={sourceGrade} onOpenPractice={onOpenPractice} />
               </div>
