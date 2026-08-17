@@ -6994,8 +6994,8 @@ function TopicContent({
             </>
           )}
 
-          {/* Herbicide MOA Reference Table - only for 6-8 and 9-12 */}
-          {!isElementary && (
+          {/* Herbicide MOA Reference Table - collegiate only */}
+          {isHighSchool && (
             <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
               <p className="font-semibold text-primary">Herbicide Modes of Action Reference</p>
               {isHighSchool ? (
@@ -7079,46 +7079,7 @@ function TopicContent({
                     })}
                   </div>
                 </>
-              ) : (
-                <>
-                  <p className="text-xs text-muted-foreground">
-                    Herbicides work in different ways to kill weeds. Scientists group them by their
-                    <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
-                  </p>
-                  <div className="space-y-2">
-                    {[...getMiddleSchoolMOAs()]
-                      .sort((a, b) => a.group - b.group)
-                      .map((h) => (
-                        <div key={h.id} className="bg-card border border-border rounded-lg p-3">
-                          <p className="font-bold text-foreground text-xs">
-                            {h.moa} (Group {h.group})
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">Timing:</span>{" "}
-                            {h.timing === "PRE"
-                              ? "Pre-emergent (before weeds sprout)"
-                              : "Post-emergent (after weeds are growing)"}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">Targets:</span>{" "}
-                            {h.spectrum === "Both"
-                              ? "Grasses and broadleaves"
-                              : h.spectrum === "Grass"
-                                ? "Grasses (monocots)"
-                                : "Broadleaves (dicots)"}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">Chemical:</span> {h.brands[0]}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">What it looks like:</span>{" "}
-                            {SYMPTOM_TYPES[h.symptomType]?.label}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                </>
-              )}
+              ) : null}
             </div>
           )}
 
