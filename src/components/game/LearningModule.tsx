@@ -41,7 +41,7 @@ import {
   Search,
 } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
-import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
+import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
 import {
   DetectiveCard,
   EvidenceTag,
