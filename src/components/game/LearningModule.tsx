@@ -41,7 +41,7 @@ import {
   Search,
 } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
-import { HERBICIDE_MOA, SYMPTOM_TYPES, getMiddleSchoolMOAs } from "@/data/herbicides";
+import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
 import {
   DetectiveCard,
   EvidenceTag,
@@ -875,7 +875,7 @@ const TOPICS: Topic[] = [
     icon: "herbicide",
     description:
       "Learn what herbicides are, how pre-emergent and post-emergent timing works, how they are applied, and why weed ID matters.",
-    grades: ["middle"],
+    grades: ["elementary", "middle"],
     category: "control",
   },
   {
@@ -905,7 +905,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: "herbicide-moa",
-    name: "Herbicide MOA",
+    name: "Herbicides & MOA",
     icon: "herbicide",
     description: "Classify herbicides by WSSA group and explain how each mode of action disrupts plant function.",
     grades: ["high"],
@@ -3825,35 +3825,6 @@ function TopicContent({
                 </div>
               );
             })}
-          </div>
-        );
-      }
-
-      if (grade === "middle") {
-        return (
-          <div className="space-y-5">
-            <JournalHeader title="Environment Profiles" subtitle="Site Preferences" />
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-              <p>
-                Have you ever noticed that some weeds always seem to pop up in the same kinds of places? That's not an
-                accident! Just like animals need the right habitat to survive, plants—including weeds—need the right
-                soil conditions to grow well. Things like how wet or dry the soil is, how packed down it is, and how
-                many nutrients it has can all affect which plants can grow there.
-              </p>
-              <p>
-                For example, some weeds are tough survivors that love growing in soil that's been squished down by
-                people walking on it a lot, like along the edge of a sidewalk or a well-used path. Other weeds prefer
-                soil that's rich in nutrients, so you might spot them growing near a garden or farm field where
-                fertilizer has been used. There are even weeds that like really wet, soggy soil, so you'll often find
-                them near ponds or in low spots where water collects after it rains.
-              </p>
-              <p>
-                So the next time you're outside, take a look at the weeds growing around you—they can actually give you
-                clues about what the soil is like in that spot, kind of like nature's own detective work!
-              </p>
-            </div>
-
-            <HabitatExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
           </div>
         );
       }
@@ -7023,8 +6994,8 @@ function TopicContent({
             </>
           )}
 
-          {/* Herbicide MOA Reference Table - only for 6-8 and 9-12 */}
-          {!isElementary && (
+          {/* Herbicide MOA Reference Table - collegiate only */}
+          {isHighSchool && (
             <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
               <p className="font-semibold text-primary">Herbicide Modes of Action Reference</p>
               {isHighSchool ? (
@@ -7108,46 +7079,7 @@ function TopicContent({
                     })}
                   </div>
                 </>
-              ) : (
-                <>
-                  <p className="text-xs text-muted-foreground">
-                    Herbicides work in different ways to kill weeds. Scientists group them by their
-                    <strong> mode of action (MOA)</strong> — the specific way the chemical disrupts the weed's biology.
-                  </p>
-                  <div className="space-y-2">
-                    {[...getMiddleSchoolMOAs()]
-                      .sort((a, b) => a.group - b.group)
-                      .map((h) => (
-                        <div key={h.id} className="bg-card border border-border rounded-lg p-3">
-                          <p className="font-bold text-foreground text-xs">
-                            {h.moa} (Group {h.group})
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">Timing:</span>{" "}
-                            {h.timing === "PRE"
-                              ? "Pre-emergent (before weeds sprout)"
-                              : "Post-emergent (after weeds are growing)"}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">Targets:</span>{" "}
-                            {h.spectrum === "Both"
-                              ? "Grasses and broadleaves"
-                              : h.spectrum === "Grass"
-                                ? "Grasses (monocots)"
-                                : "Broadleaves (dicots)"}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">Chemical:</span> {h.brands[0]}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            <span className="font-medium">What it looks like:</span>{" "}
-                            {SYMPTOM_TYPES[h.symptomType]?.label}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                </>
-              )}
+              ) : null}
             </div>
           )}
 
@@ -8207,6 +8139,12 @@ function TopicContent({
                   <p className="text-base text-foreground">
                     <strong>Timing:</strong>{" "}
                     {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
+                  </p>
+                  <p className="text-base text-foreground">
+                    <strong>Symptoms:</strong> {SYMPTOM_TYPES[m.symptomType]?.label}
+                    {SYMPTOM_TYPES[m.symptomType]?.description
+                      ? ` — ${SYMPTOM_TYPES[m.symptomType].description}`
+                      : ""}
                   </p>
                 </div>
               ))}
