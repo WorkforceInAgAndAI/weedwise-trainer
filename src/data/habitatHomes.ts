@@ -1099,3 +1099,55 @@ export const HABITAT_HOUSES: Array<{ id: HabitatId; label: string; blurb: string
   { id: 'wet', label: 'Wet & Compacted', blurb: 'Heavy, poorly drained soil that stays soggy and packed down.', shortBlurb: 'Heavy, soggy, packed soil.' },
   { id: 'dry', label: 'Dry & Disturbed', blurb: 'Bare, hot, hard-packed ground that keeps getting torn up.', shortBlurb: 'Bare, hot, disturbed ground.' },
 ];
+
+/** Formal habitat definitions used by the Habitats & Climate learning modules (6-8 and up). */
+export const HABITAT_DEFINITIONS: Record<HabitatId, string> = {
+  cropland:
+    'Land under active or recent cultivation for annual or perennial agronomic crops, characterized by periodic soil disturbance (tillage, planting, harvest), managed nutrient and moisture inputs, and open canopy conditions between crop rows that allow light penetration to the soil surface.',
+  pasture:
+    'Land maintained in perennial forage (grasses/legumes) for livestock grazing, subject to recurring defoliation pressure (grazing and/or mowing), generally undisturbed at the soil-profile level but with surface compaction and nutrient redistribution from animal traffic and manure deposition.',
+  roadside:
+    'The margin zone adjacent to paved or graveled transportation corridors, typically an engineered or graded substrate with poor structure, elevated salinity (from deicing agents), periodic mowing regimes, and exposure to vehicle-generated disturbance and runoff.',
+  woodland:
+    'The ecotone between closed-canopy forest and open habitat, marked by a light gradient (partial shade to full sun), altered microclimate (wind and temperature buffering), and soil influenced by leaf litter accumulation and tree root competition.',
+  wetland:
+    'Land where hydrology is the dominant site-forming factor, defined by periodic or permanent saturation or inundation, hydric soils with reduced (anaerobic) conditions below the surface, and vegetation adapted to low-oxygen root zones.',
+  dry:
+    'Sites with low available soil moisture (whether from climate, texture, or drainage) combined with a history of mechanical or physical disruption to the soil surface — tillage, grading, construction, erosion, or trampling — that removes existing vegetation and exposes bare mineral soil for colonization.',
+  wet:
+    'Sites where excess soil moisture (from poor drainage, flooding, or seasonal saturation) coincides with reduced soil porosity from compaction, typically caused by heavy equipment, foot or vehicle traffic, or livestock, resulting in restricted aeration, slower infiltration, and periodic standing water.',
+};
+
+const IRREGULAR: Record<string, string> = {
+  am: 'is', are: 'is', have: 'has', "don't": 'does not', do: 'does', go: 'goes',
+  can: 'can', will: 'will', may: 'may', must: 'must', could: 'could', should: 'should', would: 'would',
+};
+
+function conjugate(verb: string): string {
+  const lower = verb.toLowerCase();
+  if (IRREGULAR[lower]) return IRREGULAR[lower];
+  if (/(s|sh|ch|x|z|o)$/.test(lower)) return `${lower}es`;
+  if (/[^aeiou]y$/.test(lower)) return `${lower.slice(0, -1)}ies`;
+  return `${lower}s`;
+}
+
+/**
+ * Rewrites the first-person game traits ("I tolerate shade", "my deep taproot")
+ * into objective, third-person statements for the learning modules.
+ */
+export function objectiveTrait(trait: string): string {
+  let out = trait
+    .replace(/\bI'm\b/gi, 'it is')
+    .replace(/\bI've\b/gi, 'it has')
+    .replace(/\bI\s+([a-z']+)/g, (_m, v: string) => conjugate(v))
+    .replace(/\bmyself\b/gi, 'itself')
+    .replace(/\bmy\b/gi, 'its')
+    .replace(/\bme\b/gi, 'it')
+    .replace(/\bmine\b/gi, 'its');
+  out = out.trim();
+  return out.charAt(0).toUpperCase() + out.slice(1);
+}
+
+export function objectiveTraits(traits: string[]): string[] {
+  return traits.map(objectiveTrait);
+}
