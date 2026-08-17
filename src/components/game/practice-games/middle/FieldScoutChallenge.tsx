@@ -20,9 +20,9 @@ import aerialPasture from '@/assets/images/aerial_pasture_field.jpg';
  */
 
 const START_MONEY = 1000;
-const COST_PER_UNIT = 1.2;          // $ per percent-unit of path walked
+const COST_PER_UNIT = 0.35;         // $ per percent-unit of path walked
 const SCOUT_RADIUS_PCT = 7;         // how wide the scout can see either side
-const YIELD_LOSS_PER_WEED = 22;     // $ lost per weed left undetected at season end
+const YIELD_LOSS_PER_WEED = 12;     // $ lost per weed left undetected across the season
 const GRID = 3;                     // field is scored on a 3x3 block grid
 
 type Trip = 0 | 1 | 2;
@@ -174,12 +174,32 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
   const clearPath = () => setPath([]);
 
   const totalSpent = log.reduce((s, l) => s + l.cost, 0);
-  const yieldLoss = seasonOver ? missed * YIELD_LOSS_PER_WEED : 0;
+  const totalMissed = log.reduce((s, l) => s + (l.total - l.found), 0);
+  const yieldLoss = seasonOver ? totalMissed * YIELD_LOSS_PER_WEED : 0;
   const finalMoney = Math.max(0, START_MONEY - totalSpent - yieldLoss);
-  const rating =
-    finalMoney >= 750 ? 'Master Agronomist' :
-    finalMoney >= 550 ? 'Sharp Scout' :
-    finalMoney >= 350 ? 'Getting There' : 'Field Overgrown';
+
+  // Rating blends how much money was kept with how well the field was actually sampled.
+  const avgBlocks = log.length ? log.reduce((s, l) => s + l.blocks, 0) / log.length : 0;
+  const foundPct = (() => {
+    const tot = log.reduce((s, l) => s + l.total, 0);
+    return tot ? log.reduce((s, l) => s + l.found, 0) / tot : 0;
+  })();
+  const walkedCheap = totalSpent <= 600;
+  const goodPattern = avgBlocks >= 6.5;
+  const foundEnough = foundPct >= 0.6;
+  const productive = goodPattern && foundEnough && walkedCheap;
+  const rating = productive
+    ? 'Very productive'
+    : (goodPattern || foundEnough) && finalMoney >= 400
+      ? 'Moderately productive'
+      : 'Not productive';
+  const ratingWhy = productive
+    ? `Your W/zig-zag style routes crossed ${avgBlocks.toFixed(1)} of the 9 field blocks on an average trip, so you saw a representative sample of the field, and you did it for only $${totalSpent} in scouting. Finding ${Math.round(foundPct * 100)}% of the weeds kept end-of-season yield loss low.`
+    : !goodPattern && !foundEnough
+      ? `Your routes only sampled about ${avgBlocks.toFixed(1)} of the 9 field blocks, so whole areas were never looked at. Missing ${totalMissed} weeds let them set seed and cost you $${yieldLoss} in yield loss.`
+      : !walkedCheap
+        ? `You found the weeds, but you walked a long way to do it — $${totalSpent} of scouting. Cover the field with a tighter W or zig-zag instead of wandering.`
+        : `You scouted cheaply ($${totalSpent}) but skipped too much of the field, so ${totalMissed} weeds went undetected and cost $${yieldLoss} in yield loss. A W, M, or Z route across the whole field finds more for nearly the same walk.`;
 
   if (seasonOver) {
     return (
@@ -189,11 +209,12 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Season {season} report</p>
             <p className="font-display font-extrabold text-4xl text-primary">${finalMoney}</p>
             <p className="text-sm font-bold text-foreground">{rating}</p>
+            <p className="text-xs text-muted-foreground mt-2 text-left">{ratingWhy}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {missed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss}</span></div>
             <div className="border-t border-border pt-2 flex justify-between"><span className="font-bold text-foreground">Money kept</span><span className="font-extrabold text-primary">${finalMoney}</span></div>
             <p className="text-xs text-muted-foreground pt-2">
               Walk cheap, but walk smart. A pattern that crosses the whole field — a W, a zig-zag, an X — costs a little
@@ -297,6 +318,11 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
             <p className="text-xs text-foreground">
               Find the best representation of the weeds in your field. Draw the path you make your agronomist walk —
               the longer the path, the more it costs. Do it as cheaply as you can while still sampling the whole field.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Different paths capture different weeds: field edges are their own microenvironment — more light, more
+              compaction, seeds carried in by equipment and wind — while the middle of the field is shadier and more
+              uniform. A route that only follows the edge finds edge species and misses what is building in the middle.
             </p>
           </div>
 

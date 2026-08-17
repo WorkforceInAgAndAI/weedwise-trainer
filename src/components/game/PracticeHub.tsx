@@ -54,7 +54,6 @@ import InvasiveQuiz from './practice-games/middle/InvasiveQuiz';
 import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
 import LifeStageControl from './practice-games/middle/LifeStageControl';
 import MSLifeCycleMatching from './practice-games/middle/LifeCycleMatching';
-import EconomicThreshold from './practice-games/middle/EconomicThreshold';
 import WeedBank from './practice-games/middle/WeedBank';
 import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
@@ -121,7 +120,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'native-lookalike': 'look-alikes', 'ms-look-alike': 'look-alikes', 'weed-competitors': 'weed-competitors',
   'invasive-quiz': 'native-introduced', 'ms-safe-toxic': 'safety',
   'life-stage-control': 'life-stages', 'ms-lifecycle': 'life-cycles',
-  'economic-threshold': 'economic-threshold', 'ms-weed-control': 'control-methods',
+  'ms-weed-control': 'control-methods',
   'weed-bank': 'seeds',
   'control-matching': 'herbicide-moa', 'herbicide-applicator': 'herbicide-moa',
   'ligule-lens': 'monocot-dicot', 'ms-sleepy-seeds': 'seeds',
@@ -130,7 +129,7 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'hs-habitat': 'habitats', 'invasive-habitat': 'native-introduced',
   'hs-field-scout': 'field-scouting', 'hs-lifecycle': 'life-cycles',
   'sleepy-seeds': 'seed-dormancy', 'allelopathy': 'allelopathy',
-  'form-farm': 'economic-threshold', 'hs-weed-control': 'control-methods',
+  'form-farm': 'weed-competitors', 'hs-weed-control': 'control-methods',
   'hs-control-match': 'herbicide-moa', 'crop-doctor': 'crop-injury',
   'grass-id-lab': 'grass-id',
   'life-stage-maze': 'life-stage-control',
