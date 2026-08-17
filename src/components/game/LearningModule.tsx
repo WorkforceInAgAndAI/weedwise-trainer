@@ -875,7 +875,7 @@ const TOPICS: Topic[] = [
     icon: "herbicide",
     description:
       "Learn what herbicides are, how pre-emergent and post-emergent timing works, how they are applied, and why weed ID matters.",
-    grades: ["middle"],
+    grades: ["elementary", "middle"],
     category: "control",
   },
   {
@@ -905,7 +905,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: "herbicide-moa",
-    name: "Herbicide MOA",
+    name: "Herbicides & MOA",
     icon: "herbicide",
     description: "Classify herbicides by WSSA group and explain how each mode of action disrupts plant function.",
     grades: ["high"],
