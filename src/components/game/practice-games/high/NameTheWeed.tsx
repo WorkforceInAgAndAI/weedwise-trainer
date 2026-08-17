@@ -1,10 +1,15 @@
 import { useState, useMemo } from 'react';
-import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
+
+// Guard against duplicate species entries so a practice set never repeats a plant.
+const weeds = collegiateWeeds.filter(
+  (w, i, arr) => arr.findIndex(x => x.id === w.id || x.scientificName === w.scientificName) === i,
+);
 
 /** Plant parts / life stages shown together, mirroring the 9-12 version. */
 const STAGES: Array<{ key: string; label: string }> = [
@@ -19,7 +24,7 @@ export default function NameTheWeed({ onBack }: { onBack: () => void }) {
  const [level, setLevel] = useState(1);
  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
  const rounds = useMemo(() => {
-  const selected = levelSlice(shuffle(weeds), level, d.rounds);
+  const selected = shuffle(weeds).slice(0, d.rounds);
   return selected.map(w => {
    // Distractors must be distinct species AND distinct scientific names, so the
    // photo shown always has exactly one matching answer.
