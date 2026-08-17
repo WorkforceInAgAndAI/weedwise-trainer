@@ -2192,7 +2192,7 @@ function TopicContent({
               />
             </NotebookSection>
 
-            <WeedFlashcardDeck weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
+            <WeedNameList weeds={topicWeeds} onSelectWeed={onSelectWeed} />
           </div>
         );
       }
