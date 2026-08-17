@@ -3829,35 +3829,6 @@ function TopicContent({
         );
       }
 
-      if (grade === "middle") {
-        return (
-          <div className="space-y-5">
-            <JournalHeader title="Environment Profiles" subtitle="Site Preferences" />
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-              <p>
-                Have you ever noticed that some weeds always seem to pop up in the same kinds of places? That's not an
-                accident! Just like animals need the right habitat to survive, plants—including weeds—need the right
-                soil conditions to grow well. Things like how wet or dry the soil is, how packed down it is, and how
-                many nutrients it has can all affect which plants can grow there.
-              </p>
-              <p>
-                For example, some weeds are tough survivors that love growing in soil that's been squished down by
-                people walking on it a lot, like along the edge of a sidewalk or a well-used path. Other weeds prefer
-                soil that's rich in nutrients, so you might spot them growing near a garden or farm field where
-                fertilizer has been used. There are even weeds that like really wet, soggy soil, so you'll often find
-                them near ponds or in low spots where water collects after it rains.
-              </p>
-              <p>
-                So the next time you're outside, take a look at the weeds growing around you—they can actually give you
-                clues about what the soil is like in that spot, kind of like nature's own detective work!
-              </p>
-            </div>
-
-            <HabitatExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
-          </div>
-        );
-      }
-
       // 9-12 and collegiate - site-based habitats with adaptation context
       {
         return (
