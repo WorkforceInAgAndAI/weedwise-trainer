@@ -853,7 +853,7 @@ const TOPICS: Topic[] = [
   // Control, Safety & Field Management
   {
     id: "safety",
-    name: "Safety & Control",
+    name: "Safety",
     icon: "safety",
     description:
       "Recognize dangerous and toxic species and apply basic safety practices when handling them in the field.",
@@ -867,6 +867,15 @@ const TOPICS: Topic[] = [
     description:
       "Compare cultural, mechanical, biological, and chemical control methods and choose the right tool for each situation.",
     grades: ["elementary", "middle", "high"],
+    category: "control",
+  },
+  {
+    id: "herbicides-intro",
+    name: "Herbicides",
+    icon: "herbicide",
+    description:
+      "Learn what herbicides are, how pre-emergent and post-emergent timing works, how they are applied, and why weed ID matters.",
+    grades: ["middle"],
     category: "control",
   },
   {
