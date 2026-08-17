@@ -2027,6 +2027,7 @@ function MiddleSchoolNamesModule({ weeds: pool, onSelectWeed }: { weeds: Weed[];
             );
           })}
         </div>
+        </div>
 
         {/* Tracker sidebar */}
         <aside className="lg:sticky lg:top-6 self-start bg-card border-2 border-amber-500/40 rounded-xl p-4 space-y-4">
