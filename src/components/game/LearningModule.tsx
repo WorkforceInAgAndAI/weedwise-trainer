@@ -8140,6 +8140,12 @@ function TopicContent({
                     <strong>Timing:</strong>{" "}
                     {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
                   </p>
+                  <p className="text-base text-foreground">
+                    <strong>Symptoms:</strong> {SYMPTOM_TYPES[m.symptomType]?.label}
+                    {SYMPTOM_TYPES[m.symptomType]?.description
+                      ? ` — ${SYMPTOM_TYPES[m.symptomType].description}`
+                      : ""}
+                  </p>
                 </div>
               ))}
           </div>
