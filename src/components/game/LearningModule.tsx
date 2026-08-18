@@ -499,11 +499,11 @@ function FlipPlateCard({
 }) {
   const [flipped, setFlipped] = useState(false);
   const icons: Record<string, JSX.Element> = {
-    sun: <span className="text-3xl">☀️</span>,
-    water: <span className="text-3xl">💧</span>,
-    air: <span className="text-3xl">🌬️</span>,
-    nutrients: <span className="text-3xl">🥕</span>,
-    space: <span className="text-3xl">🪑</span>,
+    sun: <span className="text-4xl">☀️</span>,
+    water: <span className="text-4xl">💧</span>,
+    air: <span className="text-4xl">🌬️</span>,
+    nutrients: <span className="text-4xl">🥕</span>,
+    space: <span className="text-4xl">🪑</span>,
   };
   return (
     <button
@@ -520,15 +520,15 @@ function FlipPlateCard({
           className={`absolute inset-0 rounded-full border-4 border-amber-700 shadow-lg flex flex-col items-center justify-center gap-1 [backface-visibility:hidden] ${n.bg}`}
         >
           {icons[n.key]}
-          <p className="font-display font-extrabold text-foreground text-xs sm:text-sm">{n.title}</p>
-          <p className="text-[9px] text-muted-foreground italic">flip me!</p>
+          <p className="font-display font-extrabold text-foreground text-lg sm:text-xl">{n.title}</p>
+          <p className="text-sm text-muted-foreground italic">flip me!</p>
         </div>
         {/* Back */}
-        <div className="absolute inset-0 rounded-2xl bg-amber-50 border-4 border-amber-700 shadow-lg p-2 flex flex-col justify-center text-left [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <p className="text-[10px] font-bold text-amber-900 mb-1">🌽 Plants use it to:</p>
-          <p className="text-[10px] text-foreground leading-tight mb-1">{n.plantUses}</p>
-          <p className="text-[10px] font-bold text-destructive">🌿 Weeds steal it:</p>
-          <p className="text-[10px] text-foreground leading-tight">{n.weedSteals}</p>
+        <div className="absolute inset-0 rounded-2xl bg-amber-50 border-4 border-amber-700 shadow-lg p-3 flex flex-col justify-center text-left overflow-y-auto [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <p className="text-sm font-bold text-amber-900 mb-1">🌽 Plants use it to:</p>
+          <p className="text-sm text-foreground leading-snug mb-2">{n.plantUses}</p>
+          <p className="text-sm font-bold text-destructive">🌿 Weeds steal it:</p>
+          <p className="text-sm text-foreground leading-snug">{n.weedSteals}</p>
         </div>
       </div>
     </button>
