@@ -114,7 +114,8 @@ export default function NameTheWeed({ onBack }: Props) {
   const rounds = useMemo(() => {
     const levelWeeds = getWeedsForLevel(level, d.rounds);
     return levelWeeds.map(w => {
-      const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, Math.max(2, d.options - 1)).map(x => x.commonName);
+      // Always offer 4 choices so the answer grid stays a full 2x2 with no gaps.
+      const wrongs = shuffle(weeds.filter(x => x.id !== w.id)).slice(0, Math.max(3, d.options - 1)).map(x => x.commonName);
       return { weed: w, options: shuffle([w.commonName, ...wrongs]) };
     });
   }, [level, d.rounds, d.options]);
