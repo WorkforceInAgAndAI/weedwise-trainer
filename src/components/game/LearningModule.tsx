@@ -6395,21 +6395,6 @@ function TopicContent({
        SAFETY & CONTROL
     ═══════════════════════════════════════════════════════════ */
     case "safety": {
-      const ELEM_CONTROL_METHODS = [
-        {
-          label: "Hand Weeding",
-          desc: "Pulling weeds out by hand or with a tool. This works best for small areas and when there are only a few weeds. Always wear gloves!",
-        },
-        {
-          label: "Mowing",
-          desc: "Cutting weeds down before they can spread seeds. This does not remove the roots, so weeds may grow back.",
-        },
-        {
-          label: "Herbicides (Plant Sprays)",
-          desc: "Special sprays used by farmers and adults that kill unsafe weeds. Kids should never spray these — they must be handled with gloves, goggles, and training.",
-        },
-      ];
-
       // Curriculum-set placements. A species may belong to more than one
       // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
       const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
@@ -6516,23 +6501,6 @@ function TopicContent({
               "bg-secondary/40 border-border",
               other,
             )}
-
-            {/* Control methods */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">How Can We Remove Unsafe Weeds?</p>
-              <p>
-                Agronomists (plant scientists) use a few different tools to remove unsafe weeds from farms and yards.
-                The right tool depends on how many weeds there are and how dangerous they are to touch.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {ELEM_CONTROL_METHODS.map((m) => (
-                <div key={m.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                  <p className="font-bold text-foreground">{m.label}</p>
-                  <p className="text-xs text-muted-foreground">{m.desc}</p>
-                </div>
-              ))}
-            </div>
           </div>
         );
       }
