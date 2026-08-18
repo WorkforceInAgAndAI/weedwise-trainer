@@ -366,8 +366,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-1">Season Log</p>
             <p className="text-sm text-foreground">{seasonCorrect} correct · {handled.length - seasonCorrect} missed</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Every method is available — each one costs part of your ${START_BUDGET} budget. Pick the right one and
-              next season brings fewer weeds.
+              You start with hand pull, hoeing and mowing plus a ${START_BUDGET} budget. Correct control earns crop
+              revenue you can spend in the shed between seasons to unlock new methods.
             </p>
           </div>
           <div className="p-3 flex-1 lg:overflow-y-auto space-y-1.5">
