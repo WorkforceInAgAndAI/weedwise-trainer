@@ -233,7 +233,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
           <p className="text-lg font-bold text-foreground text-center">
             {seasonCorrect}/{field.length} weeds controlled correctly
           </p>
-          <p className="text-sm text-center text-muted-foreground">Budget remaining: ${budget}</p>
+          <p className="text-sm text-center text-muted-foreground">
+            Crop revenue earned: <strong className="text-success">+${income}</strong> · Budget: <strong>${budget}</strong>
+          </p>
           {wrong.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground text-center">Mismanaged weeds:</p>
@@ -263,6 +265,48 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               <>That was the last season. Let's see how the farm did.</>
             )}
           </div>
+
+          {/* Between-season store */}
+          {season < SEASONS && (
+            <div className="bg-card border-2 border-primary/40 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-primary" />
+                <p className="font-bold text-foreground">Control Methods Shed</p>
+                <span className="ml-auto text-sm font-extrabold text-success">${budget}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Buy new control methods with your crop revenue. Once bought, a method is yours for every future season.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {ALL_METHODS.filter(m => !STARTER_METHODS.includes(m.id)).map(m => {
+                  const cost = UNLOCK_COST[m.id] ?? 100;
+                  const have = owned.includes(m.id);
+                  const afford = budget >= cost;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => buyMethod(m)}
+                      disabled={have || !afford}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        have
+                          ? 'border-success/50 bg-success/10'
+                          : afford
+                            ? 'border-border bg-background hover:border-primary'
+                            : 'border-border bg-background/50 opacity-60 cursor-not-allowed'
+                      }`}
+                    >
+                      <span className="block text-sm font-bold text-foreground">{m.label}</span>
+                      <span className="text-[11px] text-muted-foreground">{m.tag} · use cost ${m.cost}</span>
+                      <span className={`block text-xs font-bold mt-1 ${have ? 'text-success' : 'text-primary'}`}>
+                        {have ? 'Owned' : `Buy — $${cost}`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <button onClick={nextSeason} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
             {season < SEASONS ? `Start Season ${season + 1}` : 'See Final Report'}
           </button>
