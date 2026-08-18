@@ -2,12 +2,26 @@ import { useState } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
-import { DollarSign, Check, X } from 'lucide-react';
+import { DollarSign, Check, X, Lock, ShoppingCart } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
-const START_BUDGET = 1000;
+const START_BUDGET = 400;
+// Methods a student owns from day one; the rest must be bought in the shed.
+const STARTER_METHODS = ['pull', 'hoe', 'mow'];
+// One-time unlock price for each purchasable method.
+const UNLOCK_COST: Record<string, number> = {
+  cultivate: 90,
+  tillage: 110,
+  cover: 120,
+  rotate: 120,
+  pre: 160,
+  post: 160,
+  'spot-spray': 140,
+};
+// Crop revenue earned for each weed controlled correctly.
+const REVENUE_PER_CORRECT = 70;
 
 interface Method { id: string; label: string; cost: number; tag: string }
 const ALL_METHODS: Method[] = [
@@ -120,6 +134,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [showSummary, setShowSummary] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [totalCorrect, setTotalCorrect] = useState(0);
+  const [owned, setOwned] = useState<string[]>(STARTER_METHODS);
+  const [income, setIncome] = useState(0);
 
   const fw = current ? field.find(f => f.id === current) : null;
   const remaining = field.filter(f => !handled.some(h => h.id === f.id));
@@ -128,6 +144,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const pickMethod = (m: Method) => {
     if (!fw || feedback) return;
     if (budget < m.cost) return;
+    if (!owned.includes(m.id)) return;
     const best = getBestMethod(fw.weed);
     const correct = m.id === best;
     const bestLabel = ALL_METHODS.find(x => x.id === best)?.label ?? best;
@@ -147,6 +164,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const endSeason = () => {
     setCurrent(null);
     setFeedback(null);
+    const earned = seasonCorrect * REVENUE_PER_CORRECT;
+    setIncome(earned);
+    setBudget(b => b + earned);
     setShowSummary(true);
   };
 
@@ -164,7 +184,14 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const startOver = () => {
     setSeason(1); setPopulation(6); setField(buildField(6)); setBudget(START_BUDGET);
     setHandled([]); setCurrent(null); setFeedback(null); setShowSummary(false);
-    setGameOver(false); setTotalCorrect(0);
+    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0);
+  };
+
+  const buyMethod = (m: Method) => {
+    const cost = UNLOCK_COST[m.id] ?? 100;
+    if (owned.includes(m.id) || budget < cost) return;
+    setBudget(b => b - cost);
+    setOwned(o => [...o, m.id]);
   };
 
   const shell = 'fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col pt-[56px]';
@@ -206,7 +233,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
           <p className="text-lg font-bold text-foreground text-center">
             {seasonCorrect}/{field.length} weeds controlled correctly
           </p>
-          <p className="text-sm text-center text-muted-foreground">Budget remaining: ${budget}</p>
+          <p className="text-sm text-center text-muted-foreground">
+            Crop revenue earned: <strong className="text-success">+${income}</strong> · Budget: <strong>${budget}</strong>
+          </p>
           {wrong.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground text-center">Mismanaged weeds:</p>
@@ -236,6 +265,48 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               <>That was the last season. Let's see how the farm did.</>
             )}
           </div>
+
+          {/* Between-season store */}
+          {season < SEASONS && (
+            <div className="bg-card border-2 border-primary/40 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-primary" />
+                <p className="font-bold text-foreground">Control Methods Shed</p>
+                <span className="ml-auto text-sm font-extrabold text-success">${budget}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Buy new control methods with your crop revenue. Once bought, a method is yours for every future season.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {ALL_METHODS.filter(m => !STARTER_METHODS.includes(m.id)).map(m => {
+                  const cost = UNLOCK_COST[m.id] ?? 100;
+                  const have = owned.includes(m.id);
+                  const afford = budget >= cost;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => buyMethod(m)}
+                      disabled={have || !afford}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        have
+                          ? 'border-success/50 bg-success/10'
+                          : afford
+                            ? 'border-border bg-background hover:border-primary'
+                            : 'border-border bg-background/50 opacity-60 cursor-not-allowed'
+                      }`}
+                    >
+                      <span className="block text-sm font-bold text-foreground">{m.label}</span>
+                      <span className="text-[11px] text-muted-foreground">{m.tag} · use cost ${m.cost}</span>
+                      <span className={`block text-xs font-bold mt-1 ${have ? 'text-success' : 'text-primary'}`}>
+                        {have ? 'Owned' : `Buy — $${cost}`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <button onClick={nextSeason} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
             {season < SEASONS ? `Start Season ${season + 1}` : 'See Final Report'}
           </button>
@@ -283,7 +354,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             </div>
             <button
               onClick={endSeason}
-              className="mt-3 px-4 py-2 rounded-lg bg-white/90 dark:bg-slate-900/90 text-foreground text-sm font-bold border border-border"
+              className="mt-3 w-full sm:w-auto px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-extrabold border-4 border-white shadow-2xl hover:scale-[1.03] transition-transform animate-pulse"
             >
               End Season {season} →
             </button>
@@ -295,8 +366,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-1">Season Log</p>
             <p className="text-sm text-foreground">{seasonCorrect} correct · {handled.length - seasonCorrect} missed</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Every method is available — each one costs part of your ${START_BUDGET} budget. Pick the right one and
-              next season brings fewer weeds.
+              You start with hand pull, hoeing and mowing plus a ${START_BUDGET} budget. Correct control earns crop
+              revenue you can spend in the shed between seasons to unlock new methods.
             </p>
           </div>
           <div className="p-3 flex-1 lg:overflow-y-auto space-y-1.5">
@@ -338,7 +409,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {ALL_METHODS.map(m => {
-                    const afford = budget >= m.cost;
+                    const have = owned.includes(m.id);
+                    const afford = have && budget >= m.cost;
                     return (
                       <button
                         key={m.id}
@@ -348,8 +420,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                           afford ? 'border-border bg-background text-foreground hover:border-primary' : 'border-border bg-background/50 text-muted-foreground cursor-not-allowed'
                         }`}
                       >
-                        <span className="block">{m.label}</span>
-                        <span className="text-[10px] font-normal text-muted-foreground">{m.tag} · ${m.cost}</span>
+                        <span className="flex items-center gap-1">
+                          {!have && <Lock className="w-3 h-3" />}
+                          {m.label}
+                        </span>
+                        <span className="text-[10px] font-normal text-muted-foreground">
+                          {have ? `${m.tag} · $${m.cost}` : `Locked — buy in the shed between seasons`}
+                        </span>
                       </button>
                     );
                   })}

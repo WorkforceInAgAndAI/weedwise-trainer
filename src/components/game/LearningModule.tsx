@@ -499,11 +499,11 @@ function FlipPlateCard({
 }) {
   const [flipped, setFlipped] = useState(false);
   const icons: Record<string, JSX.Element> = {
-    sun: <span className="text-3xl">☀️</span>,
-    water: <span className="text-3xl">💧</span>,
-    air: <span className="text-3xl">🌬️</span>,
-    nutrients: <span className="text-3xl">🥕</span>,
-    space: <span className="text-3xl">🪑</span>,
+    sun: <span className="text-4xl">☀️</span>,
+    water: <span className="text-4xl">💧</span>,
+    air: <span className="text-4xl">🌬️</span>,
+    nutrients: <span className="text-4xl">🥕</span>,
+    space: <span className="text-4xl">🪑</span>,
   };
   return (
     <button
@@ -520,15 +520,15 @@ function FlipPlateCard({
           className={`absolute inset-0 rounded-full border-4 border-amber-700 shadow-lg flex flex-col items-center justify-center gap-1 [backface-visibility:hidden] ${n.bg}`}
         >
           {icons[n.key]}
-          <p className="font-display font-extrabold text-foreground text-xs sm:text-sm">{n.title}</p>
-          <p className="text-[9px] text-muted-foreground italic">flip me!</p>
+          <p className="font-display font-extrabold text-foreground text-lg sm:text-xl">{n.title}</p>
+          <p className="text-sm text-muted-foreground italic">flip me!</p>
         </div>
         {/* Back */}
-        <div className="absolute inset-0 rounded-2xl bg-amber-50 border-4 border-amber-700 shadow-lg p-2 flex flex-col justify-center text-left [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <p className="text-[10px] font-bold text-amber-900 mb-1">🌽 Plants use it to:</p>
-          <p className="text-[10px] text-foreground leading-tight mb-1">{n.plantUses}</p>
-          <p className="text-[10px] font-bold text-destructive">🌿 Weeds steal it:</p>
-          <p className="text-[10px] text-foreground leading-tight">{n.weedSteals}</p>
+        <div className="absolute inset-0 rounded-2xl bg-amber-50 border-4 border-amber-700 shadow-lg p-3 flex flex-col justify-center text-left overflow-y-auto [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <p className="text-sm font-bold text-amber-900 mb-1">🌽 Plants use it to:</p>
+          <p className="text-sm text-foreground leading-snug mb-2">{n.plantUses}</p>
+          <p className="text-sm font-bold text-destructive">🌿 Weeds steal it:</p>
+          <p className="text-sm text-foreground leading-snug">{n.weedSteals}</p>
         </div>
       </div>
     </button>
@@ -3757,46 +3757,6 @@ function TopicContent({
               </CaseCallout>
             </DetectiveCard>
 
-            {/* Climate map */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-sm text-center">
-                Where These Habitats Live in the U.S.
-              </p>
-              <div className="relative w-full max-w-2xl mx-auto overflow-x-auto">
-                <svg viewBox="0 0 300 180" className="w-full h-auto min-w-[420px]">
-                  {/* Simplified continental US outline */}
-                  <path
-                    d="M30,60 L60,40 L120,30 L180,30 L230,40 L270,55 L275,90 L260,130 L220,150 L160,155 L100,150 L60,140 L35,110 Z"
-                    fill="hsl(var(--muted))"
-                    stroke="hsl(var(--border))"
-                    strokeWidth="1.5"
-                  />
-                  {/* Cool-Season: Northern US */}
-                  <path
-                    d="M60,40 L120,30 L180,30 L230,40 L235,70 L180,75 L120,72 L65,72 Z"
-                    fill="rgb(56 189 248 / 0.65)"
-                  />
-                  {/* Warm-Season: Southern central US */}
-                  <path d="M65,72 L235,70 L240,110 L200,130 L120,128 L65,115 Z" fill="rgb(245 158 11 / 0.6)" />
-                  {/* Dry: Southwest */}
-                  <path d="M30,60 L65,72 L65,115 L60,140 L35,110 Z" fill="rgb(234 88 12 / 0.6)" />
-                  {/* Wet: Southeast & Great Lakes */}
-                  <path d="M200,130 L240,110 L260,130 L220,150 L160,155 L120,128 Z" fill="rgb(29 78 216 / 0.55)" />
-                </svg>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {elemHabitats.map((h) => (
-                  <div key={h.key} className="flex items-center gap-2">
-                    <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
-                    <span className="text-foreground">
-                      <strong>{h.label}</strong>
-                      <span className="text-muted-foreground"> — {h.region}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {elemHabitats.map((h) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
               return (
@@ -6435,21 +6395,6 @@ function TopicContent({
        SAFETY & CONTROL
     ═══════════════════════════════════════════════════════════ */
     case "safety": {
-      const ELEM_CONTROL_METHODS = [
-        {
-          label: "Hand Weeding",
-          desc: "Pulling weeds out by hand or with a tool. This works best for small areas and when there are only a few weeds. Always wear gloves!",
-        },
-        {
-          label: "Mowing",
-          desc: "Cutting weeds down before they can spread seeds. This does not remove the roots, so weeds may grow back.",
-        },
-        {
-          label: "Herbicides (Plant Sprays)",
-          desc: "Special sprays used by farmers and adults that kill unsafe weeds. Kids should never spray these — they must be handled with gloves, goggles, and training.",
-        },
-      ];
-
       // Curriculum-set placements. A species may belong to more than one
       // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
       const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
@@ -6556,23 +6501,6 @@ function TopicContent({
               "bg-secondary/40 border-border",
               other,
             )}
-
-            {/* Control methods */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 text-sm text-foreground space-y-3">
-              <p className="font-display font-bold text-primary text-base">How Can We Remove Unsafe Weeds?</p>
-              <p>
-                Agronomists (plant scientists) use a few different tools to remove unsafe weeds from farms and yards.
-                The right tool depends on how many weeds there are and how dangerous they are to touch.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {ELEM_CONTROL_METHODS.map((m) => (
-                <div key={m.label} className="bg-card border border-border rounded-lg p-4 space-y-2">
-                  <p className="font-bold text-foreground">{m.label}</p>
-                  <p className="text-xs text-muted-foreground">{m.desc}</p>
-                </div>
-              ))}
-            </div>
           </div>
         );
       }

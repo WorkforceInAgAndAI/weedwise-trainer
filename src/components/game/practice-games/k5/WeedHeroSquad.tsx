@@ -115,6 +115,12 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
   const [rescued, setRescued] = useState(0);
 
   const mission = missions[step];
+  // Shuffle the hero order each mission so the right answer is never in a
+  // predictable left-to-right position.
+  const heroOrder = useMemo(
+    () => [...HEROES].sort(() => Math.random() - 0.5),
+    [level, step],
+  );
   const answered = picked !== null;
   const isCorrect = answered && picked === mission.best;
 
@@ -212,7 +218,7 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
           <div>
             <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Send a Hero:</div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {HEROES.map(h => {
+              {heroOrder.map(h => {
                 const isPick = picked === h.key;
                 const isBest = h.key === mission.best;
                 const state = !answered

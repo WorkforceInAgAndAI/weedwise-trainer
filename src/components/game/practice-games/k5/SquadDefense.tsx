@@ -87,9 +87,9 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   const config = useMemo(() => {
     // Gentle K-5 pacing: weeds march slowly and spawn far apart so students
     // have time to read each weakness badge before choosing a hero.
-    const spawnEverySec = Math.max(2.8, 4.6 - level * 0.2) / diff.speed;
-    const speedMin = (1.6 + level * 0.3) * diff.speed;      // % per second — slow and steady
-    const speedMax = (2.4 + level * 0.4) * diff.speed;
+    const spawnEverySec = Math.max(1.4, 2.8 - level * 0.15) / diff.speed;
+    const speedMin = (3.0 + level * 0.5) * diff.speed;      // % per second
+    const speedMax = (4.4 + level * 0.7) * diff.speed;
     const targetDefeated = 6 + level * 2;  // needed to win the level
     return { spawnEverySec, speedMin, speedMax, targetDefeated };
   }, [level, diff]);
