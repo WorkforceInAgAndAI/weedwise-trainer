@@ -248,7 +248,7 @@ export default function FunFactDetective({ onBack, gameId, gameName, gradeLabel 
         )}
 
         <div className="mt-5 text-center text-base text-muted-foreground">
-          Cases solved: <span className="font-extrabold text-foreground">{score}</span> / {step + (answered ? 1 : 0)}
+          Cases solved: <span className="font-extrabold text-foreground">{score}</span> / {rounds.length}
         </div>
       </div>
 
