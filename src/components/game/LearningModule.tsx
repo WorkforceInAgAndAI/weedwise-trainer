@@ -3757,46 +3757,6 @@ function TopicContent({
               </CaseCallout>
             </DetectiveCard>
 
-            {/* Climate map */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <p className="font-display font-bold text-foreground text-sm text-center">
-                Where These Habitats Live in the U.S.
-              </p>
-              <div className="relative w-full max-w-2xl mx-auto overflow-x-auto">
-                <svg viewBox="0 0 300 180" className="w-full h-auto min-w-[420px]">
-                  {/* Simplified continental US outline */}
-                  <path
-                    d="M30,60 L60,40 L120,30 L180,30 L230,40 L270,55 L275,90 L260,130 L220,150 L160,155 L100,150 L60,140 L35,110 Z"
-                    fill="hsl(var(--muted))"
-                    stroke="hsl(var(--border))"
-                    strokeWidth="1.5"
-                  />
-                  {/* Cool-Season: Northern US */}
-                  <path
-                    d="M60,40 L120,30 L180,30 L230,40 L235,70 L180,75 L120,72 L65,72 Z"
-                    fill="rgb(56 189 248 / 0.65)"
-                  />
-                  {/* Warm-Season: Southern central US */}
-                  <path d="M65,72 L235,70 L240,110 L200,130 L120,128 L65,115 Z" fill="rgb(245 158 11 / 0.6)" />
-                  {/* Dry: Southwest */}
-                  <path d="M30,60 L65,72 L65,115 L60,140 L35,110 Z" fill="rgb(234 88 12 / 0.6)" />
-                  {/* Wet: Southeast & Great Lakes */}
-                  <path d="M200,130 L240,110 L260,130 L220,150 L160,155 L120,128 Z" fill="rgb(29 78 216 / 0.55)" />
-                </svg>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {elemHabitats.map((h) => (
-                  <div key={h.key} className="flex items-center gap-2">
-                    <span className={`inline-block w-3 h-3 rounded ${h.color}`} />
-                    <span className="text-foreground">
-                      <strong>{h.label}</strong>
-                      <span className="text-muted-foreground"> — {h.region}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {elemHabitats.map((h) => {
               const grouped = topicWeeds.filter((w) => w.primaryHabitat === h.key);
               return (
