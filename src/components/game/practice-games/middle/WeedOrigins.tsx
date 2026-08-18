@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { weeds } from '@/data/weeds';
 import WeedImage from '@/components/game/WeedImage';
-import worldMap from '@/assets/images/world-map.jpg';
+import worldMap from '@/assets/images/world.jpg';
 import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
