@@ -7,7 +7,7 @@ import { DollarSign, Check, X } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
-const START_BUDGET = 1000;
+const START_BUDGET = 400;
 
 interface Method { id: string; label: string; cost: number; tag: string }
 const ALL_METHODS: Method[] = [
@@ -283,7 +283,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             </div>
             <button
               onClick={endSeason}
-              className="mt-3 px-4 py-2 rounded-lg bg-white/90 dark:bg-slate-900/90 text-foreground text-sm font-bold border border-border"
+              className="mt-3 w-full sm:w-auto px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-extrabold border-4 border-white shadow-2xl hover:scale-[1.03] transition-transform animate-pulse"
             >
               End Season {season} →
             </button>
