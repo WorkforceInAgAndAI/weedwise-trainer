@@ -19,10 +19,10 @@ import aerialPasture from '@/assets/images/aerial_pasture_field.jpg';
  * is the score.
  */
 
-const START_MONEY = 1000;
-const COST_PER_UNIT = 0.35;         // $ per percent-unit of path walked
+const START_MONEY = 25000;
+const COST_PER_UNIT = 8.75;         // $ per percent-unit of path walked
 const SCOUT_RADIUS_PCT = 7;         // how wide the scout can see either side
-const YIELD_LOSS_PER_WEED = 12;     // $ lost per weed left undetected across the season
+const YIELD_LOSS_PER_WEED = 300;    // $ lost per weed left undetected across the season
 const GRID = 3;                     // field is scored on a 3x3 block grid
 
 type Trip = 0 | 1 | 2;
@@ -184,7 +184,7 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
     const tot = log.reduce((s, l) => s + l.total, 0);
     return tot ? log.reduce((s, l) => s + l.found, 0) / tot : 0;
   })();
-  const walkedCheap = totalSpent <= 600;
+  const walkedCheap = totalSpent <= 15000;
   const goodPattern = avgBlocks >= 6.5;
   const foundEnough = foundPct >= 0.6;
   const productive = goodPattern && foundEnough && walkedCheap;
