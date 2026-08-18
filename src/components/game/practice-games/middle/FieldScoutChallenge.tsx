@@ -190,7 +190,7 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
   const productive = goodPattern && foundEnough && walkedCheap;
   const rating = productive
     ? 'Very productive'
-    : (goodPattern || foundEnough) && finalMoney >= 400
+    : (goodPattern || foundEnough) && finalMoney >= 10000
       ? 'Moderately productive'
       : 'Not productive';
   const ratingWhy = productive
@@ -207,15 +207,15 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
         <div className="max-w-3xl mx-auto p-4 space-y-4">
           <div className="rounded-xl border-2 border-primary/40 bg-card p-4 text-center">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Season {season} report</p>
-            <p className="font-display font-extrabold text-4xl text-primary">${finalMoney}</p>
+            <p className="font-display font-extrabold text-5xl sm:text-6xl text-primary">${finalMoney.toLocaleString()}</p>
             <p className="text-sm font-bold text-foreground">{rating}</p>
             <p className="text-xs text-muted-foreground mt-2 text-left">{ratingWhy}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss}</span></div>
-            <div className="border-t border-border pt-2 flex justify-between"><span className="font-bold text-foreground">Money kept</span><span className="font-extrabold text-primary">${finalMoney}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss.toLocaleString()}</span></div>
+            <div className="border-t border-border pt-2 flex justify-between text-lg"><span className="font-bold text-foreground">Money kept</span><span className="font-extrabold text-primary">${finalMoney.toLocaleString()}</span></div>
             <p className="text-xs text-muted-foreground pt-2">
               Walk cheap, but walk smart. A pattern that crosses the whole field — a W, a zig-zag, an X — costs a little
               more than hugging the outside, but it finds the patches before they set seed.
@@ -254,8 +254,8 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
         <h1 className="font-display font-bold text-foreground text-base sm:text-lg flex-1">{title}</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Season {season}</span>
         <span className="text-sm text-muted-foreground">Trip {trip + 1}/3</span>
-        <span className="inline-flex items-center gap-1 text-sm font-extrabold text-foreground">
-          <DollarSign className="w-4 h-4 text-primary" />{money - (submitted ? 0 : cost)}
+        <span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-primary/15 border-2 border-primary/50 text-xl sm:text-2xl font-extrabold text-primary shadow-sm">
+          <DollarSign className="w-6 h-6" />{(money - (submitted ? 0 : cost)).toLocaleString()}
         </span>
       </div>
 
