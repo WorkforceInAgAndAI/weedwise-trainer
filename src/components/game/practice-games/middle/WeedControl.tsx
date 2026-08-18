@@ -2,12 +2,26 @@ import { useState } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
-import { DollarSign, Check, X } from 'lucide-react';
+import { DollarSign, Check, X, Lock, ShoppingCart } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
 const START_BUDGET = 400;
+// Methods a student owns from day one; the rest must be bought in the shed.
+const STARTER_METHODS = ['pull', 'hoe', 'mow'];
+// One-time unlock price for each purchasable method.
+const UNLOCK_COST: Record<string, number> = {
+  cultivate: 90,
+  tillage: 110,
+  cover: 120,
+  rotate: 120,
+  pre: 160,
+  post: 160,
+  'spot-spray': 140,
+};
+// Crop revenue earned for each weed controlled correctly.
+const REVENUE_PER_CORRECT = 70;
 
 interface Method { id: string; label: string; cost: number; tag: string }
 const ALL_METHODS: Method[] = [
@@ -120,6 +134,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [showSummary, setShowSummary] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [totalCorrect, setTotalCorrect] = useState(0);
+  const [owned, setOwned] = useState<string[]>(STARTER_METHODS);
+  const [income, setIncome] = useState(0);
 
   const fw = current ? field.find(f => f.id === current) : null;
   const remaining = field.filter(f => !handled.some(h => h.id === f.id));
@@ -128,6 +144,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const pickMethod = (m: Method) => {
     if (!fw || feedback) return;
     if (budget < m.cost) return;
+    if (!owned.includes(m.id)) return;
     const best = getBestMethod(fw.weed);
     const correct = m.id === best;
     const bestLabel = ALL_METHODS.find(x => x.id === best)?.label ?? best;
@@ -147,6 +164,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const endSeason = () => {
     setCurrent(null);
     setFeedback(null);
+    const earned = seasonCorrect * REVENUE_PER_CORRECT;
+    setIncome(earned);
+    setBudget(b => b + earned);
     setShowSummary(true);
   };
 
@@ -164,7 +184,14 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const startOver = () => {
     setSeason(1); setPopulation(6); setField(buildField(6)); setBudget(START_BUDGET);
     setHandled([]); setCurrent(null); setFeedback(null); setShowSummary(false);
-    setGameOver(false); setTotalCorrect(0);
+    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0);
+  };
+
+  const buyMethod = (m: Method) => {
+    const cost = UNLOCK_COST[m.id] ?? 100;
+    if (owned.includes(m.id) || budget < cost) return;
+    setBudget(b => b - cost);
+    setOwned(o => [...o, m.id]);
   };
 
   const shell = 'fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col pt-[56px]';
