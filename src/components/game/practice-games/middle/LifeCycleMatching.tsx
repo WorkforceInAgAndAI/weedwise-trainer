@@ -119,7 +119,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
           <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {totalRounds} rounds!</p>
-          <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+          <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />
         </div>
       </div>
     );

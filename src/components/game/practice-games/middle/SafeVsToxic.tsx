@@ -239,7 +239,7 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
             </div>
           ))}
         </div>
-        <LevelComplete level={level} score={score} total={rounds.length * 2} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+        <LevelComplete level={level} score={score} total={rounds.length * 2} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />
       </div>
     );
   }

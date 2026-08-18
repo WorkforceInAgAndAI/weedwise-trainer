@@ -91,7 +91,7 @@ export default function LiguleLens({ onBack }: { onBack: () => void }) {
    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col items-center justify-center p-6">
     <h2 className="text-2xl font-bold text-foreground mb-2">Great Work!</h2>
     <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
-    <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+    <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />
    </div>
   );
  }

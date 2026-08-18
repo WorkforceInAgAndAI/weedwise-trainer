@@ -18,8 +18,13 @@ interface Props {
 
 export default function LevelComplete({ level, score, total, onNextLevel, onStartOver, onBack, title, gameId, gameName, gradeLabel, hideAccuracy }: Props) {
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
-  const passed = pct >= 60;
-  const tier = pct >= 85 ? 'gold' : pct >= 70 ? 'silver' : pct >= 50 ? 'bronze' : null;
+  // Grades 6-8 use the standard school grading scale; other levels keep the
+  // original encouragement-oriented thresholds.
+  const isMiddle = gradeLabel ? /6\s*-\s*8|middle/i.test(gradeLabel) : false;
+  const passed = isMiddle ? pct >= 70 : pct >= 60;
+  const tier = isMiddle
+    ? (pct >= 90 ? 'gold' : pct >= 80 ? 'silver' : pct >= 70 ? 'bronze' : null)
+    : (pct >= 85 ? 'gold' : pct >= 70 ? 'silver' : pct >= 50 ? 'bronze' : null);
   const { addBadge } = useGameProgress();
   // Auto-hide accuracy for K-5 unless explicitly overridden
   const hideAcc = hideAccuracy ?? (gradeLabel ? /k.?5|elementary/i.test(gradeLabel) : false);
@@ -64,7 +69,13 @@ export default function LevelComplete({ level, score, total, onNextLevel, onStar
         ) : (
           <>
             <p className="text-lg text-foreground mb-1">{score} / {total} correct</p>
-            <p className="text-sm text-muted-foreground mb-6">{pct}% accuracy</p>
+            <p className="text-sm text-muted-foreground mb-1">{pct}% accuracy</p>
+            {isMiddle && (
+              <p className="text-xs text-muted-foreground mb-6">
+                Grading scale: 90%+ Gold · 80%+ Silver · 70%+ Bronze (passing)
+              </p>
+            )}
+            {!isMiddle && <div className="mb-6" />}
           </>
         )}
 
