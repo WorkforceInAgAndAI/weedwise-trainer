@@ -106,7 +106,7 @@ export default function InvasiveQuiz({ onBack }: { onBack: () => void }) {
         <Ship className="w-10 h-10 text-primary mb-3" />
         <h2 className="text-2xl font-bold text-foreground mb-2">Journey Complete!</h2>
         <p className="text-lg text-foreground mb-6">{score}/{rounds.length} correct</p>
-        <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+        <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />
       </div>
     );
   }

@@ -151,7 +151,7 @@ export default function NameTheWeed({ onBack }: Props) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  if (done) return <LevelComplete level={level} score={score} total={rounds?.length ?? 0} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />;
 
   const progressPct = Math.round(((round + (submitted ? 1 : 0)) / rounds.length) * 100);
   const confidentIds = new Set(history.filter((h) => h.correct).map((h) => h.weed.id));

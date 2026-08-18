@@ -90,7 +90,7 @@ export default function WeedOrigins({ onBack }: { onBack: () => void }) {
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    return <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+    return <LevelComplete level={level} score={score} total={rounds.length} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />;
   }
 
   return (

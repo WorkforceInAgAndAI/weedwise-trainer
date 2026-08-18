@@ -77,7 +77,7 @@ export default function TaxonomyTower({ onBack }: Props) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  if (done) return <LevelComplete level={level} score={score} total={roundsCount} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />;
+  if (done) return <LevelComplete level={level} score={score} total={roundsCount} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />;
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">

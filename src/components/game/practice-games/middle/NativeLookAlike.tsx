@@ -120,7 +120,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const startOver = () => { setLevel(1); restart(); };
 
   if (done) {
-    return <LevelComplete level={level} score={score} total={groupSize} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} title={`Native or Introduced? Lv.${level}`} />;
+    return <LevelComplete level={level} score={score} total={groupSize} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" title={`Native or Introduced? Lv.${level}`} />;
   }
 
   return (
