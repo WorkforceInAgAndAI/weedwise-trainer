@@ -409,7 +409,8 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {ALL_METHODS.map(m => {
-                    const afford = budget >= m.cost;
+                    const have = owned.includes(m.id);
+                    const afford = have && budget >= m.cost;
                     return (
                       <button
                         key={m.id}
@@ -419,8 +420,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                           afford ? 'border-border bg-background text-foreground hover:border-primary' : 'border-border bg-background/50 text-muted-foreground cursor-not-allowed'
                         }`}
                       >
-                        <span className="block">{m.label}</span>
-                        <span className="text-[10px] font-normal text-muted-foreground">{m.tag} · ${m.cost}</span>
+                        <span className="flex items-center gap-1">
+                          {!have && <Lock className="w-3 h-3" />}
+                          {m.label}
+                        </span>
+                        <span className="text-[10px] font-normal text-muted-foreground">
+                          {have ? `${m.tag} · $${m.cost}` : `Locked — buy in the shed between seasons`}
+                        </span>
                       </button>
                     );
                   })}
