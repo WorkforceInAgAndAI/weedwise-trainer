@@ -331,9 +331,9 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
               <span className="flex items-center gap-1 text-foreground"><Footprints className="w-3 h-3" /> Path walked</span>
               <span className="font-bold text-foreground">{Math.round(walked)} units</span>
             </div>
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between items-center text-xs">
               <span className="flex items-center gap-1 text-foreground"><DollarSign className="w-3 h-3" /> Scouting cost</span>
-              <span className="font-bold text-destructive">-${cost}</span>
+              <span className="text-lg font-extrabold text-destructive">-${cost.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="flex items-center gap-1 text-foreground"><MapPin className="w-3 h-3" /> Field blocks sampled</span>
