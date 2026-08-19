@@ -16,7 +16,6 @@ import {
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
 import LeafArtist from './practice-games/k5/LeafArtist';
 import TaxonomyTower from './practice-games/k5/TaxonomyTower';
-import K5LookAlike from './practice-games/k5/K5LookAlike';
 import NameTheWeed from './practice-games/k5/NameTheWeed';
 import LifeStagesSequence from './practice-games/k5/LifeStagesSequence';
 import LifeCycleMatching from './practice-games/k5/LifeCycleMatching';
