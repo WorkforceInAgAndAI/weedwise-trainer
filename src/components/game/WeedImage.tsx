@@ -21,6 +21,9 @@ const STAGE_PREFIX_MAP: Record<string, string> = {
  rosette: 'rosette',
  shoot: 'shoot',
  underground: 'underground',
+ stem: 'stem',
+ pod: 'pod',
+ seedpod: 'pod',
 };
 
 /** Reproductive images have no variant number: reprof_.jpg / repros_.jpg */
