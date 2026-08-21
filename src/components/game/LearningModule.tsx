@@ -1471,46 +1471,105 @@ function WeedFlashcardDeck({
 }
 
 /** Maps a topic + grade to a Practice Hub game id. */
-const PRACTICE_GAME_MAP: Partial<Record<TopicId, Partial<Record<GradeLevel, string>>>> = {
-  names: { elementary: "name-the-weed", middle: "ms-name-weed", high: "hs-name-weed" },
-  "monocot-dicot": { elementary: "taxonomy-tower", middle: "ms-taxonomy" },
-  "look-alikes": { elementary: "look-alike", middle: "native-lookalike", high: "spot-differences" },
-  "native-introduced": { elementary: "invasive-id", middle: "weed-origins", high: "invasive-habitat" },
-  taxonomy: { middle: "ms-taxonomy", high: "hs-taxonomy" },
-  dioecious: { high: "spot-differences" },
-  "grass-id": { middle: "grass-id-lab", high: "ligule-lens" },
-  "life-stages": { elementary: "life-stages", middle: "life-stage-control", high: "life-stage-maze" },
-  "life-cycles": { elementary: "life-cycle-match", middle: "ms-lifecycle", high: "hs-lifecycle" },
-  seeds: { elementary: "seed-banks", middle: "seed-banks", high: "sleepy-seeds" },
-  "seed-dormancy": { high: "sleepy-seeds" },
-  habitats: { elementary: "habitat-mapping", middle: "ms-habitat", high: "hs-habitat" },
-  safety: { elementary: "safe-vs-toxic", middle: "ms-safe-toxic" },
-  "control-methods": { elementary: "weed-control", middle: "ms-weed-control", high: "hs-weed-control" },
-  "field-scouting": { middle: "field-scout", high: "hs-field-scout" },
-  "weed-competitors": { middle: "weed-competitors" },
-  allelopathy: { high: "allelopathy" },
-  "herbicide-moa": { middle: "control-matching", high: "hs-control-match" },
-  "crop-injury": { high: "crop-doctor" },
-  "life-stage-control": { high: "life-stage-maze" },
+const PRACTICE_GAME_MAP: Partial<
+  Record<TopicId, Partial<Record<"elementary" | "middle" | "high" | "collegiate", string>>>
+> = {
+  // Keys are LearningModule *display* grades (UI tabs), not legacy sourceGrade.
+  names: {
+    elementary: "fun-fact-detective",
+    middle: "name-the-weed",
+    high: "ms-name-weed",
+    collegiate: "hs-name-weed",
+  },
+  "monocot-dicot": {
+    elementary: "leaf-artist",
+    middle: "taxonomy-tower",
+    high: "ms-taxonomy",
+  },
+  "look-alikes": {
+    middle: "ms-look-alike",
+    high: "weed-lineup",
+    collegiate: "spot-differences",
+  },
+  "native-introduced": {
+    elementary: "invasive-id",
+    middle: "native-lookalike",
+    high: "weed-origins",
+    collegiate: "invasive-habitat",
+  },
+  taxonomy: { high: "ms-taxonomy", collegiate: "hs-taxonomy" },
+  dioecious: { collegiate: "spot-differences" },
+  "grass-id": { high: "grass-id-lab", collegiate: "ligule-lens" },
+  "life-stages": {
+    elementary: "life-stages",
+    middle: "life-stages",
+    high: "life-stage-control",
+    collegiate: "life-stage-maze",
+  },
+  "life-cycles": {
+    elementary: "sprout-climb",
+    middle: "life-cycle-match",
+    high: "ms-lifecycle",
+    collegiate: "hs-lifecycle",
+  },
+  seeds: {
+    elementary: "weed-travel",
+    middle: "seed-journey",
+    high: "seed-banks",
+    collegiate: "sleepy-seeds",
+  },
+  "seed-dormancy": { high: "ms-sleepy-seeds", collegiate: "sleepy-seeds" },
+  habitats: {
+    middle: "habitat-mapping",
+    high: "ms-habitat",
+    collegiate: "hs-habitat",
+  },
+  safety: {
+    elementary: "safe-vs-toxic",
+    middle: "sense-detective",
+    high: "ms-safe-toxic",
+  },
+  "control-methods": {
+    elementary: "whack-a-weed",
+    middle: "ms-weed-control",
+    high: "ms-weed-control",
+    collegiate: "hs-weed-control",
+  },
+  "field-scouting": {
+    elementary: "row-runner",
+    middle: "field-scout",
+    high: "ms-pasture-walk",
+    collegiate: "hs-field-scout",
+  },
+  "weed-competitors": { high: "weed-competitors" },
+  allelopathy: { collegiate: "allelopathy" },
+  "herbicide-moa": { high: "control-matching", collegiate: "hs-control-match" },
+  "crop-injury": { collegiate: "crop-doctor" },
+  "life-stage-control": { high: "life-stage-control", collegiate: "life-stage-maze" },
 };
 
-const GRADE_TO_HUB: Record<GradeLevel, string> = { elementary: "k5", middle: "68", high: "912" };
+const DISPLAY_GRADE_TO_HUB: Record<"elementary" | "middle" | "high" | "collegiate", string> = {
+  elementary: "newk5",
+  middle: "k5",
+  high: "68",
+  collegiate: "912",
+};
 
 function PracticeButton({
   topicId,
-  grade,
+  displayGrade,
   onOpenPractice,
 }: {
   topicId: TopicId;
-  grade: GradeLevel;
+  displayGrade: "elementary" | "middle" | "high" | "collegiate";
   onOpenPractice?: (gradeHub: string, gameId?: string) => void;
 }) {
   if (!onOpenPractice) return null;
-  const gameId = PRACTICE_GAME_MAP[topicId]?.[grade];
+  const gameId = PRACTICE_GAME_MAP[topicId]?.[displayGrade];
   if (!gameId) return null;
   return (
     <button
-      onClick={() => onOpenPractice(GRADE_TO_HUB[grade], gameId)}
+      onClick={() => onOpenPractice(DISPLAY_GRADE_TO_HUB[displayGrade], gameId)}
       className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
     >
       <Play className="w-4 h-4" />
@@ -1723,7 +1782,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                   {availableTopics.find((t) => t.id === selectedTopic)?.name ??
                     TOPICS.find((t) => t.id === selectedTopic)?.name}
                 </h2>
-                <PracticeButton topicId={selectedTopic} grade={sourceGrade} onOpenPractice={onOpenPractice} />
+                <PracticeButton topicId={selectedTopic} displayGrade={selectedGrade} onOpenPractice={onOpenPractice} />
               </div>
               <TopicContent
                 topicId={selectedTopic}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
 import BetweenLevelShop from '@/components/game/BetweenLevelShop';

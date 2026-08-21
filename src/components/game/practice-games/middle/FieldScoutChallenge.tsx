@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Footprints, DollarSign, Sprout, Leaf, Flower2, Target, RotateCcw, MapPin } from 'lucide-react';
-import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { weedsForPool, type PoolGrade } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
@@ -46,8 +46,12 @@ function pathLength(pts: { x: number; y: number }[]): number {
 }
 
 /** Scatter `count` weeds across the field in a few loose patches. */
-function buildPlants(count: number, speciesCount: number): Plant[] {
-  const chosen = shuffle(weeds).slice(0, Math.max(2, speciesCount));
+function buildPlants(
+  count: number,
+  speciesCount: number,
+  pool: ReturnType<typeof weedsForPool>,
+): Plant[] {
+  const chosen = shuffle(pool).slice(0, Math.max(2, speciesCount));
   const patches = Array.from({ length: Math.max(2, Math.round(count / 5)) }, () => ({
     cx: 12 + Math.random() * 76,
     cy: 12 + Math.random() * 76,
@@ -72,16 +76,30 @@ function distToSegment(p: { x: number; y: number }, a: { x: number; y: number },
   return Math.hypot(p.x - (a.x + abx * t), p.y - (a.y + aby * t));
 }
 
-interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }
+interface Props {
+  onBack: () => void;
+  gameId?: string;
+  gameName?: string;
+  gradeLabel?: string;
+  /** Practice hub band pool; shared by 6-8 (middle) and 9-12 (high). */
+  poolGrade?: PoolGrade;
+}
 
-export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLabel }: Props) {
+export default function FieldScoutChallenge({
+  onBack,
+  gameId,
+  gameName,
+  gradeLabel,
+  poolGrade = 'middle',
+}: Props) {
   const title = gameName ?? 'Field Scout Challenge';
+  const weeds = useMemo(() => weedsForPool(poolGrade), [poolGrade]);
   const [season, setSeason] = useState(1);
   const [trip, setTrip] = useState<Trip>(0);
   const [money, setMoney] = useState(START_MONEY);
   const [pressure, setPressure] = useState(14);      // weeds present this trip
   const [log, setLog] = useState<{ trip: number; cost: number; found: number; total: number; blocks: number }[]>([]);
-  const [plants, setPlants] = useState<Plant[]>(() => buildPlants(14, 4));
+  const [plants, setPlants] = useState<Plant[]>(() => buildPlants(14, 4, weedsForPool(poolGrade)));
   const [path, setPath] = useState<{ x: number; y: number }[]>([]);
   const [drawing, setDrawing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -91,7 +109,7 @@ export default function FieldScoutChallenge({ onBack, gameId, gameName, gradeLab
   const stage = TRIPS[trip];
 
   useEffect(() => {
-    setPlants(buildPlants(pressure, 3 + trip));
+    setPlants(buildPlants(pressure, 3 + trip, weeds));
     setPath([]);
     setSubmitted(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps

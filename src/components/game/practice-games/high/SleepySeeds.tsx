@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Shield, Dna, FlaskConical, Sprout } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
-import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { weedsForPool, collegiateWeeds, type PoolGrade } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
@@ -30,14 +30,24 @@ const SCENARIOS = [
  { desc: 'A cover crop has been planted, shading the soil and reducing light reaching the ground.', best: 'morphological', why: 'Your immature embryo keeps you dormant under shade until the cover crop is terminated and light returns.' },
 ];
 
-export default function SleepySeeds({ onBack }: { onBack: () => void }) {
+export default function SleepySeeds({
+  onBack,
+  poolGrade = 'high',
+}: {
+  onBack: () => void;
+  poolGrade?: PoolGrade;
+}) {
  const [level, setLevel] = useState(1);
  const { addBadge } = useGameProgress();
+ const weeds = useMemo(
+   () => (poolGrade === 'collegiate' ? collegiateWeeds : weedsForPool(poolGrade)),
+   [poolGrade],
+ );
 
  const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
  const rounds = useMemo(() => levelSlice(shuffle(SCENARIOS), level, d.rounds), [level, d.rounds]);
 
-  const seedWeeds = useMemo(() => levelSlice(shuffle([...weeds].filter(w => w.id !== 'Field_Horsetail')), level, d.rounds), [level, d.rounds]);
+  const seedWeeds = useMemo(() => levelSlice(shuffle([...weeds].filter(w => w.id !== 'Field_Horsetail')), level, d.rounds), [level, d.rounds, weeds]);
 
  const [idx, setIdx] = useState(0);
  const [phase, setPhase] = useState<'seedId' | 'dormancy'>('seedId');

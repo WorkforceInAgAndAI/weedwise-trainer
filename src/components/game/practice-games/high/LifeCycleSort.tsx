@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import { ArrowUpDown, Snowflake, Sun, RefreshCw, Calendar } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
