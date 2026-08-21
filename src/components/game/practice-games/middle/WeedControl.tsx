@@ -7,21 +7,29 @@ import { DollarSign, Check, X, Lock, ShoppingCart } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
-const START_BUDGET = 400;
+const START_BUDGET = 600;
 // Methods a student owns from day one; the rest must be bought in the shed.
-const STARTER_METHODS = ['pull', 'hoe', 'mow'];
+const STARTER_METHODS = ['pull', 'hoe', 'mow', 'cultivate'];
 // One-time unlock price for each purchasable method.
 const UNLOCK_COST: Record<string, number> = {
-  cultivate: 90,
-  tillage: 110,
-  cover: 120,
-  rotate: 120,
-  pre: 160,
-  post: 160,
-  'spot-spray': 140,
+  tillage: 70,
+  cover: 80,
+  rotate: 80,
+  pre: 100,
+  post: 100,
+  'spot-spray': 90,
 };
 // Crop revenue earned for each weed controlled correctly.
-const REVENUE_PER_CORRECT = 70;
+const REVENUE_PER_CORRECT = 90;
+// Extra harvest bonus paid at the end of a season, based on control success.
+function seasonBonus(correct: number, total: number) {
+  if (total === 0) return 0;
+  const rate = correct / total;
+  if (rate >= 0.9) return 250;
+  if (rate >= 0.7) return 150;
+  if (rate >= 0.5) return 75;
+  return 0;
+}
 
 interface Method { id: string; label: string; cost: number; tag: string }
 const ALL_METHODS: Method[] = [
