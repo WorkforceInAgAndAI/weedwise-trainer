@@ -77,6 +77,16 @@ export function hasImage(weedId: string, filename: string): boolean {
 }
 
 /**
+ * True when a weed has any image file starting with the given prefix
+ * (e.g. "stem" matches stem_1.jpg, stem.png, stem_2.jpeg).
+ * Used for optional gallery slots that appear as soon as photos are added.
+ */
+export function hasImagePrefix(weedId: string, prefix: string): boolean {
+ const p = `${weedId}/${prefix}`.toLowerCase();
+ return Object.keys(imageMapLower).some(k => k.startsWith(p));
+}
+
+/**
  * Get all crop image URLs for a given crop name
  */
 export function getCropImages(cropName: string): string[] {
