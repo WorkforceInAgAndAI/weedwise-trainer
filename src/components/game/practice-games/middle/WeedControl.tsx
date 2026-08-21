@@ -172,8 +172,10 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const endSeason = () => {
     setCurrent(null);
     setFeedback(null);
-    const earned = seasonCorrect * REVENUE_PER_CORRECT;
+    const bonus = seasonBonus(seasonCorrect, field.length);
+    const earned = seasonCorrect * REVENUE_PER_CORRECT + bonus;
     setIncome(earned);
+    setSeasonBonusPaid(bonus);
     setBudget(b => b + earned);
     setShowSummary(true);
   };
