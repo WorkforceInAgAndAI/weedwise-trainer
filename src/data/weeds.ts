@@ -2436,7 +2436,7 @@ export const weeds: Weed[] = [
 
   {
     id: "volunteer-sunflower",
-    commonName: "Volunteer Sunflower",
+    commonName: "Common Sunflower",
     scientificName: "Helianthus annuus",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -2458,9 +2458,9 @@ export const weeds: Weed[] = [
       id: "common_Cocklebur",
       species: "Common Cocklebur",
       difference:
-        "Common Cocklebur has spiny bur fruits and lobed leaves; Volunteer Sunflower has large flower heads and simple leaves",
+        "Common Cocklebur has spiny bur fruits and lobed leaves; Common Sunflower has large flower heads and simple leaves",
     },
-    memoryHook: "Volunteer sunflower = unmistakable yellow flower + rough sandpapery leaves + crop volunteer",
+    memoryHook: "Common sunflower = unmistakable yellow flower + rough sandpapery leaves + crop volunteer",
   },
 
   {

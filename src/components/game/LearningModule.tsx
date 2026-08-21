@@ -7998,8 +7998,8 @@ function TopicContent({
           note: "Reduces emergence and biomass of neighboring crops within thistle patches.",
         },
         {
-          id: "Volunteer_Sunflower",
-          name: "Volunteer Sunflower",
+          id: "Common_Sunflower",
+          name: "Common Sunflower",
           compound: "Chlorogenic & isochlorogenic acids",
           pathway: "Leaf Leachate + Decomposition Leaching",
           note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops.",

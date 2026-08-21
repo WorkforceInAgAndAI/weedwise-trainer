@@ -21,7 +21,7 @@ export const WARM_SEASON_NAMES = [
   'Asian copperleaf', 'Common copperleaf', 'Buffalobur', 'Common burdock', 'Common cocklebur', 'Common mallow',
   'Common milkweed', 'Common ragweed', 'Giant ragweed', 'Hemp dogbane', 'Horsenettle', 'Horseweed',
   'Jimsonweed', 'Kochia', 'Hemp', 'Palmer amaranth', 'Prickly sida', 'Redroot pigweed', 'Smooth groundcherry',
-  'Spotted spurge', 'Toothed spurge', 'Velvetleaf', 'Venice mallow', 'Volunteer sunflower', 'Wild buckwheat',
+  'Spotted spurge', 'Toothed spurge', 'Velvetleaf', 'Venice mallow', 'Common sunflower', 'Wild buckwheat',
   "Wild four o'clock", 'Field bindweed', 'Hedge bindweed', 'Ivyleaf morningglory', 'Common morningglory',
 ].map(normName);
 

@@ -81,7 +81,7 @@ export const LOOKALIKE_TRIPLES: LookAlikeTriple[] = [
   },
   {
     ids: ["Spotted_spurge", "volunteer-sunflower", "Horseweed"],
-    difference: "Spotted spurge: prostrate mat, milky sap, small leaves often with dark spot. Volunteer sunflower: large rough leaves, no milky sap, yellow ray heads. Horseweed: tall single stalk, narrow bristly leaves, no milky sap.",
+    difference: "Spotted spurge: prostrate mat, milky sap, small leaves often with dark spot. Common sunflower: large rough leaves, no milky sap, yellow ray heads. Horseweed: tall single stalk, narrow bristly leaves, no milky sap.",
   },
   {
     ids: ["poison-hemlock", "wild-parsnip", "golden-alexanders"],
