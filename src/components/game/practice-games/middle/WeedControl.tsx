@@ -144,6 +144,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [owned, setOwned] = useState<string[]>(STARTER_METHODS);
   const [income, setIncome] = useState(0);
+  const [seasonBonusPaid, setSeasonBonusPaid] = useState(0);
 
   const fw = current ? field.find(f => f.id === current) : null;
   const remaining = field.filter(f => !handled.some(h => h.id === f.id));
@@ -194,7 +195,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const startOver = () => {
     setSeason(1); setPopulation(6); setField(buildField(6)); setBudget(START_BUDGET);
     setHandled([]); setCurrent(null); setFeedback(null); setShowSummary(false);
-    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0);
+    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0); setSeasonBonusPaid(0);
   };
 
   const buyMethod = (m: Method) => {
@@ -244,7 +245,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             {seasonCorrect}/{field.length} weeds controlled correctly
           </p>
           <p className="text-sm text-center text-muted-foreground">
-            Crop revenue earned: <strong className="text-success">+${income}</strong> · Budget: <strong>${budget}</strong>
+            Crop revenue earned: <strong className="text-success">+${income}</strong>
+            {seasonBonusPaid > 0 && <> (includes a <strong className="text-success">${seasonBonusPaid}</strong> harvest bonus for strong control)</>}
+            {' '}· Budget: <strong>${budget}</strong>
           </p>
           {wrong.length > 0 && (
             <div className="space-y-2">
@@ -376,8 +379,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-1">Season Log</p>
             <p className="text-sm text-foreground">{seasonCorrect} correct · {handled.length - seasonCorrect} missed</p>
             <p className="text-xs text-muted-foreground mt-1">
-              You start with hand pull, hoeing and mowing plus a ${START_BUDGET} budget. Correct control earns crop
-              revenue you can spend in the shed between seasons to unlock new methods.
+              You start with hand pull, hoeing, mowing and cultivation plus a ${START_BUDGET} budget. Each correct
+              control earns ${REVENUE_PER_CORRECT}, and a strong season pays an extra harvest bonus you can spend in
+              the shed to unlock new methods.
             </p>
           </div>
           <div className="p-3 flex-1 lg:overflow-y-auto space-y-1.5">
