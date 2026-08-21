@@ -131,6 +131,38 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
      <span className="text-sm text-muted-foreground">Round {round + 1}/{ROUNDS_PER_LEVEL}</span>
     </div>
+    {(() => {
+     const sel = selected ? items.find(it => it.weed.id === selected)?.weed : null;
+     if (!sel) {
+      return (
+       <div className="mb-4 rounded-xl border-2 border-dashed border-border p-3 text-xs text-muted-foreground">
+        Select a species below to open its field notes — the survival structures, growth habit and control window
+        are your evidence for which life cycle it follows.
+       </div>
+      );
+     }
+     return (
+      <div className="mb-4 rounded-xl border-2 border-primary/40 bg-primary/5 p-3">
+       <div className="flex items-center gap-3 mb-2">
+        <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary shrink-0">
+         <WeedImage weedId={sel.id} stage="flower" className="w-full h-full object-cover" />
+        </div>
+        <div>
+         <p className="text-sm font-bold text-foreground">{sel.commonName}</p>
+         <p className="text-[11px] italic text-primary">{sel.scientificName}</p>
+        </div>
+       </div>
+       <ul className="space-y-1">
+        {lifeClues(sel).map((n, i) => (
+         <li key={i} className="text-xs text-foreground">
+          <span className="font-bold text-muted-foreground uppercase tracking-wider text-[10px] mr-1">{n.label}:</span>
+          {n.text}
+         </li>
+        ))}
+       </ul>
+      </div>
+     );
+    })()}
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
      {CATEGORIES.map(c => {
       const CatIcon = c.Icon;
