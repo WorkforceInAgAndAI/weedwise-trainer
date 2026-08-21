@@ -25,6 +25,18 @@ function getCategory(w: typeof weeds[0]): string {
  return 'perennial';
 }
 
+/** Field notes that connect what the plant does to how it survives the year. */
+function lifeClues(w: typeof weeds[0]): { label: string; text: string }[] {
+ const notes: { label: string; text: string }[] = [];
+ const structure = w.traits.find(t => /rhizome|tuber|taproot|rootstock|creeping root|crown|stolon|bulb|rosette|perennat/i.test(t));
+ if (structure) notes.push({ label: 'Survival structure', text: structure });
+ const growth = w.traits.find(t => /seed|germinat|emerg|flower|bolt|mature|grow/i.test(t) && t !== structure);
+ if (growth) notes.push({ label: 'Growth & reproduction', text: growth });
+ if (w.controlTiming) notes.push({ label: 'Best control window', text: w.controlTiming });
+ notes.push({ label: 'Where it lives', text: w.habitat });
+ return notes.slice(0, 3);
+}
+
 const ROUNDS_PER_LEVEL = 2;
 
 function itemsPerRound(level: number) {
