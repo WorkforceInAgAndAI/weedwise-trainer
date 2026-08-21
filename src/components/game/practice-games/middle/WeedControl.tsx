@@ -421,6 +421,18 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">
                   Choose a control method — budget ${budget}
                 </p>
+                <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-2 space-y-1">
+                  <p className="text-[11px] text-foreground">
+                    <span className="font-bold">Scouting hint:</span> {fw.weed.management}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Best timing: {fw.weed.controlTiming} · Look for a{' '}
+                    <strong className="text-foreground">
+                      {ALL_METHODS.find(m => m.id === getBestMethod(fw.weed))?.tag}
+                    </strong>{' '}
+                    method.
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   {ALL_METHODS.map(m => {
                     const have = owned.includes(m.id);
