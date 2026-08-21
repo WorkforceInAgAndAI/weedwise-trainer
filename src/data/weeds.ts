@@ -1845,7 +1845,7 @@ export const weeds: Weed[] = [
       species: "Common Mallow",
       difference: "Common Mallow is winter annual; Venice is warm-season annual",
     },
-    memoryHook: "Venice mallow = pale yellow flowers with dark center + inflated reticulate fruit",
+    memoryHook: "Venice mallow = pale yellow flowers with dark center",
   },
 
   {

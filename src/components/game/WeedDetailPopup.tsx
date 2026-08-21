@@ -3,6 +3,17 @@ import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { X } from 'lucide-react';
 import { getSessionCitations } from '@/data/imageReferences';
+import { hasImagePrefix } from '@/lib/imageMap';
+
+/**
+ * Optional gallery slots. They stay hidden until matching photos exist in
+ * src/assets/images/<weedId>/ (e.g. stem_1.jpg, pod_1.jpg), so newly uploaded
+ * detail photos show up in the glossary automatically.
+ */
+const EXTRA_SLOTS: { stage: string; prefix: string; label: string }[] = [
+  { stage: 'stem', prefix: 'stem', label: 'Stem' },
+  { stage: 'pod', prefix: 'pod', label: 'Seed Pod' },
+];
 
 interface Props {
  weed: Weed;
@@ -31,7 +42,8 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
   {(() => {
     const hasSeeds = weed.id !== 'Field_Horsetail';
     const stages = hasSeeds ? ['seed', 'seedling', 'vegetative', 'flower'] as const : ['seedling', 'vegetative', 'flower'] as const;
-    const colCount = stages.length + (isGrass ? 1 : 0);
+    const extras = EXTRA_SLOTS.filter(s => hasImagePrefix(weed.id, s.prefix));
+    const colCount = stages.length + (isGrass ? 1 : 0) + extras.length;
     return (
       <div className={`grid grid-cols-3 sm:grid-cols-${colCount} gap-2`}>
         {stages.map(stage => (
@@ -52,6 +64,14 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
             </div>
           </div>
         )}
+        {extras.map(s => (
+          <div key={s.stage} className="space-y-1">
+            <div className="text-[10px] font-medium text-muted-foreground uppercase text-center tracking-wider">{s.label}</div>
+            <div className="aspect-square rounded-md overflow-hidden bg-muted">
+              <WeedImage weedId={weed.id} stage={s.stage} className="w-full h-full" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   })()}

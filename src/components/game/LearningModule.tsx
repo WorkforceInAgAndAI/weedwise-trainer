@@ -924,7 +924,7 @@ const TOPICS: Topic[] = [
     name: "Life Stage Control",
     icon: "stagecontrol",
     description: "Choose the most vulnerable growth stage to target weeds for the most effective control outcome.",
-    grades: ["high"],
+    grades: ["middle", "high"],
     category: "control",
   },
 ];

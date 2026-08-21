@@ -7,21 +7,29 @@ import { DollarSign, Check, X, Lock, ShoppingCart } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
-const START_BUDGET = 400;
+const START_BUDGET = 600;
 // Methods a student owns from day one; the rest must be bought in the shed.
-const STARTER_METHODS = ['pull', 'hoe', 'mow'];
+const STARTER_METHODS = ['pull', 'hoe', 'mow', 'cultivate'];
 // One-time unlock price for each purchasable method.
 const UNLOCK_COST: Record<string, number> = {
-  cultivate: 90,
-  tillage: 110,
-  cover: 120,
-  rotate: 120,
-  pre: 160,
-  post: 160,
-  'spot-spray': 140,
+  tillage: 70,
+  cover: 80,
+  rotate: 80,
+  pre: 100,
+  post: 100,
+  'spot-spray': 90,
 };
 // Crop revenue earned for each weed controlled correctly.
-const REVENUE_PER_CORRECT = 70;
+const REVENUE_PER_CORRECT = 90;
+// Extra harvest bonus paid at the end of a season, based on control success.
+function seasonBonus(correct: number, total: number) {
+  if (total === 0) return 0;
+  const rate = correct / total;
+  if (rate >= 0.9) return 250;
+  if (rate >= 0.7) return 150;
+  if (rate >= 0.5) return 75;
+  return 0;
+}
 
 interface Method { id: string; label: string; cost: number; tag: string }
 const ALL_METHODS: Method[] = [
@@ -120,7 +128,7 @@ function buildField(count: number): FieldWeed[] {
 
 /** Good control shrinks next season's population; escapes and mistakes grow it. */
 function nextPopulation(population: number, correct: number, missedOrWrong: number) {
-  return Math.max(2, Math.min(14, Math.round(population + missedOrWrong * 2 - correct * 1.5)));
+  return Math.max(2, Math.min(10, Math.round(population + missedOrWrong * 1.5 - correct * 2)));
 }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
@@ -136,6 +144,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [owned, setOwned] = useState<string[]>(STARTER_METHODS);
   const [income, setIncome] = useState(0);
+  const [seasonBonusPaid, setSeasonBonusPaid] = useState(0);
 
   const fw = current ? field.find(f => f.id === current) : null;
   const remaining = field.filter(f => !handled.some(h => h.id === f.id));
@@ -164,8 +173,10 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const endSeason = () => {
     setCurrent(null);
     setFeedback(null);
-    const earned = seasonCorrect * REVENUE_PER_CORRECT;
+    const bonus = seasonBonus(seasonCorrect, field.length);
+    const earned = seasonCorrect * REVENUE_PER_CORRECT + bonus;
     setIncome(earned);
+    setSeasonBonusPaid(bonus);
     setBudget(b => b + earned);
     setShowSummary(true);
   };
@@ -184,7 +195,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   const startOver = () => {
     setSeason(1); setPopulation(6); setField(buildField(6)); setBudget(START_BUDGET);
     setHandled([]); setCurrent(null); setFeedback(null); setShowSummary(false);
-    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0);
+    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0); setSeasonBonusPaid(0);
   };
 
   const buyMethod = (m: Method) => {
@@ -234,7 +245,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             {seasonCorrect}/{field.length} weeds controlled correctly
           </p>
           <p className="text-sm text-center text-muted-foreground">
-            Crop revenue earned: <strong className="text-success">+${income}</strong> · Budget: <strong>${budget}</strong>
+            Crop revenue earned: <strong className="text-success">+${income}</strong>
+            {seasonBonusPaid > 0 && <> (includes a <strong className="text-success">${seasonBonusPaid}</strong> harvest bonus for strong control)</>}
+            {' '}· Budget: <strong>${budget}</strong>
           </p>
           {wrong.length > 0 && (
             <div className="space-y-2">
@@ -366,8 +379,9 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-1">Season Log</p>
             <p className="text-sm text-foreground">{seasonCorrect} correct · {handled.length - seasonCorrect} missed</p>
             <p className="text-xs text-muted-foreground mt-1">
-              You start with hand pull, hoeing and mowing plus a ${START_BUDGET} budget. Correct control earns crop
-              revenue you can spend in the shed between seasons to unlock new methods.
+              You start with hand pull, hoeing, mowing and cultivation plus a ${START_BUDGET} budget. Each correct
+              control earns ${REVENUE_PER_CORRECT}, and a strong season pays an extra harvest bonus you can spend in
+              the shed to unlock new methods.
             </p>
           </div>
           <div className="p-3 flex-1 lg:overflow-y-auto space-y-1.5">
@@ -407,6 +421,18 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">
                   Choose a control method — budget ${budget}
                 </p>
+                <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-2 space-y-1">
+                  <p className="text-[11px] text-foreground">
+                    <span className="font-bold">Scouting hint:</span> {fw.weed.management}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Best timing: {fw.weed.controlTiming} · Look for a{' '}
+                    <strong className="text-foreground">
+                      {ALL_METHODS.find(m => m.id === getBestMethod(fw.weed))?.tag}
+                    </strong>{' '}
+                    method.
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   {ALL_METHODS.map(m => {
                     const have = owned.includes(m.id);
