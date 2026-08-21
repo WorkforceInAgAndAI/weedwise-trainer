@@ -3,6 +3,17 @@ import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { X } from 'lucide-react';
 import { getSessionCitations } from '@/data/imageReferences';
+import { hasImagePrefix } from '@/lib/imageMap';
+
+/**
+ * Optional gallery slots. They stay hidden until matching photos exist in
+ * src/assets/images/<weedId>/ (e.g. stem_1.jpg, pod_1.jpg), so newly uploaded
+ * detail photos show up in the glossary automatically.
+ */
+const EXTRA_SLOTS: { stage: string; prefix: string; label: string }[] = [
+  { stage: 'stem', prefix: 'stem', label: 'Stem' },
+  { stage: 'pod', prefix: 'pod', label: 'Seed Pod' },
+];
 
 interface Props {
  weed: Weed;
