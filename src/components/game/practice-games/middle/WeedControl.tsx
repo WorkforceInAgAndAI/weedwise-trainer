@@ -128,7 +128,7 @@ function buildField(count: number): FieldWeed[] {
 
 /** Good control shrinks next season's population; escapes and mistakes grow it. */
 function nextPopulation(population: number, correct: number, missedOrWrong: number) {
-  return Math.max(2, Math.min(14, Math.round(population + missedOrWrong * 2 - correct * 1.5)));
+  return Math.max(2, Math.min(10, Math.round(population + missedOrWrong * 1.5 - correct * 2)));
 }
 
 export default function WeedControl({ onBack }: { onBack: () => void }) {
