@@ -80,6 +80,7 @@ import LifeStageMaze from './practice-games/high/LifeStageMaze';
 import PracticeStore from './PracticeStore';
 import HeroBuddy from './HeroCharacter';
 import type { StoreBand } from '@/lib/practiceStore';
+import type { PoolGrade } from '@/data/gradeWeeds';
 
 interface GameDef {
  id: string;
@@ -88,7 +89,20 @@ interface GameDef {
  category: string;
  description: string;
  howToPlay: string;
- component: React.ComponentType<{ onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }>;
+ component: React.ComponentType<{
+   onBack: () => void;
+   gameId?: string;
+   gameName?: string;
+   gradeLabel?: string;
+   poolGrade?: PoolGrade;
+ }>;
+}
+
+function hubToPoolGrade(hubId: string): PoolGrade {
+  if (hubId === 'newk5') return 'elementary';
+  if (hubId === 'k5') return 'middle';
+  if (hubId === '68') return 'high';
+  return 'collegiate';
 }
 
 // Maps a Practice game id to the related Learning Module topic id.
@@ -262,10 +276,17 @@ export default function PracticeHub({
    : selectedGrade === 'k5' ? '6-8'
    : selectedGrade === '68' ? '9-12'
    : 'Collegiate';
+ const poolGrade = hubToPoolGrade(selectedGrade);
  const topicId = GAME_TO_TOPIC[selectedGame.id];
  return (
    <>
-     <GameComp onBack={backToGames} gameId={selectedGame.id} gameName={selectedGame.name} gradeLabel={gradeLabel} />
+     <GameComp
+       onBack={backToGames}
+       gameId={selectedGame.id}
+       gameName={selectedGame.name}
+       gradeLabel={gradeLabel}
+       poolGrade={poolGrade}
+     />
       {/* Animated hero buddy keeps students company inside every game */}
       <HeroBuddy tips={[`${selectedGame.name}: ${selectedGame.description}`, selectedGame.howToPlay.split('. ')[0] + '.', `Tip for ${selectedGame.name} — ${selectedGame.howToPlay.split('. ').slice(1,2).join('') || 'take your time and look closely!'}`]} />
       {/* Standardized top nav bar for every practice game */}

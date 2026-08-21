@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Footprints, Target, Layers, Droplets } from 'lucide-react';
-import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import aerialCorn from '@/assets/images/aerial_corn_field.jpg';
