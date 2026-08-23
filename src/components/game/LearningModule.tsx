@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
+import HerbicideMOAExplorer from "@/components/game/learning/HerbicideMOAExplorer";
 import {
   DetectiveCard,
   EvidenceTag,
