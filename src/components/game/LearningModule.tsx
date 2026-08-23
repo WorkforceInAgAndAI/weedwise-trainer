@@ -8194,72 +8194,8 @@ function TopicContent({
             </p>
           </div>
           <h3 className="font-display font-bold text-foreground text-sm">Herbicide Groups in Use Today</h3>
-          <div className="space-y-3">
-            {[...HERBICIDE_MOA]
-              .sort((a, b) => a.group - b.group)
-              .map((m) => (
-                <div key={m.id} className="bg-card border border-border rounded-lg p-4">
-                  <p className="font-bold text-foreground">
-                    Group {m.group}: {m.moa}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    <strong>Chemistry:</strong> {m.chemistry}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    <strong>Timing / Spectrum:</strong> {m.timing} · {m.spectrum}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    <strong>Resistance risk:</strong>{" "}
-                    <span
-                      className={
-                        m.resistanceLevel === "Very high" || m.resistanceLevel === "High"
-                          ? "text-destructive font-medium"
-                          : "text-foreground"
-                      }
-                    >
-                      {m.resistanceLevel}
-                    </span>{" "}
-                    — {m.resistanceNotes}
-                  </p>
-                  <p className="text-xs text-primary mt-1">Examples: {m.brands.join(", ")}</p>
-                </div>
-              ))}
-          </div>
-          <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground">
-            <p className="font-semibold text-primary">Full MOA Reference Table</p>
-            <div className="overflow-x-auto mt-2">
-              <table className="w-full text-xs border-collapse">
-                <thead>
-                  <tr className="bg-secondary/50">
-                    <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
-                    <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
-                    <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
-                    <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
-                    <th className="p-2 text-left font-bold text-foreground border border-border">Resistance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...HERBICIDE_MOA]
-                    .sort((a, b) => a.group - b.group)
-                    .map((h) => (
-                      <tr key={h.id} className="even:bg-muted/20">
-                        <td className="p-2 border border-border font-medium text-foreground">
-                          {h.moa} (Group {h.group})
-                        </td>
-                        <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
-                        <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
-                        <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
-                        <td
-                          className={`p-2 border border-border font-medium ${h.resistanceLevel === "Very high" || h.resistanceLevel === "High" ? "text-destructive" : "text-foreground"}`}
-                        >
-                          {h.resistanceLevel}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <HerbicideMOAExplorer />
+
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Key Takeaway</p>
             <p className="mt-1">
