@@ -3521,7 +3521,7 @@ function TopicContent({
     case "native-introduced": {
       const natives = topicWeeds.filter((w) => w.origin === "Native");
       const introduced = topicWeeds.filter((w) => w.origin === "Introduced");
-      const invasives = introduced.filter((w) => w.actImmediately);
+      const aggressiveList = introduced.filter((w) => w.actImmediately);
 
       if (grade === "elementary") {
         return (
@@ -3579,16 +3579,16 @@ function TopicContent({
               </ul>
             </div>
 
-            {invasives.length > 0 && (
+            {aggressiveList.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <p className="font-display font-bold text-foreground text-sm">
-                  Invasive Weeds in the Midwest ({invasives.length})
+                  Invasive Weeds in the Midwest ({aggressiveList.length})
                 </p>
                 <p className="text-xs text-muted-foreground">
                   These weeds were introduced from other places and now hurt our farms and native plants. Scroll across
                   to see them all, and tap any weed to learn more.
                 </p>
-                <HorizontalWeedRow weeds={invasives} onSelectWeed={onSelectWeed} stage="flower" tileWidth="13rem" />
+                <HorizontalWeedRow weeds={aggressiveList} onSelectWeed={onSelectWeed} stage="flower" tileWidth="13rem" />
               </div>
             )}
 
@@ -3627,7 +3627,7 @@ function TopicContent({
                 </p>
               </div>
               <FieldNote label="Finding">
-                Most Midwestern invasives arrived via <strong>Eurasian trade routes</strong> — contaminated crop seed,
+                Most Midwestern introduced species arrived via <strong>Eurasian trade routes</strong> — contaminated crop seed,
                 ship ballast, and 1800s ornamental catalogs. The "enemy release" they left behind is what makes them
                 explode here.
               </FieldNote>
