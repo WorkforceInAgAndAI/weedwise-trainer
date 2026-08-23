@@ -10,13 +10,13 @@ function getFamilyPairs(weeds: Weed[]): Array<[Weed, Weed]> {
  return lookAlikePairsForPool(weeds) as Array<[Weed, Weed]>;
 }
 
-// Invasive vs native official look-alike pairs
+// Introduced vs native official look-alike pairs
 function getInvasiveNativePairs(weeds: Weed[]): Array<[Weed, Weed]> {
- const invasive = weeds.filter(w => w.origin === 'Introduced');
+ const introduced = weeds.filter(w => w.origin === 'Introduced');
  const native = weeds.filter(w => w.origin === 'Native');
  const pairs: Array<[Weed, Weed]> = [];
  const used = new Set<string>();
- invasive.forEach(inv => {
+ introduced.forEach(inv => {
  const match = native.find(nat => isOfficialLookAlike(inv.id, nat.id) && !used.has(nat.id));
  if (match) {
  used.add(match.id);
@@ -37,7 +37,7 @@ export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' 
  const STAGES = ['seedling', 'vegetative', 'flower', 'whole'] as const;
  const pair = useMemo(() => {
  const weeds = weedsForGrade(grade) as Weed[];
- // 40% chance to get an invasive vs native pair
+ // 40% chance to get an introduced vs native pair
  const useInvasiveNative = Math.random() < 0.4;
  const invNatPairs = useInvasiveNative ? getInvasiveNativePairs(weeds) : [];
  const allPairs = invNatPairs.length > 0 ? invNatPairs : getFamilyPairs(weeds);
@@ -81,11 +81,11 @@ export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' 
  <div className="bg-card border border-border rounded-lg p-4 sm:p-6 space-y-4 animate-scale-in">
  <div>
  <h2 className="font-display font-bold text-lg text-foreground">
- {pair.isInvasiveVsNative ? ' Invasive vs Native Challenge' : ' Look-Alike Challenge'}
+ {pair.isInvasiveVsNative ? ' Introduced vs Native Challenge' : ' Look-Alike Challenge'}
  </h2>
  <p className="text-sm text-muted-foreground">
  {pair.isInvasiveVsNative
- ? <>One is <span className="text-destructive font-semibold">invasive</span> and the other is <span className="text-accent font-semibold">native</span>. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
+ ? <>One is <span className="text-destructive font-semibold">introduced</span> and the other is <span className="text-accent font-semibold">native</span>. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
  : <>Both species are in the <span className="text-primary font-semibold">{pair.weedA.family}</span> family. Which image shows <span className="text-foreground font-bold">{pair.target.commonName}</span>?</>
  }
  </p>

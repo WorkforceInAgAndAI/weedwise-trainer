@@ -4,22 +4,22 @@ import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import { getDifficulty } from '@/lib/difficulty';
 
-// -------- Invasive Splat! (K-5 Explorer, spin-art paint canvas) -----------
-// Kids drop invasive (watery) and native (thick) paint blobs onto a round
+// -------- Introduced Splat! (K-5 Explorer, spin-art paint canvas) -----------
+// Kids drop introduced (watery) and native (thick) paint blobs onto a round
 // paper on a spinning wheel. When they hit SPIN, the paints smear outward:
-// the runny invasive paint spreads much further than the thick native paint,
-// showing how invasive weeds out-compete natives for space.
+// the runny introduced paint spreads much further than the thick native paint,
+// showing how introduced weeds out-compete natives for space.
 // -------------------------------------------------------------------------
 
-interface PaintDef { key: 'invasive' | 'native'; name: string; label: string; color: string; funFact: string; }
+interface PaintDef { key: 'introduced' | 'native'; name: string; label: string; color: string; funFact: string; }
 
-interface Round { invasive: PaintDef; native: PaintDef; }
+interface Round { introduced: PaintDef; native: PaintDef; }
 
 const INVASIVES: PaintDef[] = [
-  { key: 'invasive', name: 'Garlic Mustard', label: 'Invasive · watery', color: '#7c3aed', funFact: 'Its runny roots poison the soil so nothing else grows nearby.' },
-  { key: 'invasive', name: 'Field Bindweed', label: 'Invasive · watery', color: '#ea580c', funFact: 'Vines slip out and grab neighbors before they can react.' },
-  { key: 'invasive', name: 'Canada Thistle', label: 'Invasive · watery', color: '#be185d', funFact: 'One plant becomes a whole patch in a single summer.' },
-  { key: 'invasive', name: 'Quackgrass',      label: 'Invasive · watery', color: '#0891b2', funFact: 'Sneaky underground stems pop up everywhere.' },
+  { key: 'introduced', name: 'Garlic Mustard', label: 'Introduced · watery', color: '#7c3aed', funFact: 'Its runny roots poison the soil so nothing else grows nearby.' },
+  { key: 'introduced', name: 'Field Bindweed', label: 'Introduced · watery', color: '#ea580c', funFact: 'Vines slip out and grab neighbors before they can react.' },
+  { key: 'introduced', name: 'Canada Thistle', label: 'Introduced · watery', color: '#be185d', funFact: 'One plant becomes a whole patch in a single summer.' },
+  { key: 'introduced', name: 'Quackgrass',      label: 'Introduced · watery', color: '#0891b2', funFact: 'Sneaky underground stems pop up everywhere.' },
 ];
 const NATIVES: PaintDef[] = [
   { key: 'native', name: 'Milkweed',      label: 'Native · thick', color: '#16a34a', funFact: 'Stays put — feeds monarch caterpillars in one tidy patch.' },
@@ -38,11 +38,11 @@ const NATIVE_SPREAD   = 1.6;
 const INVASIVE_WIDTH  = 26;      // drop base radius in px
 const NATIVE_WIDTH    = 22;
 
-interface Drop { id: number; x: number; y: number; type: 'invasive' | 'native'; color: string; }
+interface Drop { id: number; x: number; y: number; type: 'introduced' | 'native'; color: string; }
 
 function pick<T>(a: T[]): T { return a[Math.floor(Math.random() * a.length)]; }
 
-function newRound(): Round { return { invasive: pick(INVASIVES), native: pick(NATIVES) }; }
+function newRound(): Round { return { introduced: pick(INVASIVES), native: pick(NATIVES) }; }
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
@@ -57,9 +57,9 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
 
   const [roundData, setRoundData] = useState<Round>(() => newRound());
   const [drops, setDrops] = useState<Drop[]>([]);
-  const [selected, setSelected] = useState<'invasive' | 'native'>('invasive');
+  const [selected, setSelected] = useState<'introduced' | 'native'>('introduced');
   const [phase, setPhase] = useState<'setup' | 'spinning' | 'result'>('setup');
-  const [coverage, setCoverage] = useState<{ invasive: number; native: number; blank: number } | null>(null);
+  const [coverage, setCoverage] = useState<{ introduced: number; native: number; blank: number } | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dropIdRef = useRef(0);
@@ -83,8 +83,8 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
     if (phase === 'setup') {
       // Just render drop dots at their spots
       for (const d of drops) {
-        const w = d.type === 'invasive' ? INVASIVE_WIDTH : NATIVE_WIDTH;
-        if (d.type === 'invasive') {
+        const w = d.type === 'introduced' ? INVASIVE_WIDTH : NATIVE_WIDTH;
+        if (d.type === 'introduced') {
           // Watery halo — wide, translucent puddle around the main drop
           const halo = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, w * 1.9);
           halo.addColorStop(0, d.color + 'aa');
@@ -135,13 +135,13 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         }
       }
     } else {
-      // Streak the drops outward from center — invasive stretches further
+      // Streak the drops outward from center — introduced stretches further
       for (const d of drops) {
         const dx = d.x - CENTER, dy = d.y - CENTER;
         const r0 = Math.sqrt(dx * dx + dy * dy) + 4;
         const angle = Math.atan2(dy, dx);
-        const spread = d.type === 'invasive' ? INVASIVE_SPREAD : NATIVE_SPREAD;
-        const w = d.type === 'invasive' ? INVASIVE_WIDTH : NATIVE_WIDTH;
+        const spread = d.type === 'introduced' ? INVASIVE_SPREAD : NATIVE_SPREAD;
+        const w = d.type === 'introduced' ? INVASIVE_WIDTH : NATIVE_WIDTH;
         const rEnd = Math.min(R_MAX, r0 * spread);
 
         // Draw many overlapping circles along the streak for a paint-smear look
@@ -150,7 +150,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
           const t = i / steps;
           const r = r0 + (rEnd - r0) * t;
           // Tangential curl follows the clockwise spin of the wheel
-          const curl = (d.type === 'invasive' ? -0.55 : -0.25) * t;
+          const curl = (d.type === 'introduced' ? -0.55 : -0.25) * t;
           const a = angle + curl;
           const px = CENTER + Math.cos(a) * r;
           const py = CENTER + Math.sin(a) * r;
@@ -179,13 +179,13 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
           // near-white paper?
           if (r > 240 && g > 240 && b > 220) { blank++; continue; }
           // classify by nearest paint color
-          const dInv = colorDist(r, g, b, roundData.invasive.color);
+          const dInv = colorDist(r, g, b, roundData.introduced.color);
           const dNat = colorDist(r, g, b, roundData.native.color);
           if (dInv < dNat) inv++; else nat++;
         }
       }
       const pct = (n: number) => total ? Math.round((n / total) * 100) : 0;
-      setCoverage({ invasive: pct(inv), native: pct(nat), blank: pct(blank) });
+      setCoverage({ introduced: pct(inv), native: pct(nat), blank: pct(blank) });
     }
   }, [drops, phase, roundData, coverage]);
 
@@ -198,7 +198,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
     // clip to paper
     const dx = x - CENTER, dy = y - CENTER;
     if (dx * dx + dy * dy > (R_MAX - 10) * (R_MAX - 10)) return;
-    const color = selected === 'invasive' ? roundData.invasive.color : roundData.native.color;
+    const color = selected === 'introduced' ? roundData.introduced.color : roundData.native.color;
     setDrops(d => [...d, { id: ++dropIdRef.current, x, y, type: selected, color }]);
   }
 
@@ -216,7 +216,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
 
   function nextRound() {
     if (!coverage) return;
-    const nextInv = totalInv + coverage.invasive;
+    const nextInv = totalInv + coverage.introduced;
     const nextNat = totalNat + coverage.native;
     if (round + 1 >= ROUNDS_PER_LEVEL) {
       setTotalInv(nextInv); setTotalNat(nextNat); setDone(true); return;
@@ -245,7 +245,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         onNextLevel={nextLevel}
         onStartOver={startOver}
         onBack={onBack}
-        title="Invasive Splat!"
+        title="Introduced Splat!"
         gameId={gameId}
         gameName={gameName}
         gradeLabel={gradeLabel}
@@ -254,7 +254,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
     );
   }
 
-  const invCount = drops.filter(d => d.type === 'invasive').length;
+  const invCount = drops.filter(d => d.type === 'introduced').length;
   const natCount = drops.filter(d => d.type === 'native').length;
 
   return (
@@ -271,10 +271,10 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1 flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-primary" /> Invasive Splat! · Spin-Art Lab
+          <Sparkles className="w-6 h-6 text-primary" /> Introduced Splat! · Spin-Art Lab
         </h1>
         <p className="text-muted-foreground mb-3">
-          Drop paint on the paper, then hit <strong>SPIN</strong>! The runny invasive paint smears way out — just like an invasive weed spreading fast — while the thick native paint stays close to home.
+          Drop paint on the paper, then hit <strong>SPIN</strong>! The runny introduced paint smears way out — just like an introduced weed spreading fast — while the thick native paint stays close to home.
         </p>
 
         <div className="mb-3 rounded-lg border-2 border-red-300 bg-red-50 p-3 flex items-start gap-2">
@@ -309,9 +309,9 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
                 <div className="pointer-events-auto bg-card/95 backdrop-blur rounded-xl p-4 border-2 border-primary shadow-2xl max-w-xs w-full text-center animate-fade-in">
                   <h3 className="text-lg font-bold text-foreground mb-2">Spin Results</h3>
                   <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                    <div className="rounded-lg p-2 border-2" style={{ borderColor: roundData.invasive.color }}>
-                      <p className="text-[10px] uppercase font-bold" style={{ color: roundData.invasive.color }}>Invasive</p>
-                      <p className="text-2xl font-black" style={{ color: roundData.invasive.color }}>{coverage.invasive}%</p>
+                    <div className="rounded-lg p-2 border-2" style={{ borderColor: roundData.introduced.color }}>
+                      <p className="text-[10px] uppercase font-bold" style={{ color: roundData.introduced.color }}>Introduced</p>
+                      <p className="text-2xl font-black" style={{ color: roundData.introduced.color }}>{coverage.introduced}%</p>
                     </div>
                     <div className="rounded-lg p-2 border-2" style={{ borderColor: roundData.native.color }}>
                       <p className="text-[10px] uppercase font-bold" style={{ color: roundData.native.color }}>Native</p>
@@ -331,7 +331,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
             <div className="rounded-lg border-2 border-border bg-card p-3">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Pick your paint</p>
               <div className="space-y-2">
-                {[roundData.invasive, roundData.native].map(paint => (
+                {[roundData.introduced, roundData.native].map(paint => (
                   <button
                     key={paint.key}
                     onClick={() => setSelected(paint.key)}
@@ -344,7 +344,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
                       className="shrink-0 w-10 h-10 rounded-full shadow"
                       style={{
                         background: `radial-gradient(circle at 35% 35%, ${paint.color}, ${paint.color}cc)`,
-                        filter: paint.key === 'invasive' ? 'blur(0.5px)' : 'none',
+                        filter: paint.key === 'introduced' ? 'blur(0.5px)' : 'none',
                       }}
                     />
                     <div className="min-w-0">
@@ -354,12 +354,12 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-muted-foreground mt-2 italic">"{(selected === 'invasive' ? roundData.invasive : roundData.native).funFact}"</p>
+              <p className="text-[11px] text-muted-foreground mt-2 italic">"{(selected === 'introduced' ? roundData.introduced : roundData.native).funFact}"</p>
             </div>
 
             <div className="rounded-lg border-2 border-dashed border-border bg-card p-3 text-xs space-y-1">
               <p className="font-bold text-foreground mb-1">Drops on paper</p>
-              <p><span className="inline-block w-3 h-3 rounded-full align-middle mr-1" style={{ background: roundData.invasive.color }} /> Invasive: <strong>{invCount}</strong></p>
+              <p><span className="inline-block w-3 h-3 rounded-full align-middle mr-1" style={{ background: roundData.introduced.color }} /> Introduced: <strong>{invCount}</strong></p>
               <p><span className="inline-block w-3 h-3 rounded-full align-middle mr-1" style={{ background: roundData.native.color }} /> Native: <strong>{natCount}</strong></p>
             </div>
 
@@ -391,7 +391,7 @@ export default function InvasiveSplat({ onBack, gameId, gameName, gradeLabel }: 
         <div className="mt-4">
           <FarmerGuide
             tone="intro"
-            message={`Drop paint anywhere on the paper, then hit SPIN. Watch how the watery invasive paint takes over — that's the same trick real invasive weeds use in a real field!`}
+            message={`Drop paint anywhere on the paper, then hit SPIN. Watch how the watery introduced paint takes over — that's the same trick real introduced weeds use in a real field!`}
           />
         </div>
       </div>
