@@ -73,10 +73,10 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  const submit = (ans: 'native' | 'invasive') => {
+  const submit = (ans: 'native' | 'introduced') => {
     setChoice(ans);
     setAnswered(true);
-    const correct = (ans === 'invasive') === isInvasive;
+    const correct = (ans === 'introduced') === isInvasive;
     if (correct) setRoundScore(s => s + 1);
   };
 
@@ -110,12 +110,12 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-xl font-display font-bold text-foreground mb-2">Round {roundIdx + 1} Complete!</h2>
           <p className="text-foreground mb-1">Score: <span className="font-bold text-primary">{roundScore}/{rounds.length}</span></p>
-          <p className="text-sm text-muted-foreground mb-2">Invasive species found: {invasiveCount} of {rounds.length}</p>
+          <p className="text-sm text-muted-foreground mb-2">Introduced species found: {invasiveCount} of {rounds.length}</p>
           <div className="space-y-2 my-4 max-h-48 overflow-y-auto">
             {rounds.map((q, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-left">
                 <span className={q.weed.origin === 'Introduced' ? 'text-destructive font-bold' : 'text-green-500 font-bold'}>
-                  {q.weed.origin === 'Introduced' ? 'Invasive' : 'Native'}
+                  {q.weed.origin === 'Introduced' ? 'Introduced' : 'Native'}
                 </span>
                 <span className="text-foreground">{q.weed.commonName}</span>
               </div>
@@ -129,13 +129,13 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
     );
   }
 
-  const correct = choice ? ((choice === 'invasive') === isInvasive) : false;
+  const correct = choice ? ((choice === 'introduced') === isInvasive) : false;
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Invasive ID</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">Introduced ID</h1>
         <span className="text-sm text-muted-foreground">R{roundIdx + 1} • {questionIdx + 1}/{rounds.length}</span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm font-bold text-primary ml-2">{roundScore} pts</span>
@@ -178,12 +178,12 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
               {!answered ? (
                 <div className="flex gap-4">
                   <button onClick={() => submit('native')} className="px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg font-bold">Native</button>
-                  <button onClick={() => submit('invasive')} className="px-8 py-4 rounded-xl bg-destructive/90 text-destructive-foreground text-lg font-bold">Invasive</button>
+                  <button onClick={() => submit('introduced')} className="px-8 py-4 rounded-xl bg-destructive/90 text-destructive-foreground text-lg font-bold">Introduced</button>
                 </div>
               ) : (
                 <div className="text-center max-w-sm">
                   <p className={`text-lg font-bold mb-2 ${correct ? 'text-green-500' : 'text-destructive'}`}>
-                    {correct ? 'Correct!' : `Not quite — this plant is ${isInvasive ? 'invasive' : 'native'}!`}
+                    {correct ? 'Correct!' : `Not quite — this plant is ${isInvasive ? 'introduced' : 'native'}!`}
                   </p>
                   <p className="text-sm text-muted-foreground mb-3">
                     {isInvasive ? `${r!.weed.commonName} was brought from ${r!.originRegion}.` : `${r!.weed.commonName} naturally grows in North America.`}
@@ -195,10 +195,10 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
           )}
         </div>
 
-        {/* Right: collected weeds split by Native vs Invasive */}
+        {/* Right: collected weeds split by Native vs Introduced */}
         <div className="space-y-3">
           <div className="rounded-xl border-2 border-destructive/40 bg-destructive/5 p-3">
-            <p className="text-xs font-bold uppercase text-destructive mb-2">Invasive ({rounds.slice(0, questionIdx + (answered ? 1 : 0)).filter(q => q.weed.origin === 'Introduced').length})</p>
+            <p className="text-xs font-bold uppercase text-destructive mb-2">Introduced ({rounds.slice(0, questionIdx + (answered ? 1 : 0)).filter(q => q.weed.origin === 'Introduced').length})</p>
             <div className="flex flex-wrap gap-1.5">
               {rounds.slice(0, questionIdx + (answered ? 1 : 0))
                 .filter(q => q.weed.origin === 'Introduced')
@@ -235,7 +235,7 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       </div>
-          <FloatingCoach grade="K-5" position="bottom-right" tip={`Invasive species don't belong here naturally — they crowd out native plants. Look for the ones that came from far away!`} />
+          <FloatingCoach grade="K-5" position="bottom-right" tip={`Introduced species don't belong here naturally — they crowd out native plants. Look for the ones that came from far away!`} />
 </div>
   );
 }

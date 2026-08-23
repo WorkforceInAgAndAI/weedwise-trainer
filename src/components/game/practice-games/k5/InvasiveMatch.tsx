@@ -7,7 +7,7 @@ import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-// Each invasive weed has multiple verified negative effects; we rotate which one shows per round
+// Each introduced weed has multiple verified negative effects; we rotate which one shows per round
 // so students see different impacts each time.
 const EFFECTS_BY_WEED: Record<string, string[]> = {
   'waterhemp': [
@@ -155,15 +155,15 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Invasive Match</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">Introduced Match</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm text-muted-foreground">Round {roundNum + 1}/{ROUNDS_PER_LEVEL}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        <p className="text-sm text-muted-foreground mb-4 text-center">Match each invasive weed to the damage it causes</p>
+        <p className="text-sm text-muted-foreground mb-4 text-center">Match each introduced weed to the damage it causes</p>
         <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
           <div className="space-y-2">
-            <p className="text-xs font-bold text-foreground text-center">Invasive Weeds</p>
+            <p className="text-xs font-bold text-foreground text-center">Introduced Weeds</p>
             {items.map(i => (
               <button key={i.weed.id} onClick={() => !checked && setSelectedWeed(i.weed.id)}
                 className={`w-full p-2 rounded-lg border-2 text-sm font-medium text-left transition-all flex items-center gap-2 ${
@@ -203,7 +203,7 @@ export default function InvasiveMatch({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-          <FloatingCoach grade="K-5" tip={`Each invasive weed causes its own kind of trouble. Match it to what it does to the field!`} />
+          <FloatingCoach grade="K-5" tip={`Each introduced weed causes its own kind of trouble. Match it to what it does to the field!`} />
 </div>
   );
 }

@@ -512,7 +512,7 @@ export const weeds: Weed[] = [
     habitat: "Woodlands, forest edges, urban areas",
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
-    actReason: "Allelopathic; displaces native understory flora; spreading invasive in forests",
+    actReason: "Allelopathic; displaces native understory flora; spreading introduced in forests",
     management: "Hand pulling biennial rosettes, POST herbicides, early spring control",
     controlTiming: "Rosette stage in spring; before seed formation",
     lookAlike: {
@@ -729,7 +729,7 @@ export const weeds: Weed[] = [
     habitat: "Row crop fields, pastures, roadsides",
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
-    actReason: "Extremely aggressive invasive; grows 2+ inches/day, and develops herbicide resistance rapidly",
+    actReason: "Extremely aggressive introduced; grows 2+ inches/day, and develops herbicide resistance rapidly",
     management: "PRE herbicides, multiple POST herbicide MOA, hand removal",
     controlTiming: "Seedling stage",
     lookAlike: {

@@ -144,7 +144,7 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
    <div className="max-w-lg mx-auto p-4">
     <div className="flex items-center gap-3 mb-4">
      <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-     <h1 className="font-display font-bold text-lg text-foreground">Invasive ID</h1>
+     <h1 className="font-display font-bold text-lg text-foreground">Introduced ID</h1>
      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
      <span className="text-sm text-muted-foreground">{idx + 1}/{QUESTIONS_PER_LEVEL}</span>
     </div>

@@ -331,10 +331,10 @@ const ALL_EVENTS: EventCard[] = [
  { id: 'b', label: 'Herbicide resistance from repeated use', correct: true, feedback: 'Correct! Repeated use of the same herbicide selects for resistant individuals.' },
  { id: 'c', label: 'It rained too soon after application', correct: false, feedback: 'Rain can reduce efficacy, but a pattern of survival points to resistance.' },
  ], teachingPoint: 'Herbicide resistance develops when the same mode of action is used repeatedly. Rotate herbicide groups to prevent it.', season: 'mid-summer', grades: ['middle'] },
- { id: 'm5', title: 'Invasive Species Alert', description: 'An aggressive introduced weed has been spotted spreading toward your field.', question: 'Why are invasive species more dangerous than native weeds?', options: [
- { id: 'a', label: 'They have no natural predators in the new environment', correct: true, feedback: 'Correct! Without natural checks, invasive species can spread unchecked.' },
+ { id: 'm5', title: 'Introduced Species Alert', description: 'An aggressive introduced weed has been spotted spreading toward your field.', question: 'Why are introduced species more dangerous than native weeds?', options: [
+ { id: 'a', label: 'They have no natural predators in the new environment', correct: true, feedback: 'Correct! Without natural checks, introduced species can spread unchecked.' },
  { id: 'b', label: 'They are always larger than native plants', correct: false, feedback: 'Size is not the key factor — it is the lack of ecological controls.' },
- ], teachingPoint: 'Invasive species lack natural predators, diseases, and competitors in their new environment, allowing rapid population growth.', season: 'late-summer', grades: ['middle'] },
+ ], teachingPoint: 'Introduced species lack natural predators, diseases, and competitors in their new environment, allowing rapid population growth.', season: 'late-summer', grades: ['middle'] },
  { id: 'm6', title: 'Life Cycle & Control Timing', description: 'Two weeds are in your field: an annual and a perennial.', question: 'Which requires multiple treatments throughout the season?', options: [
  { id: 'a', label: 'The annual (dies after one season)', correct: false, feedback: 'Annuals complete their lifecycle in one season — a single well-timed application is usually sufficient.' },
  { id: 'b', label: 'The perennial (returns from roots each year)', correct: true, feedback: 'Correct! Perennials regrow from underground structures and need sustained management.' },

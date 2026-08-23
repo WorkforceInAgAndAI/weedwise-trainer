@@ -801,10 +801,10 @@ const TOPICS: Topic[] = [
   },
   {
     id: "invasive-playground",
-    name: "Invasive Plants: The Playground Bullies",
+    name: "Introduced Plants: The Playground Bullies",
     icon: "leaf",
     description:
-      "Ever played tag with someone way too fast? Meet invasive plants — the players who take over the playground and crowd out the natives.",
+      "Ever played tag with someone way too fast? Meet introduced plants — the players who take over the playground and crowd out the natives.",
     grades: [],
     plantExplorer: true,
     category: "identification",
@@ -3542,10 +3542,10 @@ function TopicContent({
               </div>
             </DetectiveCard>
 
-            <CaseCallout heading="Warning: Invasive Suspects">
+            <CaseCallout heading="Warning: Introduced Suspects">
               <p>
                 Some introduced weeds can be harmful to their surroundings. These weeds are called{" "}
-                <strong>invasive</strong>. Invasive weeds hurt native plants and animals.
+                <strong>introduced</strong>. Introduced weeds hurt native plants and animals.
               </p>
             </CaseCallout>
 
@@ -3582,7 +3582,7 @@ function TopicContent({
             {aggressiveList.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <p className="font-display font-bold text-foreground text-sm">
-                  Invasive Weeds in the Midwest ({aggressiveList.length})
+                  Introduced Weeds in the Midwest ({aggressiveList.length})
                 </p>
                 <p className="text-xs text-muted-foreground">
                   These weeds were introduced from other places and now hurt our farms and native plants. Scroll across
@@ -3633,10 +3633,10 @@ function TopicContent({
               </FieldNote>
             </NotebookSection>
 
-            <NotebookSection title="How Invasive Weeds Travel" subtitle="Vectors">
+            <NotebookSection title="How Introduced Weeds Travel" subtitle="Vectors">
               <div className="text-sm space-y-3">
                 <p>
-                  Invasive weeds are like uninvited guests that show up, take over, and refuse to leave — and they
+                  Introduced weeds are like uninvited guests that show up, take over, and refuse to leave — and they
                   usually arrive because of human activity, even when it's completely accidental. Seeds can hitchhike on
                   the muddy tires of a tractor, hide inside a bag of crop seed, cling to an animal's fur, or float down
                   a river to a new location.
@@ -3649,7 +3649,7 @@ function TopicContent({
               </div>
               <SelfCheck
                 question="If a weed 'escapes' the natural enemies that kept it in check back home, what happens next?"
-                answer="Its population grows unchecked — that's the 'enemy release hypothesis' and it's why so many introduced species become invasive."
+                answer="Its population grows unchecked — that's the 'enemy release hypothesis' and it's why so many introduced species become introduced."
               />
             </NotebookSection>
 
@@ -3667,13 +3667,13 @@ function TopicContent({
         );
       }
 
-      // Collegiate - Detailed invasive species content
+      // Collegiate - Detailed introduced species content
       return (
         <div className="space-y-5">
           <JournalHeader title="Invasion Biology & Introduction Pathways" subtitle="Lab Journal · Module 04" />
           <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
             <p>
-              Invasive weeds are non-native plants that spread prolifically and cause significant ecological or economic
+              Introduced weeds are non-native plants that spread prolifically and cause significant ecological or economic
               harm to their new environment, often by <strong>crowding out native species, altering ecosystems</strong>,
               or damaging agricultural interests.
             </p>
@@ -3684,9 +3684,9 @@ function TopicContent({
               for these plants to escape and spread wildly.
             </p>
             <p>
-              Once established, invasive weeds are incredibly hard and expensive to eradicate, which is why{" "}
+              Once established, introduced weeds are incredibly hard and expensive to eradicate, which is why{" "}
               <strong>preventative efforts</strong> like cleaning equipment and inspecting seed sources is the smartest
-              defense. Some invasive weeds may adapt to better suit their new environments, making it challenging to
+              defense. Some introduced weeds may adapt to better suit their new environments, making it challenging to
               find control solutions.
             </p>
             <Citation>
@@ -5114,35 +5114,35 @@ function TopicContent({
               playground! Pretty soon, the other kids don't have much room left to play.
             </p>
             <p>
-              Some plants act the same way. We call them <strong>invasive plants</strong>.
+              Some plants act the same way. We call them <strong>introduced plants</strong>.
             </p>
           </div>
 
           <div className="rounded-lg border-4 border-amber-700 bg-yellow-50 p-4 shadow">
             <img
               src={weedBulliesImg}
-              alt="Cartoon of invasive plants acting like playground bullies, crowding out native plants"
+              alt="Cartoon of introduced plants acting like playground bullies, crowding out native plants"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
             <p className="text-center text-[11px] text-muted-foreground italic mt-1">
               Image generated with Google Gemini 1.5 Pro.
             </p>
             <p className="text-center text-xs text-muted-foreground mt-2">
-              Invasive plants act like playground bullies — pushing native plants out of their space.
+              Introduced plants act like playground bullies — pushing native plants out of their space.
             </p>
           </div>
 
           <div className="bg-white/95 border-2 border-amber-700 rounded-lg p-5 space-y-2 shadow">
-            <p className="font-display font-bold text-amber-900 text-base">📓 What Is an Invasive Plant?</p>
+            <p className="font-display font-bold text-amber-900 text-base">📓 What Is an Introduced Plant?</p>
             <p className="text-sm text-foreground">
-              An invasive plant is a plant that <strong>moved in from far away</strong> and grows SUPER fast. It shoots
+              An introduced plant is a plant that <strong>moved in from far away</strong> and grows SUPER fast. It shoots
               past the plants that were already living there — like a new kid who takes over the whole recess game!
             </p>
           </div>
 
           <div className="space-y-3">
             <p className="font-display font-extrabold text-amber-900 text-lg text-center bg-yellow-200 border-4 border-amber-700 rounded-full px-4 py-2 shadow">
-              🦸 Invasive Plant Superpowers 🦸
+              🦸 Introduced Plant Superpowers 🦸
             </p>
             <div className="grid gap-3 md:grid-cols-2">
               {SUPERPOWERS.map((s) => (
@@ -5168,7 +5168,7 @@ function TopicContent({
           <div className="bg-red-100 border-4 border-red-600 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-destructive text-base">Who Gets Left Out?</p>
             <p className="text-sm text-foreground">
-              As invasive plants grow, they take up sunlight, water, nutrients, and space — leaving less for the plants
+              As introduced plants grow, they take up sunlight, water, nutrients, and space — leaving less for the plants
               that belong there. That makes it harder for native plants, wildflowers, and even some animals to survive.
             </p>
           </div>
@@ -5176,22 +5176,22 @@ function TopicContent({
           <div className="rounded-lg border-4 border-amber-700 bg-yellow-50 p-4 shadow">
             <img
               src={invasivePlantImg}
-              alt="What is an invasive plant and how they overpower natives — cartoon comparison of a native plant and an invasive plant stealing sunlight and crowding roots"
+              alt="What is an introduced plant and how they overpower natives — cartoon comparison of a native plant and an introduced plant stealing sunlight and crowding roots"
               className="w-full h-auto rounded-md bg-background/60 object-contain"
             />
             <p className="text-center text-[11px] text-muted-foreground italic mt-1">
               Image generated with Google Gemini 1.5 Pro.
             </p>
             <p className="text-center text-xs text-muted-foreground mt-2">
-              Invasive plants arrive from far away and out-compete natives for sunlight, space, and food.
+              Introduced plants arrive from far away and out-compete natives for sunlight, space, and food.
             </p>
           </div>
 
           <div className="bg-white/95 border-4 border-emerald-700 rounded-lg p-5 space-y-2 shadow">
             <p className="font-display font-bold text-emerald-800 text-base">🍎 Team Up to Keep Things Fair</p>
             <p className="text-sm text-foreground">
-              Farmers, gardeners, and scientists work together to stop invasive plants before they take over. By
-              protecting native plants and keeping invasive plants under control, we help our forests, parks, gardens,
+              Farmers, gardeners, and scientists work together to stop introduced plants before they take over. By
+              protecting native plants and keeping introduced plants under control, we help our forests, parks, gardens,
               and farms stay healthy for everyone — plants, animals, and people!
             </p>
           </div>
@@ -5199,7 +5199,7 @@ function TopicContent({
           <div className="bg-yellow-200 border-4 border-amber-700 rounded-lg p-4 text-sm text-foreground shadow">
             <p className="font-semibold text-amber-900 mb-1">✏️ Remember:</p>
             <p>
-              Invasive plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong
+              Introduced plants are like the too-fast tagger — they spread quickly and crowd out the plants that belong
               there.
             </p>
           </div>
@@ -6094,7 +6094,7 @@ function TopicContent({
         }
       });
 
-      // Build invasive vs native look-alike pairs for 6-8 and 9-12
+      // Build introduced vs native look-alike pairs for 6-8 and 9-12
       const invasiveNativePairs: [Weed, Weed][] = [];
       if (dg !== "elementary") {
         const invasiveWeeds = gradePool.filter((w) => w.origin === "Introduced");
@@ -6377,7 +6377,7 @@ function TopicContent({
                   The consequences of misidentification extend beyond yield loss. Choosing the wrong mode-of-action
                   herbicide because you confused a Group-9-resistant Waterhemp with a still-susceptible Redroot Pigweed
                   selects for further resistance and burns through control options. Confusing a native pollinator host (
-                  <em>e.g.</em> Common Milkweed) with an invasive look-alike can waste conservation effort or destroy
+                  <em>e.g.</em> Common Milkweed) with an introduced look-alike can waste conservation effort or destroy
                   monarch habitat. And confusing Wild Carrot with Poison Hemlock is a safety event, not a botany
                   mistake. The triples below are the species pairings most commonly confused in field-scouting reports;
                   use the side-by-side layout to build a mental key based on the features that actually distinguish
@@ -6431,15 +6431,15 @@ function TopicContent({
             </div>
           )}
 
-          {/* Invasive vs Native Look-Alikes section for 6-8 and 9-12 */}
+          {/* Introduced vs Native Look-Alikes section for 6-8 and 9-12 */}
           {invasiveNativePairs.length > 0 && (
             <div className="space-y-4 border-t border-border pt-4">
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
                 <h3 className="font-display font-bold text-foreground text-base mb-2">
-                  Invasive vs Native Look-Alikes
+                  Introduced vs Native Look-Alikes
                 </h3>
                 <p className="text-sm text-foreground">
-                  These pairs contain an <strong className="text-destructive">invasive (introduced)</strong> species
+                  These pairs contain an <strong className="text-destructive">introduced (introduced)</strong> species
                   that closely resembles a <strong className="text-accent">native</strong> species.
                 </p>
               </div>
@@ -6553,7 +6553,7 @@ function TopicContent({
             <div className="bg-destructive/15 border border-destructive/30 rounded-lg p-5 text-sm text-foreground space-y-3">
               <p className="font-display font-bold text-destructive text-base">Safety</p>
               <p>
-                As we learned, some invasive weeds can hurt native plants and animals. There are also some weeds that
+                As we learned, some introduced weeds can hurt native plants and animals. There are also some weeds that
                 hurt <strong>humans</strong>. These unsafe weeds can look like normal plants. However, when they are
                 touched or ingested, they can cause harm to people.
               </p>
@@ -6817,7 +6817,7 @@ function TopicContent({
           key: "biological",
           label: "Biological Control",
           desc: "Biological control uses living organisms, such as host-specific insects, pathogens, or grazing animals, to suppress target weed populations, and is particularly relevant in non-cropland and natural area management contexts.",
-          example: "Releasing specific beetles that feed only on invasive thistle plants to reduce their population.",
+          example: "Releasing specific beetles that feed only on introduced thistle plants to reduce their population.",
         },
         {
           key: "chemical",

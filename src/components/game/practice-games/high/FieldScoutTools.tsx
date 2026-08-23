@@ -106,7 +106,7 @@ const FIELDS: FieldDef[] = [
   { id: 6, desc: 'A 1,200-acre corn field with weeds concentrated along irrigation channels.', bestTool: 'drone', note: 'A drone can follow irrigation lines and quickly map weed density along them.', crop: 'corn', weedLayout: 'rows', weedCount: 14 },
   { id: 7, desc: 'A 5-acre pumpkin patch with irregular spacing and hand-planted rows.', bestTool: 'manual', note: 'The small, irregularly planted area is best scouted on foot with hand tools.', crop: 'soybean', weedLayout: 'clumped', weedCount: 7 },
   { id: 8, desc: 'A 300-acre soybean field needing precise weed counts at each growth stage.', bestTool: 'rover', note: 'A rover can methodically traverse rows and log precise weed counts per zone.', crop: 'soybean', weedLayout: 'diagonal', weedCount: 11 },
-  { id: 9, desc: 'A 15,000-acre cattle ranch monitoring invasive spread over 3 years.', bestTool: 'satellite', note: 'Satellite time-series imagery is the only practical way to monitor such vast areas over years.', crop: 'pasture', weedLayout: 'scattered', weedCount: 20 },
+  { id: 9, desc: 'A 15,000-acre cattle ranch monitoring introduced spread over 3 years.', bestTool: 'satellite', note: 'Satellite time-series imagery is the only practical way to monitor such vast areas over years.', crop: 'pasture', weedLayout: 'scattered', weedCount: 20 },
   { id: 10, desc: 'A 100-acre pasture with weed clusters near water troughs and fence posts.', bestTool: 'drone', note: 'A drone can quickly identify weed clusters around infrastructure without disturbing livestock.', crop: 'pasture', weedLayout: 'clumped', weedCount: 9 },
 ];
 

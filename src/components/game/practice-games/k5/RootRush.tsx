@@ -227,7 +227,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
       newGrid[idx] = { kind: 'herbicide', hit: true };
       newEnergy -= 8;
       addScore = -5;
-      flash('Herbicide zone! -8 energy. That is how farmers stop invasive roots.');
+      flash('Herbicide zone! -8 energy. That is how farmers stop introduced roots.');
     } else if (cell.kind === 'sprout' && !cell.claimed) {
       newGrid[idx] = { kind: 'sprout', claimed: true };
       addScore = 20;
@@ -310,7 +310,7 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
                 <li className="flex items-start gap-2"><Droplet className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" /> <b>Water</b> and <b>nutrients</b> restore energy and give points.</li>
                 <li className="flex items-start gap-2"><Sparkles className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" /> <b>Sprout points</b> are new patches of field. Reach them to spread and earn +20!</li>
                 <li className="flex items-start gap-2"><Mountain className="w-4 h-4 text-stone-600 mt-0.5 shrink-0" /> <b>Rocks</b> block roots. Grow around them.</li>
-                <li className="flex items-start gap-2"><Skull className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" /> <b>Herbicide</b> zones drain energy. Real farmers use them to stop invasive roots!</li>
+                <li className="flex items-start gap-2"><Skull className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" /> <b>Herbicide</b> zones drain energy. Real farmers use them to stop introduced roots!</li>
               </ul>
             </div>
             <div className="bg-rose-50 border-l-4 border-rose-500 p-3 rounded flex items-start gap-2 mb-4">
