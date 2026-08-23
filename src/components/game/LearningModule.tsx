@@ -6439,7 +6439,7 @@ function TopicContent({
                   Introduced vs Native Look-Alikes
                 </h3>
                 <p className="text-sm text-foreground">
-                  These pairs contain an <strong className="text-destructive">introduced (introduced)</strong> species
+                  These pairs contain an <strong className="text-destructive">introduced</strong> species
                   that closely resembles a <strong className="text-accent">native</strong> species.
                 </p>
               </div>
