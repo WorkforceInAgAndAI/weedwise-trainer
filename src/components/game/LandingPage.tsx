@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
-import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
+import { ChevronRight, Users, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
 import RegionPicker from './RegionPicker';
 
 const CAROUSEL_WEEDS = ['waterhemp', 'palmer-amaranth', 'giant-ragweed', 'lambsquarters', 'velvetleaf', 'marestail', 'kochia', 'morningglory'];
