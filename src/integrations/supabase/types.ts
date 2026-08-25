@@ -270,27 +270,6 @@ export type Database = {
           },
         ]
       }
-      instructors: {
-        Row: {
-          created_at: string
-          display_name: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          display_name: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          display_name?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       instructor_credentials: {
         Row: {
           created_at: string
@@ -309,6 +288,27 @@ export type Database = {
           instructor_name?: string
           pin_hash?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      instructors: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
