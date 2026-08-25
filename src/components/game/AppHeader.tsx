@@ -1,5 +1,4 @@
 import { Leaf, BookOpen, Gamepad2, Target, BookMarked, FileText, GraduationCap, MessageSquare } from 'lucide-react';
-import type { useAuth } from '@/hooks/useAuth';
 
 interface Props {
   onOpenLearning: () => void;
@@ -9,7 +8,6 @@ interface Props {
   onOpenReferences: () => void;
   onOpenInstructor: () => void;
   onOpenFeedback: () => void;
-  auth: ReturnType<typeof useAuth>;
 }
 
 export default function AppHeader({

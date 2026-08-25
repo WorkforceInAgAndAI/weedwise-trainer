@@ -55,12 +55,16 @@ export function StudentProvider({ children }: { children: ReactNode }) {
  // Look up class by join code
  const { data: classData, error: classErr } = await supabase
  .from('classes')
- .select('id, name')
+ .select('id, name, ended_at')
  .eq('join_code', joinCode.toUpperCase().trim())
  .maybeSingle();
 
  if (classErr || !classData) {
  return { success: false, error: 'Invalid join code. Please check with your instructor.' };
+ }
+
+ if (classData.ended_at) {
+ return { success: false, error: 'This class session has ended. Ask your instructor for a new class passkey.' };
  }
 
  // Check if nickname already exists in this class

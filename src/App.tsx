@@ -7,7 +7,6 @@ import { StudentProvider } from "@/contexts/StudentContext";
 import { GameProgressProvider } from "@/contexts/GameProgressContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
-import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +22,6 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
