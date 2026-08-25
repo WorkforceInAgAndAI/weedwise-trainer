@@ -123,24 +123,23 @@ export default function LandingPage({
  </div>
  )}
 
- {/* Secondary Actions */}
- <section className="max-w-[1200px] mx-auto px-5 sm:px-10 pb-16">
- <div className="flex flex-wrap gap-3 justify-center">
- {[
- { label: 'Class', icon: Users, action: onOpenClassJoin },
- { label: 'Stats', icon: BarChart3, action: onOpenStats },
- { label: 'Dashboard', icon: LayoutDashboard, action: onOpenDashboard },
- ].map(btn => (
- <button
- key={btn.label}
- onClick={btn.action}
- className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200"
- >
- <btn.icon className="w-4 h-4 text-muted-foreground" /> {btn.label}
- </button>
- ))}
- </div>
- </section>
+  {/* Secondary Actions */}
+  <section className="max-w-[1200px] mx-auto px-5 sm:px-10 pb-16">
+  <div className="flex flex-wrap gap-3 justify-center">
+  {[
+  { label: 'Class', icon: Users, action: onOpenClassJoin },
+  { label: 'Dashboard', icon: LayoutDashboard, action: onOpenDashboard },
+  ].map(btn => (
+  <button
+  key={btn.label}
+  onClick={btn.action}
+  className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200"
+  >
+  <btn.icon className="w-4 h-4 text-muted-foreground" /> {btn.label}
+  </button>
+  ))}
+  </div>
+  </section>
 
  {/* Footer */}
  <footer className="w-full border-t border-border py-8 text-center mt-auto">
