@@ -3,7 +3,6 @@ import { useGameEngine } from "@/hooks/useGameEngine";
 import { useStudent } from "@/contexts/StudentContext";
 import { useBadgeChecker } from "@/hooks/useBadgeChecker";
 import { useSessionPersistence } from "@/hooks/useSessionPersistence";
-import { useAuth } from "@/hooks/useAuth";
 import AppHeader from "@/components/game/AppHeader";
 import LandingPage from "@/components/game/LandingPage";
 import GameScreen from "@/components/game/GameScreen";
@@ -27,7 +26,6 @@ import { useEffect, useRef } from "react";
 const Index = () => {
   const game = useGameEngine();
   const { session } = useStudent();
-  const auth = useAuth();
   const [showLearning, setShowLearning] = useState(false);
   const [showGlossaryDirect, setShowGlossaryDirect] = useState(false);
   const [showClassJoin, setShowClassJoin] = useState(false);
@@ -104,7 +102,6 @@ const Index = () => {
     onOpenReferences: () => setShowReferences(true),
     onOpenInstructor: () => setShowClassJoin(true),
     onOpenFeedback: () => setShowFeedback(true),
-    auth,
   };
 
   return (
@@ -126,7 +123,6 @@ const Index = () => {
           onOpenPracticeHub={() => setShowPracticeHub(true)}
           onOpenStats={() => setShowStats(true)}
           studentSession={session}
-          auth={auth}
           grade={globalGrade}
           onGradeChange={setGlobalGrade}
         />
@@ -185,7 +181,7 @@ const Index = () => {
           onOpenLearning={openLearningTopic}
         />
       )}
-      {showStats && <StatsPanel onClose={() => setShowStats(false)} auth={auth} />}
+      {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
       {showReferences && <ReferencesPage onClose={() => setShowReferences(false)} />}
       {showFeedback && <FeedbackDialog onClose={() => setShowFeedback(false)} />}
     </div>

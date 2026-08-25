@@ -18,34 +18,43 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          ended_at: string | null
+          exported_at: string | null
           id: string
           instructor_id: string | null
           instructor_name: string
           instructor_pin: string | null
           join_code: string
           name: string
+          purge_after: string | null
           year: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
+          ended_at?: string | null
+          exported_at?: string | null
           id?: string
           instructor_id?: string | null
           instructor_name: string
           instructor_pin?: string | null
           join_code: string
           name: string
+          purge_after?: string | null
           year?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
+          ended_at?: string | null
+          exported_at?: string | null
           id?: string
           instructor_id?: string | null
           instructor_name?: string
           instructor_pin?: string | null
           join_code?: string
           name?: string
+          purge_after?: string | null
           year?: string | null
         }
         Relationships: [
@@ -282,6 +291,27 @@ export type Database = {
         }
         Relationships: []
       }
+      instructor_credentials: {
+        Row: {
+          created_at: string
+          instructor_name: string
+          pin_hash: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          instructor_name: string
+          pin_hash: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          instructor_name?: string
+          pin_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       student_badges: {
         Row: {
           badge_id: string
@@ -349,6 +379,10 @@ export type Database = {
     }
     Functions: {
       generate_join_code: { Args: never; Returns: string }
+      verify_or_register_instructor: {
+        Args: { p_instructor_name: string; p_pin: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

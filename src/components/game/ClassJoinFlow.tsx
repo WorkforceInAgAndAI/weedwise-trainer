@@ -16,6 +16,7 @@ export default function ClassJoinFlow({ onClose }: Props) {
   const [nickname, setNickname] = useState('');
   const [className, setClassName] = useState('');
   const [instructorName, setInstructorName] = useState('');
+  const [instructorPin, setInstructorPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [createdCode, setCreatedCode] = useState<string | null>(null);
@@ -38,8 +39,20 @@ export default function ClassJoinFlow({ onClose }: Props) {
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
-    if (!className.trim() || !instructorName.trim()) return;
+    if (!className.trim() || !instructorName.trim() || instructorPin.trim().length < 4) return;
     setLoading(true); setError('');
+    const { data: verifyData, error: verifyErr } = await supabase.rpc('verify_or_register_instructor', {
+      p_instructor_name: instructorName.trim(),
+      p_pin: instructorPin.trim(),
+    });
+    if (verifyErr || !(verifyData as any)?.ok) {
+      const rpcErrorMessage = verifyErr?.message?.includes('gen_salt')
+        ? 'PIN service is not fully migrated yet. Please run the latest Supabase migration.'
+        : verifyErr?.message;
+      setError((verifyData as any)?.message || rpcErrorMessage || 'Failed to verify instructor PIN');
+      setLoading(false);
+      return;
+    }
     const { data: code, error: codeErr } = await supabase.rpc('generate_join_code');
     if (codeErr || !code) { setError('Failed to generate join code'); setLoading(false); return; }
     const { error: insertErr } = await supabase.from('classes').insert({
@@ -83,7 +96,7 @@ export default function ClassJoinFlow({ onClose }: Props) {
             </div>
             <p className="text-xs text-muted-foreground break-all">{joinUrl}</p>
             <p className="text-xs text-muted-foreground mt-1">Students scan the QR code or visit the link to join instantly.</p>
-            <button onClick={() => { setCreatedCode(null); setMode('choose'); setClassName(''); setInstructorName(''); }}
+            <button onClick={() => { setCreatedCode(null); setMode('choose'); setClassName(''); setInstructorName(''); setInstructorPin(''); }}
               className="text-sm text-primary hover:underline">Create another class</button>
           </div>
         )}
@@ -106,7 +119,7 @@ export default function ClassJoinFlow({ onClose }: Props) {
                 <Plus className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <div className="font-semibold text-foreground text-sm">Create a Class (Instructor)</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">Quick setup — no account needed. Data lasts for this session only.</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Quick setup — no account needed. Use your name and PIN to reopen this class later.</div>
                 </div>
               </div>
             </button>
@@ -138,7 +151,7 @@ export default function ClassJoinFlow({ onClose }: Props) {
 
         {!createdCode && mode === 'create' && (
           <form onSubmit={handleCreate} className="space-y-4">
-            <p className="text-xs text-muted-foreground">No account needed. Create a class for this session. When you close the tab, student data from this session won't persist.</p>
+            <p className="text-xs text-muted-foreground">No account needed. Use the same name + PIN later to return to your classes.</p>
             <div>
               <label className="text-sm font-medium text-foreground block mb-1.5">Your Name</label>
               <input type="text" value={instructorName} onChange={e => setInstructorName(e.target.value)} placeholder="e.g. Ms. Johnson" autoFocus className={inputClass} />
@@ -147,10 +160,14 @@ export default function ClassJoinFlow({ onClose }: Props) {
               <label className="text-sm font-medium text-foreground block mb-1.5">Class Name</label>
               <input type="text" value={className} onChange={e => setClassName(e.target.value)} placeholder="e.g. Biology 101" className={inputClass} />
             </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Instructor PIN</label>
+              <input type="password" value={instructorPin} onChange={e => setInstructorPin(e.target.value)} placeholder="At least 4 characters" className={inputClass} />
+            </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex gap-3">
               <button type="button" onClick={() => setMode('choose')} className="px-4 py-2 rounded-md border border-border text-sm hover:bg-secondary transition-colors">Back</button>
-              <button type="submit" disabled={loading || !className.trim() || !instructorName.trim()}
+              <button type="submit" disabled={loading || !className.trim() || !instructorName.trim() || instructorPin.trim().length < 4}
                 className="flex-1 px-4 py-3 rounded-md bg-success text-success-foreground font-semibold disabled:opacity-50 hover:opacity-90 transition-opacity text-sm">
                 {loading ? 'Creating…' : 'Create Class'}
               </button>

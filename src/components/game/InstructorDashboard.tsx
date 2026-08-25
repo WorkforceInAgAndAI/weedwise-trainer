@@ -3,8 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { BADGES } from '@/data/badges';
 import { PHASES } from '@/data/phases';
 import { weeds, weedMap } from '@/data/weeds';
-import { useAuth } from '@/hooks/useAuth';
-import AuthModal from './AuthModal';
 import Glossary from './Glossary';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Json } from '@/integrations/supabase/types';
@@ -14,6 +12,10 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } fro
 interface ClassInfo {
  id: string; name: string; join_code: string;
  instructor_name: string; instructor_id: string | null;
+ instructor_pin: string | null;
+ ended_at: string | null;
+ purge_after: string | null;
+ exported_at: string | null;
  created_at: string; year?: string | null; description?: string | null;
 }
 interface StudentRow { id: string; nickname: string; class_id: string; user_id?: string | null; }
@@ -28,8 +30,8 @@ interface Props { onClose: () => void; }
 type Tab = 'overview' | 'students' | 'glossary';
 
 /* Create-Class Modal */
-function CreateClassModal({ instructorId, instructorName, onCreated, onClose }: {
- instructorId: string; instructorName: string;
+function CreateClassModal({ instructorName, instructorPin, onCreated, onClose }: {
+ instructorName: string; instructorPin: string;
  onCreated: (c: ClassInfo) => void; onClose: () => void;
 }) {
  const [name, setName] = useState('');
@@ -55,13 +57,13 @@ function CreateClassModal({ instructorId, instructorName, onCreated, onClose }: 
  e.preventDefault();
  if (!name.trim()) { setError('Class name is required'); return; }
  if (!generatedCode) { setError('Passkey not ready yet'); return; }
+ if (instructorPin.trim().length < 4) { setError('PIN must be at least 4 characters'); return; }
  setSaving(true); setError('');
  const { data, error: dbErr } = await supabase.from('classes').insert({
  name: name.trim(),
  year: year.trim() || null,
  description: description.trim() || null,
  join_code: generatedCode,
- instructor_id: instructorId,
  instructor_name: instructorName,
  } as any).select().single();
  setSaving(false);
@@ -403,9 +405,15 @@ function StudentDetailModal({ student, sessions, badges, onClose }: {
 }
 
 /* Main Dashboard */
+const INSTRUCTOR_NAME_KEY = 'weedid_instructor_name';
+
 export default function InstructorDashboard({ onClose }: Props) {
- const { user, instructor, role, loading: authLoading, logout, isAuthenticated } = useAuth();
- const [showAuth, setShowAuth] = useState(false);
+ const [instructorName, setInstructorName] = useState<string>('');
+ const [instructorPin, setInstructorPin] = useState<string>('');
+ const [nameInput, setNameInput] = useState(() => localStorage.getItem(INSTRUCTOR_NAME_KEY) ?? '');
+ const [pinInput, setPinInput] = useState('');
+ const [pinError, setPinError] = useState('');
+ const [verifying, setVerifying] = useState(false);
  const [showCreateClass, setShowCreateClass] = useState(false);
  const [showGlossary, setShowGlossary] = useState(false);
  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
@@ -418,25 +426,54 @@ export default function InstructorDashboard({ onClose }: Props) {
  const [tab, setTab] = useState<Tab>('overview');
  const [loading, setLoading] = useState(true);
  const [showQR, setShowQR] = useState(false);
-
- /* Auth guard */
- useEffect(() => {
- if (!authLoading && !isAuthenticated) setShowAuth(true);
- else if (!authLoading && isAuthenticated) setShowAuth(false);
- }, [authLoading, isAuthenticated]);
+ const [showEndConfirm, setShowEndConfirm] = useState(false);
+ const [endingSession, setEndingSession] = useState(false);
+ const [downloadedClassIds, setDownloadedClassIds] = useState<Record<string, boolean>>({});
 
  /* Load instructor's classes */
  useEffect(() => {
- if (!instructor) return;
- supabase.from('classes').select('*')
- .eq('instructor_id', instructor.id)
- .order('created_at', { ascending: false })
- .then(({ data }) => {
- setClasses((data as unknown as ClassInfo[]) || []);
- if (data && data.length > 0) setSelectedClass(data[0].id);
+ if (!instructorName) return;
+ const nowIso = new Date().toISOString();
+
+ const loadClasses = async () => {
+ // Best-effort purge of expired ended classes.
+ await supabase
+ .from('classes')
+ .delete()
+ .eq('instructor_name', instructorName)
+ .not('ended_at', 'is', null)
+ .lte('purge_after', nowIso);
+
+ const { data, error } = await supabase
+ .from('classes')
+ .select('*')
+ .eq('instructor_name', instructorName)
+ .order('ended_at', { ascending: true, nullsFirst: true })
+ .order('created_at', { ascending: false });
+
+ if (error) {
+ setPinError("Couldn't load classes. Please verify your name and PIN.");
+ setClasses([]);
+ setSelectedClass(null);
  setLoading(false);
- });
- }, [instructor]);
+ return;
+ }
+
+ const classRows = (data as unknown as ClassInfo[]) || [];
+ setClasses(classRows);
+
+ if (classRows.length > 0) {
+ const activeClass = classRows.find(c => !c.ended_at);
+ setSelectedClass(activeClass?.id ?? classRows[0].id);
+ } else {
+ setSelectedClass(null);
+ }
+
+ setLoading(false);
+ };
+
+ loadClasses();
+ }, [instructorName, instructorPin]);
 
  /* Load class data */
  useEffect(() => {
@@ -460,6 +497,14 @@ export default function InstructorDashboard({ onClose }: Props) {
 
  const selectedClassInfo = classes.find(c => c.id === selectedClass);
  const joinUrl = selectedClassInfo ? `${window.location.origin}?join=${selectedClassInfo.join_code}` : '';
+ const selectedClassEnded = !!selectedClassInfo?.ended_at;
+ const selectedClassDownloaded = selectedClass ? !!downloadedClassIds[selectedClass] : false;
+
+ useEffect(() => {
+ if (selectedClassInfo?.ended_at) {
+ setShowQR(false);
+ }
+ }, [selectedClassInfo?.ended_at]);
 
  /* Aggregated student stats */
  const studentStats = useMemo(() => students.map(s => {
@@ -529,42 +574,176 @@ export default function InstructorDashboard({ onClose }: Props) {
  });
  }, [sessions]);
 
+ const handleDownloadCSV = async () => {
+ if (!selectedClassInfo || studentStats.length === 0) return;
+ const headers = ['Nickname', 'XP', 'Correct', 'Wrong', 'Accuracy (%)', 'Best Streak', 'Species Mastered', 'Badges', 'Time (min)', 'Grade Level(s) Played'];
+ const rows = studentStats.map(s => {
+ const stuSess = sessions.filter(sess => sess.student_id === s.id);
+ const gradeLevels = [...new Set(stuSess.map(sess => sess.grade_level))].join(', ');
+ return [
+ s.nickname,
+ s.totalXp,
+ s.totalCorrect,
+ s.totalWrong,
+ s.accuracy,
+ s.bestStreak,
+ s.speciesMastered,
+ s.badgeCount,
+ s.estimatedMinutes,
+ gradeLevels || '—',
+ ];
+ });
+ const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+ const blob = new Blob([csv], { type: 'text/csv' });
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ const date = new Date().toISOString().slice(0, 10);
+ a.href = url;
+ a.download = `${selectedClassInfo.name.replace(/\s+/g, '_')}_${date}.csv`;
+ a.click();
+ URL.revokeObjectURL(url);
+
+ setDownloadedClassIds(prev => ({ ...prev, [selectedClassInfo.id]: true }));
+ await supabase
+ .from('classes')
+ .update({ exported_at: new Date().toISOString() } as any)
+ .eq('id', selectedClassInfo.id);
+ };
+
+ const handleEndSession = async () => {
+ if (!selectedClassInfo) return;
+ setEndingSession(true);
+ const endedAt = new Date();
+ const purgeAfter = new Date(endedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+ const { error } = await supabase
+ .from('classes')
+ .update({
+ ended_at: endedAt.toISOString(),
+ purge_after: purgeAfter.toISOString(),
+ } as any)
+ .eq('id', selectedClassInfo.id);
+
+ setEndingSession(false);
+ if (error) {
+ setPinError("Couldn't end the session. Please try again.");
+ return;
+ }
+
+ setClasses(prev => prev.map(c => c.id === selectedClassInfo.id
+ ? { ...c, ended_at: endedAt.toISOString(), purge_after: purgeAfter.toISOString() }
+ : c));
+ setShowEndConfirm(false);
+ };
+
  const tabs: { key: Tab; label: string }[] = [
   { key: 'overview', label: 'Overview' },
   { key: 'students', label: 'Students' },
   { key: 'glossary', label: 'Glossary' },
  ];
 
- /* Loading / Auth guards */
- if (authLoading) return (
- <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center">
- <div className="text-lg text-muted-foreground">Loading…</div>
- </div>
- );
- if (!isAuthenticated || showAuth) return (
- <AuthModal onAuthenticated={(r) => { setShowAuth(false); if (r === 'student') onClose(); }} onClose={onClose} defaultMode="login" />
- );
- if (role !== 'instructor' || !instructor) return (
+ const handleGateSubmit = async (e: React.FormEvent) => {
+ e.preventDefault();
+ const name = nameInput.trim();
+ const pin = pinInput.trim();
+ if (!name || pin.length < 4) return;
+ setVerifying(true);
+ setPinError('');
+
+ const { data, error } = await supabase.rpc('verify_or_register_instructor', {
+ p_instructor_name: name,
+ p_pin: pin,
+ });
+
+ setVerifying(false);
+
+ if (error) {
+ setPinError(error.message?.includes('gen_salt')
+ ? 'PIN service is not fully migrated yet. Please run the latest Supabase migration.'
+ : (error.message || "Couldn't verify PIN right now. Try again."));
+ return;
+ }
+
+ const ok = Boolean((data as any)?.ok);
+ if (!ok) {
+ setPinError((data as any)?.message || 'Unable to verify instructor PIN.');
+ return;
+ }
+
+ localStorage.setItem(INSTRUCTOR_NAME_KEY, name);
+ setInstructorName(name);
+ setInstructorPin(pin);
+ };
+
+ if (!instructorName) return (
  <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center p-4">
- <div className="bg-card border border-border rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 text-center animate-scale-in">
- <div className="text-4xl"></div>
- <h2 className="text-xl font-display font-bold text-foreground">Instructor Access Required</h2>
- <p className="text-sm text-muted-foreground">You're logged in as a student. Sign out and use an instructor account.</p>
- <div className="flex gap-2 justify-center">
- <button onClick={logout} className="px-4 py-2 rounded-lg border border-destructive/50 text-destructive hover:bg-destructive/10 text-sm">Sign Out</button>
- <button onClick={onClose} className="px-4 py-2 rounded-lg border border-border hover:bg-secondary text-sm">Close</button>
+ <div className="bg-card border border-border rounded-xl shadow-lg max-w-sm w-full p-6 space-y-4 animate-scale-in">
+ <div className="text-center space-y-1">
+ <h2 className="text-xl font-display font-bold text-foreground">Instructor Dashboard</h2>
+ <p className="text-sm text-muted-foreground">Enter your name and instructor PIN.</p>
+ </div>
+ <form onSubmit={handleGateSubmit} className="space-y-3">
+ <div className="space-y-1">
+ <input
+ type="text"
+ value={nameInput}
+ onChange={e => { setNameInput(e.target.value); setPinError(''); }}
+ placeholder="Your name (e.g. Prof. Smith)"
+ autoFocus
+ className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+ />
+ {localStorage.getItem(INSTRUCTOR_NAME_KEY) && nameInput === localStorage.getItem(INSTRUCTOR_NAME_KEY) && (
+ <button
+ type="button"
+ onClick={() => { setNameInput(''); localStorage.removeItem(INSTRUCTOR_NAME_KEY); }}
+ className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+ >
+ Not you? Clear name
+ </button>
+ )}
+ </div>
+ <input
+ type="password"
+ value={pinInput}
+ onChange={e => { setPinInput(e.target.value); setPinError(''); }}
+ placeholder="Instructor PIN"
+ className={`w-full px-4 py-3 rounded-lg border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary ${pinError ? 'border-destructive' : 'border-border'}`}
+ />
+ {pinError && <p className="text-xs text-destructive">{pinError}</p>}
+ <p className="text-xs text-muted-foreground">
+ First time? Choose a PIN (4+ chars). Returning instructors should use the same PIN they used for existing classes.
+ </p>
+ <button
+ type="submit"
+ disabled={!nameInput.trim() || pinInput.trim().length < 4 || verifying}
+ className="w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+ >
+ {verifying ? 'Verifying…' : 'Enter Dashboard'}
+ </button>
+ <button
+ type="button"
+ onClick={onClose}
+ className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+ >
+ Cancel
+ </button>
+ </form>
  </div>
  </div>
+ );
+
+ if (loading) return (
+ <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex items-center justify-center">
+ <div className="text-lg text-muted-foreground">Loading classes…</div>
  </div>
  );
 
  return (
  <>
  {/* Overlays */}
- {showCreateClass && instructor && (
+{showCreateClass && (
  <CreateClassModal
- instructorId={instructor.id}
- instructorName={instructor.display_name}
+ instructorName={instructorName}
+ instructorPin={instructorPin}
  onCreated={(c) => {
  setClasses(prev => [c, ...prev]);
  setSelectedClass(c.id);
@@ -575,6 +754,37 @@ export default function InstructorDashboard({ onClose }: Props) {
  />
  )}
  {showGlossary && <Glossary onClose={() => setShowGlossary(false)} />}
+{showEndConfirm && selectedClassInfo && (
+<div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+<div className="bg-card border border-border rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 animate-scale-in">
+<div className="text-center space-y-2">
+<h2 className="text-lg font-display font-bold text-foreground">End Session?</h2>
+<p className="text-sm text-muted-foreground">
+This will close <span className="font-semibold text-foreground">{selectedClassInfo.name}</span>. Students cannot join after this, and class data is kept for 7 days before automatic deletion.
+</p>
+{!selectedClassDownloaded && (
+<p className="text-xs text-destructive">You have not downloaded CSV in this browser session yet.</p>
+)}
+</div>
+<div className="flex gap-2">
+<button
+onClick={() => setShowEndConfirm(false)}
+disabled={endingSession}
+className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-secondary text-sm transition-colors disabled:opacity-50"
+>
+Cancel
+</button>
+<button
+onClick={handleEndSession}
+disabled={endingSession}
+className="flex-1 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+>
+{endingSession ? 'Ending…' : 'End Session'}
+</button>
+</div>
+</div>
+</div>
+)}
  {selectedStudentId && (() => {
  const s = studentStats.find(s => s.id === selectedStudentId);
  if (!s) return null;
@@ -596,7 +806,7 @@ export default function InstructorDashboard({ onClose }: Props) {
  <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
  <div>
  <h1 className="text-2xl font-display font-bold text-primary"> Instructor Dashboard</h1>
- <p className="text-sm text-muted-foreground">Welcome, {instructor.display_name}</p>
+<p className="text-sm text-muted-foreground">Welcome, {instructorName}</p>
  </div>
  <div className="flex flex-wrap gap-2">
  <button onClick={() => setShowGlossary(true)}
@@ -607,7 +817,39 @@ export default function InstructorDashboard({ onClose }: Props) {
  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-opacity text-sm font-semibold">
  New Class
  </button>
- <button onClick={logout} className="px-3 py-2 rounded-lg border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors text-sm">Sign Out</button>
+{selectedClass && studentStats.length > 0 && (
+<button
+onClick={handleDownloadCSV}
+className="px-3 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-sm"
+>
+Download CSV
+</button>
+)}
+{selectedClass && !selectedClassEnded && (
+<button
+onClick={() => setShowEndConfirm(true)}
+className="px-3 py-2 rounded-lg border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors text-sm font-semibold"
+>
+End Session
+</button>
+)}
+<button
+ onClick={() => {
+ setInstructorName('');
+ setInstructorPin('');
+ setPinInput('');
+ setPinError('');
+ setClasses([]);
+ setSelectedClass(null);
+ setStudents([]);
+ setSessions([]);
+ setBadges([]);
+ setLoading(true);
+ }}
+ className="px-3 py-2 rounded-lg border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors text-sm"
+>
+ Switch Instructor
+</button>
  <button onClick={onClose} className="px-3 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-sm"> Close</button>
  </div>
  </div>
@@ -630,17 +872,29 @@ export default function InstructorDashboard({ onClose }: Props) {
  <label className="text-sm font-medium text-muted-foreground">Class:</label>
  <select value={selectedClass || ''} onChange={e => setSelectedClass(e.target.value)}
  className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary">
- {classes.map(c => <option key={c.id} value={c.id}>{c.name}{c.year ? ` (${c.year})` : ''}</option>)}
+{classes.map(c => (
+<option key={c.id} value={c.id}>
+{c.name}
+{c.year ? ` (${c.year})` : ''}
+{c.ended_at ? ' — Ended' : ''}
+</option>
+))}
  </select>
  {selectedClassInfo && (
  <>
  <div className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/30 text-sm">
  Passkey: <span className="font-mono font-bold text-primary tracking-wider">{selectedClassInfo.join_code}</span>
  </div>
+{!selectedClassInfo.ended_at ? (
  <button onClick={() => setShowQR(!showQR)}
  className="px-3 py-1.5 rounded-lg border border-border text-sm hover:bg-secondary transition-colors">
  {showQR ? 'Hide QR' : ' QR Code'}
  </button>
+ ) : (
+<span className="px-3 py-1.5 rounded-lg border border-amber-500/40 text-amber-700 text-sm">
+Class ended
+</span>
+)}
  </>
  )}
  <button onClick={() => setShowCreateClass(true)}
@@ -648,6 +902,13 @@ export default function InstructorDashboard({ onClose }: Props) {
  New Class
  </button>
  </div>
+
+{selectedClassInfo?.ended_at && (
+<div className="mb-4 px-4 py-3 rounded-lg border border-amber-500/40 bg-amber-500/10 text-sm text-amber-900">
+This class ended on {new Date(selectedClassInfo.ended_at).toLocaleString()} and is recoverable until{' '}
+{selectedClassInfo.purge_after ? new Date(selectedClassInfo.purge_after).toLocaleString() : 'automatic cleanup'}.
+</div>
+)}
 
  {/* Class description/year */}
  {selectedClassInfo?.description && (
@@ -657,7 +918,7 @@ export default function InstructorDashboard({ onClose }: Props) {
  )}
 
  {/* QR Code */}
- {showQR && selectedClassInfo && (
+{showQR && selectedClassInfo && !selectedClassInfo.ended_at && (
  <div className="mb-4 p-6 bg-card border border-border rounded-xl text-center space-y-3">
  <p className="text-sm text-muted-foreground">Students scan to join — <strong>{selectedClassInfo.name}</strong></p>
  <div className="inline-block bg-white p-4 rounded-lg">
@@ -782,7 +1043,11 @@ export default function InstructorDashboard({ onClose }: Props) {
  {students.length === 0 && (
  <div className="text-center py-10 space-y-2">
  <p className="text-muted-foreground">No students have joined yet.</p>
- <p className="text-sm text-muted-foreground">Share the passkey <span className="font-mono font-bold text-primary">{selectedClassInfo?.join_code}</span> or show the QR code.</p>
+<p className="text-sm text-muted-foreground">
+{selectedClassInfo?.ended_at
+? 'This class is ended. Students cannot join.'
+: <>Share the passkey <span className="font-mono font-bold text-primary">{selectedClassInfo?.join_code}</span> or show the QR code.</>}
+</p>
  </div>
  )}
  </div>
