@@ -1615,6 +1615,6 @@ export const weeds: Weed[] = [
     "controlTiming": "Seedling stage before vines begin twining",
     "memoryHook": "Ivyleaf morningglory = 3-lobed ivy leaves + long hairy sepals + twining vine"
   }
-]
+];
 
 export const weedMap = Object.fromEntries(weeds.map((w) => [w.id, w]));
