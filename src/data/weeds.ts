@@ -2,8 +2,6 @@ import type { Weed } from "@/types/game";
 
 export const weeds: Weed[] = [
   {
-    [
-  {
     "id": "Fall_Panicum",
     "commonName": "Fall Panicum",
     "scientificName": "Panicum dichotomiflorum",
