@@ -647,3 +647,14 @@ export const WEED_TOP_MOA: Record<string, string> = {
   "yellow-nutsedge": "als-post",
   yellow_Rocket: "auxin",
 };
+
+/**
+ * Array-shaped view of WEED_TOP_MOA for consumers that expect a ranked list.
+ * The source now provides one top MOA per weed, so each list has a single entry
+ * ("none" entries are omitted).
+ */
+export const WEED_TOP_MOAS: Record<string, string[]> = Object.fromEntries(
+  Object.entries(WEED_TOP_MOA)
+    .filter(([, moa]) => moa && moa !== 'none')
+    .map(([id, moa]) => [id, [moa]]),
+);
