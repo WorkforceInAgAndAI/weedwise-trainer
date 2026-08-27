@@ -19,18 +19,18 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, gardens, roadsides, railways, moist soils preferred",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Prolific seed producer; overtakes desirable plant growth",
-    management: "POST herbicide application before establishment, drainage management",
+    management: "POST herbicides mechanical control",
     controlTiming: "Seedling; initial leaf formation",
     lookAlike: {
       id: "Witchgrass",
       species: "Witchgrass (Panicum capillare)",
-      difference: "Witchgrass has hairy sheaths and leaves; Fall panicum is larger, has a prominent white midvein, and lacks hairs on the blades",
+      difference:
+        "Witchgrass has hairy sheaths and leaves; Fall panicum is larger, has a prominent white midvein, and lacks hairs on the blades",
     },
     memoryHook: "Fall panicum = smooth hairless blades + zig-zag stem + prominent white midvein",
   },
-
   {
     id: "Nimblewill",
     commonName: "Nimblewill",
@@ -51,16 +51,15 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: false,
     actReason: "Strong competitor; late-germinating; troublesome in lawns more than crops",
-    management: "POST grass herbicides, reseed areas with desirable grass in early fall",
+    management: "PRE herbicides multiple POST herbicide MOA hand removal",
     controlTiming: "Germination and seedling stage",
     lookAlike: {
       id: "Foxtail_barley",
       species: "Foxtail Barley",
       difference: "Foxtail has awned seed head; Nimblewill has fine panicle",
     },
-    memoryHook: "Nimblewill = wiry, delicate grass + lawn invader + weak growth",
+    memoryHook: "Nimblewill = wiry delicate grass + lawn invader + weak growth",
   },
-
   {
     id: "Foxtail_barley",
     commonName: "Foxtail Barley",
@@ -78,11 +77,11 @@ export const weeds: Weed[] = [
     ],
     habitat: "Saline soils, pastures, disturbed areas",
     primaryHabitat: "Wet / Poorly Drained",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Spiny awns harmful to livestock; seed head contaminates forage quality",
     management:
-      "PRE herbicides, early POST before seed development, mechanical control (tillage) is particularly effective given the shallow root system, improve drainage",
-    controlTiming: "Early growth stage, before seed production begins",
+      "Glyphosate (most effective, add ammonium sulfate); mowing or intensive early-season grazing; renovate/reseed with desirable forage; note it is a perennial bunchgrass, not a biennial rosette species",
+    controlTiming: "Early growth stage before seed production begins",
     lookAlike: {
       id: "Nimblewill",
       species: "Nimblewill",
@@ -92,7 +91,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Seed heads form sharp awns that can lodge in the mouths, eyes, and skin of pets and livestock, causing painful injuries, infections, and abscesses.",
   },
-
   {
     id: "Quackgrass",
     commonName: "Quackgrass",
@@ -113,8 +111,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
     actReason: "Perennial rhizomatous; extremely competitive; allelopathic; difficult to eradicate",
-    management:
-      "Repeated POST glyphosate, mechanical removal of rhizomes, fall applications are significantly more effective",
+    management: "PRE herbicides; early POST herbicides before 4 inches; cultivation",
     controlTiming: "Multiple applications from spring through fall",
     lookAlike: {
       id: "Downy_brome",
@@ -123,14 +120,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Quackgrass = rhizomatous + allelopathic + coarse blades",
   },
-
   {
     id: "Downy_brome",
     commonName: "Downy Brome",
     scientificName: "Bromus tectorum",
     family: "Poaceae",
     plantType: "Monocot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual (winter)",
     origin: "Introduced",
     image: "/images/Downy_brome/plant_1.jpeg",
     traits: [
@@ -142,9 +138,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Pastures, roadsides, fields, disturbed areas",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: false,
+    actImmediately: true,
     actReason: "Contributes to wildfire risk; sprouts in late summer or early fall",
-    management: "PRE herbicides applied in early spring or late fall, prescribed burning, shallow tillage",
+    management: "PRE herbicides applied in early spring or late fall prescribed burning shallow tillage",
     controlTiming: "Pre-emergent stage before sprouting",
     lookAlike: {
       id: "Quackgrass",
@@ -153,7 +149,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Downy brome = downy hairy leaves + winter annual + drooping awned panicle",
   },
-
   {
     id: "Wild_buckwheat",
     commonName: "Wild Buckwheat",
@@ -172,9 +167,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Grain fields, roadsides, railways",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Competes vigorously; difficult to control once vined; seeds persist 5+ years",
-    management: "PRE herbicides or early POST herbicides with multiple applications, mechanical removal",
+    management: "PRE herbicides or early POST herbicides with multiple applications mechanical removal",
     controlTiming: "Seedling stage or before vine establishment",
     lookAlike: {
       id: "Tall_morningglory",
@@ -183,7 +178,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Buckwheat = greenish-white flowers + climbing vine + arrow-shaped leaves",
   },
-
   {
     id: "Ladysthumb",
     commonName: "Lady's Thumb",
@@ -204,7 +198,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: false,
     actReason: "Moderate competitor; indicator of wet soils; responds well to herbicides",
-    management: "POST broadleaf herbicides, hand removal, cultivation",
+    management: "PRE herbicides; POST herbicides",
     controlTiming: "Seedling to 6-leaf stage",
     lookAlike: {
       id: "Water_smartweed",
@@ -213,7 +207,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Lady's thumb = purple thumbprint on leaves + pink flower spikes",
   },
-
   {
     id: "Water_smartweed",
     commonName: "Water Smartweed",
@@ -234,7 +227,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: false,
     actReason: "Limited threat in dry crops; problematic in rice and wetland management",
-    management: "Water level management, POST herbicides applied directly to foliage, drainage",
+    management: "Water level management POST herbicides applied directly to foliage drainage",
     controlTiming: "Early growth stage",
     lookAlike: {
       id: "Ladysthumb",
@@ -243,7 +236,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Water smartweed = aquatic smartweed without thumbprint",
   },
-
   {
     id: "Curly_dock",
     commonName: "Curly Dock",
@@ -266,7 +258,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: false,
     actReason: "Perennial but responsive to herbicides; deep taproot limits mechanical removal",
-    management: "POST herbicides with repeated applications, repeated cutting, hand pulling",
+    management: "POST herbicides with repeated applications repeated cutting hand pulling",
     controlTiming: "Rosette to early bolt stage",
     lookAlike: {
       id: "Common_Burdock",
@@ -275,7 +267,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Curly dock = wavy curly leaf margins + tall flower stalk + deep taproot",
   },
-
   {
     id: "Witchgrass",
     commonName: "Witchgrass",
@@ -294,9 +285,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, construction sites, roadsides",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Prolific seed producer; matures to tumble weed dispersing seeds widely",
-    management: "PRE herbicides, early POST before 4 leaves, mechanical removal",
+    management: "PRE herbicides early POST before 4 leaves mechanical removal",
     controlTiming: "Early growth or seedling stage",
     lookAlike: {
       id: "Smooth_Witchgrass",
@@ -305,7 +296,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Witchgrass = hairy sheaths + witch's broom shaped panicle + tumbles when dry",
   },
-
   {
     id: "Horsenettle",
     commonName: "Horsenettle",
@@ -324,9 +314,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Pastures, meadows, roadsides",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Perennial spreads via rhizomes; toxic to humans and livestock; extremely difficult to control",
-    management: "Repeated cutting/mowing, POST (glyphosate), burning, biological control. Avoid tilling or cultivation",
+    management:
+      "Systemic herbicide (glyphosate or dicamba) applied at flowering/bud stage in late summer or early fall; avoid tillage (spreads rhizomes); mowing only slows spread",
     controlTiming: "Repeated applications in seedling and vegetative stage",
     lookAlike: {
       id: "Buffalobur",
@@ -337,7 +328,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "A spiny nightshade with toxic glycoalkaloids in fruit and foliage; ingestion can cause digestive upset and neurological signs in livestock and people.",
   },
-
   {
     id: "Buffalobur",
     commonName: "Buffalobur",
@@ -355,9 +345,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Roadside, waste areas, cultivated fields",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Toxic to livestock; spiny fruit contaminates forage; spreads rapidly",
-    management: "Early POST herbicides, hand removal, close mowing before seed set",
+    management: "Early POST herbicides hand removal close mowing before seed set",
     controlTiming: "Seedling to 6-inch height",
     lookAlike: {
       id: "Horsenettle",
@@ -368,7 +358,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Spiny plant whose berries and foliage contain solanine-type alkaloids that are poisonous to livestock and humans if eaten.",
   },
-
   {
     id: "Smooth_Groundcherry",
     commonName: "Smooth Groundcherry",
@@ -389,7 +378,8 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Perennial with deep rhizomes; seeds persist in soil; tillage spreads root fragments.",
-    management: "PRE/POST herbicides, cultivation, mulching",
+    management:
+      "Remove young plants before rhizomes establish; glyphosate or 2,4-D; repeated tillage needed since rhizome fragments re-root; grows on dry, well-drained upland sites (not a drainage issue)",
     controlTiming: "Seedling to 4-inch stage",
     lookAlike: {
       id: "Eastern_black_nightshade",
@@ -400,7 +390,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Unripe (green) berries and the foliage contain solanine, which is toxic to humans and livestock if ingested.",
   },
-
   {
     id: "Tall_morningglory",
     commonName: "Common Morningglory",
@@ -419,9 +408,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, gardens, roadsides, coastal areas",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
-    actReason: "Highly competitive; twines around crops; produces up to 26,000 seeds",
-    management: "POST herbicides, mechanical control",
+    actImmediately: false,
+    actReason: "Highly competitive; twines around crops; produces up to 26 000 seeds",
+    management: "POST herbicides mechanical control",
     controlTiming: "Seedling or early growth stages",
     lookAlike: {
       id: "Field_bindweed",
@@ -432,7 +421,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Seeds contain compounds that can cause digestive upset and, in large doses, neurological signs in livestock.",
   },
-
   {
     id: "Field_bindweed",
     commonName: "Field Bindweed",
@@ -453,7 +441,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Perennial spreads via rhizomes; extremely difficult to control; long-lived seeds",
-    management: "Repeated POST applications before flowering, cultivation, mulching",
+    management: "Mechanical removal biological control POST herbicides in late spring",
     controlTiming: "Early growth stage or immediately after germination",
     lookAlike: {
       id: "Tall_morningglory",
@@ -462,7 +450,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Field bindweed = perennial vine + arrowhead leaves + small pink flowers + rhizomes",
   },
-
   {
     id: "Hedge_bindweed",
     commonName: "Hedge Bindweed",
@@ -483,7 +470,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Perennial rhizomatous; extremely persistent; difficult to control",
-    management: "Repeated POST herbicides, removing rhizomes and root system",
+    management: "Repeated POST herbicides biological control mechanical removal",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Field_bindweed",
@@ -492,7 +479,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Hedge bindweed = large white flowers + hedge climber + deeply rhizomatous",
   },
-
   {
     id: "Garlic_mustard",
     commonName: "Garlic Mustard",
@@ -512,8 +498,8 @@ export const weeds: Weed[] = [
     habitat: "Woodlands, forest edges, urban areas",
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: true,
-    actReason: "Allelopathic; displaces native understory flora; spreading introduced in forests",
-    management: "Hand pulling biennial rosettes, POST herbicides, early spring control",
+    actReason: "Allelopathic; displaces native understory flora; spreading invasive in forests",
+    management: "PRE herbicides; POST herbicides mowing before seed set",
     controlTiming: "Rosette stage in spring; before seed formation",
     lookAlike: {
       id: "yellow_Rocket",
@@ -522,7 +508,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Garlic mustard = smells like garlic when crushed",
   },
-
   {
     id: "Dandelion",
     commonName: "Dandelion",
@@ -542,8 +527,8 @@ export const weeds: Weed[] = [
     habitat: "Lawns, gardens, pastures, roadsides, disturbed areas",
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
-    actReason: "Perennial with deep taproot; difficult to control but slow spreading",
-    management: "POST herbicides, hand pulling, repeated cutting",
+    actReason: "Perennial with deep taproot; difficult to control and spread quickly via wind.",
+    management: "POST herbicides hand pulling repeated cutting",
     controlTiming: "Spring rosette or fall before dormancy",
     lookAlike: {
       id: "Prickly_lettuce",
@@ -552,14 +537,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Dandelion clock = yellow flower with parachute bristles at seeding",
   },
-
   {
     id: "Horseweed",
     commonName: "Horseweed",
     scientificName: "Erigeron canadensis",
     family: "Asteraceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual",
     origin: "Native",
     image: "/images/Horseweed/plant_1.jpg",
     traits: [
@@ -573,7 +557,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Resistant to common herbicides; extremely competitive in late-planted fields",
-    management: "PRE herbicides, early POST herbicide, tillage, cover crops",
+    management: "Hand removal with gloves POST herbicides during vegetative stage",
     controlTiming: "Pre-emergence to rosette stage",
     lookAlike: {
       id: "Prickly_lettuce",
@@ -584,14 +568,13 @@ export const weeds: Weed[] = [
     safetyNote:
       "Can cause skin and respiratory irritation in sensitive people and may be mildly toxic to livestock if grazed heavily.",
   },
-
   {
     id: "Prickly_lettuce",
     commonName: "Prickly Lettuce",
     scientificName: "Lactuca serriola",
     family: "Asteraceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Biennial",
     origin: "Introduced",
     image: "/images/Prickly_lettuce/plant_1.jpg",
     traits: [
@@ -605,7 +588,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Moderate competitor; spiny nature deters livestock",
-    management: "POST broadleaf herbicides, mowing, cultivation",
+    management: "PRE residual herbicides multiple POST MOA early control critical",
     controlTiming: "Seedling to early rosette stage",
     lookAlike: {
       id: "Dandelion",
@@ -614,7 +597,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Prickly lettuce = lettuce-like leaves + prickles underneath + small yellow flowers",
   },
-
   {
     id: "Jimsonweed",
     commonName: "Jimsonweed",
@@ -633,20 +615,21 @@ export const weeds: Weed[] = [
     ],
     habitat: "Fields, pastures, roadsides",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Highly toxic to livestock and humans; alkaloid compounds cause neurological damage",
-    management: "Hand removal with gloves, POST herbicides during vegetative stage",
+    management:
+      "BROADLEAF herbicides (2,4-D, dicamba, atrazine, metribuzin, glyphosate); shallow cultivation/hand-weeding of the shallow root system; prevent seed set",
     controlTiming: "Seedling stage; before flower pods develop",
     lookAlike: {
       id: "Eastern_black_nightshade",
       species: "Eastern Black Nightshade",
-      difference: "Nightshade is smaller (1–2 ft) with smaller flowers; Jimsonweed is 2–5 ft with large bell-shaped flowers",
+      difference:
+        "Nightshade is smaller (1–2 ft) with smaller flowers; Jimsonweed is 2–5 ft with large bell-shaped flowers",
     },
     memoryHook: "Jimsonweed = spiny pod + large bell-shaped flowers + musty smell + toxic",
     safetyNote:
       "HIGHLY POISONOUS — tropane alkaloids (atropine, scopolamine) can cause hallucinations, rapid heartbeat, seizures, and death in humans and animals if ingested.",
   },
-
   {
     id: "Eastern_black_nightshade",
     commonName: "Eastern Black Nightshade",
@@ -667,7 +650,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Moderate competitor; toxicity level lower than Jimsonweed but still present",
-    management: "POST herbicides, hand removal, cultivation, rotate crops to prevent population buildup",
+    management: "POST herbicides hand removal cultivation rotate crops to prevent population buildup",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Jimsonweed",
@@ -678,7 +661,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Contains toxic alkaloids in leaves and unripe berries; ingestion can cause gastrointestinal and neurological signs in people and livestock.",
   },
-
   {
     id: "waterhemp",
     commonName: "Waterhemp",
@@ -695,12 +677,12 @@ export const weeds: Weed[] = [
       "Male and female flowers grow on separate plants (dioecious), so only female plants make seed",
       "Grows 6–10 feet tall and a single female plant can produce hundreds of thousands of tiny seeds",
     ],
-    habitat: "Corn and soybean fields, disturbed row-crop ground, ditch banks and field edges (upland weed — not aquatic)",
+    habitat:
+      "Corn and soybean fields, disturbed row-crop ground, ditch banks and field edges (upland weed — not aquatic)",
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
-    actReason:
-      "Highly herbicide-resistant; prolific seed producer that can dominate crop fields if not controlled early",
-    management: "PRE herbicides, POST herbicides, cover crops",
+    actReason: "Aggressive, fast growing annual broadleaf weed that can overtake farm fields",
+    management: "PRE herbicides POST herbicides cover crops",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "palmer-amaranth",
@@ -709,7 +691,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Waterhemp = Tall plants with broad leaves + long slender flower spikes",
   },
-
   {
     id: "palmer-amaranth",
     commonName: "Palmer Amaranth",
@@ -729,8 +710,9 @@ export const weeds: Weed[] = [
     habitat: "Row crop fields, pastures, roadsides",
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
-    actReason: "Extremely aggressive introduced; grows 2+ inches/day, and develops herbicide resistance rapidly",
-    management: "PRE herbicides, multiple POST herbicide MOA, hand removal",
+    actReason: "Extremely aggressive invasive; grows 2+ inches/day and develops herbicide resistance rapidly",
+    management:
+      "PRE and POST herbicides on small (<3–4 in) plants; multiple effective sites of action; zero-tolerance hand-roguing to prevent seed production",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "waterhemp",
@@ -741,7 +723,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Can accumulate high nitrates and sometimes oxalates; heavy consumption by ruminants can lead to nitrate poisoning and kidney damage.",
   },
-
   {
     id: "Redroot_pigweed",
     commonName: "Redroot Pigweed",
@@ -760,9 +741,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Disturbed areas, gardens, roadsides, waste areas, field margins",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
-    actReason: "Prolific seed producer with deep taproot; highly competitive for light, water, and nutrients",
-    management: "PRE herbicides, early POST herbicides before 4 inches, cultivation",
+    actImmediately: false,
+    actReason: "Prolific seed producer with deep taproot; highly competitive for light water and nutrients",
+    management:
+      "PRE residual herbicides plus POST on small (cotyledon–4-leaf) plants; multiple effective sites of action due to PSII/ALS resistance; cultivation of young seedlings",
     controlTiming: "Seedling to 4-inch stage",
     lookAlike: {
       id: "palmer-amaranth",
@@ -771,7 +753,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Red root = visible red root at seedling stage",
   },
-
   {
     id: "yellow_Rocket",
     commonName: "Yellow Rocket",
@@ -792,7 +773,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Biennial; responsive to fall or early spring POST broadleaf herbicides",
-    management: "POST broadleaf herbicides fall or spring, mowing before seed set",
+    management: "POST broadleaf herbicides fall or spring mowing before seed set",
     controlTiming: "Rosette stage in fall or early spring before bolting",
     lookAlike: {
       id: "Wild_mustard",
@@ -801,14 +782,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Yellow rocket = small yellow flowers that rocket up in spring",
   },
-
   {
     id: "Wild_mustard",
     commonName: "Wild Mustard",
     scientificName: "Rhamphospermum arvense",
     family: "Brassicaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual",
     origin: "Introduced",
     image: "/images/Wild_mustard/plant_1.jpg",
     traits: [
@@ -820,10 +800,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Grain fields, gardens, disturbed ground, waste areas",
     primaryHabitat: "Cool-Season / Early Spring",
-    actImmediately: true,
-    actReason: "Competitive in small grains; single plant produces 3,000+ seeds, hosts plant diseases",
-    management: "POST herbicides, delay crop seeding after management",
-    controlTiming: "Seedling stage, before pod development",
+    actImmediately: false,
+    actReason: "Competitive in small grains; single plant produces 3 000+ seeds hosts plant diseases",
+    management: "POST herbicides delay crop seeding after management",
+    controlTiming: "Seedling stage before pod development",
     lookAlike: {
       id: "yellow_Rocket",
       species: "Yellow Rocket",
@@ -831,14 +811,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Wild Mustard = curved beaked seed pod + yellow flowers",
   },
-
   {
     id: "Shepherds_Purse",
     commonName: "Shepherd's Purse",
     scientificName: "Capsella bursa-pastoris",
     family: "Brassicaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual (winter)",
     origin: "Introduced",
     image: "/images/Shepherds_Purse/plant_1.jpeg",
     traits: [
@@ -851,7 +830,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual responsive to fall/spring herbicides; moderate competitive threat",
-    management: "POST herbicides in late fall or early spring, cultivation, mulching",
+    management: "PRE/POST herbicides cultivation mulching",
     controlTiming: "Rosette to bolting stage",
     lookAlike: {
       id: "Field_Pennycress",
@@ -860,14 +839,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Shepherd's purse = heart-shaped pods like a purse",
   },
-
   {
     id: "Field_Pennycress",
     commonName: "Field Pennycress",
     scientificName: "Thlaspi arvense",
     family: "Brassicaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual (winter)",
     origin: "Introduced",
     image: "/images/Field_Pennycress/plant_1.jpg",
     traits: [
@@ -879,9 +857,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Small grain fields, waste areas, roadsides",
     primaryHabitat: "Cool-Season / Early Spring",
-    actImmediately: true,
-    actReason: "Develops herbicide resistance; produces 20,000+ seeds per plant",
-    management: "POST broadleaf herbicides, fall or spring control, crop rotation",
+    actImmediately: false,
+    actReason: "Develops herbicide resistance; produces 20 000+ seeds per plant",
+    management:
+      "PRE herbicides in wheat/small grains, or glyphosate/2,4-D burndown preplant; POST metsulfuron/tribenuron on rosettes; mowing/tillage before seed set",
     controlTiming: "Early growth stage before pod development",
     lookAlike: {
       id: "Shepherds_Purse",
@@ -890,7 +869,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Pennycress = round pods like pennies",
   },
-
   {
     id: "Woolly_cupgrass",
     commonName: "Woolly Cupgrass",
@@ -908,9 +886,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Fields, meadows, disturbed soils",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Highly competitive in corn/sorghum; fast growing; difficult to control post-emergence",
-    management: "PRE herbicides, early POST herbicides",
+    management: "PRE herbicides early POST herbicides",
     controlTiming: "Seedling or early vegetative stage",
     lookAlike: {
       id: "Shattercane_Sorghums",
@@ -919,14 +897,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Woolly cupgrass = purple-tinted inflorescence + cup-shaped base + hairy parts",
   },
-
   {
     id: "Shattercane_Sorghums",
     commonName: "Shattercane/Sorghums",
     scientificName: "Sorghum bicolor",
     family: "Poaceae",
     plantType: "Monocot",
-    lifeCycle: "Summer Annual",
+    lifeCycle: "Annual",
     origin: "Introduced",
     image: "/images/Shattercane_Sorghums/plant_1.jpeg",
     traits: [
@@ -938,8 +915,8 @@ export const weeds: Weed[] = [
     habitat: "Corn and sorghum fields, disturbed areas",
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
-    actReason: "Cross-breeding with cultivated sorghum leads to resistance; produces 4,500+ seeds",
-    management: "PRE residual herbicides, early POST, hand removal, cleaning equipment between contaminated fields",
+    actReason: "Cross-breeding with cultivated sorghum leads to resistance; produces 4 500+ seeds",
+    management: "POST herbicides in late fall or early spring cultivation mulching",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Woolly_cupgrass",
@@ -948,7 +925,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Shattercane = coarse sorghum-like grass + shattering seed head + allelopathic",
   },
-
   {
     id: "Goosegrass",
     commonName: "Goosegrass",
@@ -966,10 +942,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, lawns, near sidewalks",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: true,
-    actReason:
-      "Highly competitive; hosts crop diseases; produces 50,000+ seeds making it highly prolific; prefers compacted soils",
-    management: "PRE residual herbicides, early POST herbicides, mechanical removal",
+    actImmediately: false,
+    actReason: "Low growing weed that grows in flat mat on ground, flowers in spikes that branch outward",
+    management: "PRE herbicides; POST herbicides early on",
     controlTiming: "Pre-emergence or early seedling stage",
     lookAlike: {
       id: "large-crabgrass",
@@ -979,7 +954,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Goosegrass = finger seedhead + flat stems + compacted soils",
   },
-
   {
     id: "Longspine_sandbur",
     commonName: "Longspine Sandbur",
@@ -998,9 +972,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Pastures, fields, lawns, roadsides",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Spiny burs painful to livestock and workers; difficult to control once established",
-    management: "PRE herbicides, early POST before seed (bur) development",
+    management:
+      "Pre-emergent and post-emergent herbicides (glyphosate, fenoxaprop, topramezone); mechanical removal; equipment/clothing/hay sanitation to prevent spread;",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Goosegrass",
@@ -1009,7 +984,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Sandbur = long spines on burs + sandy soils + painful to livestock",
   },
-
   {
     id: "Asian_copperleaf",
     commonName: "Asian Copperleaf",
@@ -1029,7 +1003,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Emerging problematic weed; competitive",
-    management: "PRE herbicides, early POST herbicides, cultivation, hand removal",
+    management: "PRE herbicides early POST herbicides cultivation hand removal",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Redroot_pigweed",
@@ -1038,7 +1012,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Asian copperleaf = green ovate leaves + hairy stems + emerging weed problem",
   },
-
   {
     id: "Asiatic_dayflower",
     commonName: "Asiatic Dayflower",
@@ -1057,10 +1030,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Roadsides, gardens, fields, waste areas",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Emerging problem weed; prolific seed producer; competitive",
     management:
-      "PRE herbicides, early POST herbicides, hand removal, mechanical cultivation, mulching, preventive sanitation",
+      "PRE residuals such as flumioxazin, indaziflam, hexazinone+sulfometuron or S-metolachlor; POST with mesotrione, topramezone or triclopyr on small (<10-leaf) plants",
     controlTiming: "Early vegetative growth",
     lookAlike: {
       id: "Tall_morningglory",
@@ -1069,14 +1042,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Asiatic dayflower = two blue-petal flowers + jointed stems + opens for a day",
   },
-
   {
     id: "Burcucumber",
     commonName: "Burcucumber",
     scientificName: "Sicyos angulatus",
     family: "Cucurbitaceae",
     plantType: "Dicot",
-    lifeCycle: "Summer Annual",
+    lifeCycle: "Annual",
     origin: "Native",
     image: "/images/Burcucumber/plant_1.jpeg",
     traits: [
@@ -1090,7 +1062,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Highly competitive; tendrils vine through crop; prolific seed production",
-    management: "PRE residual herbicides, early POST herbicides, hand removal, burning plant debris",
+    management: "PRE residual herbicides early POST herbicides hand removal burning plant debris",
     controlTiming: "Control at early seedling stage before vines begin climbing",
     lookAlike: {
       id: "Tall_morningglory",
@@ -1099,14 +1071,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Bur cucumber = spiny bur fruit + tendrils + vining growth",
   },
-
   {
     id: "Catchweed_bedstraw",
     commonName: "Catchweed Bedstraw",
     scientificName: "Galium aparine",
     family: "Rubiaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual",
     origin: "Native",
     image: "/images/Catchweed_bedstraw/plant_1.jpeg",
     traits: [
@@ -1118,9 +1089,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Gardens, crop fields, vineyards",
     primaryHabitat: "Cool-Season / Early Spring",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Highly competitive; forms dense mats of plant material",
-    management: "POST herbicides fall or spring, mechanical control, check for fruit attachment on clothing or fur",
+    management: "POST herbicides fall or spring mechanical control check for fruit attachment on clothing or fur",
     controlTiming: "Early vegetative stage",
     lookAlike: {
       id: "Ground_ivy",
@@ -1128,18 +1099,18 @@ export const weeds: Weed[] = [
       difference:
         "Ground Ivy is perennial with round scalloped leaves; Catchweed Bedstraw is annual with narrow leaves",
     },
-    memoryHook: "Catchweed = hooked hairs that stick to clothes + whorled narrow leaves (3 or more leaves attached at the same node)",
+    memoryHook:
+      "Catchweed = hooked hairs that stick to clothes + whorled narrow leaves (3 or more leaves attached at the same node)",
     safetyNote:
       "Can cause low-level poisoning if eaten in quantity by livestock and may inflame the digestive tract; bristly stems can irritate sensitive skin.",
   },
-
   {
     id: "Henbit_deadnettle",
     commonName: "Henbit",
     scientificName: "Lamium amplexicaule",
     family: "Lamiaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual (winter)",
     origin: "Introduced",
     image: "/images/Henbit_deadnettle/plant_1.jpg",
     traits: [
@@ -1153,7 +1124,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Moderately competitive; can form dense patches",
-    management: "POST herbicides applied in fall or spring, mechanical control",
+    management: "Fall/early-spring POST and PRE residuals",
     controlTiming: "Early vegetative stage",
     lookAlike: {
       id: "Ground_ivy",
@@ -1163,7 +1134,6 @@ export const weeds: Weed[] = [
     memoryHook: "Henbit = square stems + purple tubular flowers + winter annual",
     safetyNote: "Generally low toxicity; large amounts may cause mild digestive upset in livestock.",
   },
-
   {
     id: "Ground_ivy",
     commonName: "Ground Ivy",
@@ -1183,8 +1153,8 @@ export const weeds: Weed[] = [
     habitat: "Fields, gardens, disturbed lands",
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
-    actReason: "Perennial; quickly spreads through stolons; somewhat palatable to livestock",
-    management: "POST herbicides, reduce soil moisture, improved pasture species",
+    actReason: "Perennial; quickly spreads through stolons; mostly unpalatable to livestock",
+    management: "Repeated POST herbicides removing rhizomes and root system",
     controlTiming: "Early vegetative stage",
     lookAlike: {
       id: "Henbit_deadnettle",
@@ -1193,7 +1163,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Ground ivy = aromatic rounded leaves + creeping nodes + perennial",
   },
-
   {
     id: "Hemp_dogbane",
     commonName: "Hemp Dogbane",
@@ -1213,9 +1182,8 @@ export const weeds: Weed[] = [
     habitat: "Fields, open forest areas, roadsides, riverbanks",
     primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
-    actReason:
-      "Perennial spreads via rhizomes; toxic properties cause irritation if ingested; extremely difficult to control",
-    management: "Repeated POST herbicides, biological control, mechanical removal",
+    actReason: "Tall branching perennial plant with smooth stem and toxic milky sap",
+    management: "POST herbicides applied in fall or spring mechanical control",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "common_Milkweed",
@@ -1226,7 +1194,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Contains cardiac glycosides similar to oleander; highly toxic to livestock and pets if ingested, leading to heart and digestive problems.",
   },
-
   {
     id: "common_Milkweed",
     commonName: "Common Milkweed",
@@ -1247,7 +1214,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: false,
     actReason: "Perennial but slower rhizomatous spreading; important monarch butterfly host",
-    management: "POST herbicides if needed, repeated cutting, biological control preferred",
+    management: "POST herbicides if needed repeated cutting biological control preferred",
     controlTiming: "Seedling or vegetative stage before flowers appear",
     lookAlike: {
       id: "Hemp_dogbane",
@@ -1258,7 +1225,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Contains cardiac glycosides that can poison livestock and pets if ingested, causing digestive upset, weakness, and potentially heart problems.",
   },
-
   {
     id: "Honey-vine_climbing_milkweed",
     commonName: "Honeyvine Milkweed",
@@ -1279,7 +1245,8 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     actImmediately: true,
     actReason: "Perennial with lateral roots and rhizomes; vines through crop; spreading concern; difficult to control",
-    management: "Repeated POST herbicide applications, biological control, mechanical removal",
+    management:
+      "Repeated POST glyphosate (usually suppression, not eradication); repeated cultivation to fragment/exhaust roots (a single tillage pass spreads it, but repeated cultivation suppresses); mowing/cutting; avoid single-pass tillage",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Tall_morningglory",
@@ -1291,14 +1258,13 @@ export const weeds: Weed[] = [
     safetyNote:
       "Milkweed relative with cardiac glycosides; ingestion can cause vomiting, diarrhea, and heart rhythm disturbances in animals.",
   },
-
   {
     id: "CommonChickweed",
     commonName: "Common Chickweed",
     scientificName: "Stellaria media",
     family: "Caryophyllaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual (winter)",
     origin: "Introduced",
     image: "/images/CommonChickweed/plant_1.jpeg",
     traits: [
@@ -1311,7 +1277,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual; weak competitor; good herbicide response",
-    management: "POST herbicides fall or spring, tillage",
+    management: "POST herbicides fall or spring tillage",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Mouseear_chickweed",
@@ -1320,7 +1286,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Common chickweed = egg-shaped leaves + split-petal white flowers + winter annual",
   },
-
   {
     id: "Mouseear_chickweed",
     commonName: "Mouseear Chickweed",
@@ -1340,7 +1305,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Biennial/perennial; hairy foliage resists some herbicides; weak competitor",
-    management: "POST herbicides, repeated cutting, improved competition",
+    management: "POST herbicides applied to fall or spring rosette hand pulling",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "CommonChickweed",
@@ -1349,12 +1314,10 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Mouseear = fuzzy hairy leaves like mouse ears + perennial",
   },
-
   {
     id: "Common_Burdock",
     commonName: "Common Burdock",
-    safetyNote:
-      "Large hooked burs cling to skin, hair, and clothing and can scratch skin or injure eyes of animals.",
+    safetyNote: "Large hooked burs cling to skin, hair, and clothing and can scratch skin or injure eyes of animals.",
     scientificName: "Arctium minus",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -1372,7 +1335,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: false,
     actReason: "Biennial; deep taproot resists pulling; responsive to herbicides in rosette stage",
-    management: "POST herbicides applied to rosette, hand pulling with leverage, mowing before seed set",
+    management: "POST herbicides applied to rosette hand pulling with leverage mowing before seed set",
     controlTiming: "Early vegetative (rosette) stage",
     lookAlike: {
       id: "Curly_dock",
@@ -1382,12 +1345,10 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Burdock = large coarse leaves + spiny burrs that stick to hair/clothes",
   },
-
   {
     id: "Musk_thistle",
     commonName: "Musk Thistle",
-    safetyNote:
-      "Sharp spines line the leaves, stems, and flower heads and can easily puncture bare skin.",
+    safetyNote: "Sharp spines line the leaves, stems, and flower heads and can easily puncture bare skin.",
     scientificName: "Carduus nutans",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -1405,7 +1366,8 @@ export const weeds: Weed[] = [
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: true,
     actReason: "Biennial; prolific seed producer; displaces forage; spiny nature hazardous to livestock",
-    management: "POST herbicides applied to fall or spring rosette, hand pulling, biological control",
+    management:
+      "Selective BROADLEAF herbicides (2,4-D, dicamba, clopyralid, aminopyralid, metsulfuron, picloram) applied to rosettes in spring or fall; mowing at bud/bloom stage; biological control with seed-head weevils",
     controlTiming: "Rosette stage in fall or spring before bolting",
     lookAlike: {
       id: "Common_teasel",
@@ -1414,7 +1376,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Musk thistle = drooping purple flowers + coarse branched stems + biennial",
   },
-
   {
     id: "Common_mullein",
     commonName: "Common Mullein",
@@ -1435,21 +1396,20 @@ export const weeds: Weed[] = [
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: false,
     actReason: "Biennial; hairy foliage sheds contact herbicides; best controlled in rosette stage before bolting",
-    management: "Hand pulling of rosettes, mowing before seed set, POST herbicides with surfactant on rosette stage",
+    management: "Hand pulling of rosettes mowing before seed set POST herbicides with surfactant on rosette stage",
     controlTiming: "First-year rosette stage in fall or spring before bolting",
     lookAlike: {
       id: "Common_Burdock",
       species: "Common Burdock",
-      difference: "Burdock leaves are large but smooth and heart-shaped; Mullein leaves are thick and covered in soft woolly hairs",
+      difference:
+        "Burdock leaves are large but smooth and heart-shaped; Mullein leaves are thick and covered in soft woolly hairs",
     },
     memoryHook: "Mullein = fuzzy 'flannel' leaves + tall yellow flower spike + biennial",
   },
-
   {
     id: "Common_teasel",
     commonName: "Common Teasel",
-    safetyNote:
-      "Stiff prickles cover the stems and cone-shaped seed heads and can poke or scratch unprotected skin.",
+    safetyNote: "Stiff prickles cover the stems and cone-shaped seed heads and can poke or scratch unprotected skin.",
     scientificName: "Dipsacus fullonum",
     family: "Caprifoliaceae",
     plantType: "Dicot",
@@ -1465,18 +1425,17 @@ export const weeds: Weed[] = [
     ],
     habitat: "Roadsides, field margins, disturbed areas, meadows",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: false,
+    actImmediately: true,
     actReason: "Biennial; moderate competitor; responsive to herbicides if controlled in rosette",
-    management: "POST herbicides applied to fall or spring rosette, mowing before seed set",
+    management: "POST herbicides applied to fall or spring rosette mowing before seed set",
     controlTiming: "Rosette stage in fall or early spring",
     lookAlike: {
       id: "Musk_thistle",
       species: "Musk Thistle",
       difference: "Musk Thistle has drooping purple flowers; Teasel has upright prickly cone flowers",
     },
-    memoryHook: "Common Teasel = prickly inverted cone flower + rigid tall stems + biennial",
+    memoryHook: "Volunteer sunflower = unmistakable yellow flower + rough sandpapery leaves + crop volunteer",
   },
-
   {
     id: "Star_of_Bethlehem",
     commonName: "Star of Bethlehem",
@@ -1496,9 +1455,8 @@ export const weeds: Weed[] = [
     habitat: "Lawns, meadows, woodland areas",
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
-    actReason:
-      "Bulb perennial with aggressive offsets; poor herbicide response; removal is difficult because small bulbs are easily missed",
-    management: "POST herbicides, hand digging bulbs, repeated cutting, improved competition, cultivation",
+    actReason: "Grows from underground bulbs, toxic if eaten by humans or pets",
+    management: "POST herbicides hand digging bulbs repeated cutting improved competition cultivation",
     controlTiming: "Seedling or flowering stage",
     lookAlike: {
       id: "Wild_Carrot",
@@ -1509,7 +1467,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Ornamental bulb that is poisonous; cardiac glycosides in bulbs and leaves can cause vomiting, arrhythmias, and potentially death if ingested.",
   },
-
   {
     id: "Russian_thistle",
     commonName: "Russian Thistle",
@@ -1530,7 +1487,8 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: true,
     actReason: "Prolific seed producer; tumbles hundreds of yards; drought tolerant; expanding range",
-    management: "PRE herbicides, early POST herbicides before spines develop, mechanical removal early",
+    management:
+      "PRE and POST herbicides on small plants; tillage/mechanical removal before plants mature and detach to tumble and spread seed; competitive cover crops",
     controlTiming: "Early vegetative stage",
     lookAlike: {
       id: "kochia",
@@ -1540,7 +1498,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Russian thistle = succulent fleshy early + spiny later + tumbles at maturity",
   },
-
   {
     id: "Wild_Four-o'clock",
     commonName: "Wild Four-o'clock",
@@ -1558,9 +1515,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Disturbed areas, prairies, roadsides, open woods",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Perennial with large fleshy taproot; deep roots; difficult to control mechanically",
-    management: "Mechanical removal of small patches, mowing, or targeted POST herbicide if needed",
+    management:
+      "Repeated targeted POST herbicide (2,4-D is the main option, though efficacy data is limited); mechanical removal alone is unreliable since it resprouts from its deep taproot and root fragments",
     controlTiming: "Seedling or early vegetative growth",
     lookAlike: {
       id: "Tall_morningglory",
@@ -1569,14 +1527,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Four-o'clock = pink flowers open at 4pm + closes morning + fleshy taproot perennial",
   },
-
   {
     id: "Pinnate_tansymustard",
     commonName: "Pinnate Tansymustard",
     scientificName: "Descurainia pinnata",
     family: "Brassicaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Biennial",
     origin: "Native",
     image: "/images/Pinnate_tansymustard/plant_1.jpg",
     traits: [
@@ -1589,7 +1546,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual; weak competitor in humid regions; problematic in arid zones",
-    management: "POST broadleaf herbicides, mechanical control, cultivation",
+    management: "POST herbicide application to rosettes; mowing before seed set; wear gloves",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Wild_mustard",
@@ -1598,7 +1555,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Pinnate Tansymustard = finely pinnate leaves + small yellow flowers + arid adaptation",
   },
-
   {
     id: "False_London-rocket",
     commonName: "Tall Hedge Mustard",
@@ -1619,7 +1575,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Annual; weak competitor; good herbicide response",
-    management: "POST herbicides, mechanical control",
+    management: "Repeated POST applications before flowering cultivation mulching",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "yellow_Rocket",
@@ -1628,7 +1584,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Tall Hedge Mustard = small yellow flowers + narrow alternate leaves + linear pods",
   },
-
   {
     id: "Field_Horsetail",
     commonName: "Field Horsetail",
@@ -1648,9 +1603,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Wet soils, ditches, roadsides, railways",
     primaryHabitat: "Wet / Poorly Drained",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Perennial rhizomatous; extremely difficult to control; few herbicides effective",
-    management: "Drainage management, repeated mechanical removal, biological control, POST herbicides in late spring",
+    management:
+      "POST herbicides (chlorsulfuron, dichlobenil are the few effective actives) fall or spring; realistic goal is partial/temporary suppression, not full control, due to silica-rich, herbicide-tolerant tissue; crop rotation",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Scouringrush",
@@ -1661,7 +1617,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Contains thiaminase that destroys vitamin B1; chronic ingestion by horses and livestock can cause weakness, weight loss, and neurologic signs.",
   },
-
   {
     id: "Scouringrush",
     commonName: "Scouring-rush",
@@ -1680,9 +1635,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Riverbanks, marshes, swamps, near ponds",
     primaryHabitat: "Wet / Poorly Drained",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Perennial rhizomatous; extremely difficult to control; difficult to control with herbicide",
-    management: "Drainage improvement, repeated mechanical removal, long-term commitment",
+    management: "PRE residual herbicides early POST hand removal cleaning equipment between contaminated fields",
     controlTiming: "Vegetative stage",
     lookAlike: {
       id: "Field_Horsetail",
@@ -1693,7 +1648,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Like other horsetails, contains thiaminase that can cause vitamin B1 deficiency and neurologic signs in grazing animals when eaten chronically.",
   },
-
   {
     id: "commonPokeweed",
     commonName: "Common Pokeweed",
@@ -1712,9 +1666,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Pastures, fields, fencerows",
     primaryHabitat: " Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Toxic berries and plant parts to livestock and humans; deep taproot; prolific seeder; remove taproot",
-    management: "POST herbicides, repeated cutting before seed set",
+    management: "POST herbicides repeated cutting before seed set",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Common_Burdock",
@@ -1725,7 +1679,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "All parts, especially roots and berries, contain pokeweed toxins; ingestion can cause severe gastrointestinal irritation and systemic illness in humans and animals.",
   },
-
   {
     id: "Wild_Carrot",
     commonName: "Wild Carrot",
@@ -1746,7 +1699,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Biennial; responsive to herbicides in first year",
-    management: "POST herbicides applied in fall or spring, hand pulling",
+    management: "POST herbicides applied in fall or spring hand pulling",
     controlTiming: "Early vegetative growth",
     lookAlike: {
       id: "Poison_Hemlock",
@@ -1757,14 +1710,13 @@ export const weeds: Weed[] = [
     safetyNote:
       "Foliage can cause skin irritation in sensitive people; often confused with deadly look-alikes such as poison hemlock and water hemlock.",
   },
-
   {
     id: "Corn_speedwell",
     commonName: "Corn Speedwell",
     scientificName: "Veronica arvensis",
     family: "Plantaginaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual (winter)",
     origin: "Introduced",
     image: "/images/Corn_speedwell/plant_1.jpg",
     traits: [
@@ -1777,8 +1729,8 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
     actReason: "Winter annual; small competitive threat; good herbicide response",
-    management: "POST herbicides fall or spring, mechanical control",
-    controlTiming: "Seedling to early vegetative stage, before flowering",
+    management: "POST herbicides fall or spring mechanical control",
+    controlTiming: "Seedling to early vegetative stage before flowering",
     lookAlike: {
       id: "CommonChickweed",
       species: "Common Chickweed",
@@ -1787,14 +1739,13 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Corn speedwell = upright compact winter annual + tiny blue flowers + round stems",
   },
-
   {
     id: "Common_Mallow",
     commonName: "Common Mallow",
     scientificName: "Malva neglecta",
     family: "Malvaceae",
     plantType: "Dicot",
-    lifeCycle: "Winter Annual",
+    lifeCycle: "Annual",
     origin: "Introduced",
     image: "/images/Common_Mallow/plant_1.jpg",
     traits: [
@@ -1807,8 +1758,8 @@ export const weeds: Weed[] = [
     habitat: "Lawns, gardens, waste grounds, roadsides, railways",
     primaryHabitat: "Cool-Season / Early Spring",
     actImmediately: false,
-    actReason: "Winter annual; responds well to herbicides; moderate competitor",
-    management: "POST herbicides during active growth, cultivation, mulching",
+    actReason: "Winter annual; responds poorly to herbicides; moderate competitor",
+    management: "POST herbicides during active growth cultivation mulching",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Venice_mallow",
@@ -1818,7 +1769,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Common mallow = rounded scalloped leaves + low rosette + disk fruit",
   },
-
   {
     id: "Venice_mallow",
     commonName: "Venice Mallow",
@@ -1838,16 +1788,15 @@ export const weeds: Weed[] = [
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: false,
     actReason: "Annual; moderate competitor; good herbicide response",
-    management: "POST herbicides, cultivation, mulching",
+    management: "POST herbicides cultivation mulching",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Common_Mallow",
       species: "Common Mallow",
       difference: "Common Mallow is winter annual; Venice is warm-season annual",
     },
-    memoryHook: "Venice mallow = pale yellow flowers with dark center",
+    memoryHook: "Venice mallow = pale yellow flowers with dark center + inflated reticulate fruit",
   },
-
   {
     id: "Prickly_sida",
     commonName: "Prickly Sida",
@@ -1866,10 +1815,11 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, roadsides, waste areas, gardens",
     primaryHabitat: "Dry / Disturbed",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Increasingly problematic; herbicide-resistant biotypes developing; highly competitive",
-    management: "PRE residual herbicides, multiple POST MOA, early control critical",
-    controlTiming: "Seedling stage, before flowering",
+    management:
+      "PRE residual herbicides (e.g., Command/clomazone, flumetsulam, chloransulam premixes) followed by POST (Basagran/bentazon, or Liberty/glufosinate on small plants); cultivation",
+    controlTiming: "Seedling stage before flowering",
     lookAlike: {
       id: "Venice_mallow",
       species: "Venice Mallow",
@@ -1877,18 +1827,15 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Prickly sida = spines at leaf base + yellow flowers + warm-season annual",
   },
-
   {
     id: "common_Cocklebur",
     commonName: "Common Cocklebur",
-    safetyNote:
-      "Spiny burs can poke skin, and seedlings and seeds are toxic if eaten by people or livestock.",
+    safetyNote: "Spiny burs can poke skin, and seedlings and seeds are toxic if eaten by people or livestock.",
     scientificName: "Xanthium strumarium",
     family: "Asteraceae",
     plantType: "Dicot",
     lifeCycle: "Annual",
     origin: "Native",
-    image: "/images/common_Cocklebur/plant_1.jpeg",
     traits: [
       "Oval, spiny, two-seeded fruit covered by hook-like projections",
       "Broad, triangular leaves with toothed margins, covered in rough hairs",
@@ -1898,9 +1845,9 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, riverbanks, roadsides, waste areas",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Toxic seedlings to livestock; spiny burs contaminate hay; prolific seeder",
-    management: "PRE and POST herbicides, early removal, hay inspection, sanitation",
+    management: "PRE and POST herbicides early removal hay inspection sanitation",
     controlTiming: "Seedling to early vegetative growth",
     lookAlike: {
       id: "Common_Burdock",
@@ -1909,7 +1856,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Cocklebur = spiny 2-chambered burs + toxic seedlings + tall annual",
   },
-
   {
     id: "Spotted_spurge",
     commonName: "Spotted Spurge",
@@ -1918,7 +1864,6 @@ export const weeds: Weed[] = [
     plantType: "Dicot",
     lifeCycle: "Annual",
     origin: "Native",
-    image: "/images/Spotted_spurge/plant_1.jpg",
     traits: [
       "Oval leaves oppositely arranged with reddish spot in center",
       "Prostrate, mat-forming growth",
@@ -1929,7 +1874,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Annual; weak competitor; responsive to early herbicides",
-    management: "PRE herbicides, early POST herbicides, mulching, soil loosening",
+    management: "PRE herbicides early POST herbicides mulching soil loosening",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Toothed_spurge",
@@ -1940,7 +1885,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Milky sap is irritating to skin and mucous membranes; ingestion by pets or livestock can cause vomiting and diarrhea.",
   },
-
   {
     id: "Toothed_spurge",
     commonName: "Toothed Spurge",
@@ -1949,7 +1893,6 @@ export const weeds: Weed[] = [
     plantType: "Dicot",
     lifeCycle: "Annual",
     origin: "Native",
-    image: "/images/Toothed_spurge/plant_1.jpeg",
     traits: [
       "Serrate, broad, opposite leaves",
       "Upright to spreading growth (1–2 feet)",
@@ -1960,7 +1903,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Dry / Disturbed",
     actImmediately: false,
     actReason: "Annual; weak to moderate competitor; good herbicide response",
-    management: "POST herbicides, cultivation, early control important",
+    management: "POST herbicides cultivation early control important",
     controlTiming: "Seedling stage",
     lookAlike: {
       id: "Spotted_spurge",
@@ -1971,7 +1914,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Closely related to spotted spurge; acrid latex sap can irritate skin and eyes and cause gastrointestinal upset if consumed.",
   },
-
   {
     id: "annual-ryegrass",
     commonName: "Annual Ryegrass",
@@ -2000,7 +1942,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Annual ryegrass = glossy leaves + clasping auricles + bunch growth + cool-season",
   },
-
   {
     id: "barnyardgrass",
     commonName: "Barnyardgrass",
@@ -2017,7 +1958,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Crop fields, wetlands, rice fields",
     primaryHabitat: "Wet / Poorly Drained",
-    management: "PRE herbicides; POST herbicides, cultivation before canopy closure",
+    management: "PRE herbicides; POST herbicides cultivation before canopy closure",
     controlTiming: "Seedling stage",
     actImmediately: false,
     actReason: "Heavy seed producer; competes aggressively in row crops",
@@ -2028,12 +1969,10 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Barnyardgrass = no ligule + purplish stems + wet areas",
   },
-
   {
     id: "canada-thistle",
     commonName: "Canada Thistle",
-    safetyNote:
-      "Spiny-margined leaves and bracts can prick and cut bare skin; wear gloves when handling.",
+    safetyNote: "Spiny-margined leaves and bracts can prick and cut bare skin; wear gloves when handling.",
     scientificName: "Cirsium arvense",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -2059,7 +1998,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Canada thistle = small purple flowers in clusters + creeping roots",
   },
-
   {
     id: "caraway",
     commonName: "Caraway",
@@ -2083,7 +2021,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Caraway = aromatic seeds + finely divided leaves + biennial Apiaceae",
   },
-
   {
     id: "common-ragweed",
     commonName: "Common Ragweed",
@@ -2114,12 +2051,10 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Common ragweed = fern-like dissected leaves + major allergy weed + summer annual",
   },
-
   {
     id: "giant-foxtail",
     commonName: "Giant Foxtail",
-    safetyNote:
-      "Barbed seedhead awns can lodge in skin, eyes, gums, and animal mouths, causing sores.",
+    safetyNote: "Barbed seedhead awns can lodge in skin, eyes, gums, and animal mouths, causing sores.",
     scientificName: "Setaria faberi",
     family: "Poaceae",
     plantType: "Monocot",
@@ -2133,7 +2068,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Crop fields, gardens, roadsides, disturbed areas",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "PRE herbicides; POST herbicides, mowing before seed set",
+    management: "PRE herbicides; POST herbicides before 12-inch height",
     controlTiming: "Seedling stage",
     actImmediately: false,
     actReason: "One of the most competitive annual grass weeds in Midwest row crops",
@@ -2145,12 +2080,10 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Giant foxtail = fuzzy seedhead + hairy sheath + tallest foxtail",
   },
-
   {
     id: "giant-ragweed",
     commonName: "Giant Ragweed",
-    safetyNote:
-      "Highly allergenic pollen, and the rough, bristly foliage can irritate or scratch skin on contact.",
+    safetyNote: "Highly allergenic pollen, and the rough, bristly foliage can irritate or scratch skin on contact.",
     scientificName: "Ambrosia trifida",
     family: "Asteraceae",
     plantType: "Dicot",
@@ -2164,7 +2097,8 @@ export const weeds: Weed[] = [
     ],
     habitat: "Crop fields, disturbed areas, prairies, open woods",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "PRE herbicides; POST herbicides before 12-inch height",
+    management:
+      "PRE residual herbicides (e.g., PPO-inhibitors like flumioxazin/fomesafen) followed by a two-pass POST program with multiple effective sites of action; effective burndown/tillage at planting; crop rotation; scout for local herbicide resistance (glyphosate-, ALS-, and PPO-inhibitor-resistant populations exist in parts of the Midwest)",
     controlTiming: "Seedling",
     actImmediately: true,
     actReason: "Can grow 15+ feet tall; extremely competitive; herbicide resistance increasing",
@@ -2176,7 +2110,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Giant ragweed = huge 3-lobed palmate leaves + grows to 15 ft + allergy monster",
   },
-
   {
     id: "golden-alexanders",
     commonName: "Golden Alexanders",
@@ -2193,7 +2126,8 @@ export const weeds: Weed[] = [
     ],
     habitat: "Prairies, meadows, open woods, roadsides",
     primaryHabitat: "Cool-Season / Early Spring",
-    management: "Generally not controlled due to being a native prairie species; distinguish from toxic look-alikes",
+    management:
+      "Native perennial wildflower, not a target weed; where unwanted, cut/deadhead seed heads before they ripen rather than herbicide treatment",
     controlTiming: "Generally not controlled",
     actImmediately: false,
     actReason: "Beneficial native; learn to distinguish from toxic Apiaceae relatives",
@@ -2205,7 +2139,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Golden Alexanders = yellow umbels + smooth stems + prairie native",
   },
-
   {
     id: "green-foxtail",
     commonName: "Green Foxtail",
@@ -2221,7 +2154,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Pastures, meadows, crop fields, waste sites",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "PRE herbicides; POST herbicides early on",
+    management: "POST herbicides reduce soil moisture improved pasture species",
     controlTiming: "Seedling stage",
     actImmediately: false,
     actReason: "Common annual grass weed but less competitive than giant foxtail",
@@ -2233,7 +2166,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Green foxtail = upright bristly seedhead + smooth leaves + no collar hairs",
   },
-
   {
     id: "johnsongrass",
     commonName: "Johnsongrass",
@@ -2245,7 +2177,7 @@ export const weeds: Weed[] = [
     traits: ["White midrib", "Large open panicle", "Rhizomatous", "Tall growth to 8 ft", "red-purple mature panicles"],
     habitat: "Crop fields, roadsides, ditches, disturbed areas",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "Systemic grass herbicides; repeated mowing; prevent seed production",
+    management: "PRE herbicides; POST herbicides before 6-inch height",
     controlTiming: "12-18 inch height for foliar herbicides; before heading",
     actImmediately: true,
     actReason: "Aggressive perennial with extensive rhizome system; noxious weed in many states",
@@ -2256,7 +2188,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Johnsongrass = white midrib + rhizomes everywhere + perennial sorghum relative",
   },
-
   {
     id: "kochia",
     commonName: "Kochia",
@@ -2273,7 +2204,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Crop fields, gardens, roadsides, waste areas",
     primaryHabitat: "Dry / Disturbed",
-    management: "PRE herbicides; POST herbicides before 6-inch height",
+    management: "POST broadleaf herbicides hand removal cultivation",
     controlTiming: "Seedling stage",
     actImmediately: true,
     actReason: "Develops herbicide resistance rapidly; becomes tumbleweed spreading seeds widely",
@@ -2287,7 +2218,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Can accumulate nitrates and other toxins that cause poisoning, photosensitization, and liver damage in grazing animals when eaten in large amounts.",
   },
-
   {
     id: "lambsquarters",
     commonName: "Lambsquarters",
@@ -2303,7 +2233,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Crop fields, gardens, roadsides, waste areas",
     primaryHabitat: "Dry / Disturbed",
-    management: " PRE herbicides; POST herbicides",
+    management: "PRE herbicides in spring; POST herbicides in vegetative stage",
     controlTiming: "Seedling stage",
     actImmediately: false,
     actReason: "One of the most common annual broadleaf weeds; prolific seed producer",
@@ -2315,7 +2245,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Lambsquarters = white mealy leaf coating + diamond-shaped leaves + goosefoot family",
   },
-
   {
     id: "large-crabgrass",
     commonName: "Large Crabgrass",
@@ -2332,7 +2261,8 @@ export const weeds: Weed[] = [
     ],
     habitat: "Lawns, gardens, crop fields, disturbed areas",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "PRE herbicides in spring; POST herbicides in vegetative stage",
+    management:
+      "PRE herbicides (prodiamine, pendimethalin, dithiopyr) before germination; early POST (fenoxaprop, quinclorac, topramezone, mesotrione) before tillering",
     controlTiming: "Seedling to early vegetative stage",
     actImmediately: false,
     actReason: "Most common lawn weed grass; fills thin turf areas aggressively",
@@ -2344,7 +2274,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Large crabgrass = finger-like seedheads + hairy + roots at nodes",
   },
-
   {
     id: "pennsylvania-smartweed",
     commonName: "Pennsylvania Smartweed",
@@ -2361,7 +2290,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Waste grounds, wetlands, low-lying areas",
     primaryHabitat: "Wet / Poorly Drained",
-    management: "PRE and POST herbicides; drainage improvement",
+    management: "POST broadleaf herbicides mechanical control cultivation",
     controlTiming: "Seedling stage",
     actImmediately: false,
     actReason: "Common in wet field areas; indicator of poor drainage",
@@ -2373,7 +2302,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Pennsylvania smartweed = pink spikes + wet areas + swollen nodes",
   },
-
   {
     id: "poison-hemlock",
     commonName: "Poison Hemlock",
@@ -2390,7 +2318,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Roadsides, ditches, stream banks, waste areas",
     primaryHabitat: "Dry / Disturbed",
-    management: "POST herbicide application to rosettes; mowing before seed set; wear gloves",
+    management: "POST broadleaf herbicides mowing cultivation",
     controlTiming: "Rosette stage in first year; before flowering in second year",
     actImmediately: true,
     actReason: "EXTREMELY TOXIC to humans and livestock — all parts poisonous; can be fatal",
@@ -2404,7 +2332,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "EXTREMELY TOXIC — all parts of the plant are poisonous. Can cause death in humans and livestock. Do NOT touch without gloves. Wash hands immediately if contact occurs.",
   },
-
   {
     id: "velvetleaf",
     commonName: "Velvetleaf",
@@ -2421,7 +2348,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Crop fields, gardens, roadsides",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "POST herbicides, tillage",
+    management: "POST herbicides tillage",
     controlTiming: "Seedling stage",
     actImmediately: false,
     actReason: "Highly competitive in corn and soybeans; long-lived seed bank",
@@ -2431,9 +2358,8 @@ export const weeds: Weed[] = [
       difference:
         "Common Mallow has round scalloped leaves close to ground; Velvetleaf has large soft heart-shaped leaves and grows tall",
     },
-    memoryHook: "Velvetleaf = soft, heart-shaped leaves + yellow flowers + distinctive capsule-like seed pods",
+    memoryHook: "Velvetleaf = soft heart-shaped leaves + yellow flowers + distinctive capsule-like seed pods",
   },
-
   {
     id: "volunteer-sunflower",
     commonName: "Common Sunflower",
@@ -2453,16 +2379,16 @@ export const weeds: Weed[] = [
     management: "POST herbicides; cultivation; mechanical or hand removal",
     controlTiming: "Seedling stage",
     actImmediately: false,
-    actReason: "Competitive volunteer from previous crops or bird seed; shades out crops",
+    actReason:
+      "Grow aggresively and compete with crops for resources, release chemicals that inhibit growth of other plants",
     lookAlike: {
       id: "common_Cocklebur",
       species: "Common Cocklebur",
       difference:
         "Common Cocklebur has spiny bur fruits and lobed leaves; Common Sunflower has large flower heads and simple leaves",
     },
-    memoryHook: "Common sunflower = unmistakable yellow flower + rough sandpapery leaves + crop volunteer",
+    memoryHook: "Common Teasel = prickly inverted cone flower + rigid tall stems + biennial",
   },
-
   {
     id: "wild-oat",
     commonName: "Wild Oat",
@@ -2476,16 +2402,15 @@ export const weeds: Weed[] = [
     primaryHabitat: "Cool-Season / Full Sun",
     management: "Pre-emergent and post-emergent grass herbicides; crop rotation",
     controlTiming: "Before 3-leaf stage; pre-emergent preferred",
-    actImmediately: false,
+    actImmediately: true,
     actReason: "Major weed in small grains; hard to distinguish from crop at early stages",
     lookAlike: {
       id: "annual-ryegrass",
       species: "Annual Ryegrass",
       difference: "Ryegrass has spike-type seedheads; Wild Oat has open panicle with distinctive twisted awns",
     },
-    memoryHook: "Wild oat = twisted bent awns + large ligule + no auricles ",
+    memoryHook: "Wild oat = twisted bent awns + large ligule + no auricles",
   },
-
   {
     id: "wild-parsnip",
     commonName: "Wild Parsnip",
@@ -2502,7 +2427,7 @@ export const weeds: Weed[] = [
     ],
     habitat: "Roadsides, pastures, ditches, old fields",
     primaryHabitat: "Dry / Disturbed",
-    management: "Mowing at peak bloom, but before seeding; POST herbicide to rosettes in late spring or early summer",
+    management: "Mowing at peak bloom but before seeding; POST herbicide to rosettes in late spring or early summer",
     controlTiming: "Rosette stage in first year; before flowering in second year",
     actImmediately: true,
     actReason: "Causes severe phytophotodermatitis (chemical burns) from plant sap + sunlight",
@@ -2516,7 +2441,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "PHYTOPHOTODERMATITIS RISK — Plant sap causes severe blistering burns when skin is exposed to sunlight. Wear long sleeves, gloves, and eye protection. Do NOT mow on sunny days.",
   },
-
   {
     id: "yellow-foxtail",
     commonName: "Yellow Foxtail",
@@ -2545,7 +2469,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Yellow foxtail = Long hairs at collar + yellowish compact seedhead + shorter than giant",
   },
-
   {
     id: "yellow-nutsedge",
     commonName: "Yellow Nutsedge",
@@ -2564,7 +2487,7 @@ export const weeds: Weed[] = [
     primaryHabitat: "Wet / Poorly Drained",
     management: "Nutsedge-specific herbicides; tuber exhaustion through repeated cultivation",
     controlTiming: "Seedling or early vegetative stage",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Produces underground tubers that persist for years; extremely difficult to eradicate",
     lookAlike: {
       id: "Goosegrass",
@@ -2574,7 +2497,6 @@ export const weeds: Weed[] = [
     memoryHook:
       "Yellow nutsedge = triangular stem (sedges have edges!) + underground tubers + grass-like but not a grass",
   },
-
   {
     id: "White_campion",
     commonName: "White Campion",
@@ -2603,7 +2525,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "White campion = large white flowers + inflated balloon-like calyx + hairy stems",
   },
-
   {
     id: "Marijuana",
     commonName: "Hemp",
@@ -2615,9 +2536,9 @@ export const weeds: Weed[] = [
     traits: ["Palmate compound leaves with serrate edges", "5-9 serrated leaflets", "Distinctive odor", "Dioecious"],
     habitat: "Disturbed areas, fencerows, ditches, old farmsteads",
     primaryHabitat: "Warm-Season / Full Sun",
-    management: "Report to authorities in many jurisdictions; mechanical removal; herbicides not recommended",
+    management: "POST herbicides repeated cutting improved competition",
     controlTiming: "Seedling to vegetative stage; before flowering",
-    actImmediately: false,
+    actImmediately: true,
     actReason: "Regulated plant in most states; wild/feral hemp common in Midwest",
     lookAlike: {
       id: "Hemp_dogbane",
@@ -2629,7 +2550,6 @@ export const weeds: Weed[] = [
     safetyNote:
       "Cannabis sativa is a regulated/controlled plant in most U.S. jurisdictions. Wild/feral hemp is common in the Midwest from historical cultivation. Always follow local laws.",
   },
-
   {
     id: "Common_copperleaf",
     commonName: "Common Copperleaf",
@@ -2649,7 +2569,8 @@ export const weeds: Weed[] = [
     primaryHabitat: "Warm-Season / Full Sun",
     actImmediately: false,
     actReason: "Moderate competitor that persists late in the season and adds to the seed bank",
-    management: "PRE residual herbicides, early POST broadleaf herbicides, cultivation, dense crop canopy",
+    management:
+      "PRE herbicides; POST herbicides such as glyphosate/2,4-D or PPO/HPPD residuals; cultivation; hand removal",
     controlTiming: "Seedling to early vegetative stage",
     lookAlike: {
       id: "Asian_copperleaf",
@@ -2659,7 +2580,6 @@ export const weeds: Weed[] = [
     },
     memoryHook: "Common copperleaf = diamond leaves + coppery color + leafy bracts hiding the flowers",
   },
-
   {
     id: "Ivyleaf_morningglory",
     commonName: "Ivyleaf Morningglory",
@@ -2677,9 +2597,10 @@ export const weeds: Weed[] = [
     ],
     habitat: "Row crops, fencerows, roadsides, disturbed fields",
     primaryHabitat: "Warm-Season / Full Sun",
-    actImmediately: true,
+    actImmediately: false,
     actReason: "Twining vine that pulls down soybeans and clogs harvest equipment",
-    management: "PRE residual herbicides, POST broadleaf herbicides before vining, cultivation, narrow rows",
+    management:
+      "PRE residual herbicides followed by POST such as chlorimuron/fomesafen/imazaquin; narrow rows for canopy competition; cultivation/hand removal",
     controlTiming: "Seedling stage before vines begin twining",
     lookAlike: {
       id: "Tall_morningglory",
