@@ -471,7 +471,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
               );
             })}
 
-                        {floats.map(f => (
+            {floats.map(f => (
               <div key={f.id} className="absolute pointer-events-none font-black text-sm md:text-base drop-shadow z-40"
                 style={{
                   left: `${(f.x / AREA_W) * 100}%`,
