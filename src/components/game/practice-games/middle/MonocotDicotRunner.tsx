@@ -320,7 +320,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
 
   return (
     <div className="fixed inset-0 bg-background z-40 overflow-y-auto pt-[84px]">
-      <div className="max-w-5xl mx-auto p-4 md:p-6">
+      <div className="max-w-6xl mx-auto p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <button onClick={onBack} className="flex items-center gap-2 text-primary hover:underline">
             <ArrowLeft className="w-4 h-4" /> Back
