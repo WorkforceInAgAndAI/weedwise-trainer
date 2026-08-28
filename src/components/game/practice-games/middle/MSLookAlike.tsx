@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { lookAlikeGroupsForPool } from '@/data/lookAlikeGroups';
 import { getDifficulty } from '@/lib/difficulty';
+import { Search } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -46,6 +47,13 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
   const [score, setScore] = useState(0);
   const [history, setHistory] = useState<{ targetName: string; correct: boolean; ids: string[]; stage: 'flower' | 'vegetative' }[]>([]);
 
+  // ---- Magnifying glass -------------------------------------------------
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [lens, setLens] = useState<{ x: number; y: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [inspecting, setInspecting] = useState<Weed | null>(null);
+
   const done = round >= trios.length;
   const trio = !done ? trios[round] : null;
 
@@ -57,14 +65,35 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
     return { target: t as Weed | null, options: shuffle([...trio.weeds]) };
   }, [trio]);
 
+  // Park the lens back at its home slot at the start of each round.
+  useEffect(() => { setLens(null); setInspecting(null); }, [round, level]);
+
+  const lensSize = 132;
+
+  const moveLens = (clientX: number, clientY: number) => {
+    const el = stageRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setLens({ x: clientX - r.left, y: clientY - r.top });
+    // Which option card is under the glass?
+    const hit = options.find(w => {
+      const c = cardRefs.current[w.id];
+      if (!c) return false;
+      const cr = c.getBoundingClientRect();
+      return clientX >= cr.left && clientX <= cr.right && clientY >= cr.top && clientY <= cr.bottom;
+    });
+    setInspecting(hit ?? null);
+  };
+
   const restart = () => { setRound(0); setSelected(null); setSubmitted(false); setScore(0); setHistory([]); };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  const submit = () => {
-    if (!selected || !target) return;
+  const submit = (id: string) => {
+    if (submitted || !target) return;
+    setSelected(id);
     setSubmitted(true);
-    const ok = selected === target.id;
+    const ok = id === target.id;
     if (ok) setScore(s => s + 1);
     if (trio) setHistory(h => [...h, { targetName: target.commonName, correct: ok, ids: trio.weeds.map(w => w.id), stage: trio.stage }]);
   };
@@ -82,37 +111,92 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
         <span className="text-sm text-muted-foreground">{round + 1}/{trios.length}</span>
       </div>
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 p-4 overflow-y-auto">
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div
+          ref={stageRef}
+          onPointerMove={e => { if (dragging) moveLens(e.clientX, e.clientY); }}
+          onPointerUp={() => setDragging(false)}
+          onPointerLeave={() => setDragging(false)}
+          className="relative flex flex-col items-center justify-start gap-4 touch-none"
+        >
           <p className="text-foreground font-bold text-lg text-center">
             Which one is <span className="text-primary">{target?.commonName}</span>
             {target && <span className="block text-xs italic text-primary mt-1">({target.scientificName})</span>}?
           </p>
+
           <div className={`grid gap-3 sm:gap-4 w-full ${options.length === 2 ? 'grid-cols-2 max-w-xl' : 'grid-cols-3 max-w-3xl'}`}>
             {options.map(w => (
-              <button
+              <div
                 key={w.id}
-                onClick={() => !submitted && setSelected(w.id)}
-                className={`rounded-xl overflow-hidden border-[3px] transition-all bg-card ${
+                ref={el => { cardRefs.current[w.id] = el; }}
+                className={`rounded-xl overflow-hidden border-[3px] bg-card transition-all ${
                   selected === w.id ? 'border-primary scale-[1.02] shadow-lg' : 'border-border'
                 } ${submitted && w.id === target?.id ? 'ring-2 ring-green-500' : ''} ${
                   submitted && selected === w.id && w.id !== target?.id ? 'ring-2 ring-destructive' : ''
-                }`}
+                } ${inspecting?.id === w.id ? 'ring-4 ring-amber-400' : ''}`}
               >
                 <div className="aspect-square bg-secondary">
                   <WeedImage weedId={w.id} stage={trio?.stage ?? 'flower'} className="w-full h-full object-cover" />
                 </div>
-                {submitted && (
+                {submitted ? (
                   <div className="p-2 text-center">
                     <p className={`text-xs font-bold leading-tight ${w.id === target?.id ? 'text-green-600' : 'text-foreground'}`}>{w.commonName}</p>
                     <p className="text-[10px] italic text-primary leading-tight mt-0.5">{w.scientificName}</p>
                   </div>
+                ) : (
+                  <button
+                    onClick={() => submit(w.id)}
+                    className="w-full py-2 bg-primary text-primary-foreground font-bold text-sm hover:opacity-90"
+                  >
+                    Select
+                  </button>
                 )}
-              </button>
+              </div>
             ))}
           </div>
-          {!submitted ? (
-            <button onClick={submit} disabled={!selected} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold disabled:opacity-50">Confirm</button>
-          ) : (
+
+          {/* Magnifying glass tool */}
+          {!submitted && (
+            <div className="w-full max-w-3xl flex items-start gap-3">
+              <div
+                onPointerDown={e => {
+                  e.preventDefault();
+                  (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+                  setDragging(true);
+                  moveLens(e.clientX, e.clientY);
+                }}
+                className="shrink-0 w-20 h-20 rounded-full border-4 border-amber-700 bg-amber-100/70 dark:bg-amber-900/40 flex items-center justify-center cursor-grab active:cursor-grabbing shadow-md"
+                title="Drag the magnifying glass over a plant"
+              >
+                <Search className="w-8 h-8 text-amber-800 dark:text-amber-300" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                <span className="font-bold text-foreground">Field lens:</span> drag the magnifying glass on top of a
+                plant to read a field clue about that species. Then press <span className="font-bold">Select</span>
+                {' '}under the plant you think is the answer.
+              </p>
+            </div>
+          )}
+
+          {/* The lens itself, following the pointer */}
+          {lens && !submitted && (
+            <div
+              className="pointer-events-none absolute z-30"
+              style={{ left: lens.x, top: lens.y, transform: 'translate(-50%,-50%)' }}
+            >
+              <div
+                className="rounded-full border-8 border-amber-800/80 bg-sky-200/20 backdrop-brightness-125 shadow-2xl"
+                style={{ width: lensSize, height: lensSize }}
+              />
+              {inspecting && (
+                <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 w-56 rounded-lg border-2 border-amber-500 bg-card p-2 shadow-xl">
+                  <p className="text-[11px] font-bold text-foreground">Field clue</p>
+                  <p className="text-xs text-foreground leading-snug">{inspecting.memoryHook}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {submitted && (
             <div className="text-center max-w-2xl bg-card border border-border rounded-lg p-4 space-y-2">
               <p className={`text-lg font-bold ${selected === target?.id ? 'text-green-600' : 'text-destructive'}`}>
                 {selected === target?.id
