@@ -39,12 +39,12 @@ function traitsFromFact(dispersal: string, production: string): SeedCharacter['t
 
 function buildSeedCharacters(count = 5): SeedCharacter[] {
   const pool = weeds
-    .filter(w => !!w.name)
+    .filter(w => !!w.commonName)
     .map<SeedCharacter>(w => {
-      const fact = getSeedFact(w.name, (w as { family?: string }).family ?? '', (w as { plantType?: string }).plantType ?? '');
+      const fact = getSeedFact(w.commonName, w.family, w.plantType);
       return {
         weedId: w.id,
-        name: `${w.name} Seed`,
+        name: `${w.commonName} Seed`,
         traits: traitsFromFact(fact.dispersal, fact.production),
         description: `${fact.seedDescription} Travels by: ${fact.dispersal}.`,
       };
