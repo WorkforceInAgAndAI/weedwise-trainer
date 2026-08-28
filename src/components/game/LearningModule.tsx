@@ -941,7 +941,7 @@ function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[
   const base = weedsForPool(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return byCommonName(base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0));
+      return byCommonName(base.filter((w) => lookAlikePartners(w.id, new Set(base.map((x) => x.id))).length > 0));
     case "safety":
       return byCommonName(base.filter((w) => w.safetyNote));
     default:
@@ -6086,7 +6086,7 @@ function TopicContent({
       const pairs: [Weed, Weed][] = [];
       gradePool.forEach((w) => {
         if (seen.has(w.id)) return;
-        const partnerId = officialPartners(w.id, gradePoolIds).find((id) => !seen.has(id));
+        const partnerId = lookAlikePartners(w.id, gradePoolIds).find((id) => !seen.has(id));
         const pairedWith = partnerId ? gradePool.find((x) => x.id === partnerId) : undefined;
         if (pairedWith) {
           seen.add(w.id);
@@ -6102,7 +6102,7 @@ function TopicContent({
         const nativeWeeds = gradePool.filter((w) => w.origin === "Native");
         const invNatSeen = new Set<string>();
         invasiveWeeds.forEach((inv) => {
-          const partners = officialPartners(inv.id, gradePoolIds);
+          const partners = lookAlikePartners(inv.id, gradePoolIds);
           const nativeLookAlike = nativeWeeds.find(
             (nat) => partners.includes(nat.id) && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
           );
@@ -6133,7 +6133,7 @@ function TopicContent({
       // Species in this grade pool that have no look-alike on the official list yet.
       const groupedIds = new Set(lookAlikeGroups.flatMap((g) => g.weeds.map((w) => w.id)));
       const noLookAlikeWeeds = gradePool.filter(
-        (w) => !groupedIds.has(w.id) && officialPartners(w.id, gradePoolIds).length === 0,
+        (w) => !groupedIds.has(w.id) && lookAlikePartners(w.id, gradePoolIds).length === 0,
       );
 
       const renderPairCard = (a: Weed, b: Weed, key: string) => {
