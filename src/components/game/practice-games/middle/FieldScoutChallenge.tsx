@@ -222,13 +222,13 @@ export default function FieldScoutChallenge({
     if (path.length < 3) return;
     setSubmitted(true);
     setMoney(m => m - cost);
-    setLog(l => [...l, { trip, cost, found: foundIdx.size, total: plants.length, blocks: blocksCovered }]);
+    setLog(l => [...l, { trip, cost, found: foundIdx.size, total: plants.length, blocks: blocksCovered, wRoute, walked }]);
   };
 
   const nextTrip = () => {
     // Good coverage of the whole field keeps pressure down; skipping blocks lets it explode.
     const missedBlocks = GRID * GRID - blocksCovered;
-    const next = Math.max(6, Math.round(plants.length * 0.55 + missedBlocks * 2.2 + missed * 0.4));
+    const next = Math.max(6, Math.round(plants.length * (wRoute ? 0.45 : 0.55) + missedBlocks * 2.2 + missed * 0.4));
     setPressure(next);
     if (trip === 2) setSeasonOver(true);
     else setTrip((t) => (t + 1) as Trip);
@@ -238,31 +238,33 @@ export default function FieldScoutChallenge({
 
   const totalSpent = log.reduce((s, l) => s + l.cost, 0);
   const totalMissed = log.reduce((s, l) => s + (l.total - l.found), 0);
+  const wTrips = log.filter(l => l.wRoute).length;
+  const overWalked = log.filter(l => l.walked > IDEAL_MAX_LEN).length;
+  const underWalked = log.filter(l => l.walked < IDEAL_MIN_LEN).length;
+  const wBonus = seasonOver ? wTrips * W_BONUS : 0;
   const yieldLoss = seasonOver ? totalMissed * YIELD_LOSS_PER_WEED : 0;
-  const finalMoney = Math.max(0, START_MONEY - totalSpent - yieldLoss);
+  const finalMoney = Math.max(0, START_MONEY - totalSpent - yieldLoss + wBonus);
 
-  // Rating blends how much money was kept with how well the field was actually sampled.
+  // Rating is driven by the W: three W routes is the professional standard.
   const avgBlocks = log.length ? log.reduce((s, l) => s + l.blocks, 0) / log.length : 0;
   const foundPct = (() => {
     const tot = log.reduce((s, l) => s + l.total, 0);
     return tot ? log.reduce((s, l) => s + l.found, 0) / tot : 0;
   })();
-  const walkedCheap = totalSpent <= 15000;
-  const goodPattern = avgBlocks >= 6.5;
-  const foundEnough = foundPct >= 0.6;
-  const productive = goodPattern && foundEnough && walkedCheap;
+  const productive = wTrips === 3;
   const rating = productive
     ? 'Very productive'
-    : (goodPattern || foundEnough) && finalMoney >= 10000
+    : wTrips >= 1
       ? 'Moderately productive'
       : 'Not productive';
   const ratingWhy = productive
-    ? `Your W/zig-zag style routes crossed ${avgBlocks.toFixed(1)} of the 9 field blocks on an average trip, so you saw a representative sample of the field, and you did it for only $${totalSpent} in scouting. Finding ${Math.round(foundPct * 100)}% of the weeds kept end-of-season yield loss low.`
-    : !goodPattern && !foundEnough
-      ? `Your routes only sampled about ${avgBlocks.toFixed(1)} of the 9 field blocks, so whole areas were never looked at. Missing ${totalMissed} weeds let them set seed and cost you $${yieldLoss} in yield loss.`
-      : !walkedCheap
-        ? `You found the weeds, but you walked a long way to do it — $${totalSpent} of scouting. Cover the field with a tighter W or zig-zag instead of wandering.`
-        : `You scouted cheaply ($${totalSpent}) but skipped too much of the field, so ${totalMissed} weeds went undetected and cost $${yieldLoss} in yield loss. A W, M, or Z route across the whole field finds more for nearly the same walk.`;
+    ? `You walked a proper W on all three trips — four legs, edge to edge, crossing ${avgBlocks.toFixed(1)} of the 9 field blocks. That is the standard scouting pattern: it samples the whole field for the least walking, so you found ${Math.round(foundPct * 100)}% of the weeds and earned a $${wBonus.toLocaleString()} efficiency bonus.`
+    : overWalked > 0
+      ? `On ${overWalked} of your trips you walked far more than a W needs. The extra ground cost you $${totalSpent.toLocaleString()} in scouting without finding much more. Four long diagonal legs across the field is enough.`
+      : underWalked > 0
+        ? `On ${underWalked} of your trips you walked less than a full W, so whole strips of the field were never looked at. ${totalMissed} weeds went undetected and cost $${yieldLoss.toLocaleString()} in yield loss.`
+        : `Your routes were not a W — a W is four long legs from edge to edge with three turns. You sampled about ${avgBlocks.toFixed(1)} of the 9 blocks and missed ${totalMissed} weeds, costing $${yieldLoss.toLocaleString()}.`;
+
 
   if (seasonOver) {
     return (
