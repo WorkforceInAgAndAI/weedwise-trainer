@@ -16,37 +16,40 @@ interface SeedCharacter {
   description: string;
 }
 
-const ALL_SEED_CANDIDATES: Omit<SeedCharacter, 'weedId'>[] = [
-  // Trait values reflect verified dispersal mechanisms in published weed biology references.
-  // horseweed (Conyza canadensis): tiny pappus seeds carried hundreds of km on wind.
-  { name: 'Horseweed Seed', traits: { wind: 3, water: 1, animal: 1, heat: 2, cold: 2 }, description: 'Tiny pappus (parachute) seed — carried for miles on the wind.' },
-  // morningglory (Ipomoea spp.): hard, water-resistant seed coat; spread by water/animals/equipment.
-  { name: 'Morningglory Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Hard round seed coat — survives heat, water, and digestion.' },
-  // giant ragweed (Ambrosia trifida): large, heavy seeds float and overwinter; spread mainly by water and equipment.
-  { name: 'Giant Ragweed Seed', traits: { wind: 1, water: 3, animal: 1, heat: 1, cold: 3 }, description: 'Heavy seed that floats downstream and survives winter cold.' },
-  // green foxtail (Setaria viridis): bristly seedhead clings to fur and clothing.
-  { name: 'Green Foxtail Seed', traits: { wind: 2, water: 1, animal: 3, heat: 2, cold: 2 }, description: 'Bristly seedhead — hooks onto animal fur and pant legs.' },
-  // kochia (Bassia scoparia): whole plant breaks off as a tumbleweed, scattering seed.
-  { name: 'Kochia Seed', traits: { wind: 3, water: 1, animal: 1, heat: 3, cold: 1 }, description: 'Tumbleweed seed — the whole plant rolls and flings seed in wind.' },
-  // waterhemp (Amaranthus tuberculatus): tiny seeds float on floodwater into riverbanks and crop fields.
-  { name: 'Waterhemp Seed', traits: { wind: 2, water: 3, animal: 1, heat: 2, cold: 2 }, description: 'Tiny smooth seed that rides flood water into new fields.' },
-  // Palmer amaranth (Amaranthus palmeri): tiny seeds carried by equipment, manure, and water.
-  { name: 'Palmer Amaranth Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Tiny seed carried by equipment and animals; thrives in heat.' },
-  // Canada thistle (Cirsium arvense): fluffy pappus seed carried by wind; also spreads by roots.
-  { name: 'Canada Thistle Seed', traits: { wind: 3, water: 2, animal: 1, heat: 1, cold: 3 }, description: 'Fluffy pappus seed — drifts on wind and survives frost.' },
-];
+// Seed characters are built live from the elementary weed pool + seedFacts.ts so
+// the game never breaks when species ids or names change.
+const clamp3 = (n: number) => Math.max(1, Math.min(3, n)) as 1 | 2 | 3;
 
-const WEED_IDS_FOR_SEEDS = ['marestail', 'morningglory', 'giant-ragweed', 'green-foxtail', 'kochia', 'waterhemp', 'palmer-amaranth', 'canada-thistle'];
+function traitsFromFact(dispersal: string, production: string): SeedCharacter['traits'] {
+  const d = dispersal.toLowerCase();
+  const has = (...keys: string[]) => keys.some(k => d.includes(k));
+  const wind = has('wind', 'pappus', 'tumble', 'parachute', 'air') ? 3 : has('gravity', 'shatter', 'explosive') ? 2 : 1;
+  const water = has('water', 'flood', 'stream', 'irrigation', 'rain', 'waterfowl') ? 3 : has('mud', 'soil') ? 2 : 1;
+  const animal = has('animal', 'fur', 'livestock', 'bird', 'manure', 'cling', 'bur', 'hook', 'ant', 'mammal', 'deer', 'cattle')
+    ? 3
+    : has('machinery', 'equipment', 'contaminated', 'harvest') ? 2 : 1;
+  // Big seed producers and hard-coated seeds tend to be the tough travellers.
+  const big = /\d{4,}/.test(production.replace(/[,\s]/g, '')) || production.toLowerCase().includes('thousand');
+  const heat = clamp3(big ? 3 : 2);
+  const cold = clamp3(big ? 2 : 3);
+  return { wind, water, animal, heat, cold };
+}
 
 function buildSeedCharacters(count = 5): SeedCharacter[] {
-  const available: SeedCharacter[] = [];
-  WEED_IDS_FOR_SEEDS.forEach((weedId, i) => {
-    if (weeds.some(w => w.id === weedId) && ALL_SEED_CANDIDATES[i]) {
-      available.push({ ...ALL_SEED_CANDIDATES[i], weedId });
-    }
-  });
-  return shuffle(available).slice(0, count);
+  const pool = weeds
+    .filter(w => !!w.name)
+    .map<SeedCharacter>(w => {
+      const fact = getSeedFact(w.name, (w as { family?: string }).family ?? '', (w as { plantType?: string }).plantType ?? '');
+      return {
+        weedId: w.id,
+        name: `${w.name} Seed`,
+        traits: traitsFromFact(fact.dispersal, fact.production),
+        description: fact.seedDescription,
+      };
+    });
+  return shuffle(pool).slice(0, Math.max(3, count));
 }
+
 
 // Vary the "need" thresholds each level so the same need stars don't repeat,
 // and skew harder as level rises so higher levels need stronger traits.
