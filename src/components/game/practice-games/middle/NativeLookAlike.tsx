@@ -279,7 +279,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
       <LevelComplete
         level={level}
         score={score}
-        total={correctCount}
+        total={resolved * 10}
         onNextLevel={nextLevel}
         onStartOver={startOver}
         onBack={onBack}
