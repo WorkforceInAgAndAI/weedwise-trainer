@@ -3,7 +3,7 @@ import { weedsForGrade } from '@/data/gradeWeeds';
 import type { Weed } from '@/types/game';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
-import { lookAlikeStage, lookAlikePairsForPool, isOfficialLookAlike } from '@/data/lookAlikeGroups';
+import { lookAlikePairsForPool, isLookAlike } from '@/data/lookAlikeGroups';
 
 // Official look-alike pairs only, limited to the grade's weed pool
 function getFamilyPairs(weeds: Weed[]): Array<[Weed, Weed]> {
@@ -17,7 +17,7 @@ function getInvasiveNativePairs(weeds: Weed[]): Array<[Weed, Weed]> {
  const pairs: Array<[Weed, Weed]> = [];
  const used = new Set<string>();
  introduced.forEach(inv => {
- const match = native.find(nat => isOfficialLookAlike(inv.id, nat.id) && !used.has(nat.id));
+ const match = native.find(nat => isLookAlike(inv.id, nat.id) && !used.has(nat.id));
  if (match) {
  used.add(match.id);
  used.add(inv.id);
