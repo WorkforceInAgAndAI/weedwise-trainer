@@ -242,6 +242,8 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
                     </div>
                     <div className="text-sm font-bold text-foreground">{h.name}</div>
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{h.power}</div>
+                    <div className="text-[11px] leading-snug text-foreground/80 text-center">{h.blurb}</div>
+
                     {answered && isBest && <Check className="w-4 h-4 text-emerald-600" />}
                     {answered && isPick && !isBest && <X className="w-4 h-4 text-red-600" />}
                   </button>
