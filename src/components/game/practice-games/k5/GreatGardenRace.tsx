@@ -170,7 +170,10 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
     if (paused || showTally || done) return;
     const boosted = boostMs > 0;
     // Sunburst boost slows the weed down so the player can catch up.
-    const tickMs = boosted ? 620 : Math.max(260, Math.round(420 / diff.speed));
+    // The weed also gets a little quicker every round (8% faster each time).
+    const roundSpeedup = Math.pow(0.92, round - 1);
+    const tickMs = boosted ? 620 : Math.max(200, Math.round((420 / diff.speed) * roundSpeedup));
+
     const tick = setInterval(() => {
       // The flower only moves when the player presses a direction (1:1).
       // Weed AI moves toward nearest pellet
@@ -184,7 +187,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
       setBoostMs(b => Math.max(0, b - tickMs));
     }, tickMs);
     return () => clearInterval(tick);
-  }, [paused, showTally, done, pellets, boostMs > 0]);
+  }, [paused, showTally, done, pellets, boostMs > 0, round, diff.speed]);
 
   // Pellet collection
   useEffect(() => {

@@ -56,6 +56,7 @@ import {
   LabCallout,
   Citation,
   ModuleThemeProvider,
+  ThemedModuleFrame,
 } from "./learning/ThemedBlocks";
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
@@ -1787,16 +1788,38 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 <PracticeButton topicId={selectedTopic} displayGrade={selectedGrade} onOpenPractice={onOpenPractice} />
               </div>
               <ModuleThemeProvider grade={selectedGrade}>
-                <TopicContent
-                  topicId={selectedTopic}
-                  grade={sourceGrade}
-                  displayGrade={selectedGrade}
-                  topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
-                  onSelectWeed={setSelectedWeed}
-                  viewMode={viewMode}
-                  onOpenPractice={onOpenPractice}
-                />
+                {(() => {
+                  const topicName =
+                    availableTopics.find((t) => t.id === selectedTopic)?.name ??
+                    TOPICS.find((t) => t.id === selectedTopic)?.name ??
+                    "";
+                  const sectionGroup = topicsByCategory.find((g) =>
+                    g.topics.some((t) => t.id === selectedTopic),
+                  );
+                  const sectionName = sectionGroup?.category?.label;
+
+                  const content = (
+                    <TopicContent
+                      topicId={selectedTopic}
+                      grade={sourceGrade}
+                      displayGrade={selectedGrade}
+                      topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
+                      onSelectWeed={setSelectedWeed}
+                      viewMode={viewMode}
+                      onOpenPractice={onOpenPractice}
+                    />
+                  );
+                  // K-5 keeps its friendly explorer look; 6-8 / 9-12 / collegiate
+                  // get the case-file, journal, and lab-notebook chrome.
+                  if (selectedGrade === "elementary") return content;
+                  return (
+                    <ThemedModuleFrame title={topicName} section={sectionName}>
+                      {content}
+                    </ThemedModuleFrame>
+                  );
+                })()}
               </ModuleThemeProvider>
+
               {(() => {
                 // Match the display order (grouped by category) so Previous/Next
                 // walks the modules in the same order the user sees them.
