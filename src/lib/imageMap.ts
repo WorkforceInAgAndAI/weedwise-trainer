@@ -55,8 +55,42 @@ export function resolveInjuryImage(group: number, type: 'br' | 'gr'): string | n
  return injuryMap[`g${group}_${type}.jpg`] || null;
 }
 
+/**
+ * Species folders on disk still use the original dataset ids. Weed ids were
+ * later renamed (casing, separators, and a handful of true renames), so every
+ * lookup goes through a normalized folder index plus an explicit alias table.
+ */
+const normalizeKey = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const FOLDER_ALIASES: Record<string, string> = {
+ henbit: 'Henbit_deadnettle',
+ hemp: 'Marijuana',
+ honeyvinemilkweed: 'Honey-vine_climbing_milkweed',
+ commonsunflower: 'volunteer-sunflower',
+ commonmorningglory: 'Tall_morningglory',
+ fallpanicum: 'Smooth_Witchgrass',
+ tallhedgemustard: 'False_London-rocket',
+};
+
+// normalized folder name → actual folder name on disk
+const folderByNorm: Record<string, string> = {};
+for (const key of Object.keys(imageMap)) {
+ const folder = key.split('/')[0];
+ const n = normalizeKey(folder);
+ if (!(n in folderByNorm)) folderByNorm[n] = folder;
+}
+
+/** Resolve a weed id to the folder that actually holds its photos. */
+export function resolveWeedFolder(weedId: string): string {
+ const n = normalizeKey(weedId);
+ const alias = FOLDER_ALIASES[n];
+ if (alias && folderByNorm[normalizeKey(alias)]) return folderByNorm[normalizeKey(alias)];
+ return folderByNorm[n] ?? weedId;
+}
+
 export function resolveImageUrl(weedId: string, filename: string): string | null {
- const key = `${weedId}/${filename}`;
+ const folder = resolveWeedFolder(weedId);
+ const key = `${folder}/${filename}`;
  return imageMap[key] || imageMapLower[key.toLowerCase()] || null;
 }
 
@@ -72,7 +106,7 @@ export function resolveCropImageUrl(cropName: string, filename: string): string 
  * Check if a weed has a specific image file (e.g. male.jpg, female.jpg)
  */
 export function hasImage(weedId: string, filename: string): boolean {
- const key = `${weedId}/${filename}`;
+ const key = `${resolveWeedFolder(weedId)}/${filename}`;
  return !!(imageMap[key] || imageMapLower[key.toLowerCase()]);
 }
 
@@ -82,7 +116,7 @@ export function hasImage(weedId: string, filename: string): boolean {
  * Used for optional gallery slots that appear as soon as photos are added.
  */
 export function hasImagePrefix(weedId: string, prefix: string): boolean {
- const p = `${weedId}/${prefix}`.toLowerCase();
+ const p = `${resolveWeedFolder(weedId)}/${prefix}`.toLowerCase();
  return Object.keys(imageMapLower).some(k => k.startsWith(p));
 }
 
