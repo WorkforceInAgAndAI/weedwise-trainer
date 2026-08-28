@@ -412,11 +412,19 @@ function Hole({ popper, onSnip, now }: { popper?: Popper; onSnip: (id: number) =
               <CropImg name={popper.name} />
             )}
           </div>
-          <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide shadow ${
-            popper.kind === 'weed' ? 'bg-red-500 text-white' : 'bg-green-600 text-white'
-          }`}>
-            {popper.kind === 'weed' ? 'WEED' : 'CROP'}
+          <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 w-[130%]`}>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide shadow ${
+              popper.kind === 'weed' ? 'bg-red-500 text-white' : 'bg-green-600 text-white'
+            }`}>
+              {popper.kind === 'weed' ? 'WEED' : 'CROP'}
+            </span>
+            <span className="px-1.5 py-0.5 rounded-md bg-white/95 border border-border text-[10px] font-bold text-foreground text-center leading-tight shadow">
+              {popper.kind === 'weed'
+                ? (elementaryWeeds.find(w => w.id === popper.name)?.name ?? popper.name)
+                : popper.name}
+            </span>
           </div>
+
         </button>
       )}
     </div>
