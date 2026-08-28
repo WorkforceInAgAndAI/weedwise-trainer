@@ -162,6 +162,8 @@ const k5Games: GameDef[] = [
  { id: 'squad-defense', name: 'Squad Defense', Icon: ShieldAlert, category: 'Control Methods', description: 'Lane-defense action! Team up with the Weed Control Squad to stop marching weed villains before they crush the crops.', howToPlay: 'Weed villains march down 3 lanes toward your crops. Each weed shows a badge for the ONE superpower it fears. Tap a hero card (Pull, Block, Outsmart, Graze, or Stop), then tap the weed — matching hero = instant KO! Wrong hero still chips a little HP but wastes energy. Energy refills over time. Save the crops before HP hits zero!', component: SquadDefense },
  { id: 'ms-safe-toxic', name: 'Safe or Dangerous?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are dangerous to handle?', howToPlay: 'A group of weeds appears — identify which one is dangerous (toxic sap, spines, or poisonous parts), learn why, then decide how to safely manage it.', component: MSSafeVsToxic },
  { id: 'life-stage-control', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify the growth stage, the weed, and choose the best management.', howToPlay: 'A weed appears at a specific life stage. First identify the stage, then the weed, then pick the best control method.', component: LifeStageControl },
+ { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
+
 ];
 
 // True K-5 ("Explorer") games — this list is what the "Grades K-5" tab shows.
