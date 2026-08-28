@@ -56,6 +56,7 @@ import {
   LabCallout,
   Citation,
   ModuleThemeProvider,
+  ThemedModuleFrame,
 } from "./learning/ThemedBlocks";
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
@@ -1795,7 +1796,7 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                   const sectionGroup = topicsByCategory.find((g) =>
                     g.topics.some((t) => t.id === selectedTopic),
                   );
-                  const sectionName = sectionGroup?.category?.name ?? sectionGroup?.category?.label;
+                  const sectionName = sectionGroup?.category?.label;
 
                   const content = (
                     <TopicContent
