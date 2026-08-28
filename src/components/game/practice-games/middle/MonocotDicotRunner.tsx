@@ -25,12 +25,12 @@ function randomCropPhoto() {
 // Only weeds that are clearly one group or the other.
 const SORTABLE = middleSchoolWeeds.filter(w => w.plantType === 'Monocot' || w.plantType === 'Dicot');
 
-const AREA_W = 640;
-const AREA_H = 560;
+const AREA_W = 800;
+const AREA_H = 700;
 const ROW_COUNT = 5;
 const ROUND_SECONDS = 50;
-const WEED_SIZE = 74;
-const CROP_SIZE = 60;
+const WEED_SIZE = 110;
+const CROP_SIZE = 96;
 
 type Bin = 'Monocot' | 'Dicot';
 
