@@ -172,7 +172,8 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
     // Sunburst boost slows the weed down so the player can catch up.
     // The weed also gets a little quicker every round (8% faster each time).
     const roundSpeedup = Math.pow(0.92, round - 1);
-    const tickMs = boosted ? 620 : Math.max(200, Math.round((420 / diff.speed) * roundSpeedup));
+    const tickMs = boosted ? 540 : Math.max(160, Math.round((330 / diff.speed) * roundSpeedup));
+
 
     const tick = setInterval(() => {
       // The flower only moves when the player presses a direction (1:1).
