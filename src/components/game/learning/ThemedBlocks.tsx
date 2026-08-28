@@ -108,7 +108,81 @@ export function ThemedPanel({ title, subtitle, badge, children }: PanelProps) {
   );
 }
 
-/** One themed callout used by every module aside. */
+/**
+ * Full-module chrome. Wraps an entire learning topic so every UI in the
+ * section carries the grade theme: 6-8 = detective case file, 9-12 = field
+ * journal entry, collegiate = lab notebook page.
+ */
+export function ThemedModuleFrame({
+  title,
+  section,
+  children,
+}: {
+  title: string;
+  section?: string;
+  children: ReactNode;
+}) {
+  const theme = useModuleTheme();
+
+  if (theme === "journal") {
+    return (
+      <article className="rounded-lg border border-border bg-card/60 overflow-hidden">
+        <header className="px-4 sm:px-6 pt-5 pb-3 border-b-4 border-double border-primary/50 bg-card">
+          <div className="flex items-center gap-2 mb-1">
+            <Newspaper className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary/80">
+              Field Journal{section ? ` · ${section}` : ""}
+            </span>
+          </div>
+          <h2 className="font-serif font-bold text-foreground text-xl sm:text-2xl leading-tight">{title}</h2>
+          <p className="text-[11px] italic text-muted-foreground mt-1">Journal entry — observations, evidence, conclusions.</p>
+        </header>
+        <div className="p-4 sm:p-6 space-y-4">{children}</div>
+      </article>
+    );
+  }
+
+  if (theme === "lab") {
+    return (
+      <section
+        className="rounded-lg border-2 border-primary/25 bg-card overflow-hidden"
+        style={{
+          backgroundImage:
+            "linear-gradient(hsl(var(--primary) / 0.04) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.04) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+        }}
+      >
+        <header className="flex items-start gap-2 px-4 sm:px-6 py-4 border-b-2 border-primary/30 bg-card/80">
+          <Beaker className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-primary/70 font-mono mb-0.5">
+              Lab Notebook{section ? ` · ${section}` : ""}
+            </p>
+            <h2 className="font-display font-bold text-foreground text-lg sm:text-xl leading-tight">{title}</h2>
+          </div>
+        </header>
+        <div className="p-4 sm:p-6 space-y-4">{children}</div>
+      </section>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border-2 border-amber-500/40 bg-card overflow-hidden shadow-sm">
+      <header className="flex items-center gap-2 px-4 sm:px-6 py-3 bg-amber-500/10 border-b border-amber-500/30 flex-wrap">
+        <Fingerprint className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-amber-700 dark:text-amber-300">
+            Case File{section ? ` · ${section}` : ""}
+          </p>
+          <h2 className="font-display font-bold text-foreground text-base sm:text-lg leading-tight">{title}</h2>
+        </div>
+      </header>
+      <div className="p-4 sm:p-6 space-y-4">{children}</div>
+    </div>
+  );
+}
+
+
 export function ThemedCallout({ heading, children }: { heading: string; children: ReactNode }) {
   const theme = useModuleTheme();
   const Icon = theme === "detective" ? Search : theme === "journal" ? PenLine : FlaskConical;
