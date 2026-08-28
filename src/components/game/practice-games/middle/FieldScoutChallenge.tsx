@@ -136,7 +136,7 @@ export default function FieldScoutChallenge({
   const [trip, setTrip] = useState<Trip>(0);
   const [money, setMoney] = useState(START_MONEY);
   const [pressure, setPressure] = useState(14);      // weeds present this trip
-  const [log, setLog] = useState<{ trip: number; cost: number; found: number; total: number; blocks: number }[]>([]);
+  const [log, setLog] = useState<{ trip: number; cost: number; found: number; total: number; blocks: number; wRoute: boolean; walked: number }[]>([]);
   const [plants, setPlants] = useState<Plant[]>(() => buildPlants(14, 4, weedsForPool(poolGrade)));
   const [path, setPath] = useState<{ x: number; y: number }[]>([]);
   const [drawing, setDrawing] = useState(false);
