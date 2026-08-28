@@ -127,7 +127,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
         setQueue(q => {
           if (q.length === 0) return q;
           const [next, ...rest] = q;
-          setFallers(f => f.length >= 3 ? f : [...f, {
+          setFallers(f => f.length >= 6 ? f : [...f, {
             key: `${next.id}-${Date.now()}`,
             weed: next,
             x: 18 + Math.random() * 64,
