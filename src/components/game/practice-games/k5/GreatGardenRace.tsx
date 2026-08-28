@@ -187,7 +187,7 @@ export default function GreatGardenRace({ onBack, gameId, gameName, gradeLabel }
       setBoostMs(b => Math.max(0, b - tickMs));
     }, tickMs);
     return () => clearInterval(tick);
-  }, [paused, showTally, done, pellets, boostMs > 0]);
+  }, [paused, showTally, done, pellets, boostMs > 0, round, diff.speed]);
 
   // Pellet collection
   useEffect(() => {
