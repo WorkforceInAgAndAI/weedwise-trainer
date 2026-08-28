@@ -25,12 +25,12 @@ function randomCropPhoto() {
 // Only weeds that are clearly one group or the other.
 const SORTABLE = middleSchoolWeeds.filter(w => w.plantType === 'Monocot' || w.plantType === 'Dicot');
 
-const AREA_W = 800;
+const AREA_W = 900;
 const AREA_H = 700;
 const ROW_COUNT = 5;
 const ROUND_SECONDS = 50;
-const WEED_SIZE = 110;
-const CROP_SIZE = 96;
+const WEED_SIZE = 120;
+const CROP_SIZE = 100;
 
 type Bin = 'Monocot' | 'Dicot';
 
@@ -115,8 +115,8 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
     };
   }, []);
 
-  const scrollSpeed = 70 * diff.speed;
-  const spawnInterval = Math.max(600, 1100 / diff.speed);
+  const scrollSpeed = 100 * diff.speed;
+  const spawnInterval = Math.max(900, 1500 / diff.speed);
 
   function beginRound() {
     spritesRef.current = [];
@@ -143,7 +143,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
     const dt = Math.min(0.05, (now - lastRef.current) / 1000);
     lastRef.current = now;
 
-    scrollRef.current = (scrollRef.current + scrollSpeed * dt) % 80;
+    scrollRef.current = (scrollRef.current + scrollSpeed * dt) % 100;
 
     for (const s of spritesRef.current) {
       if (s.removed) continue;
@@ -405,7 +405,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
             {sprites.map(s => {
               if (s.removed) return null;
               const weedInfo = s.kind === 'weed' ? middleSchoolWeeds.find(w => w.id === s.weedId) : null;
-              const commonName = s.kind === 'weed' ? weedInfo?.commonName : s.cropName;
+              const commonName = s.kind === 'weed' ? (weedInfo?.commonName || 'Weed') : (s.cropName || 'Crop');
               
               if (s.picked && dragPos && areaRect) {
                 const localX = ((dragPos.x - areaRect.left) / areaRect.width) * AREA_W;
@@ -423,7 +423,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
                       <div className="absolute inset-0 rounded-full border-4 border-primary bg-white shadow-2xl overflow-hidden">
                         <WeedImage weedId={s.weedId} stage="vegetative" className="w-full h-full" />
                       </div>
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide shadow-md whitespace-nowrap">
+                      <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-black uppercase tracking-wide shadow-md whitespace-nowrap">
                         {commonName}
                       </div>
                     </div>
@@ -448,7 +448,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
                         <div className="absolute inset-0 rounded-full border-4 border-red-500 ring-2 ring-red-200 bg-white shadow-lg overflow-hidden">
                           <WeedImage weedId={s.weedId} stage="vegetative" className="w-full h-full" />
                         </div>
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wide shadow whitespace-nowrap">
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full bg-red-600 text-white text-[11px] font-black uppercase tracking-wide shadow whitespace-nowrap">
                           {commonName}
                         </div>
                       </>
@@ -461,8 +461,8 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
                             <div className="w-full h-full" style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }} />
                           )}
                         </div>
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wide shadow whitespace-nowrap">
-                          {s.cropName || 'Crop'}
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full bg-emerald-700 text-white text-[11px] font-black uppercase tracking-wide shadow whitespace-nowrap">
+                          {commonName}
                         </div>
                       </>
                     )}
@@ -471,7 +471,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
               );
             })}
 
-            {floats.map(f => (
+                        {floats.map(f => (
               <div key={f.id} className="absolute pointer-events-none font-black text-sm md:text-base drop-shadow z-40"
                 style={{
                   left: `${(f.x / AREA_W) * 100}%`,
