@@ -182,17 +182,24 @@ export default function FieldScoutChallenge({
 
   const walked = pathLength(path);
   const cost = Math.round(walked * COST_PER_UNIT);
+  const wRoute = useMemo(() => isWRoute(path, walked), [path, walked]);
+  const tooLong = walked > IDEAL_MAX_LEN;
+  const tooShort = path.length > 2 && walked < IDEAL_MIN_LEN;
 
   const foundIdx = useMemo(() => {
     const found = new Set<number>();
     if (path.length < 2) return found;
+    // A true W route is a representative sample, so the scout also catches
+    // patches just off the walked line. Wandering routes only see what they pass.
+    const radius = wRoute ? SCOUT_RADIUS_PCT * 1.8 : SCOUT_RADIUS_PCT;
     plants.forEach((pl, i) => {
       for (let j = 1; j < path.length; j++) {
-        if (distToSegment(pl, path[j - 1], path[j]) <= SCOUT_RADIUS_PCT) { found.add(i); break; }
+        if (distToSegment(pl, path[j - 1], path[j]) <= radius) { found.add(i); break; }
       }
     });
     return found;
-  }, [path, plants]);
+  }, [path, plants, wRoute]);
+
 
   /** How many of the 9 field blocks the path actually sampled. */
   const blocksCovered = useMemo(() => {
