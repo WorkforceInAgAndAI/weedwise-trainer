@@ -3,28 +3,20 @@ import { weedsForGrade } from '@/data/gradeWeeds';
 import type { Weed } from '@/types/game';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
-import { lookAlikePairsForPool, isLookAlike } from '@/data/lookAlikeGroups';
+import { lookAlikePairsForPool } from '@/data/lookAlikeGroups';
 
-// Official look-alike pairs only, limited to the grade's weed pool
-function getFamilyPairs(weeds: Weed[]): Array<[Weed, Weed]> {
- return lookAlikePairsForPool(weeds) as Array<[Weed, Weed]>;
+// All look-alike pairs in the grade pool (species sharing a SPECIES_GROUPS
+// group). Guard against any pair repeating the same species.
+function getPairs(weeds: Weed[]): Array<[Weed, Weed]> {
+ return (lookAlikePairsForPool(weeds) as Array<[Weed, Weed]>)
+ .filter(([a, b]) => a.id !== b.id);
 }
 
-// Introduced vs native official look-alike pairs
+// Introduced vs native look-alike pairs (subset of the shared-group pairs)
 function getInvasiveNativePairs(weeds: Weed[]): Array<[Weed, Weed]> {
- const introduced = weeds.filter(w => w.origin === 'Introduced');
- const native = weeds.filter(w => w.origin === 'Native');
- const pairs: Array<[Weed, Weed]> = [];
- const used = new Set<string>();
- introduced.forEach(inv => {
- const match = native.find(nat => isLookAlike(inv.id, nat.id) && !used.has(nat.id));
- if (match) {
- used.add(match.id);
- used.add(inv.id);
- pairs.push([inv, match]);
- }
- });
- return pairs;
+ return getPairs(weeds).filter(
+ ([a, b]) => (a.origin === 'Introduced' && b.origin === 'Native') || (a.origin === 'Native' && b.origin === 'Introduced'),
+ );
 }
 
 interface Props {
@@ -40,7 +32,7 @@ export default function LookAlikeChallenge({ onComplete, onNext, grade = 'high' 
  // 40% chance to get an introduced vs native pair
  const useInvasiveNative = Math.random() < 0.4;
  const invNatPairs = useInvasiveNative ? getInvasiveNativePairs(weeds) : [];
- const allPairs = invNatPairs.length > 0 ? invNatPairs : getFamilyPairs(weeds);
+ const allPairs = invNatPairs.length > 0 ? invNatPairs : getPairs(weeds);
  const p = allPairs[Math.floor(Math.random() * allPairs.length)];
  const flipped = Math.random() < 0.5;
  const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
