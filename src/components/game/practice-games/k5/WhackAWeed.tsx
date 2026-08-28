@@ -420,7 +420,7 @@ function Hole({ popper, onSnip, now }: { popper?: Popper; onSnip: (id: number) =
             </span>
             <span className="px-1.5 py-0.5 rounded-md bg-white/95 border border-border text-[10px] font-bold text-foreground text-center leading-tight shadow">
               {popper.kind === 'weed'
-                ? (elementaryWeeds.find(w => w.id === popper.name)?.name ?? popper.name)
+                ? (elementaryWeeds.find(w => w.id === popper.name)?.commonName ?? popper.name)
                 : popper.name}
             </span>
           </div>
