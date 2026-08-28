@@ -46,7 +46,7 @@ function buildSeedCharacters(count = 5): SeedCharacter[] {
         weedId: w.id,
         name: `${w.name} Seed`,
         traits: traitsFromFact(fact.dispersal, fact.production),
-        description: fact.seedDescription,
+        description: `${fact.seedDescription} Travels by: ${fact.dispersal}.`,
       };
     });
   return shuffle(pool).slice(0, Math.max(3, count));
