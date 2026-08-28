@@ -55,6 +55,7 @@ import {
   TermSidebar,
   LabCallout,
   Citation,
+  ModuleThemeProvider,
 } from "./learning/ThemedBlocks";
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
@@ -1785,15 +1786,17 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 </h2>
                 <PracticeButton topicId={selectedTopic} displayGrade={selectedGrade} onOpenPractice={onOpenPractice} />
               </div>
-              <TopicContent
-                topicId={selectedTopic}
-                grade={sourceGrade}
-                displayGrade={selectedGrade}
-                topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
-                onSelectWeed={setSelectedWeed}
-                viewMode={viewMode}
-                onOpenPractice={onOpenPractice}
-              />
+              <ModuleThemeProvider grade={selectedGrade}>
+                <TopicContent
+                  topicId={selectedTopic}
+                  grade={sourceGrade}
+                  displayGrade={selectedGrade}
+                  topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
+                  onSelectWeed={setSelectedWeed}
+                  viewMode={viewMode}
+                  onOpenPractice={onOpenPractice}
+                />
+              </ModuleThemeProvider>
               {(() => {
                 // Match the display order (grouped by category) so Previous/Next
                 // walks the modules in the same order the user sees them.
@@ -6070,9 +6073,7 @@ function TopicContent({
     case "look-alikes": {
       // Displayed grade drives every look-alike decision in this topic.
       const dg = (displayGrade ?? "middle") as "elementary" | "middle" | "high" | "collegiate";
-      // Every look-alike shown here must be inside the DISPLAYED grade's weed
-      // pool (6-8 = 37 species, 9-12 = 58, Collegiate = 87). The internal
-      // `grade` prop is the legacy source grade and is one level lower.
+      // Every look-alike shown here must be inside the DISPLAYED grade's weed pool.
       const gradePool =
         dg === "collegiate"
           ? collegiateWeedsAll
@@ -6081,219 +6082,48 @@ function TopicContent({
             : dg === "middle"
               ? middleSchoolWeeds
               : elementaryWeeds;
-      const gradePoolIds = new Set(gradePool.map((w) => w.id));
-      const seen = new Set<string>();
-      const pairs: [Weed, Weed][] = [];
-      gradePool.forEach((w) => {
-        if (seen.has(w.id)) return;
-        const partnerId = lookAlikePartners(w.id, gradePoolIds).find((id) => !seen.has(id));
-        const pairedWith = partnerId ? gradePool.find((x) => x.id === partnerId) : undefined;
-        if (pairedWith) {
-          seen.add(w.id);
-          seen.add(pairedWith.id);
-          pairs.push([w, pairedWith]);
-        }
-      });
 
-      // Build introduced vs native look-alike pairs for 6-8 and 9-12
-      const invasiveNativePairs: [Weed, Weed][] = [];
-      if (dg !== "elementary") {
-        const invasiveWeeds = gradePool.filter((w) => w.origin === "Introduced");
-        const nativeWeeds = gradePool.filter((w) => w.origin === "Native");
-        const invNatSeen = new Set<string>();
-        invasiveWeeds.forEach((inv) => {
-          const partners = lookAlikePartners(inv.id, gradePoolIds);
-          const nativeLookAlike = nativeWeeds.find(
-            (nat) => partners.includes(nat.id) && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
-          );
-          if (nativeLookAlike) {
-            invNatSeen.add(inv.id);
-            invNatSeen.add(nativeLookAlike.id);
-            invasiveNativePairs.push([inv, nativeLookAlike]);
-          }
-        });
-      }
+      // Groups come straight from the look-alike group names in the data,
+      // restricted to this grade's species pool.
+      const groups = lookAlikeGroupsForPool(gradePool as Weed[]).sort((a, b) => a.name.localeCompare(b.name));
 
-      const stages = [
+      const stages: { stage: string; label: string }[] = [
         { stage: "seedling", label: "Seedling" },
         { stage: "vegetative", label: "Vegetative" },
         { stage: "flower", label: "Reproductive" },
       ];
-      const elementaryStages = [{ stage: "whole", label: "Whole Plant" }];
 
-      // Official look-alike groups, restricted to this grade's weed pool.
-      const lookAlikeGroups: { name: string; weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(
-        gradePool,
-      ).map((g) => ({
-        name: g.name,
-        weeds: g.weeds as Weed[],
-        difference: g.difference,
-      }));
-
-      // Species in this grade pool that have no look-alike on the official list yet.
-      const groupedIds = new Set(lookAlikeGroups.flatMap((g) => g.weeds.map((w) => w.id)));
-      const noLookAlikeWeeds = gradePool.filter(
-        (w) => !groupedIds.has(w.id) && lookAlikePartners(w.id, gradePoolIds).length === 0,
+      const speciesCard = (w: Weed) => (
+        <div
+          key={w.id}
+          className="shrink-0 w-[260px] sm:w-[300px] snap-start bg-card border border-border rounded-xl overflow-hidden"
+        >
+          <div className="px-3 py-2 border-b border-border bg-secondary/40">
+            <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
+            <div className="text-[11px] text-primary italic leading-tight">{w.scientificName}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] text-muted-foreground">{w.family}</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
+              >
+                {w.origin}
+              </span>
+            </div>
+          </div>
+          <div className="p-3 grid grid-cols-3 gap-2">
+            {stages.map((s) => (
+              <div key={s.stage}>
+                <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                  <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                </div>
+                <div className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground text-center mt-1">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       );
-
-      const renderPairCard = (a: Weed, b: Weed, key: string) => {
-        const aIsGrass = a.plantType === "Monocot" && a.family === "Poaceae";
-        const bIsGrass = b.plantType === "Monocot" && b.family === "Poaceae";
-        const showLigule = aIsGrass || bIsGrass;
-        return (
-          <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
-            {/* Header */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <ClickableWeedName weed={a} onSelect={onSelectWeed} className="text-sm font-bold" />
-                {dg !== "elementary" && <div className="text-xs text-primary italic">{a.scientificName}</div>}
-                <div className="text-[10px] text-muted-foreground">{a.family}</div>
-                <span
-                  className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${a.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                >
-                  {a.origin === "Introduced" ? "Introduced" : "Native"}
-                </span>
-              </div>
-              <div className="text-center">
-                <ClickableWeedName weed={b} onSelect={onSelectWeed} className="text-sm font-bold" />
-                {dg !== "elementary" && <div className="text-xs text-primary italic">{b.scientificName}</div>}
-                <div className="text-[10px] text-muted-foreground">{b.family}</div>
-                <span
-                  className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${b.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                >
-                  {b.origin === "Introduced" ? "Introduced" : "Native"}
-                </span>
-              </div>
-            </div>
-
-            {/* All growth stages side by side */}
-            {(dg === "elementary" ? elementaryStages : stages).map((s) => (
-              <div key={s.stage}>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    <WeedImage weedId={a.id} stage={s.stage} className="w-full h-full" />
-                  </div>
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    <WeedImage weedId={b.id} stage={s.stage} className="w-full h-full" />
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Ligule comparison for grasses */}
-            {showLigule && dg !== "elementary" && (
-              <div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">Ligule</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    {aIsGrass ? (
-                      <WeedImage weedId={a.id} stage="ligule" className="w-full h-full" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
-                        Not a grass
-                      </div>
-                    )}
-                  </div>
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    {bIsGrass ? (
-                      <WeedImage weedId={b.id} stage="ligule" className="w-full h-full" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
-                        Not a grass
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Difference explanation */}
-            <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
-              <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
-              <p>{a.lookAlike.difference}</p>
-            </div>
-          </div>
-        );
-      };
-
-      // 3-species comparison card: shows seedling / vegetative / reproductive (+ ligule
-      // when any member is a grass) side-by-side for all three species.
-      const renderTripleCard = (group: Weed[], key: string, customDifference?: string, groupName?: string) => {
-        const compareStages = [
-          { stage: "seedling", label: "Seedling" },
-          { stage: "vegetative", label: "Vegetative" },
-          { stage: "flower", label: "Reproductive" },
-        ];
-        const anyGrass = group.some((w) => w.plantType === "Monocot" && w.family === "Poaceae");
-        const colsClass = group.length === 2 ? "grid-cols-2" : "grid-cols-3";
-
-        return (
-          <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
-            {groupName && (
-              <div className="flex items-center gap-2 border-b border-border pb-2">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                <h4 className="font-display font-bold text-foreground text-sm">{groupName}</h4>
-              </div>
-            )}
-            {/* Header row */}
-            <div className={`grid ${colsClass} gap-3`}>
-              {group.map((w) => (
-                <div key={w.id} className="text-center">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
-                  <div className="text-[11px] text-primary italic leading-tight">{w.scientificName}</div>
-                  <div className="text-[10px] text-muted-foreground">{w.family}</div>
-                  <span
-                    className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                  >
-                    {w.origin === "Introduced" ? "Introduced" : "Native"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Stage-by-stage comparison */}
-            {compareStages.map((s) => (
-              <div key={s.stage}>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
-                <div className={`grid ${colsClass} gap-2`}>
-                  {group.map((w) => (
-                    <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* Ligule row (only if at least one species is a grass) */}
-            {anyGrass && (
-              <div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">Ligule</div>
-                <div className={`grid ${colsClass} gap-2`}>
-                  {group.map((w) => (
-                    <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      {w.plantType === "Monocot" && w.family === "Poaceae" ? (
-                        <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-[10px] text-muted-foreground text-center px-1">
-                          Not a grass (no ligule)
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {customDifference && (
-              <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
-                <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
-                <p>{customDifference}</p>
-              </div>
-            )}
-          </div>
-        );
-      };
 
       if (dg === "elementary") {
         return (
@@ -6301,8 +6131,7 @@ function TopicContent({
             <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
               <p className="text-sm">
                 Some weeds look very similar to other weeds. It is important to tell them apart so we can manage them
-                the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look alike
-                — see if you can spot what makes each one different!
+                the right way.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <EvidenceTag label="Suspects: 2–4" tone="suspect" />
@@ -6315,170 +6144,110 @@ function TopicContent({
         );
       }
 
+      const intro =
+        dg === "middle" ? (
+          <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
+            <div className="text-sm space-y-3">
+              <p>
+                Many weeds are nature's copycats — similar leaf shapes, similar seeds, growing in the same places. But
+                they don't all behave the same way. Some pull out easily, some come back from deep roots, and some, like{" "}
+                <strong>poison hemlock</strong>, are dangerous to touch.
+              </p>
+              <p>
+                Each suspect line-up below holds species that share a look-alike group. Compare them at the{" "}
+                <strong>seedling, vegetative, and reproductive</strong> stages before you name your suspect.
+              </p>
+            </div>
+            <CaseCallout heading="Investigator tip">
+              One photo is never enough evidence. Check leaf shape, stem hairs, and the flower or seedhead before you
+              call the ID.
+            </CaseCallout>
+          </DetectiveCard>
+        ) : dg === "high" ? (
+          <NotebookSection title="Look-Alike Species" subtitle="Entry 03 · On Assignment">
+            <div className="text-sm space-y-3">
+              <p>
+                Reporting on a field means naming the right suspect. Two species that look nearly identical as seedlings
+                can demand completely different management. Waterhemp and Palmer Amaranth are the textbook case — both
+                are pigweeds, both resist multiple herbicide groups, but Palmer is far more aggressive.
+              </p>
+              <p>
+                Each entry below collects the species that share a look-alike group in your grade's species list. Scroll
+                each group sideways and compare the same three growth stages across every species.
+              </p>
+            </div>
+            <FieldNote label="Notes from the field">
+              Record which single character settled the ID — leaf venation, stem trichomes, ligule shape, milky sap.
+              That note is the story.
+            </FieldNote>
+          </NotebookSection>
+        ) : (
+          <>
+            <JournalHeader title="Comparative Morphology of Confused Species" subtitle="Lab Notebook · Module 03" />
+            <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p>
+                Reliable identification means moving past general impressions and using{" "}
+                <strong>diagnostic morphological characters</strong>: leaf venation and pubescence, stem cross-section
+                and trichomes, inflorescence architecture, ligule and auricle shape in grasses, and the presence or
+                absence of milky latex, square stems, or sheathing ocreae.
+              </p>
+              <p>
+                Many of these characters are only diagnostic at a specific growth stage, so each species below is
+                presented at the seedling, vegetative, and reproductive stages, grouped with the species it is most
+                often confused with.
+              </p>
+            </div>
+            <TermSidebar
+              terms={[
+                { term: "Pubescence", def: "Presence, type, and density of hairs (trichomes) on stems and leaves." },
+                { term: "Ocrea", def: "Sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds." },
+                {
+                  term: "Ligule / Auricle",
+                  def: "Grass features at the blade/sheath junction; often the most reliable grass ID character.",
+                },
+                { term: "Inflorescence", def: "Arrangement of flowers on the stem (spike, panicle, umbel, raceme)." },
+                { term: "Dioecious", def: "Male and female flowers on separate plants — key in Amaranthus." },
+              ]}
+            />
+            <LabCallout heading="Diagnostic Protocol">
+              Compare specimens at <strong>at least two life stages</strong>, verify with a genus-level key before
+              naming to species, and record which character was decisive.
+            </LabCallout>
+          </>
+        );
+
       return (
-        <div className="space-y-4">
-          {dg === "middle" ? (
-            <NotebookSection title="Look-Alike Species" subtitle="Entry 03 · Comparative ID">
-              <div className="text-sm space-y-3">
-                <p>
-                  Have you ever looked out at a field or a lawn and thought all the weeds looked pretty much the same?
-                  You're not alone — even farmers and scientists sometimes have to look twice. Many common weeds are
-                  like nature's copycats. They have similar leaf shapes, the same spiky seeds, or grow in the exact same
-                  spots, making them really easy to mix up.
-                </p>
-                <p>
-                  But here's why it matters: not all weeds play by the same rules. Some can be pulled out easily, while
-                  others have deep roots that grow back no matter how many times you remove them. Some weeds are just
-                  annoying, while others — like <strong>poison hemlock</strong> — are actually dangerous to touch or
-                  eat. And when farmers need to use herbicides (special sprays that kill unwanted plants), picking the
-                  wrong one because they misidentified the weed is like taking cold medicine when you actually have a
-                  broken arm. It just won't work, and you've wasted time and money.
-                </p>
-                <p>
-                  Getting the ID right is the first step to dealing with a weed the smart way — whether that's pulling
-                  it, spraying it, or knowing to stay away from it entirely. The good news is that once you know what
-                  clues to look for, like{" "}
-                  <strong>
-                    leaf shape, stem texture, flower color, or whether the plant has milky sap when you break it
-                  </strong>{" "}
-                  — telling these lookalikes apart becomes a lot easier than it sounds.
-                </p>
-              </div>
-              <FieldNote label="Hypothesis">
-                A single stage-photo is not enough — compare seedling, vegetative, and reproductive stages before you
-                commit to an ID.
-              </FieldNote>
-              <SelfCheck
-                question="Why is Waterhemp vs. Palmer Amaranth a high-stakes ID call?"
-                answer="Both spread fast and resist multiple herbicide groups, but Palmer is more aggressive and demands zero-tolerance control — the wrong call can cost most of a field's yield."
-              />
-            </NotebookSection>
+        <div className="space-y-5">
+          {intro}
+
+          {groups.length === 0 ? (
+            <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/40 p-4 text-sm text-muted-foreground">
+              No look-alike groups are available for this grade level yet.
+            </div>
           ) : (
-            <>
-              <JournalHeader title="Comparative Morphology of Confused Species" subtitle="Lab Journal · Module 03" />
-              <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
-                <p>
-                  In a soybean or corn field, two species that look nearly identical at the seedling stage can demand
-                  completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a
-                  textbook example — both are dioecious pigweeds, both can produce 250,000+ seeds per plant, and both
-                  have evolved resistance to multiple herbicide groups, but Palmer is the more aggressive competitor and
-                  triggers a zero-tolerance threshold across most of the Midwest. Misidentifying one as the other can
-                  cost a grower 30–80% of yield in a heavily infested field.
-                </p>
-                <p>
-                  Reliable identification at the high-school level means moving past general impressions and using
-                  <strong> diagnostic morphological characters</strong>: leaf venation and pubescence, stem
-                  cross-section and trichomes, petiole-to-leaf-blade ratio, inflorescence architecture, ligule and
-                  auricle shape in grasses, and the presence or absence of milky latex, square stems, or sheathing
-                  ocreae. Many of these features only become diagnostic at specific growth stages, so a single
-                  photograph at one stage is rarely enough — you have to compare species across the seedling,
-                  vegetative, and reproductive phases.
-                </p>
-                <p>
-                  The consequences of misidentification extend beyond yield loss. Choosing the wrong mode-of-action
-                  herbicide because you confused a Group-9-resistant Waterhemp with a still-susceptible Redroot Pigweed
-                  selects for further resistance and burns through control options. Confusing a native pollinator host (
-                  <em>e.g.</em> Common Milkweed) with an introduced look-alike can waste conservation effort or destroy
-                  monarch habitat. And confusing Wild Carrot with Poison Hemlock is a safety event, not a botany
-                  mistake. The triples below are the species pairings most commonly confused in field-scouting reports;
-                  use the side-by-side layout to build a mental key based on the features that actually distinguish
-                  them.
-                </p>
-              </div>
-              <TermSidebar
-                terms={[
-                  {
-                    term: "Pubescence",
-                    def: "The presence, type, and density of hairs (trichomes) on stems and leaves.",
-                  },
-                  {
-                    term: "Ocrea",
-                    def: "A sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds/knotweeds.",
-                  },
-                  {
-                    term: "Ligule / Auricle",
-                    def: "Grass features at the leaf-blade / sheath junction; often the most reliable ID character for grasses.",
-                  },
-                  {
-                    term: "Inflorescence",
-                    def: "The arrangement of flowers on the stem (spike, panicle, umbel, raceme).",
-                  },
-                  {
-                    term: "Dioecious",
-                    def: "Male and female flowers on separate plants — key trait separating Amaranthus species.",
-                  },
-                ]}
-              />
-              <LabCallout heading="Diagnostic Protocol">
-                Compare specimens at <strong>at least two life stages</strong>, verify with a genus-level key before
-                naming to species, and record which character was decisive — future you will need that note.
-              </LabCallout>
-            </>
-          )}
-
-          {/* 3-species look-alike groups — primary content for 6-8 and 9-12 */}
-          {lookAlikeGroups.length > 0 && (
-            <div className="space-y-4">
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <h3 className="font-display font-bold text-foreground text-base mb-1">Look-Alike Groups</h3>
-                <p className="text-sm text-foreground">
-                  Compare these commonly-confused species at each growth stage. For grass groups, the{" "}
-                  <strong>ligule</strong> row is one of the most reliable ID features.
-                </p>
-              </div>
-              {lookAlikeGroups.map((g, i) =>
-                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference, g.name),
-              )}
-            </div>
-          )}
-
-          {/* Introduced vs Native Look-Alikes section for 6-8 and 9-12 */}
-          {invasiveNativePairs.length > 0 && (
-            <div className="space-y-4 border-t border-border pt-4">
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
-                <h3 className="font-display font-bold text-foreground text-base mb-2">
-                  Introduced vs Native Look-Alikes
-                </h3>
-                <p className="text-sm text-foreground">
-                  These pairs contain an <strong className="text-destructive">introduced</strong> species
-                  that closely resembles a <strong className="text-accent">native</strong> species.
-                </p>
-              </div>
-              {invasiveNativePairs.map(([a, b]) => renderPairCard(a, b, `inv-${a.id}-${b.id}`))}
-            </div>
-          )}
-
-          {/* Official Look-Alike Pairs */}
-          {pairs.length > 0 && (
-            <div className="border-t border-border pt-4 space-y-4">
-              <h3 className="font-display font-bold text-foreground text-base">Look-Alike Pairs</h3>
-              {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
-            </div>
-          )}
-
-          {/* Species still awaiting an official look-alike */}
-          {noLookAlikeWeeds.length > 0 && (
-            <div className="border-t border-border pt-4">
-              <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/40 p-4">
-                <h3 className="font-display font-bold text-foreground text-sm mb-1">
-                  No look-alike listed yet ({noLookAlikeWeeds.length})
-                </h3>
-                <p className="text-xs text-muted-foreground mb-2">
-                  These species have no confirmed look-alike on the official list — comparisons will be added later.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {noLookAlikeWeeds.map((w) => (
-                    <span key={w.id} className="text-xs px-2 py-1 rounded-full bg-card border border-border">
-                      {w.commonName}
-                    </span>
-                  ))}
+            groups.map((g) => (
+              <section key={g.name} className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <h3 className="font-display font-bold text-foreground text-base">{g.name}</h3>
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                    {g.weeds.length} species
+                  </span>
                 </div>
-              </div>
-            </div>
+                <p className="text-xs text-muted-foreground">
+                  Compare leaf shape and margins, stem hairs and texture, and flower or seedhead structure to tell these
+                  apart. Scroll sideways to see every species in the group.
+                </p>
+                <div className="flex gap-3 overflow-x-auto snap-x pb-2 -mx-1 px-1">
+                  {g.weeds.map((w) => speciesCard(w as Weed))}
+                </div>
+              </section>
+            ))
           )}
         </div>
       );
     }
+
 
     /* ═══════════════════════════════════════════════════════════
        SAFETY & CONTROL

@@ -81,7 +81,7 @@ export const MIDDLE_SCHOOL_WEED_IDS: string[] = [
   "giant-ragweed",
   "golden-alexanders",
   "Ground_ivy",
-  "Henbit_deadnettle",
+  "Henbit",
   "Horsenettle",
   "Horseweed",
   "Jimsonweed",
@@ -92,18 +92,23 @@ export const MIDDLE_SCHOOL_WEED_IDS: string[] = [
   "pennsylvania-smartweed",
   "Redroot_pigweed",
   "Shepherds_Purse",
-  "Tall_morningglory",
+  "Common_Morningglory",
   "velvetleaf",
   "Venice_mallow",
-  "volunteer-sunflower",
+  "Common_Sunflower",
   "Wild_Carrot",
   "wild-parsnip",
   "Witchgrass",
   "yellow-nutsedge",
 ];
 
-const ELEM_ID_SET = new Set(ELEMENTARY_WEED_IDS);
-const MIDDLE_ID_SET = new Set(MIDDLE_SCHOOL_WEED_IDS);
+/** Species ids are compared case- and separator-insensitively so that
+ *  dataset renames (e.g. `Common_mullein` -> `Common_Mullein`) never
+ *  silently drop a species from a grade pool. */
+export const normalizeWeedId = (id: string): string => id.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const ELEM_ID_SET = new Set(ELEMENTARY_WEED_IDS.map(normalizeWeedId));
+const MIDDLE_ID_SET = new Set(MIDDLE_SCHOOL_WEED_IDS.map(normalizeWeedId));
 
 /**
  * 9-12 (High School) curriculum weeds — 55 species. The full 86-species
@@ -137,15 +142,15 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "green-foxtail",
   "Ground_ivy",
   "Hemp_dogbane",
-  "Henbit_deadnettle",
-  "Honey-vine_climbing_milkweed",
+  "Henbit",
+  "Honeyvine_Milkweed",
   "Horsenettle",
   "Horseweed",
   "Jimsonweed",
   "kochia",
   "lambsquarters",
   "large-crabgrass",
-  "Marijuana",
+  "Hemp",
   "Musk_thistle",
   "palmer-amaranth",
   "pennsylvania-smartweed",
@@ -155,10 +160,10 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "Shepherds_Purse",
   "Spotted_spurge",
   "Star_of_Bethlehem",
-  "Tall_morningglory",
+  "Common_Morningglory",
   "velvetleaf",
   "Venice_mallow",
-  "volunteer-sunflower",
+  "Common_Sunflower",
   "waterhemp",
   "Wild_Carrot",
   "Wild_mustard",
@@ -171,19 +176,19 @@ export const HIGH_SCHOOL_WEED_IDS: string[] = [
   "Ivyleaf_morningglory",
 ];
 
-const HIGH_ID_SET = new Set(HIGH_SCHOOL_WEED_IDS);
+const HIGH_ID_SET = new Set(HIGH_SCHOOL_WEED_IDS.map(normalizeWeedId));
 
 /** The master weeds list filtered to the K-5 curriculum. */
-export const elementaryWeeds = weeds.filter((w) => ELEM_ID_SET.has(w.id));
+export const elementaryWeeds = weeds.filter((w) => ELEM_ID_SET.has(normalizeWeedId(w.id)));
 
 /**
  * The master weeds list filtered to the 6-8 curriculum.
  * Use this in place of `weeds` for any grades-6-8 practice game.
  */
-export const middleSchoolWeeds = applyRegionPriority(weeds.filter((w) => MIDDLE_ID_SET.has(w.id)));
+export const middleSchoolWeeds = applyRegionPriority(weeds.filter((w) => MIDDLE_ID_SET.has(normalizeWeedId(w.id))));
 
 /** The master weeds list filtered to the 9-12 (high school) curriculum. */
-export const highSchoolWeeds = applyRegionPriority(weeds.filter((w) => HIGH_ID_SET.has(w.id)));
+export const highSchoolWeeds = applyRegionPriority(weeds.filter((w) => HIGH_ID_SET.has(normalizeWeedId(w.id))));
 
 /** Full 87-species collegiate pool, region-prioritized. */
 export const collegiateWeeds = applyRegionPriority(weeds);
@@ -207,9 +212,9 @@ export function weedsForPool(grade: PoolGrade): Weed[] {
 }
 
 /** Convenience predicate for one-off checks. */
-export const isMiddleSchoolWeed = (id: string): boolean => MIDDLE_ID_SET.has(id);
-export const isElementaryWeed = (id: string): boolean => ELEM_ID_SET.has(id);
-export const isHighSchoolWeed = (id: string): boolean => HIGH_ID_SET.has(id);
+export const isMiddleSchoolWeed = (id: string): boolean => MIDDLE_ID_SET.has(normalizeWeedId(id));
+export const isElementaryWeed = (id: string): boolean => ELEM_ID_SET.has(normalizeWeedId(id));
+export const isHighSchoolWeed = (id: string): boolean => HIGH_ID_SET.has(normalizeWeedId(id));
 
 /**
  * Return the weed pool a learning module or practice game should use for
