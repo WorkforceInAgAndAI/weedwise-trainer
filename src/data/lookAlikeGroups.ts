@@ -192,3 +192,9 @@ export function lookAlikePairsForPool<T extends PoolWeed>(pool: T[]): [T, T][] {
   }
   return pairs;
 }
+
+/** Alias: ids of official look-alike partners for a species. */
+export const officialPartners = lookAlikePartners;
+
+/** Alias: true when two species are official look-alikes. */
+export const isOfficialLookAlike = isLookAlike;
