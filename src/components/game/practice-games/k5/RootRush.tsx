@@ -256,8 +256,13 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
       window.setTimeout(() => endRound(true, addScore + bonus), 900);
     } else if (newEnergy <= 0) {
       window.setTimeout(() => endRound(false, addScore), 900);
+    } else if (!hasOpenMove(idx, newPath, newGrid)) {
+      // Boxed in between rocks and tunnel the root already dug — the shift ends here.
+      flash('Dead end! Your root is stuck between rock and old tunnels.');
+      window.setTimeout(() => endRound(false, addScore), 1200);
     }
   };
+
 
   const endRound = (won: boolean, lastAdd: number) => {
     const finalScore = Math.max(0, score + lastAdd);
