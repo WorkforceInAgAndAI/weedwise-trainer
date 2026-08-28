@@ -280,10 +280,11 @@ export default function FieldScoutChallenge({
             <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">W-pattern efficiency bonus ({wTrips}/3 trips)</span><span className="font-bold text-primary">+${wBonus.toLocaleString()}</span></div>
             <div className="border-t border-border pt-2 flex justify-between text-lg"><span className="font-bold text-foreground">Money kept</span><span className="font-extrabold text-primary">${finalMoney.toLocaleString()}</span></div>
             <p className="text-xs text-muted-foreground pt-2">
-              Walk cheap, but walk smart. A pattern that crosses the whole field — a W, a zig-zag, an X — costs a little
-              more than hugging the outside, but it finds the patches before they set seed.
+              The W is the standard scouting pattern: four long legs from edge to edge with three turns. Walk less than
+              that and you miss strips of the field; walk more and you burn money without finding more weeds.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -292,8 +293,12 @@ export default function FieldScoutChallenge({
                 <p className="text-[10px] font-bold uppercase text-muted-foreground">{TRIPS[l.trip].sub}</p>
                 <p className="text-sm font-bold text-foreground">{l.found}/{l.total} found</p>
                 <p className="text-[10px] text-muted-foreground">${l.cost} · {l.blocks}/9 blocks</p>
+                <p className={`text-[10px] font-bold ${l.wRoute ? 'text-primary' : 'text-destructive'}`}>
+                  {l.wRoute ? 'W route' : l.walked > IDEAL_MAX_LEN ? 'Over-walked' : 'Under-walked'}
+                </p>
               </div>
             ))}
+
           </div>
           <LevelComplete
             level={season}
