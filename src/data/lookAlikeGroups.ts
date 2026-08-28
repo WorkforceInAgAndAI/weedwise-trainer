@@ -111,6 +111,31 @@ export interface LookAlikeGroup<T> {
   ids: string[];
   name: string;
   weeds: T[];
+  difference: string;
+  stage: "flower" | "vegetative";
+}
+
+const GRASSY_GROUPS = new Set([
+  "Awned cool-season grasses",
+  "Tall grasses",
+  "Foxtails",
+  "Small panicle",
+  "Large panicle",
+  "Large seeded grasses",
+  "Prostrate finger panicle",
+  "Sprawling grass",
+  "Grass-like monocots",
+]);
+
+/** Best comparison stage for a set of look-alike species. */
+export function lookAlikeStage(ids: string[]): "flower" | "vegetative" {
+  const group = ids.map((id) => SPECIES_GROUPS[id]).find(Boolean);
+  return group && GRASSY_GROUPS.has(group) ? "vegetative" : "flower";
+}
+
+function differenceFor(name: string, weeds: PoolWeed[]): string {
+  const names = weeds.map((w) => w.commonName).join(", ");
+  return `${names} all belong to the "${name}" look-alike group. Compare leaf shape and margins, stem hairs and texture, and flower or seedhead structure to tell them apart.`;
 }
 
 /**
@@ -128,10 +153,12 @@ export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[]): LookAlike
   const groups: LookAlikeGroup<T>[] = [];
   for (const [name, weeds] of Object.entries(byGroup)) {
     if (weeds.length < 2) continue;
-    groups.push({ ids: weeds.map((w) => w.id), name, weeds });
+    const ids = weeds.map((w) => w.id);
+    groups.push({ ids, name, weeds, difference: differenceFor(name, weeds), stage: lookAlikeStage(ids) });
   }
   return groups;
 }
+
 
 /** Ids of species that share a group with `id`, optionally limited to a pool. */
 export function lookAlikePartners(id: string, poolIds?: Set<string>): string[] {
