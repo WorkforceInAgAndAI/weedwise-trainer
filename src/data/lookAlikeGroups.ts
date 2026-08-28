@@ -128,7 +128,7 @@ const GRASSY_GROUPS = new Set([
 ]);
 
 /** Best comparison stage for a set of look-alike species. */
-export function lookAlikeStage(ids: string[]): "flower" | "vegetative" {
+function lookAlikeStage(ids: string[]): "flower" | "vegetative" {
   const group = ids.map((id) => SPECIES_GROUPS[id]).find(Boolean);
   return group && GRASSY_GROUPS.has(group) ? "vegetative" : "flower";
 }
@@ -192,9 +192,3 @@ export function lookAlikePairsForPool<T extends PoolWeed>(pool: T[]): [T, T][] {
   }
   return pairs;
 }
-
-/** Alias: ids of official look-alike partners for a species. */
-export const officialPartners = lookAlikePartners;
-
-/** Alias: true when two species are official look-alikes. */
-export const isOfficialLookAlike = isLookAlike;

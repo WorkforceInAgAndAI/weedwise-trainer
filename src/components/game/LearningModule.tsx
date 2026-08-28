@@ -14,7 +14,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { lookAlikeStage, lookAlikeGroupsForPool, officialPartners } from "@/data/lookAlikeGroups";
+import { lookAlikeGroupsForPool, lookAlikePartners } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
 import {
   ArrowLeft,
@@ -1215,7 +1215,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
           .map((id) => weeds.find((w) => w.id === id))
           .filter((w): w is Weed => Boolean(w));
         if (members.length < 2) return null;
-        const groupStage = lookAlikeStage(members.map((w) => w.id));
+        const groupStage = lookAlikeGroupsForPool(members)[0]?.stage ?? "flower";
         return (
           <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
