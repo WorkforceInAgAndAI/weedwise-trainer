@@ -37,7 +37,7 @@ function traitsFromFact(dispersal: string, production: string): SeedCharacter['t
   return { wind, water, animal, heat, cold };
 }
 
-function buildSeedCharacters(count = 5): SeedCharacter[] {
+function buildSeedCharacters(count = 3): SeedCharacter[] {
   const pool = weeds
     .filter(w => !!w.commonName)
     .map<SeedCharacter>(w => {
@@ -49,8 +49,9 @@ function buildSeedCharacters(count = 5): SeedCharacter[] {
         description: `${fact.seedDescription} Travels by: ${fact.dispersal}.`,
       };
     });
-  return shuffle(pool).slice(0, Math.max(3, count));
+  return shuffle(pool).slice(0, count);
 }
+
 
 
 // Vary the "need" thresholds each level so the same need stars don't repeat,
@@ -188,7 +189,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const diff = getDifficulty(level, 'k5');
-  const seedCharacters = useMemo(() => buildSeedCharacters(diff.options + 2), [level, diff.options]);
+  const seedCharacters = useMemo(() => buildSeedCharacters(3), [level]);
   const baseObstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
   const [chosenSeed, setChosenSeed] = useState<SeedCharacter | null>(null);
   // Apply per-level threshold variation so star requirements are not identical each round.
@@ -236,22 +237,22 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <h2 className="text-xl font-bold text-foreground text-center mb-2">Choose Your Seed!</h2>
-          <p className="text-sm text-muted-foreground text-center mb-6">Help a seed travel to a new location. Each seed has different abilities. Pick wisely!</p>
-          <div className="grid gap-3 max-w-md mx-auto">
+          <h2 className="text-3xl font-bold text-foreground text-center mb-2">Choose Your Seed!</h2>
+          <p className="text-base text-muted-foreground text-center mb-6">Help a seed travel to a new home. Each seed travels a different way. Pick the one you like best!</p>
+          <div className="grid gap-5 max-w-3xl mx-auto">
             {seedCharacters.map(sc => (
               <button key={sc.weedId} onClick={() => setChosenSeed(sc)}
-                className="flex items-center gap-4 p-4 rounded-xl border-2 border-border bg-card hover:border-primary transition-all text-left">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shadow-md shrink-0">
+                className="flex items-center gap-5 p-6 rounded-2xl border-4 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-4 border-border shadow-md shrink-0">
                   <WeedImage weedId={sc.weedId} stage="seed" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-foreground text-sm">{sc.name}</p>
-                  <p className="text-xs text-muted-foreground mb-2">{sc.description}</p>
-                  <div className="flex flex-wrap gap-1">
+                  <p className="font-bold text-foreground text-xl sm:text-2xl mb-2">{sc.name}</p>
+                  <p className="text-base sm:text-lg text-foreground/80 leading-relaxed mb-3">{sc.description}</p>
+                  <div className="flex flex-wrap gap-2">
                     {Object.entries(sc.traits).map(([key, val]) => (
-                      <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground flex items-center gap-0.5">
-                        {key}: {Array.from({ length: val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 fill-primary text-primary inline" />)}{Array.from({ length: 3 - val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 text-muted-foreground/30 inline" />)}
+                      <span key={key} className="text-sm px-3 py-1 rounded-full bg-secondary text-foreground font-semibold capitalize flex items-center gap-1">
+                        {key}: {Array.from({ length: val }).map((_, si) => <Star key={si} className="w-4 h-4 fill-primary text-primary inline" />)}{Array.from({ length: 3 - val }).map((_, si) => <Star key={si} className="w-4 h-4 text-muted-foreground/30 inline" />)}
                       </span>
                     ))}
                   </div>
@@ -259,6 +260,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
               </button>
             ))}
           </div>
+
         </div>
       </div>
     );

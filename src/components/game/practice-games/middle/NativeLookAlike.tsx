@@ -1,19 +1,27 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
-import { getDifficulty, levelSlice } from '@/lib/difficulty';
+import { getDifficulty } from '@/lib/difficulty';
 import { WEED_ARRIVAL_KNOWLEDGE } from '@/data/weedKnowledge';
 import { Lightbulb } from 'lucide-react';
+
+/**
+ * Native or Introduced? — weeds drift down the screen and the student drags
+ * each one into the Native bin or the Introduced bin. A weed dropped in the
+ * wrong bin bounces back out into the air with a hint so it can be re-sorted.
+ */
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const GROUP_SIZE = 10;
+type Zone = 'native' | 'introduced';
+type Weed = typeof weeds[0];
 
-function buildHint(weed: typeof weeds[0]): string {
+function buildHint(weed: Weed): string {
   if (weed.origin === 'Native') {
-    const habitat = (weed.primaryHabitat || weed.habitat).toLowerCase();
+    const habitat = (weed.primaryHabitat || weed.habitat || '').toLowerCase();
     if (habitat.includes('wet')) {
       return `${weed.commonName} is Native — it belongs in North American wetlands and wet field edges.`;
     }
@@ -40,10 +48,9 @@ function buildHint(weed: typeof weeds[0]): string {
   return `${weed.commonName} is Introduced — it traveled here from another continent and then spread into farms and roadsides.`;
 }
 
-function buildGroup(level: number, groupSize = GROUP_SIZE): typeof weeds {
+function buildGroup(level: number, groupSize = GROUP_SIZE): Weed[] {
   const natives = shuffle(weeds.filter(w => w.origin === 'Native'));
   const intros = shuffle(weeds.filter(w => w.origin === 'Introduced'));
-  // Aim for a balanced mix: half native + half introduced when possible
   const nCount = Math.min(Math.round(groupSize / 2), natives.length);
   const iCount = Math.min(groupSize - nCount, intros.length);
   const offsetN = ((level - 1) * Math.round(groupSize / 2)) % Math.max(1, natives.length);
@@ -53,160 +60,280 @@ function buildGroup(level: number, groupSize = GROUP_SIZE): typeof weeds {
   return shuffle([...pickN, ...pickI]);
 }
 
+interface Faller {
+  key: string;
+  weed: Weed;
+  x: number;      // % of play area width (centre)
+  y: number;      // % of play area height (centre)
+  vy: number;     // % per second
+  bouncing: boolean;
+  bounceVx: number;
+}
+
+const CARD_W = 108;
+const CARD_H = 132;
+
 export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
   const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
   const groupSize = Math.max(GROUP_SIZE, d.rounds);
   const group = useMemo(() => buildGroup(level, groupSize), [level, groupSize]);
-  const [placements, setPlacements] = useState<Record<string, 'native' | 'introduced'>>({});
-  const [selectedWeed, setSelectedWeed] = useState<string | null>(null);
-  const [checked, setChecked] = useState(false);
-  const [bouncedIds, setBouncedIds] = useState<string[]>([]);
-  const [retriedOnce, setRetriedOnce] = useState(false);
-  const [done, setDone] = useState(false);
-  const [score, setScore] = useState(0);
+
+  const [queue, setQueue] = useState<Weed[]>([]);
+  const [fallers, setFallers] = useState<Faller[]>([]);
+  const [correct, setCorrect] = useState(0);
+  const [missed, setMissed] = useState(0);
+  const [resolved, setResolved] = useState(0);
   const [hint, setHint] = useState<string | null>(null);
-  const [hintWeedId, setHintWeedId] = useState<string | null>(null);
+  const [flash, setFlash] = useState<{ zone: Zone; ok: boolean } | null>(null);
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
 
-  const unplaced = group.filter(w => !placements[w.id]);
-  const allPlaced = unplaced.length === 0;
-  const isCorrectZone = (w: typeof weeds[0], z: 'native' | 'introduced') =>
-    z === 'native' ? w.origin === 'Native' : w.origin === 'Introduced';
+  const areaRef = useRef<HTMLDivElement>(null);
+  const nativeBinRef = useRef<HTMLDivElement>(null);
+  const introBinRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastRef = useRef<number>(0);
+  const spawnRef = useRef<number>(0);
 
-  const handleDrop = (zone: 'native' | 'introduced') => {
-    if (!selectedWeed || checked) return;
-    setPlacements(p => ({ ...p, [selectedWeed]: zone }));
-    setSelectedWeed(null);
+  const fallSpeed = 5.5 + level * 0.9;            // % of height per second
+  const spawnEvery = Math.max(1100, 2400 - level * 150);
+
+  const reset = useCallback(() => {
+    setQueue(buildGroup(level, groupSize));
+    setFallers([]);
+    setCorrect(0);
+    setMissed(0);
+    setResolved(0);
+    setHint(null);
+    setDragKey(null);
+    setDone(false);
+    spawnRef.current = 0;
+  }, [level, groupSize]);
+
+  useEffect(() => { setQueue(group); }, [group]);
+
+  // Animation + spawn loop
+  useEffect(() => {
+    if (done) return;
+    const step = (t: number) => {
+      const dt = lastRef.current ? Math.min(0.05, (t - lastRef.current) / 1000) : 0;
+      lastRef.current = t;
+
+      // spawn
+      spawnRef.current += dt * 1000;
+      if (spawnRef.current >= spawnEvery) {
+        spawnRef.current = 0;
+        setQueue(q => {
+          if (q.length === 0) return q;
+          const [next, ...rest] = q;
+          setFallers(f => f.length >= 3 ? f : [...f, {
+            key: `${next.id}-${Date.now()}`,
+            weed: next,
+            x: 18 + Math.random() * 64,
+            y: -12,
+            vy: fallSpeed,
+            bouncing: false,
+            bounceVx: 0,
+          }]);
+          return rest;
+        });
+      }
+
+      setFallers(prev => {
+        const survivors: Faller[] = [];
+        let missedNow = 0;
+        prev.forEach(f => {
+          if (f.key === dragKey) { survivors.push(f); return; }
+          let { x, y, bouncing, bounceVx } = f;
+          if (bouncing) {
+            x += bounceVx * dt;
+            y += f.vy * dt * 0.6;
+            if (x < 6 || x > 94) bounceVx = -bounceVx;
+            if (y > -2) bouncing = y < 12 ? true : false;
+          } else {
+            y += f.vy * dt;
+          }
+          if (y > 104) { missedNow++; return; }
+          survivors.push({ ...f, x, y, bouncing, bounceVx });
+        });
+        if (missedNow) {
+          setMissed(m => m + missedNow);
+          setResolved(r => r + missedNow);
+        }
+        return survivors;
+      });
+
+      rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lastRef.current = 0;
+    };
+  }, [done, dragKey, fallSpeed, spawnEvery]);
+
+  // Level ends once every weed in the group has been sorted or has landed.
+  useEffect(() => {
+    if (!done && resolved >= groupSize) setDone(true);
+  }, [resolved, groupSize, done]);
+
+  const pointerToPct = (clientX: number, clientY: number) => {
+    const el = areaRef.current;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { x: ((clientX - r.left) / r.width) * 100, y: ((clientY - r.top) / r.height) * 100 };
   };
-  const handleRemove = (weedId: string) => {
-    if (checked) return;
-    setPlacements(p => { const n = { ...p }; delete n[weedId]; return n; });
+
+  const onPointerDown = (key: string) => (e: React.PointerEvent) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    setDragKey(key);
   };
 
-  const checkAnswers = () => {
-    const wrong = group.filter(w => !isCorrectZone(w, placements[w.id])).map(w => w.id);
-    setChecked(true);
-    if (wrong.length > 0 && !retriedOnce) {
-      setBouncedIds(wrong);
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragKey) return;
+    const p = pointerToPct(e.clientX, e.clientY);
+    if (!p) return;
+    setFallers(prev => prev.map(f => f.key === dragKey
+      ? { ...f, x: Math.max(6, Math.min(94, p.x)), y: Math.max(-5, Math.min(100, p.y)), bouncing: false }
+      : f));
+  };
+
+  const binUnderPointer = (clientX: number, clientY: number): Zone | null => {
+    const hit = (el: HTMLDivElement | null) => {
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      return clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom;
+    };
+    if (hit(nativeBinRef.current)) return 'native';
+    if (hit(introBinRef.current)) return 'introduced';
+    return null;
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!dragKey) return;
+    const key = dragKey;
+    setDragKey(null);
+    const zone = binUnderPointer(e.clientX, e.clientY);
+    if (!zone) return;                       // released in open air — keep falling
+    const target = fallers.find(f => f.key === key);
+    if (!target) return;
+    const ok = zone === (target.weed.origin === 'Native' ? 'native' : 'introduced');
+    setFlash({ zone, ok });
+    window.setTimeout(() => setFlash(null), 600);
+    if (ok) {
+      setFallers(prev => prev.filter(f => f.key !== key));
+      setCorrect(c => c + 1);
+      setResolved(r => r + 1);
+      setHint(null);
     } else {
-      const correct = group.filter(w => isCorrectZone(w, placements[w.id])).length;
-      setScore(correct);
-      setDone(true);
+      // Wrong bin — the weed bounces back out into the air with a hint.
+      setHint(buildHint(target.weed));
+      setFallers(prev => prev.map(f => f.key === key
+        ? { ...f, y: 8, x: zone === 'native' ? 30 : 70, bouncing: true, bounceVx: zone === 'native' ? 26 : -26 }
+        : f));
     }
   };
 
-  useEffect(() => {
-    if (bouncedIds.length === 0) return;
-    const t = setTimeout(() => {
-      const target = group.find(w => w.id === bouncedIds[0]);
-      if (target) {
-        setHint(buildHint(target));
-        setHintWeedId(target.id);
-      }
-      setPlacements(p => { const n = { ...p }; bouncedIds.forEach(id => delete n[id]); return n; });
-      setChecked(false);
-      setRetriedOnce(true);
-      setBouncedIds([]);
-    }, 800);
-    return () => clearTimeout(t);
-  }, [bouncedIds, group]);
-
-  const restart = () => {
-    setPlacements({}); setSelectedWeed(null); setChecked(false);
-    setBouncedIds([]); setRetriedOnce(false); setDone(false); setScore(0);
-    setHint(null); setHintWeedId(null);
-  };
-  const nextLevel = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); restart(); };
+  const nextLevel = () => { setLevel(l => l + 1); reset(); };
+  const startOver = () => { setLevel(1); reset(); };
 
   if (done) {
-    return <LevelComplete level={level} score={score} total={groupSize} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" title={`Native or Introduced? Lv.${level}`} />;
+    return (
+      <LevelComplete
+        level={level}
+        score={correct}
+        total={groupSize}
+        onNextLevel={nextLevel}
+        onStartOver={startOver}
+        onBack={onBack}
+        gradeLabel="6-8"
+        title={`Native or Introduced? Lv.${level}`}
+      />
+    );
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-100 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900 z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Native or Introduced?</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">{Object.keys(placements).length}/{groupSize}</span>
+        <span className="text-sm text-muted-foreground">{resolved}/{groupSize}</span>
+        <span className="text-sm font-bold text-primary">{correct} correct</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <p className="text-sm text-muted-foreground text-center">Tap a weed, then drop it into Native or Introduced.</p>
 
-        {/* Drop zones */}
-        <div className="grid grid-cols-2 gap-3 max-w-4xl mx-auto">
-          {(['native', 'introduced'] as const).map(zone => {
-            const placed = group.filter(w => placements[w.id] === zone);
-            return (
-              <button key={zone} onClick={() => handleDrop(zone)}
-                className={`rounded-xl border-2 p-3 min-h-[200px] transition-all text-left ${
-                  zone === 'native' ? 'bg-green-900/15 border-green-600/50' : 'bg-amber-900/15 border-amber-600/50'
-                } ${selectedWeed && !checked ? 'ring-2 ring-primary cursor-pointer' : ''}`}>
-                <p className="text-sm font-bold text-foreground text-center mb-2 capitalize">{zone}</p>
-                <div className="flex flex-wrap gap-2">
-                  {placed.map(w => {
-                    const bouncing = bouncedIds.includes(w.id);
-                    const right = checked && isCorrectZone(w, zone);
-                    const wrong = checked && !isCorrectZone(w, zone);
-                    return (
-                      <div key={w.id} onClick={e => { e.stopPropagation(); handleRemove(w.id); }}
-                        className={`flex items-center gap-1.5 p-1.5 pr-2 rounded-lg cursor-pointer transition-all duration-500 ${
-                          bouncing ? 'opacity-0 -translate-y-6 scale-50' : ''
-                        } ${right ? 'bg-green-500/30' : wrong ? 'bg-destructive/30' : 'bg-secondary hover:bg-destructive/20'}`}>
-                        <div className="w-10 h-10 rounded overflow-hidden bg-background flex-shrink-0">
-                          <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
-                        </div>
-                        <span className="text-[11px] font-medium text-foreground">{w.commonName}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </button>
-            );
-          })}
+      {hint && (
+        <div className="flex items-start gap-2 mx-4 mt-3 rounded-xl border-2 border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 animate-scale-in">
+          <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-foreground font-medium">{hint}</p>
         </div>
+      )}
 
-        {/* Unplaced weed cards */}
-        {unplaced.length > 0 && (
-          <div className="max-w-4xl mx-auto space-y-3">
-            {retriedOnce && hint && (
-              <div className="flex items-start gap-2 rounded-xl border-2 border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 animate-scale-in">
-                <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-foreground font-medium">{hint}</p>
-              </div>
-            )}
-            {retriedOnce && (
-              <p className="text-xs text-amber-600 font-semibold text-center">
-                Try again — re-place the {unplaced.length} weed{unplaced.length === 1 ? '' : 's'} you missed.
-              </p>
-            )}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {unplaced.map(w => (
-                <button key={w.id} onClick={() => setSelectedWeed(selectedWeed === w.id ? null : w.id)}
-                  className={`p-2 rounded-lg border-2 transition-all text-center ${
-                    selectedWeed === w.id
-                      ? 'border-primary bg-primary/10 scale-105'
-                      : hintWeedId === w.id
-                        ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-300'
-                        : 'border-border bg-card hover:border-primary/50'
-                  }`}>
-                  <div className="w-full aspect-square mb-1 overflow-hidden rounded bg-secondary">
-                    <WeedImage weedId={w.id} stage="flower" className="w-full h-full object-cover" />
-                  </div>
-                  <span className="text-[10px] font-semibold text-foreground leading-tight block">{w.commonName}</span>
-                </button>
-              ))}
+      <div
+        ref={areaRef}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
+        className="relative flex-1 m-4 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900 bg-white/40 dark:bg-slate-900/40 overflow-hidden touch-none select-none"
+      >
+        <p className="absolute top-2 left-0 right-0 text-center text-xs text-muted-foreground pointer-events-none">
+          Drag each falling weed into the right bin. A wrong drop bounces back out.
+        </p>
+
+        {fallers.map(f => (
+          <div
+            key={f.key}
+            onPointerDown={onPointerDown(f.key)}
+            style={{
+              left: `${f.x}%`,
+              top: `${f.y}%`,
+              width: CARD_W,
+              height: CARD_H,
+              transform: 'translate(-50%,-50%)',
+              touchAction: 'none',
+            }}
+            className={`absolute rounded-xl border-2 bg-card shadow-lg overflow-hidden cursor-grab active:cursor-grabbing ${
+              dragKey === f.key ? 'border-primary ring-4 ring-primary/30 z-20' : 'border-border'
+            }`}
+          >
+            <div className="h-[86px] bg-secondary pointer-events-none">
+              <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
+            <p className="text-[10px] font-bold text-foreground leading-tight text-center px-1 py-1 pointer-events-none">
+              {f.weed.commonName}
+            </p>
           </div>
-        )}
+        ))}
 
-        {!checked && allPlaced && (
-          <div className="text-center">
-            <button onClick={checkAnswers} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
+        {/* Bins */}
+        <div className="absolute bottom-0 left-0 right-0 grid grid-cols-2 gap-3 p-3">
+          <div
+            ref={nativeBinRef}
+            className={`rounded-xl border-4 border-dashed p-3 h-24 flex flex-col items-center justify-center transition-colors ${
+              flash?.zone === 'native'
+                ? flash.ok ? 'border-green-500 bg-green-500/25' : 'border-destructive bg-destructive/25'
+                : 'border-green-600/60 bg-green-600/10'
+            }`}
+          >
+            <p className="font-extrabold text-foreground">NATIVE</p>
+            <p className="text-[11px] text-muted-foreground">Grew here all along</p>
           </div>
-        )}
+          <div
+            ref={introBinRef}
+            className={`rounded-xl border-4 border-dashed p-3 h-24 flex flex-col items-center justify-center transition-colors ${
+              flash?.zone === 'introduced'
+                ? flash.ok ? 'border-green-500 bg-green-500/25' : 'border-destructive bg-destructive/25'
+                : 'border-amber-600/60 bg-amber-600/10'
+            }`}
+          >
+            <p className="font-extrabold text-foreground">INTRODUCED</p>
+            <p className="text-[11px] text-muted-foreground">Arrived from another continent</p>
+          </div>
+        </div>
       </div>
+
       <FloatingCoach grade="6-8" tip="Native species evolved here. Introduced ones arrived from other continents — often without natural predators." />
     </div>
   );
