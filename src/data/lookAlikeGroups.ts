@@ -35,7 +35,7 @@ export const SPECIES_GROUPS: Record<string, string> = {
   Hedge_bindweed: "Vining weeds",
   Hemp: "Small toothed leaves",
   Hemp_dogbane: "Milkweeds",
-  Henbit_deadnettle: "Henbit-type",
+  Henbit: "Henbit-type",
   Honeyvine_Milkweed: "Vining weeds",
   Horsenettle: "Nightshades / similar",
   Horseweed: "Tumbleweeds",
@@ -97,9 +97,16 @@ export const SPECIES_GROUPS: Record<string, string> = {
   yellow_Rocket: "Mustard family",
 };
 
+/** Species-id lookup that tolerates casing / separator differences. */
+const normalizeId = (id: string): string => id.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const GROUP_BY_NORM_ID: Record<string, string> = Object.fromEntries(
+  Object.entries(SPECIES_GROUPS).map(([id, group]) => [normalizeId(id), group]),
+);
+
 /** The look-alike group name for a species id, if any. */
 export function groupNameFor(id: string): string | undefined {
-  return SPECIES_GROUPS[id];
+  return GROUP_BY_NORM_ID[normalizeId(id)];
 }
 
 interface PoolWeed {
@@ -129,7 +136,7 @@ const GRASSY_GROUPS = new Set([
 
 /** Best comparison stage for a set of look-alike species. */
 function lookAlikeStage(ids: string[]): "flower" | "vegetative" {
-  const group = ids.map((id) => SPECIES_GROUPS[id]).find(Boolean);
+  const group = ids.map((id) => groupNameFor(id)).find(Boolean);
   return group && GRASSY_GROUPS.has(group) ? "vegetative" : "flower";
 }
 
@@ -146,7 +153,7 @@ function differenceFor(name: string, weeds: PoolWeed[]): string {
 export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[]): LookAlikeGroup<T>[] {
   const byGroup: Record<string, T[]> = {};
   for (const w of pool) {
-    const group = SPECIES_GROUPS[w.id];
+    const group = groupNameFor(w.id);
     if (!group) continue;
     (byGroup[group] ||= []).push(w);
   }
@@ -162,17 +169,21 @@ export function lookAlikeGroupsForPool<T extends PoolWeed>(pool: T[]): LookAlike
 
 /** Ids of species that share a group with `id`, optionally limited to a pool. */
 export function lookAlikePartners(id: string, poolIds?: Set<string>): string[] {
-  const group = SPECIES_GROUPS[id];
+  const group = groupNameFor(id);
   if (!group) return [];
+  const poolNorm = poolIds ? new Set([...poolIds].map(normalizeId)) : undefined;
   return Object.keys(SPECIES_GROUPS).filter(
-    (otherId) => otherId !== id && SPECIES_GROUPS[otherId] === group && (!poolIds || poolIds.has(otherId)),
+    (otherId) =>
+      normalizeId(otherId) !== normalizeId(id) &&
+      groupNameFor(otherId) === group &&
+      (!poolNorm || poolNorm.has(normalizeId(otherId))),
   );
 }
 
 /** True when two species share the same look-alike group. */
 export function isLookAlike(a: string, b: string): boolean {
-  const ga = SPECIES_GROUPS[a];
-  const gb = SPECIES_GROUPS[b];
+  const ga = groupNameFor(a);
+  const gb = groupNameFor(b);
   return !!ga && ga === gb;
 }
 
