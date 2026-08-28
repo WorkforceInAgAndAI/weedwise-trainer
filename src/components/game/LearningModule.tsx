@@ -1792,9 +1792,11 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                     availableTopics.find((t) => t.id === selectedTopic)?.name ??
                     TOPICS.find((t) => t.id === selectedTopic)?.name ??
                     "";
-                  const sectionName = topicsByCategory.find((g) =>
+                  const sectionGroup = topicsByCategory.find((g) =>
                     g.topics.some((t) => t.id === selectedTopic),
-                  )?.label;
+                  );
+                  const sectionName = sectionGroup?.category?.name ?? sectionGroup?.category?.label;
+
                   const content = (
                     <TopicContent
                       topicId={selectedTopic}
