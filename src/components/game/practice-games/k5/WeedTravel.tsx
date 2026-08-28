@@ -189,7 +189,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const diff = getDifficulty(level, 'k5');
-  const seedCharacters = useMemo(() => buildSeedCharacters(diff.options + 2), [level, diff.options]);
+  const seedCharacters = useMemo(() => buildSeedCharacters(3), [level]);
   const baseObstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
   const [chosenSeed, setChosenSeed] = useState<SeedCharacter | null>(null);
   // Apply per-level threshold variation so star requirements are not identical each round.
