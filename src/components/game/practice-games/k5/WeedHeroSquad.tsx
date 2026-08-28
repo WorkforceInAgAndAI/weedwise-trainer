@@ -10,18 +10,20 @@ interface Hero {
   key: HeroKey;
   name: string;
   power: string;
+  blurb: string;
   Icon: React.ComponentType<{ className?: string }>;
   color: string;
   ring: string;
 }
 
 const HEROES: Hero[] = [
-  { key: 'pull',     name: 'Pull It!',     power: 'Super Strength',  Icon: Hand,   color: 'text-orange-700', ring: 'border-orange-500' },
-  { key: 'block',    name: 'Block It!',    power: 'Force Field',     Icon: Shield, color: 'text-sky-700',    ring: 'border-sky-500' },
-  { key: 'outsmart', name: 'Outsmart It!', power: 'Brain Power',     Icon: Brain,  color: 'text-primary',    ring: 'border-primary' },
-  { key: 'eat',      name: 'Swarm It!',   power: 'Bug Buddies',   Icon: Bug,    color: 'text-emerald-700',ring: 'border-emerald-500' },
-  { key: 'stop',     name: 'Stop It!',     power: 'Precision Blast', Icon: Zap,    color: 'text-yellow-700', ring: 'border-yellow-500' },
+  { key: 'pull',     name: 'Pull It!',     power: 'Super Strength',  blurb: 'Yank the weeds out by hand, roots and all.',        Icon: Hand,   color: 'text-orange-700', ring: 'border-orange-500' },
+  { key: 'block',    name: 'Block It!',    power: 'Force Field',     blurb: 'Cover the soil so weed seeds never get sunlight.',   Icon: Shield, color: 'text-sky-700',    ring: 'border-sky-500' },
+  { key: 'outsmart', name: 'Outsmart It!', power: 'Brain Power',     blurb: 'Plant strong crops close together to crowd weeds out.', Icon: Brain,  color: 'text-primary',    ring: 'border-primary' },
+  { key: 'eat',      name: 'Swarm It!',    power: 'Bug Buddies',     blurb: 'Send your bug buddies in to eat the weeds.',         Icon: Bug,    color: 'text-emerald-700',ring: 'border-emerald-500' },
+  { key: 'stop',     name: 'Stop It!',     power: 'Precision Blast', blurb: 'Farmers spray a careful weed-control product.',      Icon: Zap,    color: 'text-yellow-700', ring: 'border-yellow-500' },
 ];
+
 
 interface Mission {
   crop: string;
