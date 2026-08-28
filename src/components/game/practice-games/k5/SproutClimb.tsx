@@ -518,7 +518,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                 const isFinish = tileNum === BOARD_SIZE;
                 return (
                   <div key={`${r}-${c}`}
-                    className={`relative aspect-square rounded-md border-2 overflow-hidden flex flex-col items-center justify-end p-0.5 text-[10px] font-bold transition-all ${
+                    className={`relative aspect-square min-h-[86px] sm:min-h-[104px] rounded-lg border-2 overflow-hidden flex flex-col items-center justify-center gap-0.5 p-1 text-xs font-bold transition-all ${
                       isPawn ? 'ring-4 ring-primary scale-105 z-10 ' : ''
                     }${
                       isFinish ? 'bg-gradient-to-br from-yellow-300 to-orange-400 border-orange-500' :
@@ -526,24 +526,25 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                       w ? 'bg-red-100 border-rose-500' :
                       'bg-white border-amber-300'
                     }`}>
-                    <span className="absolute top-0 left-1 text-[11px] font-black text-foreground/60">{tileNum}</span>
+                    <span className="absolute top-0 left-1 text-sm font-black text-foreground/60">{tileNum}</span>
                     {v && (
                       <>
-                        <v.Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 shrink-0" />
-                        <span className="w-full text-[7px] sm:text-[8px] leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
+                        <v.Icon className="w-9 h-9 sm:w-11 sm:h-11 shrink-0" />
+                        <span className="w-full text-[10px] sm:text-xs leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
                           {v.day}
                         </span>
                       </>
                     )}
                     {w && (
                       <>
-                        <w.Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 shrink-0" />
-                        <span className="w-full text-[7px] sm:text-[8px] leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
+                        <w.Icon className="w-9 h-9 sm:w-11 sm:h-11 shrink-0" />
+                        <span className="w-full text-[10px] sm:text-xs leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
                           {w.day}
                         </span>
                       </>
                     )}
-                    {isFinish && <span className="w-full text-[8px] leading-tight text-orange-900 text-center">Seed set!</span>}
+                    {isFinish && <span className="w-full text-[11px] sm:text-sm leading-tight text-orange-900 text-center">Seed set!</span>}
+
                     {isPawn && (
                       <div className="absolute inset-0 flex items-center justify-start pl-0.5">
                         <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg animate-bounce">
