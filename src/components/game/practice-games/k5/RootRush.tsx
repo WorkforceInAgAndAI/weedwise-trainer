@@ -193,11 +193,26 @@ export default function RootRush({ onBack, gameId, gameName, gradeLabel }: Props
     return out;
   }, [tip, tipRow, tipCol, path]);
 
+  // True when the root tip still has at least one diggable square left
+  // (not a rock, not already tunnelled, inside the field).
+  const hasOpenMove = (tipIdx: number, currentPath: number[], currentGrid: Cell[]) => {
+    const r = Math.floor(tipIdx / COLS);
+    const c = tipIdx % COLS;
+    const candidates: [number, number][] = [[r + 1, c], [r - 1, c], [r, c - 1], [r, c + 1]];
+    return candidates.some(([rr, cc]) => {
+      if (rr < 0 || rr >= ROWS || cc < 0 || cc >= COLS) return false;
+      const i = rr * COLS + cc;
+      if (currentPath.includes(i)) return false;
+      return currentGrid[i]?.kind !== 'rock';
+    });
+  };
+
   const flash = (text: string) => {
     setMessage(text);
     if (flashTimer.current) window.clearTimeout(flashTimer.current);
     flashTimer.current = window.setTimeout(() => setMessage(''), 1600);
   };
+
 
   const grow = (idx: number) => {
     if (phase !== 'playing') return;
