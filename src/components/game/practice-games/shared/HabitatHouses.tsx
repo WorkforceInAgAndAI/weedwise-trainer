@@ -17,6 +17,17 @@ const HOUSE_ICONS: Record<HabitatId, typeof Home> = {
   dry: Sun,
 };
 
+/** Each village house gets its own colour so students can tell them apart. */
+const HOUSE_COLORS: Record<HabitatId, { border: string; bg: string; roof: string; icon: string }> = {
+  cropland: { border: 'border-emerald-500', bg: 'bg-emerald-500/10', roof: 'bg-emerald-500', icon: 'text-emerald-700' },
+  pasture:  { border: 'border-amber-500',   bg: 'bg-amber-500/10',   roof: 'bg-amber-500',   icon: 'text-amber-700' },
+  roadside: { border: 'border-slate-500',   bg: 'bg-slate-500/10',   roof: 'bg-slate-500',   icon: 'text-slate-700' },
+  woodland: { border: 'border-green-800',   bg: 'bg-green-800/10',   roof: 'bg-green-800',   icon: 'text-green-900' },
+  wetland:  { border: 'border-teal-500',    bg: 'bg-teal-500/10',    roof: 'bg-teal-500',    icon: 'text-teal-700' },
+  wet:      { border: 'border-sky-500',     bg: 'bg-sky-500/10',     roof: 'bg-sky-500',     icon: 'text-sky-700' },
+  dry:      { border: 'border-orange-500',  bg: 'bg-orange-500/10',  roof: 'bg-orange-500',  icon: 'text-orange-700' },
+};
+
 const ROUNDS = 6;
 
 interface Props {
@@ -94,29 +105,42 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
           Which house could you survive in best? Knock on a door.
         </p>
 
-        {/* Houses */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {HABITAT_HOUSES.map(h => {
+        {/* Houses laid out like a village circle */}
+        <div className="relative mx-auto w-full max-w-[560px] aspect-square">
+          <div className="absolute inset-[18%] rounded-full border-4 border-dashed border-primary/25 bg-primary/5 flex items-center justify-center">
+            <p className="text-sm sm:text-base font-bold text-muted-foreground text-center px-6">
+              Knock on the door of the house you could live in.
+            </p>
+          </div>
+          {HABITAT_HOUSES.map((h, i) => {
             const Icon = HOUSE_ICONS[h.id];
             const isCorrect = correctSet.includes(h.id);
-            let tone = 'border-border bg-card hover:border-primary';
+            const c = HOUSE_COLORS[h.id];
+            let tone = `${c.border} ${c.bg} hover:scale-105`;
             if (picked) {
-              if (isCorrect) tone = 'border-green-600 bg-green-500/10';
-              else if (h.id === picked) tone = 'border-destructive bg-destructive/10';
-              else tone = 'border-border bg-card opacity-60';
+              if (isCorrect) tone = 'border-green-600 bg-green-500/15';
+              else if (h.id === picked) tone = 'border-destructive bg-destructive/15';
+              else tone = `${c.border} ${c.bg} opacity-50`;
             }
+            const angle = (i / HABITAT_HOUSES.length) * Math.PI * 2 - Math.PI / 2;
+            const left = 50 + Math.cos(angle) * 39;
+            const top = 50 + Math.sin(angle) * 39;
             return (
-              <button key={h.id} onClick={() => choose(h.id)} disabled={!!picked}
-                className={`rounded-xl border-2 p-0 overflow-hidden text-center transition-all ${tone}`}>
-                {/* Roof */}
-                <div className="h-6 w-full bg-primary/80" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
-                <div className="p-3">
-                  <div className="mx-auto w-14 h-16 rounded-t-md border-2 border-primary/50 bg-secondary flex flex-col items-center justify-center gap-1">
-                    <Icon className="w-6 h-6 text-primary" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+              <button
+                key={h.id}
+                onClick={() => choose(h.id)}
+                disabled={!!picked}
+                style={{ left: `${left}%`, top: `${top}%`, transform: 'translate(-50%,-50%)' }}
+                className={`absolute w-[30%] rounded-xl border-4 p-0 overflow-hidden text-center transition-all ${tone}`}
+              >
+                <div className={`h-5 w-full ${c.roof}`} style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
+                <div className="p-2">
+                  <div className={`mx-auto w-11 h-12 rounded-t-md border-2 ${c.border} bg-background/70 flex flex-col items-center justify-center gap-1`}>
+                    <Icon className={`w-6 h-6 ${c.icon}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${c.roof}`} />
                   </div>
-                  <p className="mt-2 text-xs font-bold text-foreground leading-tight">{h.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{short ? h.shortBlurb : h.blurb}</p>
+                  <p className="mt-1.5 text-sm sm:text-base font-extrabold text-foreground leading-tight">{h.label}</p>
+                  <p className="text-[11px] sm:text-xs text-muted-foreground leading-tight mt-0.5">{short ? h.shortBlurb : h.blurb}</p>
                 </div>
               </button>
             );

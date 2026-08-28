@@ -5,7 +5,7 @@ import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty } from '@/lib/difficulty';
 import { WEED_ARRIVAL_KNOWLEDGE } from '@/data/weedKnowledge';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, Timer } from 'lucide-react';
 
 /**
  * Native or Introduced? — weeds drift down the screen and the student drags
@@ -68,6 +68,7 @@ interface Faller {
   vy: number;     // % per second
   bouncing: boolean;
   bounceVx: number;
+  isMissed?: boolean;
 }
 
 const CARD_W = 108;
@@ -81,13 +82,14 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
 
   const [queue, setQueue] = useState<Weed[]>([]);
   const [fallers, setFallers] = useState<Faller[]>([]);
-  const [correct, setCorrect] = useState(0);
-  const [missed, setMissed] = useState(0);
+  const [score, setScore] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [resolved, setResolved] = useState(0);
   const [hint, setHint] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ zone: Zone; ok: boolean } | null>(null);
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
 
   const areaRef = useRef<HTMLDivElement>(null);
   const nativeBinRef = useRef<HTMLDivElement>(null);
@@ -97,21 +99,37 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   const spawnRef = useRef<number>(0);
 
   const fallSpeed = 5.5 + level * 0.9;            // % of height per second
-  const spawnEvery = Math.max(1100, 2400 - level * 150);
+  const spawnEvery = Math.max(700, 1600 - level * 100);
 
   const reset = useCallback(() => {
     setQueue(buildGroup(level, groupSize));
     setFallers([]);
-    setCorrect(0);
-    setMissed(0);
+    setScore(0);
+    setCorrectCount(0);
     setResolved(0);
     setHint(null);
     setDragKey(null);
     setDone(false);
+    setTimeLeft(60);
     spawnRef.current = 0;
   }, [level, groupSize]);
 
   useEffect(() => { setQueue(group); }, [group]);
+
+  // Timer loop
+  useEffect(() => {
+    if (done) return;
+    const timer = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          setDone(true);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [done]);
 
   // Animation + spawn loop
   useEffect(() => {
@@ -125,9 +143,12 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
       if (spawnRef.current >= spawnEvery) {
         spawnRef.current = 0;
         setQueue(q => {
-          if (q.length === 0) return q;
-          const [next, ...rest] = q;
-          setFallers(f => f.length >= 3 ? f : [...f, {
+          let currentQueue = q;
+          if (currentQueue.length === 0) {
+            currentQueue = shuffle(group);
+          }
+          const [next, ...rest] = currentQueue;
+          setFallers(f => f.filter(x => !x.isMissed).length >= 6 ? f : [...f, {
             key: `${next.id}-${Date.now()}`,
             weed: next,
             x: 18 + Math.random() * 64,
@@ -145,20 +166,35 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
         let missedNow = 0;
         prev.forEach(f => {
           if (f.key === dragKey) { survivors.push(f); return; }
-          let { x, y, bouncing, bounceVx } = f;
-          if (bouncing) {
+          
+          let { x, y, bouncing, bounceVx, vy, isMissed } = f;
+          
+          if (isMissed) {
+            y += vy * dt;
             x += bounceVx * dt;
-            y += f.vy * dt * 0.6;
+            vy += 120 * dt; // Gravity
+            if (y > 120 || y < -50 || x < -20 || x > 120) return; // Discard
+          } else if (bouncing) {
+            x += bounceVx * dt;
+            y += vy * dt * 0.6;
             if (x < 6 || x > 94) bounceVx = -bounceVx;
             if (y > -2) bouncing = y < 12 ? true : false;
           } else {
-            y += f.vy * dt;
+            y += vy * dt;
           }
-          if (y > 104) { missedNow++; return; }
-          survivors.push({ ...f, x, y, bouncing, bounceVx });
+
+          if (y > 98 && !isMissed) {
+            isMissed = true;
+            vy = -fallSpeed * 1.5;
+            bounceVx = (Math.random() - 0.5) * 60;
+            missedNow++;
+          }
+          
+          survivors.push({ ...f, x, y, bouncing, bounceVx, vy, isMissed });
         });
+        
         if (missedNow) {
-          setMissed(m => m + missedNow);
+          setScore(s => Math.max(0, s - 5));
           setResolved(r => r + missedNow);
         }
         return survivors;
@@ -171,12 +207,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       lastRef.current = 0;
     };
-  }, [done, dragKey, fallSpeed, spawnEvery]);
-
-  // Level ends once every weed in the group has been sorted or has landed.
-  useEffect(() => {
-    if (!done && resolved >= groupSize) setDone(true);
-  }, [resolved, groupSize, done]);
+  }, [done, dragKey, fallSpeed, spawnEvery, group]);
 
   const pointerToPct = (clientX: number, clientY: number) => {
     const el = areaRef.current;
@@ -186,6 +217,9 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
   };
 
   const onPointerDown = (key: string) => (e: React.PointerEvent) => {
+    const faller = fallers.find(f => f.key === key);
+    if (!faller || faller.isMissed) return;
+    
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     setDragKey(key);
@@ -224,7 +258,8 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
     window.setTimeout(() => setFlash(null), 600);
     if (ok) {
       setFallers(prev => prev.filter(f => f.key !== key));
-      setCorrect(c => c + 1);
+      setScore(s => s + 10);
+      setCorrectCount(c => c + 1);
       setResolved(r => r + 1);
       setHint(null);
     } else {
@@ -243,8 +278,8 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
     return (
       <LevelComplete
         level={level}
-        score={correct}
-        total={groupSize}
+        score={score}
+        total={resolved * 10}
         onNextLevel={nextLevel}
         onStartOver={startOver}
         onBack={onBack}
@@ -258,10 +293,20 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
     <div className="fixed inset-0 bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-100 dark:from-slate-950 dark:via-emerald-950 dark:to-slate-900 z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Native or Introduced?</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">{resolved}/{groupSize}</span>
-        <span className="text-sm font-bold text-primary">{correct} correct</span>
+        <div className="flex-1">
+          <h1 className="font-bold text-foreground text-lg">Native or Introduced?</h1>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
+            <span className="text-muted-foreground flex items-center gap-1">
+              <Timer className="w-3 h-3" />
+              {timeLeft}s
+            </span>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-sm font-bold text-primary">{score} pts</div>
+          <div className="text-[10px] text-muted-foreground">{correctCount} sorted</div>
+        </div>
       </div>
 
       {hint && (
@@ -279,7 +324,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
         className="relative flex-1 m-4 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900 bg-white/40 dark:bg-slate-900/40 overflow-hidden touch-none select-none"
       >
         <p className="absolute top-2 left-0 right-0 text-center text-xs text-muted-foreground pointer-events-none">
-          Drag each falling weed into the right bin. A wrong drop bounces back out.
+          Drag falling weeds into bins. Correct: +10, Missed: -5.
         </p>
 
         {fallers.map(f => (
@@ -291,14 +336,19 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
               top: `${f.y}%`,
               width: CARD_W,
               height: CARD_H,
-              transform: 'translate(-50%,-50%)',
+              transform: `translate(-50%,-50%) ${f.isMissed ? `rotate(${f.y * 2}deg)` : ''}`,
               touchAction: 'none',
+              transition: 'border-color 0.2s, background-color 0.2s',
             }}
-            className={`absolute rounded-xl border-2 bg-card shadow-lg overflow-hidden cursor-grab active:cursor-grabbing ${
-              dragKey === f.key ? 'border-primary ring-4 ring-primary/30 z-20' : 'border-border'
+            className={`absolute rounded-xl border-2 shadow-lg overflow-hidden transition-transform duration-75 ${
+              f.isMissed 
+                ? 'border-destructive bg-destructive/20 z-0 pointer-events-none' 
+                : dragKey === f.key 
+                  ? 'border-primary ring-4 ring-primary/30 z-20 bg-card cursor-grabbing' 
+                  : 'border-border bg-card cursor-grab active:cursor-grabbing z-10'
             }`}
           >
-            <div className="h-[86px] bg-secondary pointer-events-none">
+            <div className={`h-[86px] pointer-events-none ${f.isMissed ? 'grayscale opacity-50' : 'bg-secondary'}`}>
               <WeedImage weedId={f.weed.id} stage="flower" className="w-full h-full object-cover" />
             </div>
             <p className="text-[10px] font-bold text-foreground leading-tight text-center px-1 py-1 pointer-events-none">
@@ -318,7 +368,7 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
             }`}
           >
             <p className="font-extrabold text-foreground">NATIVE</p>
-            <p className="text-[11px] text-muted-foreground">Grew here all along</p>
+            <p className="text-[11px] text-muted-foreground text-center">North America</p>
           </div>
           <div
             ref={introBinRef}
@@ -328,13 +378,13 @@ export default function NativeLookAlike({ onBack }: { onBack: () => void }) {
                 : 'border-amber-600/60 bg-amber-600/10'
             }`}
           >
-            <p className="font-extrabold text-foreground">INTRODUCED</p>
-            <p className="text-[11px] text-muted-foreground">Arrived from another continent</p>
+            <p className="font-extrabold text-foreground text-center">INTRODUCED</p>
+            <p className="text-[11px] text-muted-foreground text-center">Other Continents</p>
           </div>
         </div>
       </div>
 
-      <FloatingCoach grade="6-8" tip="Native species evolved here. Introduced ones arrived from other continents — often without natural predators." />
+      <FloatingCoach grade="6-8" tip="Correct sorts give +10 points! Don't let them reach the bottom or you'll lose 5 points." />
     </div>
   );
 }

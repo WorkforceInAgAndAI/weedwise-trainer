@@ -9,6 +9,24 @@ import { Search } from 'lucide-react';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+/**
+ * Strips any common-name or scientific-name words out of a field clue so the
+ * magnifying glass only reveals traits, never the answer.
+ */
+function traitOnlyClue(hook: string, commonName: string, scientificName: string): string {
+  const skip = new Set(['common', 'field', 'giant', 'large', 'small', 'tall', 'wild', 'yellow', 'white', 'smooth', 'rough', 'the', 'and']);
+  const words = `${commonName} ${scientificName}`
+    .toLowerCase()
+    .replace(/[^a-z\s-]/g, ' ')
+    .split(/[\s\-\/]+/)
+    .filter(w => w.length >= 3 && !skip.has(w));
+  let out = hook;
+  words.forEach(w => {
+    out = out.replace(new RegExp(`\\b${w}\\w*\\b`, 'gi'), 'this plant');
+  });
+  return out.replace(/(this plant\s+){2,}/gi, 'this plant ').replace(/\s{2,}/g, ' ').trim();
+}
+
 type Weed = typeof weeds[0];
 interface Trio {
   name: string;
@@ -190,7 +208,7 @@ export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Pr
               {inspecting && (
                 <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 w-56 rounded-lg border-2 border-amber-500 bg-card p-2 shadow-xl">
                   <p className="text-[11px] font-bold text-foreground">Field clue</p>
-                  <p className="text-xs text-foreground leading-snug">{inspecting.memoryHook}</p>
+                  <p className="text-xs text-foreground leading-snug">{traitOnlyClue(inspecting.memoryHook, inspecting.commonName, inspecting.scientificName)}</p>
                 </div>
               )}
             </div>
