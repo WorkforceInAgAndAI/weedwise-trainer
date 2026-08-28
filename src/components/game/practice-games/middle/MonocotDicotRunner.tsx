@@ -368,8 +368,8 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
               {Array.from({ length: ROW_COUNT }).map((_, laneIdx) => {
                 const cx = laneCenterX(laneIdx);
                 const plants: JSX.Element[] = [];
-                const STEP = 70;
-                const PLANT = 40;
+                const STEP = 100;
+                const PLANT = 60;
                 for (let y = -PLANT; y < AREA_H + PLANT; y += STEP) {
                   const yy = ((y + scrollRef.current) % (AREA_H + PLANT * 2)) - PLANT;
                   const seed = (laneIdx * 31 + y) % 7;
@@ -404,6 +404,9 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
 
             {sprites.map(s => {
               if (s.removed) return null;
+              const weedInfo = s.kind === 'weed' ? middleSchoolWeeds.find(w => w.id === s.weedId) : null;
+              const commonName = s.kind === 'weed' ? weedInfo?.commonName : s.cropName;
+              
               if (s.picked && dragPos && areaRect) {
                 const localX = ((dragPos.x - areaRect.left) / areaRect.width) * AREA_W;
                 const localY = ((dragPos.y - areaRect.top) / areaRect.height) * AREA_H;
@@ -419,6 +422,9 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
                     <div className="relative w-full" style={{ aspectRatio: '1 / 1' }}>
                       <div className="absolute inset-0 rounded-full border-4 border-primary bg-white shadow-2xl overflow-hidden">
                         <WeedImage weedId={s.weedId} stage="vegetative" className="w-full h-full" />
+                      </div>
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide shadow-md whitespace-nowrap">
+                        {commonName}
                       </div>
                     </div>
                   </div>
@@ -438,9 +444,14 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
                 >
                   <div className="relative w-full" style={{ aspectRatio: '1 / 1' }}>
                     {s.kind === 'weed' ? (
-                      <div className="absolute inset-0 rounded-full border-4 border-red-500 ring-2 ring-red-200 bg-white shadow-lg overflow-hidden">
-                        <WeedImage weedId={s.weedId} stage="vegetative" className="w-full h-full" />
-                      </div>
+                      <>
+                        <div className="absolute inset-0 rounded-full border-4 border-red-500 ring-2 ring-red-200 bg-white shadow-lg overflow-hidden">
+                          <WeedImage weedId={s.weedId} stage="vegetative" className="w-full h-full" />
+                        </div>
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wide shadow whitespace-nowrap">
+                          {commonName}
+                        </div>
+                      </>
                     ) : (
                       <>
                         <div className="absolute inset-0 rounded-full border-4 border-emerald-700 ring-2 ring-emerald-200 shadow-lg overflow-hidden bg-emerald-900">
@@ -450,7 +461,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
                             <div className="w-full h-full" style={{ background: 'radial-gradient(circle at 30% 30%, #7cb342 0%, #33691e 80%)' }} />
                           )}
                         </div>
-                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wide shadow">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 px-1.5 py-0.5 rounded-full bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wide shadow whitespace-nowrap">
                           {s.cropName || 'Crop'}
                         </div>
                       </>

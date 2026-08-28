@@ -11,6 +11,7 @@ interface Hero {
   key: PowerKey;
   name: string;
   power: string;
+  blurb: string;
   Icon: React.ComponentType<{ className?: string }>;
   color: string;
   bg: string;
@@ -19,11 +20,11 @@ interface Hero {
 }
 
 const HEROES: Hero[] = [
-  { key: 'pull',     name: 'Pull It',     power: 'Super Strength',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 1, cooldownMs: 500 },
-  { key: 'block',    name: 'Block It',    power: 'Force Field',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 1, cooldownMs: 700 },
-  { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 1, cooldownMs: 700 },
-  { key: 'eat',      name: 'Swarm It',    power: 'Bug Buddies',     Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
-  { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 2, cooldownMs: 1100 },
+  { key: 'pull',     name: 'Pull It',     power: 'Super Strength', blurb: 'Yank the weeds out by hand, roots and all.',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 1, cooldownMs: 500 },
+  { key: 'block',    name: 'Block It',    power: 'Force Field', blurb: 'Cover the soil so weed seeds never get sunlight.',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 1, cooldownMs: 700 },
+  { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power', blurb: 'Plant strong crops close together to crowd weeds out.',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 1, cooldownMs: 700 },
+  { key: 'eat',      name: 'Swarm It',    power: 'Bug Buddies', blurb: 'Send your bug buddies in to eat the weeds.',     Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
+  { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', blurb: 'Farmers spray a careful weed-control product.', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 2, cooldownMs: 1100 },
 ];
 
 interface WeedVillain {
@@ -376,6 +377,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
                   </div>
                   <div className="relative z-10 text-xs font-bold text-foreground mt-1">{h.name}</div>
                   <div className="relative z-10 text-[9px] uppercase tracking-wider text-muted-foreground">{h.power}</div>
+                  <div className="relative z-10 text-[10px] text-foreground/80 leading-tight mt-0.5">{h.blurb}</div>
                   <div className="relative z-10 text-[10px] font-bold text-amber-800 mt-0.5">⚡ {h.cost}</div>
                 </button>
               );
