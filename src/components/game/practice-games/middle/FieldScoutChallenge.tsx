@@ -76,6 +76,44 @@ function distToSegment(p: { x: number; y: number }, a: { x: number; y: number },
   return Math.hypot(p.x - (a.x + abx * t), p.y - (a.y + aby * t));
 }
 
+/**
+ * The industry-standard scouting route is a W across the field: four long
+ * diagonal legs, three top/bottom turns, edge to edge. We measure the drawn
+ * path against that: how many times it reverses vertically, how much of the
+ * field width and height it spans, and how long it is.
+ */
+const IDEAL_MIN_LEN = 240;   // shorter than this and whole strips go unseen
+const IDEAL_MAX_LEN = 430;   // longer than this and the scout is wasting money
+const W_BONUS = 1500;        // reward per trip walked as a proper W
+
+function routeShape(pts: { x: number; y: number }[]) {
+  if (pts.length < 4) return { legs: 0, xSpan: 0, ySpan: 0 };
+  let legs = 0;
+  let dir = 0;
+  let anchorY = pts[0].y;
+  for (let i = 1; i < pts.length; i++) {
+    const dy = pts[i].y - anchorY;
+    if (Math.abs(dy) < 12) continue;          // ignore jitter, only real legs count
+    const s = Math.sign(dy);
+    if (s !== dir) { legs++; dir = s; }
+    anchorY = pts[i].y;
+  }
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  return {
+    legs,
+    xSpan: Math.max(...xs) - Math.min(...xs),
+    ySpan: Math.max(...ys) - Math.min(...ys),
+  };
+}
+
+/** A trip is "W-shaped" when it has ~4 vertical legs spanning the whole field. */
+function isWRoute(pts: { x: number; y: number }[], walked: number) {
+  const { legs, xSpan, ySpan } = routeShape(pts);
+  return legs >= 3 && legs <= 5 && xSpan >= 60 && ySpan >= 60
+    && walked >= IDEAL_MIN_LEN && walked <= IDEAL_MAX_LEN;
+}
+
+
 interface Props {
   onBack: () => void;
   gameId?: string;
