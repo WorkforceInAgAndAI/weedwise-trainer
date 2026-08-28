@@ -37,7 +37,7 @@ function traitsFromFact(dispersal: string, production: string): SeedCharacter['t
   return { wind, water, animal, heat, cold };
 }
 
-function buildSeedCharacters(count = 5): SeedCharacter[] {
+function buildSeedCharacters(count = 3): SeedCharacter[] {
   const pool = weeds
     .filter(w => !!w.commonName)
     .map<SeedCharacter>(w => {
@@ -49,8 +49,9 @@ function buildSeedCharacters(count = 5): SeedCharacter[] {
         description: `${fact.seedDescription} Travels by: ${fact.dispersal}.`,
       };
     });
-  return shuffle(pool).slice(0, Math.max(3, count));
+  return shuffle(pool).slice(0, count);
 }
+
 
 
 // Vary the "need" thresholds each level so the same need stars don't repeat,
