@@ -238,7 +238,29 @@ function FloodIcon({ className = '' }: { className?: string }) {
   );
 }
 
+function HailIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Hail storm">
+      <ellipse cx="12" cy="8" rx="8" ry="4.5" fill="#94a3b8" stroke="#475569" strokeWidth="1" />
+      <circle cx="7" cy="16" r="2.2" fill="#e0f2fe" stroke="#0369a1" strokeWidth="1" />
+      <circle cx="13" cy="19" r="2.2" fill="#e0f2fe" stroke="#0369a1" strokeWidth="1" />
+      <circle cx="18" cy="15" r="2.2" fill="#e0f2fe" stroke="#0369a1" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function WindStormIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Wind storm">
+      <path d="M2 8 H14 A3 3 0 1 0 11 5" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" />
+      <path d="M2 13 H17 A3 3 0 1 1 14 16" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M2 18 H10" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function FrostIcon({ className = '' }: { className?: string }) {
+
   return (
     <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Late frost night">
       <g stroke="#38bdf8" strokeWidth="1.6" strokeLinecap="round">
