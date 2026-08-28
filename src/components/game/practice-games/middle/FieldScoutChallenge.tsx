@@ -409,6 +409,12 @@ export default function FieldScoutChallenge({
               <span className="flex items-center gap-1 text-foreground"><MapPin className="w-3 h-3" /> Field blocks sampled</span>
               <span className="font-bold text-foreground">{blocksCovered}/9</span>
             </div>
+            <div className="flex justify-between text-xs">
+              <span className="flex items-center gap-1 text-foreground"><Target className="w-3 h-3" /> Route shape</span>
+              <span className={`font-bold ${wRoute ? 'text-primary' : 'text-destructive'}`}>
+                {wRoute ? 'W pattern' : tooLong ? 'Too much walking' : tooShort ? 'Too short' : 'Not a W yet'}
+              </span>
+            </div>
             {submitted && (
               <div className="flex justify-between text-xs">
                 <span className="flex items-center gap-1 text-foreground"><Target className="w-3 h-3" /> Weeds found</span>
@@ -428,21 +434,25 @@ export default function FieldScoutChallenge({
                 <RotateCcw className="w-3.5 h-3.5" /> Clear Path
               </button>
               <p className="text-[11px] text-muted-foreground italic text-center">
-                Walking only the outside edge is cheap but misses the middle — those patches come back bigger next trip.
+                Scouts walk a W: four long legs from edge to edge with three turns. Draw less and you miss strips of
+                field; draw more and you spend money without finding more weeds.
               </p>
             </div>
           ) : (
             <div className="space-y-2">
-              <div className={`rounded-xl border-2 p-3 ${blocksCovered >= 7 ? 'border-primary/50 bg-primary/10' : 'border-destructive/50 bg-destructive/10'}`}>
+              <div className={`rounded-xl border-2 p-3 ${wRoute ? 'border-primary/50 bg-primary/10' : 'border-destructive/50 bg-destructive/10'}`}>
                 <p className="text-sm font-bold text-foreground">
-                  {blocksCovered >= 7 ? 'Strong sample of the field.' : 'You skipped part of the field.'}
+                  {wRoute ? 'Textbook W route.' : tooLong ? 'You walked too far.' : tooShort ? 'You did not walk enough.' : 'That was not a W.'}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {blocksCovered >= 7
-                    ? 'Weed pressure should stay lower on your next trip.'
-                    : `${GRID * GRID - blocksCovered} blocks were never walked — expect more weeds next time.`}
+                  {wRoute
+                    ? 'A representative sample of the whole field for the least walking — pressure stays lower next trip.'
+                    : tooLong
+                      ? `That route cost $${cost.toLocaleString()}. A W would have sampled the same field for less.`
+                      : `${GRID * GRID - blocksCovered} blocks were never walked — expect more weeds next time.`}
                 </p>
               </div>
+
               <button onClick={nextTrip} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
                 {trip === 2 ? 'Finish the Season' : `Next Trip: ${TRIPS[trip + 1].name}`}
               </button>
