@@ -77,8 +77,8 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   useEffect(() => {
     if (!containerRef.current) return;
     const { clientWidth, clientHeight } = containerRef.current;
-    const cardWidth = 140;
-    const cardHeight = 160;
+    const cardWidth = 120;
+    const cardHeight = 150;
 
     const currentIds = new Set(unplaced.map(u => u.weed.id));
     
@@ -110,9 +110,9 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
       }
 
       const { clientWidth, clientHeight } = containerRef.current;
-      const cardWidth = 140;
-      const cardHeight = 160;
-      const radius = 70; // Approximation for circular collision
+      const cardWidth = 120;
+      const cardHeight = 150;
+      const radius = 62; // Approximation for circular collision
 
       const next = physicsRef.current.map(o => ({
         ...o,
