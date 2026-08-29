@@ -122,9 +122,10 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
 
       const next = physicsRef.current.map(o => ({
         ...o,
-        x: o.x + o.vx,
-        y: o.y + o.vy
+        x: o.id === dragIdRef.current ? o.x : o.x + o.vx,
+        y: o.id === dragIdRef.current ? o.y : o.y + o.vy
       }));
+
 
       // Wall collisions
       for (const o of next) {
