@@ -65,7 +65,13 @@ export const TRAIT_DEFS: TraitDef[] = [
   },
 ];
 
-export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = [
+export interface CompetitionEntry {
+  commonName: string;
+  scientificName: string;
+  traits: CompetitionTrait[];
+}
+
+export const COMPETITION_ENTRIES: CompetitionEntry[] = [
   {
     commonName: "Annual Ryegrass",
     scientificName: "Lolium multiflorum",
@@ -642,3 +648,8 @@ export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = [
     traits: ["Fast germination", "Aggressive canopy", "Seed dormancy", "High seed output"],
   },
 ];
+
+// Keyed by weed id (common name with underscores, matching src/data/weeds.ts).
+export const COMPETITION_TRAITS: Record<string, CompetitionTrait[]> = Object.fromEntries(
+  COMPETITION_ENTRIES.map((e) => [e.commonName.trim().replace(/\s+/g, "_"), e.traits]),
+);
