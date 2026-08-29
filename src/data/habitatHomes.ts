@@ -1600,6 +1600,9 @@ export interface HabitatHome {
       "rosette resists grazing pressure"
     ]
   }
+];
+
+
 
 /** Formal habitat definitions used by the Habitats & Climate learning modules (6-8 and up). */
 export const HABITAT_DEFINITIONS: Record<HabitatId, string> = {
