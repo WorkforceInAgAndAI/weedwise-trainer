@@ -1,6 +1,5 @@
 // Brief descriptions for plant families used in the Learning Module box view
 export const FAMILY_DESCRIPTIONS: Record<string, string> = {
-  FAMILY_DESCRIPTIONS: {
     Amaranthaceae:
       "Amaranthaceae, the amaranth family, includes many aggressive agricultural weeds. Members are often characterized by simple, alternate leaves and small, densely-clustered flowers. Several species in this family have developed herbicide resistance, making them major management challenges.",
     Apiaceae:
