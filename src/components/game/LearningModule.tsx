@@ -7423,6 +7423,7 @@ function TopicContent({
 
     case "dioecious": {
       const DIOECIOUS_SPECIES = [
+        const DIOECIOUS_SPECIES = [
   {
     id: "Hemp",
     name: "Hemp",
@@ -7682,36 +7683,38 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "seed-dormancy": {
       const DORMANCY_TYPES: { label: string; desc: string; examples: string[] }[] = [
-        {
-          label: "Physical Dormancy",
-          desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
-          examples: ["Field Bindweed", "Hedge Bindweed", "Common Morningglory", "Velvetleaf"],
-        },
-        {
-          label: "Physiological Dormancy",
-          desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
-          examples: [
-            "Lambsquarters",
-            "Redroot Pigweed",
-            "Giant Foxtail",
-            "Green Foxtail",
-            "Yellow Foxtail",
-            "Wild Mustard",
-            "Curly Dock",
-            "Wild Oat",
-          ],
-        },
-        {
-          label: "Chemical Dormancy",
-          desc: "A specialized case of physiological dormancy involving high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out by rainfall or degraded by microbes before germination can occur.",
-          examples: ["Common Cocklebur", "Johnsongrass"],
-        },
-        {
-          label: "Morphological Dormancy",
-          desc: "The embryo is underdeveloped at the time the seed is released from the parent plant. The seed must spend additional time in the soil maturing internally before it is structurally ready to germinate.",
-          examples: ["Wild Carrot", "Poison Hemlock"],
-        },
-      ];
+  {
+    label: "Physical Dormancy",
+    desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
+    examples: ["Field Bindweed", "Hedge Bindweed", "Common Morningglory", "Velvetleaf"],
+  },
+  {
+    label: "Physiological Dormancy",
+    desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
+    examples: [
+      "Lambsquarters",
+      "Redroot Pigweed",
+      "Giant Foxtail",
+      "Green Foxtail",
+      "Yellow Foxtail",
+      "Wild Mustard",
+      "Curly Dock",
+      "Wild Oat",
+      "Common Ragweed",
+      "Giant Ragweed",
+    ],
+  },
+  {
+    label: "Chemical Dormancy",
+    desc: "A specialized case of physiological dormancy in which the seed coat or surrounding hull imposes dormancy through a combination of chemical germination inhibitors and restricted oxygen exchange to the embryo. Dormancy is broken as inhibitors are leached or degraded by rainfall and microbial activity, or as the coat is weakened/scarified over time.",
+    examples: ["Common Cocklebur", "Johnsongrass"],
+  },
+  {
+    label: "Morphological Dormancy",
+    desc: "The embryo is underdeveloped at the time the seed is released from the parent plant and must continue growing inside the seed before it is structurally ready to germinate. Seed populations in this category are typically mixed — a portion complete embryo growth and germinate once moisture and warmth are adequate (true morphological dormancy), while the remainder also carry an added physiological block that requires cold stratification before embryo growth can begin (morphophysiological dormancy).",
+    examples: ["Wild Carrot", "Poison Hemlock", "Wild Parsnip"],
+  },
+];
       return (
         <div className="space-y-5">
           <JournalHeader title="Seed Dormancy Mechanisms" subtitle="Reproductive Physiology" />
@@ -7802,70 +7805,98 @@ function TopicContent({
         },
       ];
       const ALLELOPATHIC_EXAMPLES: { id: string; name: string; compound: string; pathway: string; note: string }[] = [
-        {
-          id: "Johnsongrass",
-          name: "Johnsongrass",
-          compound: "Sorgoleone (root exudate)",
-          pathway: "Root Exudation",
-          note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves.",
-        },
-        {
-          id: "Quackgrass",
-          name: "Quackgrass",
-          compound: "Phenolic acids & agropyrene from rhizomes",
-          pathway: "Root Exudation + Decomposition Leaching",
-          note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment.",
-        },
-        {
-          id: "Giant_Foxtail",
-          name: "Giant Foxtail",
-          compound: "Phenolic acids from decomposing residue",
-          pathway: "Decomposition Leaching",
-          note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue.",
-        },
-        {
-          id: "Yellow_Nutsedge",
-          name: "Yellow Nutsedge",
-          compound: "Tuber-derived phenolics",
-          pathway: "Root Exudation + Soil Accumulation",
-          note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops.",
-        },
-        {
-          id: "Velvetleaf",
-          name: "Velvetleaf",
-          compound: "Phenolics & cyanogenic glycosides in residue",
-          pathway: "Decomposition Leaching",
-          note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth.",
-        },
-        {
-          id: "Canada_Thistle",
-          name: "Canada Thistle",
-          compound: "Root-exuded phenolic acids",
-          pathway: "Root Exudation",
-          note: "Reduces emergence and biomass of neighboring crops within thistle patches.",
-        },
-        {
-          id: "Common_Sunflower",
-          name: "Common Sunflower",
-          compound: "Chlorogenic & isochlorogenic acids",
-          pathway: "Leaf Leachate + Decomposition Leaching",
-          note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops.",
-        },
-        {
-          id: "Redroot_Pigweed",
-          name: "Redroot Pigweed",
-          compound: "Water-soluble leaf leachates",
-          pathway: "Leaf Leachate",
-          note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies.",
-        },
-        {
-          id: "Common_Lambsquarters",
-          name: "Lambsquarters",
-          compound: "Oxalic acid & phenolic compounds",
-          pathway: "Leaf Leachate + Decomposition Leaching",
-          note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax.",
-        },
-      ];
+       {
+    id: "Johnsongrass",
+    name: "Johnsongrass",
+    compound: "Sorgoleone (root exudate)",
+    pathway: "Root Exudation",
+    note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves.",
+  },
+  {
+    id: "Quackgrass",
+    name: "Quackgrass",
+    compound: "Phenolic acids & agropyrene from rhizomes",
+    pathway: "Root Exudation + Decomposition Leaching",
+    note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment.",
+  },
+  {
+    id: "Giant_Foxtail",
+    name: "Giant Foxtail",
+    compound: "Phenolic acids from decomposing residue",
+    pathway: "Decomposition Leaching",
+    note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue.",
+  },
+  {
+    id: "Yellow_Nutsedge",
+    name: "Yellow Nutsedge",
+    compound: "Tuber-derived phenolics",
+    pathway: "Root Exudation + Soil Accumulation",
+    note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops.",
+  },
+  {
+    id: "Velvetleaf",
+    name: "Velvetleaf",
+    compound: "Phenolic compounds (leaf tissue and residue)",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Aqueous leaf extracts and decomposing residue depress soybean and corn seedling growth and radish germination.",
+  },
+  {
+    id: "Canada_Thistle",
+    name: "Canada Thistle",
+    compound: "Root-exuded phenolic acids",
+    pathway: "Root Exudation",
+    note: "Reduces emergence and biomass of neighboring crops within thistle patches.",
+  },
+  {
+    id: "Common_Sunflower",
+    name: "Common Sunflower",
+    compound: "Chlorogenic & isochlorogenic acids",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops.",
+  },
+  {
+    id: "Redroot_Pigweed",
+    name: "Redroot Pigweed",
+    compound: "Water-soluble leaf leachates",
+    pathway: "Leaf Leachate",
+    note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies.",
+  },
+  {
+    id: "Common_Lambsquarters",
+    name: "Lambsquarters",
+    compound: "Oxalic acid & phenolic compounds",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax.",
+  },
+  {
+    id: "Wild_Oat",
+    name: "Wild Oat",
+    compound: "Scopoletin, coumarin & vanillic acid (root exudate)",
+    pathway: "Root Exudation",
+    note: "Exudates measurably inhibit root and coleoptile growth of neighboring wheat seedlings.",
+  },
+  {
+    id: "Horseweed",
+    name: "Horseweed",
+    compound: "Phenolic acids (p-coumaric, ferulic, vanillic, syringic)",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Leachate and decaying tissue inhibit germination of numerous weeds and crops, including Palmer amaranth.",
+  },
+  {
+    id: "Common_Ragweed",
+    name: "Common Ragweed",
+    compound: "Sesquiterpene lactones (psilostachyin group) & phenolic acids",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Shoot/root extracts and residue alter root and shoot growth of neighboring crops and even self-inhibit ragweed germination.",
+  },
+  {
+    id: "Garlic_Mustard",
+    name: "Garlic Mustard",
+    compound: "Glucosinolates (notably sinigrin)",
+    pathway: "Root Exudation into Soil",
+    note: "Disrupts arbuscular and ectomycorrhizal fungi that native seedlings depend on, giving this non-mycorrhizal invader a competitive edge.",
+  },
+];
       const availableAllelo = ALLELOPATHIC_EXAMPLES.map((e) => ({
         ...e,
         weed: weeds.find((w) => w.commonName.toLowerCase() === e.name.toLowerCase()),
@@ -8061,132 +8092,134 @@ function TopicContent({
     case "crop-injury": {
       const INJURY_PATTERNS = [
         {
-          group: "1",
-          name: "ACCase Inhibitors",
-          part: "New grass leaves at the whorl & growing points",
-          symptoms:
-            "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl.",
-        },
-        {
-          group: "2",
-          name: "ALS Inhibitors",
-          part: "Top (newest) leaves, veins, and shoot tips",
-          symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis.",
-        },
-        {
-          group: "3",
-          name: "Microtubule Inhibitors",
-          part: "Roots and root tips",
-          symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor.",
-        },
-        {
-          group: "4",
-          name: "Synthetic Auxins",
-          part: "New growth: top leaves, stems, and petioles",
-          symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty).",
-        },
-        {
-          group: "5",
-          name: "PSII Inhibitors (Triazines)",
-          part: "Older (bottom) leaves first",
-          symptoms:
-            "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward.",
-        },
-        {
-          group: "6",
-          name: "PSII Inhibitors (Benzothiadiazoles)",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure.",
-        },
-        {
-          group: "7",
-          name: "PSII Inhibitors (Ureas & Amides)",
-          part: "Older (bottom) leaves first",
-          symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning.",
-        },
-        {
-          group: "8",
-          name: "Lipid Synthesis Inhibitors",
-          part: "Emerging seedling whorl and shoots",
-          symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl.",
-        },
-        {
-          group: "9",
-          name: "EPSPS Inhibitors",
-          part: "Whole plant, starting at growing points and newest leaves",
-          symptoms:
-            "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks.",
-        },
-        {
-          group: "10",
-          name: "Glutamine Synthase Inhibitors",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application.",
-        },
-        {
-          group: "12",
-          name: "Phytoene Desaturase Inhibitors",
-          part: "Newest leaves and growing points",
-          symptoms: "Bright white bleached new growth; older leaves stay green.",
-        },
-        {
-          group: "13",
-          name: "DOXP Inhibitors",
-          part: "Newest leaves and shoot tips",
-          symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature.",
-        },
-        {
-          group: "14",
-          name: "PPO Inhibitors",
-          part: "Leaf surface and emerging cotyledons/stems",
-          symptoms:
-            "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings.",
-        },
-        {
-          group: "15",
-          name: "VLCFA Inhibitors",
-          part: "Emerging seedling shoots and hypocotyl",
-          symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings.",
-        },
-        {
-          group: "19",
-          name: "Auxin Transport Inhibitors",
-          part: "New growth: top leaves and stems",
-          symptoms:
-            "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified.",
-        },
-        {
-          group: "22",
-          name: "PSI Electron Diverters",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact.",
-        },
-        {
-          group: "23",
-          name: "Mitosis Inhibitors",
-          part: "Outer (oldest) leaves and central whorl",
-          symptoms: "Outer leaves desiccate and brown while the central whorl stays green.",
-        },
-        {
-          group: "25",
-          name: "Cell Wall (Cellulose) Inhibitors",
-          part: "Newest leaves at the whorl",
-          symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips.",
-        },
-        {
-          group: "26",
-          name: "Nucleic Acid Inhibitors",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury.",
-        },
-        {
-          group: "27",
-          name: "HPPD Inhibitors",
-          part: "Newest leaves and growing points",
-          symptoms:
-            "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal.",
-        },
-      ];
+    group: "1",
+    name: "ACCase Inhibitors",
+    part: "New grass leaves at the whorl & growing points",
+    symptoms:
+      "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl.",
+  },
+  {
+    group: "2",
+    name: "ALS Inhibitors",
+    part: "Top (newest) leaves, veins, and shoot tips",
+    symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis.",
+  },
+  {
+    group: "3",
+    name: "Microtubule Inhibitors",
+    part: "Roots and root tips",
+    symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor.",
+  },
+  {
+    group: "4",
+    name: "Synthetic Auxins",
+    part: "New growth: top leaves, stems, and petioles",
+    symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty).",
+  },
+  {
+    group: "5",
+    name: "PSII Inhibitors (Triazines)",
+    part: "Older (bottom) leaves first",
+    symptoms:
+      "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward.",
+  },
+  {
+    group: "6",
+    name: "PSII Inhibitors (Benzothiadiazoles)",
+    part: "Leaf surface where spray contacted",
+    symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure.",
+  },
+  {
+    group: "7",
+    name: "PSII Inhibitors (Ureas & Amides)",
+    part: "Older (bottom) leaves first",
+    symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning.",
+  },
+  {
+    group: "8",
+    name: "Lipid Synthesis Inhibitors",
+    part: "Emerging seedling whorl and shoots",
+    symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl.",
+  },
+  {
+    group: "9",
+    name: "EPSPS Inhibitors",
+    part: "Whole plant, starting at growing points and newest leaves",
+    symptoms:
+      "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks.",
+  },
+  {
+    group: "10",
+    name: "Glutamine Synthase Inhibitors",
+    part: "Leaf surface where spray contacted",
+    symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application.",
+  },
+  {
+    group: "12",
+    name: "Phytoene Desaturase Inhibitors",
+    part: "Newest leaves and growing points",
+    symptoms: "Bright white bleached new growth; older leaves stay green.",
+  },
+  {
+    group: "13",
+    name: "DOXP Inhibitors",
+    part: "Newest leaves and shoot tips",
+    symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature.",
+  },
+  {
+    group: "14",
+    name: "PPO Inhibitors",
+    part: "Leaf surface and emerging cotyledons/stems",
+    symptoms:
+      "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings.",
+  },
+  {
+    group: "15",
+    name: "VLCFA Inhibitors",
+    part: "Emerging seedling shoots and hypocotyl",
+    symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings.",
+  },
+  {
+    group: "19",
+    name: "Auxin Transport Inhibitors",
+    part: "New growth: top leaves and stems",
+    symptoms:
+      "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified.",
+  },
+  {
+    group: "22",
+    name: "PSI Electron Diverters",
+    part: "Leaf surface where spray contacted",
+    symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact.",
+  },
+  {
+    group: "23",
+    name: "Microtubule Interference (Unclear Site of Action)",
+    part: "New shoot growth in emerged grass seedlings",
+    symptoms:
+      "Anti-mitotic action retards shoot growth by blocking cell division; unlike Group 3, injury is limited to shoots with no root-pruning effect.",
+  },
+  {
+    group: "25",
+    name: "Cell Wall (Cellulose) Inhibitors",
+    part: "Newest leaves at the whorl",
+    symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips.",
+  },
+  {
+    group: "26",
+    name: "Lipid/Fatty Acid Synthesis Inhibitors (Chlorocarbonic Acids)",
+    part: "Roots first, then whole plant (root-absorbed, slow-acting)",
+    symptoms:
+      "Gradual yellowing and stunting of grass foliage that develops slowly over weeks to months as root uptake disrupts fat synthesis; no rapid contact injury.",
+  },
+  {
+    group: "27",
+    name: "HPPD Inhibitors",
+    part: "Newest leaves and growing points",
+    symptoms:
+      "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal.",
+  },
+];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
