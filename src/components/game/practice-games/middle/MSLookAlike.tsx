@@ -10,22 +10,41 @@ import { Search } from 'lucide-react';
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 /**
- * Strips any common-name or scientific-name words out of a field clue so the
- * magnifying glass only reveals traits, never the answer.
+ * Strips species names out of a field clue so the magnifying glass only reveals
+ * traits, never the answer. Every species name in the whole weed list is
+ * scrubbed (not just the inspected one) so a clue can never leak a sibling's
+ * or the target's name either.
  */
+const CLUE_SKIP = new Set([
+  'common', 'field', 'giant', 'large', 'small', 'tall', 'wild', 'yellow', 'white', 'smooth', 'rough',
+  'the', 'and', 'annual', 'spp', 'var', 'subsp',
+]);
+
+const NAME_WORDS: string[] = Array.from(
+  new Set(
+    weeds
+      .flatMap(w => `${w.commonName} ${w.scientificName}`.toLowerCase().replace(/[^a-z\s-]/g, ' ').split(/[\s\-/]+/))
+      .filter(w => w.length >= 4 && !CLUE_SKIP.has(w)),
+  ),
+).sort((a, b) => b.length - a.length);
+
 function traitOnlyClue(hook: string, commonName: string, scientificName: string): string {
-  const skip = new Set(['common', 'field', 'giant', 'large', 'small', 'tall', 'wild', 'yellow', 'white', 'smooth', 'rough', 'the', 'and']);
-  const words = `${commonName} ${scientificName}`
+  const extra = `${commonName} ${scientificName}`
     .toLowerCase()
     .replace(/[^a-z\s-]/g, ' ')
-    .split(/[\s\-\/]+/)
-    .filter(w => w.length >= 3 && !skip.has(w));
+    .split(/[\s\-/]+/)
+    .filter(w => w.length >= 3 && !CLUE_SKIP.has(w));
   let out = hook;
-  words.forEach(w => {
+  [...extra, ...NAME_WORDS].forEach(w => {
     out = out.replace(new RegExp(`\\b${w}\\w*\\b`, 'gi'), 'this plant');
   });
-  return out.replace(/(this plant\s+){2,}/gi, 'this plant ').replace(/\s{2,}/g, ' ').trim();
+  return out
+    .replace(/(this plant[\s,'’s]*){2,}/gi, 'this plant ')
+    .replace(/\s+([,.;])/g, '$1')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
+
 
 type Weed = typeof weeds[0];
 interface Trio {

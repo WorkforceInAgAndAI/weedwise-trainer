@@ -67,6 +67,12 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   const [physicsObjects, setPhysicsObjects] = useState<PhysicsState[]>([]);
   const physicsRef = useRef<PhysicsState[]>([]);
   const requestRef = useRef<number>();
+  // Pointer dragging: a floating ghost bubble follows the pointer and is
+  // dropped into whichever life-cycle bin it is released over.
+  const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null);
+  const dragIdRef = useRef<string | null>(null);
+  const binRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
 
   const unplaced = items.filter(i => !placements[i.weed.id]);
   const allPlaced = Object.keys(placements).length === items.length;
@@ -77,8 +83,8 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   useEffect(() => {
     if (!containerRef.current) return;
     const { clientWidth, clientHeight } = containerRef.current;
-    const cardWidth = 140;
-    const cardHeight = 160;
+    const cardWidth = 120;
+    const cardHeight = 150;
 
     const currentIds = new Set(unplaced.map(u => u.weed.id));
     
@@ -110,15 +116,16 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
       }
 
       const { clientWidth, clientHeight } = containerRef.current;
-      const cardWidth = 140;
-      const cardHeight = 160;
-      const radius = 70; // Approximation for circular collision
+      const cardWidth = 120;
+      const cardHeight = 150;
+      const radius = 62; // Approximation for circular collision
 
       const next = physicsRef.current.map(o => ({
         ...o,
-        x: o.x + o.vx,
-        y: o.y + o.vy
+        x: o.id === dragIdRef.current ? o.x : o.x + o.vx,
+        y: o.id === dragIdRef.current ? o.y : o.y + o.vy
       }));
+
 
       // Wall collisions
       for (const o of next) {
@@ -168,13 +175,52 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
     return () => cancelAnimationFrame(requestRef.current!);
   }, []);
 
-  const handleDrop = (cycle: string) => {
-    const id = draggedId || selected;
-    if (!id || checked) return;
+  const place = (id: string, cycle: string) => {
+    if (checked) return;
     setPlacements(p => ({ ...p, [id]: cycle }));
     setSelected(null);
     setDraggedId(null);
   };
+
+  const handleDrop = (cycle: string) => {
+    const id = draggedId || selected;
+    if (!id) return;
+    place(id, cycle);
+  };
+
+  const startDrag = (id: string, e: React.PointerEvent) => {
+    if (checked) return;
+    e.preventDefault();
+    dragIdRef.current = id;
+    setDraggedId(id);
+    setDrag({ id, x: e.clientX, y: e.clientY });
+  };
+
+  // Follow the pointer while dragging and drop into whichever bin it is over.
+  useEffect(() => {
+    if (!drag) return;
+    const move = (e: PointerEvent) => setDrag(d => (d ? { ...d, x: e.clientX, y: e.clientY } : d));
+    const up = (e: PointerEvent) => {
+      const hit = CYCLES.find(c => {
+        const el = binRefs.current[c];
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      });
+      if (hit) place(drag.id, hit);
+      dragIdRef.current = null;
+      setDraggedId(null);
+      setDrag(null);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drag?.id, checked]);
+
 
   const handleRemove = (weedId: string) => {
     if (checked) return;
@@ -255,6 +301,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
               return (
                 <div
                   key={cycle}
+                  ref={el => { binRefs.current[cycle] = el; }}
                   onClick={() => handleDrop(cycle)}
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => handleDrop(cycle)}
@@ -320,8 +367,8 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
             </div>
             
             <div className="p-3 border-b border-emerald-100 dark:border-emerald-800 flex justify-between items-center bg-white/40 dark:bg-slate-800/40">
-               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Floating Seeds ({unplaced.length})</span>
-               <span className="text-[10px] text-muted-foreground italic">Drag & drop into a zone</span>
+               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Floating Weeds ({unplaced.length})</span>
+               <span className="text-[10px] text-muted-foreground italic">Click and drag a weed into a bin</span>
             </div>
 
             <div ref={containerRef} className="flex-1 relative overflow-hidden">
@@ -337,30 +384,28 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
                 const item = items.find(i => i.weed.id === obj.id);
                 if (!item) return null;
                 const isSelected = selected === obj.id;
-                
+                const isDragging = drag?.id === obj.id;
+
                 return (
                   <div
                     key={obj.id}
-                    draggable
-                    onDragStart={() => setDraggedId(obj.id)}
-                    onDragEnd={() => setDraggedId(null)}
+                    onPointerDown={e => startDrag(obj.id, e)}
                     onClick={() => setSelected(isSelected ? null : obj.id)}
-                    className={`absolute w-[140px] bg-card border-2 rounded-xl shadow-xl cursor-grab active:cursor-grabbing overflow-hidden transition-shadow duration-300 ${
-                      isSelected ? 'border-primary ring-4 ring-primary/20 scale-105 z-10' : 'border-border hover:border-emerald-400'
-                    }`}
-                    style={{ 
-                      transform: `translate(${obj.x}px, ${obj.y}px)`,
-                      transition: isSelected ? 'transform 0.1s ease-out, border-color 0.2s, box-shadow 0.2s' : 'none'
-                    }}
+                    className={`absolute w-[120px] flex flex-col items-center cursor-grab active:cursor-grabbing select-none touch-none ${
+                      isDragging ? 'opacity-30' : ''
+                    } ${isSelected ? 'z-10' : ''}`}
+                    style={{ transform: `translate(${obj.x}px, ${obj.y}px)` }}
                   >
-                    <div className="w-full aspect-square bg-muted relative">
-                      <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <p className="text-[11px] font-bold text-white leading-tight truncate">{item.weed.commonName}</p>
-                        <p className="text-[9px] italic text-emerald-200 leading-tight truncate">{item.weed.scientificName}</p>
-                      </div>
+                    <div
+                      className={`w-[110px] h-[110px] rounded-full overflow-hidden border-4 bg-muted shadow-xl ${
+                        isSelected ? 'border-primary ring-4 ring-primary/20' : 'border-emerald-400/80'
+                      }`}
+                    >
+                      <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover pointer-events-none" />
                     </div>
+                    <p className="mt-1 w-full text-center text-[11px] font-bold text-foreground leading-tight">
+                      {item.weed.commonName}
+                    </p>
                   </div>
                 );
               })}
@@ -368,6 +413,23 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
           </div>
         </div>
       </div>
+
+      {/* Ghost bubble that follows the pointer while dragging */}
+      {drag && (() => {
+        const item = items.find(i => i.weed.id === drag.id);
+        if (!item) return null;
+        return (
+          <div
+            className="fixed pointer-events-none z-[60] flex flex-col items-center"
+            style={{ left: drag.x, top: drag.y, transform: 'translate(-50%,-50%)' }}
+          >
+            <div className="w-[110px] h-[110px] rounded-full overflow-hidden border-4 border-primary bg-muted shadow-2xl">
+              <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
+            </div>
+            <p className="mt-1 text-[11px] font-bold text-foreground bg-background/80 px-1 rounded">{item.weed.commonName}</p>
+          </div>
+        );
+      })()}
     </div>
   );
 }
