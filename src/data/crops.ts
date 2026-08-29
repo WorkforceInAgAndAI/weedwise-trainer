@@ -63,5 +63,6 @@ export const crops: Crop[] = [
     "commonWeeds": ["wild-mustard", "common-lambsquarters", "redroot-pigweed", "common-ragweed"],
     "season": "spring"
   }
-]
-export const cropMap = Object.fromEntries(crops.map(c => [c.id, c]));
+];
+
+export const cropMap: Record<string, Crop> = Object.fromEntries(crops.map((c) => [c.id, c]));
