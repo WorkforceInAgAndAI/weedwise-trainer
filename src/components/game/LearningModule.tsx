@@ -350,32 +350,54 @@ function PerennialUndergroundComparison({
   );
 }
 
-// Friendly, K-5 seed descriptions inferred from species traits.
-function getElementarySeedDescription(w: Weed): string {
-  const name = w.commonName.toLowerCase();
-  if (name.includes("dandelion")) return "Fluffy white parachute that floats on the wind.";
-  if (name.includes("waterhemp")) return "Tiny, shiny, dark seeds — thousands per plant.";
-  if (name.includes("palmer")) return "Very small dark round seeds with a smooth shell.";
-  if (name.includes("foxtail")) return "Oval seeds with bristly hairs to catch on fur and clothes.";
-  if (name.includes("crabgrass")) return "Small flat seeds that scatter near the parent plant.";
-  if (name.includes("velvetleaf")) return "Wedge-shaped seeds with a tough, fuzzy coat.";
-  if (name.includes("cocklebur")) return "Bur covered in hooks that grab onto animal fur.";
-  if (name.includes("morning glory") || name.includes("bindweed")) return "Hard, dark seeds shaped like little wedges.";
-  if (name.includes("thistle")) return "Light seeds with a feathery tuft for flying on the wind.";
-  if (name.includes("ragweed")) return "Small crown-shaped seeds with tiny spines.";
-  if (name.includes("lambsquarter")) return "Tiny round black seeds — millions can hide in one field.";
-  if (name.includes("pigweed")) return "Tiny shiny black seeds that survive a long time in the soil.";
-  if (name.includes("nightshade")) return "Round seeds tucked inside a berry that animals eat.";
-  if (name.includes("kochia")) return "Small flat seeds — the whole plant tumbles to spread them.";
-  if (name.includes("nutsedge")) return "Hard nutlets in the soil that can sprout new plants.";
-  if (name.includes("johnson")) return "Plump seeds that look a bit like little grains.";
-  if (name.includes("milkweed")) return "Flat brown seeds with a silky white parachute.";
-  if (name.includes("burdock")) return "Burs with hooks — the inspiration for Velcro!";
-  if (name.includes("plantain")) return "Tiny seeds that get sticky when wet and hitch a ride on shoes.";
-  if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
-  // Fallback
-  return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
+// Friendly, K-5 seed descriptions. Each one is a simpler retelling of the
+// seedDescription in seedFacts.ts for the 15 species in the K-5 species list.
+const K5_SEED_WORDS: Record<string, string> = {
+  canadathistle: "A skinny little tan seed with tiny stripes. It rides the wind on a fluffy white puff.",
+  commonmilkweed: "A flat brown seed shaped like a teardrop. A silky white parachute helps it fly away.",
+  commonmullein: "A speck-sized dark seed with bumpy grooves, like a tiny ear of corn.",
+  dandelion: "A skinny tan seed with a long stalk that holds its white fluffy parachute.",
+  fieldbindweed: "A hard, dark, bumpy seed shaped a bit like a tiny pear.",
+  giantfoxtail: "A small oval grass seed inside a hull with bristly hairs, like a little bottle brush.",
+  giantragweed: "A big woody seed that looks like a tiny crown with a point on top.",
+  kochia: "A tiny flat seed shaped like a triangle with a thin edge like a little wing.",
+  lambsquarters: "A tiny round black seed that is smooth and shiny, smaller than a grain of sand.",
+  pennsylvaniasmartweed: "A small round, flat, dark brown seed that feels smooth.",
+  velvetleaf: "A small gray-brown seed shaped like a heart, with a bumpy, fuzzy coat.",
+  venicemallow: "A tiny dark seed shaped like a kidney bean, with a rough, net-like surface.",
+  wildcarrot: "A tiny oval seed with little bristles that stick to animal fur and socks.",
+  wildparsnip: "A flat oval tan seed with thin paper-like wings on its edges.",
+  yellownutsedge: "A tiny three-sided dark seed. This plant mostly grows from little nutlets in the soil.",
+};
+
+/** Turns a scientific seed description into a shorter, simpler sentence. */
+function simplifySeedDescription(text: string): string {
+  const first = text.split(/[;.]/)[0] || text;
+  const simple = first
+    .replace(/\(.*?\)/g, "")
+    .replace(/\d+(\.\d+)?\s*-\s*\d+(\.\d+)?\s*mm/gi, "tiny")
+    .replace(/\d+(\.\d+)?\s*mm/gi, "tiny")
+    .replace(/achene|schizocarp|propagule|caryopsis/gi, "seed")
+    .replace(/longitudinal/gi, "long")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  return `${simple.charAt(0).toUpperCase()}${simple.slice(1)}.`;
 }
+
+function getElementarySeedDescription(w: Weed): string {
+  const key = w.commonName
+    .toLowerCase()
+    .replace(/\(.*?\)/g, "")
+    .replace(/[^a-z0-9]/g, "");
+  const curated = K5_SEED_WORDS[key];
+  if (curated) return curated;
+  const fact = getSeedFact(w.commonName, w.family, w.plantType);
+  if (fact.seedDescription && !fact.seedDescription.startsWith("No detailed")) {
+    return simplifySeedDescription(fact.seedDescription);
+  }
+  return `A small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that grows into a new plant.`;
+}
+
 
 // Simple cross-section diagram showing seeds at different soil depths.
 function SeedBankDiagram() {
