@@ -175,13 +175,52 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
     return () => cancelAnimationFrame(requestRef.current!);
   }, []);
 
-  const handleDrop = (cycle: string) => {
-    const id = draggedId || selected;
-    if (!id || checked) return;
+  const place = (id: string, cycle: string) => {
+    if (checked) return;
     setPlacements(p => ({ ...p, [id]: cycle }));
     setSelected(null);
     setDraggedId(null);
   };
+
+  const handleDrop = (cycle: string) => {
+    const id = draggedId || selected;
+    if (!id) return;
+    place(id, cycle);
+  };
+
+  const startDrag = (id: string, e: React.PointerEvent) => {
+    if (checked) return;
+    e.preventDefault();
+    dragIdRef.current = id;
+    setDraggedId(id);
+    setDrag({ id, x: e.clientX, y: e.clientY });
+  };
+
+  // Follow the pointer while dragging and drop into whichever bin it is over.
+  useEffect(() => {
+    if (!drag) return;
+    const move = (e: PointerEvent) => setDrag(d => (d ? { ...d, x: e.clientX, y: e.clientY } : d));
+    const up = (e: PointerEvent) => {
+      const hit = CYCLES.find(c => {
+        const el = binRefs.current[c];
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      });
+      if (hit) place(drag.id, hit);
+      dragIdRef.current = null;
+      setDraggedId(null);
+      setDrag(null);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drag?.id, checked]);
+
 
   const handleRemove = (weedId: string) => {
     if (checked) return;
