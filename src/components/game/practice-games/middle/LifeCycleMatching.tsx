@@ -67,6 +67,12 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
   const [physicsObjects, setPhysicsObjects] = useState<PhysicsState[]>([]);
   const physicsRef = useRef<PhysicsState[]>([]);
   const requestRef = useRef<number>();
+  // Pointer dragging: a floating ghost bubble follows the pointer and is
+  // dropped into whichever life-cycle bin it is released over.
+  const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null);
+  const dragIdRef = useRef<string | null>(null);
+  const binRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
 
   const unplaced = items.filter(i => !placements[i.weed.id]);
   const allPlaced = Object.keys(placements).length === items.length;
