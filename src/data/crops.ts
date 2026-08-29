@@ -2,7 +2,7 @@ export interface Crop {
  id: string;
  name: string;
  type: 'broadleaf' | 'grass';
- emoji: string;
+ emoji?: string;
  description: string;
  /** Base yield per acre in dollars */
  baseYieldValue: number;
@@ -13,7 +13,6 @@ export interface Crop {
 }
 
 export const crops: Crop[] = [
- [
   {
     "id": "corn",
     "name": "Corn (Zea mays)",
@@ -64,5 +63,6 @@ export const crops: Crop[] = [
     "commonWeeds": ["wild-mustard", "common-lambsquarters", "redroot-pigweed", "common-ragweed"],
     "season": "spring"
   }
-]
-export const cropMap = Object.fromEntries(crops.map(c => [c.id, c]));
+];
+
+export const cropMap: Record<string, Crop> = Object.fromEntries(crops.map((c) => [c.id, c]));
