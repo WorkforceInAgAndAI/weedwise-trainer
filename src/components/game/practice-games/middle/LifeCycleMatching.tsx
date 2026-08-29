@@ -367,8 +367,8 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
             </div>
             
             <div className="p-3 border-b border-emerald-100 dark:border-emerald-800 flex justify-between items-center bg-white/40 dark:bg-slate-800/40">
-               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Floating Seeds ({unplaced.length})</span>
-               <span className="text-[10px] text-muted-foreground italic">Drag & drop into a zone</span>
+               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Floating Weeds ({unplaced.length})</span>
+               <span className="text-[10px] text-muted-foreground italic">Click and drag a weed into a bin</span>
             </div>
 
             <div ref={containerRef} className="flex-1 relative overflow-hidden">
