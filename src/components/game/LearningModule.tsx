@@ -63,6 +63,8 @@ import TaxonomyExplorer from "./learning/TaxonomyExplorer";
 import HabitatExplorer from "./learning/HabitatExplorer";
 import SeasonGroups from "./learning/SeasonGroups";
 import SeedPanels from "./learning/SeedPanels";
+import { getSeedFact } from "@/data/seedFacts";
+
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
