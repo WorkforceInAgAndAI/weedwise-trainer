@@ -429,11 +429,6 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
           </div>
         );
       })()}
-
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
