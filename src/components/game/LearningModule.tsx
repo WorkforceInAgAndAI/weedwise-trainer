@@ -63,8 +63,6 @@ import TaxonomyExplorer from "./learning/TaxonomyExplorer";
 import HabitatExplorer from "./learning/HabitatExplorer";
 import SeasonGroups from "./learning/SeasonGroups";
 import SeedPanels from "./learning/SeedPanels";
-import { getSeedFact } from "@/data/seedFacts";
-
 import dandelionHelicopterImg from "@/assets/learning/dandelion_helicopter.jpg";
 import surfSeedImg from "@/assets/learning/surf_seed.jpg";
 import seedHitchhikerImg from "@/assets/learning/seed_hitchhiker.jpg";
@@ -352,54 +350,32 @@ function PerennialUndergroundComparison({
   );
 }
 
-// Friendly, K-5 seed descriptions. Each one is a simpler retelling of the
-// seedDescription in seedFacts.ts for the 15 species in the K-5 species list.
-const K5_SEED_WORDS: Record<string, string> = {
-  canadathistle: "A skinny little tan seed with tiny stripes. It rides the wind on a fluffy white puff.",
-  commonmilkweed: "A flat brown seed shaped like a teardrop. A silky white parachute helps it fly away.",
-  commonmullein: "A speck-sized dark seed with bumpy grooves, like a tiny ear of corn.",
-  dandelion: "A skinny tan seed with a long stalk that holds its white fluffy parachute.",
-  fieldbindweed: "A hard, dark, bumpy seed shaped a bit like a tiny pear.",
-  giantfoxtail: "A small oval grass seed inside a hull with bristly hairs, like a little bottle brush.",
-  giantragweed: "A big woody seed that looks like a tiny crown with a point on top.",
-  kochia: "A tiny flat seed shaped like a triangle with a thin edge like a little wing.",
-  lambsquarters: "A tiny round black seed that is smooth and shiny, smaller than a grain of sand.",
-  pennsylvaniasmartweed: "A small round, flat, dark brown seed that feels smooth.",
-  velvetleaf: "A small gray-brown seed shaped like a heart, with a bumpy, fuzzy coat.",
-  venicemallow: "A tiny dark seed shaped like a kidney bean, with a rough, net-like surface.",
-  wildcarrot: "A tiny oval seed with little bristles that stick to animal fur and socks.",
-  wildparsnip: "A flat oval tan seed with thin paper-like wings on its edges.",
-  yellownutsedge: "A tiny three-sided dark seed. This plant mostly grows from little nutlets in the soil.",
-};
-
-/** Turns a scientific seed description into a shorter, simpler sentence. */
-function simplifySeedDescription(text: string): string {
-  const first = text.split(/[;.]/)[0] || text;
-  const simple = first
-    .replace(/\(.*?\)/g, "")
-    .replace(/\d+(\.\d+)?\s*-\s*\d+(\.\d+)?\s*mm/gi, "tiny")
-    .replace(/\d+(\.\d+)?\s*mm/gi, "tiny")
-    .replace(/achene|schizocarp|propagule|caryopsis/gi, "seed")
-    .replace(/longitudinal/gi, "long")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-  return `${simple.charAt(0).toUpperCase()}${simple.slice(1)}.`;
-}
-
+// Friendly, K-5 seed descriptions inferred from species traits.
 function getElementarySeedDescription(w: Weed): string {
-  const key = w.commonName
-    .toLowerCase()
-    .replace(/\(.*?\)/g, "")
-    .replace(/[^a-z0-9]/g, "");
-  const curated = K5_SEED_WORDS[key];
-  if (curated) return curated;
-  const fact = getSeedFact(w.commonName, w.family, w.plantType);
-  if (fact.seedDescription && !fact.seedDescription.startsWith("No detailed")) {
-    return simplifySeedDescription(fact.seedDescription);
-  }
-  return `A small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that grows into a new plant.`;
+  const name = w.commonName.toLowerCase();
+  if (name.includes("dandelion")) return "Fluffy white parachute that floats on the wind.";
+  if (name.includes("waterhemp")) return "Tiny, shiny, dark seeds — thousands per plant.";
+  if (name.includes("palmer")) return "Very small dark round seeds with a smooth shell.";
+  if (name.includes("foxtail")) return "Oval seeds with bristly hairs to catch on fur and clothes.";
+  if (name.includes("crabgrass")) return "Small flat seeds that scatter near the parent plant.";
+  if (name.includes("velvetleaf")) return "Wedge-shaped seeds with a tough, fuzzy coat.";
+  if (name.includes("cocklebur")) return "Bur covered in hooks that grab onto animal fur.";
+  if (name.includes("morning glory") || name.includes("bindweed")) return "Hard, dark seeds shaped like little wedges.";
+  if (name.includes("thistle")) return "Light seeds with a feathery tuft for flying on the wind.";
+  if (name.includes("ragweed")) return "Small crown-shaped seeds with tiny spines.";
+  if (name.includes("lambsquarter")) return "Tiny round black seeds — millions can hide in one field.";
+  if (name.includes("pigweed")) return "Tiny shiny black seeds that survive a long time in the soil.";
+  if (name.includes("nightshade")) return "Round seeds tucked inside a berry that animals eat.";
+  if (name.includes("kochia")) return "Small flat seeds — the whole plant tumbles to spread them.";
+  if (name.includes("nutsedge")) return "Hard nutlets in the soil that can sprout new plants.";
+  if (name.includes("johnson")) return "Plump seeds that look a bit like little grains.";
+  if (name.includes("milkweed")) return "Flat brown seeds with a silky white parachute.";
+  if (name.includes("burdock")) return "Burs with hooks — the inspiration for Velcro!";
+  if (name.includes("plantain")) return "Tiny seeds that get sticky when wet and hitch a ride on shoes.";
+  if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
+  // Fallback
+  return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
 }
-
 
 // Simple cross-section diagram showing seeds at different soil depths.
 function SeedBankDiagram() {
@@ -6303,22 +6279,48 @@ function TopicContent({
       // Curriculum-set placements. A species may belong to more than one
       // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
       const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
-          Curly_dock: ["toxic"],
-          Horsenettle: ["toxic", "physical"],
-          Tall_morningglory: ["toxic"],
-          Field_bindweed: ["toxic"],
-          Jimsonweed: ["toxic", "physical"],
-          "common-ragweed": ["skin"],
-          "giant-foxtail": ["physical"],
-          "giant-ragweed": ["skin"],
-          "wild-parsnip": ["toxic", "skin"],
-          Common_Burdock: ["physical"],
-          Musk_thistle: ["physical"],
-          Common_teasel: ["physical"],
-          commonPokeweed: ["toxic"],
-          common_Cocklebur: ["physical", "toxic"],
-          "canada-thistle": ["physical"],
-      };
+    Curly_dock: ["toxic"],
+    Horsenettle: ["toxic", "physical"],
+    Tall_morningglory: ["toxic"],
+    Field_bindweed: ["toxic"],
+    Jimsonweed: ["toxic", "physical"],
+    "common-ragweed": ["skin"],
+    "giant-foxtail": ["physical"],
+    "giant-ragweed": ["skin"],
+    "wild-parsnip": ["toxic", "skin"],
+    Common_Burdock: ["physical"],
+    Musk_thistle: ["physical"],
+    Common_teasel: ["physical"],
+    commonPokeweed: ["toxic"],
+    common_Cocklebur: ["physical", "toxic"],
+    "canada-thistle": ["physical"],
+    Buffalobur: ["toxic", "physical"],
+    Burcucumber: ["physical"],
+    Common_Milkweed: ["toxic", "skin"],
+    Common_Morningglory: ["toxic"],
+    Eastern_Black_Nightshade: ["toxic"],
+    Field_Horsetail: ["toxic"],
+    Hemp_Dogbane: ["toxic"],
+    Honeyvine_Milkweed: ["toxic"],
+    Ivyleaf_Morningglory: ["toxic"],
+    Johnsongrass: ["toxic"],
+    Kochia: ["toxic", "skin"],
+    Longspine_Sandbur: ["physical"],
+    Palmer_Amaranth: ["toxic", "physical"],
+    Poison_Hemlock: ["toxic"],
+    Prickly_Lettuce: ["physical"],
+    Prickly_Sida: ["physical"],
+    Redroot_Pigweed: ["toxic", "physical"],
+    Russian_Thistle: ["toxic", "physical"],
+    "Scouring-rush": ["toxic"],
+    Shattercane_Sorghums: ["toxic"],
+    Smooth_Groundcherry: ["toxic"],
+    Spotted_Spurge: ["toxic", "skin"],
+    Star_of_Bethlehem: ["toxic"],
+    Toothed_Spurge: ["toxic", "skin"],
+    Waterhemp: ["toxic"],
+    "Wild_Four-o'clock": ["toxic"],
+};
       // Keyword fallback for species without an explicit placement.
       const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
       const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
@@ -6574,20 +6576,20 @@ function TopicContent({
       const isElementary = grade === "elementary";
 
       // Documented herbicide-resistant weeds by WSSA/HRAC group (Heap, Intl. Herbicide Resistance Database)
-      const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
-        1: ["Italian ryegrass", "Wild oat", "Johnsongrass", "Giant foxtail"],
-        2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed", "Common ragweed"],
-        3: ["Goosegrass", "Green foxtail"],
-        4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
-        5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
-        7: ["Smooth pigweed", "Common groundsel"],
-        9: ["Horseweed", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed", "Italian ryegrass"],
-        10: ["Italian ryegrass", "Palmer amaranth (limited)"],
-        14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
-        15: ["Waterhemp (recent reports)"],
-        22: ["Horseweed", "Hairy fleabane"],
-        27: ["Waterhemp", "Palmer amaranth"],
-      };
+     const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
+  1: ["Wild oat", "Johnsongrass", "Giant foxtail"],
+  2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed", "Common ragweed"],
+  3: ["Goosegrass", "Green foxtail"],
+  4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
+  5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
+  7: ["Smooth pigweed", "Common groundsel"],
+  9: ["Horseweed", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed"],
+  10: ["Palmer amaranth"],
+  14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
+  15: ["Waterhemp"],
+  22: ["Horseweed"],
+  27: ["Waterhemp", "Palmer amaranth"],
+};
 
       const ELEM_METHODS = [
         {
@@ -7421,76 +7423,105 @@ function TopicContent({
 
     case "dioecious": {
       const DIOECIOUS_SPECIES = [
-        {
-          id: "Marijuana",
-          name: "Hemp",
-          maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
-          femaleDesc: "Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes",
-        },
-        {
-          id: "palmer-amaranth",
-          name: "Palmer Amaranth",
-          maleDesc: "Has soft, drooping seed heads that release pollen",
-          femaleDesc: "Has long, spiny, rigid seed heads that feel prickly to touch",
-        },
-        {
-          id: "waterhemp",
-          name: "Waterhemp",
-          maleDesc: "Has drooping, tassel-like flower clusters that shed pollen into the wind",
-          femaleDesc: "Has compact, dense seed heads packed tightly along the stem",
-        },
-      ];
+        const DIOECIOUS_SPECIES = [
+  {
+    id: "Hemp",
+    name: "Hemp",
+    maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
+    femaleDesc: "Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes",
+  },
+  {
+    id: "palmer-amaranth",
+    name: "Palmer Amaranth",
+    maleDesc: "Has soft, drooping seed heads that release pollen",
+    femaleDesc: "Has long, spiny, rigid seed heads that feel prickly to touch",
+  },
+  {
+    id: "waterhemp",
+    name: "Waterhemp",
+    maleDesc: "Has drooping, tassel-like flower clusters that shed pollen into the wind",
+    femaleDesc: "Has compact, dense seed heads packed tightly along the stem",
+  },
+  {
+    id: "canada-thistle",
+    name: "Canada Thistle",
+    maleDesc: "Has smaller, rounder flowerheads packed with pollen-bearing florets but no seed development",
+    femaleDesc:
+      "Has slightly larger, flask-shaped flowerheads that mature into fluffy white seed heads with wind-borne down",
+  },
+  {
+    id: "white-campion",
+    name: "White Campion",
+    maleDesc: "Has narrow, slender flower bases with 10 stamens and no swelling behind the petals",
+    femaleDesc: "Has a swollen, balloon-like veiny calyx behind the petals that develops into a seed capsule",
+  },
+];
 
       const MONOECIOUS_SPECIES = [
-        {
-          id: "common-ragweed",
-          name: "Common Ragweed",
-          maleDesc:
-            "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
-          femaleDesc: "Inconspicuous clusters tucked into the leaf axils below, each maturing into a small woody bur",
-        },
-        {
-          id: "giant-ragweed",
-          name: "Giant Ragweed",
-          maleDesc: "Long, wand-like terminal racemes of tiny nodding pollen cups at the top of the stem",
-          femaleDesc:
-            "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
-        },
-        {
-          id: "common_Cocklebur",
-          name: "Common Cocklebur",
-          maleDesc: "Rounded heads of tiny flowers at the branch tips that wither and drop soon after shedding pollen",
-          femaleDesc: "Axillary clusters lower on the stem that swell into hooked, spiny two-seeded burs",
-        },
-        {
-          id: "Burcucumber",
-          name: "Burcucumber",
-          maleDesc: "Long-stalked branched clusters of small greenish-white staminate flowers held out from the vine",
-          femaleDesc: "Short-stalked tight heads of a few flowers that develop into clustered spiny, bristly pods",
-        },
-        {
-          id: "Redroot_pigweed",
-          name: "Redroot Pigweed",
-          maleDesc:
-            "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
-          femaleDesc:
-            "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
-        },
-        {
-          id: "Spotted_spurge",
-          name: "Spotted Spurge",
-          maleDesc:
-            "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
-          femaleDesc:
-            "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
-        },
-        {
-          id: "Toothed_spurge",
-          name: "Toothed Spurge",
-          maleDesc: "Clustered tiny staminate flowers inside the cyathium, each reduced to a single stamen",
-          femaleDesc: "One pistillate flower per cyathium, exserted on a stalk, forming a smooth three-parted capsule",
-        },
-      ];
+  {
+    id: "common-ragweed",
+    name: "Common Ragweed",
+    maleDesc:
+      "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
+    femaleDesc: "Inconspicuous clusters tucked into the leaf axils below, each maturing into a small woody bur",
+  },
+  {
+    id: "giant-ragweed",
+    name: "Giant Ragweed",
+    maleDesc: "Long, wand-like terminal racemes of tiny nodding pollen cups at the top of the stem",
+    femaleDesc:
+      "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
+  },
+  {
+    id: "common_Cocklebur",
+    name: "Common Cocklebur",
+    maleDesc: "Rounded heads of tiny flowers at the branch tips that wither and drop soon after shedding pollen",
+    femaleDesc: "Axillary clusters lower on the stem that swell into hooked, spiny two-seeded burs",
+  },
+  {
+    id: "Burcucumber",
+    name: "Burcucumber",
+    maleDesc: "Long-stalked branched clusters of small greenish-white staminate flowers held out from the vine",
+    femaleDesc: "Short-stalked tight heads of a few flowers that develop into clustered spiny, bristly pods",
+  },
+  {
+    id: "Redroot_pigweed",
+    name: "Redroot Pigweed",
+    maleDesc:
+      "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
+    femaleDesc:
+      "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
+  },
+  {
+    id: "Spotted_spurge",
+    name: "Spotted Spurge",
+    maleDesc:
+      "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
+    femaleDesc:
+      "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
+  },
+  {
+    id: "Toothed_spurge",
+    name: "Toothed Spurge",
+    maleDesc: "Clustered tiny staminate flowers inside the cyathium, each reduced to a single stamen",
+    femaleDesc: "One pistillate flower per cyathium, exserted on a stalk, forming a smooth three-parted capsule",
+  },
+  {
+    id: "Asian_copperleaf",
+    name: "Asian Copperleaf",
+    maleDesc: "Minute staminate flowers crowded on a slender spike rising above the leafy bract",
+    femaleDesc:
+      "One to three pistillate flowers nestled inside a toothed, fan-shaped bract, each with feathery three-branched stigmas",
+  },
+  {
+    id: "Common_copperleaf",
+    name: "Common Copperleaf",
+    maleDesc:
+      "Tiny staminate flowers densely packed along a thin axillary spike, shedding pollen readily when disturbed",
+    femaleDesc:
+      "Pistillate flowers enclosed within a heart-shaped, coarsely toothed bract, stigmas feathery and reddish",
+  },
+];
 
       const availableDioecious = DIOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
