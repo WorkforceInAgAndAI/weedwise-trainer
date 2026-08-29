@@ -126,7 +126,7 @@ const SCENARIOS = [
     situation:
       "Velvetleaf (Abutilon theophrasti) has its deep taproot intertwined with yours, directly competing for soil water and nutrients in the same root zone.",
     best: "root-exudate",
-    why: "Root exudates create a chemical inhibition zone directly around your root system, releasing compounds like sorgoleone or juglone analogs that suppress competitor roots sharing the same soil space.",
+    why: "Root exudates create a chemical inhibition zone directly around your root system, releasing phenolic acids and quinone-type compounds that suppress competitor roots sharing the same soil space.",
   },
   {
     enemy: "giant-ragweed",
@@ -158,7 +158,7 @@ const SCENARIOS = [
     situation:
       "Kochia seedlings are germinating under your dense, thick canopy of fallen leaves where light is blocked and moisture is trapped.",
     best: "mulch-suppress",
-    why: "Your thick leaf mulch creates a dual barrier: physical light exclusion reduces photosynthesis, while leaching allelopathic compounds from the mulch layer inhibit germination and root growth simultaneously.",
+    why: "Your thick leaf mulch creates a dual barrier — physically blocking light and trapping moisture at the soil surface while allelochemicals leaching from the decomposing leaves accumulate in that same layer, inhibiting kochia seed germination and early radicle growth.",
   },
   {
     enemy: "palmer-amaranth",
