@@ -2,7 +2,7 @@ export interface Crop {
  id: string;
  name: string;
  type: 'broadleaf' | 'grass';
- emoji: string;
+ emoji?: string;
  description: string;
  /** Base yield per acre in dollars */
  baseYieldValue: number;
