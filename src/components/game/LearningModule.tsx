@@ -7423,7 +7423,6 @@ function TopicContent({
 
     case "dioecious": {
       const DIOECIOUS_SPECIES = [
-        const DIOECIOUS_SPECIES = [
   {
     id: "Hemp",
     name: "Hemp",
