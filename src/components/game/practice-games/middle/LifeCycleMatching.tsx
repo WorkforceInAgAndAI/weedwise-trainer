@@ -383,33 +383,53 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
                 const item = items.find(i => i.weed.id === obj.id);
                 if (!item) return null;
                 const isSelected = selected === obj.id;
-                
+                const isDragging = drag?.id === obj.id;
+
                 return (
                   <div
                     key={obj.id}
-                    draggable
-                    onDragStart={() => setDraggedId(obj.id)}
-                    onDragEnd={() => setDraggedId(null)}
+                    onPointerDown={e => startDrag(obj.id, e)}
                     onClick={() => setSelected(isSelected ? null : obj.id)}
-                    className={`absolute w-[140px] bg-card border-2 rounded-xl shadow-xl cursor-grab active:cursor-grabbing overflow-hidden transition-shadow duration-300 ${
-                      isSelected ? 'border-primary ring-4 ring-primary/20 scale-105 z-10' : 'border-border hover:border-emerald-400'
-                    }`}
-                    style={{ 
-                      transform: `translate(${obj.x}px, ${obj.y}px)`,
-                      transition: isSelected ? 'transform 0.1s ease-out, border-color 0.2s, box-shadow 0.2s' : 'none'
-                    }}
+                    className={`absolute w-[120px] flex flex-col items-center cursor-grab active:cursor-grabbing select-none touch-none ${
+                      isDragging ? 'opacity-30' : ''
+                    } ${isSelected ? 'z-10' : ''}`}
+                    style={{ transform: `translate(${obj.x}px, ${obj.y}px)` }}
                   >
-                    <div className="w-full aspect-square bg-muted relative">
-                      <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <p className="text-[11px] font-bold text-white leading-tight truncate">{item.weed.commonName}</p>
-                        <p className="text-[9px] italic text-emerald-200 leading-tight truncate">{item.weed.scientificName}</p>
-                      </div>
+                    <div
+                      className={`w-[110px] h-[110px] rounded-full overflow-hidden border-4 bg-muted shadow-xl ${
+                        isSelected ? 'border-primary ring-4 ring-primary/20' : 'border-emerald-400/80'
+                      }`}
+                    >
+                      <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover pointer-events-none" />
                     </div>
+                    <p className="mt-1 w-full text-center text-[11px] font-bold text-foreground leading-tight">
+                      {item.weed.commonName}
+                    </p>
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Ghost bubble that follows the pointer while dragging */}
+      {drag && (() => {
+        const item = items.find(i => i.weed.id === drag.id);
+        if (!item) return null;
+        return (
+          <div
+            className="fixed pointer-events-none z-[60] flex flex-col items-center"
+            style={{ left: drag.x, top: drag.y, transform: 'translate(-50%,-50%)' }}
+          >
+            <div className="w-[110px] h-[110px] rounded-full overflow-hidden border-4 border-primary bg-muted shadow-2xl">
+              <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
+            </div>
+            <p className="mt-1 text-[11px] font-bold text-foreground bg-background/80 px-1 rounded">{item.weed.commonName}</p>
+          </div>
+        );
+      })()}
+
             </div>
           </div>
         </div>
