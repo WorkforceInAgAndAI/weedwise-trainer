@@ -8,7 +8,10 @@ export interface HabitatHome {
   habitats: HabitatId[];
   traits: string[];
   learningTraits: string[];
-[
+  scientificName?: string;
+}
+
+export const HABITAT_HOMES: HabitatHome[] = [
   {
     "name": "Annual Ryegrass",
     "scientificName": "Lolium multiflorum",
