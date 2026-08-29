@@ -13,7 +13,6 @@ export interface Crop {
 }
 
 export const crops: Crop[] = [
- [
   {
     "id": "corn",
     "name": "Corn (Zea mays)",
