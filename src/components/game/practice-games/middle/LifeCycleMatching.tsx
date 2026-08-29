@@ -301,6 +301,7 @@ export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props)
               return (
                 <div
                   key={cycle}
+                  ref={el => { binRefs.current[cycle] = el; }}
                   onClick={() => handleDrop(cycle)}
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => handleDrop(cycle)}
