@@ -333,7 +333,7 @@ export default function MonocotDicotRunner({ onBack, gameId, gameName, gradeLabe
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1 flex items-center gap-2">
-          <Scissors className="w-6 h-6 text-primary" /> Monocot or Dicot?
+          <Scissors className="w-6 h-6 text-primary" /> Pull the weeds by sorting them in to monocot or dicot!
         </h1>
         <p className="text-muted-foreground mb-3">
           Scout the rows, pull each weed out of the field, and drag it into the right bin:
