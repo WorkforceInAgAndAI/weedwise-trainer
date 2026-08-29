@@ -1,6 +1,5 @@
 // Brief descriptions for plant families used in the Learning Module box view
 export const FAMILY_DESCRIPTIONS: Record<string, string> = {
-  FAMILY_DESCRIPTIONS: {
     Amaranthaceae:
       "Amaranthaceae, the amaranth family, includes many aggressive agricultural weeds. Members are often characterized by simple, alternate leaves and small, densely-clustered flowers. Several species in this family have developed herbicide resistance, making them major management challenges.",
     Apiaceae:
@@ -57,16 +56,19 @@ export const FAMILY_DESCRIPTIONS: Record<string, string> = {
       "Rubiaceae, the bedstraw or coffee family, includes herbs with whorled leaves and square stems. Many species have small, four-petaled flowers and clinging fruits.",
     Solanaceae:
       "Solanaceae, the nightshade family, includes many important crop plants (tomato, potato, pepper) as well as toxic weeds. Members often have alternate leaves and five-lobed flowers.",
-  },
-  LIFECYCLE_DESCRIPTIONS: {
-    Annual:
-      "Annual weeds complete their entire life cycle — from seed germination to seed production and death — within a single growing season. They rely entirely on prolific seed production for survival. Summer annuals germinate in spring and die after frost; winter annuals germinate in fall, overwinter, and produce seed in spring.",
-    Biennial:
-      "Biennial weeds take two full years to complete their life cycle. In the first year, they grow as a low rosette of leaves, storing energy in a taproot. In the second year, they bolt, flower, produce seeds, and die. Control is most effective during the rosette stage.",
-    Perennial:
-      "Perennial weeds live for more than two years and can reproduce both by seed and vegetatively through rhizomes, stolons, tubers, or root fragments. They are often the most difficult weeds to manage because they can regrow from underground structures even after top growth is removed.",
-  },
 };
+
+export const HABITAT_DESCRIPTIONS: Record<string, string> = {
+  "Warm-Season / Full Sun":
+    "Warm-season species germinate once soils warm in late spring and thrive in open, sunny fields. They grow fast through summer heat and set seed before frost.",
+  "Cool-Season / Early Spring":
+    "Cool-season species germinate in fall or very early spring and complete much of their growth while temperatures are still low. Many are winter annuals or early-spring rosettes.",
+  "Wet / Poorly Drained":
+    "These species favor low spots, ditches, and poorly drained field edges where soils stay saturated. Many tolerate low soil oxygen and spread readily in standing water.",
+  "Dry / Disturbed":
+    "These species colonize droughty, compacted, or frequently disturbed ground such as roadsides, field margins, and headlands, often with deep taproots or drought-tolerant foliage.",
+};
+
 
 export const LIFECYCLE_DESCRIPTIONS: Record<string, string> = {
   Annual:
