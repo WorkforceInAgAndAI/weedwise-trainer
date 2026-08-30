@@ -240,9 +240,9 @@ export default function WeedHeroSquad({ onBack, gameId, gameName, gradeLabel }: 
                     <div className={`w-12 h-12 rounded-full bg-background border-2 border-current flex items-center justify-center ${h.color}`}>
                       <h.Icon className="w-6 h-6" />
                     </div>
-                    <div className="text-sm font-bold text-foreground">{h.name}</div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{h.power}</div>
-                    <div className="text-[11px] leading-snug text-foreground/80 text-center">{h.blurb}</div>
+                    <div className="text-base font-bold text-foreground">{h.name}</div>
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">{h.power}</div>
+                    <div className="text-sm leading-snug text-foreground/80 text-center">{h.blurb}</div>
 
                     {answered && isBest && <Check className="w-4 h-4 text-emerald-600" />}
                     {answered && isPick && !isBest && <X className="w-4 h-4 text-red-600" />}
