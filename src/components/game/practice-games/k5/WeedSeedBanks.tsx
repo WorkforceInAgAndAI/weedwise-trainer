@@ -1,30 +1,38 @@
 import { useState, useMemo, useCallback } from 'react';
-import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
-import LevelComplete from '@/components/game/LevelComplete';
 import FarmerGuide from '@/components/game/FarmerGuide';
 import { getDifficulty } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const MIN_PER_TYPE = 3;
-const MAX_PER_TYPE = 12;
+const MAX_PER_TYPE = 40;
 
 const seedWeeds = weeds.filter(w => w.id !== 'Field_Horsetail');
 
 interface Pile { weed: typeof weeds[0]; count: number }
 
+/**
+ * Generates a round's piles with guaranteed-unique seed counts so that the
+ * prediction step (highest/lowest seed count) never has a tie for the
+ * max or min value.
+ */
 function generateRound(level: number, roundIdx: number, totalRounds: number, numWeedTypes: number): { piles: Pile[] } {
   const offset = ((level - 1) * totalRounds + roundIdx) * numWeedTypes;
   const rotated = [...seedWeeds.slice(offset % seedWeeds.length), ...seedWeeds.slice(0, offset % seedWeeds.length)];
   const chosen = shuffle(rotated).slice(0, numWeedTypes);
-  const piles = chosen.map(w => ({
-    weed: w,
-    count: MIN_PER_TYPE + Math.floor(Math.random() * (MAX_PER_TYPE - MIN_PER_TYPE + 1)),
-  }));
+
+  // Draw unique counts without replacement from the allowed range so no two
+  // piles ever tie (which would make the max/min prediction ambiguous).
+  const range = MAX_PER_TYPE - MIN_PER_TYPE + 1;
+  const pool = shuffle(Array.from({ length: range }, (_, i) => MIN_PER_TYPE + i)).slice(0, chosen.length);
+  const piles = chosen.map((w, i) => ({ weed: w, count: pool[i] }));
   return { piles };
 }
+
+interface DragState { name: string; }
 
 export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
@@ -38,10 +46,11 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     [level, totalRounds, numWeedTypes]
   );
   const [round, setRound] = useState(0);
-  const [phase, setPhase] = useState<'match' | 'summary' | 'predictMost' | 'predictLeast' | 'roundResult' | 'done'>('match');
+  const [phase, setPhase] = useState<'match' | 'matchReview' | 'summary' | 'predictMost' | 'predictLeast' | 'roundResult' | 'done'>('match');
   // pileIdx -> chosen weed name
   const [matches, setMatches] = useState<Record<number, string>>({});
   const [matchChecked, setMatchChecked] = useState(false);
+  const [dragging, setDragging] = useState<DragState | null>(null);
   const [predictMostAnswer, setPredictMostAnswer] = useState<string | null>(null);
   const [predictLeastAnswer, setPredictLeastAnswer] = useState<string | null>(null);
   const [predictMostChecked, setPredictMostChecked] = useState(false);
@@ -60,8 +69,9 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   // first/last option in a sorted list. Recap panel still shows sorted order.
   const shuffledPiles = useMemo(() => shuffle(piles), [piles]);
 
-  // Choices for matching: shuffled list of weed names from these piles.
+  // Word bank: shuffled list of weed names from these piles.
   const nameChoices = useMemo(() => shuffle(piles.map(p => p.weed.commonName)), [piles]);
+  const remainingNames = nameChoices.filter(n => !Object.values(matches).includes(n));
 
   const matchCorrectCount = matchChecked
     ? piles.filter((p, i) => matches[i] === p.weed.commonName).length
@@ -69,7 +79,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   const allMatched = piles.every((_, i) => !!matches[i]);
 
   const resetRound = useCallback(() => {
-    setMatches({}); setMatchChecked(false); setPhase('match');
+    setMatches({}); setMatchChecked(false); setPhase('match'); setDragging(null);
     setPredictMostAnswer(null); setPredictLeastAnswer(null);
     setPredictMostChecked(false); setPredictLeastChecked(false);
   }, []);
@@ -78,6 +88,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     setMatchChecked(true);
     const correct = piles.filter((p, i) => matches[i] === p.weed.commonName).length;
     setTotalScore(s => s + correct);
+    setPhase('matchReview');
   };
   const handleCheckMost = () => { setPredictMostChecked(true); if (predictMostAnswer === mostPrevalent) setTotalScore(s => s + 1); };
   const handleCheckLeast = () => { setPredictLeastChecked(true); if (predictLeastAnswer === leastPrevalent) setTotalScore(s => s + 1); };
@@ -87,20 +98,34 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     else { setRound(r => r + 1); resetRound(); }
   };
 
+  const dropOnPile = (pileIdx: number) => {
+    if (matchChecked) return;
+    if (!dragging) return;
+    // Remove the name from any other pile it may already occupy, then assign.
+    setMatches(m => {
+      const n: Record<number, string> = {};
+      for (const [k, v] of Object.entries(m)) {
+        if (v !== dragging.name) n[Number(k)] = v;
+      }
+      n[pileIdx] = dragging.name;
+      return n;
+    });
+    setDragging(null);
+  };
+
   // Recap panel — shown beside prediction screens so students don't have to remember.
   const RecapPanel = () => (
     <aside className="md:w-72 shrink-0 border border-border rounded-xl bg-card p-3 self-start">
       <p className="text-xs uppercase tracking-wide text-muted-foreground font-bold mb-2">Round {round + 1} Recap</p>
       <p className="text-xs text-muted-foreground mb-3">These are the seed counts you just identified:</p>
       <ul className="space-y-2">
-        {sortedPiles.map((p, i) => (
+        {sortedPiles.map((p) => (
           <li key={p.weed.id} className="flex items-center gap-2">
             <div className="w-12 h-12 rounded-lg overflow-hidden border border-border bg-secondary shrink-0">
               <WeedImage weedId={p.weed.id} stage="seed" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-foreground truncate">{p.weed.commonName}</p>
-              <p className="text-[10px] text-muted-foreground">{i === 0 ? 'Most seeds' : i === sortedPiles.length - 1 ? 'Fewest seeds' : ''}</p>
             </div>
             <span className="text-sm font-bold text-primary shrink-0">{p.count}</span>
           </li>
@@ -110,7 +135,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
   );
 
   if (phase === 'done') {
-    addBadge({ gameId: 'weed-seed-banks', gameName: 'Weed Seed Banks', level: 'K-5', score: totalScore, total: totalScore + 10 });
+    addBadge({ gameId: 'weed-seed-banks', gameName: 'Weed Seed Banks', level: 'Collegiate', score: totalScore, total: totalScore + 10 });
     return (
       <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
@@ -157,7 +182,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
       <div className="fixed inset-0 bg-background z-50 flex flex-col">
         <div className="flex items-center gap-3 p-4 border-b border-border">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-          <h1 className="font-display font-bold text-foreground text-lg flex-1">Predict: {isMost ? 'Most' : 'Least'} Prevalent</h1>
+          <h1 className="font-display font-bold text-foreground text-lg flex-1">Predict Seed Bank Sizes</h1>
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">Round {round + 1}/{totalRounds}</span>
         </div>
@@ -165,15 +190,15 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <FarmerGuide
-                gradeLabel="K-5"
+                gradeLabel="Collegiate"
                 tone="intro"
                 className="mb-3"
                 message={isMost
-                  ? "Look at the recap on the right. Which weed had the MOST seeds in the soil? Those will probably show up most next year!"
-                  : "Now check the recap. Which weed had the FEWEST seeds? Those should be least common next year."
+                  ? "Look at the recap on the right and think about the seed counts you just identified. Which species produced the most seeds in this soil sample?"
+                  : "Now consider the recap again. Which species produced the fewest seeds in this soil sample?"
                 }
               />
-              <p className="text-sm text-muted-foreground mb-4">Which weed will be <span className="font-bold">{isMost ? 'most' : 'least'}</span> prevalent next year?</p>
+              <p className="text-sm text-muted-foreground mb-4">Which weed produced the <span className="font-bold">{isMost ? 'most' : 'fewest'}</span> seeds in this sample?</p>
               <div className="grid gap-2 mb-4">
                 {shuffledPiles.map(p => {
                   let cls = 'border-border bg-card text-foreground';
@@ -187,6 +212,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
                         <WeedImage weedId={p.weed.id} stage="seed" className="w-full h-full object-cover" />
                       </div>
                       <span className="flex-1 text-left">{p.weed.commonName}</span>
+                      <span className="text-xs text-muted-foreground">{p.count} seeds</span>
                     </button>
                   );
                 })}
@@ -200,7 +226,7 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
                     {answer === correctName ? 'Correct!' : `The answer was ${correctName}`}
                   </p>
                   <button onClick={() => setPhase(isMost ? 'predictLeast' : 'roundResult')} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-                    {isMost ? 'Next: Predict Least Prevalent' : 'Continue'}
+                    {isMost ? 'Next: Predict Fewest Seeds' : 'Continue'}
                   </button>
                 </div>
               )}
@@ -222,10 +248,10 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto w-full">
           <FarmerGuide
-            gradeLabel="K-5"
+            gradeLabel="Collegiate"
             tone="cheer"
             className="mb-4"
-            message="Nice work matching the seeds! Here's what's in the soil seed bank. Take a good look — you'll predict next year's most and least common weeds in a moment."
+            message="Here's what's actually in the soil seed bank. Study the counts — you'll predict which species had the most and fewest seeds in a moment."
           />
           <div className="grid gap-2 mb-6">
             {sortedPiles.map(fc => (
@@ -246,7 +272,44 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // Matching phase
+  if (phase === 'matchReview') {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
+          <h1 className="font-display font-bold text-foreground text-lg flex-1">Match Review</h1>
+          <span className="text-sm text-muted-foreground">Round {round + 1}/{totalRounds}</span>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="max-w-4xl mx-auto">
+            <p className={`text-lg font-bold mb-4 text-center ${matchCorrectCount === piles.length ? 'text-green-500' : 'text-foreground'}`}>
+              {matchCorrectCount}/{piles.length} matched correctly!
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {piles.map((p, i) => {
+                const chosenName = matches[i];
+                const correct = chosenName === p.weed.commonName;
+                return (
+                  <div key={i} className={`rounded-2xl border-4 p-4 bg-card flex flex-col items-center gap-2 ${correct ? 'border-green-500 bg-green-500/5' : 'border-destructive bg-destructive/5'}`}>
+                    <div className="w-32 h-32 rounded-xl overflow-hidden border-2 border-border bg-secondary">
+                      <WeedImage weedId={p.weed.id} stage="seed" className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-sm font-bold text-foreground">{p.weed.commonName}</p>
+                    {!correct && (
+                      <p className="text-xs text-destructive">You said: {chosenName ?? '(no answer)'}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <button onClick={() => setPhase('summary')} className="w-full max-w-md mx-auto block py-3 rounded-lg bg-primary text-primary-foreground font-bold">See Summary</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Matching phase: all photos in a grid up top, all names in a word bank below.
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
@@ -258,88 +321,70 @@ export default function WeedSeedBanks({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-5xl mx-auto">
           <FarmerGuide
-            gradeLabel="K-5"
+            gradeLabel="Collegiate"
             tone="intro"
             className="mb-4 max-w-2xl"
-            message="I dug up some soil and counted the seeds in each pile. Tap a weed name, then tap the pile of seeds it matches!"
+            message="Drag each name from the word bank onto the seed photo you think it matches. You won't be told right or wrong until you check all your matches at the end."
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
             {piles.map((p, i) => {
               const chosenName = matches[i];
-              const correct = matchChecked && chosenName === p.weed.commonName;
-              const wrong = matchChecked && chosenName && chosenName !== p.weed.commonName;
               return (
-                <div key={i}
-                  className={`rounded-2xl border-4 p-4 bg-card flex flex-col items-center gap-3 transition-all ${
-                    correct ? 'border-green-500 bg-green-500/5'
-                    : wrong ? 'border-destructive bg-destructive/5'
-                    : 'border-border'
-                  }`}>
-                  <div className="w-40 h-40 rounded-xl overflow-hidden border-2 border-border bg-secondary">
+                <div
+                  key={i}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={() => dropOnPile(i)}
+                  className={`rounded-2xl border-4 p-3 bg-card flex flex-col items-center gap-2 transition-all ${
+                    chosenName ? 'border-primary/60' : 'border-dashed border-border'
+                  }`}
+                >
+                  <div className="w-full aspect-square rounded-xl overflow-hidden border-2 border-border bg-secondary">
                     <WeedImage weedId={p.weed.id} stage="seed" className="w-full h-full object-cover" />
                   </div>
-                  <p className="text-sm text-muted-foreground">Pile of <span className="font-bold text-foreground">{p.count}</span> seeds</p>
                   {chosenName ? (
                     <button
-                      disabled={matchChecked}
+                      draggable
+                      onDragStart={() => setDragging({ name: chosenName })}
                       onClick={() => setMatches(m => { const n = { ...m }; delete n[i]; return n; })}
-                      className={`w-full text-center px-3 py-2 rounded-lg font-bold text-sm border-2 ${
-                        correct ? 'border-green-500 bg-green-500/10 text-green-700'
-                        : wrong ? 'border-destructive bg-destructive/10 text-destructive'
-                        : 'border-primary bg-primary/10 text-primary hover:bg-primary/20'
-                      }`}>
+                      className="w-full text-center px-2 py-2 rounded-lg font-bold text-xs border-2 border-primary bg-primary/10 text-primary hover:bg-primary/20 cursor-grab"
+                    >
                       {chosenName}
-                      {matchChecked && wrong && <span className="block text-xs mt-1">Actually: {p.weed.commonName}</span>}
                     </button>
                   ) : (
-                    <NameDropTarget
-                      onChoose={(name) => setMatches(m => ({ ...m, [i]: name }))}
-                      choices={nameChoices.filter(n => !Object.values(matches).includes(n))}
-                    />
+                    <div className="w-full text-center px-2 py-2 rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground text-xs">
+                      Drop name here
+                    </div>
                   )}
                 </div>
               );
             })}
           </div>
 
-          {!matchChecked && allMatched && (
-            <button onClick={handleCheckMatch} className="w-full max-w-md mx-auto block py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Matches</button>
-          )}
-          {matchChecked && (
-            <div className="text-center">
-              <p className={`text-lg font-bold mb-3 ${matchCorrectCount === piles.length ? 'text-green-500' : 'text-foreground'}`}>
-                {matchCorrectCount}/{piles.length} matched correctly!
-              </p>
-              <button onClick={() => setPhase('summary')} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">See Summary</button>
+          <div className="rounded-xl border border-border bg-card p-4 mb-5">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-bold mb-2">Word Bank</p>
+            <div className="flex flex-wrap gap-2">
+              {remainingNames.length === 0 && (
+                <p className="text-xs text-muted-foreground">All names placed — check your matches below.</p>
+              )}
+              {remainingNames.map(name => (
+                <button
+                  key={name}
+                  draggable
+                  onDragStart={() => setDragging({ name })}
+                  onDragEnd={() => setDragging(null)}
+                  className="px-3 py-2 rounded-lg bg-secondary text-foreground text-sm font-medium border border-border cursor-grab hover:bg-secondary/70"
+                >
+                  {name}
+                </button>
+              ))}
             </div>
+          </div>
+
+          {allMatched && (
+            <button onClick={handleCheckMatch} className="w-full max-w-md mx-auto block py-3 rounded-lg bg-primary text-primary-foreground font-bold">Check Matches</button>
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-// Inline name picker per pile — shows remaining unused names as buttons.
-function NameDropTarget({ onChoose, choices }: { onChoose: (n: string) => void; choices: string[] }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="w-full">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full px-3 py-2 rounded-lg border-2 border-dashed border-primary/40 text-primary text-sm font-bold hover:bg-primary/5"
-      >
-        {open ? 'Close' : 'Pick a name'}
-      </button>
-      {open && (
-        <div className="mt-2 flex flex-col gap-1.5">
-          {choices.map(c => (
-            <button key={c} onClick={() => { onChoose(c); setOpen(false); }}
-              className="px-3 py-2 rounded-md bg-secondary text-foreground text-xs font-medium hover:bg-primary hover:text-primary-foreground transition-colors">
-              {c}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

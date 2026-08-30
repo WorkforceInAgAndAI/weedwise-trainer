@@ -54,9 +54,9 @@ interface Trio {
   stage: 'flower' | 'vegetative';
 }
 
-function buildTrios(): Trio[] {
-  // Only official look-alikes that are inside the 6-8 weed pool.
-  return lookAlikeGroupsForPool(weeds).map(g => ({
+function buildTrios(pool: Weed[] = weeds): Trio[] {
+  // Only official look-alikes that are inside the given weed pool.
+  return lookAlikeGroupsForPool(pool).map(g => ({
     name: g.name,
     weeds: g.weeds as Weed[],
     difference: g.difference,
@@ -64,19 +64,19 @@ function buildTrios(): Trio[] {
   }));
 }
 
-interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
+interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; weedPool?: Weed[] }
 
-export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel }: Props) {
+export default function MSLookAlike({ onBack, gameId, gameName, gradeLabel, weedPool }: Props) {
   const [level, setLevel] = useState(1);
   const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
 
   const trios = useMemo(() => {
-    const all = buildTrios();
+    const all = buildTrios(weedPool);
     const perLevel = Math.max(3, Math.round(d.rounds / 2));
     // Draw a fresh random group set at every level instead of advancing through
     // the same fixed list and adding only one new group.
     return shuffle(all).slice(0, Math.min(perLevel, all.length));
-  }, [level, d.rounds]);
+  }, [level, d.rounds, weedPool]);
 
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);

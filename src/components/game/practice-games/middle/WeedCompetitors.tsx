@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from '@/data/competitionTraits';
+import { getSeedFact } from '@/data/seedFacts';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
@@ -14,8 +15,57 @@ function traitsOf(w: Weed): CompetitionTrait[] {
   return COMPETITION_TRAITS[w.id] || [];
 }
 
+/** How similar two trait profiles are, from 0 (totally contrasting) to 1 (identical). */
+function traitSimilarity(a: CompetitionTrait[], b: CompetitionTrait[]): number {
+  const setB = new Set(b);
+  const shared = a.filter(t => setB.has(t)).length;
+  const union = new Set([...a, ...b]).size;
+  return union === 0 ? 1 : shared / union;
+}
+
+/** Short seed-dispersal quality description for a species, e.g. wind-borne pappus vs. seed dropping beside the parent plant. */
+function dispersalQuality(w: Weed): string {
+  return getSeedFact(w.commonName, w.family, w.plantType).dispersal;
+}
+
 interface RoundOption { trait: CompetitionTrait; correct: boolean; reason: string; }
 interface Round { question: string; competitorInfo: string; options: RoundOption[]; }
+
+/**
+ * Builds a reason string for a trait comparison. Seed dispersal is handled
+ * specially: every species disperses seed somehow, so we compare dispersal
+ * QUALITY (e.g. wind-borne pappus that floats far vs. seed that simply drops
+ * beside the parent plant) instead of framing it as "has it / doesn't".
+ */
+function traitReason(trait: CompetitionTrait, you: Weed, opponent: Weed, mode: 'advantage' | 'shared' | 'backfire' | 'neither'): string {
+  if (trait === 'Seed dispersal') {
+    const yourQuality = dispersalQuality(you);
+    const oppQuality = dispersalQuality(opponent);
+    switch (mode) {
+      case 'advantage':
+        return `${you.commonName}'s seed spreads farther and more reliably (${yourQuality}) than ${opponent.commonName}'s (${oppQuality}) — that's a true edge.`;
+      case 'shared':
+        return `Both ${you.commonName} (${yourQuality}) and ${opponent.commonName} (${oppQuality}) disperse seed about equally well — it cancels out.`;
+      case 'backfire':
+        return `${opponent.commonName} actually spreads seed more effectively here (${oppQuality}) than ${you.commonName} does (${yourQuality}) — that would backfire.`;
+      case 'neither':
+      default:
+        return `Neither ${you.commonName}'s dispersal (${yourQuality}) nor ${opponent.commonName}'s (${oppQuality}) gives a decisive edge here.`;
+    }
+  }
+
+  switch (mode) {
+    case 'advantage':
+      return `${you.commonName} has ${trait}, and ${opponent.commonName} does not — that's a true edge.`;
+    case 'shared':
+      return `Both ${you.commonName} and ${opponent.commonName} share ${trait} — it cancels out.`;
+    case 'backfire':
+      return `${opponent.commonName} actually has ${trait} and ${you.commonName} doesn't — that would backfire.`;
+    case 'neither':
+    default:
+      return `${you.commonName} doesn't have ${trait} as a real survival trait.`;
+  }
+}
 
 function buildRound(you: Weed, opponent: Weed): Round | null {
   const yourTraits = traitsOf(you);
@@ -32,21 +82,21 @@ function buildRound(you: Weed, opponent: Weed): Round | null {
   const options: RoundOption[] = [{
     trait: correctTrait,
     correct: true,
-    reason: `${you.commonName} has ${correctTrait}, and ${opponent.commonName} does not — that's a true edge.`,
+    reason: traitReason(correctTrait, you, opponent, 'advantage'),
   }];
 
   for (const f of fillerPool) {
     if (options.length >= 3) break;
     if (options.some(o => o.trait === f)) continue;
-    let reason: string;
+    let mode: 'shared' | 'backfire' | 'neither';
     if (oppTraits.includes(f) && yourTraits.includes(f)) {
-      reason = `Both ${you.commonName} and ${opponent.commonName} share ${f} — it cancels out.`;
+      mode = 'shared';
     } else if (oppTraits.includes(f)) {
-      reason = `${opponent.commonName} actually has ${f} and ${you.commonName} doesn't — that would backfire.`;
+      mode = 'backfire';
     } else {
-      reason = `${you.commonName} doesn't have ${f} as a real survival trait.`;
+      mode = 'neither';
     }
-    options.push({ trait: f, correct: false, reason });
+    options.push({ trait: f, correct: false, reason: traitReason(f, you, opponent, mode) });
   }
 
   return {
@@ -63,20 +113,24 @@ function getMatchupsForLevel(level: number, targetCount = 4) {
   const rotated = [...pool.slice(offset % pool.length), ...pool.slice(0, offset % pool.length)];
   const shuffled = shuffle(rotated);
   const result: { you: Weed; opponent: Weed }[] = [];
-  // Only include matchups where 'you' has at least one trait the opponent doesn't
+  // Pair each "you" with the most CONTRASTING available opponent (lowest
+  // trait-profile similarity), never a near-identical one, as long as
+  // 'you' still has at least one trait the opponent lacks.
   for (let i = 0; i < shuffled.length && result.length < targetCount; i++) {
     const you = shuffled[i];
+    if (result.some(r => r.you.id === you.id || r.opponent.id === you.id)) continue;
     const yourTraits = traitsOf(you);
-    const opponent = shuffled.find(o => {
+    const candidates = shuffled.filter(o => {
       if (o.id === you.id) return false;
       if (result.some(r => r.you.id === o.id || r.opponent.id === o.id)) return false;
-      if (result.some(r => r.you.id === you.id)) return false;
       const oppT = traitsOf(o);
       return yourTraits.some(t => !oppT.includes(t));
     });
-    if (opponent && !result.some(r => r.you.id === you.id)) {
-      result.push({ you, opponent });
-    }
+    if (candidates.length === 0) continue;
+    const opponent = candidates.reduce((best, cand) =>
+      traitSimilarity(yourTraits, traitsOf(cand)) < traitSimilarity(yourTraits, traitsOf(best)) ? cand : best
+    );
+    result.push({ you, opponent });
   }
   return result;
 }

@@ -3875,36 +3875,7 @@ function TopicContent({
         );
       }
 
-      if (grade === "middle") {
-        return (
-          <div className="space-y-5">
-            <JournalHeader title="Environment Profiles" subtitle="Where Weeds Choose to Grow" />
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-              <p>
-                Have you ever noticed that some weeds always seem to pop up in the same kinds of places? That's not an
-                accident! Just like animals need the right habitat to survive, plants—including weeds—need the right
-                soil conditions to grow well. Things like how wet or dry the soil is, how packed down it is, and how many
-                nutrients it has can all affect which plants can grow there.
-              </p>
-              <p>
-                For example, some weeds are tough survivors that love growing in soil that's been squished down by people
-                walking on it a lot, like along the edge of a sidewalk or a well-used path. Other weeds prefer soil
-                that's rich in nutrients, so you might spot them growing near a garden or farm field where fertilizer has
-                been used. There are even weeds that like really wet, soggy soil, so you'll often find them near ponds or
-                in low spots where water collects after it rains.
-              </p>
-              <p>
-                So the next time you're outside, take a look at the weeds growing around you—they can actually give you
-                clues about what the soil is like in that spot, kind of like nature's own detective work!
-              </p>
-            </div>
-
-            <HabitatExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
-          </div>
-        );
-      }
-
-      // 9-12 and collegiate - site-based habitats with adaptation context
+      // middle, 9-12, and collegiate - site-based habitats with adaptation context
       {
         return (
           <div className="space-y-5">
@@ -6601,7 +6572,7 @@ function TopicContent({
         {
           key: "cover-crops",
           label: "Cover Crops",
-          desc: "Planting helper crops (like cereal rye or clover) between cash crops to shade the soil, take up space, and stop weed seeds from germinating. This is a natural, chemical-free approach.",
+          desc: "Planting helper crops (like cereal rye or clover) between main crops to shade the soil, take up space, and stop weed seeds from germinating. This is a natural, chemical-free approach.",
           example: "Planting cereal rye after the soybean harvest so the field is not bare during the winter.",
         },
         {
@@ -6747,16 +6718,6 @@ function TopicContent({
               </>
             )}
           </div>
-
-          {isElementary && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm text-foreground">
-              <p className="font-display font-bold text-primary mb-1">Word Bank</p>
-              <p>
-                <strong>Cash crop</strong> — the main crop a farmer grows to sell for money, such as soybeans, corn, or
-                wheat. Cash crops are what weeds compete against for sunlight, water, and nutrients.
-              </p>
-            </div>
-          )}
 
           <div className="space-y-3">
             {methods.map((method) => (
@@ -7954,6 +7915,9 @@ function TopicContent({
                 </div>
               ))}
           </div>
+
+          <h3 className="font-display font-bold text-foreground text-sm">Herbicide Injury Symptoms & By-Weed Lookup</h3>
+          <HerbicideMOAExplorer />
         </div>
       );
     }

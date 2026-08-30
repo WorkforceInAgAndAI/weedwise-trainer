@@ -76,7 +76,7 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
       <div className="max-w-4xl mx-auto p-4 pb-28">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-          <h1 className="font-display font-bold text-lg text-foreground">{title}</h1>
+          <h1 className="font-display font-bold text-lg text-foreground">Which house would you most like to move in to?</h1>
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
           <span className="text-sm text-muted-foreground">{idx + 1}/{rounds.length}</span>
         </div>
@@ -94,9 +94,8 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
           </ul>
         </div>
 
-        <p className="text-sm font-semibold text-foreground mb-2 text-center">
-          Which house could you survive in best? Knock on a door.
-        </p>
+
+
 
         {/* Houses laid out like a village circle, with you in the middle */}
         <div className="relative mx-auto w-full max-w-[760px] aspect-square">

@@ -5,6 +5,7 @@ import LevelComplete from '@/components/game/LevelComplete';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { ShieldAlert, Fingerprint, Gavel } from 'lucide-react';
 import { getDifficulty } from '@/lib/difficulty';
+import { normalizeWeedId } from '@/data/gradeWeeds';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -131,7 +132,7 @@ export default function WeedLineUp({ onBack, gameId, gameName, gradeLabel }: Pro
   );
  }
 
- const criminal = weeds.find(w => w.id === c.criminalId);
+ const criminal = weeds.find(w => normalizeWeedId(w.id) === normalizeWeedId(c.criminalId));
  const isCorrect = picked === c.criminalId;
 
  const submit = (id: string) => {
@@ -193,9 +194,10 @@ export default function WeedLineUp({ onBack, gameId, gameName, gradeLabel }: Pro
        <p className="text-xs font-black uppercase tracking-widest text-foreground mb-2 text-center">The Line-Up · Pick the Bad Weed</p>
        <div className="grid grid-cols-3 gap-3">
         {lineup.map((id, i) => {
-         const w = weeds.find(x => x.id === id)!;
+         const w = weeds.find(x => normalizeWeedId(x.id) === normalizeWeedId(id));
          const isThis = picked === id;
          const isBad = id === c.criminalId;
+         if (!w) return null;
          const showResult = picked !== null;
          return (
           <button
