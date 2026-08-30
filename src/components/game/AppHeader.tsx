@@ -30,19 +30,31 @@ export default function AppHeader({
         {/* Center Nav — Learn, Practice, Play, Glossary, References */}
         <nav className="hidden md:flex items-center gap-1">
           {[
-            { label: 'Learn', action: onOpenLearning, icon: BookOpen },
-            { label: 'Practice', action: onOpenPracticeHub, icon: Target },
-            { label: 'Play', action: onOpenFarmMode, icon: Gamepad2 },
-            { label: 'Glossary', action: onOpenGlossary, icon: BookMarked },
-            { label: 'References', action: onOpenReferences, icon: FileText },
+            { label: 'Learn', action: onOpenLearning, icon: BookOpen, disabled: false },
+            { label: 'Practice', action: onOpenPracticeHub, icon: Target, disabled: false },
+            { label: 'Play', action: onOpenFarmMode, icon: Gamepad2, disabled: true },
+            { label: 'Glossary', action: onOpenGlossary, icon: BookMarked, disabled: false },
+            { label: 'References', action: onOpenReferences, icon: FileText, disabled: false },
           ].map(item => (
-            <button
-              key={item.label}
-              onClick={item.action}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary"
-            >
-              {item.label}
-            </button>
+            item.disabled ? (
+              <div
+                key={item.label}
+                aria-disabled="true"
+                title="Coming Soon!"
+                className="px-4 py-1 rounded-md flex flex-col items-center leading-tight cursor-not-allowed select-none opacity-50"
+              >
+                <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Coming Soon!</span>
+              </div>
+            ) : (
+              <button
+                key={item.label}
+                onClick={item.action}
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary"
+              >
+                {item.label}
+              </button>
+            )
           ))}
         </nav>
 
