@@ -5,7 +5,7 @@
 
 // Words too generic to filter on (would remove too many valid traits)
 const SKIP_WORDS = new Set([
- 'common', 'field', 'giant', 'large', 'small', 'tall', 'wild', 'yellow',
+ 'field', 'giant', 'large', 'small', 'tall', 'wild', 'yellow',
  'white', 'eastern', 'false', 'smooth', 'rough', 'mat', 'long', 'short',
  'asian', 'spotted', 'prickly', 'venice', 'star', 'water', 'corn',
 ]);

@@ -15,16 +15,11 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
  * scrubbed (not just the inspected one) so a clue can never leak a sibling's
  * or the target's name either.
  */
-const CLUE_SKIP = new Set([
-  'common', 'field', 'giant', 'large', 'small', 'tall', 'wild', 'yellow', 'white', 'smooth', 'rough',
-  'the', 'and', 'annual', 'spp', 'var', 'subsp',
-]);
-
 const NAME_WORDS: string[] = Array.from(
   new Set(
     weeds
       .flatMap(w => `${w.commonName} ${w.scientificName}`.toLowerCase().replace(/[^a-z\s-]/g, ' ').split(/[\s\-/]+/))
-      .filter(w => w.length >= 4 && !CLUE_SKIP.has(w)),
+      .filter(w => w.length >= 3),
   ),
 ).sort((a, b) => b.length - a.length);
 
@@ -33,7 +28,7 @@ function traitOnlyClue(hook: string, commonName: string, scientificName: string)
     .toLowerCase()
     .replace(/[^a-z\s-]/g, ' ')
     .split(/[\s\-/]+/)
-    .filter(w => w.length >= 3 && !CLUE_SKIP.has(w));
+    .filter(w => w.length >= 3);
   let out = hook;
   [...extra, ...NAME_WORDS].forEach(w => {
     out = out.replace(new RegExp(`\\b${w}\\w*\\b`, 'gi'), 'this plant');

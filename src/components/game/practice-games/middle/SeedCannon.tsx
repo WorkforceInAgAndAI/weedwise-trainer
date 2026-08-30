@@ -36,8 +36,8 @@ function parseSeedCount(production: string): number {
 function scaleToSpawnCount(realCount: number): number {
   // log scale keeps huge producers (100,000+ seeds) from spawning thousands,
   // while still spawning noticeably more of them than low producers.
-  const scaled = Math.round(4 + Math.log10(Math.max(10, realCount)) * 4);
-  return Math.min(28, Math.max(4, scaled));
+  const scaled = Math.round(8 + Math.log10(Math.max(10, realCount)) * 7);
+  return Math.min(48, Math.max(8, scaled));
 }
 
 interface SpeciesInfo { weed: typeof weeds[0]; spawnCount: number; }
@@ -172,7 +172,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
     popsRef.current = popsRef.current.filter(f => f.life > 0);
 
     // spawn
-    const spawnInterval = 260;
+    const spawnInterval = 140;
     if (now - spawnRef.current > spawnInterval && now < endRef.current && spawnQueueRef.current.length > 0) {
       spawnRef.current = now;
       const weedId = spawnQueueRef.current.pop()!;
@@ -182,7 +182,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
         weedId,
         x: 40 + Math.random() * (AREA_W - 80),
         y: -SEED_SIZE,
-        vy: 55 + Math.random() * 55,
+        vy: 95 + Math.random() * 75,
         rot: Math.random() * 360,
         vr: (Math.random() - 0.5) * 60,
         popped: false,
