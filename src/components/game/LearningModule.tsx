@@ -2669,8 +2669,8 @@ function TopicContent({
                       <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
                         <WeedImage weedId={w.id} stage="seed" className="w-full h-full object-cover" />
                       </div>
-                      <p className="font-display font-bold text-sm text-foreground text-center">{w.commonName} seed</p>
-                      <p className="text-xs text-muted-foreground text-center">{getElementarySeedDescription(w)}</p>
+                      <p className="font-display font-bold text-sm text-foreground text-center">{w.commonName}</p>
+                      <p className="text-xs text-muted-foreground text-center">{getSeedPanelDescription(w)}</p>
                     </div>
                   ))}
                 </div>
