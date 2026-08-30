@@ -22,7 +22,6 @@ import LifeCycleMatching from './practice-games/k5/LifeCycleMatching';
 import HabitatMapping from './practice-games/k5/HabitatMapping';
 import WeedSeedBanks from './practice-games/k5/WeedSeedBanks';
 import WeedTravel from './practice-games/k5/WeedTravel';
-import InvasiveMatch from './practice-games/k5/InvasiveMatch';
 import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import GreatGardenRace from './practice-games/k5/GreatGardenRace';
@@ -53,7 +52,6 @@ import InvasiveQuiz from './practice-games/middle/InvasiveQuiz';
 import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
 import LifeStageControl from './practice-games/middle/LifeStageControl';
 import MSLifeCycleMatching from './practice-games/middle/LifeCycleMatching';
-import WeedBank from './practice-games/middle/WeedBank';
 import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
@@ -79,6 +77,7 @@ import LifeStageMaze from './practice-games/high/LifeStageMaze';
 import PracticeStore from './PracticeStore';
 import HeroBuddy from './HeroCharacter';
 import type { StoreBand } from '@/lib/practiceStore';
+import { collegiateWeeds } from '@/data/gradeWeeds';
 import type { PoolGrade } from '@/data/gradeWeeds';
 
 interface GameDef {
@@ -145,9 +144,13 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'hs-control-match': 'herbicide-moa', 'crop-doctor': 'crop-injury',
   'grass-id-lab': 'grass-id',
   'life-stage-maze': 'life-stage-control',
+  'college-look-alike': 'look-alikes',
 };
 
 /** 9-12 variants of the two shared scouting/herbicide games. */
+const CollegiateLookAlike = (p: { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }) =>
+  <MSLookAlike {...p} weedPool={collegiateWeeds} />;
+
 const HSFieldScoutChallenge = (p: { onBack: () => void }) => <FieldScoutChallenge {...p} variant="high" />;
 const HSHerbicideApplicator = (p: { onBack: () => void }) => <HerbicideApplicator {...p} variant="high" />;
 
@@ -213,7 +216,7 @@ const middleGames: GameDef[] = [
 
 const highGames: GameDef[] = [
  { id: 'hs-name-weed', name: 'Name the Weed', Icon: GraduationCap, category: 'Scientific Names', description: 'Identify weeds by their scientific name.', howToPlay: 'Look at the image and traits, then choose the correct scientific name.', component: HSNameTheWeed },
- { id: 'weed-bank', name: 'Weed Bank', Icon: Landmark, category: 'Seed Banks', description: 'Manage the weed seed bank under the field like a bank account over 5 seasons.', howToPlay: 'Read each year\u2019s Farm Conditions card, spend your Farm Dollars on management, then watch the bank statement. Germination and seed death are withdrawals; weeds that set seed are deposits. Shrink the balance over 5 seasons.', component: WeedBank },
+ { id: 'weed-bank', name: 'Weed Seed Banks', Icon: Landmark, category: 'Seed Banks', description: 'Match every seed to its species, then predict how many seeds are hiding in the soil.', howToPlay: 'Drag each common name from the word bank onto the seed photo you think it belongs to. Your answers are reviewed at the end. Then predict the seeds each species drops per plant.', component: WeedSeedBanks },
  { id: 'hs-taxonomy', name: 'Taxonomy Tower', Icon: Layers, category: 'Taxonomy', description: 'Navigate genus and species using a dichotomous key.', howToPlay: 'Climb the tower from Kingdom to Species.', component: HSTaxonomyTower },
  { id: 'spot-differences', name: 'Flower Reproductive Jobs', Icon: Search, category: 'Intra-species', description: 'Dioecious and monoecious weeds: match the clue to the male or female flowers.', howToPlay: 'Pick a section, read the trait clue, then tap the male or female image it describes.', component: SpotTheDifferences },
  { id: 'hs-habitat', name: 'Habitat Selection Lab', Icon: Map, category: 'Habitats', description: 'Seedling-stage specimens: infer habitat from condensed adaptation notes.', howToPlay: 'A seedling photo and two short adaptation notes are given. Select the habitat the species is best adapted to. Some species occupy more than one habitat.', component: HSHabitatMapping },
@@ -227,6 +230,7 @@ const highGames: GameDef[] = [
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Review your diagnoses at the end.', component: CropDoctor },
  
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
+ { id: 'college-look-alike', name: 'Look-Alikes', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from commonly-confused look-alikes across the full species list.', howToPlay: 'Three look-alike weeds appear. Drag the magnifying glass over each specimen to read trait-only field notes, then select the species that matches the target name.', component: CollegiateLookAlike },
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
 ];
 

@@ -7915,6 +7915,9 @@ function TopicContent({
                 </div>
               ))}
           </div>
+
+          <h3 className="font-display font-bold text-foreground text-sm">Herbicide Injury Symptoms & By-Weed Lookup</h3>
+          <HerbicideMOAExplorer />
         </div>
       );
     }
