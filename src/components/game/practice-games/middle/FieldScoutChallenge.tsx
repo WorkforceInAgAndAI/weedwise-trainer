@@ -258,12 +258,12 @@ export default function FieldScoutChallenge({
       ? 'Moderately productive'
       : 'Not productive';
   const ratingWhy = productive
-    ? `You walked a proper W on all three trips — four legs, edge to edge, crossing ${avgBlocks.toFixed(1)} of the 9 field blocks. That is the standard scouting pattern: it samples the whole field for the least walking, so you found ${Math.round(foundPct * 100)}% of the weeds and earned a $${wBonus.toLocaleString()} efficiency bonus.`
+    ? `You had good coverage on all three trips, crossing ${avgBlocks.toFixed(1)} of the 9 field blocks. Good coverage samples the whole field for the least walking, so you found ${Math.round(foundPct * 100)}% of the weeds and earned a $${wBonus.toLocaleString()} efficiency bonus.`
     : overWalked > 0
-      ? `On ${overWalked} of your trips you walked far more than a W needs. The extra ground cost you $${totalSpent.toLocaleString()} in scouting without finding much more. Four long diagonal legs across the field is enough.`
+      ? `On ${overWalked} of your trips you had too much coverage and wasted money. The extra ground cost you $${totalSpent.toLocaleString()} in scouting without finding much more.`
       : underWalked > 0
-        ? `On ${underWalked} of your trips you walked less than a full W, so whole strips of the field were never looked at. ${totalMissed} weeds went undetected and cost $${yieldLoss.toLocaleString()} in yield loss.`
-        : `Your routes were not a W — a W is four long legs from edge to edge with three turns. You sampled about ${avgBlocks.toFixed(1)} of the 9 blocks and missed ${totalMissed} weeds, costing $${yieldLoss.toLocaleString()}.`;
+        ? `On ${underWalked} of your trips you had poor coverage, so whole strips of the field were never looked at. ${totalMissed} weeds went undetected and cost $${yieldLoss.toLocaleString()} in yield loss.`
+        : `Your routes had poor coverage. You sampled about ${avgBlocks.toFixed(1)} of the 9 blocks and missed ${totalMissed} weeds, costing $${yieldLoss.toLocaleString()}.`;
 
 
   if (seasonOver) {
@@ -280,11 +280,11 @@ export default function FieldScoutChallenge({
             <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">W-pattern efficiency bonus ({wTrips}/3 trips)</span><span className="font-bold text-primary">+${wBonus.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Good coverage efficiency bonus ({wTrips}/3 trips)</span><span className="font-bold text-primary">+${wBonus.toLocaleString()}</span></div>
             <div className="border-t border-border pt-2 flex justify-between text-lg"><span className="font-bold text-foreground">Money kept</span><span className="font-extrabold text-primary">${finalMoney.toLocaleString()}</span></div>
             <p className="text-xs text-muted-foreground pt-2">
-              The W is the standard scouting pattern: four long legs from edge to edge with three turns. Walk less than
-              that and you miss strips of the field; walk more and you burn money without finding more weeds.
+              Aim for good coverage of the whole field. Cover less than that and you miss strips of the field; cover
+              more and you waste money without finding more weeds.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -294,7 +294,7 @@ export default function FieldScoutChallenge({
                 <p className="text-sm font-bold text-foreground">{l.found}/{l.total} found</p>
                 <p className="text-[10px] text-muted-foreground">${l.cost} · {l.blocks}/9 blocks</p>
                 <p className={`text-[10px] font-bold ${l.wRoute ? 'text-primary' : 'text-destructive'}`}>
-                  {l.wRoute ? 'W route' : l.walked > IDEAL_MAX_LEN ? 'Over-walked' : 'Under-walked'}
+                  {l.wRoute ? 'Good coverage' : l.walked > IDEAL_MAX_LEN ? 'Too much coverage' : 'Poor coverage'}
                 </p>
               </div>
             ))}
@@ -412,7 +412,7 @@ export default function FieldScoutChallenge({
             <div className="flex justify-between text-xs">
               <span className="flex items-center gap-1 text-foreground"><Target className="w-3 h-3" /> Route shape</span>
               <span className={`font-bold ${wRoute ? 'text-primary' : 'text-destructive'}`}>
-                {wRoute ? 'W pattern' : tooLong ? 'Too much walking' : tooShort ? 'Too short' : 'Not a W yet'}
+                {wRoute ? 'Good coverage' : tooLong ? 'Too much coverage' : tooShort ? 'Poor coverage' : 'Poor coverage'}
               </span>
             </div>
             {submitted && (
@@ -434,21 +434,21 @@ export default function FieldScoutChallenge({
                 <RotateCcw className="w-3.5 h-3.5" /> Clear Path
               </button>
               <p className="text-[11px] text-muted-foreground italic text-center">
-                Scouts walk a W: four long legs from edge to edge with three turns. Draw less and you miss strips of
-                field; draw more and you spend money without finding more weeds.
+                Cover the whole field evenly. Draw less and you miss strips of field; draw more and you spend money
+                without finding more weeds.
               </p>
             </div>
           ) : (
             <div className="space-y-2">
               <div className={`rounded-xl border-2 p-3 ${wRoute ? 'border-primary/50 bg-primary/10' : 'border-destructive/50 bg-destructive/10'}`}>
                 <p className="text-sm font-bold text-foreground">
-                  {wRoute ? 'Textbook W route.' : tooLong ? 'You walked too far.' : tooShort ? 'You did not walk enough.' : 'That was not a W.'}
+                  {wRoute ? 'Good coverage.' : tooLong ? 'Too much coverage — you wasted money.' : 'Poor coverage.'}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
                   {wRoute
                     ? 'A representative sample of the whole field for the least walking — pressure stays lower next trip.'
                     : tooLong
-                      ? `That route cost $${cost.toLocaleString()}. A W would have sampled the same field for less.`
+                      ? `That route cost $${cost.toLocaleString()}. Even coverage would have sampled the same field for less.`
                       : `${GRID * GRID - blocksCovered} blocks were never walked — expect more weeds next time.`}
                 </p>
               </div>
