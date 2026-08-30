@@ -74,7 +74,6 @@ import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
 import GrassID from './practice-games/high/GrassID';
-import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 import PracticeStore from './PracticeStore';
@@ -229,8 +228,6 @@ const highGames: GameDef[] = [
  
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
- { id: 'hs-field-scout-draw', name: 'Field Scout — Draw Your Transect', Icon: Footprints, category: 'Scouting Tools', description: 'Draw your own scouting path with limited walking distance and herbicide.', howToPlay: 'Drag on the aerial field to draw a transect. You have a limited path length and 8 spot-spray charges. Score combines coverage (weeds found) and diversity (unique species) — a straight line loses to a smart zigzag.', component: FieldScoutDraw },
- { id: 'invasive-match', name: 'Introduced Match', Icon: AlertTriangle, category: 'Introduced Weeds', description: 'Match introduced weeds to the damage they cause.', howToPlay: 'Connect each introduced weed with the negative effect it has on the environment.', component: InvasiveMatch },
 ];
 
 type Screen = 'grades' | 'games' | 'info' | 'playing' | 'store';
