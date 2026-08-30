@@ -10,6 +10,12 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const STAGES = ['seedling', 'vegetative', 'reproductive'] as const;
 type Stage = typeof STAGES[number];
 const STAGE_LABELS: Record<Stage, string> = { seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive' };
+const DISPLAY_STAGES = [
+  { id: "seedling", label: "Seedling", image: "seedling" },
+  { id: "vegetative", label: "Vegetative", image: "vegetative" },
+  { id: "reproductive", label: "Flower/Repro", image: "flower" },
+  { id: "mature", label: "Mature/Seed", image: "repros" },
+] as const;
 const STAGE_IMAGE_MAP: Record<Stage, string> = { seedling: 'seedling', vegetative: 'vegetative', reproductive: 'flower' };
 
 const CONTROLS = [
