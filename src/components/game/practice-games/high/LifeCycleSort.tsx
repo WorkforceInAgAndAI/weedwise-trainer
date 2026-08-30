@@ -327,7 +327,7 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
         <h2 className="text-xl font-bold text-foreground mb-2">Round {round + 1}</h2>
         <p className="text-sm text-muted-foreground mb-4">
          Drag each falling weed into its correct life-cycle bin. Wrong bin: it bounces back out and keeps falling.
-         Reach the ground: it's a miss.
+         Reach the soil line: it bounces back to the top and keeps falling.
         </p>
         <button onClick={beginRound}
          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-bold hover:opacity-90">
