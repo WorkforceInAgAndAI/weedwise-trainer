@@ -8416,7 +8416,7 @@ function TopicContent({
                   >
                     {s}
                   </div>
-                  <p className="text-[9px] text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {i === 0 ? "Easiest" : i === 1 ? "Easy" : i === 2 ? "Moderate" : i === 3 ? "Hard" : "Hardest"}
                   </p>
                 </div>
@@ -8443,7 +8443,7 @@ function TopicContent({
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <figcaption className="text-[10px] text-center text-muted-foreground">
+                        <figcaption className="text-sm font-bold text-center text-foreground">
                           {w?.commonName ?? wid}
                         </figcaption>
                       </figure>
@@ -8458,6 +8458,55 @@ function TopicContent({
               </div>
             ))}
           </div>
+
+          {/* Every species grouped by the stage at which it is best controlled */}
+          {(() => {
+            const buckets: { key: string; label: string; imgStage: string; methods: string; test: (t: string) => boolean }[] = [
+              { key: "seedling", label: "Best controlled at the SEEDLING stage", imgStage: "seedling", methods: "POST herbicide at small weed height, cultivation, hand removal, and a PRE herbicide the following season.", test: (t) => /seedling|small|early|pre-?emerg|cotyledon|2\s*-?\s*4/i.test(t) },
+              { key: "vegetative", label: "Best controlled at the VEGETATIVE stage", imgStage: "vegetative", methods: "Full-rate POST herbicide with an effective MOA, mechanical cultivation, or mowing before bud.", test: (t) => /vegetative|rosette|bolting|bud|before flower/i.test(t) },
+              { key: "reproductive", label: "Best controlled at the REPRODUCTIVE / MATURE stage", imgStage: "flower", methods: "Systemic herbicide translocated to roots or rhizomes, plus hand-pulling escapes to prevent seed set.", test: () => true },
+            ];
+            const assigned = new Map<string, Weed[]>(buckets.map((b) => [b.key, []]));
+            topicWeeds.forEach((w) => {
+              const timing = w.controlTiming || "";
+              const b = buckets.find((bk) => bk.test(timing))!;
+              assigned.get(b.key)!.push(w);
+            });
+            return (
+              <div className="space-y-4">
+                <h3 className="font-display font-bold text-foreground text-base border-l-4 border-primary pl-3">
+                  Species Grouped by Best Control Timing
+                </h3>
+                {buckets.map((b) => {
+                  const list = byCommonName(assigned.get(b.key) ?? []);
+                  if (!list.length) return null;
+                  return (
+                    <div key={b.key} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                      <p className="font-display font-bold text-foreground text-base">{b.label}</p>
+                      <p className="text-sm text-primary">
+                        <span className="font-semibold">Best ways to control:</span> {b.methods}
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {list.map((w) => (
+                          <figure key={w.id} className="space-y-1">
+                            <div className="aspect-square rounded-md overflow-hidden bg-secondary border border-border">
+                              <WeedImage weedId={w.id} stage={b.imgStage} className="w-full h-full object-cover" />
+                            </div>
+                            <figcaption className="text-sm font-bold text-center text-foreground leading-tight">
+                              {w.commonName}
+                            </figcaption>
+                            <p className="text-[11px] text-center text-muted-foreground leading-tight">
+                              {w.controlTiming}
+                            </p>
+                          </figure>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       );
     }
