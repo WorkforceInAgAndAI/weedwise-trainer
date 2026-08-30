@@ -78,6 +78,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
   const spawnQueueRef = useRef<string[]>([]);
   const seenSpeciesRef = useRef<Set<string>>(new Set());
   const shotSpeciesRef = useRef<Set<string>>(new Set());
+  const missedSpeciesRef = useRef<Set<string>>(new Set());
 
   const seedsRef = useRef<FallingSeed[]>([]);
   const projectilesRef = useRef<Projectile[]>([]);
@@ -117,6 +118,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
     popsRef.current = [];
     seenSpeciesRef.current = new Set();
     shotSpeciesRef.current = new Set();
+    missedSpeciesRef.current = new Set();
     scoreRef.current = 0;
     setScore(0);
     setTimeLeft(ROUND_SECONDS);
@@ -138,6 +140,9 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
     // move falling seeds
     for (const s of seedsRef.current) {
       if (!s.popped) { s.y += s.vy * dt; s.rot += s.vr * dt; }
+    }
+    for (const s of seedsRef.current) {
+      if (!s.popped && s.y >= AREA_H - 30) missedSpeciesRef.current.add(s.weedId);
     }
     seedsRef.current = seedsRef.current.filter(s => s.y < AREA_H + 60 && !s.popped);
 
@@ -246,7 +251,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
     return (
       <MatchPhase
         speciesPool={speciesPool}
-        shotSpecies={shotSpeciesRef.current}
+        missedSpecies={missedSpeciesRef.current}
         seenSpecies={seenSpeciesRef.current}
         score={score}
         level={level}
@@ -298,7 +303,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
         {phase === 'roundEnd' && (
           <div className="rounded-xl border-2 border-border p-8 text-center bg-card">
             <h2 className="text-xl font-bold text-foreground mb-2">Time's Up!</h2>
-            <p className="text-muted-foreground mb-4">You popped seeds from {shotSpeciesRef.current.size} species. Now match what you saw to its name.</p>
+            <p className="text-muted-foreground mb-4">{missedSpeciesRef.current.size} species made it into the soil. Figure out what seeds you missed and are now in your seed bank.</p>
             <button onClick={goToMatch} className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Continue to Matching</button>
           </div>
         )}
@@ -393,7 +398,7 @@ export default function SeedCannon({ onBack, gameId, gameName, gradeLabel }: Pro
 
 interface MatchPhaseProps {
   speciesPool: SpeciesInfo[];
-  shotSpecies: Set<string>;
+  missedSpecies: Set<string>;
   seenSpecies: Set<string>;
   score: number;
   level: number;
@@ -405,17 +410,15 @@ interface MatchPhaseProps {
   onStartOver: () => void;
 }
 
-function MatchPhase({ speciesPool, shotSpecies, seenSpecies, score, level, gameId, gameName, gradeLabel, onBack, onNextLevel, onStartOver }: MatchPhaseProps) {
-  // Prefer species the player actually shot; pad with seen-but-unshot species up to 8.
+function MatchPhase({ speciesPool, missedSpecies, seenSpecies, score, level, gameId, gameName, gradeLabel, onBack, onNextLevel, onStartOver }: MatchPhaseProps) {
+  // Species whose seeds reached the soil — those are the ones now in the seed bank.
   const roundSpecies = useMemo(() => {
     const byId = new Map(speciesPool.map(s => [s.weed.id, s]));
-    const shot = [...shotSpecies].map(id => byId.get(id)).filter(Boolean) as SpeciesInfo[];
+    const missed = [...missedSpecies].map(id => byId.get(id)).filter(Boolean) as SpeciesInfo[];
     const seen = [...seenSpecies].map(id => byId.get(id)).filter(Boolean) as SpeciesInfo[];
-    const combined = shot.length > 0 ? shot : seen;
-    const extra = seen.filter(s => !combined.includes(s));
-    const merged = [...combined, ...extra].slice(0, 8);
+    const merged = (missed.length > 0 ? missed : seen).slice(0, 8);
     return merged.length > 0 ? merged : speciesPool.slice(0, 6);
-  }, [speciesPool, shotSpecies, seenSpecies]);
+  }, [speciesPool, missedSpecies, seenSpecies]);
 
   const [matched, setMatched] = useState<Record<string, string>>({}); // weedId -> commonName
   const [rejecting, setRejecting] = useState<string | null>(null); // weedId currently bouncing
@@ -464,7 +467,7 @@ function MatchPhase({ speciesPool, shotSpecies, seenSpecies, score, level, gameI
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       <div className="flex items-center gap-3 p-4 border-b border-border">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-display font-bold text-foreground text-lg flex-1">Match What You Shot</h1>
+        <h1 className="font-display font-bold text-foreground text-lg flex-1">Figure Out What You Missed</h1>
         <span className="text-sm text-muted-foreground">Score {score}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
@@ -473,7 +476,7 @@ function MatchPhase({ speciesPool, shotSpecies, seenSpecies, score, level, gameI
             gradeLabel="9-12"
             tone="intro"
             className="mb-4"
-            message="Drag each name onto the seed photo it belongs to. Wrong guesses will bounce right back to the word bank — keep trying until every seed is matched."
+            message="These seeds hit the soil and are now in your seed bank. Figure out what seeds you missed and are now in your seed bank — drag each name onto the seed photo it belongs to. Wrong guesses bounce right back to the word bank."
           />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
             {roundSpecies.map(s => {
