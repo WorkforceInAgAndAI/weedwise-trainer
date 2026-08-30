@@ -81,7 +81,7 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
  const dragPointerIdRef = useRef<number | null>(null);
  const dragPosRef = useRef<{ x: number; y: number } | null>(null);
 
- const fallSpeed = 22 * Math.min(1.6, d.speed); // slow, gently ramps with level
+ const fallSpeed = 70 * Math.min(1.6, d.speed); // steady fall, ramps with level
 
  const done = round >= ROUNDS_PER_LEVEL;
 
@@ -129,11 +129,10 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
    if (s.status !== 'falling') continue;
    s.y += fallSpeed * dt;
    if (s.y >= groundY) {
-    s.y = groundY;
-    s.status = 'missed';
-    s.resolvedAt = now;
-    missedRef.current = [...missedRef.current, { weed: s.weed, correct: s.correct }];
-    resolvedCountRef.current += 1;
+    // Hit the soil line — bounce back to the top and fall again.
+    const width = container ? container.clientWidth : 600;
+    s.y = -(CARD_H + Math.random() * 80);
+    s.x = Math.max(0, Math.min(Math.max(1, width - CARD_W), Math.random() * Math.max(1, width - CARD_W)));
    }
   }
 
@@ -142,8 +141,9 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
    const rect = container.getBoundingClientRect();
    const s = spritesRef.current.find(sp => sp.key === dragKeyRef.current);
    if (s) {
-    s.x = Math.max(0, Math.min(rect.width - CARD_W, dragPosRef.current.x - rect.left - CARD_W / 2));
-    s.y = Math.max(0, Math.min(rect.height - CARD_H, dragPosRef.current.y - rect.top - CARD_H / 2));
+    // Allow the card to travel past the field edges so it can be dropped on a bin.
+    s.x = Math.max(-CARD_W / 2, Math.min(rect.width - CARD_W / 2, dragPosRef.current.x - rect.left - CARD_W / 2));
+    s.y = Math.max(-CARD_H / 2, Math.min(rect.height + 400, dragPosRef.current.y - rect.top - CARD_H / 2));
    }
   }
 
