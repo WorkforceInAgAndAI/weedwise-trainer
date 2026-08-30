@@ -289,6 +289,25 @@ export default function SafeVsToxic({ onBack }: { onBack: () => void }) {
               <p className="text-xs italic text-muted-foreground">{current!.toxic.scientificName}</p>
             </div>
 
+            {selected !== current!.toxic.id && (
+              <div className="bg-destructive/5 border border-destructive/30 rounded-xl p-3 mb-4 space-y-1.5">
+                <p className="text-xs font-bold text-foreground mb-1">Here's what was actually in the lineup:</p>
+                {current!.options.map(w => {
+                  const isToxic = w.id === current!.toxic.id;
+                  return (
+                    <p key={w.id} className="text-xs text-foreground leading-snug">
+                      <span className={`font-bold ${isToxic ? 'text-destructive' : 'text-green-600 dark:text-green-500'}`}>
+                        {w.commonName} — {isToxic ? 'UNSAFE' : 'safe to handle'}
+                      </span>
+                      {isToxic && current!.toxic.safetyNote && (
+                        <span className="text-muted-foreground"> ({current!.toxic.safetyNote})</span>
+                      )}
+                    </p>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="grid sm:grid-cols-2 gap-3 mb-4">
               {current!.toxic.safetyNote && (
                 <div className="bg-destructive/10 border border-destructive rounded-xl p-3 sm:col-span-2">
