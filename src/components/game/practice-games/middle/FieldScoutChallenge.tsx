@@ -281,6 +281,8 @@ export default function FieldScoutChallenge({
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Season {season} report</p>
             <p className="font-display font-extrabold text-5xl sm:text-6xl text-primary">${finalMoney.toLocaleString()}</p>
             <p className="text-sm font-bold text-foreground">{rating}</p>
+            <p className="text-base font-extrabold text-foreground mt-1">Scouting score: {seasonPoints}/3</p>
+            <p className="text-[11px] text-muted-foreground">One point per season with good coverage; poor or wasteful coverage loses the point.</p>
             <p className="text-xs text-muted-foreground mt-2 text-left">{ratingWhy}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 space-y-2 text-sm">
