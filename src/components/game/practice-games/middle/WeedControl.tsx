@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { middleSchoolWeeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
 import { DollarSign, Check, X, Info } from 'lucide-react';
@@ -72,8 +72,8 @@ function scatter(count: number): { x: number; y: number }[] {
   return spots;
 }
 
-function buildField(count: number): FieldWeed[] {
-  const pool = shuffle(weeds);
+function buildField(count: number, weedPool: Weed[]): FieldWeed[] {
+  const pool = shuffle(weedPool);
   const spots = scatter(count);
   return Array.from({ length: count }, (_, i) => ({
     id: `${pool[i % pool.length].id}-${i}-${Math.random().toString(36).slice(2, 6)}`,
@@ -99,10 +99,11 @@ interface Handled {
   cost: number;
 }
 
-export default function WeedControl({ onBack }: { onBack: () => void }) {
+export default function WeedControl({ onBack, weedPool, title }: { onBack: () => void; weedPool?: Weed[]; title?: string }) {
+  const weeds = weedPool ?? middleSchoolWeeds;
   const [season, setSeason] = useState(1);
   const [population, setPopulation] = useState(6);
-  const [field, setField] = useState<FieldWeed[]>(() => buildField(6));
+  const [field, setField] = useState<FieldWeed[]>(() => buildField(6, weeds));
   const [budget, setBudget] = useState(START_BUDGET);
   const [current, setCurrent] = useState<string | null>(null);
   const [step, setStep] = useState<'quiz' | 'result'>('quiz');
@@ -180,13 +181,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     if (season >= SEASONS) { setGameOver(true); setShowSummary(false); return; }
     setSeason(s => s + 1);
     setPopulation(next);
-    setField(buildField(next));
+    setField(buildField(next, weeds));
     setHandled([]);
     setShowSummary(false);
   };
 
   const startOver = () => {
-    setSeason(1); setPopulation(6); setField(buildField(6)); setBudget(START_BUDGET);
+    setSeason(1); setPopulation(6); setField(buildField(6, weeds)); setBudget(START_BUDGET);
     setHandled([]); closeWeed(); setShowSummary(false);
     setGameOver(false); setTotalCorrectWeeds(0); setIncome(0); setSeasonBonusPaid(0);
   };
@@ -259,7 +260,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     <div className={shell}>
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur flex-wrap">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Weed Control</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">{title ?? 'Weed Control'}</h1>
         <span className="text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
           <DollarSign className="w-3 h-3" />{budget}
         </span>
