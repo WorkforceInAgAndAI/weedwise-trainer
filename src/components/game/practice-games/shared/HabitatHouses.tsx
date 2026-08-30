@@ -106,9 +106,9 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
         </p>
 
         {/* Houses laid out like a village circle */}
-        <div className="relative mx-auto w-full max-w-[560px] aspect-square">
-          <div className="absolute inset-[18%] rounded-full border-4 border-dashed border-primary/25 bg-primary/5 flex items-center justify-center">
-            <p className="text-sm sm:text-base font-bold text-muted-foreground text-center px-6">
+        <div className="relative mx-auto w-full max-w-[720px] aspect-square">
+          <div className="absolute inset-[30%] rounded-full border-4 border-dashed border-primary/25 bg-primary/5 flex items-center justify-center">
+            <p className="text-sm sm:text-base font-bold text-muted-foreground text-center px-4">
               Knock on the door of the house you could live in.
             </p>
           </div>
@@ -123,15 +123,15 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
               else tone = `${c.border} ${c.bg} opacity-50`;
             }
             const angle = (i / HABITAT_HOUSES.length) * Math.PI * 2 - Math.PI / 2;
-            const left = 50 + Math.cos(angle) * 39;
-            const top = 50 + Math.sin(angle) * 39;
+            const left = 50 + Math.cos(angle) * 41;
+            const top = 50 + Math.sin(angle) * 41;
             return (
               <button
                 key={h.id}
                 onClick={() => choose(h.id)}
                 disabled={!!picked}
                 style={{ left: `${left}%`, top: `${top}%`, transform: 'translate(-50%,-50%)' }}
-                className={`absolute w-[30%] rounded-xl border-4 p-0 overflow-hidden text-center transition-all ${tone}`}
+                className={`absolute w-[25%] rounded-xl border-4 p-0 overflow-hidden text-center transition-all ${tone}`}
               >
                 <div className={`h-5 w-full ${c.roof}`} style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
                 <div className="p-2">

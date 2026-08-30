@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
@@ -11,59 +11,216 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const CYCLES = ['Annual', 'Biennial', 'Perennial'] as const;
 
 function getCycleType(w: typeof weeds[0]): string {
-  if (w.lifeCycle.includes('Biennial')) return 'Biennial';
-  if (w.lifeCycle.includes('Perennial')) return 'Perennial';
+  const lc = w.lifeCycle.toLowerCase();
+  if (lc.includes('biennial')) return 'Biennial';
+  if (lc.includes('perennial')) return 'Perennial';
   return 'Annual';
 }
 
-function pickRoundWeeds(level: number, roundNum: number, perType: number): { weed: typeof weeds[0]; correct: string }[] {
+const TOTAL_ROUNDS = 4;
+const PER_ROUND = 9;
+
+function pickRoundWeeds(level: number, roundNum: number) {
   const byType: Record<string, typeof weeds[0][]> = { Annual: [], Biennial: [], Perennial: [] };
   weeds.forEach(w => byType[getCycleType(w)].push(w));
-  const offset = ((level - 1) * 24 + roundNum * 6);
+  const offset = (level - 1) * 12 + roundNum * 3;
   const picks: { weed: typeof weeds[0]; correct: string }[] = [];
   for (const type of CYCLES) {
     const pool = byType[type];
-    const start = offset % Math.max(pool.length, 1);
+    if (pool.length === 0) continue;
+    const start = offset % pool.length;
     const rotated = [...pool.slice(start), ...pool.slice(0, start)];
-    shuffle(rotated).slice(0, perType).forEach(w => picks.push({ weed: w, correct: type }));
+    shuffle(rotated).slice(0, 3).forEach(w => picks.push({ weed: w, correct: type }));
   }
-  return shuffle(picks);
+  return shuffle(picks).slice(0, PER_ROUND);
 }
 
-const TOTAL_ROUNDS = 4;
+interface PhysicsState {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  id: string;
+}
 
 interface Props { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string; }
 
-export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
+export default function LifeCycleMatching({ onBack, gradeLabel = '6-8' }: Props) {
   const [level, setLevel] = useState(1);
-  const d = useMemo(() => getDifficulty(level, 'k5'), [level]);
-  const perType = Math.max(1, Math.round(d.rounds / 3));
   const { addBadge } = useGameProgress();
   const [round, setRound] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const d = useMemo(() => getDifficulty(level, 'ms'), [level]);
+  const totalRounds = Math.max(TOTAL_ROUNDS, Math.round(d.rounds / 3));
 
-  const items = useMemo(() => pickRoundWeeds(level, round, perType), [level, round, perType]);
+  const items = useMemo(() => pickRoundWeeds(level, round), [level, round]);
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [bouncedIds, setBouncedIds] = useState<string[]>([]);
   const [farmerMsg, setFarmerMsg] = useState<{ tone: 'intro' | 'correct' | 'wrong' | 'cheer'; text: string }>(
-    { tone: 'intro', text: `Howdy! Let's sort these weeds by life cycle. Annuals finish in one year, biennials take two, and perennials come back year after year. Drag each weed into the right bin!` }
+    { tone: 'intro', text: `Sort each weed into its life-cycle type: Summer annuals germinate in spring and die before winter. Winter annuals germinate in the fall, flower the next spring, and die before summer. Biennials live two years — leafy rosette year one, flower & seed year two. Perennials live three or more years, regrowing from roots, rhizomes, or crowns every season.` }
   );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [physicsObjects, setPhysicsObjects] = useState<PhysicsState[]>([]);
+  const physicsRef = useRef<PhysicsState[]>([]);
+  const requestRef = useRef<number>();
+  // Pointer dragging: a floating ghost bubble follows the pointer and is
+  // dropped into whichever life-cycle bin it is released over.
+  const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null);
+  const dragIdRef = useRef<string | null>(null);
+  const binRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
 
   const unplaced = items.filter(i => !placements[i.weed.id]);
   const allPlaced = Object.keys(placements).length === items.length;
   const correctCount = items.filter(i => placements[i.weed.id] === i.correct).length;
-  const done = round >= TOTAL_ROUNDS;
+  const done = round >= totalRounds;
 
-  const handleDrop = (cycle: string) => {
-    const id = draggedId || selected;
-    if (!id || checked) return;
+  // Sync physics objects when unplaced weeds change
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const { clientWidth, clientHeight } = containerRef.current;
+    const cardWidth = 120;
+    const cardHeight = 150;
+
+    const currentIds = new Set(unplaced.map(u => u.weed.id));
+    
+    // Filter out removed weeds and add new ones
+    const nextPhysics = physicsRef.current.filter(p => currentIds.has(p.id));
+    const existingIds = new Set(nextPhysics.map(p => p.id));
+
+    unplaced.forEach(u => {
+      if (!existingIds.has(u.weed.id)) {
+        nextPhysics.push({
+          id: u.weed.id,
+          x: Math.random() * (clientWidth - cardWidth),
+          y: Math.random() * (clientHeight - cardHeight),
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+        });
+      }
+    });
+
+    physicsRef.current = nextPhysics;
+    setPhysicsObjects([...nextPhysics]);
+  }, [unplaced.length]); // Only re-sync when count changes to avoid jitter
+
+  useEffect(() => {
+    const animate = () => {
+      if (!containerRef.current) {
+        requestRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      const { clientWidth, clientHeight } = containerRef.current;
+      const cardWidth = 120;
+      const cardHeight = 150;
+      const radius = 62; // Approximation for circular collision
+
+      const next = physicsRef.current.map(o => ({
+        ...o,
+        x: o.id === dragIdRef.current ? o.x : o.x + o.vx,
+        y: o.id === dragIdRef.current ? o.y : o.y + o.vy
+      }));
+
+
+      // Wall collisions
+      for (const o of next) {
+        if (o.x < 0) { o.x = 0; o.vx *= -1; }
+        if (o.x + cardWidth > clientWidth) { o.x = clientWidth - cardWidth; o.vx *= -1; }
+        if (o.y < 0) { o.y = 0; o.vy *= -1; }
+        if (o.y + cardHeight > clientHeight) { o.y = clientHeight - cardHeight; o.vy *= -1; }
+      }
+
+      // Card collisions (Circular elastic)
+      for (let i = 0; i < next.length; i++) {
+        for (let j = i + 1; j < next.length; j++) {
+          const dx = (next[i].x + cardWidth/2) - (next[j].x + cardWidth/2);
+          const dy = (next[i].y + cardHeight/2) - (next[j].y + cardHeight/2);
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const minDistance = radius * 2;
+
+          if (distance < minDistance) {
+            // Collision detected - swap velocities roughly
+            const angle = Math.atan2(dy, dx);
+            const targetX = next[j].x + cardWidth/2 + Math.cos(angle) * minDistance;
+            const targetY = next[j].y + cardHeight/2 + Math.sin(angle) * minDistance;
+            
+            const ax = (targetX - (next[i].x + cardWidth/2)) * 0.1;
+            const ay = (targetY - (next[i].y + cardHeight/2)) * 0.1;
+
+            next[i].vx += ax;
+            next[i].vy += ay;
+            next[j].vx -= ax;
+            next[j].vy -= ay;
+
+            // Dampen to prevent explosion
+            next[i].vx *= 0.99;
+            next[i].vy *= 0.99;
+            next[j].vx *= 0.99;
+            next[j].vy *= 0.99;
+          }
+        }
+      }
+
+      physicsRef.current = next;
+      setPhysicsObjects(next);
+      requestRef.current = requestAnimationFrame(animate);
+    };
+
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current!);
+  }, []);
+
+  const place = (id: string, cycle: string) => {
+    if (checked) return;
     setPlacements(p => ({ ...p, [id]: cycle }));
     setSelected(null);
     setDraggedId(null);
   };
+
+  const handleDrop = (cycle: string) => {
+    const id = draggedId || selected;
+    if (!id) return;
+    place(id, cycle);
+  };
+
+  const startDrag = (id: string, e: React.PointerEvent) => {
+    if (checked) return;
+    e.preventDefault();
+    dragIdRef.current = id;
+    setDraggedId(id);
+    setDrag({ id, x: e.clientX, y: e.clientY });
+  };
+
+  // Follow the pointer while dragging and drop into whichever bin it is over.
+  useEffect(() => {
+    if (!drag) return;
+    const move = (e: PointerEvent) => setDrag(d => (d ? { ...d, x: e.clientX, y: e.clientY } : d));
+    const up = (e: PointerEvent) => {
+      const hit = CYCLES.find(c => {
+        const el = binRefs.current[c];
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      });
+      if (hit) place(drag.id, hit);
+      dragIdRef.current = null;
+      setDraggedId(null);
+      setDrag(null);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drag?.id, checked]);
+
 
   const handleRemove = (weedId: string) => {
     if (checked) return;
@@ -73,12 +230,8 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
   const nextRound = () => {
     setTotalScore(s => s + items.length);
     setRound(r => r + 1);
-    setPlacements({});
-    setSelected(null);
-    setChecked(false);
-    setDraggedId(null);
-    setBouncedIds([]);
-    setFarmerMsg({ tone: 'intro', text: `New round! Same rules — annual, biennial, or perennial?` });
+    setPlacements({}); setSelected(null); setChecked(false); setDraggedId(null); setBouncedIds([]);
+    setFarmerMsg({ tone: 'intro', text: `New round, harder set — keep watching for biennials. They look like annuals year one, then bolt year two.` });
   };
 
   const restart = () => {
@@ -87,15 +240,10 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
   const startOver = () => { setLevel(1); restart(); };
 
-  // After bounce animation, remove wrong placements so user can re-try only those
   useEffect(() => {
     if (bouncedIds.length === 0) return;
     const t = setTimeout(() => {
-      setPlacements(p => {
-        const n = { ...p };
-        bouncedIds.forEach(id => delete n[id]);
-        return n;
-      });
+      setPlacements(p => { const n = { ...p }; bouncedIds.forEach(id => delete n[id]); return n; });
       setChecked(false);
       setBouncedIds([]);
     }, 700);
@@ -106,26 +254,26 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
     const wrong = items.filter(i => placements[i.weed.id] !== i.correct).map(i => i.weed.id);
     setChecked(true);
     if (wrong.length === 0) {
-      setFarmerMsg({ tone: 'correct', text: `Bullseye! All ${items.length} weeds sorted correctly. Movin' on!` });
+      setFarmerMsg({ tone: 'correct', text: `All ${items.length} sorted correctly. Onto the next round.` });
     } else {
       const example = items.find(i => i.weed.id === wrong[0]);
       setFarmerMsg({
         tone: 'wrong',
-        text: `${wrong.length} weed${wrong.length === 1 ? '' : 's'} popped back out — they were in the wrong bin. Hint: ${example?.weed.commonName} is a ${example?.correct.toLowerCase()} (${example?.weed.lifeCycle}). Try those again!`,
+        text: `${wrong.length} popped back out — wrong bin. Hint: ${example?.weed.commonName} (${example?.weed.scientificName}) is a ${example?.correct.toLowerCase()}. Re-sort the highlighted ones.`,
       });
       setBouncedIds(wrong);
     }
   };
 
   if (done) {
-    const total = TOTAL_ROUNDS * items.length;
-    addBadge({ gameId: 'lifecycle-matching-k5', gameName: 'Life Cycle Matching', level: 'K-5', score: totalScore, total });
+    const total = totalRounds * PER_ROUND;
+    addBadge({ gameId: 'lifecycle-matching-68', gameName: 'Life Cycle Sort', level: '6-8', score: totalScore, total });
     return (
-      <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex items-center justify-center p-4">
         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">All Rounds Complete!</h2>
-          <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {TOTAL_ROUNDS} rounds!</p>
-          <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+          <p className="text-muted-foreground mb-6">You sorted {totalScore} / {total} weeds correctly across {totalRounds} rounds!</p>
+          <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} gradeLabel="6-8" />
         </div>
       </div>
     );
@@ -134,33 +282,42 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
   const allCorrect = checked && bouncedIds.length === 0 && correctCount === items.length;
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      <div className="flex items-center gap-3 p-4 border-b border-border">
+    <div className="fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col">
+      <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Life Cycle Matching</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">Life Cycle Sort</h1>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">Round {round + 1}/{TOTAL_ROUNDS}</span>
+        <span className="text-sm text-muted-foreground">Round {round + 1}/{totalRounds}</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <FarmerGuide gradeLabel={gradeLabel} tone={farmerMsg.tone} message={farmerMsg.text} className="mb-4 max-w-3xl mx-auto" />
+      <div className="flex-1 overflow-hidden p-4 flex flex-col">
+        <FarmerGuide gradeLabel={gradeLabel} tone={farmerMsg.tone} message={farmerMsg.text} className="mb-4 max-w-3xl mx-auto shrink-0" />
 
-        <div className="max-w-5xl mx-auto space-y-3">
-          {/* Cycle bins side by side across the top */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_400px] gap-6 max-w-7xl mx-auto w-full overflow-hidden">
+          {/* Drop Zones */}
+          <div className="space-y-4 flex flex-col overflow-y-auto pr-2">
             {CYCLES.map(cycle => {
               const placed = items.filter(i => placements[i.weed.id] === cycle);
               return (
                 <div
                   key={cycle}
+                  ref={el => { binRefs.current[cycle] = el; }}
                   onClick={() => handleDrop(cycle)}
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => handleDrop(cycle)}
-                  className={`rounded-xl border-2 p-2.5 min-h-[110px] transition-all ${
-                    (selected || draggedId) ? 'border-primary bg-primary/5 cursor-pointer hover:bg-primary/10' : 'border-border bg-card'
+                  className={`rounded-xl border-2 p-4 min-h-[160px] transition-all flex flex-col ${
+                    (selected || draggedId) ? 'border-primary bg-primary/5 cursor-pointer hover:bg-primary/10' : 'border-border bg-card shadow-sm'
                   }`}
                 >
-                  <p className="text-sm font-bold text-foreground mb-2">{cycle}</p>
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="text-base font-bold text-foreground">{cycle}</p>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-mono">{placed.length}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mb-3 leading-tight">
+                    {cycle === 'Annual' && 'Germinates, flowers, sets seed, dies in 1 year'}
+                    {cycle === 'Biennial' && 'Vegetative year 1 → bolts and flowers year 2'}
+                    {cycle === 'Perennial' && 'Lives 3+ years from rhizomes, tubers, or crowns'}
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {placed.map(i => {
                       const isWrong = checked && i.correct !== cycle;
@@ -169,19 +326,19 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                       return (
                         <div
                           key={i.weed.id}
-                          className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg border-2 transition-all duration-500 ${
+                          className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all duration-500 ${
                             isBouncing ? 'opacity-0 -translate-y-12 scale-50 border-destructive' :
                             isWrong ? 'border-destructive bg-destructive/10' :
                             isRight ? 'border-green-500 bg-green-500/10' :
-                            'border-border bg-secondary'
+                            'border-border bg-secondary shadow-sm'
                           }`}
                         >
-                          <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted">
+                          <div className="w-16 h-16 rounded overflow-hidden bg-muted">
                             <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
                           </div>
-                          <span className="text-[10px] font-medium text-foreground max-w-[60px] text-center leading-tight">{i.weed.commonName}</span>
+                          <span className="text-[10px] font-medium text-foreground max-w-[70px] text-center truncate">{i.weed.commonName}</span>
                           {!checked && (
-                            <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-[9px] text-muted-foreground hover:text-destructive">remove</button>
+                            <button onClick={e => { e.stopPropagation(); handleRemove(i.weed.id); }} className="text-[9px] text-muted-foreground hover:text-destructive underline decoration-dotted">remove</button>
                           )}
                         </div>
                       );
@@ -190,47 +347,89 @@ export default function LifeCycleMatching({ onBack, gradeLabel }: Props) {
                 </div>
               );
             })}
-          </div>
 
-          {/* Weeds still to sort — below the bins, laid out across */}
-          <div className="rounded-xl border-2 border-border bg-card p-3">
-            <p className="text-xs font-bold uppercase text-foreground mb-2">Weeds to Sort ({unplaced.length})</p>
-            <div className="flex flex-wrap gap-2">
-              {unplaced.length === 0 && (
-                <p className="text-xs text-muted-foreground italic">All placed! Hit "Check Answers".</p>
+            <div className="mt-auto pt-4 space-y-3">
+              {allPlaced && !checked && (
+                <button onClick={handleCheck} className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">Check Answers</button>
               )}
-              {unplaced.map(i => (
-                <button
-                  key={i.weed.id}
-                  draggable
-                  onDragStart={() => setDraggedId(i.weed.id)}
-                  onDragEnd={() => setDraggedId(null)}
-                  onClick={() => setSelected(selected === i.weed.id ? null : i.weed.id)}
-                  className={`flex items-center gap-2 p-1.5 rounded-lg border-2 transition-all cursor-grab active:cursor-grabbing ${
-                    selected === i.weed.id ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-background text-foreground hover:border-primary/50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-md overflow-hidden bg-muted shrink-0">
-                    <WeedImage weedId={i.weed.id} stage="flower" className="w-full h-full object-cover" />
-                  </div>
-                  <span className="text-left text-[11px] leading-tight max-w-[110px]">{i.weed.commonName}</span>
+              {allCorrect && (
+                <button onClick={nextRound} className="w-full py-4 rounded-xl bg-green-600 text-white font-bold shadow-lg hover:bg-green-700 active:scale-[0.98] transition-all">
+                  {round + 1 < totalRounds ? `Start Round ${round + 2} →` : 'Complete Level'}
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
-          <div className="space-y-2">
-            {allPlaced && !checked && (
-              <button onClick={handleCheck} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold">Check Answers</button>
-            )}
-            {allCorrect && (
-              <button onClick={nextRound} className="w-full py-2.5 rounded-lg bg-success text-success-foreground font-bold">
-                {round + 1 < TOTAL_ROUNDS ? `Round ${round + 2} →` : 'See Results'}
-              </button>
-            )}
+          {/* Physics Play Area */}
+          <div className="relative flex flex-col h-full min-h-[400px] border-2 border-emerald-200/50 dark:border-emerald-900/30 rounded-2xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm overflow-hidden shadow-inner">
+            <div className="absolute inset-0 pointer-events-none border-[12px] border-transparent">
+               <div className="w-full h-full border-2 border-dashed border-emerald-500/10 rounded-xl" />
+            </div>
+            
+            <div className="p-3 border-b border-emerald-100 dark:border-emerald-800 flex justify-between items-center bg-white/40 dark:bg-slate-800/40">
+               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Floating Weeds ({unplaced.length})</span>
+               <span className="text-[10px] text-muted-foreground italic">Click and drag a weed into a bin</span>
+            </div>
+
+            <div ref={containerRef} className="flex-1 relative overflow-hidden">
+              {unplaced.length === 0 && !checked && !allCorrect && (
+                <div className="absolute inset-0 flex items-center justify-center text-center p-8">
+                  <p className="text-sm text-muted-foreground italic bg-white/80 dark:bg-slate-900/80 p-4 rounded-xl border border-emerald-100 dark:border-emerald-900">
+                    All weeds are in zones. Click "Check Answers" to see how you did!
+                  </p>
+                </div>
+              )}
+              
+              {physicsObjects.map(obj => {
+                const item = items.find(i => i.weed.id === obj.id);
+                if (!item) return null;
+                const isSelected = selected === obj.id;
+                const isDragging = drag?.id === obj.id;
+
+                return (
+                  <div
+                    key={obj.id}
+                    onPointerDown={e => startDrag(obj.id, e)}
+                    onClick={() => setSelected(isSelected ? null : obj.id)}
+                    className={`absolute w-[120px] flex flex-col items-center cursor-grab active:cursor-grabbing select-none touch-none ${
+                      isDragging ? 'opacity-30' : ''
+                    } ${isSelected ? 'z-10' : ''}`}
+                    style={{ transform: `translate(${obj.x}px, ${obj.y}px)` }}
+                  >
+                    <div
+                      className={`w-[110px] h-[110px] rounded-full overflow-hidden border-4 bg-muted shadow-xl ${
+                        isSelected ? 'border-primary ring-4 ring-primary/20' : 'border-emerald-400/80'
+                      }`}
+                    >
+                      <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover pointer-events-none" />
+                    </div>
+                    <p className="mt-1 w-full text-center text-[11px] font-bold text-foreground leading-tight">
+                      {item.weed.commonName}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Ghost bubble that follows the pointer while dragging */}
+      {drag && (() => {
+        const item = items.find(i => i.weed.id === drag.id);
+        if (!item) return null;
+        return (
+          <div
+            className="fixed pointer-events-none z-[60] flex flex-col items-center"
+            style={{ left: drag.x, top: drag.y, transform: 'translate(-50%,-50%)' }}
+          >
+            <div className="w-[110px] h-[110px] rounded-full overflow-hidden border-4 border-primary bg-muted shadow-2xl">
+              <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
+            </div>
+            <p className="mt-1 text-[11px] font-bold text-foreground bg-background/80 px-1 rounded">{item.weed.commonName}</p>
+          </div>
+        );
+      })()}
     </div>
   );
 }
