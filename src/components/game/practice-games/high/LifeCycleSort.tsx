@@ -319,7 +319,7 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
 
     <div
      ref={containerRef}
-     className="relative flex-1 min-h-[360px] rounded-xl border-2 border-border bg-secondary/20 overflow-hidden touch-none"
+     className={`relative flex-1 min-h-[360px] rounded-xl border-2 border-border bg-secondary/20 touch-none ${dragKeyRef.current ? 'overflow-visible z-30' : 'overflow-hidden'}`}
     >
      {phase === 'ready' && (
       <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/50">
