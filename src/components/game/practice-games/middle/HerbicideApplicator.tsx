@@ -3,7 +3,6 @@ import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import soybeanBg from '@/assets/images/soybean_field_1.jpg';
 import { Target, Timer, AlertTriangle, Skull, HeartCrack } from 'lucide-react';
-import { useGameProgress } from '@/contexts/GameProgressContext';
 import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
@@ -61,7 +60,6 @@ function isGroupListedForWeed(groupNum: number, weed: typeof weeds[0]): boolean 
 }
 
 export default function HerbicideApplicator({ onBack }: { onBack: () => void }) {
-  const { addBadge } = useGameProgress();
   const groupOptions = useMemo(() => getMiddleSchoolMOAs(), []);
 
   const [season, setSeason] = useState(1);
@@ -93,12 +91,6 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
     const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [phase, timeLeft]);
-
-  useEffect(() => {
-    if (showComplete) {
-      addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: TOTAL_SEASONS * 10 });
-    }
-  }, [showComplete]);
 
   const toggleWeed = (id: string) => {
     if (phase !== 'scout') return;
@@ -143,12 +135,16 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
   if (showComplete) {
     return (
       <LevelComplete
+        level={1}
         score={score}
         total={TOTAL_SEASONS * 10}
-        onNext={restart}
+        onNextLevel={restart}
+        onStartOver={restart}
         onBack={onBack}
         title="Fields Sprayed!"
-        subtitle="3 seasons of scouting and spraying complete."
+        gameId="herbicide-applicator"
+        gameName="Herbicide Applicator"
+        gradeLabel="6-8"
       />
     );
   }
