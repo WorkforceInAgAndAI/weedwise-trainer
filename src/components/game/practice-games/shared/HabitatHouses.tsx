@@ -81,36 +81,32 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
           <span className="text-sm text-muted-foreground">{idx + 1}/{rounds.length}</span>
         </div>
 
-        {/* You are the weed */}
-        <div className="rounded-2xl border-2 border-border bg-card p-4 mb-4 flex flex-col sm:flex-row gap-4">
-          <div className="w-full sm:w-48 h-40 sm:h-44 rounded-xl overflow-hidden bg-secondary shrink-0">
-            <WeedImage key={`${current.weed.id}-${stage}`} weedId={current.weed.id} stage={stage} className="w-full h-full object-cover" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">You are…</p>
-            <p className="font-display font-bold text-xl text-foreground">{current.weed.commonName}</p>
-            <p className="text-xs italic text-muted-foreground mb-2">{current.weed.scientificName}</p>
-            <ul className="space-y-1">
-              {traits.map(t => (
-                <li key={t} className="text-sm text-foreground flex gap-2">
-                  <span className="text-primary font-bold">•</span>
-                  <span>{t.charAt(0).toUpperCase() + t.slice(1)}.</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Your characteristics */}
+        <div className="rounded-2xl border-2 border-border bg-card p-4 mb-4">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-1">Your characteristics</p>
+          <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1">
+            {traits.map(t => (
+              <li key={t} className="text-sm text-foreground flex gap-2">
+                <span className="text-primary font-bold">•</span>
+                <span>{t.charAt(0).toUpperCase() + t.slice(1)}.</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <p className="text-sm font-semibold text-foreground mb-2 text-center">
           Which house could you survive in best? Knock on a door.
         </p>
 
-        {/* Houses laid out like a village circle */}
-        <div className="relative mx-auto w-full max-w-[720px] aspect-square">
-          <div className="absolute inset-[30%] rounded-full border-4 border-dashed border-primary/25 bg-primary/5 flex items-center justify-center">
-            <p className="text-sm sm:text-base font-bold text-muted-foreground text-center px-4">
-              Knock on the door of the house you could live in.
-            </p>
+        {/* Houses laid out like a village circle, with you in the middle */}
+        <div className="relative mx-auto w-full max-w-[760px] aspect-square">
+          <div className="absolute inset-[29%] rounded-full border-4 border-dashed border-primary/25 bg-primary/5 flex flex-col items-center justify-center p-3 text-center overflow-hidden">
+            <div className="w-[46%] aspect-square rounded-full overflow-hidden border-4 border-primary/40 bg-secondary shrink-0">
+              <WeedImage key={`${current.weed.id}-${stage}`} weedId={current.weed.id} stage={stage} className="w-full h-full object-cover" />
+            </div>
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground leading-none">You are</p>
+            <p className="font-display font-bold text-sm sm:text-lg text-foreground leading-tight px-1">{current.weed.commonName}</p>
+            <p className="text-[10px] sm:text-xs italic text-muted-foreground leading-tight px-1">{current.weed.scientificName}</p>
           </div>
           {HABITAT_HOUSES.map((h, i) => {
             const Icon = HOUSE_ICONS[h.id];
@@ -123,29 +119,30 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
               else tone = `${c.border} ${c.bg} opacity-50`;
             }
             const angle = (i / HABITAT_HOUSES.length) * Math.PI * 2 - Math.PI / 2;
-            const left = 50 + Math.cos(angle) * 41;
-            const top = 50 + Math.sin(angle) * 41;
+            const left = 50 + Math.cos(angle) * 42;
+            const top = 50 + Math.sin(angle) * 42;
             return (
               <button
                 key={h.id}
                 onClick={() => choose(h.id)}
                 disabled={!!picked}
                 style={{ left: `${left}%`, top: `${top}%`, transform: 'translate(-50%,-50%)' }}
-                className={`absolute w-[25%] rounded-xl border-4 p-0 overflow-hidden text-center transition-all ${tone}`}
+                className={`absolute w-[24%] rounded-xl border-4 p-0 overflow-hidden text-center transition-all ${tone}`}
               >
                 <div className={`h-5 w-full ${c.roof}`} style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
                 <div className="p-2">
-                  <div className={`mx-auto w-11 h-12 rounded-t-md border-2 ${c.border} bg-background/70 flex flex-col items-center justify-center gap-1`}>
-                    <Icon className={`w-6 h-6 ${c.icon}`} />
+                  <div className={`mx-auto w-10 h-11 rounded-t-md border-2 ${c.border} bg-background/70 flex flex-col items-center justify-center gap-1`}>
+                    <Icon className={`w-5 h-5 ${c.icon}`} />
                     <span className={`w-1.5 h-1.5 rounded-full ${c.roof}`} />
                   </div>
-                  <p className="mt-1.5 text-sm sm:text-base font-extrabold text-foreground leading-tight">{h.label}</p>
-                  <p className="text-[11px] sm:text-xs text-muted-foreground leading-tight mt-0.5">{short ? h.shortBlurb : h.blurb}</p>
+                  <p className="mt-1.5 text-xs sm:text-sm font-extrabold text-foreground leading-tight">{h.label}</p>
+                  <p className="text-[10px] sm:text-[11px] text-muted-foreground leading-tight mt-0.5">{short ? h.shortBlurb : h.blurb}</p>
                 </div>
               </button>
             );
           })}
         </div>
+
 
         {picked && (
           <div className={`mt-4 rounded-xl border-2 p-4 ${isRight ? 'border-green-600 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>

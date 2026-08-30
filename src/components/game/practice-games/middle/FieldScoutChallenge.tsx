@@ -116,6 +116,8 @@ function isWRoute(pts: { x: number; y: number }[], walked: number) {
 
 interface Props {
   onBack: () => void;
+  /** 'high' = 9-12 "Scout the Weeds" manual scouting on a $25,000 budget. */
+  variant?: 'middle' | 'high';
   gameId?: string;
   gameName?: string;
   gradeLabel?: string;
@@ -125,16 +127,19 @@ interface Props {
 
 export default function FieldScoutChallenge({
   onBack,
+  variant = 'middle',
   gameId,
   gameName,
   gradeLabel,
   poolGrade = 'middle',
 }: Props) {
-  const title = gameName ?? 'Field Scout Challenge';
+  const title = gameName ?? (variant === 'high' ? 'Scout the Weeds' : 'Field Scout Challenge');
+  const SCALE = variant === 'high' ? 1 : 0.04;
+  const startMoney = Math.round(START_MONEY * SCALE);
   const weeds = useMemo(() => weedsForPool(poolGrade), [poolGrade]);
   const [season, setSeason] = useState(1);
   const [trip, setTrip] = useState<Trip>(0);
-  const [money, setMoney] = useState(START_MONEY);
+  const [money, setMoney] = useState(startMoney);
   const [pressure, setPressure] = useState(14);      // weeds present this trip
   const [log, setLog] = useState<{ trip: number; cost: number; found: number; total: number; blocks: number; wRoute: boolean; walked: number }[]>([]);
   const [plants, setPlants] = useState<Plant[]>(() => buildPlants(14, 4, weedsForPool(poolGrade)));
@@ -181,7 +186,7 @@ export default function FieldScoutChallenge({
   const end = () => setDrawing(false);
 
   const walked = pathLength(path);
-  const cost = Math.round(walked * COST_PER_UNIT);
+  const cost = Math.round(walked * COST_PER_UNIT * SCALE);
   const wRoute = useMemo(() => isWRoute(path, walked), [path, walked]);
   const tooLong = walked > IDEAL_MAX_LEN;
   const tooShort = path.length > 2 && walked < IDEAL_MIN_LEN;
@@ -241,9 +246,11 @@ export default function FieldScoutChallenge({
   const wTrips = log.filter(l => l.wRoute).length;
   const overWalked = log.filter(l => l.walked > IDEAL_MAX_LEN).length;
   const underWalked = log.filter(l => l.walked < IDEAL_MIN_LEN).length;
-  const wBonus = seasonOver ? wTrips * W_BONUS : 0;
-  const yieldLoss = seasonOver ? totalMissed * YIELD_LOSS_PER_WEED : 0;
-  const finalMoney = Math.max(0, START_MONEY - totalSpent - yieldLoss + wBonus);
+  const wBonus = seasonOver ? Math.round(wTrips * W_BONUS * SCALE) : 0;
+  const yieldLoss = seasonOver ? Math.round(totalMissed * YIELD_LOSS_PER_WEED * SCALE) : 0;
+  const finalMoney = Math.max(0, startMoney - totalSpent - yieldLoss + wBonus);
+  /** Season score out of 3: one point per season trip with good coverage. */
+  const seasonPoints = log.filter(l => l.wRoute).length;
 
   // Rating is driven by the W: three W routes is the professional standard.
   const avgBlocks = log.length ? log.reduce((s, l) => s + l.blocks, 0) / log.length : 0;
@@ -274,10 +281,12 @@ export default function FieldScoutChallenge({
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Season {season} report</p>
             <p className="font-display font-extrabold text-5xl sm:text-6xl text-primary">${finalMoney.toLocaleString()}</p>
             <p className="text-sm font-bold text-foreground">{rating}</p>
+            <p className="text-base font-extrabold text-foreground mt-1">Scouting score: {seasonPoints}/3</p>
+            <p className="text-[11px] text-muted-foreground">One point per season with good coverage; poor or wasteful coverage loses the point.</p>
             <p className="text-xs text-muted-foreground mt-2 text-left">{ratingWhy}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${startMoney.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Good coverage efficiency bonus ({wTrips}/3 trips)</span><span className="font-bold text-primary">+${wBonus.toLocaleString()}</span></div>
@@ -302,10 +311,10 @@ export default function FieldScoutChallenge({
           </div>
           <LevelComplete
             level={season}
-            score={finalMoney}
-            total={START_MONEY}
-            onNextLevel={() => { setSeason(s => s + 1); setTrip(0); setMoney(START_MONEY); setPressure(14); setLog([]); setSeasonOver(false); }}
-            onStartOver={() => { setSeason(1); setTrip(0); setMoney(START_MONEY); setPressure(14); setLog([]); setSeasonOver(false); }}
+            score={seasonPoints}
+            total={3}
+            onNextLevel={() => { setSeason(s => s + 1); setTrip(0); setMoney(startMoney); setPressure(14); setLog([]); setSeasonOver(false); }}
+            onStartOver={() => { setSeason(1); setTrip(0); setMoney(startMoney); setPressure(14); setLog([]); setSeasonOver(false); }}
             onBack={onBack}
             title={title}
             gameId={gameId}

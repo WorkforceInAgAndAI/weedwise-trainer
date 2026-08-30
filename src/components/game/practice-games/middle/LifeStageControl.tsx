@@ -10,6 +10,12 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const STAGES = ['seedling', 'vegetative', 'reproductive'] as const;
 type Stage = typeof STAGES[number];
 const STAGE_LABELS: Record<Stage, string> = { seedling: 'Seedling', vegetative: 'Vegetative', reproductive: 'Reproductive' };
+const DISPLAY_STAGES = [
+  { id: "seedling", label: "Seedling", image: "seedling" },
+  { id: "vegetative", label: "Vegetative", image: "vegetative" },
+  { id: "reproductive", label: "Flower/Repro", image: "flower" },
+  { id: "mature", label: "Mature/Seed", image: "repros" },
+] as const;
 const STAGE_IMAGE_MAP: Record<Stage, string> = { seedling: 'seedling', vegetative: 'vegetative', reproductive: 'flower' };
 
 const CONTROLS = [
@@ -138,9 +144,45 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
         <span className="text-sm text-muted-foreground">{idx + 1}/{items.length}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center">
-        {/* Weed image */}
-        <div className="w-48 h-48 rounded-xl overflow-hidden bg-secondary mb-3">
-          <WeedImage weedId={current!.weed.id} stage={STAGE_IMAGE_MAP[current!.stage]} className="w-full h-full object-cover" />
+        {/* Weed images row */}
+        <div className="flex flex-wrap gap-2 w-full max-w-3xl px-2 mb-6 justify-center">
+          {DISPLAY_STAGES.map(ds => {
+            const isCorrectStage = ds.id === current!.stage;
+            const hasGuessedStage = step === "control" || step === "feedback";
+            const showHighlight = hasGuessedStage && isCorrectStage;
+            const showDim = hasGuessedStage && !isCorrectStage;
+            
+            return (
+              <div 
+                key={ds.id} 
+                className={`flex flex-col items-center gap-1.5 transition-all duration-500 ${
+                  showDim ? "opacity-40 scale-95" : "opacity-100 scale-100"
+                }`}
+              >
+                <div className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 bg-secondary transition-all ${
+                  showHighlight 
+                    ? "ring-4 ring-primary ring-offset-2 border-primary shadow-lg shadow-primary/20" 
+                    : "border-white/10 dark:border-white/5"
+                }`}>
+                  <WeedImage 
+                    weedId={current!.weed.id} 
+                    stage={ds.image} 
+                    className="w-full h-full object-cover" 
+                  />
+                  {showHighlight && (
+                    <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[8px] sm:text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg z-10 animate-in zoom-in duration-300">
+                      CONTROL HERE
+                    </div>
+                  )}
+                </div>
+                <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
+                  showHighlight ? "text-primary" : "text-muted-foreground/70"
+                }`}>
+                  {ds.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Step indicators */}
