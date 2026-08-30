@@ -234,6 +234,7 @@ const highGames: GameDef[] = [
  
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
  { id: 'college-look-alike', name: 'Look-Alikes', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from commonly-confused look-alikes across the full species list.', howToPlay: 'Three look-alike weeds appear. Drag the magnifying glass over each specimen to read trait-only field notes, then select the species that matches the target name.', component: CollegiateLookAlike },
+ { id: 'college-safe-toxic', name: 'Safe or Dangerous?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are dangerous to handle?', howToPlay: 'A group of weeds appears — identify which one is dangerous (toxic sap, spines, or poisonous parts), learn why, then decide how to safely manage it.', component: MSSafeVsToxic },
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
 ];
 
