@@ -3802,7 +3802,7 @@ function TopicContent({
         );
       }
 
-      if (grade === "elementary") {
+      if (displayGrade === "elementary") {
         const elemHabitats = [
           {
             key: "Warm-Season / Full Sun",
@@ -7898,33 +7898,6 @@ function TopicContent({
               itself. That's why proper weed identification is one of the most important steps in making sure herbicide
               treatment actually works!
             </p>
-          </div>
-
-          <p className="text-base font-semibold text-foreground">
-            Here are just a few of the common herbicide groups used by farmers today.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[...HERBICIDE_MOA]
-              .sort((a, b) => a.group - b.group)
-              .map((m) => (
-                <div key={m.id} className="bg-card border border-border rounded-xl p-5 space-y-2">
-                  <p className="font-display font-bold text-foreground text-lg leading-snug">{m.moa}</p>
-                  <p className="text-base text-primary font-semibold">Group {m.group}</p>
-                  <p className="text-base text-foreground">
-                    <strong>Target:</strong> {m.spectrum === "Both" ? "Grass & Broadleaf" : m.spectrum} weeds
-                  </p>
-                  <p className="text-base text-foreground">
-                    <strong>Timing:</strong>{" "}
-                    {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
-                  </p>
-                  <p className="text-base text-foreground">
-                    <strong>Symptoms:</strong> {SYMPTOM_TYPES[m.symptomType]?.label}
-                    {SYMPTOM_TYPES[m.symptomType]?.description
-                      ? ` — ${SYMPTOM_TYPES[m.symptomType].description}`
-                      : ""}
-                  </p>
-                </div>
-              ))}
           </div>
 
           <h3 className="font-display font-bold text-foreground text-sm">Herbicide Injury Symptoms & By-Weed Lookup</h3>
