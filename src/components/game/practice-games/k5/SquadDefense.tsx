@@ -7,7 +7,7 @@ import WeedImage from '@/components/game/WeedImage';
 
 type PowerKey = 'pull' | 'block' | 'outsmart' | 'eat' | 'stop';
 
-interface Hero {
+interface Cannon {
   key: PowerKey;
   name: string;
   power: string;
@@ -19,12 +19,12 @@ interface Hero {
   cooldownMs: number;
 }
 
-const HEROES: Hero[] = [
-  { key: 'pull',     name: 'Pull It',     power: 'Super Strength', blurb: 'Yank the weeds out by hand, roots and all.',  Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400', cost: 1, cooldownMs: 500 },
-  { key: 'block',    name: 'Block It',    power: 'Force Field', blurb: 'Cover the soil so weed seeds never get sunlight.',     Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',       cost: 1, cooldownMs: 700 },
-  { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power', blurb: 'Plant strong crops close together to crowd weeds out.',     Icon: Brain,  color: 'text-primary',    bg: 'bg-emerald-100 border-emerald-400',cost: 1, cooldownMs: 700 },
-  { key: 'eat',      name: 'Swarm It',    power: 'Bug Buddies', blurb: 'Send your bug buddies in to eat the weeds.',     Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',     cost: 2, cooldownMs: 900 },
-  { key: 'stop',     name: 'Stop It',     power: 'Precision Blast', blurb: 'Farmers spray a careful weed-control product.', Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400', cost: 2, cooldownMs: 1100 },
+const CANNONS: Cannon[] = [
+  { key: 'pull',     name: 'Pull It',     power: 'Super Strength',    blurb: 'Yank the weeds out by hand, roots and all.',        Icon: Hand,   color: 'text-orange-700', bg: 'bg-orange-100 border-orange-400',   cost: 1, cooldownMs: 500 },
+  { key: 'block',    name: 'Block It',    power: 'Force Field',       blurb: 'Cover the soil so weed seeds never get sunlight.', Icon: Shield, color: 'text-sky-700',    bg: 'bg-sky-100 border-sky-400',         cost: 1, cooldownMs: 700 },
+  { key: 'outsmart', name: 'Outsmart It', power: 'Brain Power',       blurb: 'Plant strong crops close together to crowd weeds out.', Icon: Brain, color: 'text-primary',  bg: 'bg-emerald-100 border-emerald-400', cost: 1, cooldownMs: 700 },
+  { key: 'eat',      name: 'Swarm It',    power: 'Bug Buddies',       blurb: 'Send your bug buddies in to eat the weeds.',       Icon: Bug,    color: 'text-lime-700',   bg: 'bg-lime-100 border-lime-400',       cost: 2, cooldownMs: 900 },
+  { key: 'stop',     name: 'Stop It',     power: 'Precision Blast',   blurb: 'Farmers spray a careful weed-control product.',    Icon: Zap,    color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-400',   cost: 2, cooldownMs: 1100 },
 ];
 
 interface WeedVillain {
@@ -40,6 +40,16 @@ interface WeedVillain {
   hp: number;
   maxHp: number;
   flash?: 'hit' | 'miss' | null;
+}
+
+interface Projectile {
+  id: number;
+  lane: number;
+  weedId: number;       // target weed id
+  cannonKey: PowerKey;
+  fromPos: number;      // 0..100, where it starts (near crops)
+  toPos: number;        // 0..100, weed position when fired
+  startedAt: number;
 }
 
 // Weeds pulled from the K-5 "14 Weeds You Can Spot" curriculum with the
@@ -65,6 +75,7 @@ const LANES = 3;
 const CROP_HP_START = 10;
 const ENERGY_MAX = 12;
 const ENERGY_REGEN = 2.6;   // per second
+const PROJECTILE_MS = 320;  // travel time for a fired shot
 
 export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
@@ -79,15 +90,17 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   const [running, setRunning] = useState(true);
   const [done, setDone] = useState(false);
   const [feedback, setFeedback] = useState<{ text: string; kind: 'good' | 'bad' } | null>(null);
+  const [projectiles, setProjectiles] = useState<Projectile[]>([]);
 
   const nextId = useRef(1);
+  const nextProjectileId = useRef(1);
   const spawnTimer = useRef(9999); // spawn the first weed immediately
 
   // Level tuning
   const diff = useMemo(() => getDifficulty(level, 'k5'), [level]);
   const config = useMemo(() => {
     // Gentle K-5 pacing: weeds march slowly and spawn far apart so students
-    // have time to read each weakness badge before choosing a hero.
+    // have time to read each weakness badge before choosing a cannon.
     const spawnEverySec = Math.max(1.4, 2.8 - level * 0.15) / diff.speed;
     const speedMin = (3.0 + level * 0.5) * diff.speed;      // % per second
     const speedMax = (4.4 + level * 0.7) * diff.speed;
@@ -102,7 +115,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
     fbTimeout.current = window.setTimeout(() => setFeedback(null), 1100);
   };
 
-  // Main tick loop
+  // Main tick loop — drives weed advance (pos updates every animation frame)
   useEffect(() => {
     if (!running || done) return;
     let last = performance.now();
@@ -154,7 +167,8 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
         });
       }
 
-      // advance weeds
+      // advance weeds — this is the only place `pos` changes, every frame,
+      // so the villains steadily march toward the crop line.
       setWeeds(list => {
         let hpLoss = 0;
         let esc = 0;
@@ -188,36 +202,57 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
     else if (defeated >= config.targetDefeated) { setDone(true); setRunning(false); }
   }, [cropHp, defeated, config.targetDefeated, done]);
 
-  const deployOn = (weed: WeedVillain) => {
-    if (!selected || done) { showFeedback('Pick a hero first!', 'bad'); return; }
-    const hero = HEROES.find(h => h.key === selected)!;
-    if (cooldowns[hero.key] > 0) { showFeedback(`${hero.name} recharging…`, 'bad'); return; }
-    if (energy < hero.cost) { showFeedback('Not enough energy!', 'bad'); return; }
-    setEnergy(e => e - hero.cost);
-    setCooldowns(cd => ({ ...cd, [hero.key]: hero.cooldownMs }));
-
-    const match = hero.key === weed.weakness;
-    if (match) {
-      setWeeds(list => list.map(w => w.id === weed.id ? { ...w, flash: 'hit', hp: 0 } : w));
-      window.setTimeout(() => setWeeds(list => list.filter(w => w.id !== weed.id)), 220);
-      setScore(s => s + 10);
-      setDefeated(d => d + 1);
-      showFeedback(`${hero.name} saves the crops! +10`, 'good');
-    } else {
+  const resolveHit = (weedId: number, cannonKey: PowerKey) => {
+    const hero = CANNONS.find(h => h.key === cannonKey)!;
+    setWeeds(list => {
+      const weed = list.find(w => w.id === weedId);
+      if (!weed) return list;
+      const match = hero.key === weed.weakness;
+      if (match) {
+        setScore(s => s + 10);
+        setDefeated(d => d + 1);
+        showFeedback(`${hero.name} saves the crops! +10`, 'good');
+        window.setTimeout(() => setWeeds(l => l.filter(x => x.id !== weedId)), 220);
+        return list.map(w => w.id === weedId ? { ...w, flash: 'hit', hp: 0 } : w);
+      }
       // wrong power: chip 1 hp; if still alive, slow it a little; costs a small score penalty
-      setWeeds(list => list.map(w => {
-        if (w.id !== weed.id) return w;
+      showFeedback(`Not quite — ${weed.name} needs a different cannon. Try again!`, 'bad');
+      return list.map(w => {
+        if (w.id !== weedId) return w;
         const nextHp = w.hp - 1;
         if (nextHp <= 0) {
-          window.setTimeout(() => setWeeds(l => l.filter(x => x.id !== weed.id)), 220);
+          window.setTimeout(() => setWeeds(l => l.filter(x => x.id !== weedId)), 220);
           return { ...w, hp: 0, flash: 'miss' };
         }
         return { ...w, hp: nextHp, speed: Math.max(2, w.speed * 0.6), flash: 'miss' };
-      }));
-      showFeedback(`Not quite — ${weed.name} needs a different hero. Try again!`, 'bad');
-    }
-    // clear flash
-    window.setTimeout(() => setWeeds(list => list.map(w => w.id === weed.id ? { ...w, flash: null } : w)), 300);
+      });
+    });
+    window.setTimeout(() => setWeeds(list => list.map(w => w.id === weedId ? { ...w, flash: null } : w)), 300);
+  };
+
+  const fireOn = (weed: WeedVillain) => {
+    if (!selected || done) { showFeedback('Arm a cannon first!', 'bad'); return; }
+    const cannon = CANNONS.find(h => h.key === selected)!;
+    if (cooldowns[cannon.key] > 0) { showFeedback(`${cannon.name} recharging…`, 'bad'); return; }
+    if (energy < cannon.cost) { showFeedback('Not enough energy!', 'bad'); return; }
+    setEnergy(e => e - cannon.cost);
+    setCooldowns(cd => ({ ...cd, [cannon.key]: cannon.cooldownMs }));
+
+    const projId = nextProjectileId.current++;
+    setProjectiles(list => [...list, {
+      id: projId,
+      lane: weed.lane,
+      weedId: weed.id,
+      cannonKey: cannon.key,
+      fromPos: 100,
+      toPos: weed.pos,
+      startedAt: performance.now(),
+    }]);
+
+    window.setTimeout(() => {
+      setProjectiles(list => list.filter(p => p.id !== projId));
+      resolveHit(weed.id, cannon.key);
+    }, PROJECTILE_MS);
   };
 
   const restart = () => {
@@ -225,6 +260,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
     setScore(0); setCropHp(CROP_HP_START); setEnergy(ENERGY_MAX); setWeeds([]);
     setSelected(null); setCooldowns({ pull: 0, block: 0, outsmart: 0, eat: 0, stop: 0 });
     setDefeated(0); setEscaped(0); setRunning(true); setDone(false); setFeedback(null);
+    setProjectiles([]);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
 
@@ -247,10 +283,11 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
   }
 
   const laneWeeds = (n: number) => weeds.filter(w => w.lane === n);
+  const laneProjectiles = (n: number) => projectiles.filter(p => p.lane === n);
 
   return (
     <div className="fixed top-[84px] inset-x-0 bottom-0 practice-game-extra-offset bg-background z-50 overflow-y-auto p-3 sm:p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-card border-2 border-primary/40 rounded-lg p-3 mb-3 flex items-center gap-3 flex-wrap">
           <button onClick={onBack} className="text-muted-foreground hover:text-foreground" aria-label="Back">
@@ -259,7 +296,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
           <Shield className="w-6 h-6 text-primary" />
           <div className="flex-1 min-w-0">
             <h1 className="font-display font-bold text-lg text-foreground">Squad Defense</h1>
-            <p className="text-xs text-muted-foreground truncate">Deploy the right superpower — protect the crops from the weed wave!</p>
+            <p className="text-xs text-muted-foreground truncate">Arm a cannon, aim at the matching weed, and fire — protect the crops from the weed wave!</p>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-bold">Level {level}</span>
@@ -298,9 +335,12 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
         </div>
 
         {/* Battlefield */}
-        <div className="relative rounded-xl overflow-hidden border-2 border-emerald-800/40 shadow-lg" style={{ height: 380, background: 'linear-gradient(180deg, #a8d8b9 0%, #7dc290 55%, #4a8f5f 100%)' }}>
+        <div
+          className="relative rounded-xl overflow-hidden border-2 border-emerald-800/40 shadow-lg"
+          style={{ height: 'min(72vh, 640px)', minHeight: 480, background: 'linear-gradient(180deg, #a8d8b9 0%, #7dc290 55%, #4a8f5f 100%)' }}
+        >
           {/* wave marker */}
-          <div className="absolute inset-x-0 top-0 h-6 bg-red-500/10 border-b border-red-400/40 flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-red-800">
+          <div className="absolute inset-x-0 top-0 h-6 bg-red-500/10 border-b border-red-400/40 flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-red-800 z-10">
             Weed Wave Incoming
           </div>
           {/* lanes */}
@@ -308,16 +348,16 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
             {[0, 1, 2].map(l => (
               <div key={l} className="relative border-r last:border-r-0 border-emerald-900/10">
                 {laneWeeds(l).map(w => {
-                  const H = HEROES.find(h => h.key === w.weakness)!;
+                  const H = CANNONS.find(h => h.key === w.weakness)!;
                   const badgeState = w.flash === 'hit' ? 'scale-125 opacity-0' : w.flash === 'miss' ? 'animate-pulse ring-2 ring-red-500' : '';
                   return (
                     <button
                       key={w.id}
-                      onClick={() => deployOn(w)}
-                      className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 transition-all duration-200 ${badgeState}`}
-                      style={{ top: `calc(24px + ${w.pos}% * 0.78)` }}
+                      onClick={() => fireOn(w)}
+                      className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 ${badgeState}`}
+                      style={{ top: `calc(24px + ${w.pos}% * 0.9)`, transition: w.flash ? 'transform 200ms, opacity 200ms' : 'none' }}
                     >
-                      <div className="w-20 h-20 rounded-xl bg-white border-4 border-red-500 shadow-lg overflow-hidden relative">
+                      <div className="w-24 h-24 rounded-xl bg-white border-4 border-red-500 shadow-lg overflow-hidden relative">
                         <WeedImage weedId={w.weedId} stage="flower" className="w-full h-full object-cover" />
                         {w.maxHp > 1 && (
                           <div className="absolute -top-1 -right-1 text-[10px] font-bold text-red-900 bg-white rounded-full w-4 h-4 flex items-center justify-center border border-red-400">{w.hp}</div>
@@ -326,10 +366,32 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
                       <div className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white bg-black/60 flex items-center gap-0.5 border ${H.color.replace('text-','border-')}`}>
                         <H.Icon className="w-2.5 h-2.5" /> {H.name}
                       </div>
-                      <div className="text-[9px] font-bold text-red-950 bg-white/85 px-1.5 py-0.5 rounded max-w-[110px] text-center truncate">
+                      <div className="text-[9px] font-bold text-red-950 bg-white/85 px-1.5 py-0.5 rounded max-w-[130px] text-center truncate">
                         {w.name}
                       </div>
                     </button>
+                  );
+                })}
+
+                {/* projectiles: fired shots traveling up toward their target */}
+                {laneProjectiles(l).map(p => {
+                  const C = CANNONS.find(h => h.key === p.cannonKey)!;
+                  return (
+                    <div
+                      key={p.id}
+                      className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+                      style={{
+                        top: `calc(24px + ${p.toPos}% * 0.9)`,
+                        animation: `squad-defense-shot ${PROJECTILE_MS}ms linear forwards`,
+                        // custom props consumed by the keyframes below
+                        // @ts-ignore -- CSS custom properties
+                        '--from-top': `calc(24px + ${p.fromPos}% * 0.9)`,
+                      } as React.CSSProperties}
+                    >
+                      <div className={`w-7 h-7 rounded-full bg-white border-2 shadow-md flex items-center justify-center ${C.color} ${C.bg.split(' ')[1]}`}>
+                        <C.Icon className="w-4 h-4" />
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -337,7 +399,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
           </div>
 
           {/* crops row (defense line) */}
-          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-amber-900/50 to-transparent border-t-4 border-amber-800/60 flex items-end justify-around px-2 pb-1">
+          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-amber-900/50 to-transparent border-t-4 border-amber-800/60 flex items-end justify-around px-2 pb-1 z-10">
             {Array.from({ length: 6 }).map((_, i) => (
               <Sprout key={i} className={`w-8 h-8 ${cropHp > 0 ? 'text-emerald-700' : 'text-stone-500'} drop-shadow`} />
             ))}
@@ -345,19 +407,27 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
 
           {/* feedback banner */}
           {feedback && (
-            <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full font-bold text-sm shadow-lg animate-scale-in ${feedback.kind === 'good' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+            <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full font-bold text-sm shadow-lg animate-scale-in z-30 ${feedback.kind === 'good' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
               {feedback.text}
             </div>
           )}
         </div>
 
-        {/* Hero deck */}
+        {/* Local keyframes for the projectile travel animation */}
+        <style>{`
+          @keyframes squad-defense-shot {
+            from { top: var(--from-top); opacity: 1; }
+            to   { opacity: 1; }
+          }
+        `}</style>
+
+        {/* Cannon deck */}
         <div className="mt-3">
           <div className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-1">
-            {selected ? `Deployed hero: ${HEROES.find(h => h.key === selected)!.name} — tap a weed!` : 'Pick a hero, then tap a weed with the matching label.'}
+            {selected ? `Cannon armed: ${CANNONS.find(h => h.key === selected)!.name} — tap a weed to fire!` : 'Arm a cannon, then tap a weed with the matching label.'}
           </div>
           <div className="grid grid-cols-5 gap-2">
-            {HEROES.map(h => {
+            {CANNONS.map(h => {
               const cd = cooldowns[h.key];
               const cdPct = Math.max(0, Math.min(100, (cd / h.cooldownMs) * 100));
               const disabled = cd > 0 || energy < h.cost;
@@ -367,13 +437,18 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
                   key={h.key}
                   onClick={() => setSelected(isSel ? null : h.key)}
                   disabled={disabled}
+                  aria-label={`${h.name} cannon`}
                   className={`relative overflow-hidden p-2 rounded-lg border-2 transition-all text-center ${h.bg} ${isSel ? 'ring-4 ring-primary scale-[1.03]' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02]'}`}
                 >
                   {cd > 0 && (
                     <div className="absolute inset-x-0 bottom-0 bg-black/40" style={{ height: `${cdPct}%` }} />
                   )}
-                  <div className={`relative z-10 w-9 h-9 mx-auto rounded-full bg-white border-2 border-current flex items-center justify-center ${h.color}`}>
-                    <h.Icon className="w-5 h-5" />
+                  {/* little cannon body: barrel + base, colored by power */}
+                  <div className={`relative z-10 mx-auto w-11 h-9 flex flex-col items-center justify-end`}>
+                    <div className={`w-4 h-5 rounded-t-full border-2 border-current ${h.color} bg-white`} />
+                    <div className={`w-9 h-3 rounded-md border-2 border-current ${h.color} bg-white -mt-0.5 flex items-center justify-center`}>
+                      <h.Icon className="w-3 h-3" />
+                    </div>
                   </div>
                   <div className="relative z-10 text-xs font-bold text-foreground mt-1">{h.name}</div>
                   <div className="relative z-10 text-[9px] uppercase tracking-wider text-muted-foreground">{h.power}</div>
@@ -396,7 +471,7 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
         </div>
       </div>
 
-      <FarmerGuide message="Match the hero to the weed's weakness! Wrong powers still hurt them a little — but the RIGHT power wipes the weed out in one hit." />
+      <FarmerGuide message="Arm the cannon that matches the weed's weakness, then tap the weed to fire! Wrong cannons still chip them a little — but the RIGHT cannon wipes the weed out in one hit." />
     </div>
   );
 }

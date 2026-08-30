@@ -49,7 +49,7 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const items = useMemo(() => buildRounds(level, d.rounds), [level, d.rounds]);
 
   const [idx, setIdx] = useState(0);
-  const [step, setStep] = useState<'stage' | 'weed' | 'control' | 'feedback'>('stage');
+  const [step, setStep] = useState<'weed' | 'stage' | 'control' | 'feedback'>('weed');
   const [stageAnswer, setStageAnswer] = useState<Stage | null>(null);
   const [weedAnswer, setWeedAnswer] = useState<string | null>(null);
   const [controlAnswer, setControlAnswer] = useState<string | null>(null);
@@ -80,13 +80,13 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
   const handleStage = (s: Stage) => {
     setStageAnswer(s);
     if (s === current!.stage) setScore(sc => sc + 1);
-    setStep('weed');
+    setStep('control');
   };
 
   const handleWeed = (id: string) => {
     setWeedAnswer(id);
     if (id === current!.weed.id) setScore(sc => sc + 1);
-    setStep('control');
+    setStep('stage');
   };
 
   const handleControl = (cId: string) => {
@@ -98,14 +98,14 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
 
   const next = () => {
     setIdx(i => i + 1);
-    setStep('stage');
+    setStep('weed');
     setStageAnswer(null);
     setWeedAnswer(null);
     setControlAnswer(null);
   };
 
   const restart = () => {
-    setIdx(0); setScore(0); setStep('stage');
+    setIdx(0); setScore(0); setStep('weed');
     setStageAnswer(null); setWeedAnswer(null); setControlAnswer(null);
   };
   const nextLevel = () => { setLevel(l => l + 1); restart(); };
@@ -145,15 +145,15 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
 
         {/* Step indicators */}
         <div className="flex gap-2 mb-4">
-          {['Stage', 'Weed', 'Control'].map((label, i) => {
-            const stepNames = ['stage', 'weed', 'control', 'feedback'] as const;
+          {['Weed', 'When', 'How'].map((label, i) => {
+            const stepNames = ['weed', 'stage', 'control', 'feedback'] as const;
             const currentIdx = stepNames.indexOf(step);
             const isComplete = currentIdx > i;
             const isCurrent = currentIdx === i;
             // Determine correctness per step (only known after answered)
             let stepCorrect: boolean | null = null;
-            if (i === 0 && stageAnswer) stepCorrect = stageAnswer === current!.stage;
-            else if (i === 1 && weedAnswer) stepCorrect = weedAnswer === current!.weed.id;
+            if (i === 0 && weedAnswer) stepCorrect = weedAnswer === current!.weed.id;
+            else if (i === 1 && stageAnswer) stepCorrect = stageAnswer === current!.stage;
             else if (i === 2 && controlAnswer) stepCorrect = validControlIds.includes(controlAnswer);
             return (
               <span key={label} className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -166,10 +166,15 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
           })}
         </div>
 
-        {/* Step 1: Identify life stage */}
+        {/* Step 2: When should it be controlled? */}
         {step === 'stage' && (
           <>
-            <p className="font-bold text-foreground mb-3 text-center">What life stage is shown in the image?</p>
+            <p className={`text-sm font-bold mb-1 ${weedCorrect ? 'text-green-500' : 'text-destructive'}`}>
+              {weedCorrect ? 'Correct weed!' : `That's ${current!.weed.commonName}.`}
+            </p>
+            <p className="font-bold text-foreground mb-3 text-center">
+              At which growth stage should you control {current!.weed.commonName}?
+            </p>
             <div className="flex flex-col gap-2 w-full max-w-sm">
               {STAGES.map(s => (
                 <button key={s} onClick={() => handleStage(s)}
@@ -181,12 +186,9 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
           </>
         )}
 
-        {/* Step 2: Identify the weed */}
+        {/* Step 1: Name the weed */}
         {step === 'weed' && (
           <>
-            <p className={`text-sm font-bold mb-1 ${stageCorrect ? 'text-green-500' : 'text-destructive'}`}>
-              {stageCorrect ? 'Correct stage!' : `Not quite -- it's the ${STAGE_LABELS[current!.stage]} stage.`}
-            </p>
             <p className="font-bold text-foreground mb-3 text-center">Which weed is shown in the image?</p>
             <div className="flex flex-col gap-2 w-full max-w-sm">
               {weedOptions.map(w => (
@@ -202,8 +204,8 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
         {/* Step 3: Choose control method */}
         {step === 'control' && (
           <>
-            <p className={`text-sm font-bold mb-1 ${weedCorrect ? 'text-green-500' : 'text-destructive'}`}>
-              {weedCorrect ? 'Correct weed!' : `That's ${current!.weed.commonName}.`}
+            <p className={`text-sm font-bold mb-1 ${stageCorrect ? 'text-green-500' : 'text-destructive'}`}>
+              {stageCorrect ? 'Good timing!' : `Best timing here is the ${STAGE_LABELS[current!.stage].toLowerCase()} stage.`}
             </p>
             <p className="font-bold text-foreground mb-3 text-center">
               How should you manage {current!.weed.commonName} at the {STAGE_LABELS[current!.stage].toLowerCase()} stage?
@@ -236,7 +238,7 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <span className={`font-bold ${stageCorrect ? 'text-green-500' : 'text-destructive'}`}>
-                    {stageCorrect ? 'Stage: Correct' : `Stage: ${STAGE_LABELS[current!.stage]}`}
+                    {stageCorrect ? 'Timing: Correct' : `Timing: ${STAGE_LABELS[current!.stage]}`}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
