@@ -2,196 +2,153 @@ import { useState, useMemo, useEffect } from 'react';
 import { highSchoolWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import soybeanBg from '@/assets/images/soybean_field_1.jpg';
-import { Target, DollarSign, Lock } from 'lucide-react';
+import { Target, Timer, AlertTriangle, Skull, HeartCrack } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
-import { getDifficulty, levelSlice } from '@/lib/difficulty';
 import {
   HERBICIDE_MOA,
   getMiddleSchoolMOAs,
-  getBestMOAForWeed,
   getTopMOAsForWeed,
+  getBestMOAForWeed,
   type HerbicideMOA,
 } from '@/data/herbicides';
 import FloatingCoach from '@/components/game/FloatingCoach';
-import BetweenLevelShop from '@/components/game/BetweenLevelShop';
-import { usePracticeShop, type ShopItem } from '@/lib/practiceShop';
+import LevelComplete from '@/components/game/LevelComplete';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
-interface FieldWeed { id: string; weed: typeof weeds[0]; x: number; y: number; killed: boolean }
+interface FieldWeed { id: string; weed: typeof weeds[0]; x: number; y: number }
 
-// Fewer rounds per level so students earn faster and reach the shop sooner.
-const TOTAL_ROUNDS = 2;
+const TOTAL_SEASONS = 3;
+const SCOUT_SECONDS = 10;
 
-// Kills award crop revenue that flows into the persistent shop wallet.
-const REVENUE_PER_KILL = 40;
-// Guaranteed end-of-level scouting stipend so a student who mismatches every
-// spray still accumulates enough to unlock a new chemical and progress.
-const LEVEL_COMPLETION_BONUS = 150;
+type Phase = 'scout' | 'review' | 'choose' | 'result';
 
-// Students START with 2 basic MOAs (ids MUST match HERBICIDE_MOA ids, or every
-// chemical stays locked and the game is unplayable).
-const STARTER_MOAS = ['epsps', 'psii-6'];
-// Unlock costs keyed by real MOA id.
-const MOA_COST: Record<string, number> = {
-  auxin: 125,
-  'ppo-post': 200,
-  gs: 225,
-  hppd: 175,
-  'vlcfa-15': 150,
-  accase: 175,
-};
+interface WeedOutcome { item: FieldWeed; killed: boolean; groupUsed: number }
 
-function buildField(level: number, round: number): FieldWeed[] {
-  const d = getDifficulty(level, 'ms');
+interface SeasonRecord {
+  season: number;
+  moa: HerbicideMOA;
+  killed: number;
+  damaged: number;
+  total: number;
+  repeated: boolean;
+}
+
+function buildField(season: number): FieldWeed[] {
   const pool = shuffle(weeds);
-  const offset = ((level - 1) * TOTAL_ROUNDS + round) * 5;
-  const speciesCount = Math.min(pool.length, 4 + Math.floor(Math.random() * 2) + Math.max(0, d.options - 4));
-  const species = pool.slice(offset % pool.length, (offset % pool.length) + speciesCount);
+  const speciesCount = Math.min(pool.length, 5);
+  const species = pool.slice(0, speciesCount);
   const items: FieldWeed[] = [];
-  species.forEach(s => {
-    const cnt = 2 + Math.floor(Math.random() * 3);
+  species.forEach((s) => {
+    const cnt = 3 + Math.floor(Math.random() * 3);
     for (let i = 0; i < cnt; i++) {
       items.push({
-        id: `${s.id}-${items.length}`,
+        id: `${s.id}-${season}-${items.length}`,
         weed: s,
         x: 8 + Math.random() * 84,
         y: 8 + Math.random() * 84,
-        killed: false,
       });
     }
   });
   return items;
 }
 
-export default function HerbicideApplicator({ onBack }: { onBack: () => void }) {
-  const [level, setLevel] = useState(1);
-  const { addBadge } = useGameProgress();
-  const msPool = useMemo(() => getMiddleSchoolMOAs(), []);
-  const shop = usePracticeShop('herbicide-applicator', STARTER_MOAS, 0);
-  // Starters are always owned, even for students whose saved locker predates
-  // the id fix (legacy saves stored chemical names, not MOA ids).
-  const owns = (id: string) => STARTER_MOAS.includes(id) || shop.owns(id);
-  const catalog: ShopItem[] = useMemo(
-    () => msPool
-      .filter(m => !STARTER_MOAS.includes(m.id))
-      .map(m => ({
-        id: m.id,
-        name: `${m.moa} (Group ${m.group})`,
-        cost: MOA_COST[m.id] ?? 175,
-        tag: m.spectrum,
-        desc: `${m.chemistry} — e.g. ${m.brands[0]}`,
-      })),
-    [msPool],
-  );
-  const [earnedThisLevel, setEarnedThisLevel] = useState(0);
-  const [showShop, setShowShop] = useState(false);
-  const [round, setRound] = useState(1);
-  const [items, setItems] = useState<FieldWeed[]>(() => buildField(1, 1));
-  const [selected, setSelected] = useState<string[]>([]);
-  const [appliedMOA, setAppliedMOA] = useState<string | null>(null);
-  const [phase, setPhase] = useState<'select' | 'choose' | 'result'>('select');
-  const [score, setScore] = useState(0);
-  const [history, setHistory] = useState<{ round: number; moaLabel: string; killed: number; total: number; optimal: number }[]>([]);
+/** True if this MOA's group number is "listed" (effective, per curated data) for the weed. */
+function isGroupListedForWeed(groupNum: number, weed: typeof weeds[0]): boolean {
+  const top = getTopMOAsForWeed(weed);
+  const listedGroups = top ? top.map((m) => m.group) : [HERBICIDE_MOA.find((m) => m.id === getBestMOAForWeed(weed))?.group];
+  return listedGroups.includes(groupNum);
+}
 
-  useEffect(() => { setItems(buildField(level, round)); setSelected([]); setAppliedMOA(null); setPhase('select'); }, [level, round]);
+export default function HerbicideApplicator({ onBack }: { onBack: () => void }) {
+  const { addBadge } = useGameProgress();
+  const groupOptions = useMemo(() => getMiddleSchoolMOAs(), []);
+
+  const [season, setSeason] = useState(1);
+  const [phase, setPhase] = useState<Phase>('scout');
+  const [field, setField] = useState<FieldWeed[]>(() => buildField(1));
+  const [selected, setSelected] = useState<string[]>([]);
+  const [timeLeft, setTimeLeft] = useState(SCOUT_SECONDS);
+  const [chosenGroups, setChosenGroups] = useState<number[]>([]);
+  const [outcomes, setOutcomes] = useState<WeedOutcome[]>([]);
+  const [records, setRecords] = useState<SeasonRecord[]>([]);
+  const [score, setScore] = useState(0);
+  const [showComplete, setShowComplete] = useState(false);
+
+  // Reset each season
+  useEffect(() => {
+    setField(buildField(season));
+    setSelected([]);
+    setTimeLeft(SCOUT_SECONDS);
+    setPhase('scout');
+  }, [season]);
+
+  // Scouting countdown
+  useEffect(() => {
+    if (phase !== 'scout') return;
+    if (timeLeft <= 0) {
+      setPhase('review');
+      return;
+    }
+    const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [phase, timeLeft]);
 
   useEffect(() => {
-    if (showShop) {
-      addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: items.length * TOTAL_ROUNDS });
+    if (showComplete) {
+      addBadge({ gameId: 'herbicide-applicator', gameName: 'Herbicide Applicator', level: 'MS', score, total: TOTAL_SEASONS * 10 });
     }
-  }, [showShop]);
+  }, [showComplete]);
 
-  const toggle = (id: string) => {
-    if (phase !== 'select') return;
-    setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
+  const toggleWeed = (id: string) => {
+    if (phase !== 'scout') return;
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   };
 
-  const selectAll = () => setSelected(items.filter(i => !i.killed).map(i => i.id));
+  const selectedWeeds = field.filter((f) => selected.includes(f.id));
+  const previousGroup = chosenGroups[chosenGroups.length - 1];
 
-  // A curated recommendation is always effective. Spectrum matching also
-  // counts so broad-spectrum starter products remain usable in every round.
-  const isEffective = (moa: HerbicideMOA, weed: typeof weeds[0]): boolean => {
-    const recommendedIds = getTopMOAsForWeed(weed)?.map(option => option.id) ?? [getBestMOAForWeed(weed)];
-    if (recommendedIds.includes(moa.id)) return true;
-    if (moa.spectrum === 'Both') return true;
-    const isGrass = weed.plantType === 'Monocot';
-    return moa.spectrum === (isGrass ? 'Grass' : 'Broadleaf');
-  };
+  const spray = (moa: HerbicideMOA) => {
+    const isRepeat = previousGroup === moa.group;
+    const results: WeedOutcome[] = selectedWeeds.map((item) => {
+      const listed = isGroupListedForWeed(moa.group, item.weed);
+      // Resistance penalty: repeated back-to-back group use downgrades roughly
+      // half of what would otherwise be kills to only "damaged".
+      const downgraded = isRepeat && listed && Math.random() < 0.5;
+      return { item, killed: listed && !downgraded, groupUsed: moa.group };
+    });
+    const killed = results.filter((r) => r.killed).length;
+    const damaged = results.length - killed;
 
-  // Compute kill score for an MOA across the selected weeds.
-  const scoreMOA = (moaId: string): number => {
-    const moa = HERBICIDE_MOA.find(option => option.id === moaId);
-    if (!moa) return 0;
-    return selected.reduce((acc, id) => {
-      const item = items.find(fieldWeed => fieldWeed.id === id);
-      return acc + (item && !item.killed && isEffective(moa, item.weed) ? 1 : 0);
-    }, 0);
-  };
-
-  const apply = (moaId: string) => {
-    if (!owns(moaId)) return;
-    const moa = HERBICIDE_MOA.find(h => h.id === moaId);
-    if (!moa) return;
-
-    const optimal = Math.max(0, ...moaOptions.map(option => scoreMOA(option.id)));
-    const selectedIds = new Set(selected);
-    const killedIds = new Set(
-      items
-        .filter(item => selectedIds.has(item.id) && !item.killed && isEffective(moa, item.weed))
-        .map(item => item.id),
-    );
-    const killed = killedIds.size;
-
-    // Only selected weeds are in the sprayed area.
-    setItems(prev => prev.map(item => killedIds.has(item.id) ? { ...item, killed: true } : item));
-    setAppliedMOA(moaId);
-    setScore(s => s + killed);
-    const revenue = killed * REVENUE_PER_KILL;
-    shop.earn(revenue);
-    setEarnedThisLevel(v => v + revenue);
-    setHistory(h => [...h, { round, moaLabel: `${moa.moa} (Group ${moa.group})`, killed, total: selected.length, optimal }]);
+    setOutcomes(results);
+    setChosenGroups((g) => [...g, moa.group]);
+    setRecords((r) => [...r, { season, moa, killed, damaged, total: results.length, repeated: isRepeat }]);
+    setScore((s) => s + killed * 2 + damaged * 1);
     setPhase('result');
   };
 
-  const nextRound = () => {
-    if (round < TOTAL_ROUNDS) setRound(r => r + 1);
-    else {
-      shop.earn(LEVEL_COMPLETION_BONUS);
-      setEarnedThisLevel(v => v + LEVEL_COMPLETION_BONUS);
-      setShowShop(true); // end of level -> shop
-    }
+  const nextSeason = () => {
+    if (season < TOTAL_SEASONS) setSeason((s) => s + 1);
+    else setShowComplete(true);
   };
 
-  const sprayAgain = () => {
-    setSelected([]);
-    setAppliedMOA(null);
-    setPhase('select');
+  const restart = () => {
+    setSeason(1);
+    setRecords([]);
+    setChosenGroups([]);
+    setScore(0);
+    setShowComplete(false);
   };
 
-  const livingCount = items.filter(i => !i.killed).length;
-
-  const restart = () => { setRound(1); setScore(0); setHistory([]); setSelected([]); setAppliedMOA(null); setPhase('select'); setEarnedThisLevel(0); setShowShop(false); };
-  const nextLevelFn = () => { setLevel(l => l + 1); restart(); };
-  const startOver = () => { setLevel(1); shop.reset(); restart(); };
-  const moaOptions = msPool.filter(m => STARTER_MOAS.includes(m.id) || shop.owned.includes(m.id));
-
-  if (showShop) {
+  if (showComplete) {
     return (
-      <BetweenLevelShop
-        title="Herbicide Locker"
-        level={level}
+      <LevelComplete
         score={score}
-        total={items.length * TOTAL_ROUNDS}
-        money={shop.money}
-        owned={shop.owned}
-        earnedThisLevel={earnedThisLevel}
-        catalog={catalog}
-        onBuy={shop.buy}
-        onContinue={nextLevelFn}
-        onStartOver={startOver}
+        total={TOTAL_SEASONS * 10}
+        onNext={restart}
         onBack={onBack}
-        gradeLabel="6-8"
+        title="Fields Sprayed!"
+        subtitle="3 seasons of scouting and spraying complete."
       />
     );
   }
@@ -201,26 +158,31 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Herbicide Applicator</h1>
-        <span className="text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
-          <DollarSign className="w-3 h-3" />{shop.money}
-        </span>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
-        <span className="text-sm text-muted-foreground">Round {round}/{TOTAL_ROUNDS}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Season {season}/{TOTAL_SEASONS}</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-foreground font-bold">Score {score}</span>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_340px] overflow-hidden">
         {/* LEFT: field */}
         <div className="relative overflow-hidden">
           <img src={soybeanBg} alt="Soybean field" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/15" />
-          {items.map(it => {
+          {phase === 'scout' && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-full bg-destructive text-destructive-foreground font-bold text-lg shadow-lg">
+              <Timer className="w-5 h-5" /> {timeLeft}s
+            </div>
+          )}
+          {field.map((it) => {
             const isSelected = selected.includes(it.id);
+            const outcome = outcomes.find((o) => o.item.id === it.id);
             return (
-              <button key={it.id} onClick={() => toggle(it.id)} disabled={it.killed || phase !== 'select'}
+              <button key={it.id} onClick={() => toggleWeed(it.id)} disabled={phase !== 'scout'}
                 style={{ left: `${it.x}%`, top: `${it.y}%` }}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${it.killed ? 'opacity-25 grayscale' : ''}`}>
+                className="absolute -translate-x-1/2 -translate-y-1/2 transition-all">
                 <div className={`w-12 h-12 rounded-full overflow-hidden border-[3px] shadow-lg ${
-                  it.killed ? 'border-destructive' : isSelected ? 'border-primary ring-2 ring-primary/40 scale-110' : 'border-white/80'
+                  outcome
+                    ? outcome.killed ? 'border-destructive opacity-30 grayscale' : 'border-amber-500'
+                    : isSelected ? 'border-primary ring-2 ring-primary/40 scale-110' : 'border-white/80'
                 }`}>
                   <WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" />
                 </div>
@@ -231,97 +193,120 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
 
         {/* RIGHT: panel */}
         <div className="bg-card border-l border-border overflow-y-auto p-3 space-y-3">
-          {phase === 'select' && (
+          {phase === 'scout' && (
             <>
-              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Step 1: Select target weeds</p>
-              <p className="text-xs text-muted-foreground">Click weeds in the field to add them to your spray list. Pick a herbicide that controls the most.</p>
-              <button onClick={selectAll} className="w-full py-2 rounded-lg bg-secondary text-foreground font-bold text-xs">Select All Living</button>
-              <div className="bg-background border border-border rounded-lg p-2 max-h-60 overflow-y-auto">
-                <p className="text-[11px] font-bold text-foreground mb-1">Selected ({selected.length})</p>
-                {selected.length === 0 && <p className="text-[10px] text-muted-foreground italic">Click weeds in the field.</p>}
+              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Scouting — Time is running out!</p>
+              <p className="text-xs text-muted-foreground">Click every weed you can find before the timer hits zero.</p>
+              <div className="p-3 rounded-lg border-2 border-primary/40 bg-primary/5 text-center">
+                <p className="text-3xl font-black text-primary">{selected.length}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Weeds Flagged</p>
+              </div>
+            </>
+          )}
+
+          {phase === 'review' && (
+            <>
+              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Scouting Report</p>
+              <p className="text-xs text-muted-foreground">Here's every weed you flagged this season.</p>
+              <div className="bg-background border border-border rounded-lg p-2 max-h-72 overflow-y-auto">
+                {selectedWeeds.length === 0 && (
+                  <p className="text-[11px] text-muted-foreground italic">You didn't flag any weeds in time!</p>
+                )}
                 <div className="space-y-1">
-                  {selected.map(id => {
-                    const it = items.find(i => i.id === id)!;
-                    return (
-                      <div key={id} className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded overflow-hidden bg-secondary flex-shrink-0">
-                          <WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" />
-                        </div>
-                        <span className="text-[11px] text-foreground flex-1 truncate">{it.weed.commonName}</span>
+                  {selectedWeeds.map((it) => (
+                    <div key={it.id} className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded overflow-hidden bg-secondary flex-shrink-0">
+                        <WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" />
                       </div>
-                    );
-                  })}
+                      <span className="text-xs text-foreground flex-1 truncate">{it.weed.commonName}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <button onClick={() => setPhase('choose')} disabled={selected.length === 0}
+              <button onClick={() => setPhase('choose')} disabled={selectedWeeds.length === 0}
                 className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50">
-                Choose Herbicide →
+                Choose a Herbicide →
               </button>
             </>
           )}
 
           {phase === 'choose' && (
             <>
-              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Step 2: Pick a mode of action</p>
-              <p className="text-xs text-muted-foreground">Which of YOUR unlocked herbicides matches these weeds best?</p>
+              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Pick ONE Mode of Action to Spray</p>
+              <p className="text-xs text-muted-foreground">Every flagged weed in the field gets this one herbicide group.</p>
+              {previousGroup !== undefined && (
+                <div className="flex items-start gap-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/40 text-[10px] text-amber-700 dark:text-amber-300">
+                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                  Spraying Group {previousGroup} again will risk selecting for resistance.
+                </div>
+              )}
               <div className="space-y-2">
-                {moaOptions.length === 0 && (
-                  <p className="text-xs text-destructive font-bold">No herbicides unlocked yet — save up between levels!</p>
-                )}
-                {moaOptions.map(m => (
-                  <button key={m.id} onClick={() => apply(m.id)}
+                {groupOptions.map((m) => (
+                  <button key={m.id} onClick={() => spray(m)}
                     className="w-full p-2.5 rounded-lg border-2 border-border bg-background hover:border-primary text-left">
                     <span className="text-xs font-bold text-foreground">{m.moa} (Group {m.group})</span>
-                    <span className="text-[10px] text-muted-foreground block">Chemical: {m.brands[0]}</span>
+                    <span className="text-[10px] text-muted-foreground block">e.g. {m.brands[0]}</span>
                   </button>
                 ))}
               </div>
-              <p className="text-[10px] text-muted-foreground italic">Each kill earns ${REVENUE_PER_KILL} for your locker. Unlock more chemicals between levels.</p>
-              {msPool.some(m => !owns(m.id)) && (
-                <div className="mt-2 border-t border-border pt-2">
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1 inline-flex items-center gap-1"><Lock className="w-3 h-3" />Locked</p>
-                  {msPool.filter(m => !owns(m.id)).slice(0,4).map(m => (
-                    <p key={m.id} className="text-[10px] text-muted-foreground">{m.moa} (Group {m.group})</p>
-                  ))}
-                </div>
-              )}
-              <button onClick={() => setPhase('select')} className="w-full py-2 rounded-lg bg-secondary text-foreground font-bold text-xs">← Change Selection</button>
             </>
           )}
 
-          {phase === 'result' && appliedMOA && (
-            <>
-              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Spray Results</p>
-              {(() => {
-                const last = history[history.length - 1];
-                return (
-                  <div className={`p-3 rounded-lg border-2 ${last.killed === last.optimal ? 'border-green-500 bg-green-500/10' : 'border-amber-500 bg-amber-500/10'}`}>
-                    <p className="font-bold text-foreground flex items-center gap-1"><Target className="w-4 h-4" /> Controlled {last.killed}/{last.total}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Best possible with this selection: {last.optimal}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">{last.moaLabel}</p>
+          {phase === 'result' && records.length > 0 && (() => {
+            const last = records[records.length - 1];
+            return (
+              <>
+                <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Season {last.season} Results</p>
+                {last.repeated && (
+                  <div className="flex items-start gap-1.5 p-2 rounded-lg bg-destructive/10 border border-destructive/40 text-[11px] text-destructive font-semibold">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    Repeated Group {last.moa.group} applications are selecting for herbicide resistance in this field.
                   </div>
-                );
-              })()}
-              {livingCount > 0 && (
-                <button onClick={sprayAgain} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                  Spray Again ({livingCount} weeds left) →
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-2 rounded-lg border-2 border-destructive/50 bg-destructive/10 text-center">
+                    <Skull className="w-4 h-4 mx-auto text-destructive" />
+                    <p className="text-xl font-black text-foreground">{last.killed}</p>
+                    <p className="text-[10px] text-muted-foreground">Killed</p>
+                  </div>
+                  <div className="p-2 rounded-lg border-2 border-amber-500/50 bg-amber-500/10 text-center">
+                    <HeartCrack className="w-4 h-4 mx-auto text-amber-600" />
+                    <p className="text-xl font-black text-foreground">{last.damaged}</p>
+                    <p className="text-[10px] text-muted-foreground">Only Damaged</p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Sprayed: {last.moa.moa} (Group {last.moa.group})</p>
+                <div className="bg-background border border-border rounded-lg p-2 max-h-56 overflow-y-auto">
+                  <p className="text-[11px] font-bold text-foreground mb-1 flex items-center gap-1"><Target className="w-3 h-3" /> Per-Weed Breakdown</p>
+                  <div className="space-y-1">
+                    {outcomes.map((o) => (
+                      <div key={o.item.id} className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded overflow-hidden bg-secondary flex-shrink-0">
+                          <WeedImage weedId={o.item.weed.id} stage="flower" className="w-full h-full object-cover" />
+                        </div>
+                        <span className="text-[11px] text-foreground flex-1 truncate">{o.item.weed.commonName}</span>
+                        <span className={`text-[10px] font-bold ${o.killed ? 'text-destructive' : 'text-amber-600'}`}>
+                          {o.killed ? 'Killed' : 'Damaged'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={nextSeason} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+                  {season < TOTAL_SEASONS ? 'Next Season →' : 'Finish →'}
                 </button>
-              )}
-              <button onClick={nextRound}
-                className={`w-full py-2.5 rounded-lg font-bold text-sm ${livingCount > 0 ? 'bg-secondary text-foreground' : 'bg-primary text-primary-foreground'}`}>
-                {round < TOTAL_ROUNDS ? (livingCount > 0 ? 'End Round Early →' : 'Next Round →') : 'Finish Level →'}
-              </button>
-            </>
-          )}
+              </>
+            );
+          })()}
 
-          {history.length > 0 && (
+          {records.length > 0 && (
             <div className="border-t border-border pt-2">
-              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Spray History</p>
+              <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Season History</p>
               <div className="space-y-1">
-                {history.map((h, i) => (
+                {records.map((r, i) => (
                   <div key={i} className="text-[10px] text-muted-foreground flex justify-between">
-                    <span>R{h.round}: {h.moaLabel}</span>
-                    <span className="font-bold text-foreground">{h.killed}/{h.total}</span>
+                    <span>S{r.season}: {r.moa.moa} (Group {r.moa.group}){r.repeated ? ' ⚠' : ''}</span>
+                    <span className="font-bold text-foreground">{r.killed} killed / {r.damaged} damaged</span>
                   </div>
                 ))}
               </div>
@@ -330,7 +315,7 @@ export default function HerbicideApplicator({ onBack }: { onBack: () => void }) 
         </div>
       </div>
 
-      <FloatingCoach grade="6-8" tip={`A field herbicide hits everything you spray. Pick the mode of action that controls the most of your target weeds.`} />
+      <FloatingCoach grade="6-8" tip="Scout fast, spray smart — and never spray the same mode of action two seasons in a row or resistance builds up." />
     </div>
   );
 }
