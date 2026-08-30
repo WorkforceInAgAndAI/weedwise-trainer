@@ -116,13 +116,8 @@ function isWRoute(pts: { x: number; y: number }[], walked: number) {
 
 interface Props {
   onBack: () => void;
+  /** 'high' = 9-12 "Scout the Weeds" manual scouting on a $25,000 budget. */
   variant?: 'middle' | 'high';
-  gameId?: string;
-  gameName?: string;
-  gradeLabel?: string;
-  poolGrade?: PoolGrade;
-}
-  onBack: () => void;
   gameId?: string;
   gameName?: string;
   gradeLabel?: string;
@@ -132,12 +127,15 @@ interface Props {
 
 export default function FieldScoutChallenge({
   onBack,
+  variant = 'middle',
   gameId,
   gameName,
   gradeLabel,
   poolGrade = 'middle',
 }: Props) {
-  const title = gameName ?? 'Field Scout Challenge';
+  const title = gameName ?? (variant === 'high' ? 'Scout the Weeds' : 'Field Scout Challenge');
+  const SCALE = variant === 'high' ? 1 : 0.04;
+  const startMoney = Math.round(START_MONEY * SCALE);
   const weeds = useMemo(() => weedsForPool(poolGrade), [poolGrade]);
   const [season, setSeason] = useState(1);
   const [trip, setTrip] = useState<Trip>(0);
