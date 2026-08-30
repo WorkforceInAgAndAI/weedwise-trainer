@@ -57,7 +57,7 @@ function WorldMap({ onSelect, selected, correctId, showResult }: {
       key={c.id}
       onClick={() => !showResult && onSelect(c.id)}
       disabled={showResult}
-      className={`absolute transform -translate-x-1/2 -translate-y-1/2 px-2 py-1 rounded-lg border-2 text-[10px] font-bold text-foreground transition-all whitespace-nowrap ${borderCls}`}
+      className={`absolute transform -translate-x-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg border-2 text-sm sm:text-base font-bold text-foreground transition-all whitespace-nowrap ${borderCls}`}
       style={{ left: `${c.x}%`, top: `${c.y}%` }}
      >
       {c.label.split('/')[0].trim()}
@@ -141,7 +141,7 @@ export default function InvasiveHabitatMapping({ onBack }: { onBack: () => void 
 
  return (
   <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-   <div className="max-w-lg mx-auto p-4">
+   <div className="max-w-3xl mx-auto p-4">
     <div className="flex items-center gap-3 mb-4">
      <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
      <h1 className="font-display font-bold text-lg text-foreground">Introduced ID</h1>
