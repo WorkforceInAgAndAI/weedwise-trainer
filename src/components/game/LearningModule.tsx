@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
+import { getSeedFact } from "@/data/seedFacts";
 import HerbicideMOAExplorer from "@/components/game/learning/HerbicideMOAExplorer";
 import {
   DetectiveCard,
@@ -375,6 +376,16 @@ function getElementarySeedDescription(w: Weed): string {
   if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
   // Fallback
   return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
+}
+
+// Seed panel descriptions: always prefer the curated seedFacts.ts description;
+// only fall back to the friendly generic text when no curated entry exists.
+function getSeedPanelDescription(w: Weed): string {
+  const fact = getSeedFact(w.commonName, w.family, w.plantType);
+  if (fact.seedDescription && !fact.seedDescription.startsWith("No detailed")) {
+    return fact.seedDescription;
+  }
+  return getElementarySeedDescription(w);
 }
 
 // Simple cross-section diagram showing seeds at different soil depths.
@@ -2679,7 +2690,7 @@ function TopicContent({
                 weeds={topicWeeds}
                 onSelectWeed={onSelectWeed}
                 mode={displayGrade === "collegiate" ? "flip" : "list"}
-                seedDescription={getElementarySeedDescription}
+                seedDescription={getSeedPanelDescription}
               />
             </div>
           )}
@@ -3791,7 +3802,7 @@ function TopicContent({
         );
       }
 
-      if (grade === "elementary") {
+      if (displayGrade === "elementary") {
         const elemHabitats = [
           {
             key: "Warm-Season / Full Sun",
@@ -7887,33 +7898,6 @@ function TopicContent({
               itself. That's why proper weed identification is one of the most important steps in making sure herbicide
               treatment actually works!
             </p>
-          </div>
-
-          <p className="text-base font-semibold text-foreground">
-            Here are just a few of the common herbicide groups used by farmers today.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[...HERBICIDE_MOA]
-              .sort((a, b) => a.group - b.group)
-              .map((m) => (
-                <div key={m.id} className="bg-card border border-border rounded-xl p-5 space-y-2">
-                  <p className="font-display font-bold text-foreground text-lg leading-snug">{m.moa}</p>
-                  <p className="text-base text-primary font-semibold">Group {m.group}</p>
-                  <p className="text-base text-foreground">
-                    <strong>Target:</strong> {m.spectrum === "Both" ? "Grass & Broadleaf" : m.spectrum} weeds
-                  </p>
-                  <p className="text-base text-foreground">
-                    <strong>Timing:</strong>{" "}
-                    {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
-                  </p>
-                  <p className="text-base text-foreground">
-                    <strong>Symptoms:</strong> {SYMPTOM_TYPES[m.symptomType]?.label}
-                    {SYMPTOM_TYPES[m.symptomType]?.description
-                      ? ` — ${SYMPTOM_TYPES[m.symptomType].description}`
-                      : ""}
-                  </p>
-                </div>
-              ))}
           </div>
 
           <h3 className="font-display font-bold text-foreground text-sm">Herbicide Injury Symptoms & By-Weed Lookup</h3>

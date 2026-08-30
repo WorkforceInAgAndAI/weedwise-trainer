@@ -450,10 +450,10 @@ export default function SquadDefense({ onBack, gameId, gameName, gradeLabel }: P
                       <h.Icon className="w-3 h-3" />
                     </div>
                   </div>
-                  <div className="relative z-10 text-xs font-bold text-foreground mt-1">{h.name}</div>
-                  <div className="relative z-10 text-[9px] uppercase tracking-wider text-muted-foreground">{h.power}</div>
-                  <div className="relative z-10 text-[10px] text-foreground/80 leading-tight mt-0.5">{h.blurb}</div>
-                  <div className="relative z-10 text-[10px] font-bold text-amber-800 mt-0.5">⚡ {h.cost}</div>
+                  <div className="relative z-10 text-sm font-bold text-foreground mt-1">{h.name}</div>
+                  <div className="relative z-10 text-[11px] uppercase tracking-wider text-muted-foreground">{h.power}</div>
+                  <div className="relative z-10 text-sm text-foreground/80 leading-tight mt-0.5">{h.blurb}</div>
+                  <div className="relative z-10 text-xs font-bold text-amber-800 mt-0.5">⚡ {h.cost}</div>
                 </button>
               );
             })}
