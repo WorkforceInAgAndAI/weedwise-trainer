@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
 import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
+import { getSeedFact } from "@/data/seedFacts";
 import HerbicideMOAExplorer from "@/components/game/learning/HerbicideMOAExplorer";
 import {
   DetectiveCard,
@@ -375,6 +376,16 @@ function getElementarySeedDescription(w: Weed): string {
   if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
   // Fallback
   return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
+}
+
+// Seed panel descriptions: always prefer the curated seedFacts.ts description;
+// only fall back to the friendly generic text when no curated entry exists.
+function getSeedPanelDescription(w: Weed): string {
+  const fact = getSeedFact(w.commonName, w.family, w.plantType);
+  if (fact.seedDescription && !fact.seedDescription.startsWith("No detailed")) {
+    return fact.seedDescription;
+  }
+  return getElementarySeedDescription(w);
 }
 
 // Simple cross-section diagram showing seeds at different soil depths.
@@ -2679,7 +2690,7 @@ function TopicContent({
                 weeds={topicWeeds}
                 onSelectWeed={onSelectWeed}
                 mode={displayGrade === "collegiate" ? "flip" : "list"}
-                seedDescription={getElementarySeedDescription}
+                seedDescription={getSeedPanelDescription}
               />
             </div>
           )}
