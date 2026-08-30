@@ -94,9 +94,8 @@ export default function HabitatHouses({ weeds, stage = 'vegetative', short = fal
           </ul>
         </div>
 
-        <p className="text-sm font-semibold text-foreground mb-2 text-center">
-          Which house could you survive in best? Knock on a door.
-        </p>
+
+
 
         {/* Houses laid out like a village circle, with you in the middle */}
         <div className="relative mx-auto w-full max-w-[760px] aspect-square">
