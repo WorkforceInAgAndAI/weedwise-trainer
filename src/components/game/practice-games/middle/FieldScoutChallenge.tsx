@@ -116,6 +116,13 @@ function isWRoute(pts: { x: number; y: number }[], walked: number) {
 
 interface Props {
   onBack: () => void;
+  variant?: 'middle' | 'high';
+  gameId?: string;
+  gameName?: string;
+  gradeLabel?: string;
+  poolGrade?: PoolGrade;
+}
+  onBack: () => void;
   gameId?: string;
   gameName?: string;
   gradeLabel?: string;
