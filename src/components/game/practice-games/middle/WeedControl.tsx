@@ -4,6 +4,18 @@ import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
 import { DollarSign, Check, X, Info } from 'lucide-react';
 import type { Weed } from '@/types/game';
+import { resolveControlMethodImage } from '@/lib/imageMap';
+
+/** Reference photo for each selectable control method. */
+const METHOD_PHOTO: Record<string, string | null> = {
+  'Hand Pulling': resolveControlMethodImage('handmethods'),
+  'Hoeing': resolveControlMethodImage('mechanicalcontrol'),
+  'Cultivation': resolveControlMethodImage('tillage'),
+  'PRE Herbicide': resolveControlMethodImage('chemicalmethods'),
+  'POST Herbicide': resolveControlMethodImage('chemicalcontrol'),
+  'Cover Cropping': resolveControlMethodImage('covercrops'),
+  'Mulching': resolveControlMethodImage('culturalcontrol'),
+};
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
