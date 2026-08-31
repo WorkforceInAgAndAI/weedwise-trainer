@@ -29,6 +29,18 @@ const CONTROLS = [
   { id: 'biocontrol', label: 'Biological Control', stages: ['vegetative', 'reproductive'] },
 ];
 
+/** Reference photo for each control option. */
+const CONTROL_PHOTO: Record<string, string | null> = {
+  'pre-herb': resolveControlMethodImage('chemicalmethods'),
+  'post-herb': resolveControlMethodImage('chemicalcontrol'),
+  'mow': resolveControlMethodImage('mechanicalcontrol'),
+  'hand-pull': resolveControlMethodImage('handmethods'),
+  'cultivate': resolveControlMethodImage('tillage'),
+  'cover-crop': resolveControlMethodImage('covercrops'),
+  'spot-spray': resolveControlMethodImage('chemicalcontrol'),
+  'biocontrol': resolveControlMethodImage('biologicalcontrol'),
+};
+
 const QUESTIONS_PER_ROUND = 5;
 
 function buildRounds(level: number, questionsPerRound = QUESTIONS_PER_ROUND) {
