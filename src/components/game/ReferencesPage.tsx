@@ -41,9 +41,35 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+/**
+ * Image folders still use the original dataset names, but several species have
+ * since been renamed (Marijuana -> Hemp, Tall Morningglory -> Common
+ * Morningglory, Smooth Witchgrass -> Fall Panicum, etc.). Derive the label for
+ * each folder from the current weed data so citations always show the name the
+ * rest of the site uses.
+ */
+const FOLDER_DISPLAY_NAMES: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const w of weeds) {
+    const folder = resolveWeedFolder(w.id);
+    if (folder) map[folder.toLowerCase()] = w.commonName;
+  }
+  return map;
+})();
+
+function displayName(folder: string): string {
+  return (
+    FOLDER_DISPLAY_NAMES[folder.toLowerCase()] ||
+    folder.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  );
+}
+
 export default function ReferencesPage({ onClose }: { onClose: () => void }) {
   const grouped = useMemo(() => getAllReferencesGrouped(), []);
-  const speciesList = Object.keys(grouped);
+  const speciesList = useMemo(
+    () => Object.keys(grouped).sort((a, b) => displayName(a).localeCompare(displayName(b))),
+    [grouped]
+  );
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
