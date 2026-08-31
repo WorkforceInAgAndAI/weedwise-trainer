@@ -375,7 +375,12 @@ export default function WeedControl({ onBack, weedPool, title }: { onBack: () =>
                           isSelected ? 'border-primary bg-primary/5' : 'border-border bg-background hover:border-primary/50'
                         }`}
                       >
-                        <span className="text-sm font-medium text-foreground">{m}</span>
+                        <span className="flex items-center gap-2">
+                          {METHOD_PHOTO[m] && (
+                            <img src={METHOD_PHOTO[m]!} alt="" loading="lazy" className="w-12 h-12 rounded-md object-cover border border-border" />
+                          )}
+                          <span className="text-sm font-medium text-foreground">{m}</span>
+                        </span>
                         {isSelected && <Check className="w-4 h-4 text-primary" />}
                       </button>
                     );
