@@ -53,9 +53,14 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
  const [errorCount, setErrorCount] = useState(0);
 
  // Build ordered list of resolved image URLs synchronously
- const resolvedAttempts = useMemo(() => {
-  const exts = ['jpg', 'jpeg', 'png', 'webp'];
-  const key = stage.toLowerCase();
+  const resolvedAttempts = useMemo(() => {
+   const exts = ['jpg', 'jpeg', 'png', 'webp'];
+   const key = stage.toLowerCase();
+
+   // Rosette / shoot / underground structures live in shared Biennial & Perennial folders
+   const lifeForm = resolveLifeFormImage(weedId, key);
+   const lifeFormFirst = lifeForm ? [lifeForm] : [];
+
 
   // Handle herbicide injury images
   if (stage.startsWith('g_')) {
