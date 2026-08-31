@@ -1,73 +1,24 @@
-# Welcome to your Lovable project
+# WeedWise Trainer
 
-## Project info
+WeedID — Midwest Weed Identification TrainerComplete Build Prompt for App BuildersOVERVIEWBuild a single-file HTML/CSS/JavaScript web application called WeedID — a gamified weed identification trainer for K–12 agriculture and science classrooms. The game uses three grade-level learning paths, rotating multi-phase question types, an XP/leveling system, and a detailed instructor analytics panel. No frameworks, no external libraries, no backend required. Everything runs in the browser.WEED SPECIES (exactly these 25 — no others)Common NameScientific NameEPPO CodeFamilyTypeLife CycleOriginWaterhempAmaranthus tuberculatusAMATUAmaranthaceaeDicotAnnualNativePalmer AmaranthAmaranthus palmeriAMAPLAmaranthaceaeDicotAnnualIntroducedGiant RagweedAmbrosia trifidaAMBTRAsteraceaeDicotAnnualNativeCommon RagweedAmbrosia artemisiifoliaAMBELAsteraceaeDicotAnnualNativeMarestail (Horseweed)Erigeron canadensisEROCAAsteraceaeDicotAnnual/Winter AnnualNativeGiant FoxtailSetaria faberiSETFAPoaceaeMonocotAnnualIntroducedGreen FoxtailSetaria viridisSETVIPoaceaeMonocotAnnualIntroducedYellow FoxtailSetaria pumilaSETPUPoaceaeMonocotAnnualIntroducedBarnyardgrassEchinochloa crus-galliECHCGPoaceaeMonocotAnnualIntroducedLarge CrabgrassDigitaria sanguinalisDIGSAPoaceaeMonocotAnnualIntroducedJohnsongrassSorghum halepenseSORHAPoaceaeMonocotPerennialIntroducedVelvetleafAbutilon theophrastiABUTHMalvaceaeDicotAnnualIntroducedLambsquartersChenopodium albumCHEALAmaranthaceaeDicotAnnualIntroducedKochiaBassia scopariaBASSCAmaranthaceaeDicotAnnualIntroducedPennsylvania SmartweedPersicaria pensylvanicaPOLPYPolygonaceaeDicotAnnualNativeCanada ThistleCirsium arvenseCIRARAsteraceaeDicotPerennialIntroducedVolunteer SunflowerHelianthus annuusHELANAsteraceaeDicotAnnualNativeMorningglory spp.Ipomoea spp.IOOPUConvolvulaceaeDicotAnnualIntroducedYellow NutsedgeCyperus esculentusCYPESCyperaceaeMonocotPerennialNativeAnnual RyegrassLolium multiflorumLOLMUPoaceaeMonocotAnnualIntroducedWild OatAvena fatuaAVEFAPoaceaeMonocotAnnualIntroducedWild ParsnipPastinaca sativaPASTAApiaceaeDicotBiennialIntroducedPoison HemlockConium maculatumCOIMAApiaceaeDicotBiennialIntroducedCarawayCarum carviCARCAApiaceaeDicotBiennialIntroducedGolden AlexandersZizia aureaZIZAUApiaceaeDicotPerennialNativePer-Weed Data Required (store for each species)Key traits (5 bullet points of visual/tactile identifying features)Habitat (where it grows in the Midwest)Management (IPM-aligned control methods)Control timing (growth stage threshold)Look-alike (which species it resembles + how to tell them apart)Memory hook (one memorable phrase to aid recall)Emoji (representative emoji for card-flip placeholder)Safety notes (required for: Poison Hemlock, Wild Parsnip — severe human toxicity; Johnsongrass — prussic acid livestock risk)GRADE LEVELS & PHASESThree grade-level paths. Each path has 5 phases that unlock progressively as the student earns XP.XP Unlock ThresholdsPhase 1: 0 XP (always available)Phase 2: 60 XPPhase 3: 140 XPPhase 4: 240 XPPhase 5: 360 XPOnce phases unlock, ALL unlocked phases feed into the question pool simultaneously so earlier concepts are continuously reinforced.ELEMENTARY (K–5) — "Plant Explorer"PhaseNameActivity TypeXP/Correct1Name That WeedMultiple choice — identify weed from image + traits102Monocot or Dicot?Drag/click sort into two categories123Card Flip MatchFlip-card memory game: match emoji to common name84Habitat SortSort weeds into habitat categories125Act Now or Wait?Binary management decision (act immediately / monitor)15MIDDLE SCHOOL (6–8) — "Field Scout"PhaseNameActivity TypeXP/Correct1Identify the WeedMultiple choice from characteristics102Plant Family SortSort into plant families143Life Cycle MatchClassify annual / perennial / biennial124Look-Alike ChallengeChoose between two commonly confused species205Native or Introduced?Binary origin classification12HIGH SCHOOL (9–12) — "IPM Specialist"PhaseNameActivity TypeXP/Correct1Weed IdentificationMultiple choice — vegetative characteristics102Scientific NameFill-in-the-blank (accept genus match as partial)203EPPO Code MatchFlip card: match EPPO code to species154Control TimingMultiple choice — correct growth stage for control185IPM DecisionMultiple choice — best integrated management action25QUESTION POOL SYSTEM (critical — prevents repetition)Generate questions for ALL currently unlocked phases across ALL 25 weedsShuffle into a poolDraw from pool one at a timeWhen pool is empty, rebuild and reshuffer automatically — show "Round X" counterNever stop asking questions — the game runs until the student clicks "End Session"Track round number and total question count in the headerGAME UI LAYOUTHeader BarShows: current phase name (pill badge) | round number | question countDO NOT show the weed name in the header — this allows students to cheat by reading the answer before attempting. The header should only show the phase name and round/question count.Weed Card (shown for every question)Left side: image placeholder (loads from images/{weed-id}/{stage}.jpg — silently falls back to emoji if file not found)Image stage shown depends on phase: seedling for early phases, vegetative for advanced, flower/seed for high schoolStage label shown as a small tag (e.g. "VEGETATIVE")Right side: 3 key identifying traits listed (but NOT the weed's name)For fill-in and EPPO questions: also show family as a hintQuestion BoxAppears below weed cardShows the question textSafety banner (red) shown below question for Poison Hemlock, Wild Parsnip, JohnsongrassAnswer AreaMultiple choice: 2-column grid of buttons labeled A/B/C/DSort activities: click-to-select item then click category targetFlip cards: 4-column gridFill-in: text input + submit button (accept Enter key)Binary decisions: two large buttonsFeedback Box (appears after answering)Color-coded header: green = correct, red = incorrectShows: XP earned, memory hook, key traits, look-alike tip if applicable, safety warning if applicable"NEXT QUESTION →" button always present — never leave student stuckSidebarLogoXP bar with levelPhase list (locked/active/completed states)Session stats: Correct, Wrong, Mastered, StreakButtons: Instructor Panel, Glossary, End SessionINSTRUCTOR PANELAccessible from sidebar button OR from the landing page. Three tabs:Tab 1 — Session OverviewSummary stats: Total Questions Asked, Total Correct, Total Wrong, Overall Accuracy %, Total XP, Species Mastered count, Avg. Time Per QuestionPer-Weed Performance Table (this is the key instructor analytics view):Columns: Weed Name | Times Shown | Times Correct | Times Wrong | Accuracy % | Avg. Time on Question (seconds) | Status (Mastered / Struggling / Not Yet Seen)Sort by any columnHighlight struggling weeds (accuracy < 50% and shown 3+ times) in redHighlight mastered weeds (3+ correct in a row for that species) in greenPer-Phase Accuracy Breakdown: for each unlocked phase, show correct/wrong/accuracyQuestion Log (last 20 questions): scrollable table showing — Weed Name | Phase | Question Type | Student Answer | Correct Answer | Result (✅/❌) | Time Taken (sec)Tab 2 — Species ReferenceCard grid showing all 25 weedsEach card: common name, scientific name, EPPO code, family, type, life cycle, origin, key traits, management, control timing, look-alike, memory hookNo mastery data here — this is a pure teaching referenceNote that images load from images/{weed-id}/whole.jpg automaticallyTab 3 — Phase GuideFor each grade level, list all 5 phasesShow: phase name, activity type description, XP required to unlock, XP awarded per correct answerExplain that all unlocked phases rotate together for continuous reviewANALYTICS TRACKING (required for Instructor Panel)Track the following in memory (JavaScript object) for each weed during a session:weedStats[weedId] = {  timesShown: 0,  timesCorrect: 0,  timesWrong: 0,  consecutiveCorrect: 0,   // resets on wrong answer  mastered: false,          // true when consecutiveCorrect >= 3  totalTimeMs: 0,           // sum of ms spent on all questions for this weed  questionLog: []           // array of {phase, type, correct, timeMs, studentAnswer, correctAnswer}}Start a timer when each question rendersStop timer when student submits answerStore elapsed time in weedStatsTrack per-phase stats separately:phaseStats[phaseId] = { correct: 0, wrong: 0 }GLOSSARY OVERLAYAccessible from sidebar and landing pageFull-screen overlayCard grid: one card per weedShows: name, scientific name, EPPO code, family, type, origin, habitat, memory hookClose buttonRESULTS SCREENShown when student clicks "End Session":Trophy icon, "Session Complete!" headingCertificate card showing: grade level name, questions answered, XP earned, correct answers, accuracy %"Play Again" button returns to landing pageIMAGE FOLDER STRUCTUREindex.htmlimages/  waterhemp/    whole.jpg    seedling.jpg    vegetative.jpg    flower.jpg    seed.jpg  palmer-amaranth/    (same 5 slots)  giant-ragweed/  common-ragweed/  marestail/  giant-foxtail/  green-foxtail/  yellow-foxtail/  barnyardgrass/  large-crabgrass/  johnsongrass/  velvetleaf/  lambsquarters/  kochia/  pennsylvania-smartweed/  canada-thistle/  volunteer-sunflower/  morningglory/  yellow-nutsedge/  annual-ryegrass/  wild-oat/  wild-parsnip/  poison-hemlock/  caraway/  golden-alexanders/Images must be .jpg. If a file is not found, silently show the weed's emoji placeholder instead — never show a broken image icon.Run from a local web server (e.g. python -m http.server) for images to load via fetch.VISUAL DESIGNDark agricultural theme: near-black green background (#0f1a0a), gold accents (#c8a020), bright green highlights (#6ab832), red warnings (#d05050)No external CSS frameworksResponsive: sidebar collapses on mobile, answer grids stack to single columnSmooth CSS animations for card entry, feedback box, flip cardsScrollable sidebar, sticky game headerColor-coded grade levels: green = Elementary, blue = Middle School, gold = High SchoolIMPORTANT ANTI-CHEAT RULES1. Never display the weed name in the game header during a question — only show phase name and round/question number2. The weed card's right-side trait panel should list identifying characteristics only — not the name — for MCQ and look-alike question types3. For fill-in-blank questions, the weed name may appear in the question text (e.g. "What is the scientific name of Waterhemp?") since the student already knows the common name and is being tested on scientific nomenclature4. For all other question types, the weed identity must be discoverable only through the image and listed traitsSAFETY REQUIREMENTSThe following species must display a red safety warning banner on every question:Poison Hemlock — "⚠ SAFETY: All parts of this plant are highly toxic to humans and animals. Never touch without gloves. Contact with sap can cause serious harm."Wild Parsnip — "⚠ SAFETY: Sap causes severe phototoxic burns when skin is exposed to sunlight. Wear protective clothing when near this plant."Johnsongrass — "⚠ SAFETY: Can produce prussic acid (hydrogen cyanide) toxic to livestock, especially after frost or drought stress."MISCELLANEOUS REQUIREMENTSEverything in a single HTML file — no build tools, no npm, no external scriptsAll state in JavaScript variables (no localStorage)Works offline after first load (except images)Correct answers always highlighted green even when student picks wrong — student learns the right answer immediatelyMastery = 3 correct answers for a species across the session (not necessarily consecutive for mastery badge, but track consecutive for "struggling" detection)Streak counter resets on any wrong answerToast notifications for: level up, phase unlock, mastery, streak milestones (every 5)
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+This project was built with [Lovable](https://lovable.dev).
 
-## How can I edit this code?
+## Build with Lovable
 
-There are several ways of editing your application.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/3501bfab-fc91-4705-81c7-19942bbbec20).
 
-**Use Lovable**
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Development
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
