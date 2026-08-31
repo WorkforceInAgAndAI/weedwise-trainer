@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { DetectiveCard, NotebookSection, SelfCheck } from "./ThemedBlocks";
+import { resolvePlantPartImage } from "@/lib/imageMap";
+
+/** Terms whose photo filename differs from the term text. */
+const PART_IMAGE_KEY: Record<string, string> = {
+  "Auricle": "auricles",
+  "Ocrea (ochrea)": "ocrea",
+  "Perfect flower": "perfectflower",
+};
+
+const partImage = (term: string) => resolvePlantPartImage(PART_IMAGE_KEY[term] ?? term);
 
 interface BotanyTerm {
   term: string;
