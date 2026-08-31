@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { getAllReferencesGrouped, INATURALIST_DEFAULT_CITATION } from '@/data/imageReferences';
+import { weeds } from '@/data/weeds';
+import { resolveWeedFolder } from '@/lib/imageMap';
 import {
   CONTROL_METHOD_REFS,
   BOTANY_TERM_REFS,
@@ -39,9 +41,35 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+/**
+ * Image folders still use the original dataset names, but several species have
+ * since been renamed (Marijuana -> Hemp, Tall Morningglory -> Common
+ * Morningglory, Smooth Witchgrass -> Fall Panicum, etc.). Derive the label for
+ * each folder from the current weed data so citations always show the name the
+ * rest of the site uses.
+ */
+const FOLDER_DISPLAY_NAMES: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const w of weeds) {
+    const folder = resolveWeedFolder(w.id);
+    if (folder) map[folder.toLowerCase()] = w.commonName;
+  }
+  return map;
+})();
+
+function displayName(folder: string): string {
+  return (
+    FOLDER_DISPLAY_NAMES[folder.toLowerCase()] ||
+    folder.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  );
+}
+
 export default function ReferencesPage({ onClose }: { onClose: () => void }) {
   const grouped = useMemo(() => getAllReferencesGrouped(), []);
-  const speciesList = Object.keys(grouped);
+  const speciesList = useMemo(
+    () => Object.keys(grouped).sort((a, b) => displayName(a).localeCompare(displayName(b))),
+    [grouped]
+  );
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
@@ -73,7 +101,7 @@ export default function ReferencesPage({ onClose }: { onClose: () => void }) {
         <h2 className="font-display font-semibold text-base text-foreground mb-3">Weed Species</h2>
         <div className="space-y-6 mb-12">
           {speciesList.map(species => (
-            <Section key={species} title={species.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}>
+            <Section key={species} title={displayName(species)}>
               <div className="divide-y divide-border/50">
                 {grouped[species].map((entry, i) => (
                   <div key={i} className="px-4 py-2.5 flex gap-3">
