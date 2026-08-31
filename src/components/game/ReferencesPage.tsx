@@ -101,7 +101,7 @@ export default function ReferencesPage({ onClose }: { onClose: () => void }) {
         <h2 className="font-display font-semibold text-base text-foreground mb-3">Weed Species</h2>
         <div className="space-y-6 mb-12">
           {speciesList.map(species => (
-            <Section key={species} title={species.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}>
+            <Section key={species} title={displayName(species)}>
               <div className="divide-y divide-border/50">
                 {grouped[species].map((entry, i) => (
                   <div key={i} className="px-4 py-2.5 flex gap-3">
