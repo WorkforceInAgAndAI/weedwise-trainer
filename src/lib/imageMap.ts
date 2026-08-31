@@ -44,6 +44,79 @@ for (const [path, url] of Object.entries(injuryModules)) {
  if (m) injuryMap[m[1].toLowerCase()] = url;
 }
 
+// Plant Parts and Types reference photos: src/assets/Plant Parts and Types/<term>_.jpg
+const plantPartModules = import.meta.glob<string>(
+ '/src/assets/Plant Parts and Types/*.{jpg,jpeg,png,webp}',
+ { eager: true, query: '?url', import: 'default' }
+);
+const plantPartMap: Record<string, string> = {};
+for (const [path, url] of Object.entries(plantPartModules)) {
+ const m = path.match(/\/([^/]+)$/);
+ if (m) plantPartMap[m[1].toLowerCase().replace(/[^a-z0-9]/g, '')] = url;
+}
+
+/** Resolve a botanical term photo, e.g. "ligule", "perfect flower", "Auricle". */
+export function resolvePlantPartImage(term: string): string | null {
+ const n = term.toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9]/g, '');
+ return (
+  plantPartMap[`${n}jpg`] ||
+  plantPartMap[`${n}sjpg`] ||
+  plantPartMap[`${n.replace(/s$/, '')}jpg`] ||
+  null
+ );
+}
+
+// Control method photos: src/assets/ControlMethods/<name>_1.jpg
+const controlMethodModules = import.meta.glob<string>(
+ '/src/assets/ControlMethods/*.{jpg,jpeg,png,webp}',
+ { eager: true, query: '?url', import: 'default' }
+);
+const controlMethodMap: Record<string, string> = {};
+for (const [path, url] of Object.entries(controlMethodModules)) {
+ const m = path.match(/\/([^/]+)$/);
+ if (m) controlMethodMap[m[1].toLowerCase().replace(/[^a-z0-9]/g, '')] = url;
+}
+
+/** Resolve a control-method photo by a loose name, e.g. "tillage", "Cover Crops". */
+export function resolveControlMethodImage(name: string): string | null {
+ const n = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+ const candidates = [`${n}1jpg`, `${n}jpg`, `${n.replace(/s$/, '')}1jpg`];
+ for (const c of candidates) if (controlMethodMap[c]) return controlMethodMap[c];
+ // partial match fallback (e.g. "chemical" → chemicalcontrol_1.jpg)
+ const hit = Object.keys(controlMethodMap).find(k => k.startsWith(n) || n.startsWith(k.replace(/1?jpg$/, '')));
+ return hit ? controlMethodMap[hit] : null;
+}
+
+/**
+ * Life-form structure photos live in shared folders keyed by species:
+ *   images/Biennial/<species>_rose_1.jpg  (rosette)
+ *   images/Biennial/<species>_sho_1.jpg   (shoot)
+ *   images/Perennial/<species>_per_1.jpg  (underground structure)
+ */
+const LIFEFORM_SUFFIX: Record<string, { folder: string; suffix: string }[]> = {
+ rosette: [{ folder: 'Biennial', suffix: 'rose' }],
+ shoot: [{ folder: 'Biennial', suffix: 'sho' }],
+ underground: [{ folder: 'Perennial', suffix: 'per' }],
+};
+
+export function resolveLifeFormImage(weedId: string, stage: string): string | null {
+ const entries = LIFEFORM_SUFFIX[stage.toLowerCase()];
+ if (!entries) return null;
+ const n = normalizeKey(weedId);
+ const folderNorm = normalizeKey(resolveWeedFolder(weedId));
+ for (const { folder, suffix } of entries) {
+  const prefix = `${folder.toLowerCase()}/`;
+  for (const key of Object.keys(imageMapLower)) {
+   if (!key.startsWith(prefix)) continue;
+   const file = key.slice(prefix.length);
+   const base = normalizeKey(file.split(`_${suffix}_`)[0]);
+   if (!file.includes(`_${suffix}_`)) continue;
+   if (base === n || base === folderNorm) return imageMapLower[key];
+  }
+ }
+ return null;
+}
+
 /**
  * Resolve a herbicide injury image by WSSA group number and symptom type.
  * type: 'br' = broadleaf injury, 'gr' = grass injury.
