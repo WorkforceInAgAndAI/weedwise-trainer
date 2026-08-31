@@ -40,7 +40,27 @@ import {
   Award,
   Search,
 } from "lucide-react";
-import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
+import { hasImage, resolveCropImageUrl, resolveInjuryImage, resolveControlMethodImage } from "@/lib/imageMap";
+
+/** Photo for each control-method card key (see src/assets/ControlMethods). */
+const CONTROL_METHOD_IMAGE_KEY: Record<string, string> = {
+  "hand-weeding": "handmethods",
+  "cover-crops": "covercrops",
+  "mulch-cover": "covercrops",
+  tillage: "tillage",
+  chemical: "chemicalmethods",
+  cultural: "culturalcontrol",
+  mechanical: "mechanicalcontrol",
+  biological: "biologicalcontrol",
+  integrated: "integratedapproach",
+  "pre-emergent": "chemicalmethods",
+  "post-emergent": "chemicalcontrol",
+  "multi-moa": "chemicalcontrol",
+  wait: "integratedapproach",
+};
+
+export const controlMethodPhoto = (key: string): string | null =>
+  CONTROL_METHOD_IMAGE_KEY[key] ? resolveControlMethodImage(CONTROL_METHOD_IMAGE_KEY[key]) : null;
 import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
 import { getSeedFact } from "@/data/seedFacts";
 import HerbicideMOAExplorer from "@/components/game/learning/HerbicideMOAExplorer";
