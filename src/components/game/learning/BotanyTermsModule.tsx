@@ -93,12 +93,21 @@ const BOTANY_TERM_GROUPS: { group: string; blurb: string; tone: string; terms: B
 
 function BotanyTermCard({ t, advanced }: { t: BotanyTerm; advanced: boolean }) {
   const [open, setOpen] = useState(false);
+  const img = partImage(t.term);
   return (
     <button
       type="button"
       onClick={() => setOpen((o) => !o)}
       className="text-left w-full bg-card border border-border rounded-lg p-3 hover:border-primary/60 transition-colors"
     >
+      {img && (
+        <img
+          src={img}
+          alt={`${t.term} example photo`}
+          loading="lazy"
+          className="w-full h-32 object-cover rounded-md mb-2 border border-border"
+        />
+      )}
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-display font-bold text-foreground text-sm">{t.term}</p>
