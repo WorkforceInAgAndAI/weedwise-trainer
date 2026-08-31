@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { getAllReferencesGrouped, INATURALIST_DEFAULT_CITATION } from '@/data/imageReferences';
+import { weeds } from '@/data/weeds';
+import { resolveWeedFolder } from '@/lib/imageMap';
 import {
   CONTROL_METHOD_REFS,
   BOTANY_TERM_REFS,
