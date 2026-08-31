@@ -6753,6 +6753,14 @@ function TopicContent({
           <div className="space-y-3">
             {methods.map((method) => (
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                {controlMethodPhoto(method.key) && (
+                  <img
+                    src={controlMethodPhoto(method.key)!}
+                    alt={`${method.label} in the field`}
+                    loading="lazy"
+                    className="w-full h-44 object-cover rounded-lg border border-border"
+                  />
+                )}
                 <h3 className="font-display font-bold text-foreground">{method.label}</h3>
                 <p className="text-sm text-foreground">{method.desc}</p>
                 <div className="flex gap-3 items-start">
