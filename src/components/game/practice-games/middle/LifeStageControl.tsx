@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
 import LevelComplete from '@/components/game/LevelComplete';
+import { resolveControlMethodImage } from '@/lib/imageMap';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
@@ -28,6 +29,18 @@ const CONTROLS = [
   { id: 'spot-spray', label: 'Spot Spray Treatment', stages: ['vegetative', 'reproductive'] },
   { id: 'biocontrol', label: 'Biological Control', stages: ['vegetative', 'reproductive'] },
 ];
+
+/** Reference photo for each control option. */
+const CONTROL_PHOTO: Record<string, string | null> = {
+  'pre-herb': resolveControlMethodImage('chemicalmethods'),
+  'post-herb': resolveControlMethodImage('chemicalcontrol'),
+  'mow': resolveControlMethodImage('mechanicalcontrol'),
+  'hand-pull': resolveControlMethodImage('handmethods'),
+  'cultivate': resolveControlMethodImage('tillage'),
+  'cover-crop': resolveControlMethodImage('covercrops'),
+  'spot-spray': resolveControlMethodImage('chemicalcontrol'),
+  'biocontrol': resolveControlMethodImage('biologicalcontrol'),
+};
 
 const QUESTIONS_PER_ROUND = 5;
 
@@ -255,8 +268,11 @@ export default function LifeStageControl({ onBack }: { onBack: () => void }) {
             <div className="flex flex-col gap-2 w-full max-w-sm">
               {controlOptions.map(c => (
                 <button key={c.id} onClick={() => handleControl(c.id)}
-                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all text-left">
-                  {c.label}
+                  className="p-3 rounded-lg border-2 border-border bg-card hover:border-primary text-sm font-medium text-foreground transition-all text-left flex items-center gap-3">
+                  {CONTROL_PHOTO[c.id] && (
+                    <img src={CONTROL_PHOTO[c.id]!} alt="" loading="lazy" className="w-14 h-14 rounded-md object-cover border border-border shrink-0" />
+                  )}
+                  <span>{c.label}</span>
                 </button>
               ))}
             </div>

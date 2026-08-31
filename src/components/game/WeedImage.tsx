@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { resolveImageUrl } from '@/lib/imageMap';
+import { resolveImageUrl, resolveLifeFormImage } from '@/lib/imageMap';
 
 const STAGE_PREFIX_MAP: Record<string, string> = {
  seed: 'seed',
@@ -53,9 +53,14 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
  const [errorCount, setErrorCount] = useState(0);
 
  // Build ordered list of resolved image URLs synchronously
- const resolvedAttempts = useMemo(() => {
-  const exts = ['jpg', 'jpeg', 'png', 'webp'];
-  const key = stage.toLowerCase();
+  const resolvedAttempts = useMemo(() => {
+   const exts = ['jpg', 'jpeg', 'png', 'webp'];
+   const key = stage.toLowerCase();
+
+   // Rosette / shoot / underground structures live in shared Biennial & Perennial folders
+   const lifeForm = resolveLifeFormImage(weedId, key);
+   const lifeFormFirst = lifeForm ? [lifeForm] : [];
+
 
   // Handle herbicide injury images
   if (stage.startsWith('g_')) {
@@ -108,7 +113,7 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
   const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
   const prefix = prefixForStage;
   
-  const urls: string[] = [];
+  const urls: string[] = [...lifeFormFirst];
   // Primary variant first, all extensions
   for (const ext of exts) {
    const url = resolveImageUrl(weedId, `${prefix}_${variant}.${ext}`);

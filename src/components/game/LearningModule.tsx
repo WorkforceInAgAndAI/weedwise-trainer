@@ -40,7 +40,27 @@ import {
   Award,
   Search,
 } from "lucide-react";
-import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
+import { hasImage, resolveCropImageUrl, resolveInjuryImage, resolveControlMethodImage } from "@/lib/imageMap";
+
+/** Photo for each control-method card key (see src/assets/ControlMethods). */
+const CONTROL_METHOD_IMAGE_KEY: Record<string, string> = {
+  "hand-weeding": "handmethods",
+  "cover-crops": "covercrops",
+  "mulch-cover": "covercrops",
+  tillage: "tillage",
+  chemical: "chemicalmethods",
+  cultural: "culturalcontrol",
+  mechanical: "mechanicalcontrol",
+  biological: "biologicalcontrol",
+  integrated: "integratedapproach",
+  "pre-emergent": "chemicalmethods",
+  "post-emergent": "chemicalcontrol",
+  "multi-moa": "chemicalcontrol",
+  wait: "integratedapproach",
+};
+
+export const controlMethodPhoto = (key: string): string | null =>
+  CONTROL_METHOD_IMAGE_KEY[key] ? resolveControlMethodImage(CONTROL_METHOD_IMAGE_KEY[key]) : null;
 import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
 import { getSeedFact } from "@/data/seedFacts";
 import HerbicideMOAExplorer from "@/components/game/learning/HerbicideMOAExplorer";
@@ -6733,6 +6753,14 @@ function TopicContent({
           <div className="space-y-3">
             {methods.map((method) => (
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                {controlMethodPhoto(method.key) && (
+                  <img
+                    src={controlMethodPhoto(method.key)!}
+                    alt={`${method.label} in the field`}
+                    loading="lazy"
+                    className="w-full h-44 object-cover rounded-lg border border-border"
+                  />
+                )}
                 <h3 className="font-display font-bold text-foreground">{method.label}</h3>
                 <p className="text-sm text-foreground">{method.desc}</p>
                 <div className="flex gap-3 items-start">
