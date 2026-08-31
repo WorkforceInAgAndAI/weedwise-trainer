@@ -113,7 +113,7 @@ export default function WeedImage({ weedId, stage, className, preferredVariant }
   const otherVariant: 1 | 2 = variant === 1 ? 2 : 1;
   const prefix = prefixForStage;
   
-  const urls: string[] = [];
+  const urls: string[] = [...lifeFormFirst];
   // Primary variant first, all extensions
   for (const ext of exts) {
    const url = resolveImageUrl(weedId, `${prefix}_${variant}.${ext}`);
