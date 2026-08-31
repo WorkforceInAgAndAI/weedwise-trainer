@@ -4,6 +4,7 @@ import WeedImage from '@/components/game/WeedImage';
 import FloatingCoach from '@/components/game/FloatingCoach';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
 import LevelComplete from '@/components/game/LevelComplete';
+import { resolveControlMethodImage } from '@/lib/imageMap';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
