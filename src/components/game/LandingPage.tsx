@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { GameEngine } from '@/hooks/useGameEngine';
 import type { GradeLevel } from '@/types/game';
 import WeedImage from './WeedImage';
-import { ChevronRight, Users, BarChart3, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
+import { ChevronRight, Users, LayoutDashboard, BookOpen, Target, Gamepad2 } from 'lucide-react';
 import RegionPicker from './RegionPicker';
 
 const CAROUSEL_WEEDS = ['waterhemp', 'palmer-amaranth', 'giant-ragweed', 'lambsquarters', 'velvetleaf', 'marestail', 'kochia', 'morningglory'];
@@ -89,23 +89,35 @@ export default function LandingPage({
  <section className="max-w-[1200px] mx-auto px-5 sm:px-10 py-16">
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
  {[
- { title: 'Learn', desc: 'Study weeds by topic with detailed guides, real photographs, and botanical information organized by grade level.', icon: BookOpen, action: onOpenLearning },
- { title: 'Practice', desc: 'Sharpen your skills with interactive mini-games covering identification, taxonomy, ecology, and management.', icon: Target, action: onOpenPracticeHub },
- { title: 'Play', desc: 'Manage a soybean farm through a full growing season. Scout fields, make management decisions, and harvest.', icon: Gamepad2, action: onOpenFarmMode },
+ { title: 'Learn', desc: 'Study weeds by topic with detailed guides, real photographs, and botanical information organized by grade level.', icon: BookOpen, action: onOpenLearning, disabled: false },
+ { title: 'Practice', desc: 'Sharpen your skills with interactive mini-games covering identification, taxonomy, ecology, and management.', icon: Target, action: onOpenPracticeHub, disabled: false },
+ { title: 'Play', desc: 'Manage a soybean farm through a full growing season. Scout fields, make management decisions, and harvest.', icon: Gamepad2, action: onOpenFarmMode, disabled: true },
  ].map(card => (
  <button
  key={card.title}
- onClick={card.action}
- className="group bg-card border border-border rounded-lg p-8 text-left shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-200"
+ onClick={card.disabled ? undefined : card.action}
+ disabled={card.disabled}
+ aria-disabled={card.disabled}
+ title={card.disabled ? 'Coming Soon!' : undefined}
+ className={`group bg-card border border-border rounded-lg p-8 text-left shadow-card transition-all duration-200 ${card.disabled ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:shadow-card-hover hover:border-primary/30'}`}
  >
+ {card.disabled && (
+ <span className="inline-block mb-3 px-2.5 py-1 rounded-full bg-secondary text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+ Coming Soon!
+ </span>
+ )}
  <div className="w-12 h-12 rounded-lg bg-primary/8 flex items-center justify-center mb-5 group-hover:bg-primary/12 transition-colors">
  <card.icon className="w-6 h-6 text-primary" />
  </div>
  <h3 className="font-display font-bold text-foreground text-xl mb-2">{card.title}</h3>
  <p className="text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
+ {card.disabled ? (
+ <span className="inline-flex items-center gap-1 text-sm text-muted-foreground font-medium mt-4">Coming Soon!</span>
+ ) : (
  <span className="inline-flex items-center gap-1 text-sm text-primary font-medium mt-4 group-hover:gap-2 transition-all">
  Explore <ChevronRight className="w-4 h-4" />
  </span>
+ )}
  </button>
  ))}
  </div>
@@ -123,24 +135,23 @@ export default function LandingPage({
  </div>
  )}
 
- {/* Secondary Actions */}
- <section className="max-w-[1200px] mx-auto px-5 sm:px-10 pb-16">
- <div className="flex flex-wrap gap-3 justify-center">
- {[
- { label: 'Class', icon: Users, action: onOpenClassJoin },
- { label: 'Stats', icon: BarChart3, action: onOpenStats },
- { label: 'Dashboard', icon: LayoutDashboard, action: onOpenDashboard },
- ].map(btn => (
- <button
- key={btn.label}
- onClick={btn.action}
- className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200"
- >
- <btn.icon className="w-4 h-4 text-muted-foreground" /> {btn.label}
- </button>
- ))}
- </div>
- </section>
+  {/* Secondary Actions */}
+  <section className="max-w-[1200px] mx-auto px-5 sm:px-10 pb-16">
+  <div className="flex flex-wrap gap-3 justify-center">
+  {[
+  { label: 'Class', icon: Users, action: onOpenClassJoin },
+  { label: 'Dashboard', icon: LayoutDashboard, action: onOpenDashboard },
+  ].map(btn => (
+  <button
+  key={btn.label}
+  onClick={btn.action}
+  className="flex items-center gap-2 px-4 py-2.5 rounded-md border border-border bg-card text-foreground text-sm font-medium hover:bg-secondary hover:shadow-subtle transition-all duration-200"
+  >
+  <btn.icon className="w-4 h-4 text-muted-foreground" /> {btn.label}
+  </button>
+  ))}
+  </div>
+  </section>
 
  {/* Footer */}
  <footer className="w-full border-t border-border py-8 text-center mt-auto">

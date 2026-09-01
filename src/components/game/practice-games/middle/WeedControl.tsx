@@ -1,27 +1,63 @@
 import { useState } from 'react';
-import { middleSchoolWeeds as weeds } from '@/data/gradeWeeds';
+import { middleSchoolWeeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
 import fieldBg from '@/assets/images/field-background.jpg';
-import { DollarSign, Check, X, Lock, ShoppingCart } from 'lucide-react';
+import { DollarSign, Check, X, Info } from 'lucide-react';
+import type { Weed } from '@/types/game';
+import { resolveControlMethodImage } from '@/lib/imageMap';
+
+/** Reference photo for each selectable control method. */
+const METHOD_PHOTO: Record<string, string | null> = {
+  'Hand Pulling': resolveControlMethodImage('handmethods'),
+  'Hoeing': resolveControlMethodImage('mechanicalcontrol'),
+  'Cultivation': resolveControlMethodImage('tillage'),
+  'PRE Herbicide': resolveControlMethodImage('chemicalmethods'),
+  'POST Herbicide': resolveControlMethodImage('chemicalcontrol'),
+  'Cover Cropping': resolveControlMethodImage('covercrops'),
+  'Mulching': resolveControlMethodImage('culturalcontrol'),
+};
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
 const SEASONS = 3;
-const START_BUDGET = 600;
-// Methods a student owns from day one; the rest must be bought in the shed.
-const STARTER_METHODS = ['pull', 'hoe', 'mow', 'cultivate'];
-// One-time unlock price for each purchasable method.
-const UNLOCK_COST: Record<string, number> = {
-  tillage: 70,
-  cover: 80,
-  rotate: 80,
-  pre: 100,
-  post: 100,
-  'spot-spray': 90,
-};
-// Crop revenue earned for each weed controlled correctly.
-const REVENUE_PER_CORRECT = 90;
-// Extra harvest bonus paid at the end of a season, based on control success.
+const START_BUDGET = 1000;
+const REVENUE_PER_CORRECT = 150;
+const METHOD_COST = 30;
+
+const CONTROL_METHODS = [
+  'Hand Pulling',
+  'Hoeing',
+  'Cultivation',
+  'PRE Herbicide',
+  'POST Herbicide',
+  'Cover Cropping',
+  'Mulching'
+] as const;
+
+type ControlMethod = typeof CONTROL_METHODS[number];
+
+/** Maps a weed to its applicable control methods based on dataset keywords. */
+function getCorrectMethods(weed: Weed): ControlMethod[] {
+  const m = (weed.management || '').toLowerCase();
+  const res: ControlMethod[] = [];
+
+  if (m.includes('hand') || m.includes('pulling')) res.push('Hand Pulling');
+  if (m.includes('hoeing') || m.includes('cutting') || m.includes('mowing') || m.includes('mechanical')) res.push('Hoeing');
+  if (m.includes('cultivation') || m.includes('tillage') || m.includes('plowing')) res.push('Cultivation');
+  if (m.includes('pre-emerg') || m.includes('pre ') || m.includes('pre-herbicide')) res.push('PRE Herbicide');
+  if (m.includes('post-emerg') || m.includes('post ') || m.includes('post-herbicide') || m.includes('glyphosate')) res.push('POST Herbicide');
+  if (m.includes('cover crop') || m.includes('competition') || m.includes('rotation')) res.push('Cover Cropping');
+  if (m.includes('mulch') || m.includes('shade') || m.includes('shading')) res.push('Mulching');
+
+  // Fallbacks if data is sparse
+  if (res.length === 0) {
+    res.push('Hand Pulling');
+    res.push('Hoeing');
+  }
+  return Array.from(new Set(res));
+}
+
+/** Extra harvest bonus paid at the end of a season, based on control success. */
 function seasonBonus(correct: number, total: number) {
   if (total === 0) return 0;
   const rate = correct / total;
@@ -31,75 +67,8 @@ function seasonBonus(correct: number, total: number) {
   return 0;
 }
 
-interface Method { id: string; label: string; cost: number; tag: string }
-const ALL_METHODS: Method[] = [
-  { id: 'hoe',        label: 'Hoeing',                  cost: 20, tag: 'Mechanical' },
-  { id: 'pull',       label: 'Hand Pull',               cost: 15, tag: 'Mechanical' },
-  { id: 'cultivate',  label: 'Cultivation',             cost: 35, tag: 'Mechanical' },
-  { id: 'tillage',    label: 'Tillage',                 cost: 40, tag: 'Mechanical' },
-  { id: 'mow',        label: 'Mowing',                  cost: 25, tag: 'Mechanical' },
-  { id: 'cover',      label: 'Cover Crop',              cost: 45, tag: 'Cultural' },
-  { id: 'rotate',     label: 'Crop Rotation',           cost: 45, tag: 'Cultural' },
-  { id: 'pre',        label: 'Pre-emergent Herbicide',  cost: 55, tag: 'Chemical' },
-  { id: 'post',       label: 'Post-emergent Herbicide', cost: 55, tag: 'Chemical' },
-  { id: 'spot-spray', label: 'Spot-spray Herbicide',    cost: 50, tag: 'Chemical' },
-];
+interface FieldWeed { id: string; weed: Weed; x: number; y: number }
 
-const BEST_BY_SPECIES: Record<string, string> = {
-  'waterhemp': 'pre',
-  'palmer-amaranth': 'rotate',
-  'lambsquarters': 'cultivate',
-  'common-lambsquarters': 'cultivate',
-  'redroot-pigweed': 'hoe',
-  'smooth-pigweed': 'hoe',
-  'kochia': 'rotate',
-  'horseweed': 'cover',
-  'giant-foxtail': 'post',
-  'yellow-foxtail': 'tillage',
-  'green-foxtail': 'cultivate',
-  'large-crabgrass': 'cultivate',
-  'smooth-crabgrass': 'pre',
-  'barnyardgrass': 'cover',
-  'fall-panicum': 'post',
-  'shattercane': 'spot-spray',
-  'johnsongrass': 'spot-spray',
-  'quackgrass': 'tillage',
-  'yellow-nutsedge': 'spot-spray',
-  'purple-nutsedge': 'spot-spray',
-  'common-ragweed': 'mow',
-  'giant-ragweed': 'pull',
-  'velvetleaf': 'hoe',
-  'jimsonweed': 'pull',
-  'cocklebur': 'pull',
-  'morningglory': 'cultivate',
-  'ivyleaf-morningglory': 'post',
-  'bindweed': 'cover',
-  'canada-thistle': 'mow',
-  'bull-thistle': 'pull',
-  'common-burdock': 'mow',
-  'poison-hemlock': 'mow',
-  'poison-ivy': 'spot-spray',
-  'horsenettle': 'mow',
-  'stinging-nettle': 'mow',
-};
-
-function getBestMethod(w: typeof weeds[0]): string {
-  if (BEST_BY_SPECIES[w.id]) return BEST_BY_SPECIES[w.id];
-  const m = (w.management || '').toLowerCase();
-  if (m.includes('pre')) return 'pre';
-  if (m.includes('post')) return 'post';
-  if (m.includes('cover')) return 'cover';
-  if (m.includes('rotation')) return 'rotate';
-  if (m.includes('mow')) return 'mow';
-  if (m.includes('cultivat')) return 'cultivate';
-  if (m.includes('till')) return 'tillage';
-  if (m.includes('pull') || m.includes('roguing')) return 'pull';
-  return 'hoe';
-}
-
-interface FieldWeed { id: string; weed: typeof weeds[0]; x: number; y: number }
-
-/** Scatter weed bubbles across the field, keeping them apart from each other. */
 function scatter(count: number): { x: number; y: number }[] {
   const spots: { x: number; y: number }[] = [];
   let guard = 0;
@@ -115,8 +84,8 @@ function scatter(count: number): { x: number; y: number }[] {
   return spots;
 }
 
-function buildField(count: number): FieldWeed[] {
-  const pool = shuffle(weeds);
+function buildField(count: number, weedPool: Weed[]): FieldWeed[] {
+  const pool = shuffle(weedPool);
   const spots = scatter(count);
   return Array.from({ length: count }, (_, i) => ({
     id: `${pool[i % pool.length].id}-${i}-${Math.random().toString(36).slice(2, 6)}`,
@@ -126,83 +95,113 @@ function buildField(count: number): FieldWeed[] {
   }));
 }
 
-/** Good control shrinks next season's population; escapes and mistakes grow it. */
-function nextPopulation(population: number, correct: number, missedOrWrong: number) {
-  return Math.max(2, Math.min(10, Math.round(population + missedOrWrong * 1.5 - correct * 2)));
+function nextPopulation(population: number, controlled: number, survived: number) {
+  return Math.max(2, Math.min(10, Math.round(population + survived * 1.5 - controlled * 2)));
 }
 
-export default function WeedControl({ onBack }: { onBack: () => void }) {
+interface Handled {
+  id: string;
+  weedName: string;
+  weedId: string;
+  selected: ControlMethod[];
+  correctPicks: ControlMethod[];
+  wrongPicks: ControlMethod[];
+  missedPicks: ControlMethod[];
+  survived: boolean;
+  cost: number;
+}
+
+export default function WeedControl({ onBack, weedPool, title }: { onBack: () => void; weedPool?: Weed[]; title?: string }) {
+  const weeds = weedPool ?? middleSchoolWeeds;
   const [season, setSeason] = useState(1);
   const [population, setPopulation] = useState(6);
-  const [field, setField] = useState<FieldWeed[]>(() => buildField(6));
+  const [field, setField] = useState<FieldWeed[]>(() => buildField(6, weeds));
   const [budget, setBudget] = useState(START_BUDGET);
   const [current, setCurrent] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ correct: boolean; text: string } | null>(null);
-  const [handled, setHandled] = useState<{ id: string; correct: boolean; weedName: string; weedId: string; method: string }[]>([]);
+  const [step, setStep] = useState<'quiz' | 'result'>('quiz');
+  const [selectedMethods, setSelectedMethods] = useState<ControlMethod[]>([]);
+  const [handled, setHandled] = useState<Handled[]>([]);
   const [showSummary, setShowSummary] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [totalCorrect, setTotalCorrect] = useState(0);
-  const [owned, setOwned] = useState<string[]>(STARTER_METHODS);
+  const [totalCorrectWeeds, setTotalCorrectWeeds] = useState(0);
   const [income, setIncome] = useState(0);
   const [seasonBonusPaid, setSeasonBonusPaid] = useState(0);
 
   const fw = current ? field.find(f => f.id === current) : null;
   const remaining = field.filter(f => !handled.some(h => h.id === f.id));
-  const seasonCorrect = handled.filter(h => h.correct).length;
+  const seasonControlled = handled.filter(h => !h.survived).length;
+  const seasonCorrectCount = handled.filter(h => h.missedPicks.length === 0 && h.wrongPicks.length === 0).length;
 
-  const pickMethod = (m: Method) => {
-    if (!fw || feedback) return;
-    if (budget < m.cost) return;
-    if (!owned.includes(m.id)) return;
-    const best = getBestMethod(fw.weed);
-    const correct = m.id === best;
-    const bestLabel = ALL_METHODS.find(x => x.id === best)?.label ?? best;
-    setBudget(b => b - m.cost);
-    setHandled(h => [...h, { id: fw.id, correct, weedName: fw.weed.commonName, weedId: fw.weed.id, method: m.id }]);
-    if (correct) setTotalCorrect(c => c + 1);
-    setFeedback({
-      correct,
-      text: correct
-        ? `Correct! ${m.label} is the best control for ${fw.weed.commonName}. ${fw.weed.management}`
-        : `${m.label} is not the best choice for ${fw.weed.commonName}. ${bestLabel} works best because: ${fw.weed.management}`,
-    });
+  const openWeed = (id: string) => {
+    setCurrent(id);
+    setStep('quiz');
+    setSelectedMethods([]);
   };
 
-  const closeWeed = () => { setCurrent(null); setFeedback(null); };
+  const toggleMethod = (m: ControlMethod) => {
+    setSelectedMethods(prev => 
+      prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]
+    );
+  };
+
+  const submitQuiz = () => {
+    if (!fw) return;
+    const correct = getCorrectMethods(fw.weed);
+    const correctPicks = selectedMethods.filter(m => correct.includes(m));
+    const wrongPicks = selectedMethods.filter(m => !correct.includes(m));
+    const missedPicks = correct.filter(m => !selectedMethods.includes(m));
+    
+    const cost = selectedMethods.length * METHOD_COST;
+    // Survives if we missed any correct methods
+    const survived = missedPicks.length > 0;
+    
+    if (!survived && wrongPicks.length === 0) {
+      setTotalCorrectWeeds(c => c + 1);
+    }
+
+    setBudget(b => b - cost);
+    setHandled(h => [...h, {
+      id: fw.id,
+      weedName: fw.weed.commonName,
+      weedId: fw.weed.id,
+      selected: selectedMethods,
+      correctPicks,
+      wrongPicks,
+      missedPicks,
+      survived,
+      cost
+    }]);
+    setStep('result');
+  };
+
+  const closeWeed = () => { setCurrent(null); setStep('quiz'); setSelectedMethods([]); };
 
   const endSeason = () => {
-    setCurrent(null);
-    setFeedback(null);
-    const bonus = seasonBonus(seasonCorrect, field.length);
-    const earned = seasonCorrect * REVENUE_PER_CORRECT + bonus;
+    closeWeed();
+    const bonus = seasonBonus(seasonCorrectCount, field.length);
+    const earned = seasonCorrectCount * REVENUE_PER_CORRECT + bonus;
     setIncome(earned);
     setSeasonBonusPaid(bonus);
     setBudget(b => b + earned);
     setShowSummary(true);
   };
 
+  const survivorCount = handled.filter(h => h.survived).length + remaining.length;
+
   const nextSeason = () => {
-    const wrong = handled.length - seasonCorrect + remaining.length;
-    const next = nextPopulation(population, seasonCorrect, wrong);
+    const next = nextPopulation(population, seasonControlled, survivorCount);
     if (season >= SEASONS) { setGameOver(true); setShowSummary(false); return; }
     setSeason(s => s + 1);
     setPopulation(next);
-    setField(buildField(next));
+    setField(buildField(next, weeds));
     setHandled([]);
     setShowSummary(false);
   };
 
   const startOver = () => {
-    setSeason(1); setPopulation(6); setField(buildField(6)); setBudget(START_BUDGET);
-    setHandled([]); setCurrent(null); setFeedback(null); setShowSummary(false);
-    setGameOver(false); setTotalCorrect(0); setOwned(STARTER_METHODS); setIncome(0); setSeasonBonusPaid(0);
-  };
-
-  const buyMethod = (m: Method) => {
-    const cost = UNLOCK_COST[m.id] ?? 100;
-    if (owned.includes(m.id) || budget < cost) return;
-    setBudget(b => b - cost);
-    setOwned(o => [...o, m.id]);
+    setSeason(1); setPopulation(6); setField(buildField(6, weeds)); setBudget(START_BUDGET);
+    setHandled([]); closeWeed(); setShowSummary(false);
+    setGameOver(false); setTotalCorrectWeeds(0); setIncome(0); setSeasonBonusPaid(0);
   };
 
   const shell = 'fixed inset-0 bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 dark:from-emerald-950 dark:via-sky-950 dark:to-slate-950 z-50 flex flex-col pt-[56px]';
@@ -216,13 +215,13 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-4 max-w-md mx-auto w-full">
           <div className="bg-card border border-border rounded-xl p-5 space-y-2 text-center">
-            <p className="text-3xl font-bold text-primary">{totalCorrect}</p>
-            <p className="text-sm text-muted-foreground">correct control decisions</p>
+            <p className="text-3xl font-bold text-primary">{totalCorrectWeeds}</p>
+            <p className="text-sm text-muted-foreground">weeds perfectly managed</p>
             <p className="text-sm text-foreground">Budget left: <strong>${budget}</strong></p>
             <p className="text-sm text-foreground">Final weed pressure: <strong>{population} weeds</strong></p>
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            Matching the control method to the weed keeps pressure — and cost — down season after season.
+            Managing weeds requires selecting the right methods while watching your budget. Missing methods allows weeds to survive, while picking unnecessary ones wastes money.
           </p>
           <button onClick={startOver} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">Play Again</button>
           <button onClick={onBack} className="w-full py-3 rounded-lg border border-border text-foreground font-bold">Back to Practice</button>
@@ -232,8 +231,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
   }
 
   if (showSummary) {
-    const wrong = handled.filter(h => !h.correct);
-    const nextPop = nextPopulation(population, seasonCorrect, wrong.length + remaining.length);
+    const nextPop = nextPopulation(population, seasonControlled, survivorCount);
     return (
       <div className={shell}>
         <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur">
@@ -242,83 +240,25 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3 max-w-md mx-auto w-full">
           <p className="text-lg font-bold text-foreground text-center">
-            {seasonCorrect}/{field.length} weeds controlled correctly
+            {seasonCorrectCount}/{field.length} weeds perfectly managed
           </p>
           <p className="text-sm text-center text-muted-foreground">
             Crop revenue earned: <strong className="text-success">+${income}</strong>
-            {seasonBonusPaid > 0 && <> (includes a <strong className="text-success">${seasonBonusPaid}</strong> harvest bonus for strong control)</>}
+            {seasonBonusPaid > 0 && <> (includes a <strong className="text-success">${seasonBonusPaid}</strong> harvest bonus)</>}
             {' '}· Budget: <strong>${budget}</strong>
           </p>
-          {wrong.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground text-center">Mismanaged weeds:</p>
-              {wrong.map((r, i) => (
-                <div key={i} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-                    <WeedImage weedId={r.weedId} stage="flower" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-foreground text-sm">{r.weedName}</p>
-                    <p className="text-xs text-destructive">Your pick: {ALL_METHODS.find(m => m.id === r.method)?.label}</p>
-                    {(() => {
-                      const sp = weeds.find(w => w.id === r.weedId);
-                      const best = sp ? getBestMethod(sp) : null;
-                      return best ? <p className="text-xs text-success">Best: {ALL_METHODS.find(m => m.id === best)?.label}</p> : null;
-                    })()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="bg-card border border-border rounded-xl p-3 text-sm text-foreground space-y-1 text-center">
+            <p>Survivors building for next year: <strong>{survivorCount}</strong></p>
+          </div>
+
           <div className="bg-card border border-border rounded-xl p-4 text-sm text-foreground">
             {season < SEASONS ? (
               <>Next season's weed pressure: <strong>{nextPop} weeds</strong>{' '}
-              {nextPop < population ? '— good control means fewer weeds!' : '— missed weeds set seed and come back stronger.'}</>
+              {nextPop < population ? '— good control means fewer weeds!' : '— survivors set seed and come back stronger.'}</>
             ) : (
               <>That was the last season. Let's see how the farm did.</>
             )}
           </div>
-
-          {/* Between-season store */}
-          {season < SEASONS && (
-            <div className="bg-card border-2 border-primary/40 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5 text-primary" />
-                <p className="font-bold text-foreground">Control Methods Shed</p>
-                <span className="ml-auto text-sm font-extrabold text-success">${budget}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Buy new control methods with your crop revenue. Once bought, a method is yours for every future season.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {ALL_METHODS.filter(m => !STARTER_METHODS.includes(m.id)).map(m => {
-                  const cost = UNLOCK_COST[m.id] ?? 100;
-                  const have = owned.includes(m.id);
-                  const afford = budget >= cost;
-                  return (
-                    <button
-                      key={m.id}
-                      onClick={() => buyMethod(m)}
-                      disabled={have || !afford}
-                      className={`p-3 rounded-lg border-2 text-left transition-all ${
-                        have
-                          ? 'border-success/50 bg-success/10'
-                          : afford
-                            ? 'border-border bg-background hover:border-primary'
-                            : 'border-border bg-background/50 opacity-60 cursor-not-allowed'
-                      }`}
-                    >
-                      <span className="block text-sm font-bold text-foreground">{m.label}</span>
-                      <span className="text-[11px] text-muted-foreground">{m.tag} · use cost ${m.cost}</span>
-                      <span className={`block text-xs font-bold mt-1 ${have ? 'text-success' : 'text-primary'}`}>
-                        {have ? 'Owned' : `Buy — $${cost}`}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           <button onClick={nextSeason} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
             {season < SEASONS ? `Start Season ${season + 1}` : 'See Final Report'}
@@ -332,7 +272,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
     <div className={shell}>
       <div className="flex items-center gap-3 p-4 border-b-2 border-emerald-200 dark:border-emerald-900 bg-white/60 dark:bg-slate-900/60 backdrop-blur flex-wrap">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
-        <h1 className="font-bold text-foreground text-lg flex-1">Weed Control</h1>
+        <h1 className="font-bold text-foreground text-lg flex-1">{title ?? 'Weed Control'}</h1>
         <span className="text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
           <DollarSign className="w-3 h-3" />{budget}
         </span>
@@ -345,7 +285,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
           <div className="absolute inset-0 bg-black/25 pointer-events-none" />
           <div className="relative p-3 sm:p-4 h-full min-h-[46vh]">
             <p className="text-xs font-bold text-white/90 mb-2 drop-shadow">
-              Scout the field — tap a weed and choose a control method ({remaining.length} left)
+              Scout the field — select a weed and choose all applicable management methods ({remaining.length} left)
             </p>
             <div className="relative w-full h-[38vh] lg:h-[calc(100%-5rem)] min-h-[280px]">
               {field.map(f => {
@@ -353,7 +293,7 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
                 return (
                   <button
                     key={f.id}
-                    onClick={() => !rec && setCurrent(f.id)}
+                    onClick={() => !rec && openWeed(f.id)}
                     disabled={!!rec}
                     style={{ left: `${f.x}%`, top: `${f.y}%` }}
                     className={`absolute -translate-x-1/2 -translate-y-1/2 w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-[3px] bg-secondary shadow-xl transition-all ${
@@ -377,32 +317,28 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
         <div className="bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col lg:overflow-hidden">
           <div className="p-3 border-b border-border">
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-1">Season Log</p>
-            <p className="text-sm text-foreground">{seasonCorrect} correct · {handled.length - seasonCorrect} missed</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              You start with hand pull, hoeing, mowing and cultivation plus a ${START_BUDGET} budget. Each correct
-              control earns ${REVENUE_PER_CORRECT}, and a strong season pays an extra harvest bonus you can spend in
-              the shed to unlock new methods.
-            </p>
+            <p className="text-sm text-foreground">{seasonCorrectCount} perfect · {handled.filter(h => h.survived).length} survivors</p>
           </div>
           <div className="p-3 flex-1 lg:overflow-y-auto space-y-1.5">
             {handled.length === 0 && <p className="text-xs text-muted-foreground italic">Managed weeds appear here.</p>}
             {handled.map((h, i) => (
-              <div key={i} className={`flex items-center gap-2 p-2 rounded border ${h.correct ? 'border-success/40 bg-success/10' : 'border-destructive/40 bg-destructive/10'}`}>
+              <div key={i} className={`flex items-center gap-2 p-2 rounded border ${!h.survived && h.wrongPicks.length === 0 ? 'border-success/40 bg-success/10' : 'border-destructive/40 bg-destructive/10'}`}>
                 <div className="w-9 h-9 rounded overflow-hidden bg-secondary flex-shrink-0">
                   <WeedImage weedId={h.weedId} stage="flower" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground truncate">{h.weedName}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{ALL_METHODS.find(m => m.id === h.method)?.label}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {h.selected.length > 0 ? h.selected.join(', ') : 'No methods selected'}
+                  </p>
                 </div>
-                {h.correct ? <Check className="w-4 h-4 text-success" /> : <X className="w-4 h-4 text-destructive" />}
+                {!h.survived && h.wrongPicks.length === 0 ? <Check className="w-4 h-4 text-success" /> : <X className="w-4 h-4 text-destructive" />}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Weed detail / method chooser */}
       {fw && (
         <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4 pt-[70px]">
           <div className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-full overflow-y-auto">
@@ -416,55 +352,116 @@ export default function WeedControl({ onBack }: { onBack: () => void }) {
               </div>
               <button onClick={closeWeed} className="text-muted-foreground hover:text-foreground text-xl">×</button>
             </div>
-            {!feedback ? (
-              <div className="p-4">
-                <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground mb-2">
-                  Choose a control method — budget ${budget}
-                </p>
-                <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-2 space-y-1">
-                  <p className="text-[11px] text-foreground">
-                    <span className="font-bold">Scouting hint:</span> {fw.weed.management}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    Best timing: {fw.weed.controlTiming} · Look for a{' '}
-                    <strong className="text-foreground">
-                      {ALL_METHODS.find(m => m.id === getBestMethod(fw.weed))?.tag}
-                    </strong>{' '}
-                    method.
-                  </p>
+
+            {step === 'quiz' && (
+              <div className="p-4 space-y-4">
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-2 space-y-1">
+                  <p className="text-[11px] text-foreground font-bold">Scouting Evidence:</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">{fw.weed.management}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {ALL_METHODS.map(m => {
-                    const have = owned.includes(m.id);
-                    const afford = have && budget >= m.cost;
+                
+                <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">
+                  Select all control methods that apply:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {CONTROL_METHODS.map(m => {
+                    const isSelected = selectedMethods.includes(m);
                     return (
-                      <button
-                        key={m.id}
-                        onClick={() => pickMethod(m)}
-                        disabled={!afford}
-                        className={`p-2 rounded-lg border-2 text-xs font-bold text-left transition-all ${
-                          afford ? 'border-border bg-background text-foreground hover:border-primary' : 'border-border bg-background/50 text-muted-foreground cursor-not-allowed'
+                      <button 
+                        key={m} 
+                        onClick={() => toggleMethod(m)}
+                        className={`p-3 rounded-lg border-2 text-left transition-all flex items-center justify-between ${
+                          isSelected ? 'border-primary bg-primary/5' : 'border-border bg-background hover:border-primary/50'
                         }`}
                       >
-                        <span className="flex items-center gap-1">
-                          {!have && <Lock className="w-3 h-3" />}
-                          {m.label}
+                        <span className="flex items-center gap-2">
+                          {METHOD_PHOTO[m] && (
+                            <img src={METHOD_PHOTO[m]!} alt="" loading="lazy" className="w-12 h-12 rounded-md object-cover border border-border" />
+                          )}
+                          <span className="text-sm font-medium text-foreground">{m}</span>
                         </span>
-                        <span className="text-[10px] font-normal text-muted-foreground">
-                          {have ? `${m.tag} · $${m.cost}` : `Locked — buy in the shed between seasons`}
-                        </span>
+                        {isSelected && <Check className="w-4 h-4 text-primary" />}
                       </button>
                     );
                   })}
                 </div>
-              </div>
-            ) : (
-              <div className="p-4 space-y-3">
-                <div className={`p-3 rounded-lg border ${feedback.correct ? 'border-success/40 bg-success/10' : 'border-destructive/40 bg-destructive/10'}`}>
-                  <p className="text-sm text-foreground">{feedback.text}</p>
+
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-muted-foreground">Estimated Cost:</span>
+                    <span className="text-sm font-bold text-primary">${selectedMethods.length * METHOD_COST}</span>
+                  </div>
+                  <button 
+                    onClick={submitQuiz}
+                    className="px-8 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold hover:scale-[1.02] transition-transform"
+                  >
+                    Implement Control
+                  </button>
                 </div>
-                <button onClick={closeWeed} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold">
-                  Back to Field
+              </div>
+            )}
+
+            {step === 'result' && (
+              <div className="p-4 space-y-4">
+                <div className="space-y-3">
+                  {(() => {
+                    const h = handled[handled.length - 1];
+                    const correctSet = getCorrectMethods(fw.weed);
+                    return (
+                      <>
+                        <div className={`p-3 rounded-lg border ${!h.survived && h.wrongPicks.length === 0 ? 'border-success/40 bg-success/10' : 'border-destructive/40 bg-destructive/10'}`}>
+                          <p className="text-sm font-bold text-foreground mb-1">
+                            {!h.survived && h.wrongPicks.length === 0 
+                              ? 'Perfect management!' 
+                              : h.survived 
+                                ? 'Weeds survived treatment.' 
+                                : 'Control successful, but costly.'}
+                          </p>
+                          <p className="text-xs text-foreground/80">
+                            {h.survived ? 'You missed some critical control steps.' : 'All necessary control methods were implemented.'}
+                            {h.wrongPicks.length > 0 && ' You also used unnecessary methods that drained your budget.'}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground px-1">Control Analysis</p>
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {CONTROL_METHODS.map(m => {
+                              const wasSelected = h.selected.includes(m);
+                              const isCorrect = correctSet.includes(m);
+                              
+                              if (!wasSelected && !isCorrect) return null;
+
+                              let status: 'correct-hit' | 'wrong-hit' | 'missed' = 'correct-hit';
+                              if (wasSelected && !isCorrect) status = 'wrong-hit';
+                              if (!wasSelected && isCorrect) status = 'missed';
+
+                              return (
+                                <div key={m} className={`flex items-center justify-between p-2 rounded-md border ${
+                                  status === 'wrong-hit' ? 'border-destructive/20 bg-destructive/5' : 'border-success/20 bg-success/5'
+                                }`}>
+                                  <span className={`text-sm font-medium ${
+                                    status === 'wrong-hit' ? 'text-destructive line-through' : 'text-success'
+                                  }`}>
+                                    {m} {status === 'missed' && <span className="text-[10px] opacity-70 ml-1">(Missed)</span>}
+                                  </span>
+                                  {status === 'wrong-hit' ? <X className="w-4 h-4 text-destructive" /> : <Check className="w-4 h-4 text-success" />}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+
+                <button 
+                  onClick={closeWeed} 
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:scale-[1.02] transition-transform"
+                >
+                  Return to Field
                 </button>
               </div>
             )}

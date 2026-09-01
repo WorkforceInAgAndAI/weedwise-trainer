@@ -76,8 +76,48 @@ function distToSegment(p: { x: number; y: number }, a: { x: number; y: number },
   return Math.hypot(p.x - (a.x + abx * t), p.y - (a.y + aby * t));
 }
 
+/**
+ * The industry-standard scouting route is a W across the field: four long
+ * diagonal legs, three top/bottom turns, edge to edge. We measure the drawn
+ * path against that: how many times it reverses vertically, how much of the
+ * field width and height it spans, and how long it is.
+ */
+const IDEAL_MIN_LEN = 240;   // shorter than this and whole strips go unseen
+const IDEAL_MAX_LEN = 430;   // longer than this and the scout is wasting money
+const W_BONUS = 1500;        // reward per trip walked as a proper W
+
+function routeShape(pts: { x: number; y: number }[]) {
+  if (pts.length < 4) return { legs: 0, xSpan: 0, ySpan: 0 };
+  let legs = 0;
+  let dir = 0;
+  let anchorY = pts[0].y;
+  for (let i = 1; i < pts.length; i++) {
+    const dy = pts[i].y - anchorY;
+    if (Math.abs(dy) < 12) continue;          // ignore jitter, only real legs count
+    const s = Math.sign(dy);
+    if (s !== dir) { legs++; dir = s; }
+    anchorY = pts[i].y;
+  }
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  return {
+    legs,
+    xSpan: Math.max(...xs) - Math.min(...xs),
+    ySpan: Math.max(...ys) - Math.min(...ys),
+  };
+}
+
+/** A trip is "W-shaped" when it has ~4 vertical legs spanning the whole field. */
+function isWRoute(pts: { x: number; y: number }[], walked: number) {
+  const { legs, xSpan, ySpan } = routeShape(pts);
+  return legs >= 3 && legs <= 5 && xSpan >= 60 && ySpan >= 60
+    && walked >= IDEAL_MIN_LEN && walked <= IDEAL_MAX_LEN;
+}
+
+
 interface Props {
   onBack: () => void;
+  /** 'high' = 9-12 "Scout the Weeds" manual scouting on a $25,000 budget. */
+  variant?: 'middle' | 'high';
   gameId?: string;
   gameName?: string;
   gradeLabel?: string;
@@ -87,18 +127,21 @@ interface Props {
 
 export default function FieldScoutChallenge({
   onBack,
+  variant = 'middle',
   gameId,
   gameName,
   gradeLabel,
   poolGrade = 'middle',
 }: Props) {
-  const title = gameName ?? 'Field Scout Challenge';
+  const title = gameName ?? (variant === 'high' ? 'Scout the Weeds' : 'Field Scout Challenge');
+  const SCALE = variant === 'high' ? 1 : 0.04;
+  const startMoney = Math.round(START_MONEY * SCALE);
   const weeds = useMemo(() => weedsForPool(poolGrade), [poolGrade]);
   const [season, setSeason] = useState(1);
   const [trip, setTrip] = useState<Trip>(0);
-  const [money, setMoney] = useState(START_MONEY);
+  const [money, setMoney] = useState(startMoney);
   const [pressure, setPressure] = useState(14);      // weeds present this trip
-  const [log, setLog] = useState<{ trip: number; cost: number; found: number; total: number; blocks: number }[]>([]);
+  const [log, setLog] = useState<{ trip: number; cost: number; found: number; total: number; blocks: number; wRoute: boolean; walked: number }[]>([]);
   const [plants, setPlants] = useState<Plant[]>(() => buildPlants(14, 4, weedsForPool(poolGrade)));
   const [path, setPath] = useState<{ x: number; y: number }[]>([]);
   const [drawing, setDrawing] = useState(false);
@@ -143,18 +186,25 @@ export default function FieldScoutChallenge({
   const end = () => setDrawing(false);
 
   const walked = pathLength(path);
-  const cost = Math.round(walked * COST_PER_UNIT);
+  const cost = Math.round(walked * COST_PER_UNIT * SCALE);
+  const wRoute = useMemo(() => isWRoute(path, walked), [path, walked]);
+  const tooLong = walked > IDEAL_MAX_LEN;
+  const tooShort = path.length > 2 && walked < IDEAL_MIN_LEN;
 
   const foundIdx = useMemo(() => {
     const found = new Set<number>();
     if (path.length < 2) return found;
+    // A true W route is a representative sample, so the scout also catches
+    // patches just off the walked line. Wandering routes only see what they pass.
+    const radius = wRoute ? SCOUT_RADIUS_PCT * 1.8 : SCOUT_RADIUS_PCT;
     plants.forEach((pl, i) => {
       for (let j = 1; j < path.length; j++) {
-        if (distToSegment(pl, path[j - 1], path[j]) <= SCOUT_RADIUS_PCT) { found.add(i); break; }
+        if (distToSegment(pl, path[j - 1], path[j]) <= radius) { found.add(i); break; }
       }
     });
     return found;
-  }, [path, plants]);
+  }, [path, plants, wRoute]);
+
 
   /** How many of the 9 field blocks the path actually sampled. */
   const blocksCovered = useMemo(() => {
@@ -177,13 +227,13 @@ export default function FieldScoutChallenge({
     if (path.length < 3) return;
     setSubmitted(true);
     setMoney(m => m - cost);
-    setLog(l => [...l, { trip, cost, found: foundIdx.size, total: plants.length, blocks: blocksCovered }]);
+    setLog(l => [...l, { trip, cost, found: foundIdx.size, total: plants.length, blocks: blocksCovered, wRoute, walked }]);
   };
 
   const nextTrip = () => {
     // Good coverage of the whole field keeps pressure down; skipping blocks lets it explode.
     const missedBlocks = GRID * GRID - blocksCovered;
-    const next = Math.max(6, Math.round(plants.length * 0.55 + missedBlocks * 2.2 + missed * 0.4));
+    const next = Math.max(6, Math.round(plants.length * (wRoute ? 0.45 : 0.55) + missedBlocks * 2.2 + missed * 0.4));
     setPressure(next);
     if (trip === 2) setSeasonOver(true);
     else setTrip((t) => (t + 1) as Trip);
@@ -193,31 +243,35 @@ export default function FieldScoutChallenge({
 
   const totalSpent = log.reduce((s, l) => s + l.cost, 0);
   const totalMissed = log.reduce((s, l) => s + (l.total - l.found), 0);
-  const yieldLoss = seasonOver ? totalMissed * YIELD_LOSS_PER_WEED : 0;
-  const finalMoney = Math.max(0, START_MONEY - totalSpent - yieldLoss);
+  const wTrips = log.filter(l => l.wRoute).length;
+  const overWalked = log.filter(l => l.walked > IDEAL_MAX_LEN).length;
+  const underWalked = log.filter(l => l.walked < IDEAL_MIN_LEN).length;
+  const wBonus = seasonOver ? Math.round(wTrips * W_BONUS * SCALE) : 0;
+  const yieldLoss = seasonOver ? Math.round(totalMissed * YIELD_LOSS_PER_WEED * SCALE) : 0;
+  const finalMoney = Math.max(0, startMoney - totalSpent - yieldLoss + wBonus);
+  /** Season score out of 3: one point per season trip with good coverage. */
+  const seasonPoints = log.filter(l => l.wRoute).length;
 
-  // Rating blends how much money was kept with how well the field was actually sampled.
+  // Rating is driven by the W: three W routes is the professional standard.
   const avgBlocks = log.length ? log.reduce((s, l) => s + l.blocks, 0) / log.length : 0;
   const foundPct = (() => {
     const tot = log.reduce((s, l) => s + l.total, 0);
     return tot ? log.reduce((s, l) => s + l.found, 0) / tot : 0;
   })();
-  const walkedCheap = totalSpent <= 15000;
-  const goodPattern = avgBlocks >= 6.5;
-  const foundEnough = foundPct >= 0.6;
-  const productive = goodPattern && foundEnough && walkedCheap;
+  const productive = wTrips === 3;
   const rating = productive
     ? 'Very productive'
-    : (goodPattern || foundEnough) && finalMoney >= 10000
+    : wTrips >= 1
       ? 'Moderately productive'
       : 'Not productive';
   const ratingWhy = productive
-    ? `Your W/zig-zag style routes crossed ${avgBlocks.toFixed(1)} of the 9 field blocks on an average trip, so you saw a representative sample of the field, and you did it for only $${totalSpent} in scouting. Finding ${Math.round(foundPct * 100)}% of the weeds kept end-of-season yield loss low.`
-    : !goodPattern && !foundEnough
-      ? `Your routes only sampled about ${avgBlocks.toFixed(1)} of the 9 field blocks, so whole areas were never looked at. Missing ${totalMissed} weeds let them set seed and cost you $${yieldLoss} in yield loss.`
-      : !walkedCheap
-        ? `You found the weeds, but you walked a long way to do it — $${totalSpent} of scouting. Cover the field with a tighter W or zig-zag instead of wandering.`
-        : `You scouted cheaply ($${totalSpent}) but skipped too much of the field, so ${totalMissed} weeds went undetected and cost $${yieldLoss} in yield loss. A W, M, or Z route across the whole field finds more for nearly the same walk.`;
+    ? `You had good coverage on all three trips, crossing ${avgBlocks.toFixed(1)} of the 9 field blocks. Good coverage samples the whole field for the least walking, so you found ${Math.round(foundPct * 100)}% of the weeds and earned a $${wBonus.toLocaleString()} efficiency bonus.`
+    : overWalked > 0
+      ? `On ${overWalked} of your trips you had too much coverage and wasted money. The extra ground cost you $${totalSpent.toLocaleString()} in scouting without finding much more.`
+      : underWalked > 0
+        ? `On ${underWalked} of your trips you had poor coverage, so whole strips of the field were never looked at. ${totalMissed} weeds went undetected and cost $${yieldLoss.toLocaleString()} in yield loss.`
+        : `Your routes had poor coverage. You sampled about ${avgBlocks.toFixed(1)} of the 9 blocks and missed ${totalMissed} weeds, costing $${yieldLoss.toLocaleString()}.`;
+
 
   if (seasonOver) {
     return (
@@ -227,16 +281,19 @@ export default function FieldScoutChallenge({
             <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Season {season} report</p>
             <p className="font-display font-extrabold text-5xl sm:text-6xl text-primary">${finalMoney.toLocaleString()}</p>
             <p className="text-sm font-bold text-foreground">{rating}</p>
+            <p className="text-base font-extrabold text-foreground mt-1">Scouting score: {seasonPoints}/3</p>
+            <p className="text-[11px] text-muted-foreground">One point per season with good coverage; poor or wasteful coverage loses the point.</p>
             <p className="text-xs text-muted-foreground mt-2 text-left">{ratingWhy}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4 space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${START_MONEY.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Starting budget</span><span className="font-bold text-foreground">${startMoney.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Scouting cost (3 trips)</span><span className="font-bold text-destructive">-${totalSpent.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Yield loss from {totalMissed} missed weeds</span><span className="font-bold text-destructive">-${yieldLoss.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Good coverage efficiency bonus ({wTrips}/3 trips)</span><span className="font-bold text-primary">+${wBonus.toLocaleString()}</span></div>
             <div className="border-t border-border pt-2 flex justify-between text-lg"><span className="font-bold text-foreground">Money kept</span><span className="font-extrabold text-primary">${finalMoney.toLocaleString()}</span></div>
             <p className="text-xs text-muted-foreground pt-2">
-              Walk cheap, but walk smart. A pattern that crosses the whole field — a W, a zig-zag, an X — costs a little
-              more than hugging the outside, but it finds the patches before they set seed.
+              Aim for good coverage of the whole field. Cover less than that and you miss strips of the field; cover
+              more and you waste money without finding more weeds.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -245,15 +302,19 @@ export default function FieldScoutChallenge({
                 <p className="text-[10px] font-bold uppercase text-muted-foreground">{TRIPS[l.trip].sub}</p>
                 <p className="text-sm font-bold text-foreground">{l.found}/{l.total} found</p>
                 <p className="text-[10px] text-muted-foreground">${l.cost} · {l.blocks}/9 blocks</p>
+                <p className={`text-[10px] font-bold ${l.wRoute ? 'text-primary' : 'text-destructive'}`}>
+                  {l.wRoute ? 'Good coverage' : l.walked > IDEAL_MAX_LEN ? 'Too much coverage' : 'Poor coverage'}
+                </p>
               </div>
             ))}
+
           </div>
           <LevelComplete
             level={season}
-            score={finalMoney}
-            total={START_MONEY}
-            onNextLevel={() => { setSeason(s => s + 1); setTrip(0); setMoney(START_MONEY); setPressure(14); setLog([]); setSeasonOver(false); }}
-            onStartOver={() => { setSeason(1); setTrip(0); setMoney(START_MONEY); setPressure(14); setLog([]); setSeasonOver(false); }}
+            score={seasonPoints}
+            total={3}
+            onNextLevel={() => { setSeason(s => s + 1); setTrip(0); setMoney(startMoney); setPressure(14); setLog([]); setSeasonOver(false); }}
+            onStartOver={() => { setSeason(1); setTrip(0); setMoney(startMoney); setPressure(14); setLog([]); setSeasonOver(false); }}
             onBack={onBack}
             title={title}
             gameId={gameId}
@@ -357,6 +418,12 @@ export default function FieldScoutChallenge({
               <span className="flex items-center gap-1 text-foreground"><MapPin className="w-3 h-3" /> Field blocks sampled</span>
               <span className="font-bold text-foreground">{blocksCovered}/9</span>
             </div>
+            <div className="flex justify-between text-xs">
+              <span className="flex items-center gap-1 text-foreground"><Target className="w-3 h-3" /> Route shape</span>
+              <span className={`font-bold ${wRoute ? 'text-primary' : 'text-destructive'}`}>
+                {wRoute ? 'Good coverage' : tooLong ? 'Too much coverage' : tooShort ? 'Poor coverage' : 'Poor coverage'}
+              </span>
+            </div>
             {submitted && (
               <div className="flex justify-between text-xs">
                 <span className="flex items-center gap-1 text-foreground"><Target className="w-3 h-3" /> Weeds found</span>
@@ -376,21 +443,25 @@ export default function FieldScoutChallenge({
                 <RotateCcw className="w-3.5 h-3.5" /> Clear Path
               </button>
               <p className="text-[11px] text-muted-foreground italic text-center">
-                Walking only the outside edge is cheap but misses the middle — those patches come back bigger next trip.
+                Cover the whole field evenly. Draw less and you miss strips of field; draw more and you spend money
+                without finding more weeds.
               </p>
             </div>
           ) : (
             <div className="space-y-2">
-              <div className={`rounded-xl border-2 p-3 ${blocksCovered >= 7 ? 'border-primary/50 bg-primary/10' : 'border-destructive/50 bg-destructive/10'}`}>
+              <div className={`rounded-xl border-2 p-3 ${wRoute ? 'border-primary/50 bg-primary/10' : 'border-destructive/50 bg-destructive/10'}`}>
                 <p className="text-sm font-bold text-foreground">
-                  {blocksCovered >= 7 ? 'Strong sample of the field.' : 'You skipped part of the field.'}
+                  {wRoute ? 'Good coverage.' : tooLong ? 'Too much coverage — you wasted money.' : 'Poor coverage.'}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {blocksCovered >= 7
-                    ? 'Weed pressure should stay lower on your next trip.'
-                    : `${GRID * GRID - blocksCovered} blocks were never walked — expect more weeds next time.`}
+                  {wRoute
+                    ? 'A representative sample of the whole field for the least walking — pressure stays lower next trip.'
+                    : tooLong
+                      ? `That route cost $${cost.toLocaleString()}. Even coverage would have sampled the same field for less.`
+                      : `${GRID * GRID - blocksCovered} blocks were never walked — expect more weeds next time.`}
                 </p>
               </div>
+
               <button onClick={nextTrip} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-bold">
                 {trip === 2 ? 'Finish the Season' : `Next Trip: ${TRIPS[trip + 1].name}`}
               </button>

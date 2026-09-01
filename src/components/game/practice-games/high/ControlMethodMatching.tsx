@@ -13,6 +13,9 @@ import { getDifficulty, levelSlice } from '@/lib/difficulty';
 
 const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 
+/** Options show only the group name and number — no timing or pathway details. */
+const groupLabel = (h: HerbicideMOA) => `${h.moa.split('(')[0].trim()} (Group ${h.group})`;
+
 /** High school gets the full MOA table; pick 5 random options per question */
 function buildOptions(correct: HerbicideMOA, optionCount: number): HerbicideMOA[] {
   const others = shuffle(HERBICIDE_MOA.filter(h => h.id !== correct.id)).slice(0, Math.max(1, optionCount - 1));
@@ -75,10 +78,10 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
                     <div className="flex-1">
                       <p className="font-bold text-foreground text-sm">{r.weed.commonName}</p>
                       <p className="text-xs text-destructive">
-                        You: {pickedMOA ? `${pickedMOA.moa} (Group ${pickedMOA.group})` : r.picked}
+                        You: {pickedMOA ? groupLabel(pickedMOA) : r.picked}
                       </p>
                       <p className="text-xs text-green-600">
-                        Correct: {bestMOA ? `${bestMOA.moa} (Group ${bestMOA.group})` : r.best}
+                        Correct: {bestMOA ? groupLabel(bestMOA) : r.best}
                       </p>
                     </div>
                   </div>
@@ -119,10 +122,7 @@ export default function ControlMethodMatching({ onBack }: { onBack: () => void }
             return (
               <button key={g.id} onClick={() => submit(g.id)}
                 className={`p-3 rounded-xl border-2 text-left transition-all ${cls}`}>
-                <p className="text-sm font-bold text-foreground">{g.moa} (Group {g.group})</p>
-                <p className="text-[10px] text-muted-foreground">
-                  {g.timing} -- {g.spectrum} -- chemical: {g.brands[0]}
-                </p>
+                <p className="text-sm font-bold text-foreground">{groupLabel(g)}</p>
               </button>
             );
           })}

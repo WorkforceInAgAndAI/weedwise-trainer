@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { collegiateWeeds as weeds } from '@/data/gradeWeeds';
 import WeedImage from '@/components/game/WeedImage';
-import { ArrowUpDown, Snowflake, Sun, RefreshCw, Calendar } from 'lucide-react';
+import { Snowflake, Sun, RefreshCw, Calendar, Play } from 'lucide-react';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
 import { getDifficulty, levelSlice } from '@/lib/difficulty';
@@ -11,8 +11,8 @@ const shuffle = <T,>(a: T[]): T[] => [...a].sort(() => Math.random() - 0.5);
 const CATEGORIES = [
  { id: 'winter-annual', label: 'Winter Annual', Icon: Snowflake, desc: 'Germinates fall, overwinters, seeds spring' },
  { id: 'summer-annual', label: 'Summer Annual', Icon: Sun, desc: 'Germinates spring, seeds summer/fall' },
- { id: 'perennial', label: 'Perennial', Icon: RefreshCw, desc: 'Lives 3+ years' },
  { id: 'biennial', label: 'Biennial', Icon: Calendar, desc: '2-year life cycle' },
+ { id: 'perennial', label: 'Perennial', Icon: RefreshCw, desc: 'Lives 3+ years' },
 ];
 
 const WINTER_ANNUALS = ['wild-oat'];
@@ -25,28 +25,30 @@ function getCategory(w: typeof weeds[0]): string {
  return 'perennial';
 }
 
-/** Field notes that connect what the plant does to how it survives the year. */
-function lifeClues(w: typeof weeds[0]): { label: string; text: string }[] {
- const notes: { label: string; text: string }[] = [];
- const structure = w.traits.find(t => /rhizome|tuber|taproot|rootstock|creeping root|crown|stolon|bulb|rosette|perennat/i.test(t));
- if (structure) notes.push({ label: 'Survival structure', text: structure });
- const growth = w.traits.find(t => /seed|germinat|emerg|flower|bolt|mature|grow/i.test(t) && t !== structure);
- if (growth) notes.push({ label: 'Growth & reproduction', text: growth });
- if (w.controlTiming) notes.push({ label: 'Best control window', text: w.controlTiming });
- notes.push({ label: 'Where it lives', text: w.habitat });
- return notes.slice(0, 3);
-}
-
 const ROUNDS_PER_LEVEL = 2;
+const CARD_W = 108;
+const CARD_H = 132;
 
 function itemsPerRound(level: number) {
- return Math.min(14, 10 + Math.floor((level - 1) / 2));
+ return Math.min(10, 7 + Math.floor((level - 1) / 2));
 }
 
 function buildRound(level: number, round: number) {
  const count = itemsPerRound(level);
  const pool = levelSlice(shuffle(weeds), level * 100 + round, count);
- return pool.map(w => ({ weed: w, correct: getCategory(w) }));
+ return pool.map((w, i) => ({ weed: w, correct: getCategory(w), key: `${w.id}-${i}` }));
+}
+
+type Status = 'falling' | 'dragging' | 'correct' | 'missed';
+
+interface Sprite {
+ key: string;
+ weed: typeof weeds[0];
+ correct: string;
+ x: number; // px, left position (fixed at spawn, container-relative)
+ y: number; // px, top position (container-relative)
+ status: Status;
+ resolvedAt: number; // timestamp when correct/missed was set, for fade-out
 }
 
 export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
@@ -55,155 +57,332 @@ export default function LifeCycleSort({ onBack }: { onBack: () => void }) {
  const [totalScore, setTotalScore] = useState(0);
  const { addBadge } = useGameProgress();
 
+ const d = useMemo(() => getDifficulty(level, 'hs'), [level]);
  const items = useMemo(() => buildRound(level, round), [level, round]);
- const [placements, setPlacements] = useState<Record<string, string>>({});
- const [selected, setSelected] = useState<string | null>(null);
- const [checked, setChecked] = useState(false);
- const [reviewing, setReviewing] = useState(false);
+
+ const [phase, setPhase] = useState<'ready' | 'playing' | 'roundEnd'>('ready');
+ const [roundScore, setRoundScore] = useState(0);
+ const [missedItems, setMissedItems] = useState<{ weed: typeof weeds[0]; correct: string }[]>([]);
  const [reviewIdx, setReviewIdx] = useState(0);
+ const [reviewing, setReviewing] = useState(false);
+ const [message, setMessage] = useState<{ tone: 'good' | 'bad'; text: string } | null>(null);
 
- const place = (catId: string) => { if (!selected || checked) return; setPlacements(p => ({ ...p, [selected]: catId })); setSelected(null); };
- const remove = (wId: string) => { if (checked) return; setPlacements(p => { const n = { ...p }; delete n[wId]; return n; }); };
- const correctCount = items.filter(it => placements[it.weed.id] === it.correct).length;
- const wrongItems = items.filter(it => placements[it.weed.id] !== it.correct);
+ const containerRef = useRef<HTMLDivElement>(null);
+ const binRefs = useRef<Record<string, HTMLDivElement | null>>({});
+ const spritesRef = useRef<Sprite[]>([]);
+ const [, forceTick] = useState(0);
+ const rafRef = useRef<number | null>(null);
+ const lastRef = useRef(0);
+ const scoreRef = useRef(0);
+ const missedRef = useRef<{ weed: typeof weeds[0]; correct: string }[]>([]);
+ const resolvedCountRef = useRef(0);
 
- const handleCheck = () => {
-  setChecked(true);
-  setTotalScore(s => s + items.filter(it => placements[it.weed.id] === it.correct).length);
-  if (items.filter(it => placements[it.weed.id] !== it.correct).length > 0) {
-   setReviewing(true);
-   setReviewIdx(0);
+ const dragKeyRef = useRef<string | null>(null);
+ const dragPointerIdRef = useRef<number | null>(null);
+ const dragPosRef = useRef<{ x: number; y: number } | null>(null);
+
+ const fallSpeed = 70 * Math.min(1.6, d.speed); // steady fall, ramps with level
+
+ const done = round >= ROUNDS_PER_LEVEL;
+
+ function beginRound() {
+  const container = containerRef.current;
+  const width = container ? container.clientWidth : 600;
+  const slots = items.length;
+  const usableW = Math.max(1, width - CARD_W);
+  spritesRef.current = items.map((it, i) => {
+   const base = slots > 1 ? (usableW * i) / (slots - 1) : usableW / 2;
+   const jitter = (Math.random() - 0.5) * Math.min(40, usableW / slots);
+   return {
+    key: it.key,
+    weed: it.weed,
+    correct: it.correct,
+    x: Math.max(0, Math.min(usableW, base + jitter)),
+    y: -(CARD_H + i * 160 + Math.random() * 60),
+    status: 'falling' as Status,
+    resolvedAt: 0,
+   };
+  });
+  scoreRef.current = 0;
+  missedRef.current = [];
+  resolvedCountRef.current = 0;
+  setRoundScore(0);
+  setMissedItems([]);
+  setMessage(null);
+  dragKeyRef.current = null;
+  dragPointerIdRef.current = null;
+  dragPosRef.current = null;
+  setPhase('playing');
+  lastRef.current = performance.now();
+  if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  rafRef.current = requestAnimationFrame(loop);
+ }
+
+ function loop() {
+  const now = performance.now();
+  const dt = Math.min(0.05, (now - lastRef.current) / 1000);
+  lastRef.current = now;
+  const container = containerRef.current;
+  const groundY = container ? container.clientHeight - CARD_H : 500;
+
+  for (const s of spritesRef.current) {
+   if (s.status !== 'falling') continue;
+   s.y += fallSpeed * dt;
+   if (s.y >= groundY) {
+    // Hit the soil line — bounce back to the top and fall again.
+    const width = container ? container.clientWidth : 600;
+    s.y = -(CARD_H + Math.random() * 80);
+    s.x = Math.max(0, Math.min(Math.max(1, width - CARD_W), Math.random() * Math.max(1, width - CARD_W)));
+   }
   }
- };
 
- const resetRound = () => { setPlacements({}); setSelected(null); setChecked(false); setReviewing(false); setReviewIdx(0); };
- const nextRound = () => { setRound(r => r + 1); resetRound(); };
- const isLevelDone = round === ROUNDS_PER_LEVEL - 1 && checked && !reviewing;
+  // Drag follows pointer
+  if (dragKeyRef.current && dragPosRef.current && container) {
+   const rect = container.getBoundingClientRect();
+   const s = spritesRef.current.find(sp => sp.key === dragKeyRef.current);
+   if (s) {
+    // Allow the card to travel past the field edges so it can be dropped on a bin.
+    s.x = Math.max(-CARD_W / 2, Math.min(rect.width - CARD_W / 2, dragPosRef.current.x - rect.left - CARD_W / 2));
+    s.y = Math.max(-CARD_H / 2, Math.min(rect.height + 400, dragPosRef.current.y - rect.top - CARD_H / 2));
+   }
+  }
 
- const nextLevel = () => { setLevel(l => l + 1); setRound(0); setTotalScore(0); resetRound(); };
- const startOver = () => { setLevel(1); setRound(0); setTotalScore(0); resetRound(); };
+  forceTick(t => (t + 1) % 1000000);
 
- // Review wrong answers one by one
- if (reviewing && wrongItems.length > 0) {
-  const item = wrongItems[reviewIdx];
-  const correctCat = CATEGORIES.find(c => c.id === item.correct);
-  const yourCat = CATEGORIES.find(c => c.id === placements[item.weed.id]);
+  if (resolvedCountRef.current >= items.length) {
+   setPhase('roundEnd');
+   setRoundScore(scoreRef.current);
+   setMissedItems(missedRef.current);
+   return;
+  }
+
+  rafRef.current = requestAnimationFrame(loop);
+ }
+
+ useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+ useEffect(() => {
+  function onMove(e: PointerEvent) {
+   if (dragKeyRef.current == null) return;
+   if (dragPointerIdRef.current != null && e.pointerId !== dragPointerIdRef.current) return;
+   dragPosRef.current = { x: e.clientX, y: e.clientY };
+  }
+  function onUp(e: PointerEvent) {
+   if (dragKeyRef.current == null) return;
+   if (dragPointerIdRef.current != null && e.pointerId !== dragPointerIdRef.current) return;
+   releaseDrag(e.clientX, e.clientY);
+  }
+  window.addEventListener('pointermove', onMove, { passive: true });
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+  return () => {
+   window.removeEventListener('pointermove', onMove);
+   window.removeEventListener('pointerup', onUp);
+   window.removeEventListener('pointercancel', onUp);
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, []);
+
+ function startDrag(key: string, e: React.PointerEvent) {
+  if (phase !== 'playing') return;
+  const s = spritesRef.current.find(sp => sp.key === key);
+  if (!s || s.status !== 'falling') return;
+  e.preventDefault();
+  s.status = 'dragging';
+  dragKeyRef.current = key;
+  dragPointerIdRef.current = e.pointerId;
+  dragPosRef.current = { x: e.clientX, y: e.clientY };
+ }
+
+ function binUnder(clientX: number, clientY: number): string | null {
+  for (const c of CATEGORIES) {
+   const el = binRefs.current[c.id];
+   if (!el) continue;
+   const r = el.getBoundingClientRect();
+   if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) return c.id;
+  }
+  return null;
+ }
+
+ function releaseDrag(clientX: number, clientY: number) {
+  const key = dragKeyRef.current;
+  dragKeyRef.current = null;
+  dragPointerIdRef.current = null;
+  dragPosRef.current = null;
+  if (!key) return;
+  const s = spritesRef.current.find(sp => sp.key === key);
+  if (!s) return;
+
+  const bin = binUnder(clientX, clientY);
+  if (bin && bin === s.correct) {
+   s.status = 'correct';
+   s.resolvedAt = performance.now();
+   scoreRef.current += 1;
+   resolvedCountRef.current += 1;
+   setMessage({ tone: 'good', text: `${s.weed.commonName} — correct! It's a ${CATEGORIES.find(c => c.id === bin)?.label}.` });
+  } else if (bin) {
+   // wrong bin — bounces back and keeps falling
+   s.status = 'falling';
+   setMessage({ tone: 'bad', text: `Not quite — ${s.weed.commonName} keeps falling. Check its life cycle again.` });
+  } else {
+   // dropped in open space, resumes falling from current spot
+   s.status = 'falling';
+  }
+ }
+
+ const nextRound = () => { setRound(r => r + 1); setPhase('ready'); };
+ const restart = () => { setRound(0); setTotalScore(0); setPhase('ready'); };
+ const nextLevel = () => { setLevel(l => l + 1); restart(); };
+ const startOver = () => { setLevel(1); restart(); };
+
+ // Commit round score into total once, when round ends
+ const committedRef = useRef(-1);
+ useEffect(() => {
+  if (phase === 'roundEnd' && committedRef.current !== round) {
+   committedRef.current = round;
+   setTotalScore(s => s + scoreRef.current);
+  }
+ }, [phase, round]);
+
+ if (done) {
+  const total = ROUNDS_PER_LEVEL * itemsPerRound(level);
+  addBadge({ gameId: 'hs-lifecycle', gameName: 'Life Cycle Sort', level: 'HS', score: totalScore, total });
   return (
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-    <h2 className="font-bold text-lg text-foreground mb-4">Review: {reviewIdx + 1}/{wrongItems.length}</h2>
+    <h2 className="text-2xl font-bold text-foreground mb-2">Level {level} Complete</h2>
+    <p className="text-lg text-foreground mb-6">{totalScore}/{total} correct</p>
+    <LevelComplete level={level} score={totalScore} total={total} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+   </div>
+  );
+ }
+
+ if (phase === 'roundEnd' && reviewing && missedItems.length > 0) {
+  const item = missedItems[reviewIdx];
+  const correctCat = CATEGORIES.find(c => c.id === item.correct);
+  return (
+   <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
+    <h2 className="font-bold text-lg text-foreground mb-4">Review: {reviewIdx + 1}/{missedItems.length}</h2>
     <div className="w-32 h-32 rounded-xl overflow-hidden bg-secondary mb-3">
      <WeedImage weedId={item.weed.id} stage="flower" className="w-full h-full object-cover" />
     </div>
     <p className="font-bold text-foreground text-lg mb-1">{item.weed.commonName}</p>
     <p className="text-xs text-muted-foreground italic mb-2">{item.weed.scientificName}</p>
-    <div className="flex gap-2 mb-2">
-     <span className="px-3 py-1 rounded bg-destructive/20 text-destructive text-sm font-bold">Your answer: {yourCat?.label}</span>
-     <span className="px-3 py-1 rounded bg-green-500/20 text-green-700 text-sm font-bold">Correct: {correctCat?.label}</span>
-    </div>
+    <p className="px-3 py-1 rounded bg-destructive/20 text-destructive text-sm font-bold mb-2">Missed — it reached the ground</p>
+    <p className="px-3 py-1 rounded bg-green-500/20 text-green-700 text-sm font-bold mb-2">Correct bin: {correctCat?.label}</p>
     <p className="text-sm text-muted-foreground text-center max-w-sm mb-4">Life cycle: {item.weed.lifeCycle}</p>
     <button onClick={() => {
-     if (reviewIdx + 1 < wrongItems.length) setReviewIdx(i => i + 1);
+     if (reviewIdx + 1 < missedItems.length) setReviewIdx(i => i + 1);
      else setReviewing(false);
     }} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
-     {reviewIdx + 1 < wrongItems.length ? 'Next' : 'Continue'}
+     {reviewIdx + 1 < missedItems.length ? 'Next' : 'Continue'}
     </button>
    </div>
   );
  }
 
- if (isLevelDone) {
-  addBadge({ gameId: 'hs-lifecycle', gameName: 'Life Cycle Sort', level: 'HS', score: totalScore, total: items.length * ROUNDS_PER_LEVEL });
+ if (phase === 'roundEnd' && !reviewing) {
   return (
    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center p-6">
-    <h2 className="text-2xl font-bold text-foreground mb-2">Level {level} Complete</h2>
-    <p className="text-lg text-foreground mb-6">{totalScore}/{items.length * ROUNDS_PER_LEVEL} correct</p>
-    <LevelComplete level={level} score={totalScore} total={items.length * ROUNDS_PER_LEVEL} onNextLevel={nextLevel} onStartOver={startOver} onBack={onBack} />
+    <h2 className="text-2xl font-bold text-foreground mb-2">Round {round + 1} Complete</h2>
+    <p className="text-lg text-foreground mb-6">{roundScore}/{items.length} correct</p>
+    {missedItems.length > 0 ? (
+     <button onClick={() => { setReviewIdx(0); setReviewing(true); }} className="px-8 py-3 rounded-lg bg-secondary text-foreground font-bold mb-3">
+      Review {missedItems.length} missed
+     </button>
+    ) : null}
+    <button onClick={nextRound} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">
+     {round + 1 < ROUNDS_PER_LEVEL ? 'Next Round' : 'Finish Level'}
+    </button>
    </div>
   );
  }
 
  return (
-  <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
-   <div className="max-w-2xl mx-auto p-4">
-    <div className="flex items-center gap-3 mb-4">
-     <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
-     <h1 className="font-display font-bold text-lg text-foreground">Life Cycle Sort</h1>
-     <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
-     <span className="text-sm text-muted-foreground">Round {round + 1}/{ROUNDS_PER_LEVEL}</span>
-    </div>
-    {(() => {
-     const sel = selected ? items.find(it => it.weed.id === selected)?.weed : null;
-     if (!sel) {
-      return (
-       <div className="mb-4 rounded-xl border-2 border-dashed border-border p-3 text-xs text-muted-foreground">
-        Select a species below to open its field notes — the survival structures, growth habit and control window
-        are your evidence for which life cycle it follows.
+  <div className="fixed inset-0 bg-background z-50 flex flex-col">
+   <div className="flex items-center gap-3 p-4 border-b border-border">
+    <button onClick={onBack} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-foreground">←</button>
+    <h1 className="font-display font-bold text-lg text-foreground">Life Cycle Sort</h1>
+    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
+    <span className="text-sm text-muted-foreground">Round {round + 1}/{ROUNDS_PER_LEVEL}</span>
+   </div>
+
+   <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col p-4 min-h-0">
+    <p className="text-sm text-muted-foreground text-center mb-2">
+     Weeds fall slowly from the top — drag each one into its correct life-cycle bin before it hits the ground.
+    </p>
+
+    {message && (
+     <p className={`text-center text-xs font-bold mb-2 ${message.tone === 'good' ? 'text-green-600' : 'text-destructive'}`}>
+      {message.text}
+     </p>
+    )}
+
+    <div
+     ref={containerRef}
+     className={`relative flex-1 min-h-[360px] rounded-xl border-2 border-border bg-secondary/20 touch-none ${dragKeyRef.current ? 'overflow-visible z-30' : 'overflow-hidden'}`}
+    >
+     {phase === 'ready' && (
+      <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/50">
+       <div className="bg-card rounded-xl p-6 max-w-sm text-center shadow-2xl border-2 border-primary">
+        <h2 className="text-xl font-bold text-foreground mb-2">Round {round + 1}</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+         Drag each falling weed into its correct life-cycle bin. Wrong bin: it bounces back out and keeps falling.
+         Reach the soil line: it bounces back to the top and keeps falling.
+        </p>
+        <button onClick={beginRound}
+         className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-bold hover:opacity-90">
+         <Play className="w-4 h-4" /> Start Round
+        </button>
        </div>
-      );
-     }
-     return (
-      <div className="mb-4 rounded-xl border-2 border-primary/40 bg-primary/5 p-3">
-       <div className="flex items-center gap-3 mb-2">
-        <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary shrink-0">
-         <WeedImage weedId={sel.id} stage="flower" className="w-full h-full object-cover" />
-        </div>
-        <div>
-         <p className="text-sm font-bold text-foreground">{sel.commonName}</p>
-         <p className="text-[11px] italic text-primary">{sel.scientificName}</p>
-        </div>
-       </div>
-       <ul className="space-y-1">
-        {lifeClues(sel).map((n, i) => (
-         <li key={i} className="text-xs text-foreground">
-          <span className="font-bold text-muted-foreground uppercase tracking-wider text-[10px] mr-1">{n.label}:</span>
-          {n.text}
-         </li>
-        ))}
-       </ul>
       </div>
-     );
-    })()}
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-     {CATEGORIES.map(c => {
-      const CatIcon = c.Icon;
+     )}
+
+     {phase === 'playing' && spritesRef.current.map(s => {
+      if (s.status === 'correct' && performance.now() - s.resolvedAt > 350) return null;
+      if (s.status === 'missed' && performance.now() - s.resolvedAt > 600) return null;
+      const fading = s.status === 'correct' || s.status === 'missed';
       return (
-       <button key={c.id} onClick={() => place(c.id)}
-        className={`p-3 rounded-xl border-2 text-center transition-all ${selected ? 'border-primary hover:bg-primary/10' : 'border-border'}`}>
-        <CatIcon className="w-6 h-6 mx-auto mb-1 text-foreground" />
-        <p className="text-xs font-bold text-foreground">{c.label}</p>
-        <p className="text-[10px] text-muted-foreground">{c.desc}</p>
-        <div className="mt-1 flex flex-wrap gap-1 justify-center">
-         {items.filter(it => placements[it.weed.id] === c.id).map(it => (
-          <span key={it.weed.id} onClick={e => { e.stopPropagation(); remove(it.weed.id); }}
-           className={`text-[10px] px-1.5 py-0.5 rounded-full cursor-pointer ${checked ? (it.correct === c.id ? 'bg-green-500/20 text-green-700' : 'bg-destructive/20 text-destructive') : 'bg-secondary text-foreground'}`}>
-           {it.weed.commonName} x
-          </span>
-         ))}
+       <div
+        key={s.key}
+        onPointerDown={e => startDrag(s.key, e)}
+        className={`absolute select-none flex flex-col items-center gap-1 p-1.5 rounded-lg border-2 bg-card shadow-md transition-opacity duration-300 ${
+         s.status === 'dragging' ? 'z-40 cursor-grabbing border-primary scale-105' :
+         s.status === 'correct' ? 'border-green-500 opacity-0' :
+         s.status === 'missed' ? 'border-destructive opacity-0' :
+         'border-border cursor-grab'
+        }`}
+        style={{
+         left: s.x,
+         top: s.y,
+         width: CARD_W,
+         height: CARD_H,
+         transitionProperty: fading ? 'opacity' : 'none',
+        }}
+       >
+        <div className="w-full flex-1 rounded overflow-hidden bg-muted">
+         <WeedImage weedId={s.weed.id} stage="flower" className="w-full h-full object-cover" />
         </div>
-       </button>
+        <span className="text-[10px] font-bold text-foreground text-center leading-tight truncate w-full">{s.weed.commonName}</span>
+       </div>
       );
      })}
     </div>
-    <div className="flex flex-wrap gap-2 mb-4">
-     {items.filter(it => !placements[it.weed.id]).map(it => (
-      <button key={it.weed.id} onClick={() => setSelected(selected === it.weed.id ? null : it.weed.id)}
-       className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 ${selected === it.weed.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-       <div className="w-8 h-8 rounded-lg overflow-hidden"><WeedImage weedId={it.weed.id} stage="flower" className="w-full h-full object-cover" /></div>
-       <span className="text-xs font-medium text-foreground">{it.weed.commonName}</span>
-      </button>
-     ))}
+
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+     {CATEGORIES.map(c => {
+      const CatIcon = c.Icon;
+      return (
+       <div key={c.id}
+        ref={el => { binRefs.current[c.id] = el; }}
+        className={`p-3 rounded-xl border-2 border-dashed text-center transition-all ${dragKeyRef.current ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}
+       >
+        <CatIcon className="w-6 h-6 mx-auto mb-1 text-foreground" />
+        <p className="text-xs font-bold text-foreground">{c.label}</p>
+        <p className="text-[10px] text-muted-foreground">{c.desc}</p>
+       </div>
+      );
+     })}
     </div>
-    {!checked && Object.keys(placements).length === items.length && (
-     <button onClick={handleCheck} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold">Check Answers</button>
-    )}
-    {checked && !reviewing && (
-     <div className="text-center">
-      <p className="text-foreground font-bold mb-3">{correctCount}/{items.length} correct</p>
-      {round < ROUNDS_PER_LEVEL - 1 && (
-       <button onClick={nextRound} className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold">Next Round</button>
-      )}
-     </div>
-    )}
    </div>
   </div>
  );

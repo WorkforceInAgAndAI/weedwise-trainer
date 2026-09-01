@@ -1,10 +1,75 @@
 import { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { getAllReferencesGrouped, INATURALIST_DEFAULT_CITATION } from '@/data/imageReferences';
+import { weeds } from '@/data/weeds';
+import { resolveWeedFolder } from '@/lib/imageMap';
+import {
+  CONTROL_METHOD_REFS,
+  BOTANY_TERM_REFS,
+  CROP_REFS,
+  WEED_INJURY_REFS,
+  CROP_INJURY_REFS,
+  CitedImage,
+} from '@/data/otherImageReferences';
+
+function CitedImageTable({ items }: { items: CitedImage[] }) {
+  return (
+    <div className="divide-y divide-border/50">
+      {items.map((entry, i) => (
+        <div key={i} className="px-4 py-2.5 flex gap-3">
+          <span className="text-xs text-primary font-mono shrink-0 pt-0.5 w-36">
+            {entry.image}
+          </span>
+          <p className="text-xs text-muted-foreground leading-relaxed break-words">
+            <span className="font-medium text-foreground">{entry.label}: </span>
+            {entry.citation}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <div className="bg-secondary/30 px-4 py-2.5 border-b border-border">
+        <h2 className="font-display font-semibold text-sm text-foreground">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Image folders still use the original dataset names, but several species have
+ * since been renamed (Marijuana -> Hemp, Tall Morningglory -> Common
+ * Morningglory, Smooth Witchgrass -> Fall Panicum, etc.). Derive the label for
+ * each folder from the current weed data so citations always show the name the
+ * rest of the site uses.
+ */
+const FOLDER_DISPLAY_NAMES: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const w of weeds) {
+    const folder = resolveWeedFolder(w.id);
+    if (folder) map[folder.toLowerCase()] = w.commonName;
+  }
+  return map;
+})();
+
+function displayName(folder: string): string {
+  return (
+    FOLDER_DISPLAY_NAMES[folder.toLowerCase()] ||
+    folder.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  );
+}
 
 export default function ReferencesPage({ onClose }: { onClose: () => void }) {
   const grouped = useMemo(() => getAllReferencesGrouped(), []);
-  const speciesList = Object.keys(grouped);
+  const speciesList = useMemo(
+    () => Object.keys(grouped).sort((a, b) => displayName(a).localeCompare(displayName(b))),
+    [grouped]
+  );
 
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-y-auto">
@@ -20,8 +85,8 @@ export default function ReferencesPage({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="text-sm text-muted-foreground mb-6">
-          All images used in this application are credited below, organized by species. Images not listed
-          individually were sourced from iNaturalist.
+          All images used in this application are credited below, organized by category. Any image
+          not listed individually was sourced from iNaturalist.
         </p>
 
         {/* iNaturalist general citation */}
@@ -32,18 +97,15 @@ export default function ReferencesPage({ onClose }: { onClose: () => void }) {
           <p className="text-sm text-foreground">{INATURALIST_DEFAULT_CITATION}</p>
         </div>
 
-        <div className="space-y-6">
+        {/* Weed species images */}
+        <h2 className="font-display font-semibold text-base text-foreground mb-3">Weed Species</h2>
+        <div className="space-y-6 mb-12">
           {speciesList.map(species => (
-            <div key={species} className="border border-border rounded-lg overflow-hidden">
-              <div className="bg-secondary/30 px-4 py-2.5 border-b border-border">
-                <h2 className="font-display font-semibold text-sm text-foreground">
-                  {species.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                </h2>
-              </div>
+            <Section key={species} title={displayName(species)}>
               <div className="divide-y divide-border/50">
                 {grouped[species].map((entry, i) => (
                   <div key={i} className="px-4 py-2.5 flex gap-3">
-                    <span className="text-xs text-primary font-mono shrink-0 pt-0.5 w-28">
+                    <span className="text-xs text-primary font-mono shrink-0 pt-0.5 w-36">
                       {entry.image}
                     </span>
                     <p className="text-xs text-muted-foreground leading-relaxed break-words">
@@ -52,8 +114,61 @@ export default function ReferencesPage({ onClose }: { onClose: () => void }) {
                   </div>
                 ))}
               </div>
-            </div>
+            </Section>
           ))}
+        </div>
+
+        {/* Control methods */}
+        <h2 className="font-display font-semibold text-base text-foreground mb-3">Control Methods</h2>
+        <div className="mb-12">
+          <Section title="Control Method Illustrations">
+            <CitedImageTable items={CONTROL_METHOD_REFS} />
+          </Section>
+        </div>
+
+        {/* Botany terms */}
+        <h2 className="font-display font-semibold text-base text-foreground mb-3">Botany &amp; Plant Structures</h2>
+        <div className="mb-12">
+          <Section title="Botanical Term Illustrations">
+            <CitedImageTable items={BOTANY_TERM_REFS} />
+          </Section>
+        </div>
+
+        {/* Crop images */}
+        <h2 className="font-display font-semibold text-base text-foreground mb-3">Crop Images</h2>
+        <div className="space-y-6 mb-12">
+          {CROP_REFS.map(group => (
+            <Section key={group.crop} title={group.crop}>
+              <CitedImageTable items={group.images} />
+            </Section>
+          ))}
+        </div>
+
+        {/* Weed herbicide injury */}
+        <h2 className="font-display font-semibold text-base text-foreground mb-3">Weed Herbicide Injury</h2>
+        <div className="mb-12">
+          <Section title="Herbicide Injury on Weeds">
+            <CitedImageTable items={WEED_INJURY_REFS} />
+          </Section>
+        </div>
+
+        {/* Crop herbicide injury */}
+        <h2 className="font-display font-semibold text-base text-foreground mb-3">Crop Herbicide Injury</h2>
+        <div className="mb-12">
+          <Section title="Herbicide Injury on Crops">
+            <div className="divide-y divide-border/50">
+              {CROP_INJURY_REFS.map((entry, i) => (
+                <div key={i} className="px-4 py-2.5">
+                  <p className="text-xs text-foreground font-medium">
+                    {entry.herbicide} — {entry.crop} ({entry.activeIngredient})
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed break-words mt-0.5">
+                    {entry.citation}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Section>
         </div>
 
         <div className="mt-12 pb-8 text-center text-xs text-muted-foreground">

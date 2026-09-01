@@ -11,13 +11,13 @@ export interface Weed {
  emoji?: string;
  image?: string;
  traits: string[];
- habitat: string;
- primaryHabitat: string;
+ habitat?: string;
+ primaryHabitat?: string;
  management: string;
  controlTiming: string;
  actImmediately: boolean;
  actReason: string;
- lookAlike: { id: string; species: string; difference: string };
+ lookAlike?: { id: string; species: string; difference: string };
  memoryHook: string;
  safetyNote?: string;
 }

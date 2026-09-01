@@ -30,20 +30,29 @@ const ROWS = 5;
 
 // tile => target tile. Positive = ladder (vine), negative meaning target<from = chute (weed)
 const VINES: Record<number, { to: number; reason: string; resource: string; day: string; Icon: React.ComponentType<{ className?: string }> }> = {
-  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: 'Water', day: 'A nice rainy day', Icon: RainDropIcon },
-  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: 'Sunlight', day: 'A sunny warm day', Icon: SunIcon },
-  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: 'Nutrients', day: 'Plant fertilizer day', Icon: FertilizerBagIcon },
-  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: 'Healthy soil', day: 'Earthworms loosen the soil', Icon: WormIcon },
-  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: 'Pollinator', day: 'Busy honeybee visit day', Icon: BeeIcon },
+  2:  { to: 8,  reason: 'The farmer waters the field. Your seed soaks it up!', resource: 'Water', day: 'Watering day', Icon: WateringCanIcon },
+  3:  { to: 11, reason: 'A gentle rain soaks your seed — you sprout up fast!', resource: 'Water', day: 'Rainy day', Icon: RainDropIcon },
+  6:  { to: 17, reason: 'Warm sunlight pours down. Photosynthesis kicks in!', resource: 'Sunlight', day: 'Sunny warm day', Icon: SunIcon },
+  9:  { to: 21, reason: 'Rich compost feeds your roots. Big growth spurt!', resource: 'Nutrients', day: 'Fertilizer day', Icon: FertilizerBagIcon },
+  12: { to: 19, reason: 'A long sunny afternoon makes lots of plant food!', resource: 'Sunlight', day: 'Long sunny afternoon', Icon: SunIcon },
+  14: { to: 26, reason: 'A friendly earthworm loosens the soil. Roots dig deep!', resource: 'Healthy soil', day: 'Earthworms loosen soil', Icon: WormIcon },
+  16: { to: 22, reason: 'Compost is mixed into the soil. Your roots feast!', resource: 'Nutrients', day: 'Compost day', Icon: FertilizerBagIcon },
+  20: { to: 29, reason: 'A honeybee pollinates your flower. Almost to seed!', resource: 'Pollinator', day: 'Honeybee visit', Icon: BeeIcon },
+  24: { to: 29, reason: 'A soft shower keeps your flower fresh and strong.', resource: 'Water', day: 'Gentle shower', Icon: RainDropIcon },
 };
 
 const WEEDS: Record<number, { to: number; reason: string; weed: string; day: string; Icon: React.ComponentType<{ className?: string }> }> = {
-  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail', day: 'A hungry insect swarm', Icon: BugIcon },
-  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed', day: 'A blistering hot day', Icon: ThermometerIcon },
-  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp', day: 'A long dry drought', Icon: DroughtIcon },
-  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle', day: 'A local flood event', Icon: FloodIcon },
-  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters', day: 'A late frost night', Icon: FrostIcon },
+  10: { to: 5,  reason: 'Hail pounds your young leaves. Ouch — start regrowing.', weed: 'Hail damage', day: 'Hail storm', Icon: HailIcon },
+  13: { to: 4,  reason: 'Foxtail grass shades your leaves. You lose energy!', weed: 'Foxtail', day: 'Hungry insect swarm', Icon: BugIcon },
+  15: { to: 8,  reason: 'Strong winds whip your stem and snap a leaf.', weed: 'Wind damage', day: 'Big wind storm', Icon: WindStormIcon },
+  18: { to: 7,  reason: 'Bindweed twists around your stem and pulls you down.', weed: 'Field Bindweed', day: 'Blistering hot day', Icon: ThermometerIcon },
+  22: { to: 11, reason: 'Waterhemp shoots up beside you and blocks your sun.', weed: 'Waterhemp', day: 'Weeds crowd in', Icon: BugIcon },
+  23: { to: 10, reason: 'Waterhemp steals your water. You wilt back down.', weed: 'Waterhemp', day: 'Long dry drought', Icon: DroughtIcon },
+  26: { to: 17, reason: 'Giant Ragweed towers over you and steals the sunlight.', weed: 'Giant Ragweed', day: 'Shaded-out day', Icon: DroughtIcon },
+  27: { to: 15, reason: 'Canada Thistle roots crowd yours. Slide down!', weed: 'Canada Thistle', day: 'Local flood', Icon: FloodIcon },
+  28: { to: 19, reason: 'Lambsquarters blocks your sun. Back you go.', weed: 'Lambsquarters', day: 'Late frost night', Icon: FrostIcon },
 };
+
 
 // Life stage banner based on tile position
 /**
@@ -229,7 +238,29 @@ function FloodIcon({ className = '' }: { className?: string }) {
   );
 }
 
+function HailIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Hail storm">
+      <ellipse cx="12" cy="8" rx="8" ry="4.5" fill="#94a3b8" stroke="#475569" strokeWidth="1" />
+      <circle cx="7" cy="16" r="2.2" fill="#e0f2fe" stroke="#0369a1" strokeWidth="1" />
+      <circle cx="13" cy="19" r="2.2" fill="#e0f2fe" stroke="#0369a1" strokeWidth="1" />
+      <circle cx="18" cy="15" r="2.2" fill="#e0f2fe" stroke="#0369a1" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function WindStormIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Wind storm">
+      <path d="M2 8 H14 A3 3 0 1 0 11 5" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" />
+      <path d="M2 13 H17 A3 3 0 1 1 14 16" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M2 18 H10" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function FrostIcon({ className = '' }: { className?: string }) {
+
   return (
     <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Late frost night">
       <g stroke="#38bdf8" strokeWidth="1.6" strokeLinecap="round">
@@ -487,7 +518,7 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                 const isFinish = tileNum === BOARD_SIZE;
                 return (
                   <div key={`${r}-${c}`}
-                    className={`relative aspect-square rounded-md border-2 overflow-hidden flex flex-col items-center justify-end p-0.5 text-[10px] font-bold transition-all ${
+                    className={`relative aspect-square min-h-[86px] sm:min-h-[104px] rounded-lg border-2 overflow-hidden flex flex-col items-center justify-center gap-0.5 p-1 text-xs font-bold transition-all ${
                       isPawn ? 'ring-4 ring-primary scale-105 z-10 ' : ''
                     }${
                       isFinish ? 'bg-gradient-to-br from-yellow-300 to-orange-400 border-orange-500' :
@@ -495,24 +526,25 @@ export default function SproutClimb({ onBack, gameId, gameName, gradeLabel }: Pr
                       w ? 'bg-red-100 border-rose-500' :
                       'bg-white border-amber-300'
                     }`}>
-                    <span className="absolute top-0 left-1 text-[11px] font-black text-foreground/60">{tileNum}</span>
+                    <span className="absolute top-0 left-1 text-sm font-black text-foreground/60">{tileNum}</span>
                     {v && (
                       <>
-                        <v.Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 shrink-0" />
-                        <span className="w-full text-[7px] sm:text-[8px] leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
+                        <v.Icon className="w-9 h-9 sm:w-11 sm:h-11 shrink-0" />
+                        <span className="w-full text-[10px] sm:text-xs leading-tight text-green-900 bg-green-200/80 rounded px-0.5 py-0.5 text-center">
                           {v.day}
                         </span>
                       </>
                     )}
                     {w && (
                       <>
-                        <w.Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 shrink-0" />
-                        <span className="w-full text-[7px] sm:text-[8px] leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
+                        <w.Icon className="w-9 h-9 sm:w-11 sm:h-11 shrink-0" />
+                        <span className="w-full text-[10px] sm:text-xs leading-tight text-rose-900 bg-rose-200/80 rounded px-0.5 py-0.5 text-center">
                           {w.day}
                         </span>
                       </>
                     )}
-                    {isFinish && <span className="w-full text-[8px] leading-tight text-orange-900 text-center">Seed set!</span>}
+                    {isFinish && <span className="w-full text-[11px] sm:text-sm leading-tight text-orange-900 text-center">Seed set!</span>}
+
                     {isPawn && (
                       <div className="absolute inset-0 flex items-center justify-start pl-0.5">
                         <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg animate-bounce">

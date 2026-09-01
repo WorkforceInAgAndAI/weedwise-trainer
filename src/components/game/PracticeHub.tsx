@@ -15,14 +15,13 @@ import {
 
 import WeedOrCrop from './practice-games/k5/WeedOrCrop';
 import LeafArtist from './practice-games/k5/LeafArtist';
-import TaxonomyTower from './practice-games/k5/TaxonomyTower';
+import MonocotDicotRunner from './practice-games/middle/MonocotDicotRunner';
 import NameTheWeed from './practice-games/k5/NameTheWeed';
 import LifeStagesSequence from './practice-games/k5/LifeStagesSequence';
 import LifeCycleMatching from './practice-games/k5/LifeCycleMatching';
 import HabitatMapping from './practice-games/k5/HabitatMapping';
 import WeedSeedBanks from './practice-games/k5/WeedSeedBanks';
 import WeedTravel from './practice-games/k5/WeedTravel';
-import InvasiveMatch from './practice-games/k5/InvasiveMatch';
 import InvasiveID from './practice-games/k5/InvasiveID';
 import SafeVsToxic from './practice-games/k5/SafeVsToxic';
 import GreatGardenRace from './practice-games/k5/GreatGardenRace';
@@ -53,12 +52,12 @@ import InvasiveQuiz from './practice-games/middle/InvasiveQuiz';
 import MSSafeVsToxic from './practice-games/middle/SafeVsToxic';
 import LifeStageControl from './practice-games/middle/LifeStageControl';
 import MSLifeCycleMatching from './practice-games/middle/LifeCycleMatching';
-import WeedBank from './practice-games/middle/WeedBank';
 import MSWeedControl from './practice-games/middle/WeedControl';
 import ControlMethodMatching from './practice-games/middle/ControlMethodMatching';
 import HerbicideApplicator from './practice-games/middle/HerbicideApplicator';
 import LiguleLens from './practice-games/middle/LiguleLens';
 import FieldScoutChallenge from './practice-games/middle/FieldScoutChallenge';
+import SeedCannon from './practice-games/middle/SeedCannon';
 
 import HSNameTheWeed from './practice-games/high/NameTheWeed';
 import HSTaxonomyTower from './practice-games/high/TaxonomyTower';
@@ -70,16 +69,15 @@ import LifeCycleSort from './practice-games/high/LifeCycleSort';
 import SleepySeeds from './practice-games/high/SleepySeeds';
 import AllelopathyAttack from './practice-games/high/AllelopathyAttack';
 import FormYourFarm from './practice-games/high/FormYourFarm';
-import HSWeedControl from './practice-games/high/WeedControl';
 import HSControlMethodMatching from './practice-games/high/ControlMethodMatching';
 import CropDoctor from './practice-games/high/CropDoctor';
 import GrassID from './practice-games/high/GrassID';
-import FieldScoutDraw from './practice-games/high/FieldScoutDraw';
 
 import LifeStageMaze from './practice-games/high/LifeStageMaze';
 import PracticeStore from './PracticeStore';
 import HeroBuddy from './HeroCharacter';
 import type { StoreBand } from '@/lib/practiceStore';
+import { collegiateWeeds } from '@/data/gradeWeeds';
 import type { PoolGrade } from '@/data/gradeWeeds';
 
 interface GameDef {
@@ -146,20 +144,35 @@ const GAME_TO_TOPIC: Record<string, string> = {
   'hs-control-match': 'herbicide-moa', 'crop-doctor': 'crop-injury',
   'grass-id-lab': 'grass-id',
   'life-stage-maze': 'life-stage-control',
+  'college-look-alike': 'look-alikes',
 };
+
+/** 9-12 variants of the two shared scouting/herbicide games. */
+const CollegiateWeedControl = (p: { onBack: () => void }) =>
+  <MSWeedControl {...p} weedPool={collegiateWeeds} />;
+
+const CollegiateLookAlike = (p: { onBack: () => void; gameId?: string; gameName?: string; gradeLabel?: string }) =>
+  <MSLookAlike {...p} weedPool={collegiateWeeds} />;
+
+const HSFieldScoutChallenge = (p: { onBack: () => void }) => <FieldScoutChallenge {...p} variant="high" />;
+const HSHerbicideApplicator = (p: { onBack: () => void }) => <HerbicideApplicator {...p} variant="high" />;
 
 const k5Games: GameDef[] = [
  { id: 'field-scout', name: 'Weed Searcher', Icon: Footprints, category: 'Field Methods', description: 'Draw the path your scout walks and find the best representation of the weeds in your field — spend as little as you can.', howToPlay: 'You start with $1,000 and scout the same field three times in one season (soon after planting, vegetative, and reproductive). Drag on the aerial field to draw the walking path — longer paths cost more money. Cover the whole field (a W pattern works well) so weed patches do not blow up before your next trip. The money you keep at the end is your score.', component: FieldScoutChallenge },
  { id: 'native-lookalike', name: 'Native or Introduced?', Icon: Eye, category: 'Look-Alikes', description: 'Sort look-alike pairs into Native or Introduced.', howToPlay: 'Two similar plants are shown. Drag each to the Native or Introduced box.', component: NativeLookAlike },
  { id: 'ms-look-alike', name: 'Look-Alikes', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from commonly-confused look-alikes.', howToPlay: 'Three look-alike weeds appear. Choose the image that matches the target common + scientific name, then read how to tell them apart.', component: MSLookAlike },
  { id: 'ms-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field using the right techniques.', howToPlay: 'Click weeds in the field, identify them, then choose the right control method. Review your answers after each round.', component: MSWeedControl },
- { id: 'taxonomy-tower', name: 'Monocot or Dicot?', Icon: Layers, category: 'Taxonomy', description: 'Look at two weeds and identify which is a monocot and which is a dicot.', howToPlay: 'Two weeds are shown side by side. Identify which is the monocot and which is the dicot, then answer a follow-up question about monocot and dicot traits.', component: TaxonomyTower },
+ { id: 'taxonomy-tower', name: 'Monocot or Dicot Weeds', Icon: Layers, category: 'Taxonomy', description: 'Fly the scouting drone over the rows, pull the weeds, and sort them into the Monocot and Dicot bins.', howToPlay: 'The field scrolls past from above. Click and hold a weed to pull it, then drag it all the way into the Monocot bin (grasses: parallel veins, one seed leaf) or the Dicot bin (broadleaves: netted veins, two seed leaves) and release. Wrong bin drops it back in the field. Do not pull the crops.', component: MonocotDicotRunner },
  { id: 'life-cycle-match', name: 'Life Cycle Matching', Icon: RefreshCw, category: 'Life Cycles', description: 'Sort weeds into their correct life cycle category.', howToPlay: 'Drag each weed into the Annual, Biennial, or Perennial bin. Review any mistakes after each round.', component: LifeCycleMatching },
  { id: 'habitat-mapping', name: 'Habitat House Hunt', Icon: Map, category: 'Habitats', description: 'You ARE the weed — read your own characteristics and pick the house you could survive in.', howToPlay: 'Each round you become a weed. Look at your photo and read your first-person characteristics (roots, leaves, moisture tolerance), then knock on the door of the habitat house where you would live best. Some weeds fit more than one house.', component: HabitatMapping },
- { id: 'sense-detective', name: 'Weed Scout Report', Icon: Eye, category: 'Safety', description: 'A farmer radios in a mystery weed in their crop field. Ask simple questions, gather clues, and name the invader!', howToPlay: 'You have 3 questions. Ask about where the weed is, how many there are, what the leaves look like, or if it has flowers. Use the clues in your notebook to pick the right weed. Never touch a weed unless a trusted adult says it is safe.', component: SenseDetective },
+ { id: 'sense-detective', name: 'Weed Detective', Icon: Eye, category: 'Safety', description: 'A farmer radios in a mystery weed in their crop field. Ask simple questions, gather clues, and name the invader!', howToPlay: 'You have 3 questions. Ask about where the weed is, how many there are, what the leaves look like, or if it has flowers. Use the clues in your notebook to pick the right weed. Never touch a weed unless a trusted adult says it is safe.', component: SenseDetective },
  { id: 'name-the-weed', name: 'Name the Weed', Icon: Tag, category: 'Names', description: 'Identify weeds by their image and description.', howToPlay: 'Look at the weed image and read the clue. Choose the correct common name from four options.', component: NameTheWeed },
  { id: 'seed-journey', name: 'Seed Journey', Icon: Wind, category: 'Seed Dispersal', description: 'You are a seed! Choose the best way to travel — wind, water, or animal — in each scenario.', howToPlay: 'Read the scenario, then pick one of two travel choices. Match the best dispersal method (wind, water, or animal hitchhiker) to the place your seed is starting from.', component: SeedJourney },
  { id: 'squad-defense', name: 'Squad Defense', Icon: ShieldAlert, category: 'Control Methods', description: 'Lane-defense action! Team up with the Weed Control Squad to stop marching weed villains before they crush the crops.', howToPlay: 'Weed villains march down 3 lanes toward your crops. Each weed shows a badge for the ONE superpower it fears. Tap a hero card (Pull, Block, Outsmart, Graze, or Stop), then tap the weed — matching hero = instant KO! Wrong hero still chips a little HP but wastes energy. Energy refills over time. Save the crops before HP hits zero!', component: SquadDefense },
+ { id: 'ms-safe-toxic', name: 'Safe or Dangerous?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are dangerous to handle?', howToPlay: 'A group of weeds appears — identify which one is dangerous (toxic sap, spines, or poisonous parts), learn why, then decide how to safely manage it.', component: MSSafeVsToxic },
+ { id: 'life-stage-control', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify the growth stage, the weed, and choose the best management.', howToPlay: 'A weed appears at a specific life stage. First identify the stage, then the weed, then pick the best control method.', component: LifeStageControl },
+ { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
+
 ];
 
 // True K-5 ("Explorer") games — this list is what the "Grades K-5" tab shows.
@@ -191,21 +204,22 @@ const middleGames: GameDef[] = [
  { id: 'ms-habitat', name: 'Habitat House Call', Icon: Map, category: 'Habitats', description: 'Play as the weed — use your own adaptations to choose the habitat you would survive in.', howToPlay: 'You become a weed each round. Study the vegetative photo and your first-person adaptations, then choose the habitat house that matches. Some species can live in more than one.', component: MSHabitatMapping },
  { id: 'weed-competitors', name: 'Weed Competitors', Icon: Swords, category: 'Competition', description: 'Compete as a weed for resources against rivals.', howToPlay: 'Read the competitor intel, then make strategic decisions about leaves, roots, and reproduction to out-compete your opponent.', component: WeedCompetitors },
  { id: 'invasive-quiz', name: 'Introduced Travelers', Icon: ClipboardList, category: 'Introduced Weeds', description: 'Discover how introduced weeds traveled to North America.', howToPlay: 'An introduced weed is shown. Learn its arrival story and identify how it was introduced.', component: InvasiveQuiz },
- { id: 'ms-safe-toxic', name: 'Safe or Dangerous?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are dangerous to handle?', howToPlay: 'A group of weeds appears — identify which one is dangerous (toxic sap, spines, or poisonous parts), learn why, then decide how to safely manage it.', component: MSSafeVsToxic },
- { id: 'life-stage-control', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify the growth stage, the weed, and choose the best management.', howToPlay: 'A weed appears at a specific life stage. First identify the stage, then the weed, then pick the best control method.', component: LifeStageControl },
  { id: 'ms-lifecycle', name: 'Life Cycle Sort', Icon: RefreshCw, category: 'Life Cycles', description: 'Sort weeds into Annual, Biennial, or Perennial categories.', howToPlay: 'Sort weed images into the correct life cycle column. Review any mistakes after each round.', component: MSLifeCycleMatching },
  { id: 'control-matching', name: 'Control Method Matching', Icon: FlaskConical, category: 'Chemical Control', description: 'Match herbicide groups to the weeds they target.', howToPlay: 'Identify grass vs broadleaf, then pick the correct herbicide group.', component: ControlMethodMatching },
- { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Choose the right herbicide and rate for each weed.', howToPlay: 'Select a weed in the corn field, then use the sidebar to choose the herbicide type and application rate. Watch for resistance buildup!', component: HerbicideApplicator },
+ { id: 'herbicide-applicator', name: 'Herbicide Applicator', Icon: Droplets, category: 'Herbicide Resistance', description: 'Run three seasons of herbicide and integrated control decisions.', howToPlay: 'You have 10 seconds to select the weeds you see in the field. Then choose a herbicide group to apply, and decide whether to move on or add a second control method. Repeat for three seasons — the fewer weeds left at the end, the better your score. Reusing the same group every year builds resistance.', component: HSHerbicideApplicator },
  { id: 'grass-id-lab', name: 'Grass ID Lab', Icon: Microscope, category: 'Grass ID', description: 'Identify grasses from ligule, collar, blade, and seed head characters.', howToPlay: 'Study the zoomable ligule and seed head images, unlock written characters only if you need them (each costs a point), then name the species.', component: GrassID },
  { id: 'ms-sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
- { id: 'ms-pasture-walk', name: 'Field Scout Challenge', Icon: Footprints, category: 'Field Methods', description: 'Draw the path your agronomist walks — find the best representation of the weeds in your field, as cheaply as possible.', howToPlay: 'You start with $1,000 and scout the same field three times in one season (soon after planting, vegetative, and reproductive). Drag on the aerial field to draw your walking path — the longer the path, the more it costs. A pattern that crosses the whole field (like a W) finds patches early; skipping big blocks lets weeds explode before your next trip. Money left after scouting costs and end-of-season yield loss is your score.', component: FieldScoutChallenge },
- { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Search, category: 'Seed Banks', description: 'Sort seeds and predict how many are hiding in the field.', howToPlay: 'Sort seed images into columns by species, then predict the count for each type. Click a seed for a hint!', component: WeedSeedBanks },
+ { id: 'hs-field-scout-tools', name: 'Field Scout Tools', Icon: Scan, category: 'Scouting Tools', description: 'Choose the right scouting tool for each field.', howToPlay: 'Evaluate field conditions and select from drones, rovers, manual scouting, or satellite imagery.', component: FieldScoutTools },
+ { id: 'ms-pasture-walk', name: 'Scout the Weeds', Icon: Footprints, category: 'Field Methods', description: 'Manual scouting: walk the field yourself on a $25,000 budget and find the best representation of the weeds.', howToPlay: 'This is MANUAL scouting — you physically walk the field, no drones or satellites. You start with a $25,000 scouting budget and walk the same field three times in one season (soon after planting, vegetative, and reproductive). Drag on the aerial field to draw your walking path — the longer the path, the more it costs. Good coverage each season earns a point; poor coverage that misses weeds or excessive coverage that wastes money loses it. Your final score is out of 3.', component: HSFieldScoutChallenge },
+ { id: 'seed-banks', name: 'Weed Seed Banks', Icon: Target, category: 'Seed Banks', description: 'Arcade seed defense: blast the falling weed seeds before they hit the soil, then match the seeds you saw to their species.', howToPlay: 'For 20 seconds weed seeds rain down in proportion to how many seeds each species really produces — far more than you can stop. Click and drag the cannon along the bottom to aim and press the SPACE BAR to fire. Afterwards, drag each seed photo to its common name in the word bank; wrong matches bounce out until every seed is correctly named.', component: SeedCannon },
+ { id: 'ms-safe-toxic', name: 'Safe or Dangerous?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are dangerous to handle?', howToPlay: 'A group of weeds appears — identify which one is dangerous (toxic sap, spines, or poisonous parts), learn why, then decide how to safely manage it.', component: MSSafeVsToxic },
  { id: 'weed-lineup', name: 'Weed Line-Up', Icon: Scan, category: 'Look-Alikes', description: 'Police line-up! Study the suspect sketch, read the eyewitness clue, and pick the bad weed hiding among its innocent look-alikes.', howToPlay: 'Read the Case File to see what the bad weed is wanted for. Look at the black-and-white Suspect Sketch, then compare it with the three mugshots in the Line-Up. Pick the suspect that matches the clue to make the arrest!', component: WeedLineUp },
+
 ];
 
 const highGames: GameDef[] = [
  { id: 'hs-name-weed', name: 'Name the Weed', Icon: GraduationCap, category: 'Scientific Names', description: 'Identify weeds by their scientific name.', howToPlay: 'Look at the image and traits, then choose the correct scientific name.', component: HSNameTheWeed },
- { id: 'weed-bank', name: 'Weed Bank', Icon: Landmark, category: 'Seed Banks', description: 'Manage the weed seed bank under the field like a bank account over 5 seasons.', howToPlay: 'Read each year\u2019s Farm Conditions card, spend your Farm Dollars on management, then watch the bank statement. Germination and seed death are withdrawals; weeds that set seed are deposits. Shrink the balance over 5 seasons.', component: WeedBank },
+ { id: 'weed-bank', name: 'Weed Seed Banks', Icon: Landmark, category: 'Seed Banks', description: 'Match every seed to its species, then predict how many seeds are hiding in the soil.', howToPlay: 'Drag each common name from the word bank onto the seed photo you think it belongs to. Your answers are reviewed at the end. Then predict the seeds each species drops per plant.', component: WeedSeedBanks },
  { id: 'hs-taxonomy', name: 'Taxonomy Tower', Icon: Layers, category: 'Taxonomy', description: 'Navigate genus and species using a dichotomous key.', howToPlay: 'Climb the tower from Kingdom to Species.', component: HSTaxonomyTower },
  { id: 'spot-differences', name: 'Flower Reproductive Jobs', Icon: Search, category: 'Intra-species', description: 'Dioecious and monoecious weeds: match the clue to the male or female flowers.', howToPlay: 'Pick a section, read the trait clue, then tap the male or female image it describes.', component: SpotTheDifferences },
  { id: 'hs-habitat', name: 'Habitat Selection Lab', Icon: Map, category: 'Habitats', description: 'Seedling-stage specimens: infer habitat from condensed adaptation notes.', howToPlay: 'A seedling photo and two short adaptation notes are given. Select the habitat the species is best adapted to. Some species occupy more than one habitat.', component: HSHabitatMapping },
@@ -214,14 +228,14 @@ const highGames: GameDef[] = [
  { id: 'hs-lifecycle', name: 'Life Cycle Sort', Icon: ArrowUpDown, category: 'Life Cycles', description: 'Sort winter annuals, summer annuals, and more.', howToPlay: 'Classify weeds into winter annual, summer annual, perennial, or biennial. Review any mistakes after each round.', component: LifeCycleSort },
  { id: 'sleepy-seeds', name: 'Sleepy Seeds', Icon: Moon, category: 'Seed Dormancy', description: 'Identify seeds and choose the right dormancy strategy to survive.', howToPlay: 'First identify the seed, then face an environmental challenge and pick the best dormancy mechanism to survive.', component: SleepySeeds },
  { id: 'allelopathy', name: 'Allelopathy Attack', Icon: Swords, category: 'Allelopathy', description: 'Pick your weed and use chemical warfare to suppress competitors.', howToPlay: 'Choose a weed to play as, learn its characteristics, then select the best allelopathy strategy for each enemy encounter.', component: AllelopathyAttack },
- { id: 'hs-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field as an agronomist.', howToPlay: 'Click weeds in the field, identify them, choose the right control method. Review your answers after each round.', component: HSWeedControl },
+ { id: 'hs-weed-control', name: 'Weed Control', Icon: Wrench, category: 'Control Methods', description: 'Manage weeds in the field as an agronomist.', howToPlay: 'Click weeds in the field, identify them, choose the right control method. Review your answers after each round.', component: CollegiateWeedControl },
  { id: 'hs-control-match', name: 'Mode of Action Match', Icon: FlaskRound, category: 'Modes of Action', description: 'Match herbicides to their modes and sites of action.', howToPlay: 'For each weed, select the correct herbicide mode of action. Review your answers at the end of each round.', component: HSControlMethodMatching },
  { id: 'crop-doctor', name: 'Crop Doctor', Icon: Stethoscope, category: 'Injury Symptoms', description: 'Diagnose herbicide injury symptoms on crops.', howToPlay: 'Read the crop symptom description and identify the herbicide group that caused it. Review your diagnoses at the end.', component: CropDoctor },
  
  { id: 'ligule-lens', name: 'Ligule Lens', Icon: ZoomIn, category: 'Grass ID', description: 'Zoom in on ligules to identify grass species.', howToPlay: 'Study the zoomed-in ligule image and pick the correct grass species.', component: LiguleLens },
+ { id: 'college-look-alike', name: 'Look-Alikes', Icon: Eye, category: 'Look-Alikes', description: 'Pick the correct species from commonly-confused look-alikes across the full species list.', howToPlay: 'Three look-alike weeds appear. Drag the magnifying glass over each specimen to read trait-only field notes, then select the species that matches the target name.', component: CollegiateLookAlike },
+ { id: 'college-safe-toxic', name: 'Safe or Dangerous?', Icon: ShieldAlert, category: 'Safety', description: 'Can you tell which weeds are dangerous to handle?', howToPlay: 'A group of weeds appears — identify which one is dangerous (toxic sap, spines, or poisonous parts), learn why, then decide how to safely manage it.', component: MSSafeVsToxic },
  { id: 'life-stage-maze', name: 'Life Stage Control', Icon: Target, category: 'Life Stages', description: 'Identify weed life stages and choose the best control method.', howToPlay: 'First identify the life stage shown, then name the weed, then choose the best control method for that stage.', component: LifeStageMaze },
- { id: 'hs-field-scout-draw', name: 'Field Scout — Draw Your Transect', Icon: Footprints, category: 'Scouting Tools', description: 'Draw your own scouting path with limited walking distance and herbicide.', howToPlay: 'Drag on the aerial field to draw a transect. You have a limited path length and 8 spot-spray charges. Score combines coverage (weeds found) and diversity (unique species) — a straight line loses to a smart zigzag.', component: FieldScoutDraw },
- { id: 'invasive-match', name: 'Introduced Match', Icon: AlertTriangle, category: 'Introduced Weeds', description: 'Match introduced weeds to the damage they cause.', howToPlay: 'Connect each introduced weed with the negative effect it has on the environment.', component: InvasiveMatch },
 ];
 
 type Screen = 'grades' | 'games' | 'info' | 'playing' | 'store';

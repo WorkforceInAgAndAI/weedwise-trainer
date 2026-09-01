@@ -14,7 +14,7 @@ import WeedImage from "./WeedImage";
 import WeedDetailPopup from "./WeedDetailPopup";
 import HomeButton from "./HomeButton";
 import { FAMILY_DESCRIPTIONS, HABITAT_DESCRIPTIONS, LIFECYCLE_DESCRIPTIONS } from "@/data/familyDescriptions";
-import { lookAlikeStage, lookAlikeGroupsForPool, officialPartners } from "@/data/lookAlikeGroups";
+import { lookAlikeGroupsForPool, lookAlikePartners } from "@/data/lookAlikeGroups";
 import { TRAIT_DEFS, COMPETITION_TRAITS, type CompetitionTrait } from "@/data/competitionTraits";
 import {
   ArrowLeft,
@@ -40,8 +40,29 @@ import {
   Award,
   Search,
 } from "lucide-react";
-import { hasImage, resolveCropImageUrl, resolveInjuryImage } from "@/lib/imageMap";
+import { hasImage, resolveCropImageUrl, resolveInjuryImage, resolveControlMethodImage } from "@/lib/imageMap";
+
+/** Photo for each control-method card key (see src/assets/ControlMethods). */
+const CONTROL_METHOD_IMAGE_KEY: Record<string, string> = {
+  "hand-weeding": "handmethods",
+  "cover-crops": "covercrops",
+  "mulch-cover": "covercrops",
+  tillage: "tillage",
+  chemical: "chemicalmethods",
+  cultural: "culturalcontrol",
+  mechanical: "mechanicalcontrol",
+  biological: "biologicalcontrol",
+  integrated: "integratedapproach",
+  "pre-emergent": "chemicalmethods",
+  "post-emergent": "chemicalcontrol",
+  "multi-moa": "chemicalcontrol",
+  wait: "integratedapproach",
+};
+
+export const controlMethodPhoto = (key: string): string | null =>
+  CONTROL_METHOD_IMAGE_KEY[key] ? resolveControlMethodImage(CONTROL_METHOD_IMAGE_KEY[key]) : null;
 import { HERBICIDE_MOA, SYMPTOM_TYPES } from "@/data/herbicides";
+import { getSeedFact } from "@/data/seedFacts";
 import HerbicideMOAExplorer from "@/components/game/learning/HerbicideMOAExplorer";
 import {
   DetectiveCard,
@@ -55,6 +76,8 @@ import {
   TermSidebar,
   LabCallout,
   Citation,
+  ModuleThemeProvider,
+  ThemedModuleFrame,
 } from "./learning/ThemedBlocks";
 import BotanyTermsModule from "./learning/BotanyTermsModule";
 import TaxonomyExplorer from "./learning/TaxonomyExplorer";
@@ -373,6 +396,16 @@ function getElementarySeedDescription(w: Weed): string {
   if (name.includes("clover")) return "Tiny round seeds with a hard shell.";
   // Fallback
   return `Small ${w.plantType === "Monocot" ? "grass" : "broadleaf"} seed that helps new ${w.commonName} plants grow.`;
+}
+
+// Seed panel descriptions: always prefer the curated seedFacts.ts description;
+// only fall back to the friendly generic text when no curated entry exists.
+function getSeedPanelDescription(w: Weed): string {
+  const fact = getSeedFact(w.commonName, w.family, w.plantType);
+  if (fact.seedDescription && !fact.seedDescription.startsWith("No detailed")) {
+    return fact.seedDescription;
+  }
+  return getElementarySeedDescription(w);
 }
 
 // Simple cross-section diagram showing seeds at different soil depths.
@@ -941,7 +974,7 @@ function getTopicWeeds(topicId: TopicId, sourceGrade: PoolGrade = "high"): Weed[
   const base = weedsForPool(sourceGrade);
   switch (topicId) {
     case "look-alikes":
-      return byCommonName(base.filter((w) => officialPartners(w.id, new Set(base.map((x) => x.id))).length > 0));
+      return byCommonName(base.filter((w) => lookAlikePartners(w.id, new Set(base.map((x) => x.id))).length > 0));
     case "safety":
       return byCommonName(base.filter((w) => w.safetyNote));
     default:
@@ -1215,7 +1248,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
           .map((id) => weeds.find((w) => w.id === id))
           .filter((w): w is Weed => Boolean(w));
         if (members.length < 2) return null;
-        const groupStage = lookAlikeStage(members.map((w) => w.id));
+        const groupStage = lookAlikeGroupsForPool(members)[0]?.stage ?? "flower";
         return (
           <div key={g.title} className="bg-card border border-border rounded-lg p-4 space-y-3">
             <p className="font-display font-bold text-foreground text-base">
@@ -1234,7 +1267,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
                   >
                     <WeedImage weedId={w.id} stage={groupStage} className="w-full h-full" />
                   </button>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
+                  <div className="text-xs mt-1.5 block font-semibold text-foreground">{w.commonName}</div>
                 </div>
               ))}
             </div>
@@ -1785,15 +1818,39 @@ export default function LearningModule({ onClose, onOpenPractice, initialTopicId
                 </h2>
                 <PracticeButton topicId={selectedTopic} displayGrade={selectedGrade} onOpenPractice={onOpenPractice} />
               </div>
-              <TopicContent
-                topicId={selectedTopic}
-                grade={sourceGrade}
-                displayGrade={selectedGrade}
-                topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
-                onSelectWeed={setSelectedWeed}
-                viewMode={viewMode}
-                onOpenPractice={onOpenPractice}
-              />
+              <ModuleThemeProvider grade={selectedGrade}>
+                {(() => {
+                  const topicName =
+                    availableTopics.find((t) => t.id === selectedTopic)?.name ??
+                    TOPICS.find((t) => t.id === selectedTopic)?.name ??
+                    "";
+                  const sectionGroup = topicsByCategory.find((g) =>
+                    g.topics.some((t) => t.id === selectedTopic),
+                  );
+                  const sectionName = sectionGroup?.category?.label;
+
+                  const content = (
+                    <TopicContent
+                      topicId={selectedTopic}
+                      grade={sourceGrade}
+                      displayGrade={selectedGrade}
+                      topicWeeds={getTopicWeeds(selectedTopic, curriculumGrade)}
+                      onSelectWeed={setSelectedWeed}
+                      viewMode={viewMode}
+                      onOpenPractice={onOpenPractice}
+                    />
+                  );
+                  // K-5 keeps its friendly explorer look; 6-8 / 9-12 / collegiate
+                  // get the case-file, journal, and lab-notebook chrome.
+                  if (selectedGrade === "elementary") return content;
+                  return (
+                    <ThemedModuleFrame title={topicName} section={sectionName}>
+                      {content}
+                    </ThemedModuleFrame>
+                  );
+                })()}
+              </ModuleThemeProvider>
+
               {(() => {
                 // Match the display order (grouped by category) so Previous/Next
                 // walks the modules in the same order the user sees them.
@@ -2632,8 +2689,8 @@ function TopicContent({
                       <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
                         <WeedImage weedId={w.id} stage="seed" className="w-full h-full object-cover" />
                       </div>
-                      <p className="font-display font-bold text-sm text-foreground text-center">{w.commonName} seed</p>
-                      <p className="text-xs text-muted-foreground text-center">{getElementarySeedDescription(w)}</p>
+                      <p className="font-display font-bold text-sm text-foreground text-center">{w.commonName}</p>
+                      <p className="text-xs text-muted-foreground text-center">{getSeedPanelDescription(w)}</p>
                     </div>
                   ))}
                 </div>
@@ -2653,7 +2710,7 @@ function TopicContent({
                 weeds={topicWeeds}
                 onSelectWeed={onSelectWeed}
                 mode={displayGrade === "collegiate" ? "flip" : "list"}
-                seedDescription={getElementarySeedDescription}
+                seedDescription={getSeedPanelDescription}
               />
             </div>
           )}
@@ -3765,7 +3822,7 @@ function TopicContent({
         );
       }
 
-      if (grade === "elementary") {
+      if (displayGrade === "elementary") {
         const elemHabitats = [
           {
             key: "Warm-Season / Full Sun",
@@ -3849,36 +3906,7 @@ function TopicContent({
         );
       }
 
-      if (grade === "middle") {
-        return (
-          <div className="space-y-5">
-            <JournalHeader title="Environment Profiles" subtitle="Where Weeds Choose to Grow" />
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-2">
-              <p>
-                Have you ever noticed that some weeds always seem to pop up in the same kinds of places? That's not an
-                accident! Just like animals need the right habitat to survive, plants—including weeds—need the right
-                soil conditions to grow well. Things like how wet or dry the soil is, how packed down it is, and how many
-                nutrients it has can all affect which plants can grow there.
-              </p>
-              <p>
-                For example, some weeds are tough survivors that love growing in soil that's been squished down by people
-                walking on it a lot, like along the edge of a sidewalk or a well-used path. Other weeds prefer soil
-                that's rich in nutrients, so you might spot them growing near a garden or farm field where fertilizer has
-                been used. There are even weeds that like really wet, soggy soil, so you'll often find them near ponds or
-                in low spots where water collects after it rains.
-              </p>
-              <p>
-                So the next time you're outside, take a look at the weeds growing around you—they can actually give you
-                clues about what the soil is like in that spot, kind of like nature's own detective work!
-              </p>
-            </div>
-
-            <HabitatExplorer weeds={topicWeeds} onSelectWeed={onSelectWeed} stage="flower" />
-          </div>
-        );
-      }
-
-      // 9-12 and collegiate - site-based habitats with adaptation context
+      // middle, 9-12, and collegiate - site-based habitats with adaptation context
       {
         return (
           <div className="space-y-5">
@@ -6070,9 +6098,7 @@ function TopicContent({
     case "look-alikes": {
       // Displayed grade drives every look-alike decision in this topic.
       const dg = (displayGrade ?? "middle") as "elementary" | "middle" | "high" | "collegiate";
-      // Every look-alike shown here must be inside the DISPLAYED grade's weed
-      // pool (6-8 = 37 species, 9-12 = 58, Collegiate = 87). The internal
-      // `grade` prop is the legacy source grade and is one level lower.
+      // Every look-alike shown here must be inside the DISPLAYED grade's weed pool.
       const gradePool =
         dg === "collegiate"
           ? collegiateWeedsAll
@@ -6081,219 +6107,48 @@ function TopicContent({
             : dg === "middle"
               ? middleSchoolWeeds
               : elementaryWeeds;
-      const gradePoolIds = new Set(gradePool.map((w) => w.id));
-      const seen = new Set<string>();
-      const pairs: [Weed, Weed][] = [];
-      gradePool.forEach((w) => {
-        if (seen.has(w.id)) return;
-        const partnerId = officialPartners(w.id, gradePoolIds).find((id) => !seen.has(id));
-        const pairedWith = partnerId ? gradePool.find((x) => x.id === partnerId) : undefined;
-        if (pairedWith) {
-          seen.add(w.id);
-          seen.add(pairedWith.id);
-          pairs.push([w, pairedWith]);
-        }
-      });
 
-      // Build introduced vs native look-alike pairs for 6-8 and 9-12
-      const invasiveNativePairs: [Weed, Weed][] = [];
-      if (dg !== "elementary") {
-        const invasiveWeeds = gradePool.filter((w) => w.origin === "Introduced");
-        const nativeWeeds = gradePool.filter((w) => w.origin === "Native");
-        const invNatSeen = new Set<string>();
-        invasiveWeeds.forEach((inv) => {
-          const partners = officialPartners(inv.id, gradePoolIds);
-          const nativeLookAlike = nativeWeeds.find(
-            (nat) => partners.includes(nat.id) && !invNatSeen.has(nat.id) && !invNatSeen.has(inv.id),
-          );
-          if (nativeLookAlike) {
-            invNatSeen.add(inv.id);
-            invNatSeen.add(nativeLookAlike.id);
-            invasiveNativePairs.push([inv, nativeLookAlike]);
-          }
-        });
-      }
+      // Groups come straight from the look-alike group names in the data,
+      // restricted to this grade's species pool.
+      const groups = lookAlikeGroupsForPool(gradePool as Weed[]).sort((a, b) => a.name.localeCompare(b.name));
 
-      const stages = [
+      const stages: { stage: string; label: string }[] = [
         { stage: "seedling", label: "Seedling" },
         { stage: "vegetative", label: "Vegetative" },
         { stage: "flower", label: "Reproductive" },
       ];
-      const elementaryStages = [{ stage: "whole", label: "Whole Plant" }];
 
-      // Official look-alike groups, restricted to this grade's weed pool.
-      const lookAlikeGroups: { name: string; weeds: Weed[]; difference: string }[] = lookAlikeGroupsForPool(
-        gradePool,
-      ).map((g) => ({
-        name: g.name,
-        weeds: g.weeds as Weed[],
-        difference: g.difference,
-      }));
-
-      // Species in this grade pool that have no look-alike on the official list yet.
-      const groupedIds = new Set(lookAlikeGroups.flatMap((g) => g.weeds.map((w) => w.id)));
-      const noLookAlikeWeeds = gradePool.filter(
-        (w) => !groupedIds.has(w.id) && officialPartners(w.id, gradePoolIds).length === 0,
+      const speciesCard = (w: Weed) => (
+        <div
+          key={w.id}
+          className="shrink-0 w-[260px] sm:w-[300px] snap-start bg-card border border-border rounded-xl overflow-hidden"
+        >
+          <div className="px-3 py-2 border-b border-border bg-secondary/40">
+            <div className="text-sm font-bold text-foreground">{w.commonName}</div>
+            <div className="text-[11px] text-primary italic leading-tight">{w.scientificName}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] text-muted-foreground">{w.family}</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
+              >
+                {w.origin}
+              </span>
+            </div>
+          </div>
+          <div className="p-3 grid grid-cols-3 gap-2">
+            {stages.map((s) => (
+              <div key={s.stage}>
+                <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                  <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
+                </div>
+                <div className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground text-center mt-1">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       );
-
-      const renderPairCard = (a: Weed, b: Weed, key: string) => {
-        const aIsGrass = a.plantType === "Monocot" && a.family === "Poaceae";
-        const bIsGrass = b.plantType === "Monocot" && b.family === "Poaceae";
-        const showLigule = aIsGrass || bIsGrass;
-        return (
-          <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
-            {/* Header */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <ClickableWeedName weed={a} onSelect={onSelectWeed} className="text-sm font-bold" />
-                {dg !== "elementary" && <div className="text-xs text-primary italic">{a.scientificName}</div>}
-                <div className="text-[10px] text-muted-foreground">{a.family}</div>
-                <span
-                  className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${a.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                >
-                  {a.origin === "Introduced" ? "Introduced" : "Native"}
-                </span>
-              </div>
-              <div className="text-center">
-                <ClickableWeedName weed={b} onSelect={onSelectWeed} className="text-sm font-bold" />
-                {dg !== "elementary" && <div className="text-xs text-primary italic">{b.scientificName}</div>}
-                <div className="text-[10px] text-muted-foreground">{b.family}</div>
-                <span
-                  className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${b.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                >
-                  {b.origin === "Introduced" ? "Introduced" : "Native"}
-                </span>
-              </div>
-            </div>
-
-            {/* All growth stages side by side */}
-            {(dg === "elementary" ? elementaryStages : stages).map((s) => (
-              <div key={s.stage}>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    <WeedImage weedId={a.id} stage={s.stage} className="w-full h-full" />
-                  </div>
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    <WeedImage weedId={b.id} stage={s.stage} className="w-full h-full" />
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Ligule comparison for grasses */}
-            {showLigule && dg !== "elementary" && (
-              <div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">Ligule</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    {aIsGrass ? (
-                      <WeedImage weedId={a.id} stage="ligule" className="w-full h-full" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
-                        Not a grass
-                      </div>
-                    )}
-                  </div>
-                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                    {bIsGrass ? (
-                      <WeedImage weedId={b.id} stage="ligule" className="w-full h-full" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
-                        Not a grass
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Difference explanation */}
-            <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
-              <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
-              <p>{a.lookAlike.difference}</p>
-            </div>
-          </div>
-        );
-      };
-
-      // 3-species comparison card: shows seedling / vegetative / reproductive (+ ligule
-      // when any member is a grass) side-by-side for all three species.
-      const renderTripleCard = (group: Weed[], key: string, customDifference?: string, groupName?: string) => {
-        const compareStages = [
-          { stage: "seedling", label: "Seedling" },
-          { stage: "vegetative", label: "Vegetative" },
-          { stage: "flower", label: "Reproductive" },
-        ];
-        const anyGrass = group.some((w) => w.plantType === "Monocot" && w.family === "Poaceae");
-        const colsClass = group.length === 2 ? "grid-cols-2" : "grid-cols-3";
-
-        return (
-          <div key={key} className="bg-card border border-border rounded-lg p-4 space-y-4">
-            {groupName && (
-              <div className="flex items-center gap-2 border-b border-border pb-2">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                <h4 className="font-display font-bold text-foreground text-sm">{groupName}</h4>
-              </div>
-            )}
-            {/* Header row */}
-            <div className={`grid ${colsClass} gap-3`}>
-              {group.map((w) => (
-                <div key={w.id} className="text-center">
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
-                  <div className="text-[11px] text-primary italic leading-tight">{w.scientificName}</div>
-                  <div className="text-[10px] text-muted-foreground">{w.family}</div>
-                  <span
-                    className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${w.origin === "Introduced" ? "bg-destructive/15 text-destructive" : "bg-accent/15 text-accent"}`}
-                  >
-                    {w.origin === "Introduced" ? "Introduced" : "Native"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Stage-by-stage comparison */}
-            {compareStages.map((s) => (
-              <div key={s.stage}>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">{s.label}</div>
-                <div className={`grid ${colsClass} gap-2`}>
-                  {group.map((w) => (
-                    <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      <WeedImage weedId={w.id} stage={s.stage} className="w-full h-full" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* Ligule row (only if at least one species is a grass) */}
-            {anyGrass && (
-              <div>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase mb-1 text-center">Ligule</div>
-                <div className={`grid ${colsClass} gap-2`}>
-                  {group.map((w) => (
-                    <div key={w.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      {w.plantType === "Monocot" && w.family === "Poaceae" ? (
-                        <WeedImage weedId={w.id} stage="ligule" className="w-full h-full" />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-[10px] text-muted-foreground text-center px-1">
-                          Not a grass (no ligule)
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {customDifference && (
-              <div className="bg-muted/30 rounded p-3 text-xs text-foreground">
-                <p className="font-semibold text-primary mb-1">How to tell them apart:</p>
-                <p>{customDifference}</p>
-              </div>
-            )}
-          </div>
-        );
-      };
 
       if (dg === "elementary") {
         return (
@@ -6301,8 +6156,7 @@ function TopicContent({
             <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
               <p className="text-sm">
                 Some weeds look very similar to other weeds. It is important to tell them apart so we can manage them
-                the right way. The groups below have <strong>two, three, or even four</strong> weeds that all look alike
-                — see if you can spot what makes each one different!
+                the right way.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <EvidenceTag label="Suspects: 2–4" tone="suspect" />
@@ -6315,170 +6169,110 @@ function TopicContent({
         );
       }
 
+      const intro =
+        dg === "middle" ? (
+          <DetectiveCard title="Case File: Copycat Weeds" badge="Case 03 · Look-Alikes">
+            <div className="text-sm space-y-3">
+              <p>
+                Many weeds are nature's copycats — similar leaf shapes, similar seeds, growing in the same places. But
+                they don't all behave the same way. Some pull out easily, some come back from deep roots, and some, like{" "}
+                <strong>poison hemlock</strong>, are dangerous to touch.
+              </p>
+              <p>
+                Each suspect line-up below holds species that share a look-alike group. Compare them at the{" "}
+                <strong>seedling, vegetative, and reproductive</strong> stages before you name your suspect.
+              </p>
+            </div>
+            <CaseCallout heading="Investigator tip">
+              One photo is never enough evidence. Check leaf shape, stem hairs, and the flower or seedhead before you
+              call the ID.
+            </CaseCallout>
+          </DetectiveCard>
+        ) : dg === "high" ? (
+          <NotebookSection title="Look-Alike Species" subtitle="Entry 03 · On Assignment">
+            <div className="text-sm space-y-3">
+              <p>
+                Reporting on a field means naming the right suspect. Two species that look nearly identical as seedlings
+                can demand completely different management. Waterhemp and Palmer Amaranth are the textbook case — both
+                are pigweeds, both resist multiple herbicide groups, but Palmer is far more aggressive.
+              </p>
+              <p>
+                Each entry below collects the species that share a look-alike group in your grade's species list. Scroll
+                each group sideways and compare the same three growth stages across every species.
+              </p>
+            </div>
+            <FieldNote label="Notes from the field">
+              Record which single character settled the ID — leaf venation, stem trichomes, ligule shape, milky sap.
+              That note is the story.
+            </FieldNote>
+          </NotebookSection>
+        ) : (
+          <>
+            <JournalHeader title="Comparative Morphology of Confused Species" subtitle="Lab Notebook · Module 03" />
+            <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
+              <p>
+                Reliable identification means moving past general impressions and using{" "}
+                <strong>diagnostic morphological characters</strong>: leaf venation and pubescence, stem cross-section
+                and trichomes, inflorescence architecture, ligule and auricle shape in grasses, and the presence or
+                absence of milky latex, square stems, or sheathing ocreae.
+              </p>
+              <p>
+                Many of these characters are only diagnostic at a specific growth stage, so each species below is
+                presented at the seedling, vegetative, and reproductive stages, grouped with the species it is most
+                often confused with.
+              </p>
+            </div>
+            <TermSidebar
+              terms={[
+                { term: "Pubescence", def: "Presence, type, and density of hairs (trichomes) on stems and leaves." },
+                { term: "Ocrea", def: "Sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds." },
+                {
+                  term: "Ligule / Auricle",
+                  def: "Grass features at the blade/sheath junction; often the most reliable grass ID character.",
+                },
+                { term: "Inflorescence", def: "Arrangement of flowers on the stem (spike, panicle, umbel, raceme)." },
+                { term: "Dioecious", def: "Male and female flowers on separate plants — key in Amaranthus." },
+              ]}
+            />
+            <LabCallout heading="Diagnostic Protocol">
+              Compare specimens at <strong>at least two life stages</strong>, verify with a genus-level key before
+              naming to species, and record which character was decisive.
+            </LabCallout>
+          </>
+        );
+
       return (
-        <div className="space-y-4">
-          {dg === "middle" ? (
-            <NotebookSection title="Look-Alike Species" subtitle="Entry 03 · Comparative ID">
-              <div className="text-sm space-y-3">
-                <p>
-                  Have you ever looked out at a field or a lawn and thought all the weeds looked pretty much the same?
-                  You're not alone — even farmers and scientists sometimes have to look twice. Many common weeds are
-                  like nature's copycats. They have similar leaf shapes, the same spiky seeds, or grow in the exact same
-                  spots, making them really easy to mix up.
-                </p>
-                <p>
-                  But here's why it matters: not all weeds play by the same rules. Some can be pulled out easily, while
-                  others have deep roots that grow back no matter how many times you remove them. Some weeds are just
-                  annoying, while others — like <strong>poison hemlock</strong> — are actually dangerous to touch or
-                  eat. And when farmers need to use herbicides (special sprays that kill unwanted plants), picking the
-                  wrong one because they misidentified the weed is like taking cold medicine when you actually have a
-                  broken arm. It just won't work, and you've wasted time and money.
-                </p>
-                <p>
-                  Getting the ID right is the first step to dealing with a weed the smart way — whether that's pulling
-                  it, spraying it, or knowing to stay away from it entirely. The good news is that once you know what
-                  clues to look for, like{" "}
-                  <strong>
-                    leaf shape, stem texture, flower color, or whether the plant has milky sap when you break it
-                  </strong>{" "}
-                  — telling these lookalikes apart becomes a lot easier than it sounds.
-                </p>
-              </div>
-              <FieldNote label="Hypothesis">
-                A single stage-photo is not enough — compare seedling, vegetative, and reproductive stages before you
-                commit to an ID.
-              </FieldNote>
-              <SelfCheck
-                question="Why is Waterhemp vs. Palmer Amaranth a high-stakes ID call?"
-                answer="Both spread fast and resist multiple herbicide groups, but Palmer is more aggressive and demands zero-tolerance control — the wrong call can cost most of a field's yield."
-              />
-            </NotebookSection>
+        <div className="space-y-5">
+          {intro}
+
+          {groups.length === 0 ? (
+            <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/40 p-4 text-sm text-muted-foreground">
+              No look-alike groups are available for this grade level yet.
+            </div>
           ) : (
-            <>
-              <JournalHeader title="Comparative Morphology of Confused Species" subtitle="Lab Journal · Module 03" />
-              <div className="bg-card border border-border rounded-lg p-5 text-sm text-foreground space-y-3">
-                <p>
-                  In a soybean or corn field, two species that look nearly identical at the seedling stage can demand
-                  completely different management programs. <strong>Waterhemp and Palmer Amaranth</strong> are a
-                  textbook example — both are dioecious pigweeds, both can produce 250,000+ seeds per plant, and both
-                  have evolved resistance to multiple herbicide groups, but Palmer is the more aggressive competitor and
-                  triggers a zero-tolerance threshold across most of the Midwest. Misidentifying one as the other can
-                  cost a grower 30–80% of yield in a heavily infested field.
-                </p>
-                <p>
-                  Reliable identification at the high-school level means moving past general impressions and using
-                  <strong> diagnostic morphological characters</strong>: leaf venation and pubescence, stem
-                  cross-section and trichomes, petiole-to-leaf-blade ratio, inflorescence architecture, ligule and
-                  auricle shape in grasses, and the presence or absence of milky latex, square stems, or sheathing
-                  ocreae. Many of these features only become diagnostic at specific growth stages, so a single
-                  photograph at one stage is rarely enough — you have to compare species across the seedling,
-                  vegetative, and reproductive phases.
-                </p>
-                <p>
-                  The consequences of misidentification extend beyond yield loss. Choosing the wrong mode-of-action
-                  herbicide because you confused a Group-9-resistant Waterhemp with a still-susceptible Redroot Pigweed
-                  selects for further resistance and burns through control options. Confusing a native pollinator host (
-                  <em>e.g.</em> Common Milkweed) with an introduced look-alike can waste conservation effort or destroy
-                  monarch habitat. And confusing Wild Carrot with Poison Hemlock is a safety event, not a botany
-                  mistake. The triples below are the species pairings most commonly confused in field-scouting reports;
-                  use the side-by-side layout to build a mental key based on the features that actually distinguish
-                  them.
-                </p>
-              </div>
-              <TermSidebar
-                terms={[
-                  {
-                    term: "Pubescence",
-                    def: "The presence, type, and density of hairs (trichomes) on stems and leaves.",
-                  },
-                  {
-                    term: "Ocrea",
-                    def: "A sheathing membrane at the node in Polygonaceae — diagnostic for smartweeds/knotweeds.",
-                  },
-                  {
-                    term: "Ligule / Auricle",
-                    def: "Grass features at the leaf-blade / sheath junction; often the most reliable ID character for grasses.",
-                  },
-                  {
-                    term: "Inflorescence",
-                    def: "The arrangement of flowers on the stem (spike, panicle, umbel, raceme).",
-                  },
-                  {
-                    term: "Dioecious",
-                    def: "Male and female flowers on separate plants — key trait separating Amaranthus species.",
-                  },
-                ]}
-              />
-              <LabCallout heading="Diagnostic Protocol">
-                Compare specimens at <strong>at least two life stages</strong>, verify with a genus-level key before
-                naming to species, and record which character was decisive — future you will need that note.
-              </LabCallout>
-            </>
-          )}
-
-          {/* 3-species look-alike groups — primary content for 6-8 and 9-12 */}
-          {lookAlikeGroups.length > 0 && (
-            <div className="space-y-4">
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <h3 className="font-display font-bold text-foreground text-base mb-1">Look-Alike Groups</h3>
-                <p className="text-sm text-foreground">
-                  Compare these commonly-confused species at each growth stage. For grass groups, the{" "}
-                  <strong>ligule</strong> row is one of the most reliable ID features.
-                </p>
-              </div>
-              {lookAlikeGroups.map((g, i) =>
-                renderTripleCard(g.weeds, `tri-${i}-${g.weeds.map((w) => w.id).join("-")}`, g.difference, g.name),
-              )}
-            </div>
-          )}
-
-          {/* Introduced vs Native Look-Alikes section for 6-8 and 9-12 */}
-          {invasiveNativePairs.length > 0 && (
-            <div className="space-y-4 border-t border-border pt-4">
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
-                <h3 className="font-display font-bold text-foreground text-base mb-2">
-                  Introduced vs Native Look-Alikes
-                </h3>
-                <p className="text-sm text-foreground">
-                  These pairs contain an <strong className="text-destructive">introduced</strong> species
-                  that closely resembles a <strong className="text-accent">native</strong> species.
-                </p>
-              </div>
-              {invasiveNativePairs.map(([a, b]) => renderPairCard(a, b, `inv-${a.id}-${b.id}`))}
-            </div>
-          )}
-
-          {/* Official Look-Alike Pairs */}
-          {pairs.length > 0 && (
-            <div className="border-t border-border pt-4 space-y-4">
-              <h3 className="font-display font-bold text-foreground text-base">Look-Alike Pairs</h3>
-              {pairs.map(([a, b]) => renderPairCard(a, b, `fam-${a.id}`))}
-            </div>
-          )}
-
-          {/* Species still awaiting an official look-alike */}
-          {noLookAlikeWeeds.length > 0 && (
-            <div className="border-t border-border pt-4">
-              <div className="rounded-lg border-2 border-dashed border-muted-foreground/40 bg-muted/40 p-4">
-                <h3 className="font-display font-bold text-foreground text-sm mb-1">
-                  No look-alike listed yet ({noLookAlikeWeeds.length})
-                </h3>
-                <p className="text-xs text-muted-foreground mb-2">
-                  These species have no confirmed look-alike on the official list — comparisons will be added later.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {noLookAlikeWeeds.map((w) => (
-                    <span key={w.id} className="text-xs px-2 py-1 rounded-full bg-card border border-border">
-                      {w.commonName}
-                    </span>
-                  ))}
+            groups.map((g) => (
+              <section key={g.name} className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <h3 className="font-display font-bold text-foreground text-base">{g.name}</h3>
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
+                    {g.weeds.length} species
+                  </span>
                 </div>
-              </div>
-            </div>
+                <p className="text-xs text-muted-foreground">
+                  Compare leaf shape and margins, stem hairs and texture, and flower or seedhead structure to tell these
+                  apart. Scroll sideways to see every species in the group.
+                </p>
+                <div className="flex gap-3 overflow-x-auto snap-x pb-2 -mx-1 px-1">
+                  {g.weeds.map((w) => speciesCard(w as Weed))}
+                </div>
+              </section>
+            ))
           )}
         </div>
       );
     }
+
 
     /* ═══════════════════════════════════════════════════════════
        SAFETY & CONTROL
@@ -6487,22 +6281,48 @@ function TopicContent({
       // Curriculum-set placements. A species may belong to more than one
       // hazard group (e.g. Jimsonweed is both toxic and physically harmful).
       const SAFETY_PLACEMENT: Record<string, Array<"skin" | "toxic" | "physical">> = {
-          Curly_dock: ["toxic"],
-          Horsenettle: ["toxic", "physical"],
-          Tall_morningglory: ["toxic"],
-          Field_bindweed: ["toxic"],
-          Jimsonweed: ["toxic", "physical"],
-          "common-ragweed": ["skin"],
-          "giant-foxtail": ["physical"],
-          "giant-ragweed": ["skin"],
-          "wild-parsnip": ["toxic", "skin"],
-          Common_Burdock: ["physical"],
-          Musk_thistle: ["physical"],
-          Common_teasel: ["physical"],
-          commonPokeweed: ["toxic"],
-          common_Cocklebur: ["physical", "toxic"],
-          "canada-thistle": ["physical"],
-      };
+    Curly_dock: ["toxic"],
+    Horsenettle: ["toxic", "physical"],
+    Tall_morningglory: ["toxic"],
+    Field_bindweed: ["toxic"],
+    Jimsonweed: ["toxic", "physical"],
+    "common-ragweed": ["skin"],
+    "giant-foxtail": ["physical"],
+    "giant-ragweed": ["skin"],
+    "wild-parsnip": ["toxic", "skin"],
+    Common_Burdock: ["physical"],
+    Musk_thistle: ["physical"],
+    Common_teasel: ["physical"],
+    commonPokeweed: ["toxic"],
+    common_Cocklebur: ["physical", "toxic"],
+    "canada-thistle": ["physical"],
+    Buffalobur: ["toxic", "physical"],
+    Burcucumber: ["physical"],
+    Common_Milkweed: ["toxic", "skin"],
+    Common_Morningglory: ["toxic"],
+    Eastern_Black_Nightshade: ["toxic"],
+    Field_Horsetail: ["toxic"],
+    Hemp_Dogbane: ["toxic"],
+    Honeyvine_Milkweed: ["toxic"],
+    Ivyleaf_Morningglory: ["toxic"],
+    Johnsongrass: ["toxic"],
+    Kochia: ["toxic", "skin"],
+    Longspine_Sandbur: ["physical"],
+    Palmer_Amaranth: ["toxic", "physical"],
+    Poison_Hemlock: ["toxic"],
+    Prickly_Lettuce: ["physical"],
+    Prickly_Sida: ["physical"],
+    Redroot_Pigweed: ["toxic", "physical"],
+    Russian_Thistle: ["toxic", "physical"],
+    "Scouring-rush": ["toxic"],
+    Shattercane_Sorghums: ["toxic"],
+    Smooth_Groundcherry: ["toxic"],
+    Spotted_Spurge: ["toxic", "skin"],
+    Star_of_Bethlehem: ["toxic"],
+    Toothed_Spurge: ["toxic", "skin"],
+    Waterhemp: ["toxic"],
+    "Wild_Four-o'clock": ["toxic"],
+};
       // Keyword fallback for species without an explicit placement.
       const matches = (w: Weed, re: RegExp) => re.test(w.safetyNote || "");
       const fallback = (w: Weed): Array<"skin" | "toxic" | "physical"> => {
@@ -6758,20 +6578,20 @@ function TopicContent({
       const isElementary = grade === "elementary";
 
       // Documented herbicide-resistant weeds by WSSA/HRAC group (Heap, Intl. Herbicide Resistance Database)
-      const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
-        1: ["Italian ryegrass", "Wild oat", "Johnsongrass", "Giant foxtail"],
-        2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed", "Common ragweed"],
-        3: ["Goosegrass", "Green foxtail"],
-        4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
-        5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
-        7: ["Smooth pigweed", "Common groundsel"],
-        9: ["Horseweed", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed", "Italian ryegrass"],
-        10: ["Italian ryegrass", "Palmer amaranth (limited)"],
-        14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
-        15: ["Waterhemp (recent reports)"],
-        22: ["Horseweed", "Hairy fleabane"],
-        27: ["Waterhemp", "Palmer amaranth"],
-      };
+     const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
+  1: ["Wild oat", "Johnsongrass", "Giant foxtail"],
+  2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed", "Common ragweed"],
+  3: ["Goosegrass", "Green foxtail"],
+  4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
+  5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
+  7: ["Smooth pigweed", "Common groundsel"],
+  9: ["Horseweed", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed"],
+  10: ["Palmer amaranth"],
+  14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
+  15: ["Waterhemp"],
+  22: ["Horseweed"],
+  27: ["Waterhemp", "Palmer amaranth"],
+};
 
       const ELEM_METHODS = [
         {
@@ -6783,7 +6603,7 @@ function TopicContent({
         {
           key: "cover-crops",
           label: "Cover Crops",
-          desc: "Planting helper crops (like cereal rye or clover) between cash crops to shade the soil, take up space, and stop weed seeds from germinating. This is a natural, chemical-free approach.",
+          desc: "Planting helper crops (like cereal rye or clover) between main crops to shade the soil, take up space, and stop weed seeds from germinating. This is a natural, chemical-free approach.",
           example: "Planting cereal rye after the soybean harvest so the field is not bare during the winter.",
         },
         {
@@ -6930,19 +6750,17 @@ function TopicContent({
             )}
           </div>
 
-          {isElementary && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm text-foreground">
-              <p className="font-display font-bold text-primary mb-1">Word Bank</p>
-              <p>
-                <strong>Cash crop</strong> — the main crop a farmer grows to sell for money, such as soybeans, corn, or
-                wheat. Cash crops are what weeds compete against for sunlight, water, and nutrients.
-              </p>
-            </div>
-          )}
-
           <div className="space-y-3">
             {methods.map((method) => (
               <div key={method.key} className="bg-card border border-border rounded-lg p-4 space-y-2">
+                {controlMethodPhoto(method.key) && (
+                  <img
+                    src={controlMethodPhoto(method.key)!}
+                    alt={`${method.label} in the field`}
+                    loading="lazy"
+                    className="w-full h-44 object-cover rounded-lg border border-border"
+                  />
+                )}
                 <h3 className="font-display font-bold text-foreground">{method.label}</h3>
                 <p className="text-sm text-foreground">{method.desc}</p>
                 <div className="flex gap-3 items-start">
@@ -7011,94 +6829,6 @@ function TopicContent({
             </>
           )}
 
-          {/* Herbicide MOA Reference Table - collegiate only */}
-          {isHighSchool && (
-            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
-              <p className="font-semibold text-primary">Herbicide Modes of Action Reference</p>
-              {isHighSchool ? (
-                <>
-                  <p className="text-xs text-muted-foreground">
-                    The table below lists the major herbicide MOA groups used in crop production, sorted by group
-                    number. Where a group has both pre- and post-emergent chemistries, the PRE entry is listed first.
-                  </p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-secondary/50">
-                          <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
-                          <th className="p-2 text-left font-bold text-foreground border border-border">
-                            Resistance & Documented Resistant Weeds
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[...HERBICIDE_MOA]
-                          .sort((a, b) => {
-                            if (a.group !== b.group) return a.group - b.group;
-                            const order = { PRE: 0, BOTH: 1, POST: 2 } as const;
-                            return (order[a.timing] ?? 3) - (order[b.timing] ?? 3);
-                          })
-                          .map((h) => {
-                            const resistantWeeds = RESISTANT_WEEDS_BY_GROUP[h.group];
-                            return (
-                              <tr key={h.id} className="even:bg-muted/20">
-                                <td className="p-2 border border-border font-medium text-foreground">
-                                  {h.moa} (Group {h.group})
-                                </td>
-                                <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
-                                <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
-                                <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
-                                <td className="p-2 border border-border align-top">
-                                  <span
-                                    className={`font-medium ${h.resistanceLevel === "Very high" || h.resistanceLevel === "High" ? "text-destructive" : "text-foreground"}`}
-                                  >
-                                    {h.resistanceLevel}
-                                  </span>
-                                  {resistantWeeds && (
-                                    <div className="text-[10px] text-muted-foreground mt-1">
-                                      Examples: {resistantWeeds.join(", ")}
-                                    </div>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </div>
-                  <p className="font-semibold text-primary mt-3">Injury Symptoms → MOA Groups</p>
-                  <p className="text-xs text-muted-foreground">
-                    Each symptom type below is followed by the MOA groups that produce it, so injury seen in the field
-                    can be traced back to the responsible herbicide group.
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => {
-                      const groups = [...HERBICIDE_MOA]
-                        .filter((h) => h.symptomType === key)
-                        .map((h) => h.group)
-                        .filter((g, i, arr) => arr.indexOf(g) === i)
-                        .sort((a, b) => a - b);
-                      return (
-                        <div key={key} className="bg-card border border-border rounded-lg p-3">
-                          <p className="font-bold text-foreground text-xs">{info.label}</p>
-                          <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
-                          {groups.length > 0 && (
-                            <p className="text-[10px] text-primary mt-1">
-                              <span className="font-semibold">MOA groups:</span>{" "}
-                              {groups.map((g) => `Group ${g}`).join(", ")}
-                            </p>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : null}
-            </div>
-          )}
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 space-y-2">
             <p className="font-semibold text-accent text-sm">Key Takeaway</p>
@@ -7605,76 +7335,104 @@ function TopicContent({
 
     case "dioecious": {
       const DIOECIOUS_SPECIES = [
-        {
-          id: "Marijuana",
-          name: "Hemp",
-          maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
-          femaleDesc: "Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes",
-        },
-        {
-          id: "palmer-amaranth",
-          name: "Palmer Amaranth",
-          maleDesc: "Has soft, drooping seed heads that release pollen",
-          femaleDesc: "Has long, spiny, rigid seed heads that feel prickly to touch",
-        },
-        {
-          id: "waterhemp",
-          name: "Waterhemp",
-          maleDesc: "Has drooping, tassel-like flower clusters that shed pollen into the wind",
-          femaleDesc: "Has compact, dense seed heads packed tightly along the stem",
-        },
-      ];
+  {
+    id: "Hemp",
+    name: "Hemp",
+    maleDesc: "Has loose, hanging clusters of small pollen-producing flowers on thin stalks",
+    femaleDesc: "Has dense, resinous flower buds with protruding white pistils (hairs) at stem nodes",
+  },
+  {
+    id: "palmer-amaranth",
+    name: "Palmer Amaranth",
+    maleDesc: "Has soft, drooping seed heads that release pollen",
+    femaleDesc: "Has long, spiny, rigid seed heads that feel prickly to touch",
+  },
+  {
+    id: "waterhemp",
+    name: "Waterhemp",
+    maleDesc: "Has drooping, tassel-like flower clusters that shed pollen into the wind",
+    femaleDesc: "Has compact, dense seed heads packed tightly along the stem",
+  },
+  {
+    id: "canada-thistle",
+    name: "Canada Thistle",
+    maleDesc: "Has smaller, rounder flowerheads packed with pollen-bearing florets but no seed development",
+    femaleDesc:
+      "Has slightly larger, flask-shaped flowerheads that mature into fluffy white seed heads with wind-borne down",
+  },
+  {
+    id: "white-campion",
+    name: "White Campion",
+    maleDesc: "Has narrow, slender flower bases with 10 stamens and no swelling behind the petals",
+    femaleDesc: "Has a swollen, balloon-like veiny calyx behind the petals that develops into a seed capsule",
+  },
+];
 
       const MONOECIOUS_SPECIES = [
-        {
-          id: "common-ragweed",
-          name: "Common Ragweed",
-          maleDesc:
-            "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
-          femaleDesc: "Inconspicuous clusters tucked into the leaf axils below, each maturing into a small woody bur",
-        },
-        {
-          id: "giant-ragweed",
-          name: "Giant Ragweed",
-          maleDesc: "Long, wand-like terminal racemes of tiny nodding pollen cups at the top of the stem",
-          femaleDesc:
-            "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
-        },
-        {
-          id: "common_Cocklebur",
-          name: "Common Cocklebur",
-          maleDesc: "Rounded heads of tiny flowers at the branch tips that wither and drop soon after shedding pollen",
-          femaleDesc: "Axillary clusters lower on the stem that swell into hooked, spiny two-seeded burs",
-        },
-        {
-          id: "Burcucumber",
-          name: "Burcucumber",
-          maleDesc: "Long-stalked branched clusters of small greenish-white staminate flowers held out from the vine",
-          femaleDesc: "Short-stalked tight heads of a few flowers that develop into clustered spiny, bristly pods",
-        },
-        {
-          id: "Redroot_pigweed",
-          name: "Redroot Pigweed",
-          maleDesc:
-            "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
-          femaleDesc:
-            "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
-        },
-        {
-          id: "Spotted_spurge",
-          name: "Spotted Spurge",
-          maleDesc:
-            "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
-          femaleDesc:
-            "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
-        },
-        {
-          id: "Toothed_spurge",
-          name: "Toothed Spurge",
-          maleDesc: "Clustered tiny staminate flowers inside the cyathium, each reduced to a single stamen",
-          femaleDesc: "One pistillate flower per cyathium, exserted on a stalk, forming a smooth three-parted capsule",
-        },
-      ];
+  {
+    id: "common-ragweed",
+    name: "Common Ragweed",
+    maleDesc:
+      "Terminal spikes of small nodding green cups held above the foliage that shed abundant wind-borne pollen",
+    femaleDesc: "Inconspicuous clusters tucked into the leaf axils below, each maturing into a small woody bur",
+  },
+  {
+    id: "giant-ragweed",
+    name: "Giant Ragweed",
+    maleDesc: "Long, wand-like terminal racemes of tiny nodding pollen cups at the top of the stem",
+    femaleDesc:
+      "Small clusters hidden at the leaf bases beneath the spikes, developing large ribbed, crowned burs",
+  },
+  {
+    id: "common_Cocklebur",
+    name: "Common Cocklebur",
+    maleDesc: "Rounded heads of tiny flowers at the branch tips that wither and drop soon after shedding pollen",
+    femaleDesc: "Axillary clusters lower on the stem that swell into hooked, spiny two-seeded burs",
+  },
+  {
+    id: "Burcucumber",
+    name: "Burcucumber",
+    maleDesc: "Long-stalked branched clusters of small greenish-white staminate flowers held out from the vine",
+    femaleDesc: "Short-stalked tight heads of a few flowers that develop into clustered spiny, bristly pods",
+  },
+  {
+    id: "Redroot_pigweed",
+    name: "Redroot Pigweed",
+    maleDesc:
+      "Staminate flowers concentrated toward the top of the dense terminal spike — softer and dusty when shaken",
+    femaleDesc:
+      "Pistillate flowers lower on the same spike — stiff and bristly with papery bracts covering the seeds",
+  },
+  {
+    id: "Spotted_spurge",
+    name: "Spotted Spurge",
+    maleDesc:
+      "Several tiny stalked staminate flowers, one stamen each, ringed inside the cyathium at the leaf axil",
+    femaleDesc:
+      "A single pistillate flower per cyathium that swells and bends outward into a three-lobed capsule",
+  },
+  {
+    id: "Toothed_spurge",
+    name: "Toothed Spurge",
+    maleDesc: "Clustered tiny staminate flowers inside the cyathium, each reduced to a single stamen",
+    femaleDesc: "One pistillate flower per cyathium, exserted on a stalk, forming a smooth three-parted capsule",
+  },
+  {
+    id: "Asian_copperleaf",
+    name: "Asian Copperleaf",
+    maleDesc: "Minute staminate flowers crowded on a slender spike rising above the leafy bract",
+    femaleDesc:
+      "One to three pistillate flowers nestled inside a toothed, fan-shaped bract, each with feathery three-branched stigmas",
+  },
+  {
+    id: "Common_copperleaf",
+    name: "Common Copperleaf",
+    maleDesc:
+      "Tiny staminate flowers densely packed along a thin axillary spike, shedding pollen readily when disturbed",
+    femaleDesc:
+      "Pistillate flowers enclosed within a heart-shaped, coarsely toothed bract, stigmas feathery and reddish",
+  },
+];
 
       const availableDioecious = DIOECIOUS_SPECIES.filter(
         (sp) => hasImage(sp.id, "male.jpg") && hasImage(sp.id, "female.jpg"),
@@ -7836,36 +7594,38 @@ function TopicContent({
     ═══════════════════════════════════════════════════════════ */
     case "seed-dormancy": {
       const DORMANCY_TYPES: { label: string; desc: string; examples: string[] }[] = [
-        {
-          label: "Physical Dormancy",
-          desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
-          examples: ["Field Bindweed", "Hedge Bindweed", "Common Morningglory", "Velvetleaf"],
-        },
-        {
-          label: "Physiological Dormancy",
-          desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
-          examples: [
-            "Lambsquarters",
-            "Redroot Pigweed",
-            "Giant Foxtail",
-            "Green Foxtail",
-            "Yellow Foxtail",
-            "Wild Mustard",
-            "Curly Dock",
-            "Wild Oat",
-          ],
-        },
-        {
-          label: "Chemical Dormancy",
-          desc: "A specialized case of physiological dormancy involving high concentrations of chemical inhibitors in the seed covering or embryo. These inhibitors must be leached out by rainfall or degraded by microbes before germination can occur.",
-          examples: ["Common Cocklebur", "Johnsongrass"],
-        },
-        {
-          label: "Morphological Dormancy",
-          desc: "The embryo is underdeveloped at the time the seed is released from the parent plant. The seed must spend additional time in the soil maturing internally before it is structurally ready to germinate.",
-          examples: ["Wild Carrot", "Poison Hemlock"],
-        },
-      ];
+  {
+    label: "Physical Dormancy",
+    desc: "The seed has a hard or impenetrable seed coat that blocks water and gas exchange. The seed cannot germinate until the coat is broken down by weathering, fire, freeze–thaw cycles, or microbial activity.",
+    examples: ["Field Bindweed", "Hedge Bindweed", "Common Morningglory", "Velvetleaf"],
+  },
+  {
+    label: "Physiological Dormancy",
+    desc: "Caused by chemical inhibitors within the embryo or surrounding tissues that prevent embryonic growth. This is the most common form of seed dormancy. Seasonal cues — winter chilling, warming spring soils, fluctuating moisture, or light exposure — break the dormancy when conditions become favorable.",
+    examples: [
+      "Lambsquarters",
+      "Redroot Pigweed",
+      "Giant Foxtail",
+      "Green Foxtail",
+      "Yellow Foxtail",
+      "Wild Mustard",
+      "Curly Dock",
+      "Wild Oat",
+      "Common Ragweed",
+      "Giant Ragweed",
+    ],
+  },
+  {
+    label: "Chemical Dormancy",
+    desc: "A specialized case of physiological dormancy in which the seed coat or surrounding hull imposes dormancy through a combination of chemical germination inhibitors and restricted oxygen exchange to the embryo. Dormancy is broken as inhibitors are leached or degraded by rainfall and microbial activity, or as the coat is weakened/scarified over time.",
+    examples: ["Common Cocklebur", "Johnsongrass"],
+  },
+  {
+    label: "Morphological Dormancy",
+    desc: "The embryo is underdeveloped at the time the seed is released from the parent plant and must continue growing inside the seed before it is structurally ready to germinate. Seed populations in this category are typically mixed — a portion complete embryo growth and germinate once moisture and warmth are adequate (true morphological dormancy), while the remainder also carry an added physiological block that requires cold stratification before embryo growth can begin (morphophysiological dormancy).",
+    examples: ["Wild Carrot", "Poison Hemlock", "Wild Parsnip"],
+  },
+];
       return (
         <div className="space-y-5">
           <JournalHeader title="Seed Dormancy Mechanisms" subtitle="Reproductive Physiology" />
@@ -7956,70 +7716,98 @@ function TopicContent({
         },
       ];
       const ALLELOPATHIC_EXAMPLES: { id: string; name: string; compound: string; pathway: string; note: string }[] = [
-        {
-          id: "Johnsongrass",
-          name: "Johnsongrass",
-          compound: "Sorgoleone (root exudate)",
-          pathway: "Root Exudation",
-          note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves.",
-        },
-        {
-          id: "Quackgrass",
-          name: "Quackgrass",
-          compound: "Phenolic acids & agropyrene from rhizomes",
-          pathway: "Root Exudation + Decomposition Leaching",
-          note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment.",
-        },
-        {
-          id: "Giant_Foxtail",
-          name: "Giant Foxtail",
-          compound: "Phenolic acids from decomposing residue",
-          pathway: "Decomposition Leaching",
-          note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue.",
-        },
-        {
-          id: "Yellow_Nutsedge",
-          name: "Yellow Nutsedge",
-          compound: "Tuber-derived phenolics",
-          pathway: "Root Exudation + Soil Accumulation",
-          note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops.",
-        },
-        {
-          id: "Velvetleaf",
-          name: "Velvetleaf",
-          compound: "Phenolics & cyanogenic glycosides in residue",
-          pathway: "Decomposition Leaching",
-          note: "Decomposing leaves and seeds inhibit soybean and corn radicle growth.",
-        },
-        {
-          id: "Canada_Thistle",
-          name: "Canada Thistle",
-          compound: "Root-exuded phenolic acids",
-          pathway: "Root Exudation",
-          note: "Reduces emergence and biomass of neighboring crops within thistle patches.",
-        },
-        {
-          id: "Common_Sunflower",
-          name: "Common Sunflower",
-          compound: "Chlorogenic & isochlorogenic acids",
-          pathway: "Leaf Leachate + Decomposition Leaching",
-          note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops.",
-        },
-        {
-          id: "Redroot_Pigweed",
-          name: "Redroot Pigweed",
-          compound: "Water-soluble leaf leachates",
-          pathway: "Leaf Leachate",
-          note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies.",
-        },
-        {
-          id: "Common_Lambsquarters",
-          name: "Lambsquarters",
-          compound: "Oxalic acid & phenolic compounds",
-          pathway: "Leaf Leachate + Decomposition Leaching",
-          note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax.",
-        },
-      ];
+       {
+    id: "Johnsongrass",
+    name: "Johnsongrass",
+    compound: "Sorgoleone (root exudate)",
+    pathway: "Root Exudation",
+    note: "Root-released quinone strongly inhibits germination of corn, soybean, and small-seeded broadleaves.",
+  },
+  {
+    id: "Quackgrass",
+    name: "Quackgrass",
+    compound: "Phenolic acids & agropyrene from rhizomes",
+    pathway: "Root Exudation + Decomposition Leaching",
+    note: "Living rhizomes exude phenolics and their residues suppress alfalfa, corn, and soybean establishment.",
+  },
+  {
+    id: "Giant_Foxtail",
+    name: "Giant Foxtail",
+    compound: "Phenolic acids from decomposing residue",
+    pathway: "Decomposition Leaching",
+    note: "Reduces corn and soybean seedling vigor when crop is planted into heavy residue.",
+  },
+  {
+    id: "Yellow_Nutsedge",
+    name: "Yellow Nutsedge",
+    compound: "Tuber-derived phenolics",
+    pathway: "Root Exudation + Soil Accumulation",
+    note: "Tubers and roots release phenolics that build up in dense colonies, suppressing grasses and broadleaf crops.",
+  },
+  {
+    id: "Velvetleaf",
+    name: "Velvetleaf",
+    compound: "Phenolic compounds (leaf tissue and residue)",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Aqueous leaf extracts and decomposing residue depress soybean and corn seedling growth and radish germination.",
+  },
+  {
+    id: "Canada_Thistle",
+    name: "Canada Thistle",
+    compound: "Root-exuded phenolic acids",
+    pathway: "Root Exudation",
+    note: "Reduces emergence and biomass of neighboring crops within thistle patches.",
+  },
+  {
+    id: "Common_Sunflower",
+    name: "Common Sunflower",
+    compound: "Chlorogenic & isochlorogenic acids",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Rain-washed leaf leachate and residue suppress competing weeds and small-seeded crops.",
+  },
+  {
+    id: "Redroot_Pigweed",
+    name: "Redroot Pigweed",
+    compound: "Water-soluble leaf leachates",
+    pathway: "Leaf Leachate",
+    note: "Aqueous extracts measurably reduce soybean and wheat germination in field studies.",
+  },
+  {
+    id: "Common_Lambsquarters",
+    name: "Lambsquarters",
+    compound: "Oxalic acid & phenolic compounds",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Rain-washed leachate and breakdown of residue inhibit germination of small-seeded crops like alfalfa and flax.",
+  },
+  {
+    id: "Wild_Oat",
+    name: "Wild Oat",
+    compound: "Scopoletin, coumarin & vanillic acid (root exudate)",
+    pathway: "Root Exudation",
+    note: "Exudates measurably inhibit root and coleoptile growth of neighboring wheat seedlings.",
+  },
+  {
+    id: "Horseweed",
+    name: "Horseweed",
+    compound: "Phenolic acids (p-coumaric, ferulic, vanillic, syringic)",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Leachate and decaying tissue inhibit germination of numerous weeds and crops, including Palmer amaranth.",
+  },
+  {
+    id: "Common_Ragweed",
+    name: "Common Ragweed",
+    compound: "Sesquiterpene lactones (psilostachyin group) & phenolic acids",
+    pathway: "Leaf Leachate + Decomposition Leaching",
+    note: "Shoot/root extracts and residue alter root and shoot growth of neighboring crops and even self-inhibit ragweed germination.",
+  },
+  {
+    id: "Garlic_Mustard",
+    name: "Garlic Mustard",
+    compound: "Glucosinolates (notably sinigrin)",
+    pathway: "Root Exudation into Soil",
+    note: "Disrupts arbuscular and ectomycorrhizal fungi that native seedlings depend on, giving this non-mycorrhizal invader a competitive edge.",
+  },
+];
       const availableAllelo = ALLELOPATHIC_EXAMPLES.map((e) => ({
         ...e,
         weed: weeds.find((w) => w.commonName.toLowerCase() === e.name.toLowerCase()),
@@ -8140,36 +7928,27 @@ function TopicContent({
             </p>
           </div>
 
-          <p className="text-base font-semibold text-foreground">
-            Here are just a few of the common herbicide groups used by farmers today.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[...HERBICIDE_MOA]
-              .sort((a, b) => a.group - b.group)
-              .map((m) => (
-                <div key={m.id} className="bg-card border border-border rounded-xl p-5 space-y-2">
-                  <p className="font-display font-bold text-foreground text-lg leading-snug">{m.moa}</p>
-                  <p className="text-base text-primary font-semibold">Group {m.group}</p>
-                  <p className="text-base text-foreground">
-                    <strong>Target:</strong> {m.spectrum === "Both" ? "Grass & Broadleaf" : m.spectrum} weeds
-                  </p>
-                  <p className="text-base text-foreground">
-                    <strong>Timing:</strong>{" "}
-                    {m.timing === "PRE" ? "Pre-emergent" : m.timing === "POST" ? "Post-emergent" : "Pre- or post-emergent"}
-                  </p>
-                  <p className="text-base text-foreground">
-                    <strong>Symptoms:</strong> {SYMPTOM_TYPES[m.symptomType]?.label}
-                    {SYMPTOM_TYPES[m.symptomType]?.description
-                      ? ` — ${SYMPTOM_TYPES[m.symptomType].description}`
-                      : ""}
-                  </p>
-                </div>
-              ))}
-          </div>
+          <h3 className="font-display font-bold text-foreground text-sm">Herbicide Injury Symptoms & By-Weed Lookup</h3>
+          <HerbicideMOAExplorer />
         </div>
       );
     }
     case "herbicide-moa": {
+      const RESISTANT_WEEDS_BY_GROUP: Record<number, string[]> = {
+  1: ["Wild oat", "Johnsongrass", "Giant foxtail"],
+  2: ["Palmer amaranth", "Waterhemp", "Kochia", "Horseweed", "Common ragweed"],
+  3: ["Goosegrass", "Green foxtail"],
+  4: ["Kochia", "Waterhemp", "Wild mustard", "Horseweed"],
+  5: ["Common lambsquarters", "Redroot pigweed", "Kochia", "Waterhemp"],
+  7: ["Smooth pigweed", "Common groundsel"],
+  9: ["Horseweed", "Palmer amaranth", "Waterhemp", "Kochia", "Giant ragweed"],
+  10: ["Palmer amaranth"],
+  14: ["Waterhemp", "Palmer amaranth", "Common ragweed"],
+  15: ["Waterhemp"],
+  22: ["Horseweed"],
+  27: ["Waterhemp", "Palmer amaranth"],
+};
+
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -8197,6 +7976,95 @@ function TopicContent({
           <h3 className="font-display font-bold text-foreground text-sm">Herbicide Groups in Use Today</h3>
           <HerbicideMOAExplorer />
 
+          {/* Herbicide MOA Reference Table  */}
+          {true && (
+            <div className="bg-muted/30 rounded-lg p-4 text-sm text-foreground space-y-3">
+              <p className="font-semibold text-primary">Herbicide Modes of Action Reference</p>
+              {true ? (
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    The table below lists the major herbicide MOA groups used in crop production, sorted by group
+                    number. Where a group has both pre- and post-emergent chemistries, the PRE entry is listed first.
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-secondary/50">
+                          <th className="p-2 text-left font-bold text-foreground border border-border">MOA (Group)</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Timing</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Spectrum</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">Chemical</th>
+                          <th className="p-2 text-left font-bold text-foreground border border-border">
+                            Resistance & Documented Resistant Weeds
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...HERBICIDE_MOA]
+                          .sort((a, b) => {
+                            if (a.group !== b.group) return a.group - b.group;
+                            const order = { PRE: 0, BOTH: 1, POST: 2 } as const;
+                            return (order[a.timing] ?? 3) - (order[b.timing] ?? 3);
+                          })
+                          .map((h) => {
+                            const resistantWeeds = RESISTANT_WEEDS_BY_GROUP[h.group];
+                            return (
+                              <tr key={h.id} className="even:bg-muted/20">
+                                <td className="p-2 border border-border font-medium text-foreground">
+                                  {h.moa} (Group {h.group})
+                                </td>
+                                <td className="p-2 border border-border text-muted-foreground">{h.timing}</td>
+                                <td className="p-2 border border-border text-muted-foreground">{h.spectrum}</td>
+                                <td className="p-2 border border-border text-muted-foreground">{h.brands[0]}</td>
+                                <td className="p-2 border border-border align-top">
+                                  <span
+                                    className={`font-medium ${h.resistanceLevel === "Very high" || h.resistanceLevel === "High" ? "text-destructive" : "text-foreground"}`}
+                                  >
+                                    {h.resistanceLevel}
+                                  </span>
+                                  {resistantWeeds && (
+                                    <div className="text-[10px] text-muted-foreground mt-1">
+                                      Examples: {resistantWeeds.join(", ")}
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="font-semibold text-primary mt-3">Injury Symptoms → MOA Groups</p>
+                  <p className="text-xs text-muted-foreground">
+                    Each symptom type below is followed by the MOA groups that produce it, so injury seen in the field
+                    can be traced back to the responsible herbicide group.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {Object.entries(SYMPTOM_TYPES).map(([key, info]) => {
+                      const groups = [...HERBICIDE_MOA]
+                        .filter((h) => h.symptomType === key)
+                        .map((h) => h.group)
+                        .filter((g, i, arr) => arr.indexOf(g) === i)
+                        .sort((a, b) => a - b);
+                      return (
+                        <div key={key} className="bg-card border border-border rounded-lg p-3">
+                          <p className="font-bold text-foreground text-xs">{info.label}</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{info.description}</p>
+                          {groups.length > 0 && (
+                            <p className="text-[10px] text-primary mt-1">
+                              <span className="font-semibold">MOA groups:</span>{" "}
+                              {groups.map((g) => `Group ${g}`).join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          )}
+
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 text-sm text-foreground">
             <p className="font-bold text-accent">Key Takeaway</p>
             <p className="mt-1">
@@ -8215,132 +8083,134 @@ function TopicContent({
     case "crop-injury": {
       const INJURY_PATTERNS = [
         {
-          group: "1",
-          name: "ACCase Inhibitors",
-          part: "New grass leaves at the whorl & growing points",
-          symptoms:
-            "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl.",
-        },
-        {
-          group: "2",
-          name: "ALS Inhibitors",
-          part: "Top (newest) leaves, veins, and shoot tips",
-          symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis.",
-        },
-        {
-          group: "3",
-          name: "Microtubule Inhibitors",
-          part: "Roots and root tips",
-          symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor.",
-        },
-        {
-          group: "4",
-          name: "Synthetic Auxins",
-          part: "New growth: top leaves, stems, and petioles",
-          symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty).",
-        },
-        {
-          group: "5",
-          name: "PSII Inhibitors (Triazines)",
-          part: "Older (bottom) leaves first",
-          symptoms:
-            "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward.",
-        },
-        {
-          group: "6",
-          name: "PSII Inhibitors (Benzothiadiazoles)",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure.",
-        },
-        {
-          group: "7",
-          name: "PSII Inhibitors (Ureas & Amides)",
-          part: "Older (bottom) leaves first",
-          symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning.",
-        },
-        {
-          group: "8",
-          name: "Lipid Synthesis Inhibitors",
-          part: "Emerging seedling whorl and shoots",
-          symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl.",
-        },
-        {
-          group: "9",
-          name: "EPSPS Inhibitors",
-          part: "Whole plant, starting at growing points and newest leaves",
-          symptoms:
-            "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks.",
-        },
-        {
-          group: "10",
-          name: "Glutamine Synthase Inhibitors",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application.",
-        },
-        {
-          group: "12",
-          name: "Phytoene Desaturase Inhibitors",
-          part: "Newest leaves and growing points",
-          symptoms: "Bright white bleached new growth; older leaves stay green.",
-        },
-        {
-          group: "13",
-          name: "DOXP Inhibitors",
-          part: "Newest leaves and shoot tips",
-          symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature.",
-        },
-        {
-          group: "14",
-          name: "PPO Inhibitors",
-          part: "Leaf surface and emerging cotyledons/stems",
-          symptoms:
-            "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings.",
-        },
-        {
-          group: "15",
-          name: "VLCFA Inhibitors",
-          part: "Emerging seedling shoots and hypocotyl",
-          symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings.",
-        },
-        {
-          group: "19",
-          name: "Auxin Transport Inhibitors",
-          part: "New growth: top leaves and stems",
-          symptoms:
-            "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified.",
-        },
-        {
-          group: "22",
-          name: "PSI Electron Diverters",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact.",
-        },
-        {
-          group: "23",
-          name: "Mitosis Inhibitors",
-          part: "Outer (oldest) leaves and central whorl",
-          symptoms: "Outer leaves desiccate and brown while the central whorl stays green.",
-        },
-        {
-          group: "25",
-          name: "Cell Wall (Cellulose) Inhibitors",
-          part: "Newest leaves at the whorl",
-          symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips.",
-        },
-        {
-          group: "26",
-          name: "Nucleic Acid Inhibitors",
-          part: "Leaf surface where spray contacted",
-          symptoms: "Mild interveinal yellowing with small necrotic flecks; mostly cosmetic contact injury.",
-        },
-        {
-          group: "27",
-          name: "HPPD Inhibitors",
-          part: "Newest leaves and growing points",
-          symptoms:
-            "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal.",
-        },
-      ];
+    group: "1",
+    name: "ACCase Inhibitors",
+    part: "New grass leaves at the whorl & growing points",
+    symptoms:
+      "Yellowing of the newest grass leaves and death at the central growing point; leaves pull easily from the whorl.",
+  },
+  {
+    group: "2",
+    name: "ALS Inhibitors",
+    part: "Top (newest) leaves, veins, and shoot tips",
+    symptoms: "Stunted plants with purpling along veins and stems on the top leaves and interveinal chlorosis.",
+  },
+  {
+    group: "3",
+    name: "Microtubule Inhibitors",
+    part: "Roots and root tips",
+    symptoms: "Pruned, stubby roots with swollen tips; poor stand establishment because seedlings cannot anchor.",
+  },
+  {
+    group: "4",
+    name: "Synthetic Auxins",
+    part: "New growth: top leaves, stems, and petioles",
+    symptoms: "Leaf cupping, strap-leafing, and downward twisting of stems and petioles (epinasty).",
+  },
+  {
+    group: "5",
+    name: "PSII Inhibitors (Triazines)",
+    part: "Older (bottom) leaves first",
+    symptoms:
+      "Interveinal chlorosis and necrosis that starts on the margins of the oldest leaves and moves inward.",
+  },
+  {
+    group: "6",
+    name: "PSII Inhibitors (Benzothiadiazoles)",
+    part: "Leaf surface where spray contacted",
+    symptoms: "Bronzing and rapid necrotic speckling between leaf veins after sunlight exposure.",
+  },
+  {
+    group: "7",
+    name: "PSII Inhibitors (Ureas & Amides)",
+    part: "Older (bottom) leaves first",
+    symptoms: "Slow-developing interveinal chlorosis on older leaves followed by leaf-edge browning.",
+  },
+  {
+    group: "8",
+    name: "Lipid Synthesis Inhibitors",
+    part: "Emerging seedling whorl and shoots",
+    symptoms: "Twisted, malformed seedlings whose leaves fail to unfurl from the whorl.",
+  },
+  {
+    group: "9",
+    name: "EPSPS Inhibitors",
+    part: "Whole plant, starting at growing points and newest leaves",
+    symptoms:
+      "Gradual yellowing then browning starting at the youngest tissue and meristems; plant collapses over 1–3 weeks.",
+  },
+  {
+    group: "10",
+    name: "Glutamine Synthase Inhibitors",
+    part: "Leaf surface where spray contacted",
+    symptoms: "Rapid wilting, marginal leaf burn, and tissue collapse within days of application.",
+  },
+  {
+    group: "12",
+    name: "Phytoene Desaturase Inhibitors",
+    part: "Newest leaves and growing points",
+    symptoms: "Bright white bleached new growth; older leaves stay green.",
+  },
+  {
+    group: "13",
+    name: "DOXP Inhibitors",
+    part: "Newest leaves and shoot tips",
+    symptoms: "Bleached white new growth with green veining; seedlings may regreen as they mature.",
+  },
+  {
+    group: "14",
+    name: "PPO Inhibitors",
+    part: "Leaf surface and emerging cotyledons/stems",
+    symptoms:
+      "Brown or scorched leaf spots soon after application; cotyledon and stem cracking on emerging seedlings.",
+  },
+  {
+    group: "15",
+    name: "VLCFA Inhibitors",
+    part: "Emerging seedling shoots and hypocotyl",
+    symptoms: "Tightly rolled 'buggy-whipped' whorls; swollen hypocotyls and stunted seedlings.",
+  },
+  {
+    group: "19",
+    name: "Auxin Transport Inhibitors",
+    part: "New growth: top leaves and stems",
+    symptoms:
+      "Severely crinkled, cupped leaves with thickened, leathery surfaces — auxin-style injury amplified.",
+  },
+  {
+    group: "22",
+    name: "PSI Electron Diverters",
+    part: "Leaf surface where spray contacted",
+    symptoms: "Sunburn-like necrotic spots and bleached patches within hours of contact.",
+  },
+  {
+    group: "23",
+    name: "Microtubule Interference (Unclear Site of Action)",
+    part: "New shoot growth in emerged grass seedlings",
+    symptoms:
+      "Anti-mitotic action retards shoot growth by blocking cell division; unlike Group 3, injury is limited to shoots with no root-pruning effect.",
+  },
+  {
+    group: "25",
+    name: "Cell Wall (Cellulose) Inhibitors",
+    part: "Newest leaves at the whorl",
+    symptoms: "Whorl twisting with bleached leaf margins and curled, distorted tips.",
+  },
+  {
+    group: "26",
+    name: "Lipid/Fatty Acid Synthesis Inhibitors (Chlorocarbonic Acids)",
+    part: "Roots first, then whole plant (root-absorbed, slow-acting)",
+    symptoms:
+      "Gradual yellowing and stunting of grass foliage that develops slowly over weeks to months as root uptake disrupts fat synthesis; no rapid contact injury.",
+  },
+  {
+    group: "27",
+    name: "HPPD Inhibitors",
+    part: "Newest leaves and growing points",
+    symptoms:
+      "Bleached white-to-pink new growth; older leaves remain green; seedlings may regreen if dose is sub-lethal.",
+  },
+];
       return (
         <div className="space-y-5">
           <div className="bg-muted/30 rounded-lg p-5 text-sm text-foreground space-y-3">
@@ -8522,7 +8392,7 @@ function TopicContent({
                   >
                     {s}
                   </div>
-                  <p className="text-[9px] text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {i === 0 ? "Easiest" : i === 1 ? "Easy" : i === 2 ? "Moderate" : i === 3 ? "Hard" : "Hardest"}
                   </p>
                 </div>
@@ -8549,7 +8419,7 @@ function TopicContent({
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <figcaption className="text-[10px] text-center text-muted-foreground">
+                        <figcaption className="text-sm font-bold text-center text-foreground">
                           {w?.commonName ?? wid}
                         </figcaption>
                       </figure>
@@ -8564,6 +8434,55 @@ function TopicContent({
               </div>
             ))}
           </div>
+
+          {/* Every species grouped by the stage at which it is best controlled */}
+          {(() => {
+            const buckets: { key: string; label: string; imgStage: string; methods: string; test: (t: string) => boolean }[] = [
+              { key: "seedling", label: "Best controlled at the SEEDLING stage", imgStage: "seedling", methods: "POST herbicide at small weed height, cultivation, hand removal, and a PRE herbicide the following season.", test: (t) => /seedling|small|early|pre-?emerg|cotyledon|2\s*-?\s*4/i.test(t) },
+              { key: "vegetative", label: "Best controlled at the VEGETATIVE stage", imgStage: "vegetative", methods: "Full-rate POST herbicide with an effective MOA, mechanical cultivation, or mowing before bud.", test: (t) => /vegetative|rosette|bolting|bud|before flower/i.test(t) },
+              { key: "reproductive", label: "Best controlled at the REPRODUCTIVE / MATURE stage", imgStage: "flower", methods: "Systemic herbicide translocated to roots or rhizomes, plus hand-pulling escapes to prevent seed set.", test: () => true },
+            ];
+            const assigned = new Map<string, Weed[]>(buckets.map((b) => [b.key, []]));
+            topicWeeds.forEach((w) => {
+              const timing = w.controlTiming || "";
+              const b = buckets.find((bk) => bk.test(timing))!;
+              assigned.get(b.key)!.push(w);
+            });
+            return (
+              <div className="space-y-4">
+                <h3 className="font-display font-bold text-foreground text-base border-l-4 border-primary pl-3">
+                  Species Grouped by Best Control Timing
+                </h3>
+                {buckets.map((b) => {
+                  const list = byCommonName(assigned.get(b.key) ?? []);
+                  if (!list.length) return null;
+                  return (
+                    <div key={b.key} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                      <p className="font-display font-bold text-foreground text-base">{b.label}</p>
+                      <p className="text-sm text-primary">
+                        <span className="font-semibold">Best ways to control:</span> {b.methods}
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {list.map((w) => (
+                          <figure key={w.id} className="space-y-1">
+                            <div className="aspect-square rounded-md overflow-hidden bg-secondary border border-border">
+                              <WeedImage weedId={w.id} stage={b.imgStage} className="w-full h-full object-cover" />
+                            </div>
+                            <figcaption className="text-sm font-bold text-center text-foreground leading-tight">
+                              {w.commonName}
+                            </figcaption>
+                            <p className="text-[11px] text-center text-muted-foreground leading-tight">
+                              {w.controlTiming}
+                            </p>
+                          </figure>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       );
     }

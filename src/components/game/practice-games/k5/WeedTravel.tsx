@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Wind, Droplets, PawPrint, Mountain, TreePine, Waves, Wheat, CloudRain, Sprout, Snowflake, Flame, Zap, Bug, Shovel, Star } from 'lucide-react';
 import { elementaryWeeds as weeds } from '@/data/gradeWeeds';
+import { getSeedFact } from '@/data/seedFacts';
+
 import WeedImage from '@/components/game/WeedImage';
 import { useGameProgress } from '@/contexts/GameProgressContext';
 import LevelComplete from '@/components/game/LevelComplete';
@@ -16,37 +18,41 @@ interface SeedCharacter {
   description: string;
 }
 
-const ALL_SEED_CANDIDATES: Omit<SeedCharacter, 'weedId'>[] = [
-  // Trait values reflect verified dispersal mechanisms in published weed biology references.
-  // horseweed (Conyza canadensis): tiny pappus seeds carried hundreds of km on wind.
-  { name: 'Horseweed Seed', traits: { wind: 3, water: 1, animal: 1, heat: 2, cold: 2 }, description: 'Tiny pappus (parachute) seed — carried for miles on the wind.' },
-  // morningglory (Ipomoea spp.): hard, water-resistant seed coat; spread by water/animals/equipment.
-  { name: 'Morningglory Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Hard round seed coat — survives heat, water, and digestion.' },
-  // giant ragweed (Ambrosia trifida): large, heavy seeds float and overwinter; spread mainly by water and equipment.
-  { name: 'Giant Ragweed Seed', traits: { wind: 1, water: 3, animal: 1, heat: 1, cold: 3 }, description: 'Heavy seed that floats downstream and survives winter cold.' },
-  // green foxtail (Setaria viridis): bristly seedhead clings to fur and clothing.
-  { name: 'Green Foxtail Seed', traits: { wind: 2, water: 1, animal: 3, heat: 2, cold: 2 }, description: 'Bristly seedhead — hooks onto animal fur and pant legs.' },
-  // kochia (Bassia scoparia): whole plant breaks off as a tumbleweed, scattering seed.
-  { name: 'Kochia Seed', traits: { wind: 3, water: 1, animal: 1, heat: 3, cold: 1 }, description: 'Tumbleweed seed — the whole plant rolls and flings seed in wind.' },
-  // waterhemp (Amaranthus tuberculatus): tiny seeds float on floodwater into riverbanks and crop fields.
-  { name: 'Waterhemp Seed', traits: { wind: 2, water: 3, animal: 1, heat: 2, cold: 2 }, description: 'Tiny smooth seed that rides flood water into new fields.' },
-  // Palmer amaranth (Amaranthus palmeri): tiny seeds carried by equipment, manure, and water.
-  { name: 'Palmer Amaranth Seed', traits: { wind: 1, water: 2, animal: 2, heat: 3, cold: 1 }, description: 'Tiny seed carried by equipment and animals; thrives in heat.' },
-  // Canada thistle (Cirsium arvense): fluffy pappus seed carried by wind; also spreads by roots.
-  { name: 'Canada Thistle Seed', traits: { wind: 3, water: 2, animal: 1, heat: 1, cold: 3 }, description: 'Fluffy pappus seed — drifts on wind and survives frost.' },
-];
+// Seed characters are built live from the elementary weed pool + seedFacts.ts so
+// the game never breaks when species ids or names change.
+const clamp3 = (n: number) => Math.max(1, Math.min(3, n)) as 1 | 2 | 3;
 
-const WEED_IDS_FOR_SEEDS = ['marestail', 'morningglory', 'giant-ragweed', 'green-foxtail', 'kochia', 'waterhemp', 'palmer-amaranth', 'canada-thistle'];
-
-function buildSeedCharacters(count = 5): SeedCharacter[] {
-  const available: SeedCharacter[] = [];
-  WEED_IDS_FOR_SEEDS.forEach((weedId, i) => {
-    if (weeds.some(w => w.id === weedId) && ALL_SEED_CANDIDATES[i]) {
-      available.push({ ...ALL_SEED_CANDIDATES[i], weedId });
-    }
-  });
-  return shuffle(available).slice(0, count);
+function traitsFromFact(dispersal: string, production: string): SeedCharacter['traits'] {
+  const d = dispersal.toLowerCase();
+  const has = (...keys: string[]) => keys.some(k => d.includes(k));
+  const wind = has('wind', 'pappus', 'tumble', 'parachute', 'air') ? 3 : has('gravity', 'shatter', 'explosive') ? 2 : 1;
+  const water = has('water', 'flood', 'stream', 'irrigation', 'rain', 'waterfowl') ? 3 : has('mud', 'soil') ? 2 : 1;
+  const animal = has('animal', 'fur', 'livestock', 'bird', 'manure', 'cling', 'bur', 'hook', 'ant', 'mammal', 'deer', 'cattle')
+    ? 3
+    : has('machinery', 'equipment', 'contaminated', 'harvest') ? 2 : 1;
+  // Big seed producers and hard-coated seeds tend to be the tough travellers.
+  const big = /\d{4,}/.test(production.replace(/[,\s]/g, '')) || production.toLowerCase().includes('thousand');
+  const heat = clamp3(big ? 3 : 2);
+  const cold = clamp3(big ? 2 : 3);
+  return { wind, water, animal, heat, cold };
 }
+
+function buildSeedCharacters(count = 3): SeedCharacter[] {
+  const pool = weeds
+    .filter(w => !!w.commonName)
+    .map<SeedCharacter>(w => {
+      const fact = getSeedFact(w.commonName, w.family, w.plantType);
+      return {
+        weedId: w.id,
+        name: `${w.commonName} Seed`,
+        traits: traitsFromFact(fact.dispersal, fact.production),
+        description: `${fact.seedDescription} Travels by: ${fact.dispersal}.`,
+      };
+    });
+  return shuffle(pool).slice(0, count);
+}
+
+
 
 // Vary the "need" thresholds each level so the same need stars don't repeat,
 // and skew harder as level rises so higher levels need stronger traits.
@@ -183,7 +189,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
   const [level, setLevel] = useState(1);
   const { addBadge } = useGameProgress();
   const diff = getDifficulty(level, 'k5');
-  const seedCharacters = useMemo(() => buildSeedCharacters(diff.options + 2), [level, diff.options]);
+  const seedCharacters = useMemo(() => buildSeedCharacters(3), [level]);
   const baseObstacleSet = useMemo(() => OBSTACLE_SETS[(level - 1) % OBSTACLE_SETS.length], [level]);
   const [chosenSeed, setChosenSeed] = useState<SeedCharacter | null>(null);
   // Apply per-level threshold variation so star requirements are not identical each round.
@@ -231,22 +237,22 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold ml-auto">Lv.{level}</span>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <h2 className="text-xl font-bold text-foreground text-center mb-2">Choose Your Seed!</h2>
-          <p className="text-sm text-muted-foreground text-center mb-6">Help a seed travel to a new location. Each seed has different abilities. Pick wisely!</p>
-          <div className="grid gap-3 max-w-md mx-auto">
+          <h2 className="text-3xl font-bold text-foreground text-center mb-2">Choose Your Seed!</h2>
+          <p className="text-base text-muted-foreground text-center mb-6">Help a seed travel to a new home. Each seed travels a different way. Pick the one you like best!</p>
+          <div className="grid gap-5 max-w-3xl mx-auto">
             {seedCharacters.map(sc => (
               <button key={sc.weedId} onClick={() => setChosenSeed(sc)}
-                className="flex items-center gap-4 p-4 rounded-xl border-2 border-border bg-card hover:border-primary transition-all text-left">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border shadow-md shrink-0">
+                className="flex items-center gap-5 p-6 rounded-2xl border-4 border-border bg-card hover:border-primary hover:shadow-lg transition-all text-left">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-4 border-border shadow-md shrink-0">
                   <WeedImage weedId={sc.weedId} stage="seed" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-foreground text-sm">{sc.name}</p>
-                  <p className="text-xs text-muted-foreground mb-2">{sc.description}</p>
-                  <div className="flex flex-wrap gap-1">
+                  <p className="font-bold text-foreground text-xl sm:text-2xl mb-2">{sc.name}</p>
+                  <p className="text-base sm:text-lg text-foreground/80 leading-relaxed mb-3">{sc.description}</p>
+                  <div className="flex flex-wrap gap-2">
                     {Object.entries(sc.traits).map(([key, val]) => (
-                      <span key={key} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-foreground flex items-center gap-0.5">
-                        {key}: {Array.from({ length: val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 fill-primary text-primary inline" />)}{Array.from({ length: 3 - val }).map((_, si) => <Star key={si} className="w-2.5 h-2.5 text-muted-foreground/30 inline" />)}
+                      <span key={key} className="text-sm px-3 py-1 rounded-full bg-secondary text-foreground font-semibold capitalize flex items-center gap-1">
+                        {key}: {Array.from({ length: val }).map((_, si) => <Star key={si} className="w-4 h-4 fill-primary text-primary inline" />)}{Array.from({ length: 3 - val }).map((_, si) => <Star key={si} className="w-4 h-4 text-muted-foreground/30 inline" />)}
                       </span>
                     ))}
                   </div>
@@ -254,6 +260,7 @@ export default function WeedTravel({ onBack, gradeLabel }: Props) {
               </button>
             ))}
           </div>
+
         </div>
       </div>
     );
