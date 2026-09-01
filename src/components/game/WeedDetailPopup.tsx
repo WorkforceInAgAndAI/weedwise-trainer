@@ -3,6 +3,7 @@ import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { X } from 'lucide-react';
 import { getSessionCitations } from '@/data/imageReferences';
+import { getWeedArrival } from '@/data/weedKnowledge';
 import { hasImagePrefix } from '@/lib/imageMap';
 
 /**
