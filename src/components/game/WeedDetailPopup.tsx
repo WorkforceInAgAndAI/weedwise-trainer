@@ -3,6 +3,7 @@ import type { Weed } from '@/types/game';
 import WeedImage from './WeedImage';
 import { X } from 'lucide-react';
 import { getSessionCitations } from '@/data/imageReferences';
+import { getWeedArrival } from '@/data/weedKnowledge';
 import { hasImagePrefix } from '@/lib/imageMap';
 
 /**
@@ -23,6 +24,7 @@ interface Props {
 export default function WeedDetailPopup({ weed, onClose }: Props) {
  // Ligule exists only in true grasses (Poaceae) — sedges like nutsedge have none.
  const isGrass = weed.plantType === 'Monocot' && weed.family === 'Poaceae';
+ const arrival = getWeedArrival(weed.id);
 
  return (
  <div className="fixed inset-0 z-[60] bg-background/60 backdrop-blur-sm flex items-center justify-center p-5" onClick={onClose}>
@@ -90,6 +92,7 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  </div>
  )}
 
+ {weed.traits?.length ? (
  <div>
  <h3 className="text-sm font-semibold text-foreground mb-2">Identifying Traits</h3>
  <ul className="space-y-1">
@@ -100,30 +103,48 @@ export default function WeedDetailPopup({ weed, onClose }: Props) {
  ))}
  </ul>
  </div>
+ ) : null}
 
+ {arrival && (
+ <div className="bg-secondary/60 border border-border rounded-md p-3">
+ <h3 className="text-sm font-semibold text-foreground mb-1">The Weed's Story</h3>
+ <p className="text-sm text-muted-foreground">{arrival.story}</p>
+ </div>
+ )}
+
+ {weed.habitat && (
  <div>
  <h3 className="text-sm font-semibold text-foreground mb-1">Habitat</h3>
  <p className="text-sm text-muted-foreground">{weed.habitat}</p>
  </div>
+ )}
 
+ {(weed.management || weed.controlTiming) && (
  <div>
  <h3 className="text-sm font-semibold text-foreground mb-1">Management</h3>
- <p className="text-sm text-muted-foreground">{weed.management}</p>
+ {weed.management && <p className="text-sm text-muted-foreground">{weed.management}</p>}
+ {weed.controlTiming && (
  <p className="text-sm text-muted-foreground mt-1"><span className="font-medium text-foreground">Timing:</span> {weed.controlTiming}</p>
+ )}
  {weed.actImmediately && (
  <p className="text-sm text-destructive mt-1">Act Immediately: {weed.actReason}</p>
  )}
  </div>
+ )}
 
+ {weed.lookAlike && (
  <div className="bg-secondary rounded-md p-3">
  <h3 className="text-sm font-semibold text-foreground mb-1">Look-Alike: {weed.lookAlike.species}</h3>
  <p className="text-sm text-muted-foreground">{weed.lookAlike.difference}</p>
  </div>
+ )}
 
+  {weed.memoryHook && (
   <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
   <h3 className="text-sm font-semibold text-primary mb-1">Memory Hook</h3>
   <p className="text-sm text-foreground">{weed.memoryHook}</p>
   </div>
+  )}
 
   {/* Image References for this species */}
   <WeedCitations weedId={weed.id} />

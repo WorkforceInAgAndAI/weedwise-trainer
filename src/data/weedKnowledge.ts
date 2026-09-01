@@ -658,3 +658,20 @@ export const WEED_TOP_MOAS: Record<string, string[]> = Object.fromEntries(
     .filter(([, moa]) => moa && moa !== 'none')
     .map(([id, moa]) => [id, [moa]]),
 );
+
+const normalizeKnowledgeKey = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const ARRIVAL_BY_NORMALIZED_KEY: Record<string, WeedArrival> = Object.fromEntries(
+  Object.entries(WEED_ARRIVAL_KNOWLEDGE).map(([k, v]) => [normalizeKnowledgeKey(k), v]),
+);
+
+/** Aliases where the weed id and the knowledge key differ beyond punctuation. */
+const ARRIVAL_ALIASES: Record<string, string> = {
+  henbit: 'henbitdeadnettle',
+};
+
+/** Look up a species' arrival story tolerant of id/key casing and punctuation. */
+export function getWeedArrival(weedId: string): WeedArrival | undefined {
+  const n = normalizeKnowledgeKey(weedId);
+  return ARRIVAL_BY_NORMALIZED_KEY[n] || ARRIVAL_BY_NORMALIZED_KEY[ARRIVAL_ALIASES[n] ?? ''];
+}

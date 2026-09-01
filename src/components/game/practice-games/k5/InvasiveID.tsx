@@ -132,19 +132,20 @@ export default function InvasiveID({ onBack }: { onBack: () => void }) {
   const correct = choice ? ((choice === 'introduced') === isInvasive) : false;
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      <div className="flex items-center gap-3 p-4 border-b border-border">
+    <div className="fixed inset-0 bg-background z-50 flex flex-col overflow-hidden">
+      <div className="flex items-center gap-3 p-4 border-b border-border shrink-0">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">←</button>
         <h1 className="font-bold text-foreground text-lg flex-1">Introduced ID</h1>
         <span className="text-sm text-muted-foreground">R{roundIdx + 1} • {questionIdx + 1}/{rounds.length}</span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">Lv.{level}</span>
         <span className="text-sm font-bold text-primary ml-2">{roundScore} pts</span>
       </div>
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-[1fr_240px] gap-4 p-4">
+      <div className="flex-1 min-h-0 overflow-y-auto grid grid-cols-1 md:grid-cols-[1fr_240px] gap-4 p-4">
         {/* Left: bigger map + interaction */}
-        <div className="flex flex-col items-center justify-center gap-3">
-          <div className="relative w-full max-w-3xl aspect-[16/10] rounded-2xl border-2 border-border overflow-hidden">
+        <div className="flex flex-col items-center justify-start gap-3">
+          <div className="relative w-full max-w-2xl aspect-[16/10] max-h-[46vh] rounded-2xl border-2 border-border overflow-hidden">
             <img src={midwestMap} alt="U.S. Midwest map" className="absolute inset-0 w-full h-full object-cover" />
+
             {MIDWEST_STATES.map(s => {
               const isCurrentDot = r && s.name === r.state.name;
               return (
