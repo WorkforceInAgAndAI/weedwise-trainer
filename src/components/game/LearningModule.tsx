@@ -1267,7 +1267,7 @@ function ElementaryLookAlikeGroups({ onSelectWeed }: { onSelectWeed: (w: Weed) =
                   >
                     <WeedImage weedId={w.id} stage={groupStage} className="w-full h-full" />
                   </button>
-                  <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-xs mt-1.5 block" />
+                  <div className="text-xs mt-1.5 block font-semibold text-foreground">{w.commonName}</div>
                 </div>
               ))}
             </div>
