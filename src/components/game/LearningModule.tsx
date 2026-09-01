@@ -6124,7 +6124,7 @@ function TopicContent({
           className="shrink-0 w-[260px] sm:w-[300px] snap-start bg-card border border-border rounded-xl overflow-hidden"
         >
           <div className="px-3 py-2 border-b border-border bg-secondary/40">
-            <ClickableWeedName weed={w} onSelect={onSelectWeed} className="text-sm font-bold" />
+            <div className="text-sm font-bold text-foreground">{w.commonName}</div>
             <div className="text-[11px] text-primary italic leading-tight">{w.scientificName}</div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[10px] text-muted-foreground">{w.family}</span>
